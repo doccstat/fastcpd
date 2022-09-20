@@ -1,0 +1,85 @@
+---
+title: "my-vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{my-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(cpd)
+```
+
+```{r}
+library(fastglm)
+# library(fossil)
+library(abind)
+
+# A simulation study
+
+# set.seed(100)
+# n <- 1000
+# p <- 1
+# tau <- c(0.3, 0.6, 1)
+# mu <- matrix(c(-1, rnorm(p - 1, 0.5, 0.1)), p, n)
+# K <- length(tau)
+# for (i in 1:(K - 1))
+# {
+#   st <- floor(n * tau[i] + 1)
+#   en <- floor(n * tau[i + 1])
+#   mu[, st:en] <- c((-1)^(i + 1), rnorm(p - 1, 0.5, 0.1))
+# }
+# g_tr <- rep(1:K, diff(c(0, tau * n)))
+
+# # The choice of beta = (p+1)*log leads to the BIC
+
+# beta <- (p + 1) * log(n) / 2
+
+# reptim <- 10
+# rand_gd <- rand_va <- rep(NA, reptim)
+# for (i in 1:reptim) {
+#   X <- matrix(rnorm(n * (p - 1), 0), n, p - 1)
+#   X <- cbind(1, X)
+#   eta <- apply(t(mu) * X, 1, sum)
+#   prob <- 1 / (1 + exp(-eta))
+#   Y <- rbinom(n, size = 1, prob = prob)
+#   data <- cbind(X, Y)
+
+#   # seGD
+#   cp_set <- CP(data, beta)$cp
+#   cp_gd <- cp_set[!(cp_set == 0)]
+#   K_est <- length(cp_gd) + 1
+#   cp_un <- unique(c(0, cp_gd, n))
+#   g_est <- rep(1:K_est, diff(cp_un))
+#   rand_gd[i] <- rand.index(g_tr, g_est)
+
+#   # vanilla
+#   cp_set <- CP_vanilla(data, beta)$cp
+#   cp_va <- cp_set[!(cp_set == 0)]
+#   K_est <- length(cp_va) + 1
+#   cp_un <- unique(c(0, cp_va, n))
+#   g_est <- rep(1:K_est, diff(cp_un))
+#   rand_va[i] <- rand.index(g_tr, g_est)
+
+#   print(i)
+# }
+
+# c(mean(rand_gd), mean(rand_va))
+
+# n <- 1000
+# d <- 2
+# Sigma <- diag(1, d)
+# true.cp.loc <- c(200, 300, 400)
+# seg <- length(true.cp.loc) + 1
+# true.coef <- matrix(rnorm(seg * d), d, seg)
+# data_gen(n, d, true.coef, true.cp.loc, Sigma)
+
+```
