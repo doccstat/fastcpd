@@ -7,7 +7,7 @@
 #'
 #' @return TODO
 #' @export
-CP <- function(data, beta, B = 10, trim = 0.025) {
+CP <- function(data, beta, B = 10, trim = 0.025, family) {
   n <- dim(data)[1]
   p <- dim(data)[2] - 1
   Fobj <- c(-beta, 0)
@@ -21,7 +21,7 @@ CP <- function(data, beta, B = 10, trim = 0.025) {
   for (i in 1:B) {
     out <- fastglm::fastglm(as.matrix(data[index == i, 1:p]),
       data[index == i, p + 1],
-      family = "binomial"
+      family
     )
     coef.int[i, ] <- coef(out)
   }
@@ -94,7 +94,7 @@ CP <- function(data, beta, B = 10, trim = 0.025) {
     data_seg <- data[seg, ]
     out <- fastglm::fastglm(as.matrix(data_seg[, 1:p]),
       data_seg[, p + 1],
-      family = "binomial"
+      family
     )
     nLL <- out$deviance / 2 + nLL
   }
