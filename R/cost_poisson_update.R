@@ -6,6 +6,9 @@
 #' @param cum_coef TODO
 #' @param cmatrix TODO
 #' @param epsilon TODO
+#' @param G TODO
+#' @param L TODO
+#' @param H TODO
 #'
 #' @return TODO
 #' @export
@@ -18,7 +21,7 @@ cost_poisson_update <- function(data_new, coef, cum_coef, cmatrix, epsilon = 0.0
   cmatrix <- cmatrix + (X_new %o% X_new) * min(as.numeric(mu), G)
   lik_dev <- as.numeric(-(Y_new - mu)) * X_new
   coef <- coef - solve(cmatrix + epsilon * diag(1, p), lik_dev)
-  coef <- Winsorize(coef, minval = L, maxval = H)
+  coef <- DescTools::Winsorize(coef, minval = L, maxval = H)
   cum_coef <- cum_coef + coef
   return(list(coef, cum_coef, cmatrix))
 }

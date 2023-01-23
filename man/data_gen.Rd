@@ -4,7 +4,7 @@
 \alias{data_gen}
 \title{Generate data from logistic regression models with change-points}
 \usage{
-data_gen(n, d, true.coef, true.cp.loc, Sigma)
+data_gen(n, d, true.coef, true.cp.loc, Sigma, family)
 }
 \arguments{
 \item{n}{TODO}
@@ -16,6 +16,8 @@ data_gen(n, d, true.coef, true.cp.loc, Sigma)
 \item{true.cp.loc}{TODO}
 
 \item{Sigma}{TODO}
+
+\item{family}{TODO}
 }
 \value{
 TODO

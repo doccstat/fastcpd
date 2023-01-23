@@ -2,20 +2,22 @@
 % Please edit documentation in R/neg_log_lik.R
 \name{neg_log_lik}
 \alias{neg_log_lik}
-\title{Solve logistic regression using Gradient Descent Extension to the
+\title{Solve logistic/poisson regression using Gradient Descent Extension to the
 multivariate case}
 \usage{
-neg_log_lik(data, b)
+neg_log_lik(data, b, family)
 }
 \arguments{
 \item{data}{TODO}
 
 \item{b}{TODO}
+
+\item{family}{TODO}
 }
 \value{
 TODO
 }
 \description{
-Solve logistic regression using Gradient Descent Extension to the
+Solve logistic/poisson regression using Gradient Descent Extension to the
 multivariate case
 }

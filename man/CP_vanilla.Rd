@@ -4,7 +4,7 @@
 \alias{CP_vanilla}
 \title{Dynamic Programming with Pruning}
 \usage{
-CP_vanilla(data, beta, cost = cost_glm)
+CP_vanilla(data, beta, cost = cost_glm, family)
 }
 \arguments{
 \item{data}{TODO}
@@ -12,6 +12,8 @@ CP_vanilla(data, beta, cost = cost_glm)
 \item{beta}{TODO}
 
 \item{cost}{TODO}
+
+\item{family}{TODO}
 }
 \value{
 TODO

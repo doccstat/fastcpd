@@ -19,12 +19,6 @@ library(cpd)
 ```
 
 ```{r}
-library(fastglm)
-# library(fossil)
-library(abind)
-
-# A simulation study
-
 # set.seed(100)
 # n <- 1000
 # p <- 1
@@ -88,11 +82,6 @@ library(abind)
 
 
 
-
-# library(fastglm)
-# library(fossil)
-# library(abind)
-# library(DescTools)
 
 # n <- 1500
 # d <- 5

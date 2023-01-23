@@ -4,7 +4,7 @@
 \alias{CP}
 \title{Dynamic Programming with Pruning and Gradient Descent}
 \usage{
-CP(data, beta, B = 10, trim = 0.025)
+CP(data, beta, B = 10, trim = 0.025, family, ...)
 }
 \arguments{
 \item{data}{TODO}
@@ -14,6 +14,10 @@ CP(data, beta, B = 10, trim = 0.025)
 \item{B}{TODO}
 
 \item{trim}{TODO}
+
+\item{family}{TODO}
+
+\item{...}{TODO}
 }
 \value{
 TODO
