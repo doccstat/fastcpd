@@ -8,7 +8,7 @@
 #'
 #' @return TODO
 #' @export
-data_gen <- function(n, d, true.coef, true.cp.loc, Sigma) {
+data_gen <- function(n, d, true.coef, true.cp.loc, Sigma, family) {
   loc <- unique(c(0, true.cp.loc, n))
   if (dim(true.coef)[2] != length(loc) - 1) {
     stop("true.coef and true.cp.loc do not match")
@@ -16,10 +16,16 @@ data_gen <- function(n, d, true.coef, true.cp.loc, Sigma) {
   x <- mvtnorm::rmvnorm(n, mean = rep(0, d), sigma = Sigma)
   y <- NULL
   for (i in 1:(length(loc) - 1)) {
-    Xb <- x[(loc[i] + 1):loc[i + 1], , drop = FALSE] %*% true.coef[, i, drop = FALSE]
-    prob <- 1 / (1 + exp(-Xb))
-    group <- stats::rbinom(length(prob), 1, prob)
-    y <- c(y, group)
+    if (family == "binomial") {
+      Xb <- x[(loc[i] + 1):loc[i + 1], , drop = FALSE] %*% true.coef[, i, drop = FALSE]
+      prob <- 1 / (1 + exp(-Xb))
+      group <- stats::rbinom(length(prob), 1, prob)
+      y <- c(y, group)
+    } else if (family == "poisson") {
+      mu <- exp(x[(loc[i] + 1):loc[i + 1], , drop = FALSE] %*% true.coef[, i, drop = FALSE])
+      group <- rpois(length(mu), mu)
+      y <- c(y, group)
+    }
   }
   data <- cbind(x, y)
   true_cluster <- rep(1:(length(loc) - 1), diff(loc))

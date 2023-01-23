@@ -80,6 +80,46 @@ library(abind)
 # true.cp.loc <- c(200, 300, 400)
 # seg <- length(true.cp.loc) + 1
 # true.coef <- matrix(rnorm(seg * d), d, seg)
-# data_gen(n, d, true.coef, true.cp.loc, Sigma)
+# data_gen(n, d, true.coef, true.cp.loc, Sigma, "binomial")
+
+
+
+
+
+
+
+
+# library(fastglm)
+# library(fossil)
+# library(abind)
+# library(DescTools)
+
+# n <- 1500
+# d <- 5
+# rho <- 0.9
+# Sigma <- array(0, c(d, d))
+# for (i in 1:d)
+# {
+#   Sigma[i, ] <- rho^(abs(i - (1:d)))
+# }
+
+# delta <- c(5, 7, 9, 11, 13)
+# a.sq <- 1
+# delta.new <- delta * sqrt(a.sq) / sqrt(as.numeric(t(delta) %*% Sigma %*% delta))
+# true.cp.loc <- c(375, 750, 1125)
+
+# true.coef <- matrix(0, nrow = d, ncol = length(true.cp.loc) + 1)
+# true.coef[, 1] <- c(1, 1.2, -1, 0.5, -2)
+# true.coef[, 2] <- true.coef[, 1] + delta.new
+# true.coef[, 3] <- true.coef[, 1]
+# true.coef[, 4] <- true.coef[, 3] - delta.new
+
+# out <- data_gen(n, d, true.coef, true.cp.loc, Sigma, "poisson")
+# data <- out[[1]]
+# g_tr <- out[[2]]
+# beta <- log(n) * (d + 1) / 2
+# CP(data, beta, trim = 0.03, B = 10, "poisson", epsilon = 0.001, G = 10^10, L = -20, H = 20)
+
+# CP_vanilla(data, beta, family = "poisson")
 
 ```
