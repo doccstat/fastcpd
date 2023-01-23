@@ -20,7 +20,8 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
   index <- rep(1:B, rep(n / B, B))
   coef.int <- matrix(NA, B, p)
   for (i in 1:B) {
-    out <- fastglm::fastglm(as.matrix(data[index == i, 1:p]),
+    out <- fastglm::fastglm(
+      as.matrix(data[index == i, 1:p]),
       data[index == i, p + 1],
       family
     )
@@ -83,7 +84,7 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
       e_eta_t <- exp(coef_add %*% Xt)
       const <- e_eta_t
     }
-    
+
     cmatrix_add <- (Xt %o% Xt) * as.numeric(const)
 
     coef <- cbind(coef, coef_add)
@@ -120,7 +121,8 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
     {
       seg <- (cp_loc[i] + 1):cp_loc[i + 1]
       data_seg <- data[seg, ]
-      out <- fastglm::fastglm(as.matrix(data_seg[, 1:p]),
+      out <- fastglm::fastglm(
+        as.matrix(data_seg[, 1:p]),
         data_seg[, p + 1],
         family
       )
@@ -156,6 +158,6 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
     output <- list(cp)
     names(output) <- c("cp")
   }
-  
+
   return(output)
 }
