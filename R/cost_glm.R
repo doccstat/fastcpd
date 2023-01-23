@@ -5,11 +5,9 @@
 #'
 #' @return TODO
 #' @export
-cost_glm <- function(data, family = "binomial") {
+cost_glm <- function(data, family) {
   data <- as.matrix(data)
   p <- dim(data)[2] - 1
-  x <- as.matrix(data[, 1:p])
-  y <- data[, p + 1]
-  out <- fastglm::fastglm(x = x, y = y, family = family)
+  out <- fastglm::fastglm(as.matrix(data[, seq_len(p)]), data[, p + 1], family)
   return(out$deviance / 2)
 }
