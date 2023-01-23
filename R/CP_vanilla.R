@@ -6,7 +6,7 @@
 #'
 #' @return TODO
 #' @export
-CP_vanilla <- function(data, beta, cost = cost_glm) {
+CP_vanilla <- function(data, beta, cost = cost_glm, family) {
   n <- dim(data)[1]
   p <- dim(data)[2] - 1
   Fobj <- c(-beta, 0)
@@ -36,7 +36,7 @@ CP_vanilla <- function(data, beta, cost = cost_glm) {
     seg <- (cp_loc[i] + 1):cp_loc[i + 1]
     data_seg <- data[seg, ]
     x <- as.matrix(data_seg[, 1:p])
-    out <- fastglm::fastglm(x = x, y = data_seg[, p + 1], family = "binomial")
+    out <- fastglm::fastglm(x, data_seg[, p + 1], family)
     nLL <- out$deviance / 2 + nLL
   }
 
