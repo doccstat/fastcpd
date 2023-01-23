@@ -5,6 +5,7 @@
 #' @param true.coef TODO
 #' @param true.cp.loc TODO
 #' @param Sigma TODO
+#' @param family TODO
 #'
 #' @return TODO
 #' @export
@@ -23,7 +24,7 @@ data_gen <- function(n, d, true.coef, true.cp.loc, Sigma, family) {
       y <- c(y, group)
     } else if (family == "poisson") {
       mu <- exp(x[(loc[i] + 1):loc[i + 1], , drop = FALSE] %*% true.coef[, i, drop = FALSE])
-      group <- rpois(length(mu), mu)
+      group <- stats::rpois(length(mu), mu)
       y <- c(y, group)
     }
   }

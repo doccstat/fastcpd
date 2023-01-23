@@ -3,6 +3,7 @@
 #' @param data TODO
 #' @param beta TODO
 #' @param cost TODO
+#' @param family TODO
 #'
 #' @return TODO
 #' @export

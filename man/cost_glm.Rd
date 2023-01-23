@@ -4,7 +4,7 @@
 \alias{cost_glm}
 \title{Logistic regression.}
 \usage{
-cost_glm(data, family = "binomial")
+cost_glm(data, family)
 }
 \arguments{
 \item{data}{TODO}

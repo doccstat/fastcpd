@@ -9,7 +9,7 @@ Description: Change-Point Detection Based on Dynamic Programming with Pruning
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports: stats, mvtnorm, fastglm, abind
+Imports: stats, mvtnorm, fastglm, abind, DescTools
 RoxygenNote: 7.2.1
 Suggests: 
     knitr,

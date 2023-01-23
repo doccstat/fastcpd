@@ -4,6 +4,8 @@
 #' @param beta TODO
 #' @param B TODO
 #' @param trim TODO
+#' @param family TODO
+#' @param ... TODO
 #'
 #' @return TODO
 #' @export
@@ -33,7 +35,7 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
     e_eta <- exp(coef %*% X1)
     const <- e_eta / (1 + e_eta)^2
   } else if (family == "poisson") {
-    cum_coef <- coef <- Winsorize(matrix(coef.int[1, ], p, 1), minval = args_list$L, maxval = args_list$H)
+    cum_coef <- coef <- DescTools::Winsorize(matrix(coef.int[1, ], p, 1), minval = args_list$L, maxval = args_list$H)
     e_eta <- exp(coef %*% X1)
     const <- e_eta
   }
@@ -63,7 +65,7 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
         cum_coef[, i] <- out[[2]]
         cmatrix[, , i] <- out[[3]]
         k <- set[i] + 1
-        cum_coef_win <- Winsorize(cum_coef[, i] / (t - k + 1), minval = args_list$L, maxval = args_list$H)
+        cum_coef_win <- DescTools::Winsorize(cum_coef[, i] / (t - k + 1), minval = args_list$L, maxval = args_list$H)
         cval[i] <- 0
         if (t - k >= p - 1) {
           cval[i] <- neg_log_lik(data[k:t, ], cum_coef_win, family = family)
@@ -80,7 +82,7 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
       e_eta_t <- exp(coef_add %*% Xt)
       const <- e_eta_t / (1 + e_eta_t)^2
     } else if (family == "poisson") {
-      cum_coef_add <- coef_add <- Winsorize(coef.int[index[t], ], minval = L, maxval = H) ####
+      cum_coef_add <- coef_add <- DescTools::Winsorize(coef.int[index[t], ], minval = args_list$L, maxval = args_list$H) ####
       e_eta_t <- exp(coef_add %*% Xt)
       const <- e_eta_t
     }
