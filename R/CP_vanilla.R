@@ -18,7 +18,10 @@ CP_vanilla <- function(data, beta, cost = cost_glm, family) {
     cval <- rep(NA, m)
     for (i in 1:m) {
       k <- set[i] + 1
-      cval[i] <- if (t - k >= p - 1) suppressWarnings(cost(data[k:t, ])) else 0
+      cval[i] <- 0
+      if (t - k >= p - 1) {
+        cval[i] <- suppressWarnings(cost(data[k:t, ], family = family))
+      }
     }
     obj <- cval + Fobj[set + 1] + beta
     min_val <- min(obj)

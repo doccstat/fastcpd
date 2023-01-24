@@ -135,7 +135,7 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
     names(output) <- c("cp", "nLL")
   } else if (family == "poisson") {
     if (length(cp) > 0) {
-      ind3 <- (1:length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
+      ind3 <- seq_len(length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
       if (length(ind3) > 0) cp <- cp[-ind3]
     }
 
