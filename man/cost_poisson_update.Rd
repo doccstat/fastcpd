@@ -6,7 +6,7 @@
 multivariate case}
 \usage{
 cost_poisson_update(
-  data_new,
+  data,
   coef,
   cum_coef,
   cmatrix,
@@ -17,7 +17,7 @@ cost_poisson_update(
 )
 }
 \arguments{
-\item{data_new}{TODO}
+\item{data}{TODO}
 
 \item{coef}{TODO}
 

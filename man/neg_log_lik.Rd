@@ -5,7 +5,7 @@
 \title{Solve logistic/poisson regression using Gradient Descent Extension to the
 multivariate case}
 \usage{
-neg_log_lik(data, b, family)
+neg_log_lik(data, b, family, lambda = NULL)
 }
 \arguments{
 \item{data}{TODO}
@@ -13,6 +13,8 @@ neg_log_lik(data, b, family)
 \item{b}{TODO}
 
 \item{family}{TODO}
+
+\item{lambda}{TODO}
 }
 \value{
 TODO
