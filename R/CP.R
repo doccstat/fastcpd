@@ -22,24 +22,44 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
   index <- rep(1:B, rep(n / B, B))
   coef.int <- matrix(NA, B, p)
   for (i in 1:B) {
-    out <- fastglm::fastglm(
-      as.matrix(data[index == i, 1:p]),
-      data[index == i, p + 1],
-      family
-    )
-    coef.int[i, ] <- coef(out)
+    if (family %in% c("binomial", "poisson")) {
+      out <- fastglm::fastglm(
+        as.matrix(data[index == i, 1:p]),
+        data[index == i, p + 1],
+        family
+      )
+      coef.int[i, ] <- coef(out)
+    } else if (family == "gaussian") {
+      cvfit <- glmnet::cv.glmnet(as.matrix(data[index == i, 1:p]), data[index == i, p + 1], family = family)
+      coef.int[i, ] <- coef(cvfit, s = "lambda.1se")[-1]
+      resi <- data[index == i, p + 1] - as.matrix(data[index == i, 1:p]) %*% as.numeric(coef.int[i, ])
+      err_sd[i] <- sqrt(mean(resi^2))
+      act_num[i] <- sum(abs(coef.int[i, ]) > 0)
+    }
+  }
+  if (family == "gaussian") {
+    err_sd_mean <- mean(err_sd) # only works if error sd is unchanged.
+    act_num_mean <- mean(act_num)
+    beta <- (act_num_mean + 1) * beta # seems to work but there might be better choices
   }
   X1 <- data[1, 1:p]
   if (family == "binomial") {
     cum_coef <- coef <- matrix(coef.int[1, ], p, 1)
     e_eta <- exp(coef %*% X1)
     const <- e_eta / (1 + e_eta)^2
+    cmatrix <- array((X1 %o% X1) * as.numeric(const), c(p, p, 1))
   } else if (family == "poisson") {
     cum_coef <- coef <- DescTools::Winsorize(matrix(coef.int[1, ], p, 1), minval = args_list$L, maxval = args_list$H)
     e_eta <- exp(coef %*% X1)
     const <- e_eta
+    cmatrix <- array((X1 %o% X1) * as.numeric(const), c(p, p, 1))
+  } else if (family == "gaussian") {
+    cum_coef <- coef <- matrix(coef.int[1, ], p, 1)
+    eta <- coef %*% X1
+    # c_int <- diag(1/epsilon,p) - X1%o%X1/epsilon^2/(1+sum(X1^2)/epsilon)
+    # cmatrix_inv <- array(c_int, c(p,p,1))
+    cmatrix <- array(X1 %o% X1 + args_list$epsilon * diag(1, p), c(p, p, 1))
   }
-  cmatrix <- array((X1 %o% X1) * as.numeric(const), c(p, p, 1))
 
   for (t in 2:n) {
     m <- length(set)
@@ -70,6 +90,14 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
         if (t - k >= p - 1) {
           cval[i] <- neg_log_lik(data[k:t, ], cum_coef_win, family = family)
         }
+      } else if (family == "gaussian") {
+        k <- set[i] + 1
+        out <- cost_lasso_update(data[t, ], coef_c, cum_coef_c, cmatrix_c, lambda = err_sd_mean * sqrt(2 * log(p) / (t - k + 1)))
+        coef[, i] <- out[[1]]
+        cum_coef[, i] <- out[[2]]
+        # cmatrix_inv[,,i] <- out[[3]]
+        cmatrix[, , i] <- out[[3]]
+        if (t - k >= 2) cval[i] <- neg_log_lik(data[k:t, ], cum_coef[, i] / (t - k + 1), family = "gaussian", lambda = err_sd_mean * sqrt(2 * log(p) / (t - k + 1))) else cval[i] <- 0
       }
     }
 
@@ -81,13 +109,16 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
       cum_coef_add <- coef_add <- coef.int[index[t], ]
       e_eta_t <- exp(coef_add %*% Xt)
       const <- e_eta_t / (1 + e_eta_t)^2
+      cmatrix_add <- (Xt %o% Xt) * as.numeric(const)
     } else if (family == "poisson") {
       cum_coef_add <- coef_add <- DescTools::Winsorize(coef.int[index[t], ], minval = args_list$L, maxval = args_list$H) ####
       e_eta_t <- exp(coef_add %*% Xt)
       const <- e_eta_t
+      cmatrix_add <- (Xt %o% Xt) * as.numeric(const)
+    } else if (family == "gaussian") {
+      cum_coef_add <- coef_add <- coef.int[index[t], ]
+      cmatrix_add <- Xt %o% Xt + args_list$epsilon * diag(1, p)
     }
-
-    cmatrix_add <- (Xt %o% Xt) * as.numeric(const)
 
     coef <- cbind(coef, coef_add)
     cum_coef <- cbind(cum_coef, cum_coef_add)
@@ -156,6 +187,29 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
 
     # output <- list(cp, nLL)
     # names(output) <- c("cp", "nLL")
+
+    output <- list(cp)
+    names(output) <- c("cp")
+  } else if (family == "gaussian") {
+    if (length(cp) > 0) {
+      ind3 <- (1:length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
+      if (length(ind3) > 0) cp <- cp[-ind3]
+    }
+
+    cp <- sort(unique(c(0, cp)))
+    index <- which((diff(cp) < trim * n) == TRUE)
+    if (length(index) > 0) cp <- floor((cp[-(index + 1)] + cp[-index]) / 2)
+    cp <- cp[cp > 0]
+
+    # nLL <- 0
+    # cp_loc <- unique(c(0,cp,n))
+    # for(i in 1:(length(cp_loc)-1))
+    # {
+    #  seg <- (cp_loc[i]+1):cp_loc[i+1]
+    #  data_seg <- data[seg,]
+    #  out <- fastglm(as.matrix(data_seg[, 1:p]), data_seg[, p+1], family="binomial")
+    #  nLL <- out$deviance/2 + nLL
+    # }
 
     output <- list(cp)
     names(output) <- c("cp")
