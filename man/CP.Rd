@@ -4,14 +4,22 @@
 \alias{CP}
 \title{Dynamic Programming with Pruning and Gradient Descent}
 \usage{
-CP(data, beta, B = 10, trim = 0.025, family, ...)
+CP(
+  data,
+  beta,
+  segment_count = 10,
+  trim = 0.025,
+  momentum_coef = 0,
+  family,
+  ...
+)
 }
 \arguments{
 \item{data}{TODO}
 
 \item{beta}{TODO}
 
-\item{B}{TODO}
+\item{segment_count}{TODO}
 
 \item{trim}{TODO}
 

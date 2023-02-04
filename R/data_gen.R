@@ -30,7 +30,7 @@ data_gen <- function(n, d, true.coef, true.cp.loc, Sigma, family, evar = NULL) {
     }
     y <- c(y, y_new)
   }
-  data <- cbind(x, y)
+  data <- cbind(y, x)
   true_cluster <- rep(1:(length(loc) - 1), diff(loc))
   result <- list(data, true_cluster)
   return(result)

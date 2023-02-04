@@ -9,9 +9,8 @@
 #' @return TODO
 #' @export
 neg_log_lik <- function(data, b, family, lambda = NULL) {
-  p <- dim(data)[2] - 1
-  x <- data[, 1:p, drop = FALSE]
-  y <- data[, p + 1, drop = FALSE]
+  x <- data[, -1, drop = FALSE]
+  y <- data[, 1, drop = FALSE]
   xb <- x %*% b
   if (family == "binomial") {
     u <- as.numeric(xb)
