@@ -28,6 +28,12 @@ cost_update(
 
 \item{hessian}{TODO}
 
+\item{tau}{TODO}
+
+\item{i}{TODO}
+
+\item{k}{TODO}
+
 \item{family}{TODO}
 
 \item{momentum}{TODO}

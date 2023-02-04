@@ -10,6 +10,7 @@ CP(
   segment_count = 10,
   trim = 0.025,
   momentum_coef = 0,
+  sgd_k = 3,
   family,
   ...
 )
@@ -24,6 +25,8 @@ CP(
 \item{trim}{TODO}
 
 \item{momentum_coef}{TODO}
+
+\item{sgd_k}{TODO}
 
 \item{family}{TODO}
 

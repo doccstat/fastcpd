@@ -43,3 +43,4 @@ cpd.Rproj
 src/*.o
 src/*.so
 inst/doc
+vignettes/*.aux

@@ -29,7 +29,7 @@ for (i in 1:reptim) {
   data <- cbind(Y, X)
 
   # seGD
-  cp_set <- CP(data, beta, family = "binomial")$cp
+  cp_set <- CP(data, beta, sgd_k = 1, family = "binomial")$cp
   cp_gd <- cp_set[!(cp_set == 0)]
   K_est <- length(cp_gd) + 1
   cp_un <- unique(c(0, cp_gd, n))
