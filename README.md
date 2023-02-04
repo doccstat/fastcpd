@@ -1,9 +1,9 @@
 ```r
 library(cpd)
 set.seed(100)
-n <- 1000
-p <- 3
-tau <- c(0.3, 0.85, 1)
+n <- 300
+p <- 8
+tau <- c(0.45, 1)
 mu <- matrix(c(-1, rnorm(p - 1, 0.5, 0.1)), p, n)
 K <- length(tau)
 for (i in 1:(K - 1))
