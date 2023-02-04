@@ -19,7 +19,7 @@ CP_vanilla <- function(data, beta, family, ...) {
     for (i in 1:B) {
       cvfit <- glmnet::cv.glmnet(as.matrix(data[index == i, -1]), data[index == i, 1], family = family)
       coef <- coef(cvfit, s = "lambda.1se")[-1]
-      resi <- data[index == i, 11] - as.matrix(data[index == i, -1]) %*% as.numeric(coef)
+      resi <- data[index == i, 1] - as.matrix(data[index == i, -1]) %*% as.numeric(coef)
       err_sd[i] <- sqrt(mean(resi^2))
       act_num[i] <- sum(abs(coef) > 0)
     }
@@ -61,7 +61,7 @@ CP_vanilla <- function(data, beta, family, ...) {
       seg <- (cp_loc[i] + 1):cp_loc[i + 1]
       data_seg <- data[seg, ]
       x <- as.matrix(data_seg[, -1])
-      out <- fastglm::fastglm(x, data_seg[, p + 1], family)
+      out <- fastglm::fastglm(x, data_seg[, 1], family)
       nLL <- out$deviance / 2 + nLL
     }
 

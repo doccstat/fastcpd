@@ -4,13 +4,21 @@
 #' @param beta TODO
 #' @param segment_count TODO
 #' @param trim TODO
+#' @param momentum_coef TODO
 #' @param family TODO
 #' @param ... TODO
 #'
 #' @return TODO
 #' @export
 CP <- function(
-  data, beta, segment_count = 10, trim = 0.025, momentum_coef = 0, family, ...
+  data,
+  beta,
+  segment_count = 10,
+  trim = 0.025,
+  momentum_coef = 0,
+  sgd_k = 3,
+  family,
+  ...
 ) {
   args_list <- list(...)
   n <- nrow(data)
@@ -100,10 +108,13 @@ CP <- function(
         args_list$lambda <- err_sd_mean * sqrt(2 * log(p) / (t - tau))
       }
 
-      cost_update_result <- cost_update(data = data[t, ],
-                                        theta_hat = theta_hat[, i],
-                                        theta_sum = theta_sum[, i],
-                                        hessian = hessian[, , i],
+      cost_update_result <- cost_update(data = data[seq_len(t), , drop = FALSE],
+                                        theta_hat = theta_hat,
+                                        theta_sum = theta_sum,
+                                        hessian = hessian,
+                                        tau = tau,
+                                        i = i,
+                                        k = sgd_k,
                                         family = family,
                                         momentum = momentum,
                                         momentum_coef = momentum_coef,

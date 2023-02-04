@@ -23,6 +23,8 @@ CP(
 
 \item{trim}{TODO}
 
+\item{momentum_coef}{TODO}
+
 \item{family}{TODO}
 
 \item{...}{TODO}
