@@ -2,8 +2,7 @@
 
 export(CP)
 export(CP_vanilla)
-export(cost_glm)
-export(cost_lasso)
+export(cost)
 export(cost_lasso_update)
 export(cost_logistic_update)
 export(cost_poisson_update)

@@ -12,7 +12,14 @@
 #'
 #' @return TODO
 #' @export
-cost_poisson_update <- function(data, coef, cum_coef, cmatrix, epsilon = 0.001, G = 10^10, L = -20, H = 20) {
+cost_poisson_update <- function(data,
+                                coef,
+                                cum_coef,
+                                cmatrix,
+                                epsilon = 0.001,
+                                G = 10^10,
+                                L = -20,
+                                H = 20) {
   p <- length(data) - 1
   x <- data[1:p]
   y <- data[p + 1]
