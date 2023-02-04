@@ -2,8 +2,8 @@
 library(cpd)
 set.seed(100)
 n <- 1000
-p <- 1
-tau <- c(0.3, 0.6, 1)
+p <- 3
+tau <- c(0.3, 0.85, 1)
 mu <- matrix(c(-1, rnorm(p - 1, 0.5, 0.1)), p, n)
 K <- length(tau)
 for (i in 1:(K - 1))
@@ -26,7 +26,7 @@ for (i in 1:reptim) {
   eta <- apply(t(mu) * X, 1, sum)
   prob <- 1 / (1 + exp(-eta))
   Y <- rbinom(n, size = 1, prob = prob)
-  data <- cbind(X, Y)
+  data <- cbind(Y, X)
 
   # seGD
   cp_set <- CP(data, beta, family = "binomial")$cp

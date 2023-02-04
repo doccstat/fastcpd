@@ -9,17 +9,17 @@
 #' @export
 CP_vanilla <- function(data, beta, family, ...) {
   args_list <- list(...)
-  n <- dim(data)[1]
-  p <- dim(data)[2] - 1
+  n <- nrow(data)
+  p <- ncol(data) - 1
 
   if (family == "gaussian") {
     B <- args_list$B
     index <- rep(1:B, rep(n / B, B))
     err_sd <- act_num <- rep(NA, B)
     for (i in 1:B) {
-      cvfit <- glmnet::cv.glmnet(as.matrix(data[index == i, 1:p]), data[index == i, p + 1], family = family)
+      cvfit <- glmnet::cv.glmnet(as.matrix(data[index == i, -1]), data[index == i, 1], family = family)
       coef <- coef(cvfit, s = "lambda.1se")[-1]
-      resi <- data[index == i, p + 1] - as.matrix(data[index == i, 1:p]) %*% as.numeric(coef)
+      resi <- data[index == i, 11] - as.matrix(data[index == i, -1]) %*% as.numeric(coef)
       err_sd[i] <- sqrt(mean(resi^2))
       act_num[i] <- sum(abs(coef) > 0)
     }
@@ -60,7 +60,7 @@ CP_vanilla <- function(data, beta, family, ...) {
     for (i in 1:(length(cp_loc) - 1)) {
       seg <- (cp_loc[i] + 1):cp_loc[i + 1]
       data_seg <- data[seg, ]
-      x <- as.matrix(data_seg[, 1:p])
+      x <- as.matrix(data_seg[, -1])
       out <- fastglm::fastglm(x, data_seg[, p + 1], family)
       nLL <- out$deviance / 2 + nLL
     }
