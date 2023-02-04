@@ -5,6 +5,7 @@
 #' @param segment_count TODO
 #' @param trim TODO
 #' @param momentum_coef TODO
+#' @param sgd_k TODO
 #' @param family TODO
 #' @param ... TODO
 #'
@@ -42,7 +43,7 @@ CP <- function(
         y = data[segment_indices == segment_index, 1],
         family = family
       )
-      segment_theta_hat[segment_index, ] <- coef(cvfit, s = "lambda.1se")[-1]
+      segment_theta_hat[segment_index, ] <- stats::coef(cvfit, s = "lambda.1se")[-1]
       resi <- data[segment_indices == segment_index, 1] - as.matrix(data[segment_indices == segment_index, -1]) %*% as.numeric(segment_theta_hat[segment_index, ])
       err_sd[segment_index] <- sqrt(mean(resi^2))
       act_num[segment_index] <- sum(abs(segment_theta_hat[segment_index, ]) > 0)

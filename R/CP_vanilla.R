@@ -18,7 +18,7 @@ CP_vanilla <- function(data, beta, family, ...) {
     err_sd <- act_num <- rep(NA, B)
     for (i in 1:B) {
       cvfit <- glmnet::cv.glmnet(as.matrix(data[index == i, -1]), data[index == i, 1], family = family)
-      coef <- coef(cvfit, s = "lambda.1se")[-1]
+      coef <- stats::coef(cvfit, s = "lambda.1se")[-1]
       resi <- data[index == i, 1] - as.matrix(data[index == i, -1]) %*% as.numeric(coef)
       err_sd[i] <- sqrt(mean(resi^2))
       act_num[i] <- sum(abs(coef) > 0)
