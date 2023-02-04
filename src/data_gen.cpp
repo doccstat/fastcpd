@@ -1,15 +1,17 @@
-#' Generate data from logistic regression models with change-points
-#'
-#' @param n TODO
-#' @param d TODO
-#' @param true.coef TODO
-#' @param true.cp.loc TODO
-#' @param Sigma TODO
-#' @param family TODO
-#' @param evar TODO
-#'
-#' @return TODO
-#' @export
+// -*- mode: C++; c-indent-level: 4; c-basic-offset: 4; indent-tabs-mode: nil; -*-
+
+// we only include RcppArmadillo.h which pulls Rcpp.h in for us
+#include "RcppArmadillo.h"
+
+// [[Rcpp::export]]
+arma::mat data_gen(int n, int d, arma::mat true_coef, arma::vec true_cp_loc, arma::mat Sigma, std::string family, double evar = 0.0) {
+    arma::vec loc = arma::unique(arma::join_cols(arma::join_cols(arma::zeros<arma::vec>(1), true_cp_loc), arma::zeros<arma::vec>(1) + n));
+    arma::mat m1 = arma::eye<arma::mat>(3, 3);
+    arma::mat m2 = arma::eye<arma::mat>(3, 3);
+	                     
+    return m1 + 3 * (m1 + m2);
+}
+
 data_gen <- function(n, d, true.coef, true.cp.loc, Sigma, family, evar = NULL) {
   loc <- unique(c(0, true.cp.loc, n))
   if (dim(true.coef)[2] != length(loc) - 1) {

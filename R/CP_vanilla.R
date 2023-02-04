@@ -9,19 +9,11 @@
 #' @export
 CP_vanilla <- function(data, beta, family, ...) {
   args_list <- list(...)
-  cost <- NULL
-  if (family %in% c("binomial", "poisson")) {
-    cost <- cost_glm
-  } else if (family == "gaussian") {
-    cost <- cost_lasso
-    B <- args_list$B
-  } else {
-    stop("family must be one of 'binomial', 'poisson', or 'gaussian'")
-  }
   n <- dim(data)[1]
   p <- dim(data)[2] - 1
 
   if (family == "gaussian") {
+    B <- args_list$B
     index <- rep(1:B, rep(n / B, B))
     err_sd <- act_num <- rep(NA, B)
     for (i in 1:B) {
@@ -48,7 +40,7 @@ CP_vanilla <- function(data, beta, family, ...) {
       if (family %in% c("binomial", "poisson") && t - k >= p - 1) {
         cval[i] <- suppressWarnings(cost(data[k:t, ], family = family))
       } else if (family == "gaussian" && t - k >= 1) {
-        cval[i] <- suppressWarnings(cost(data[k:t, ], lambda = err_sd_mean * sqrt(2 * log(p) / (t - k + 1))))
+        cval[i] <- suppressWarnings(cost(data[k:t, ], family = family, lambda = err_sd_mean * sqrt(2 * log(p) / (t - k + 1))))
       }
     }
     obj <- cval + f_obj[set + 1] + beta

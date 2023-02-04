@@ -2,141 +2,142 @@
 #'
 #' @param data TODO
 #' @param beta TODO
-#' @param B TODO
+#' @param segment_count TODO
 #' @param trim TODO
 #' @param family TODO
 #' @param ... TODO
 #'
 #' @return TODO
 #' @export
-CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
+CP <- function(data, beta, segment_count = 10, trim = 0.025, family, ...) {
   args_list <- list(...)
   n <- dim(data)[1]
   p <- dim(data)[2] - 1
-  Fobj <- c(-beta, 0)
-  cp_set <- list(NULL, 0)
-  set <- c(0, 1)
 
   # choose the initial values based on pre-segmentation
 
-  index <- rep(1:B, rep(n / B, B))
-  coef.int <- matrix(NA, B, p)
-  for (i in 1:B) {
+  index <- rep(1:segment_count, rep(n / segment_count, segment_count))
+  theta <- matrix(NA, segment_count, p)
+  for (segment_index in 1:segment_count) {
     if (family %in% c("binomial", "poisson")) {
-      out <- fastglm::fastglm(
-        as.matrix(data[index == i, 1:p]),
-        data[index == i, p + 1],
+      theta[segment_index, ] <- fastglm::fastglm(
+        data[index == segment_index, 1:p, drop = FALSE],
+        data[index == segment_index, p + 1],
         family
-      )
-      coef.int[i, ] <- coef(out)
+      )$coefficients
     } else if (family == "gaussian") {
-      cvfit <- glmnet::cv.glmnet(as.matrix(data[index == i, 1:p]), data[index == i, p + 1], family = family)
-      coef.int[i, ] <- coef(cvfit, s = "lambda.1se")[-1]
-      resi <- data[index == i, p + 1] - as.matrix(data[index == i, 1:p]) %*% as.numeric(coef.int[i, ])
-      err_sd[i] <- sqrt(mean(resi^2))
-      act_num[i] <- sum(abs(coef.int[i, ]) > 0)
+      cvfit <- glmnet::cv.glmnet(as.matrix(data[index == segment_index, 1:p]), data[index == segment_index, p + 1], family = family)
+      theta[segment_index, ] <- theta_hat(cvfit, s = "lambda.1se")[-1]
+      resi <- data[index == segment_index, p + 1] - as.matrix(data[index == segment_index, 1:p]) %*% as.numeric(theta[segment_index, ])
+      err_sd[segment_index] <- sqrt(mean(resi^2))
+      act_num[segment_index] <- sum(abs(theta[segment_index, ]) > 0)
     }
   }
+
   if (family == "gaussian") {
     err_sd_mean <- mean(err_sd) # only works if error sd is unchanged.
     act_num_mean <- mean(act_num)
     beta <- (act_num_mean + 1) * beta # seems to work but there might be better choices
   }
-  X1 <- data[1, 1:p]
+
+  # t = 1
   if (family == "binomial") {
-    cum_coef <- coef <- matrix(coef.int[1, ], p, 1)
-    e_eta <- exp(coef %*% X1)
-    const <- e_eta / (1 + e_eta)^2
-    cmatrix <- array((X1 %o% X1) * as.numeric(const), c(p, p, 1))
+    theta_sum <- theta_hat <- matrix(theta[1, ], p, 1)
+    p <- 1 / (1 + exp(-theta_hat %*% data[1, 1:p]))
+    hessian <- array((data[1, 1:p] %o% data[1, 1:p]) * as.numeric(p * (1 - p)), c(p, p, 1))
   } else if (family == "poisson") {
-    cum_coef <- coef <- DescTools::Winsorize(matrix(coef.int[1, ], p, 1), minval = args_list$L, maxval = args_list$H)
-    e_eta <- exp(coef %*% X1)
+    theta_sum <- theta_hat <- DescTools::Winsorize(matrix(theta[1, ], p, 1), minval = args_list$L, maxval = args_list$H)
+    e_eta <- exp(theta_hat %*% data[1, 1:p])
     const <- e_eta
-    cmatrix <- array((X1 %o% X1) * as.numeric(const), c(p, p, 1))
+    hessian <- array((data[1, 1:p] %o% data[1, 1:p]) * as.numeric(const), c(p, p, 1))
   } else if (family == "gaussian") {
-    cum_coef <- coef <- matrix(coef.int[1, ], p, 1)
-    eta <- coef %*% X1
-    # c_int <- diag(1/epsilon,p) - X1%o%X1/epsilon^2/(1+sum(X1^2)/epsilon)
+    theta_sum <- theta_hat <- matrix(theta[1, ], p, 1)
+    # eta <- theta_hat %*% data[1, 1:p]
+    # c_int <- diag(1/epsilon,p) - data[1, 1:p]%o%data[1, 1:p]/epsilon^2/(1+sum(data[1, 1:p]^2)/epsilon)
     # cmatrix_inv <- array(c_int, c(p,p,1))
-    cmatrix <- array(X1 %o% X1 + args_list$epsilon * diag(1, p), c(p, p, 1))
+    hessian <- array(data[1, 1:p] %o% data[1, 1:p] + args_list$epsilon * diag(1, p), c(p, p, 1))
   }
 
-  for (t in 2:n) {
-    m <- length(set)
-    cval <- rep(NA, m)
+  # After t = 1, the r_t_set R_t contains 0 and 1.
+  r_t_set <- c(0, 1)
+  # C(0)=NULL, C(1)={0}
+  cp_set <- append(list(NULL), rep(list(0), n))
+  # F(0)=-beta
+  f_t <- c(-beta, rep(0, n))
 
+  for (t in 2:n) {
+    m <- length(r_t_set)
+    # number of cost values is the same as number of elemnts in R_t
+    cval <- rep(0, m)
+
+    # for tau in R_t\{t-1}
     for (i in 1:(m - 1)) {
-      coef_c <- coef[, i]
-      cum_coef_c <- cum_coef[, i]
-      cmatrix_c <- cmatrix[, , i]
+      tau <- r_t_set[i]
       if (family == "binomial") {
-        out <- cost_logistic_update(data[t, ], coef_c, cum_coef_c, cmatrix_c)
-        coef[, i] <- out[[1]]
-        cum_coef[, i] <- out[[2]]
-        cmatrix[, , i] <- out[[3]]
-        k <- set[i] + 1
-        cval[i] <- 0
-        if (t - k >= p - 1) {
-          cval[i] <- neg_log_lik(data[k:t, ], cum_coef[, i] / (t - k + 1), family = family)
+        out <- cost_logistic_update(data[t, ], theta_hat[, i], theta_sum[, i], hessian[, , i])
+        theta_hat[, i] <- out[[1]]
+        theta_sum[, i] <- out[[2]]
+        hessian[, , i] <- out[[3]]
+        if (t - tau >= p) {
+          cval[i] <- neg_log_lik(data[(tau + 1):t, ], theta_sum[, i] / (t - tau), family = family)
         }
       } else if (family == "poisson") {
-        out <- cost_poisson_update(data[t, ], coef_c, cum_coef_c, cmatrix_c, epsilon = args_list$epsilon, G = args_list$G, L = args_list$L, H = args_list$H)
-        coef[, i] <- out[[1]]
-        cum_coef[, i] <- out[[2]]
-        cmatrix[, , i] <- out[[3]]
-        k <- set[i] + 1
-        cum_coef_win <- DescTools::Winsorize(cum_coef[, i] / (t - k + 1), minval = args_list$L, maxval = args_list$H)
-        cval[i] <- 0
-        if (t - k >= p - 1) {
-          cval[i] <- neg_log_lik(data[k:t, ], cum_coef_win, family = family)
+        out <- cost_poisson_update(data[t, ], theta_hat[, i], theta_sum[, i], hessian[, , i], epsilon = args_list$epsilon, G = args_list$G, L = args_list$L, H = args_list$H)
+        theta_hat[, i] <- out[[1]]
+        theta_sum[, i] <- out[[2]]
+        hessian[, , i] <- out[[3]]
+        cum_coef_win <- DescTools::Winsorize(theta_sum[, i] / (t - tau), minval = args_list$L, maxval = args_list$H)
+        if (t - tau >= p) {
+          cval[i] <- neg_log_lik(data[(tau + 1):t, ], cum_coef_win, family = family)
         }
       } else if (family == "gaussian") {
-        k <- set[i] + 1
-        out <- cost_lasso_update(data[t, ], coef_c, cum_coef_c, cmatrix_c, lambda = err_sd_mean * sqrt(2 * log(p) / (t - k + 1)))
-        coef[, i] <- out[[1]]
-        cum_coef[, i] <- out[[2]]
+        out <- cost_lasso_update(data[t, ], theta_hat[, i], theta_sum[, i], hessian[, , i], lambda = err_sd_mean * sqrt(2 * log(p) / (t - tau)))
+        theta_hat[, i] <- out[[1]]
+        theta_sum[, i] <- out[[2]]
         # cmatrix_inv[,,i] <- out[[3]]
-        cmatrix[, , i] <- out[[3]]
-        if (t - k >= 2) cval[i] <- neg_log_lik(data[k:t, ], cum_coef[, i] / (t - k + 1), family = "gaussian", lambda = err_sd_mean * sqrt(2 * log(p) / (t - k + 1))) else cval[i] <- 0
+        hessian[, , i] <- out[[3]]
+        if (t - tau >= 3) {
+          cval[i] <- neg_log_lik(data[(tau + 1):t, ], theta_sum[, i] / (t - tau), family = "gaussian", lambda = err_sd_mean * sqrt(2 * log(p) / (t - tau)))
+        }
       }
     }
 
     # the choice of initial values requires further investigation
 
-    cval[m] <- 0
-    Xt <- data[t, 1:p]
+    new_data <- data[t, 1:p]
     if (family == "binomial") {
-      cum_coef_add <- coef_add <- coef.int[index[t], ]
-      e_eta_t <- exp(coef_add %*% Xt)
-      const <- e_eta_t / (1 + e_eta_t)^2
-      cmatrix_add <- (Xt %o% Xt) * as.numeric(const)
+      cum_coef_add <- coef_add <- theta[index[t], ]
+      p <- 1 / (1 + exp(-coef_add %*% new_data))
+      hessian_new <- (new_data %o% new_data) * as.numeric(p * (1 - p))
     } else if (family == "poisson") {
-      cum_coef_add <- coef_add <- DescTools::Winsorize(coef.int[index[t], ], minval = args_list$L, maxval = args_list$H) ####
-      e_eta_t <- exp(coef_add %*% Xt)
-      const <- e_eta_t
-      cmatrix_add <- (Xt %o% Xt) * as.numeric(const)
+      cum_coef_add <- coef_add <- DescTools::Winsorize(theta[index[t], ], minval = args_list$L, maxval = args_list$H) ####
+      hessian_new <- (new_data %o% new_data) * as.numeric(exp(coef_add %*% new_data))
     } else if (family == "gaussian") {
-      cum_coef_add <- coef_add <- coef.int[index[t], ]
-      cmatrix_add <- Xt %o% Xt + args_list$epsilon * diag(1, p)
+      cum_coef_add <- coef_add <- theta[index[t], ]
+      hessian_new <- new_data %o% new_data + args_list$epsilon * diag(1, p)
     }
 
-    coef <- cbind(coef, coef_add)
-    cum_coef <- cbind(cum_coef, cum_coef_add)
-    cmatrix <- abind::abind(cmatrix, cmatrix_add, along = 3)
+    theta_hat <- cbind(theta_hat, coef_add)
+    theta_sum <- cbind(theta_sum, cum_coef_add)
+    hessian <- abind::abind(hessian, hessian_new, along = 3)
 
     # Adding a momentum term (TBD)
 
-    obj <- cval + Fobj[set + 1] + beta
+    obj <- cval + f_t[r_t_set + 1] + beta
     min_val <- min(obj)
     ind <- which(obj == min_val)[1]
-    cp_set_add <- c(cp_set[[set[ind] + 1]], set[ind])
-    cp_set <- append(cp_set, list(cp_set_add))
-    ind2 <- (cval + Fobj[set + 1]) <= min_val
-    set <- c(set[ind2], t)
-    coef <- coef[, ind2, drop = FALSE]
-    cum_coef <- cum_coef[, ind2, drop = FALSE]
-    cmatrix <- cmatrix[, , ind2, drop = FALSE]
-    Fobj <- c(Fobj, min_val)
+    tau_star <- r_t_set[ind]
+    cp_set[[t + 1]] <- c(cp_set[[tau_star + 1]], tau_star)
+
+    # Step 5
+    ind2 <- (cval + f_t[r_t_set + 1]) <= min_val
+    r_t_set <- c(r_t_set[ind2], t)
+
+    theta_hat <- theta_hat[, ind2, drop = FALSE]
+    theta_sum <- theta_sum[, ind2, drop = FALSE]
+    hessian <- hessian[, , ind2, drop = FALSE]
+    # F(t)
+    f_t[t + 1] <- min_val
   }
 
   # Remove change-points close to the boundaries
@@ -192,7 +193,7 @@ CP <- function(data, beta, B = 10, trim = 0.025, family, ...) {
     names(output) <- c("cp")
   } else if (family == "gaussian") {
     if (length(cp) > 0) {
-      ind3 <- (1:length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
+      ind3 <- seq_len(length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
       if (length(ind3) > 0) cp <- cp[-ind3]
     }
 
