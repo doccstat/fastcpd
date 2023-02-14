@@ -2,7 +2,8 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd}
 \alias{fastcpd}
-\title{Dynamic Programming with Pruning and Gradient Descent}
+\title{Sequential Gradient Descent and Quasi-Newton’s Method for Change-Point
+Analysis}
 \usage{
 fastcpd(
   data,
@@ -11,33 +12,43 @@ fastcpd(
   trim = 0.025,
   momentum_coef = 0,
   sgd_k = 3,
-  family,
+  family = NULL,
   cost = negative_log_likelihood,
+  cost_gradient = cost_update_gradient,
+  cost_hessian = cost_update_hessian,
   ...
 )
 }
 \arguments{
-\item{data}{TODO}
+\item{data}{A data frame containing the data to be segmented.}
 
-\item{beta}{TODO}
+\item{beta}{Initial cost value.}
 
-\item{segment_count}{TODO}
+\item{segment_count}{Number of segments for initial guess.}
 
-\item{trim}{TODO}
+\item{trim}{Trimming for the boundary change points.}
 
-\item{momentum_coef}{TODO}
+\item{momentum_coef}{Momentum coefficient to be applied to each update.}
 
-\item{sgd_k}{TODO}
+\item{sgd_k}{Number of epochs in SGD.}
 
-\item{family}{TODO}
+\item{family}{Family of the model. Can be "binomial", "poisson", or
+"gaussian". If not provided, the user must specify the cost function and
+its gradient (and Hessian).}
 
-\item{cost}{TODO}
+\item{cost}{Cost function to be used. If not specified, the default is
+the negative log-likelihood for the corresponding family.}
 
-\item{...}{TODO}
+\item{cost_gradient}{Gradient for custom cost function.}
+
+\item{cost_hessian}{Hessian for custom cost function.}
+
+\item{...}{List of arguments to be passed to the model.}
 }
 \value{
-TODO
+Change points and corresponding cost values.
 }
 \description{
-Dynamic Programming with Pruning and Gradient Descent
+Sequential Gradient Descent and Quasi-Newton’s Method for Change-Point
+Analysis
 }

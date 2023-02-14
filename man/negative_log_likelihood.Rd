@@ -5,19 +5,21 @@
 \title{Solve logistic/poisson regression using Gradient Descent Extension to the
 multivariate case}
 \usage{
-negative_log_likelihood(data, b, family, lambda = NULL)
+negative_log_likelihood(data, theta, family, lambda = NULL)
 }
 \arguments{
-\item{data}{TODO}
+\item{data}{A data frame containing the data to be segmented.}
 
-\item{b}{TODO}
+\item{theta}{Estimate of the parameters. If null, the function will estimate
+the parameters.}
 
-\item{family}{TODO}
+\item{family}{Family of the model.}
 
 \item{lambda}{TODO}
 }
 \value{
-TODO
+Negative log likelihood of the corresponding data with the given
+  family.
 }
 \description{
 Solve logistic/poisson regression using Gradient Descent Extension to the
