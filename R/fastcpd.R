@@ -7,20 +7,24 @@
 #' @param momentum_coef TODO
 #' @param sgd_k TODO
 #' @param family TODO
+#' @param cost TODO
 #' @param ... TODO
 #'
 #' @return TODO
 #' @export
-CP <- function(
-  data,
-  beta,
-  segment_count = 10,
-  trim = 0.025,
-  momentum_coef = 0,
-  sgd_k = 3,
-  family,
-  ...
-) {
+fastcpd <- function(
+    data,
+    beta,
+    segment_count = 10,
+    trim = 0.025,
+    momentum_coef = 0,
+    sgd_k = 3,
+    family,
+    cost = NULL,
+    ...) {
+  if (is.null(cost)) {
+    cost <- negative_log_likelihood
+  }
   args_list <- list(...)
   n <- nrow(data)
   p <- ncol(data) - 1
@@ -109,17 +113,19 @@ CP <- function(
         args_list$lambda <- err_sd_mean * sqrt(2 * log(p) / (t - tau))
       }
 
-      cost_update_result <- cost_update(data = data[seq_len(t), , drop = FALSE],
-                                        theta_hat = theta_hat,
-                                        theta_sum = theta_sum,
-                                        hessian = hessian,
-                                        tau = tau,
-                                        i = i,
-                                        k = sgd_k,
-                                        family = family,
-                                        momentum = momentum,
-                                        momentum_coef = momentum_coef,
-                                        args_list = args_list)
+      cost_update_result <- cost_update(
+        data = data[seq_len(t), , drop = FALSE],
+        theta_hat = theta_hat,
+        theta_sum = theta_sum,
+        hessian = hessian,
+        tau = tau,
+        i = i,
+        k = sgd_k,
+        family = family,
+        momentum = momentum,
+        momentum_coef = momentum_coef,
+        args_list = args_list
+      )
       theta_hat[, i] <- cost_update_result[[1]]
       theta_sum[, i] <- cost_update_result[[2]]
       hessian[, , i] <- cost_update_result[[3]]
@@ -130,11 +136,12 @@ CP <- function(
     for (i in 1:(r_t_count - 1)) {
       tau <- r_t_set[i]
       if (family == "binomial" && t - tau >= p) {
-        cval[i] <- neg_log_lik(
-          data[(tau + 1):t, ], theta_sum[, i] / (t - tau), family = family
+        cval[i] <- negative_log_likelihood(
+          data[(tau + 1):t, ], theta_sum[, i] / (t - tau),
+          family = family
         )
       } else if (family == "poisson" && t - tau >= p) {
-        cval[i] <- neg_log_lik(
+        cval[i] <- negative_log_likelihood(
           data[(tau + 1):t, ],
           DescTools::Winsorize(
             theta_sum[, i] / (t - tau),
@@ -144,7 +151,7 @@ CP <- function(
           family = family
         )
       } else if (family == "gaussian" && t - tau >= 3) {
-        cval[i] <- neg_log_lik(
+        cval[i] <- negative_log_likelihood(
           data[(tau + 1):t, ],
           theta_sum[, i] / (t - tau),
           family = family,
@@ -203,20 +210,11 @@ CP <- function(
 
     nLL <- 0
     cp_loc <- unique(c(0, cp, n))
-    for (i in 1:(length(cp_loc) - 1))
-    {
-      seg <- (cp_loc[i] + 1):cp_loc[i + 1]
-      data_seg <- data[seg, ]
-      out <- fastglm::fastglm(
-        as.matrix(data_seg[, -1]),
-        data_seg[, 1],
-        family
-      )
-      nLL <- out$deviance / 2 + nLL
+    for (i in 1:(length(cp_loc) - 1)) {
+      nLL <- nLL + negative_log_likelihood(data[(cp_loc[i] + 1):cp_loc[i + 1], ], b = NULL, family = family)
     }
 
-    output <- list(cp, nLL)
-    names(output) <- c("cp", "nLL")
+    output <- list(cp = cp, nLL = nLL)
   } else if (family == "poisson") {
     if (length(cp) > 0) {
       ind3 <- seq_len(length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
@@ -225,24 +223,18 @@ CP <- function(
 
     cp <- sort(unique(c(0, cp)))
     segment_indices <- which((diff(cp) < trim * n) == TRUE)
-    if (length(segment_indices) > 0) cp <- floor((cp[-(segment_indices + 1)] + cp[-segment_indices]) / 2)
+    if (length(segment_indices) > 0) {
+      cp <- floor((cp[-(segment_indices + 1)] + cp[-segment_indices]) / 2)
+    }
     cp <- cp[cp > 0]
 
-    # nLL <- 0
-    # cp_loc <- unique(c(0,cp,n))
-    # for(i in 1:(length(cp_loc)-1))
-    # {
-    #   seg <- (cp_loc[i]+1):cp_loc[i+1]
-    #   data_seg <- data[seg,]
-    #   out <- fastglm(as.matrix(data_seg[, -1]), data_seg[, 1], family="Poisson")
-    #   nLL <- out$deviance/2 + nLL
-    # }
+    nLL <- 0
+    cp_loc <- unique(c(0, cp, n))
+    for (i in 1:(length(cp_loc) - 1)) {
+      nLL <- nLL + negative_log_likelihood(data[(cp_loc[i] + 1):cp_loc[i + 1], ], b = NULL, family = family)
+    }
 
-    # output <- list(cp, nLL)
-    # names(output) <- c("cp", "nLL")
-
-    output <- list(cp)
-    names(output) <- c("cp")
+    output <- list(cp = cp, nLL = nLL)
   } else if (family == "gaussian") {
     if (length(cp) > 0) {
       ind3 <- seq_len(length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
@@ -254,18 +246,17 @@ CP <- function(
     if (length(segment_indices) > 0) cp <- floor((cp[-(segment_indices + 1)] + cp[-segment_indices]) / 2)
     cp <- cp[cp > 0]
 
-    # nLL <- 0
-    # cp_loc <- unique(c(0,cp,n))
-    # for(i in 1:(length(cp_loc)-1))
+    nLL <- 0
+    # cp_loc <- unique(c(0, cp, n))
+    # for (i in 1:(length(cp_loc) - 1))
     # {
-    #  seg <- (cp_loc[i]+1):cp_loc[i+1]
-    #  data_seg <- data[seg,]
-    #  out <- fastglm(as.matrix(data_seg[, -1]), data_seg[, 1], family="binomial")
-    #  nLL <- out$deviance/2 + nLL
+    #   seg <- (cp_loc[i] + 1):cp_loc[i + 1]
+    #   data_seg <- data[seg, ]
+    #   out <- fastglm(as.matrix(data_seg[, -1]), data_seg[, 1], family = "binomial")
+    #   nLL <- out$deviance / 2 + nLL
     # }
 
-    output <- list(cp)
-    names(output) <- c("cp")
+    output <- list(cp = cp, nLL = nLL)
   }
 
   return(output)

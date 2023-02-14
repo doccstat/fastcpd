@@ -2,23 +2,23 @@
 #'
 #' @param n TODO
 #' @param d TODO
-#' @param true.coef TODO
-#' @param true.cp.loc TODO
+#' @param tau TODO
 #' @param Sigma TODO
 #' @param family TODO
 #' @param evar TODO
 #'
 #' @return TODO
 #' @export
-data_gen <- function(n, d, true.coef, true.cp.loc, Sigma, family, evar = NULL) {
-  loc <- unique(c(0, true.cp.loc, n))
-  if (dim(true.coef)[2] != length(loc) - 1) {
-    stop("true.coef and true.cp.loc do not match")
+data_gen <- function(n, d, tau, Sigma, family, evar = NULL) {
+  loc <- unique(c(0, tau, n))
+  theta <- matrix(NA, nrow = d, ncol = length(tau) + 1)
+  for (i in seq_len(length(tau) + 1)) {
+    theta[, i] <- c((-1) ** (i + 1), rnorm(d - 1, 0.5, 0.1))
   }
   x <- mvtnorm::rmvnorm(n, mean = rep(0, d), sigma = Sigma)
   y <- NULL
-  for (i in 1:(length(loc) - 1)) {
-    Xb <- x[(loc[i] + 1):loc[i + 1], , drop = FALSE] %*% true.coef[, i, drop = FALSE]
+  for (i in 1:(length(tau) + 1)) {
+    Xb <- x[(loc[i] + 1):loc[i + 1], , drop = FALSE] %*% theta[, i, drop = FALSE]
     y_new <- if (family == "binomial") {
       stats::rbinom(length(Xb), 1, 1 / (1 + exp(-Xb)))
     } else if (family == "poisson") {
@@ -31,7 +31,6 @@ data_gen <- function(n, d, true.coef, true.cp.loc, Sigma, family, evar = NULL) {
     y <- c(y, y_new)
   }
   data <- cbind(y, x)
-  true_cluster <- rep(1:(length(loc) - 1), diff(loc))
-  result <- list(data, true_cluster)
-  return(result)
+  segment <- rep(seq_len(length(tau) + 1), diff(loc))
+  return(list(data = data, theta = theta, segment = segment))
 }

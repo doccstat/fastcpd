@@ -1,33 +1,32 @@
-#' Solve logistic regression using Gradient Descent Extension to the
-#' multivariate case
+#' Update the cost values for the segmentation.
 #'
-#' @param data TODO
-#' @param theta_hat TODO
-#' @param theta_sum TODO
-#' @param hessian TODO
-#' @param tau TODO
-#' @param i TODO
-#' @param k TODO
-#' @param family TODO
-#' @param momentum TODO
-#' @param momentum_coef TODO
-#' @param args_list TODO
+#' @param data A data frame containing the data to be segmented.
+#' @param theta_hat Estimated theta from the previous iteration.
+#' @param theta_sum Sum of estimated theta from the previous iteration.
+#' @param hessian Hessian matrix from the previous iteration.
+#' @param tau Start of the current segment.
+#' @param i Index of the current data in the whole data set.
+#' @param k Number of epochs in SGD.
+#' @param family Family of the model.
+#' @param momentum Momentum from the previous iteration.
+#' @param momentum_coef Momentum coefficient to be applied to the current
+#'   momentum.
+#' @param args_list Arguments to be passed to the model.
 #'
-#' @return TODO
-#' @export
+#' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
+#'   \code{hessian}, and \code{momentum}.s
 cost_update <- function(
-  data,
-  theta_hat,
-  theta_sum,
-  hessian,
-  tau,
-  i,
-  k,
-  family,
-  momentum,
-  momentum_coef,
-  args_list
-) {
+    data,
+    theta_hat,
+    theta_sum,
+    hessian,
+    tau,
+    i,
+    k,
+    family,
+    momentum,
+    momentum_coef,
+    args_list) {
   p <- ncol(data) - 1
   new_data_x <- data[nrow(data), -1]
   new_data_y <- data[nrow(data), 1]
@@ -72,8 +71,7 @@ cost_update <- function(
   }
 
   for (kk in 1 + seq_len(k - 1)) {
-    for (j in (tau + 1):nrow(data)) {
-
+    for (j in max(tau + 1, nrow(data) - 500):nrow(data)) {
       if (family == "binomial") {
         prob <- 1 / (1 + exp(-data[j, -1] %*% theta_hat[, i]))
         hessian[, , i] <- hessian[, , i] + (data[j, -1] %o% data[j, -1]) * as.numeric((1 - prob) * prob)

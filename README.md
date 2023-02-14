@@ -1,5 +1,5 @@
 ```r
-library(cpd)
+library(fastcpd)
 set.seed(100)
 n <- 300
 p <- 8
@@ -29,7 +29,7 @@ for (i in 1:reptim) {
   data <- cbind(Y, X)
 
   # seGD
-  cp_set <- CP(data, beta, sgd_k = 1, family = "binomial")$cp
+  cp_set <- fastcpd(data, beta, sgd_k = 1, family = "binomial")$cp
   cp_gd <- cp_set[!(cp_set == 0)]
   K_est <- length(cp_gd) + 1
   cp_un <- unique(c(0, cp_gd, n))
@@ -88,7 +88,7 @@ out <- data_gen(n, d, true.coef, true.cp.loc, Sigma, "poisson")
 data <- out[[1]]
 g_tr <- out[[2]]
 beta <- log(n) * (d + 1) / 2
-CP(data, beta, trim = 0.03, B = 10, "poisson", epsilon = 0.001, G = 10^10, L = -20, H = 20)
+fastcpd(data, beta, trim = 0.03, B = 10, "poisson", epsilon = 0.001, G = 10^10, L = -20, H = 20)
 
 CP_vanilla(data, beta, family = "poisson")
 
@@ -119,7 +119,7 @@ end_time <- Sys.time()
 end_time - start_time
 
 start_time <- Sys.time()
-CP(data, beta, B = 10, trim = 0.025, family = "gaussian", epsilon = 1e-5)
+fastcpd(data, beta, B = 10, trim = 0.025, family = "gaussian", epsilon = 1e-5)
 end_time <- Sys.time()
 end_time - start_time
 
