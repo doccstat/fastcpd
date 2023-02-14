@@ -20,11 +20,8 @@ fastcpd <- function(
     momentum_coef = 0,
     sgd_k = 3,
     family,
-    cost = NULL,
+    cost = negative_log_likelihood,
     ...) {
-  if (is.null(cost)) {
-    cost <- negative_log_likelihood
-  }
   args_list <- list(...)
   n <- nrow(data)
   p <- ncol(data) - 1
@@ -136,12 +133,12 @@ fastcpd <- function(
     for (i in 1:(r_t_count - 1)) {
       tau <- r_t_set[i]
       if (family == "binomial" && t - tau >= p) {
-        cval[i] <- negative_log_likelihood(
+        cval[i] <- cost(
           data[(tau + 1):t, ], theta_sum[, i] / (t - tau),
           family = family
         )
       } else if (family == "poisson" && t - tau >= p) {
-        cval[i] <- negative_log_likelihood(
+        cval[i] <- cost(
           data[(tau + 1):t, ],
           DescTools::Winsorize(
             theta_sum[, i] / (t - tau),
@@ -151,7 +148,7 @@ fastcpd <- function(
           family = family
         )
       } else if (family == "gaussian" && t - tau >= 3) {
-        cval[i] <- negative_log_likelihood(
+        cval[i] <- cost(
           data[(tau + 1):t, ],
           theta_sum[, i] / (t - tau),
           family = family,
@@ -211,7 +208,7 @@ fastcpd <- function(
     nLL <- 0
     cp_loc <- unique(c(0, cp, n))
     for (i in 1:(length(cp_loc) - 1)) {
-      nLL <- nLL + negative_log_likelihood(data[(cp_loc[i] + 1):cp_loc[i + 1], ], b = NULL, family = family)
+      nLL <- nLL + cost(data[(cp_loc[i] + 1):cp_loc[i + 1], ], b = NULL, family = family)
     }
 
     output <- list(cp = cp, nLL = nLL)
@@ -231,7 +228,7 @@ fastcpd <- function(
     nLL <- 0
     cp_loc <- unique(c(0, cp, n))
     for (i in 1:(length(cp_loc) - 1)) {
-      nLL <- nLL + negative_log_likelihood(data[(cp_loc[i] + 1):cp_loc[i + 1], ], b = NULL, family = family)
+      nLL <- nLL + cost(data[(cp_loc[i] + 1):cp_loc[i + 1], ], b = NULL, family = family)
     }
 
     output <- list(cp = cp, nLL = nLL)

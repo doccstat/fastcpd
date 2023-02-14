@@ -12,7 +12,7 @@ fastcpd(
   momentum_coef = 0,
   sgd_k = 3,
   family,
-  cost = NULL,
+  cost = negative_log_likelihood,
   ...
 )
 }

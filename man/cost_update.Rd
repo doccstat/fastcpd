@@ -2,8 +2,7 @@
 % Please edit documentation in R/cost_update.R
 \name{cost_update}
 \alias{cost_update}
-\title{Solve logistic regression using Gradient Descent Extension to the
-multivariate case}
+\title{Update the cost values for the segmentation.}
 \usage{
 cost_update(
   data,
@@ -20,32 +19,33 @@ cost_update(
 )
 }
 \arguments{
-\item{data}{TODO}
+\item{data}{A data frame containing the data to be segmented.}
 
-\item{theta_hat}{TODO}
+\item{theta_hat}{Estimated theta from the previous iteration.}
 
-\item{theta_sum}{TODO}
+\item{theta_sum}{Sum of estimated theta from the previous iteration.}
 
-\item{hessian}{TODO}
+\item{hessian}{Hessian matrix from the previous iteration.}
 
-\item{tau}{TODO}
+\item{tau}{Start of the current segment.}
 
-\item{i}{TODO}
+\item{i}{Index of the current data in the whole data set.}
 
-\item{k}{TODO}
+\item{k}{Number of epochs in SGD.}
 
-\item{family}{TODO}
+\item{family}{Family of the model.}
 
-\item{momentum}{TODO}
+\item{momentum}{Momentum from the previous iteration.}
 
-\item{momentum_coef}{TODO}
+\item{momentum_coef}{Momentum coefficient to be applied to the current
+momentum.}
 
-\item{args_list}{TODO}
+\item{args_list}{Arguments to be passed to the model.}
 }
 \value{
-TODO
+A list containing new values of \code{theta_hat}, \code{theta_sum},
+  \code{hessian}, and \code{momentum}.s
 }
 \description{
-Solve logistic regression using Gradient Descent Extension to the
-multivariate case
+Update the cost values for the segmentation.
 }
