@@ -38,7 +38,7 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-cpd.Rproj
+fastcpd.Rproj
 .DS_Store
 src/*.o
 src/*.so

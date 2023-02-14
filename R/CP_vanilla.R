@@ -1,6 +1,6 @@
 #' Dynamic Programming with Pruning
 #'
-#' @param data TODO
+#' @param data A data frame containing the data to be segmented.
 #' @param beta TODO
 #' @param family TODO
 #' @param ... TODO
@@ -38,9 +38,9 @@ CP_vanilla <- function(data, beta, family, ...) {
       k <- set[i] + 1
       cval[i] <- 0
       if (family %in% c("binomial", "poisson") && t - k >= p - 1) {
-        cval[i] <- suppressWarnings(cost(data[k:t, ], family = family))
+        cval[i] <- suppressWarnings(negative_log_likelihood(data[k:t, ], b = NULL, family = family))
       } else if (family == "gaussian" && t - k >= 1) {
-        cval[i] <- suppressWarnings(cost(data[k:t, ], family = family, lambda = err_sd_mean * sqrt(2 * log(p) / (t - k + 1))))
+        cval[i] <- suppressWarnings(negative_log_likelihood(data[k:t, ], b = NULL, family = family, lambda = err_sd_mean * sqrt(2 * log(p) / (t - k + 1))))
       }
     }
     obj <- cval + f_obj[set + 1] + beta

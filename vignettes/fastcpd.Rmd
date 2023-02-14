@@ -1,0 +1,65 @@
+---
+title: "fastcpd"
+output: rmarkdown::pdf_document
+vignette: >
+  %\VignetteIndexEntry{fastcpd}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(fastcpd)
+```
+
+```{r}
+set.seed(100)
+n <- 300
+p <- 9
+tau <- c(0.45, 1)
+theta <- matrix(c(-1, rnorm(p - 1, 0.5, 0.1)), p, n)
+for (i in 1:(length(tau) - 1)) {
+  segment_start <- floor(n * tau[i] + 1)
+  segment_end <- floor(n * tau[i + 1])
+  theta[, segment_start:segment_end] <- c((-1)^(i + 1), rnorm(p - 1, 0.5, 0.1))
+}
+beta <- (p + 1) * log(n) / 2
+
+x <- cbind(1, mvtnorm::rmvnorm(n, rep(0, p - 1), diag(p - 1)))
+xb <- rowSums(t(theta) * x)
+y <- rbinom(n, size = 1, prob = 1 / (1 + exp(-xb)))
+data <- cbind(y, x)
+```
+
+```{r}
+fastcpd_result_1 <- fastcpd(data, beta, sgd_k = 1, family = "binomial")$cp
+fastcpd_result_5 <- fastcpd(data, beta, sgd_k = 5, family = "binomial")$cp
+cp_vanilla_result <- CP_vanilla(data, beta, family = "binomial")$cp
+cat("fastcpd with sgd_k = 1: ", fastcpd_result_1, "\nfastcpd with sgd_k = 5: ", fastcpd_result_5, "\nvanilla: ", cp_vanilla_result)
+```
+
+```{r}
+microbenchmark::microbenchmark(
+  fastcpd(data, beta, sgd_k = 5, family = "binomial"),
+  CP_vanilla(data, beta, family = "binomial"),
+  times = 1
+)
+```
+
+```{r}
+y <- rpois(n, lambda = exp(xb))
+data <- cbind(y, x)
+```
+
+```{r}
+fastcpd_result_1 <- fastcpd(data = data, beta = beta, segment_count = 10, sgd_k = 1, family = "poisson", trim = 0.03, B = 10, epsilon = 0.001, G = 10^10, L = -20, H = 20)$cp
+fastcpd_result_5 <- fastcpd(data, beta, sgd_k = 5, family = "poisson")$cp
+cp_vanilla_result <- CP_vanilla(data, beta, family = "poisson")$cp
+cat("fastcpd with sgd_k = 1: ", fastcpd_result_1, "\nfastcpd with sgd_k = 5: ", fastcpd_result_5, "\nvanilla: ", cp_vanilla_result)
+```
