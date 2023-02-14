@@ -15,7 +15,9 @@ cost_update(
   family,
   momentum,
   momentum_coef,
-  args_list
+  args_list,
+  cost_gradient,
+  cost_hessian
 )
 }
 \arguments{
@@ -41,10 +43,14 @@ cost_update(
 momentum.}
 
 \item{args_list}{Arguments to be passed to the model.}
+
+\item{cost_gradient}{Gradient for custom cost function.}
+
+\item{cost_hessian}{Hessian for custom cost function.}
 }
 \value{
 A list containing new values of \code{theta_hat}, \code{theta_sum},
-  \code{hessian}, and \code{momentum}.s
+  \code{hessian}, and \code{momentum}.
 }
 \description{
 Update the cost values for the segmentation.
