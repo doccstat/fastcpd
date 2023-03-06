@@ -10,28 +10,40 @@
 #' @param family Family of the model. Can be "binomial", "poisson", or
 #'   "gaussian". If not provided, the user must specify the cost function and
 #'   its gradient (and Hessian).
+#' @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
+#'   poisson.
+#' @param min_prob Minimum probability to avoid numerical issues. Only used for
+#'   poisson.
+#' @param winsorise_minval Minimum value to be winsorised. Only used for
+#'   poisson.
+#' @param winsorise_maxval Maximum value to be winsorised. Only used for
+#'   poisson.
+#' @param lambda Lambda for L1 regularization. Only used for lasso.
 #' @param cost Cost function to be used. If not specified, the default is
 #'   the negative log-likelihood for the corresponding family.
 #' @param cost_gradient Gradient for custom cost function.
 #' @param cost_hessian Hessian for custom cost function.
-#' @param ... List of arguments to be passed to the model.
 #'
 #' @return Change points and corresponding cost values.
 #' @export
 fastcpd <- function(
-    data,
-    beta,
-    segment_count = 10,
-    trim = 0.025,
-    momentum_coef = 0,
-    sgd_k = 3,
-    family = NULL,
-    cost = negative_log_likelihood,
-    cost_gradient = cost_update_gradient,
-    cost_hessian = cost_update_hessian,
-    ...) {
+  data,
+  beta,
+  segment_count = 10,
+  trim = 0.025,
+  momentum_coef = 0,
+  sgd_k = 3,
+  family = NULL,
+  epsilon = 1e-10,
+  min_prob = 10^10,
+  winsorise_minval = -20,
+  winsorise_maxval = 20,
+  lambda = NULL,
+  cost = negative_log_likelihood,
+  cost_gradient = cost_update_gradient,
+  cost_hessian = cost_update_hessian
+) {
 
-  args_list <- list(...)
   n <- nrow(data)
   p <- ncol(data) - 1
 
@@ -58,7 +70,7 @@ fastcpd <- function(
       )$coefficients
     } else if (family == "gaussian") {
       cvfit <- glmnet::cv.glmnet(
-        x = as.matrix(data_segment[, -1]),
+        x = data_segment[, -1, drop = FALSE],
         y = data_segment[, 1],
         family = family
       )
@@ -91,21 +103,18 @@ fastcpd <- function(
     )
   } else if (family == "poisson") {
     theta_sum <- theta_hat <- DescTools::Winsorize(
-      matrix(segment_theta_hat[1, ], p, 1),
-      minval = args_list$L,
-      maxval = args_list$H
+      matrix(segment_theta_hat[1, ]),
+      minval = winsorise_minval,
+      maxval = winsorise_maxval
     )
     hessian <- array(
       (data[1, -1] %o% data[1, -1]) * c(exp(theta_hat %*% data[1, -1])),
       c(p, p, 1)
     )
   } else if (family == "gaussian") {
-    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ], p, 1)
-    # eta <- theta_hat %*% data[1, -1]
-    # c_int <- diag(1/epsilon,p) - data[1, -1]%o%data[1, -1]/epsilon^2/(1+sum(data[1, -1]^2)/epsilon)
-    # cmatrix_inv <- array(c_int, c(p,p,1))
+    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
     hessian <- array(
-      data[1, -1] %o% data[1, -1] + args_list$epsilon * diag(1, p),
+      data[1, -1] %o% data[1, -1] + epsilon * diag(1, p),
       c(p, p, 1)
     )
   }
@@ -114,7 +123,7 @@ fastcpd <- function(
   r_t_set <- c(0, 1)
   # C(0)=NULL, C(1)={0}
   cp_set <- append(list(NULL), rep(list(0), n))
-  # F(0)=-beta
+  # Objective function: F(0) = -beta
   f_t <- c(-beta, rep(0, n))
   momentum <- 0
 
@@ -127,7 +136,7 @@ fastcpd <- function(
     for (i in 1:(r_t_count - 1)) {
       tau <- r_t_set[i]
       if (family == "gaussian") {
-        args_list$lambda <- err_sd_mean * sqrt(2 * log(p) / (t - tau))
+        lambda <- err_sd_mean * sqrt(2 * log(p) / (t - tau))
       }
 
       cost_update_result <- cost_update(
@@ -141,7 +150,11 @@ fastcpd <- function(
         family = family,
         momentum = momentum,
         momentum_coef = momentum_coef,
-        args_list = args_list,
+        min_prob = min_prob,
+        winsorise_minval = winsorise_minval,
+        winsorise_maxval = winsorise_maxval,
+        epsilon = epsilon,
+        lambda = lambda,
         cost_gradient = cost_gradient,
         cost_hessian = cost_hessian
       )
@@ -154,28 +167,20 @@ fastcpd <- function(
     # Step 2
     for (i in 1:(r_t_count - 1)) {
       tau <- r_t_set[i]
-      if (family == "binomial" && t - tau >= p) {
-        cval[i] <- cost(
-          data[(tau + 1):t, ], theta_sum[, i] / (t - tau),
-          family = family
+      theta <- theta_sum[, i] / (t - tau)
+      if (family == "poisson" && t - tau >= p) {
+        theta <- DescTools::Winsorize(
+          theta,
+          minval = winsorise_minval,
+          maxval = winsorise_maxval
         )
-      } else if (family == "poisson" && t - tau >= p) {
-        cval[i] <- cost(
-          data[(tau + 1):t, ],
-          DescTools::Winsorize(
-            theta_sum[, i] / (t - tau),
-            minval = args_list$L,
-            maxval = args_list$H
-          ),
-          family = family
-        )
-      } else if (family == "gaussian" && t - tau >= 3) {
-        cval[i] <- cost(
-          data[(tau + 1):t, ],
-          theta_sum[, i] / (t - tau),
-          family = family,
-          lambda = args_list$lambda
-        )
+      }
+
+      if (
+        (family %in% c("binomial", "poisson") && t - tau >= p) ||
+        (family == "gaussian" && t - tau >= 3)
+      ) {
+        cval[i] <- cost(data[(tau + 1):t, ], theta, family, lambda)
       }
     }
 
@@ -190,13 +195,13 @@ fastcpd <- function(
     } else if (family == "poisson") {
       cum_coef_add <- coef_add <- DescTools::Winsorize(
         x = segment_theta_hat[segment_indices[t], ],
-        minval = args_list$L,
-        maxval = args_list$H
+        minval = winsorise_minval,
+        maxval = winsorise_maxval
       )
       hessian_new <- (new_data %o% new_data) * c(exp(coef_add %*% new_data))
     } else if (family == "gaussian") {
       cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
-      hessian_new <- new_data %o% new_data + args_list$epsilon * diag(1, p)
+      hessian_new <- new_data %o% new_data + epsilon * diag(1, p)
     }
 
     theta_hat <- cbind(theta_hat, coef_add)
@@ -218,75 +223,31 @@ fastcpd <- function(
     theta_hat <- theta_hat[, pruned_left, drop = FALSE]
     theta_sum <- theta_sum[, pruned_left, drop = FALSE]
     hessian <- hessian[, , pruned_left, drop = FALSE]
-    # F(t)
+
+    # Objective function F(t).
     f_t[t + 1] <- min_val
   }
 
   # Remove change-points close to the boundaries
 
-  cp <- cp_set[[n + 1]]
-  if (family == "binomial") {
-    if (length(cp) > 0) {
-      ind3 <- (seq_len(length(cp)))[(cp < trim * n) | (cp > (1 - trim) * n)]
-      cp <- cp[-ind3]
-    }
+  cp_set <- cp_set[[n + 1]]
+  cp_set <- cp_set[(cp_set >= trim * n) & (cp_set <= (1 - trim) * n)]
+  cp_set <- sort(unique(c(0, cp_set)))
 
-    cost_value <- 0
-    cp_loc <- unique(c(0, cp, n))
-    for (i in 1:(length(cp_loc) - 1)) {
-      cost_value <- cost_value + cost(
-        data[(cp_loc[i] + 1):cp_loc[i + 1], ], theta = NULL, family = family
-      )
-    }
-
-    output <- list(cp = cp, cost_value = cost_value)
-  } else if (family == "poisson") {
-    if (length(cp) > 0) {
-      ind3 <- seq_len(length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
-      if (length(ind3) > 0) cp <- cp[-ind3]
-    }
-
-    cp <- sort(unique(c(0, cp)))
-    segment_indices <- which((diff(cp) < trim * n) == TRUE)
-    if (length(segment_indices) > 0) {
-      cp <- floor((cp[-(segment_indices + 1)] + cp[-segment_indices]) / 2)
-    }
-    cp <- cp[cp > 0]
-
-    cost_value <- 0
-    cp_loc <- unique(c(0, cp, n))
-    for (i in 1:(length(cp_loc) - 1)) {
-      cost_value <- cost_value + cost(
-        data[(cp_loc[i] + 1):cp_loc[i + 1], ], theta = NULL, family = family
-      )
-    }
-
-    output <- list(cp = cp, cost_value = cost_value)
-  } else if (family == "gaussian") {
-    if (length(cp) > 0) {
-      ind3 <- seq_len(length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
-      if (length(ind3) > 0) cp <- cp[-ind3]
-    }
-
-    cp <- sort(unique(c(0, cp)))
-    segment_indices <- which((diff(cp) < trim * n) == TRUE)
-    if (length(segment_indices) > 0) {
-      cp <- floor((cp[-(segment_indices + 1)] + cp[-segment_indices]) / 2)
-    }
-    cp <- cp[cp > 0]
-
-    cost_value <- 0
-    # cp_loc <- unique(c(0, cp, n))
-    # for (i in 1:(length(cp_loc) - 1))
-    # {
-    #   seg <- (cp_loc[i] + 1):cp_loc[i + 1]
-    #   data_seg <- data[seg, ]
-    #   out <- fastglm(as.matrix(data_seg[, -1]), data_seg[, 1], family = "binomial")
-    #   cost_value <- out$deviance / 2 + cost_value
-    # }
-
-    output <- list(cp = cp, cost_value = cost_value)
+  segment_indices <- which((diff(cp_set) < trim * n) == TRUE)
+  if (length(segment_indices) > 0) {
+    cp_set <- floor(
+      (cp_set[-(segment_indices + 1)] + cp_set[-segment_indices]) / 2
+    )
+  }
+  cp_set <- cp_set[cp_set > 0]
+  cost_value <- 0
+  cp_loc <- unique(c(0, cp_set, n))
+  for (i in 1:(length(cp_loc) - 1)) {
+    cost_value <- cost_value + cost(
+      data[(cp_loc[i] + 1):cp_loc[i + 1], ], NULL, family, lambda
+    )
   }
 
-  return(output)
+  return(list(cp_set = cp_set, cost_value = cost_value))
 }

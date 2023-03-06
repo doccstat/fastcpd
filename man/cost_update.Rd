@@ -15,7 +15,11 @@ cost_update(
   family,
   momentum,
   momentum_coef,
-  args_list,
+  epsilon,
+  min_prob,
+  winsorise_minval,
+  winsorise_maxval,
+  lambda,
   cost_gradient,
   cost_hessian
 )
@@ -42,7 +46,19 @@ cost_update(
 \item{momentum_coef}{Momentum coefficient to be applied to the current
 momentum.}
 
-\item{args_list}{Arguments to be passed to the model.}
+\item{epsilon}{Epsilon to avoid numerical issues. Only used for binomial and
+poisson.}
+
+\item{min_prob}{Minimum probability to avoid numerical issues. Only used for
+poisson.}
+
+\item{winsorise_minval}{Minimum value to be winsorised. Only used for
+poisson.}
+
+\item{winsorise_maxval}{Maximum value to be winsorised. Only used for
+poisson.}
+
+\item{lambda}{Lambda for L1 regularization. Only used for lasso.}
 
 \item{cost_gradient}{Gradient for custom cost function.}
 

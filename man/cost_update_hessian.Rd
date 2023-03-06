@@ -4,7 +4,7 @@
 \alias{cost_update_hessian}
 \title{Function to calculate the Hessian matrix at the current data.}
 \usage{
-cost_update_hessian(data, theta, hessian, family, G = NULL)
+cost_update_hessian(data, theta, hessian, family, min_prob)
 }
 \arguments{
 \item{data}{A data frame containing the data to be segmented.}
@@ -14,6 +14,8 @@ cost_update_hessian(data, theta, hessian, family, G = NULL)
 \item{hessian}{Hessian matrix from the previous iteration.}
 
 \item{family}{Family of the model.}
+
+\item{min_prob}{Minimum probability to avoid numerical issues.}
 }
 \value{
 Hessian at the current data.

@@ -5,7 +5,7 @@
 \title{Solve logistic/poisson regression using Gradient Descent Extension to the
 multivariate case}
 \usage{
-negative_log_likelihood(data, theta, family, lambda = NULL)
+negative_log_likelihood(data, theta, family, lambda)
 }
 \arguments{
 \item{data}{A data frame containing the data to be segmented.}
@@ -15,7 +15,7 @@ the parameters.}
 
 \item{family}{Family of the model.}
 
-\item{lambda}{TODO}
+\item{lambda}{Lambda for L1 regularization. Only used for lasso.}
 }
 \value{
 Negative log likelihood of the corresponding data with the given

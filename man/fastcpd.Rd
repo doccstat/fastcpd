@@ -13,10 +13,14 @@ fastcpd(
   momentum_coef = 0,
   sgd_k = 3,
   family = NULL,
+  epsilon = 1e-10,
+  min_prob = 10^10,
+  winsorise_minval = -20,
+  winsorise_maxval = 20,
+  lambda = NULL,
   cost = negative_log_likelihood,
   cost_gradient = cost_update_gradient,
-  cost_hessian = cost_update_hessian,
-  ...
+  cost_hessian = cost_update_hessian
 )
 }
 \arguments{
@@ -32,9 +36,23 @@ fastcpd(
 
 \item{sgd_k}{Number of epochs in SGD.}
 
-\item{family}{Family of the model. Can be "binomial", "poisson", or
-"gaussian". If not provided, the user must specify the cost function and
+\item{family}{Family of the model. Can be "binomial", "poisson", "gaussian"
+or "lasso". If not provided, the user must specify the cost function and
 its gradient (and Hessian).}
+
+\item{epsilon}{Epsilon to avoid numerical issues. Only used for binomial and
+poisson.}
+
+\item{min_prob}{Minimum probability to avoid numerical issues. Only used for
+poisson.}
+
+\item{winsorise_minval}{Minimum value to be winsorised. Only used for
+poisson.}
+
+\item{winsorise_maxval}{Maximum value to be winsorised. Only used for
+poisson.}
+
+\item{lambda}{Lambda for L1 regularization. Only used for lasso.}
 
 \item{cost}{Cost function to be used. If not specified, the default is
 the negative log-likelihood for the corresponding family.}
@@ -42,8 +60,6 @@ the negative log-likelihood for the corresponding family.}
 \item{cost_gradient}{Gradient for custom cost function.}
 
 \item{cost_hessian}{Hessian for custom cost function.}
-
-\item{...}{List of arguments to be passed to the model.}
 }
 \value{
 Change points and corresponding cost values.
