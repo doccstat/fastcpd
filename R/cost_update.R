@@ -46,8 +46,6 @@ cost_update <- function(
 ) {
   p <- ncol(data) - 1
 
-  stopifnot(!(family == "gaussian" && is.null(lambda)))
-
   hessian[, , i] <- cost_hessian(
     data[nrow(data), ], theta_hat[, i], hessian[, , i], family, min_prob
   )
@@ -60,7 +58,7 @@ cost_update <- function(
     theta_hat[, i] <- DescTools::Winsorize(
       x = theta_hat[, i], minval = winsorise_minval, maxval = winsorise_maxval
     )
-  } else if (family == "gaussian") {
+  } else if (family %in% c("lasso", "gaussian")) {
     # the choice of norm affects the speed.
     # Spectral norm is more accurate but slower than F norm.
     normd <- abs(theta_hat[, i]) - lambda / norm(hessian[, , i], type = "F")
@@ -83,7 +81,7 @@ cost_update <- function(
           minval = winsorise_minval,
           maxval = winsorise_maxval
         )
-      } else if (family == "gaussian") {
+      } else if (family %in% c("lasso", "gaussian")) {
         normd <- abs(theta_hat[, i]) - lambda / norm(hessian[, , i], type = "F")
         theta_hat[, i] <- sign(theta_hat[, i]) * pmax(normd, 0)
       }

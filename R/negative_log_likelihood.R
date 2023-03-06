@@ -12,9 +12,9 @@
 negative_log_likelihood <- function(data, theta, family, lambda) {
   data <- as.matrix(data)
 
-  if (is.null(theta) && family == "gaussian") {
+  if (is.null(theta) && family == "lasso") {
 
-    # Estimate theta in gaussian family
+    # Estimate theta in lasso family
     out <- glmnet::glmnet(
       as.matrix(data[, -1]), data[, 1],
       family = family, lambda = lambda
@@ -23,11 +23,11 @@ negative_log_likelihood <- function(data, theta, family, lambda) {
 
   } else if (is.null(theta)) {
 
-    # Estimate theta in binomial/poisson family
+    # Estimate theta in binomial/poisson/gaussian family
     out <- fastglm::fastglm(as.matrix(data[, -1]), data[, 1], family)
     out$deviance / 2
 
-  } else if (family == "gaussian") {
+  } else if (family %in% c("lasso", "gaussian")) {
 
     # Calculate negative log likelihood in gaussian family
     penalty <- lambda * sum(abs(theta))

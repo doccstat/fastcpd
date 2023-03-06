@@ -7,7 +7,7 @@
 #' @param trim Trimming for the boundary change points.
 #' @param momentum_coef Momentum coefficient to be applied to each update.
 #' @param sgd_k Number of epochs in SGD.
-#' @param family Family of the model. Can be "binomial", "poisson", or
+#' @param family Family of the model. Can be "binomial", "poisson", "lasso" or
 #'   "gaussian". If not provided, the user must specify the cost function and
 #'   its gradient (and Hessian).
 #' @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
@@ -38,7 +38,6 @@ fastcpd <- function(
   min_prob = 10^10,
   winsorise_minval = -20,
   winsorise_maxval = 20,
-  lambda = NULL,
   cost = negative_log_likelihood,
   cost_gradient = cost_update_gradient,
   cost_hessian = cost_update_hessian
@@ -47,7 +46,7 @@ fastcpd <- function(
   n <- nrow(data)
   p <- ncol(data) - 1
 
-  if (family == "gaussian") {
+  if (family %in% c("lasso", "gaussian")) {
     err_sd <- act_num <- rep(NA, segment_count)
   }
 
@@ -68,13 +67,19 @@ fastcpd <- function(
         data_segment[, 1],
         family
       )$coefficients
-    } else if (family == "gaussian") {
-      cvfit <- glmnet::cv.glmnet(
-        x = data_segment[, -1, drop = FALSE],
-        y = data_segment[, 1],
-        family = family
-      )
-      segment_theta <- stats::coef(cvfit, s = "lambda.1se")[-1]
+    } else if (family %in% c("lasso", "gaussian")) {
+      if (family == "lasso") {
+        cvfit <- glmnet::cv.glmnet(
+          x = data_segment[, -1, drop = FALSE],
+          y = data_segment[, 1],
+          family = "gaussian"
+        )
+        segment_theta <- stats::coef(cvfit, s = "lambda.1se")[-1]
+      } else {
+        segment_theta <- stats::lm(
+          data_segment[, 1] ~ data_segment[, -1, drop = FALSE]
+        )$coefficients[-1]
+      }
       segment_theta_hat[segment_index, ] <- segment_theta
       response_estimate <- data_segment[, -1, drop = FALSE] %*% c(segment_theta)
       segment_residual <- data_segment[, 1] - response_estimate
@@ -83,7 +88,7 @@ fastcpd <- function(
     }
   }
 
-  if (family == "gaussian") {
+  if (family %in% c("lasso", "gaussian")) {
     # only works if error sd is unchanged.
     err_sd_mean <- mean(err_sd)
 
@@ -111,7 +116,7 @@ fastcpd <- function(
       (data[1, -1] %o% data[1, -1]) * c(exp(theta_hat %*% data[1, -1])),
       c(p, p, 1)
     )
-  } else if (family == "gaussian") {
+  } else if (family %in% c("lasso", "gaussian")) {
     theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
     hessian <- array(
       data[1, -1] %o% data[1, -1] + epsilon * diag(1, p),
@@ -135,8 +140,10 @@ fastcpd <- function(
     # for tau in R_t\{t-1}
     for (i in 1:(r_t_count - 1)) {
       tau <- r_t_set[i]
-      if (family == "gaussian") {
+      if (family == "lasso") {
         lambda <- err_sd_mean * sqrt(2 * log(p) / (t - tau))
+      } else if (family == "gaussian") {
+        lambda <- 0
       }
 
       cost_update_result <- cost_update(
@@ -178,7 +185,7 @@ fastcpd <- function(
 
       if (
         (family %in% c("binomial", "poisson") && t - tau >= p) ||
-        (family == "gaussian" && t - tau >= 3)
+        (family %in% c("lasso", "gaussian") && t - tau >= 3)
       ) {
         cval[i] <- cost(data[(tau + 1):t, ], theta, family, lambda)
       }
@@ -199,7 +206,7 @@ fastcpd <- function(
         maxval = winsorise_maxval
       )
       hessian_new <- (new_data %o% new_data) * c(exp(coef_add %*% new_data))
-    } else if (family == "gaussian") {
+    } else if (family %in% c("lasso", "gaussian")) {
       cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
       hessian_new <- new_data %o% new_data + epsilon * diag(1, p)
     }
