@@ -10,11 +10,15 @@ cost_update_gradient <- function(
   theta,
   family
 ) {
-  new_data_x <- data[-1]
-  new_data_y <- data[1]
+  x <- data[-1]
+  y <- data[1]
   if (family == "binomial") {
-    c(-(new_data_y - 1 / (1 + exp(-new_data_x %*% theta)))) * new_data_x
+    c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
   } else if (family == "poisson") {
-    c(-(new_data_y - exp(new_data_x %*% theta))) * new_data_x
+    c(-(y - exp(x %*% theta))) * x
+  } else if (family == "gaussian") {
+    c(-(y - x %*% theta)) * x
+  } else {
+    stop("family must be one of 'gaussian', 'binomial', or 'poisson'")
   }
 }
