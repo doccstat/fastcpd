@@ -16,9 +16,9 @@ cost_update_gradient <- function(
     c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
   } else if (family == "poisson") {
     c(-(y - exp(x %*% theta))) * x
-  } else if (family == "gaussian") {
+  } else if (family %in% c("lasso", "gaussian")) {
     c(-(y - x %*% theta)) * x
   } else {
-    stop("family must be one of 'gaussian', 'binomial', or 'poisson'")
+    stop("family must be one of 'gaussian', 'binomial', 'lasso' or 'poisson'")
   }
 }

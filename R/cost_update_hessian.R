@@ -25,7 +25,7 @@ cost_update_hessian <- function(
     prob <- exp(data_x %*% theta)
     hessian + (data_x %o% data_x) * min(c(prob), min_prob)
 
-  } else if (family == "gaussian") {
+  } else if (family %in% c("lasso", "gaussian")) {
 
     hessian + data_x %o% data_x
 

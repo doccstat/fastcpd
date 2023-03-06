@@ -114,7 +114,7 @@ fastcpd(
   segment_count = 10,
   trim = 0.025,
   sgd_k = 1,
-  family = "gaussian",
+  family = "lasso",
   epsilon = 1e-5
 )$cp
 ```
