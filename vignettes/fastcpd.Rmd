@@ -38,83 +38,119 @@ data <- cbind(y, x)
 ```
 
 ```{r}
-fastcpd_result_1 <- fastcpd(data, beta, sgd_k = 1, family = "binomial")$cp
-fastcpd_result_5 <- fastcpd(data, beta, sgd_k = 5, family = "binomial")$cp
-cp_vanilla_result <- CP_vanilla(data, beta, family = "binomial")$cp
-cat("fastcpd with sgd_k = 1: ", fastcpd_result_1, "\nfastcpd with sgd_k = 5: ", fastcpd_result_5, "\nvanilla: ", cp_vanilla_result)
-```
+# fastcpd_result_1 <- fastcpd(data, beta, sgd_k = 1, family = "binomial")$cp
+# fastcpd_result_5 <- fastcpd(data, beta, sgd_k = 5, family = "binomial")$cp
+# cp_vanilla_result <- CP_vanilla(data, beta, family = "binomial")$cp
+# cat("fastcpd with sgd_k = 1: ", fastcpd_result_1, "\nfastcpd with sgd_k = 5: ", fastcpd_result_5, "\nvanilla: ", cp_vanilla_result)
+# ```
 
-```{r}
-microbenchmark::microbenchmark(
-  fastcpd(data, beta, sgd_k = 5, family = "binomial"),
-  CP_vanilla(data, beta, family = "binomial"),
-  times = 1
-)
-```
+# ```{r}
+# microbenchmark::microbenchmark(
+#   fastcpd(data, beta, sgd_k = 5, family = "binomial"),
+#   CP_vanilla(data, beta, family = "binomial"),
+#   times = 1
+# )
+# ```
 
-```{r}
-y <- rpois(n, lambda = exp(xb))
-data <- cbind(y, x)
-```
+# ```{r}
+# y <- rpois(n, lambda = exp(xb))
+# data <- cbind(y, x)
+# ```
 
-```{r}
-fastcpd_result_1 <- fastcpd(
-  data = data,
-  beta = beta,
-  segment_count = 10,
-  trim = 0.03,
-  sgd_k = 1,
-  family = "poisson",
-  epsilon = 0.001,
-  min_prob = 10^10,
-  winsorise_minval = -20,
-  winsorise_maxval = 20
-)$cp
-fastcpd_result_5 <- fastcpd(data, beta, sgd_k = 5, family = "poisson")$cp
-cp_vanilla_result <- CP_vanilla(data, beta, family = "poisson")$cp
-cat("fastcpd with sgd_k = 1: ", fastcpd_result_1, "\nfastcpd with sgd_k = 5: ", fastcpd_result_5, "\nvanilla: ", cp_vanilla_result)
-```
-
-
-```{r}
-data_gen_lin <- function(n, d, true.coef, true.cp.loc, Sigma, evar) {
-  loc <- unique(c(0, true.cp.loc, n))
-  if(dim(true.coef)[2] != length(loc)-1) stop("true.coef and true.cp.loc do not match")
-  x <- mvtnorm::rmvnorm(n, mean = rep(0, d), sigma = Sigma)
-  y <- NULL
-  for(i in 1:(length(loc)-1))
-  {
-    Xb <- x[(loc[i] + 1):loc[i + 1], ,drop=FALSE]%*%true.coef[,i,drop=FALSE]
-    add <- Xb + rnorm(length(Xb), sd=sqrt(evar))
-    y <- c(y, add)
-  }
-  data <- cbind(x, y)
-  true_cluster <- rep(1:(length(loc)-1), diff(loc))
-  result <- list(data, true_cluster)
-  return(result)
-}
-
-n <- 1000
-s <- 3
-d <-  50
-evar <- 0.5
-Sigma <- diag(1, d)
-true.cp.loc <- c(100, 300, 500, 800, 900)
-seg <- length(true.cp.loc)+1
-true.coef <- matrix(rnorm(seg*s), s, seg)
-true.coef <- rbind(true.coef, matrix(0, d-s, seg))
-out <- data_gen_lin(n, d, true.coef, true.cp.loc, Sigma, evar)
-data <- out[[1]]
-beta <- log(n)/2   # beta here has different meaning 
+# ```{r}
+# fastcpd_result_1 <- fastcpd(
+#   data = data,
+#   beta = beta,
+#   segment_count = 10,
+#   trim = 0.03,
+#   sgd_k = 1,
+#   family = "poisson",
+#   epsilon = 0.001,
+#   min_prob = 10^10,
+#   winsorise_minval = -20,
+#   winsorise_maxval = 20
+# )$cp
+# fastcpd_result_5 <- fastcpd(data, beta, sgd_k = 5, family = "poisson")$cp
+# cp_vanilla_result <- CP_vanilla(data, beta, family = "poisson")$cp
+# cat("fastcpd with sgd_k = 1: ", fastcpd_result_1, "\nfastcpd with sgd_k = 5: ", fastcpd_result_5, "\nvanilla: ", cp_vanilla_result)
+# ```
 
 
-fastcpd(
-  data = data[, c(51, 1:50)],
-  beta = beta,
-  segment_count = 10,
-  trim = 0.025,
-  sgd_k = 1,
-  family = "lasso",
-  epsilon = 1e-5
-)$cp
+# ```{r}
+# data_gen_lin <- function(n, p, true.coef, true.cp.loc, Sigma, evar) {
+#   loc <- unique(c(0, true.cp.loc, n))
+#   if(dim(true.coef)[2] != length(loc)-1) stop("true.coef and true.cp.loc do not match")
+#   x <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = Sigma)
+#   y <- NULL
+#   for(i in 1:(length(loc)-1))
+#   {
+#     Xb <- x[(loc[i] + 1):loc[i + 1], ,drop=FALSE]%*%true.coef[,i,drop=FALSE]
+#     add <- Xb + rnorm(length(Xb), sd=sqrt(evar))
+#     y <- c(y, add)
+#   }
+#   data <- cbind(y, x)
+#   true_cluster <- rep(1:(length(loc)-1), diff(loc))
+#   result <- list(data, true_cluster)
+#   return(result)
+# }
+
+# n <- 100
+# s <- 3
+# p <-  3
+# evar <- 0.5
+# Sigma <- diag(1, p)
+# true.cp.loc <- c(30, 70)
+# seg <- length(true.cp.loc)+1
+# true.coef <- matrix(rnorm(seg*s), s, seg)
+# true.coef <- rbind(true.coef, matrix(0, p-s, seg))
+# out <- data_gen_lin(n, p, true.coef, true.cp.loc, Sigma, evar)
+# data <- out[[1]]
+# beta <- log(n)/2   # beta here has different meaning 
+
+
+# fastcpd(
+#   data = data,
+#   beta = beta,
+#   segment_count = 10,
+#   trim = 0.025,
+#   sgd_k = 1,
+#   family = "lasso",
+#   epsilon = 1e-5
+# )$cp
+
+
+
+# quantile_loss <- function(data, theta, ...) {
+#   data <- as.matrix(data)
+
+#   if (is.null(theta)) {
+
+#     rq_result <- quantreg::rq(data[, 1] ~ data[, -1, drop = FALSE] - 1, 0.5)
+#     list(theta = rq_result$coefficients, val = mean(abs(data[, 1] - rq_result$fitted.values)) / 2)
+
+#   } else {
+
+#     mean(abs(data[, 1] - data[, -1, drop = FALSE] %*% theta)) / 2
+
+#   }
+# }
+
+# quantile_loss_gradient <- function(data, theta, ...) {
+#   c(1 / 2 - 1 / (1 + exp((data[1] - data[-1] %*% theta) * 2))) * data[-1]
+# }
+
+# quantile_loss_hessian <- function(...) {
+#   0.5 * diag(p)
+# }
+
+# fastcpd(
+#   data = data,
+#   beta = beta,
+#   segment_count = 10,
+#   trim = 0.025,
+#   sgd_k = 1,
+#   cost = quantile_loss,
+#   cost_gradient = quantile_loss_gradient,
+#   cost_hessian = quantile_loss_hessian
+# )$cp
 ```

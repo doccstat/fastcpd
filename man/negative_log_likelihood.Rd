@@ -5,7 +5,7 @@
 \title{Solve logistic/poisson regression using Gradient Descent Extension to the
 multivariate case}
 \usage{
-negative_log_likelihood(data, theta, family, lambda)
+negative_log_likelihood(data, theta, family, lambda, cv = FALSE)
 }
 \arguments{
 \item{data}{A data frame containing the data to be segmented.}
