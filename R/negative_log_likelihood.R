@@ -9,23 +9,32 @@
 #'
 #' @return Negative log likelihood of the corresponding data with the given
 #'   family.
-negative_log_likelihood <- function(data, theta, family, lambda) {
+negative_log_likelihood <- function(data, theta, family, lambda, cv = FALSE) {
   data <- as.matrix(data)
 
   if (is.null(theta) && family == "lasso") {
 
     # Estimate theta in lasso family
-    out <- glmnet::glmnet(
-      as.matrix(data[, -1]), data[, 1],
-      family = family, lambda = lambda
-    )
-    stats::deviance(out) / 2
+    if (cv) {
+      out <- glmnet::cv.glmnet(
+        data[, -1, drop = FALSE],
+        data[, 1],
+        family = "gaussian"
+      )
+      return(list(theta = stats::coef(out, s = "lambda.1se")[-1], val = NULL))
+    } else {
+      out <- glmnet::glmnet(
+        as.matrix(data[, -1]), data[, 1],
+        family = "gaussian", lambda = lambda
+      )
+      return(list(theta = NULL, val = out$deviance / 2))
+    }
 
   } else if (is.null(theta)) {
 
     # Estimate theta in binomial/poisson/gaussian family
     out <- fastglm::fastglm(as.matrix(data[, -1]), data[, 1], family)
-    out$deviance / 2
+    return(list(theta = out$coefficients, val = out$deviance / 2))
 
   } else if (family %in% c("lasso", "gaussian")) {
 

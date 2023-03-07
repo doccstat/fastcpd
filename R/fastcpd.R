@@ -43,15 +43,15 @@ fastcpd <- function(
   cost_hessian = cost_update_hessian
 ) {
 
+  if (is.null(family)) {
+    family <- "custom"
+  }
+
   n <- nrow(data)
   p <- ncol(data) - 1
 
   if (family %in% c("lasso", "gaussian")) {
     err_sd <- act_num <- rep(NA, segment_count)
-  }
-
-  if (is.null(family) && (is.null(cost) || is.null(cost_gradient))) {
-    stop("Must specify family or cost and cost_gradient.")
   }
 
   # choose the initial values based on pre-segmentation
@@ -61,26 +61,15 @@ fastcpd <- function(
   # Remark 3.4: initialize theta_hat_t_t to be the estimate in the segment
   for (segment_index in 1:segment_count) {
     data_segment <- data[segment_indices == segment_index, , drop = FALSE]
-    if (family %in% c("binomial", "poisson")) {
-      segment_theta_hat[segment_index, ] <- fastglm::fastglm(
-        data_segment[, -1, drop = FALSE],
-        data_segment[, 1],
-        family
-      )$coefficients
-    } else if (family %in% c("lasso", "gaussian")) {
-      if (family == "lasso") {
-        cvfit <- glmnet::cv.glmnet(
-          x = data_segment[, -1, drop = FALSE],
-          y = data_segment[, 1],
-          family = "gaussian"
-        )
-        segment_theta <- stats::coef(cvfit, s = "lambda.1se")[-1]
-      } else {
-        segment_theta <- stats::lm(
-          data_segment[, 1] ~ data_segment[, -1, drop = FALSE]
-        )$coefficients[-1]
-      }
-      segment_theta_hat[segment_index, ] <- segment_theta
+    segment_theta <- cost(
+      data = data_segment,
+      theta = NULL,
+      family = family,
+      lambda = NULL,
+      cv = TRUE
+    )$theta
+    segment_theta_hat[segment_index, ] <- segment_theta
+    if (family %in% c("lasso", "gaussian")) {
       response_estimate <- data_segment[, -1, drop = FALSE] %*% c(segment_theta)
       segment_residual <- data_segment[, 1] - response_estimate
       err_sd[segment_index] <- sqrt(mean(segment_residual^2))
@@ -120,6 +109,12 @@ fastcpd <- function(
     theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
     hessian <- array(
       data[1, -1] %o% data[1, -1] + epsilon * diag(1, p),
+      c(p, p, 1)
+    )
+  } else if (family == "custom") {
+    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
+    hessian <- array(
+      matrix(0, p, p),
       c(p, p, 1)
     )
   }
@@ -209,6 +204,9 @@ fastcpd <- function(
     } else if (family %in% c("lasso", "gaussian")) {
       cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
       hessian_new <- new_data %o% new_data + epsilon * diag(1, p)
+    } else if (family == "custom") {
+      cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
+      hessian_new <- matrix(0, p, p)
     }
 
     theta_hat <- cbind(theta_hat, coef_add)
@@ -253,7 +251,7 @@ fastcpd <- function(
   for (i in 1:(length(cp_loc) - 1)) {
     cost_value <- cost_value + cost(
       data[(cp_loc[i] + 1):cp_loc[i + 1], ], NULL, family, lambda
-    )
+    )$val
   }
 
   return(list(cp_set = cp_set, cost_value = cost_value))
