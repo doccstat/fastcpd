@@ -38,6 +38,7 @@ fastcpd <- function(
   min_prob = 10^10,
   winsorise_minval = -20,
   winsorise_maxval = 20,
+  p = NULL,
   cost = negative_log_likelihood,
   cost_gradient = cost_update_gradient,
   cost_hessian = cost_update_hessian
@@ -48,7 +49,9 @@ fastcpd <- function(
   }
 
   n <- nrow(data)
-  p <- ncol(data) - 1
+  if (is.null(p)) {
+    p <- ncol(data) - 1
+  }
 
   if (family %in% c("lasso", "gaussian")) {
     err_sd <- act_num <- rep(NA, segment_count)
@@ -56,7 +59,7 @@ fastcpd <- function(
 
   # choose the initial values based on pre-segmentation
 
-  segment_indices <- rep(1:segment_count, rep(n / segment_count, segment_count))
+  segment_indices <- seq_len(n) %/% (n %/% segment_count + 1) + 1
   segment_theta_hat <- matrix(NA, segment_count, p)
   # Remark 3.4: initialize theta_hat_t_t to be the estimate in the segment
   for (segment_index in 1:segment_count) {
@@ -180,7 +183,8 @@ fastcpd <- function(
 
       if (
         (family %in% c("binomial", "poisson") && t - tau >= p) ||
-        (family %in% c("lasso", "gaussian") && t - tau >= 3)
+        (family %in% c("lasso", "gaussian") && t - tau >= 3) ||
+        (family == "custom" && t - tau >= 1)
       ) {
         cval[i] <- cost(data[(tau + 1):t, ], theta, family, lambda)
       }
