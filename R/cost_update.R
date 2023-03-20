@@ -44,13 +44,12 @@ cost_update <- function(
   cost_gradient,
   cost_hessian
 ) {
-  p <- ncol(data) - 1
-
   hessian[, , i] <- cost_hessian(
     data[nrow(data), ], theta_hat[, i], hessian[, , i], family, min_prob
   )
   gradient <- cost_gradient(data[nrow(data), ], theta_hat[, i], family)
-  momentum_step <- solve(hessian[, , i] + epsilon * diag(1, p), gradient)
+  hessian_psd <- hessian[, , i] + epsilon * diag(1, nrow(theta_hat))
+  momentum_step <- solve(hessian_psd, gradient)
   momentum <- momentum_coef * momentum - momentum_step
   theta_hat[, i] <- theta_hat[, i] + momentum
 
@@ -61,7 +60,8 @@ cost_update <- function(
   } else if (family %in% c("lasso", "gaussian")) {
     # the choice of norm affects the speed.
     # Spectral norm is more accurate but slower than F norm.
-    normd <- abs(theta_hat[, i]) - lambda / norm(hessian[, , i], type = "F")
+    hessian_norm <- norm(as.matrix(hessian[, , i]), type = "F")
+    normd <- abs(theta_hat[, i]) - lambda / hessian_norm
     theta_hat[, i] <- sign(theta_hat[, i]) * pmax(normd, 0)
   }
 
@@ -71,7 +71,8 @@ cost_update <- function(
         data[j, ], theta_hat[, i], hessian[, , i], family, min_prob
       )
       gradient <- cost_gradient(data[j, ], theta_hat[, i], family)
-      momentum_step <- solve(hessian[, , i] + epsilon * diag(1, p), gradient)
+      hessian_psd <- hessian[, , i] + epsilon * diag(1, nrow(theta_hat))
+      momentum_step <- solve(hessian_psd, gradient)
       momentum <- momentum_coef * momentum - momentum_step
       theta_hat[, i] <- theta_hat[, i] + momentum
 
@@ -82,7 +83,8 @@ cost_update <- function(
           maxval = winsorise_maxval
         )
       } else if (family %in% c("lasso", "gaussian")) {
-        normd <- abs(theta_hat[, i]) - lambda / norm(hessian[, , i], type = "F")
+        hessian_norm <- norm(as.matrix(hessian[, , i]), type = "F")
+        normd <- abs(theta_hat[, i]) - lambda / hessian_norm
         theta_hat[, i] <- sign(theta_hat[, i]) * pmax(normd, 0)
       }
     }
