@@ -1,3 +1,97 @@
+# Class and Methods ------------------------------------------------------------
+#' An S4 class to store the three data.frames created with \link{lnt_read}
+#'
+#' This S4 class stores the output from \link{lnt_read}. Just like a spreadsheet
+#' with multiple worksheets, an fastcpd object consist of three data.frames
+#' which you can select using \code{@}. This object class is intended to be an
+#' intermediate container. As it stores articles and paragraphs in two separate
+#' data.frames, nested in an S4 object, the relevant text data is stored twice
+#' in almost the same format. This has the advantage, that there is no need to
+#' use special characters, such as "\\n" to indicate a new paragraph. However,
+#' it makes the files rather big when you save them directly. They should thus
+#' usually be subsetted using \code{@} or converted to a different format using
+#' \link{lnt_convert}.
+#'
+#' @slot meta The metadata of the articles read in.
+#' @slot articles The article texts and respective IDs.
+#' @slot paragraphs The paragraphs (if the data.frame exists) and respective
+#'   article and paragraph IDs.
+#' @name fastcpd
+#' @export
+setClass(
+  "fastcpd",
+  representation(
+    call = "language",
+    data = "data.frame",
+    cp_set = "numeric",
+    cost_values = "numeric",
+    residuals = "numeric",
+    thetas = "matrix"
+  )
+)
+
+#' @export
+setMethod("plot", signature(x = "fastcpd"), function(x, ...) {
+  p <- ggplot2::ggplot(data = data.frame(y = x@data[, 1], x = x@data[, -1, drop = FALSE], label = "response"), ggplot2::aes(x = x, y = y)) +
+    ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = x@data[, 1])) +
+    ggplot2::geom_vline(xintercept = x@cp_set, color = "red") +
+    ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = x@residuals, label = "residual")) +
+    ggplot2::facet_wrap(c("label"), ncol = 1)
+  print(p)
+  invisible()
+})
+
+#' @export
+setMethod("print", signature(x = "fastcpd"), function(x) {
+  cat(
+    "\nCall:\n",
+    paste(deparse(x@call), sep = "\n", collapse = "\n"), "\n\n",
+    sep = ""
+  )
+  if (length(x@cp_set)) {
+    cat("Change points:\n")
+    print.default(x@cp_set)
+  } else {
+    cat("No change points found\n")
+  }
+  cat("\n")
+  invisible(x)
+})
+
+#' @export
+setMethod("show", signature(object = "fastcpd"), function(object) {
+  cat(
+    "\nA fastcpd object.\n",
+    "Available methods to evaluate the object are:\n",
+    "plot, print, show, summary\n\n",
+    sep = ""
+  )
+  invisible(object)
+})
+
+#' @export
+setMethod("summary", signature(object = "fastcpd"), function(object) {
+  cat(
+    "\nCall:\n",
+    paste(deparse(object@call), sep = "\n", collapse = "\n"), "\n\n",
+    "Residuals:\n",
+    sep = ""
+  )
+  print(structure(
+    zapsmall(quantile(object@residuals)),
+    names = c("Min", "1Q", "Median", "3Q", "Max")
+  ))
+  cat("\n")
+  if (length(object@cp_set)) {
+    cat("Change points:\n")
+    print.default(object@cp_set)
+  } else {
+    cat("No change points found\n")
+  }
+  cat("\n")
+  invisible(object)
+})
+
 #' Sequential Gradient Descent and Quasi-Newton’s Method for Change-Point
 #' Analysis
 #'
@@ -64,13 +158,20 @@ fastcpd <- function(
   # Remark 3.4: initialize theta_hat_t_t to be the estimate in the segment
   for (segment_index in 1:segment_count) {
     data_segment <- data[segment_indices == segment_index, , drop = FALSE]
-    segment_theta <- cost(
-      data = data_segment,
-      theta = NULL,
-      family = family,
-      lambda = NULL,
-      cv = TRUE
-    )$theta
+    segment_theta <- if (family == "custom") {
+      cost(
+        data = data_segment,
+        theta = NULL
+      )$theta
+    } else {
+      cost(
+        data = data_segment,
+        theta = NULL,
+        family = family,
+        lambda = NULL,
+        cv = TRUE
+      )$theta
+    }
     segment_theta_hat[segment_index, ] <- segment_theta
     if (family %in% c("lasso", "gaussian")) {
       response_estimate <- data_segment[, -1, drop = FALSE] %*% c(segment_theta)
@@ -183,10 +284,11 @@ fastcpd <- function(
 
       if (
         (family %in% c("binomial", "poisson") && t - tau >= p) ||
-        (family %in% c("lasso", "gaussian") && t - tau >= 3) ||
-        (family == "custom" && t - tau >= 1)
+        (family %in% c("lasso", "gaussian") && t - tau >= 3)
       ) {
         cval[i] <- cost(data[(tau + 1):t, ], theta, family, lambda)
+      } else if (family == "custom" && t - tau >= 1) {
+        cval[i] <- cost(data[(tau + 1):t, ], theta)
       }
     }
 
@@ -250,13 +352,26 @@ fastcpd <- function(
     )
   }
   cp_set <- cp_set[cp_set > 0]
-  cost_value <- 0
+  cost_values <- thetas <- residual <- NULL
   cp_loc <- unique(c(0, cp_set, n))
   for (i in 1:(length(cp_loc) - 1)) {
-    cost_value <- cost_value + cost(
-      data[(cp_loc[i] + 1):cp_loc[i + 1], ], NULL, family, lambda
-    )$val
+    cost_result <- if (family == "custom") {
+      cost(data[(cp_loc[i] + 1):cp_loc[i + 1], ], NULL)
+    } else {
+      cost(data[(cp_loc[i] + 1):cp_loc[i + 1], ], NULL, family, lambda)
+    }
+    cost_values <- c(cost_values, cost_result$val)
+    thetas <- cbind(thetas, cost_result$theta)
+    residual <- c(residual, cost_result$residuals)
   }
 
-  return(list(cp_set = cp_set, cost_value = cost_value))
+  methods::new(
+    Class = "fastcpd",
+    call = match.call(),
+    data = data.frame(data),
+    cp_set = cp_set,
+    cost_values = cost_values,
+    residuals = residual,
+    thetas = thetas
+  )
 }

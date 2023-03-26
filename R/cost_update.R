@@ -44,10 +44,18 @@ cost_update <- function(
   cost_gradient,
   cost_hessian
 ) {
-  hessian[, , i] <- cost_hessian(
-    data[nrow(data), ], theta_hat[, i], hessian[, , i], family, min_prob
-  )
-  gradient <- cost_gradient(data[nrow(data), ], theta_hat[, i], family)
+  hessian[, , i] <- if (family == "custom") {
+    cost_hessian(data[nrow(data), ], theta_hat[, i], hessian[, , i])
+  } else {
+    cost_hessian(
+      data[nrow(data), ], theta_hat[, i], hessian[, , i], family, min_prob
+    )
+  }
+  gradient <- if (family == "custom") {
+    cost_gradient(data[nrow(data), ], theta_hat[, i])
+  } else {
+    cost_gradient(data[nrow(data), ], theta_hat[, i], family)
+  }
   hessian_psd <- hessian[, , i] + epsilon * diag(1, nrow(theta_hat))
   momentum_step <- solve(hessian_psd, gradient)
   momentum <- momentum_coef * momentum - momentum_step
@@ -67,10 +75,18 @@ cost_update <- function(
 
   for (kk in 1 + seq_len(k - 1)) {
     for (j in (tau + 1):nrow(data)) {
-      hessian[, , i] <- cost_hessian(
-        data[j, ], theta_hat[, i], hessian[, , i], family, min_prob
-      )
-      gradient <- cost_gradient(data[j, ], theta_hat[, i], family)
+      hessian[, , i] <- if (family == "custom") {
+        cost_hessian(data[j, ], theta_hat[, i], hessian[, , i])
+      } else {
+        cost_hessian(
+          data[j, ], theta_hat[, i], hessian[, , i], family, min_prob
+        )
+      }
+      gradient <- if (family == "custom") {
+        cost_gradient(data[j, ], theta_hat[, i])
+      } else {
+        cost_gradient(data[j, ], theta_hat[, i], family)
+      }
       hessian_psd <- hessian[, , i] + epsilon * diag(1, nrow(theta_hat))
       momentum_step <- solve(hessian_psd, gradient)
       momentum <- momentum_coef * momentum - momentum_step
