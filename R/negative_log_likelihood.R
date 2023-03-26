@@ -27,14 +27,19 @@ negative_log_likelihood <- function(data, theta, family, lambda, cv = FALSE) {
         as.matrix(data[, -1]), data[, 1],
         family = "gaussian", lambda = lambda
       )
-      return(list(theta = NULL, val = out$deviance / 2))
+      fitted_values <- predict(out, data[, -1, drop = FALSE], s = lambda)
+      return(list(
+        theta = out$beta[, 1],
+        val = out$deviance / 2,
+        residuals = data[, 1] - fitted_values
+      ))
     }
 
   } else if (is.null(theta)) {
 
     # Estimate theta in binomial/poisson/gaussian family
     out <- fastglm::fastglm(as.matrix(data[, -1]), data[, 1], family)
-    return(list(theta = out$coefficients, val = out$deviance / 2))
+    return(list(theta = out$coefficients, val = out$deviance / 2, residuals = out$residuals))
 
   } else if (family %in% c("lasso", "gaussian")) {
 
