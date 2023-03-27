@@ -74,14 +74,16 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
   cat(
     "\nCall:\n",
     paste(deparse(object@call), sep = "\n", collapse = "\n"), "\n\n",
-    "Residuals:\n",
     sep = ""
   )
-  print(structure(
-    zapsmall(quantile(object@residuals)),
-    names = c("Min", "1Q", "Median", "3Q", "Max")
-  ))
-  cat("\n")
+  if (object@family != "custom") {
+    print("Residuals:")
+    print(structure(
+      zapsmall(quantile(object@residuals)),
+      names = c("Min", "1Q", "Median", "3Q", "Max")
+    ))
+    cat("\n")
+  }
   if (length(object@cp_set)) {
     cat("Change points:\n")
     print.default(object@cp_set)
