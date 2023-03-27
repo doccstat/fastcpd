@@ -21,7 +21,7 @@ negative_log_likelihood <- function(data, theta, family, lambda, cv = FALSE) {
         data[, 1],
         family = "gaussian"
       )
-      return(list(theta = stats::coef(out, s = "lambda.1se")[-1], val = NULL))
+      return(list(par = stats::coef(out, s = "lambda.1se")[-1], value = NULL))
     } else {
       out <- glmnet::glmnet(
         as.matrix(data[, -1]), data[, 1],
@@ -29,8 +29,8 @@ negative_log_likelihood <- function(data, theta, family, lambda, cv = FALSE) {
       )
       fitted_values <- predict(out, data[, -1, drop = FALSE], s = lambda)
       return(list(
-        theta = out$beta[, 1],
-        val = out$deviance / 2,
+        par = out$beta[, 1],
+        value = out$deviance / 2,
         residuals = data[, 1] - fitted_values
       ))
     }
@@ -39,7 +39,7 @@ negative_log_likelihood <- function(data, theta, family, lambda, cv = FALSE) {
 
     # Estimate theta in binomial/poisson/gaussian family
     out <- fastglm::fastglm(as.matrix(data[, -1]), data[, 1], family)
-    return(list(theta = out$coefficients, val = out$deviance / 2, residuals = out$residuals))
+    return(list(par = out$coefficients, value = out$deviance / 2, residuals = out$residuals))
 
   } else if (family %in% c("lasso", "gaussian")) {
 

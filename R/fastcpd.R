@@ -23,6 +23,7 @@ setClass(
   representation(
     call = "language",
     data = "data.frame",
+    family = "character",
     cp_set = "numeric",
     cost_values = "numeric",
     residuals = "numeric",
@@ -32,11 +33,17 @@ setClass(
 
 #' @export
 setMethod("plot", signature(x = "fastcpd"), function(x, ...) {
-  p <- ggplot2::ggplot(data = data.frame(y = x@data[, 1], x = x@data[, -1, drop = FALSE], label = "response"), ggplot2::aes(x = x, y = y)) +
-    ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = x@data[, 1])) +
-    ggplot2::geom_vline(xintercept = x@cp_set, color = "red") +
-    ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = x@residuals, label = "residual")) +
-    ggplot2::facet_wrap(c("label"), ncol = 1)
+  p <- if (x@family == "custom") {
+    ggplot2::ggplot(data = data.frame(y = x@data[, 1], x = x@data[, -1, drop = FALSE]), ggplot2::aes(x = x, y = y)) +
+      ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = x@data[, 1])) +
+      ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
+  } else {
+    ggplot2::ggplot(data = data.frame(y = x@data[, 1], x = x@data[, -1, drop = FALSE], label = "response"), ggplot2::aes(x = x, y = y)) +
+      ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = x@data[, 1])) +
+      ggplot2::geom_vline(xintercept = x@cp_set, color = "red") +
+      ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = x@residuals, label = "residual")) +
+      ggplot2::facet_wrap(c("label"), ncol = 1)
+  }
   print(p)
   invisible()
 })
@@ -161,10 +168,26 @@ fastcpd <- function(
   for (segment_index in 1:segment_count) {
     data_segment <- data[segment_indices == segment_index, , drop = FALSE]
     segment_theta <- if (family == "custom") {
-      cost(
-        data = data_segment,
-        theta = NULL
-      )$theta
+      if (p == 1) {
+        optim_result <- optim(
+          par = 0,
+          fn = function(theta, data) {
+            cost(data = data, theta = log(theta / (1 - theta)))
+          },
+          method = "Brent",
+          lower = 0,
+          upper = 1,
+          data = data_segment
+        )
+        log(optim_result$par / (1 - optim_result$par))
+      } else {
+        optim(
+          par = rep(0, p),
+          fn = cost,
+          gr = cost_gradient,
+          data = data_segment
+        )$par
+      }
     } else {
       cost(
         data = data_segment,
@@ -172,7 +195,7 @@ fastcpd <- function(
         family = family,
         lambda = NULL,
         cv = TRUE
-      )$theta
+      )$par
     }
     segment_theta_hat[segment_index, ] <- segment_theta
     if (family %in% c("lasso", "gaussian")) {
@@ -288,9 +311,9 @@ fastcpd <- function(
         (family %in% c("binomial", "poisson") && t - tau >= p) ||
         (family %in% c("lasso", "gaussian") && t - tau >= 3)
       ) {
-        cval[i] <- cost(data[(tau + 1):t, ], theta, family, lambda)
+        cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta, family, lambda)
       } else if (family == "custom" && t - tau >= 1) {
-        cval[i] <- cost(data[(tau + 1):t, ], theta)
+        cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta)
       }
     }
 
@@ -354,23 +377,47 @@ fastcpd <- function(
     )
   }
   cp_set <- cp_set[cp_set > 0]
-  cost_values <- thetas <- residual <- NULL
+  cost_values <- thetas <- NULL
+  residual <- 0[family == "custom"]
   cp_loc <- unique(c(0, cp_set, n))
   for (i in 1:(length(cp_loc) - 1)) {
-    cost_result <- if (family == "custom") {
-      cost(data[(cp_loc[i] + 1):cp_loc[i + 1], ], NULL)
+    if (family == "custom") {
+      if (p == 1) {
+        optim_result <- optim(
+          par = 0,
+          fn = function(theta, data) {
+            cost(data = data, theta = log(theta / (1 - theta)))
+          },
+          method = "Brent",
+          lower = 0,
+          upper = 1,
+          data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
+        )
+        cost_result <- list(
+          par = log(optim_result$par / (1 - optim_result$par)),
+          value = exp(optim_result$value) / (1 + exp(optim_result$value))
+        )
+      } else {
+        cost_result <- optim(
+          par = rep(0, p),
+          fn = cost,
+          gr = cost_gradient,
+          data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
+        )
+      }
     } else {
-      cost(data[(cp_loc[i] + 1):cp_loc[i + 1], ], NULL, family, lambda)
+      cost_result <- cost(data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE], NULL, family, lambda)
+      residual <- c(residual, cost_result$residuals)
     }
-    cost_values <- c(cost_values, cost_result$val)
-    thetas <- cbind(thetas, cost_result$theta)
-    residual <- c(residual, cost_result$residuals)
+    cost_values <- c(cost_values, cost_result$value)
+    thetas <- cbind(thetas, cost_result$par)
   }
 
   methods::new(
     Class = "fastcpd",
     call = match.call(),
     data = data.frame(data),
+    family = family,
     cp_set = cp_set,
     cost_values = cost_values,
     residuals = residual,
