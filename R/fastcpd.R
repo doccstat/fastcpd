@@ -66,7 +66,7 @@ setMethod("show", signature(object = "fastcpd"), function(object) {
     "plot, print, show, summary\n\n",
     sep = ""
   )
-  invisible(object)
+  print(object)
 })
 
 #' @export
