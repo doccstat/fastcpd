@@ -33,13 +33,14 @@ setClass(
 
 #' @export
 setMethod("plot", signature(x = "fastcpd"), function(x, ...) {
+  y <- x@data[, 1]
   p <- if (x@family == "custom") {
-    ggplot2::ggplot(data = data.frame(y = x@data[, 1], x = x@data[, -1, drop = FALSE]), ggplot2::aes(x = x, y = y)) +
-      ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = x@data[, 1])) +
+    ggplot2::ggplot(data = data.frame(y = y, x = x@data[, -1, drop = FALSE]), ggplot2::aes(x = x, y = y)) +
+      ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = y)) +
       ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
   } else {
-    ggplot2::ggplot(data = data.frame(y = x@data[, 1], x = x@data[, -1, drop = FALSE], label = "response"), ggplot2::aes(x = x, y = y)) +
-      ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = x@data[, 1])) +
+    ggplot2::ggplot(data = data.frame(y = y, x = x@data[, -1, drop = FALSE], label = "response"), ggplot2::aes(x = x, y = y)) +
+      ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = y)) +
       ggplot2::geom_vline(xintercept = x@cp_set, color = "red") +
       ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = x@residuals, label = "residual")) +
       ggplot2::facet_wrap(c("label"), ncol = 1)
@@ -109,7 +110,7 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #' @param segment_count Number of segments for initial guess.
 #' @param trim Trimming for the boundary change points.
 #' @param momentum_coef Momentum coefficient to be applied to each update.
-#' @param sgd_k Number of epochs in SGD.
+#' @param k Function on number of epochs in SGD.
 #' @param family Family of the model. Can be "binomial", "poisson", "lasso" or
 #'   "gaussian". If not provided, the user must specify the cost function and
 #'   its gradient (and Hessian).
@@ -135,7 +136,7 @@ fastcpd <- function(
   segment_count = 10,
   trim = 0.025,
   momentum_coef = 0,
-  sgd_k = 3,
+  k = function(x) 0,
   family = NULL,
   epsilon = 1e-10,
   min_prob = 10^10,
@@ -277,7 +278,7 @@ fastcpd <- function(
         hessian = hessian,
         tau = tau,
         i = i,
-        k = sgd_k,
+        k = k,
         family = family,
         momentum = momentum,
         momentum_coef = momentum_coef,

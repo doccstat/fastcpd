@@ -42,8 +42,7 @@ cost_update <- function(
   winsorise_maxval,
   lambda,
   cost_gradient,
-  cost_hessian,
-  kfunc = function(k, segment_length) {k - 1}
+  cost_hessian
 ) {
   hessian[, , i] <- if (family == "custom") {
     cost_hessian(data[nrow(data), ], theta_hat[, i], hessian[, , i])
@@ -74,7 +73,7 @@ cost_update <- function(
     theta_hat[, i] <- sign(theta_hat[, i]) * pmax(normd, 0)
   }
 
-  for (kk in 1 + seq_len(kfunc(k, nrow(data) - tau))) {
+  for (kk in 1 + seq_len(k(nrow(data) - tau))) {
     for (j in (tau + 1):nrow(data)) {
       hessian[, , i] <- if (family == "custom") {
         cost_hessian(data[j, ], theta_hat[, i], hessian[, , i])

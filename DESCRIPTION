@@ -1,7 +1,7 @@
 Package: fastcpd
 Type: Package
 Title: What the Package Does (Title Case)
-Version: 0.1.0
+Version: 0.1.1
 Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: Change-Point Detection Based on Dynamic Programming with Pruning
