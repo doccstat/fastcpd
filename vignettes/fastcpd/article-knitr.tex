@@ -1,0 +1,1402 @@
+% \citep[][Chapter~7.4]{Venables+Ripley:2002}
+% knitr::Sweave2knitr("article.Rnw"); knitr::knit("article-knitr.Rnw")
+\documentclass[article]{jss}\usepackage[]{graphicx}\usepackage[]{xcolor}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+%% -- LaTeX packages and custom commands ---------------------------------------
+
+%% recommended packages
+\usepackage{orcidlink,thumbpdf,lmodern}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\usepackage{geometry}
+\usepackage{pdflscape}
+
+%% another package (only for this demo article)
+\usepackage{framed}
+
+%% new custom commands
+\newcommand{\class}[1]{`\code{#1}'}
+\newcommand{\fct}[1]{\code{#1()}}
+
+%% For Sweave-based articles about R packages:
+%% need no \usepackage{Sweave}
+
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: bigmemory}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: foreach}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: rngtools}}\end{kframe}
+\end{knitrout}
+
+
+%% -- Article metainformation (author, title, ...) -----------------------------
+
+%% - \author{} with primary affiliation (and optionally ORCID link)
+%% - \Plainauthor{} without affiliations
+%% - Separate authors by \And or \AND (in \author) or by comma (in \Plainauthor).
+%% - \AND starts a new line, \And does not.
+\author{First Author~\orcidlink{0009-0006-2493-0853}\\Texas A\&M University
+   \And Second Author~\orcidlink{0009-0006-2493-0853}\\Texas A\&M University}
+\Plainauthor{First Author, Second Author}
+
+%% - \title{} in title case
+%% - \Plaintitle{} without LaTeX markup (if any)
+%% - \Shorttitle{} with LaTeX markup (if any), used as running title
+\title{\pkg{fastcpd}: Fast Change Point Detection in \proglang{R}}
+\Plaintitle{fastcpd: Fast Change Point Detection in R}
+\Shorttitle{Fast Change Point Detection in \proglang{R}}
+
+%% - \Abstract{} almost as usual
+\Abstract{
+  TBD
+}
+
+%% - \Keywords{} with LaTeX markup, at least one required
+%% - \Plainkeywords{} without LaTeX markup (if necessary)
+%% - Should be comma-separated and in sentence case.
+\Keywords{change point detection, gradient descent, quasi-newton, incremental gradient, \proglang{R}}
+\Plainkeywords{change point detection, gradient descent, quasi-newton, incremental gradient, R}
+
+%% - \Address{} of at least one author
+%% - May contain multiple affiliations for each author
+%%   (in extra lines, separated by \emph{and}\\).
+%% - May contain multiple authors for the same affiliation
+%%   (in the same first line, separated by comma).
+\Address{
+  Contact Author\\
+  Journal of Statistical Software\\
+  \emph{and}\\
+  Department of Statistics\\
+  Faculty of Economics and Statistics\\
+  Universit\"at Innsbruck\\
+  Universit\"atsstr.~15\\
+  6020 Innsbruck, Austria\\
+  E-mail: \email{Achim.Zeileis@R-project.org}\\
+  URL: \url{https://www.zeileis.org/}
+}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+%% -- Introduction -------------------------------------------------------------
+
+\section[Introduction: Fast change point detection in R]{Introduction: Fast change point detection in \proglang{R}} \label{sec:intro}
+
+\pkg{fastcpd} (\textbf{FAST} \textbf{C}hange \textbf{P}oint \textbf{D}etection)
+is an R package for fast offline change-point detection.
+Change-point detection is an important problem in many fields, including signal
+processing, finance, and biology. Given a sequence of data points, a
+change-point detection algorithm identifies points where the underlying
+statistical properties of the data change. \pkg{fastcpd} implements a novel
+approach for change-point detection that is orders of magnitude faster than
+existing methods, without sacrificing accuracy.
+
+The \pkg{fastcpd} method is based on a sequential optimization algorithm that
+uses gradient descent to efficiently search for change-points. The algorithm is
+designed to minimize a cost function that captures the likelihood of observing
+the data given a particular segmentation. The key idea is to update the cost
+function using information from previous steps, rather than re-optimizing the
+objective function at each step. This allows \pkg{fastcpd} to quickly identify
+change-points in long sequences of data, even when the cost function involves
+solving a non-trivial optimization problem.
+
+\pkg{fastcpd} supports change-point detection in a variety of settings,
+including generalized linear models and penalized regression. The package
+provides a simple and intuitive interface for users to specify their data and
+desired parameters, and produces output in a convenient format for further
+analysis. In addition, \pkg{fastcpd} includes a suite of visualization tools for
+exploring the results of the change-point detection algorithm.
+
+We believe that \pkg{fastcpd} will be a valuable tool for researchers and
+practitioners working with change-point detection problems. By providing fast
+and accurate change-point detection in a user-friendly package, \pkg{fastcpd}
+will enable users to more easily analyze and understand complex datasets.
+
+In \proglang{R} \citep{R}, \cite{killick2014changepoint} has implemented
+\pkg{changepoint} to detect change points with a linear computational cost.
+Functions including \fct{cpt.mean}, \fct{cpt.var}, \fct{PELT} etc are provided.
+The manuscript that this document is based on \citep{zhang2022sequential}
+then introduced sequential gradient descent and quasi-Newton's method.
+
+%% -- Manuscript ---------------------------------------------------------------
+
+\section{Models and software} \label{sec:models}
+
+Logistic regression, Poisson regression, linear regression, and penalized
+linear regression have already been implemented in \pkg{fastcpd} package. Some
+specifications are listed in Table~\ref{tab:models}. The signature of the main
+function \fct{fastcpd} is
+%
+\begin{Code}
+fastcpd(
+  data,
+  beta,
+  segment_count = 10,
+  trim = 0.025,
+  momentum_coef = 0,
+  sgd_k = 3,
+  family = NULL,
+  epsilon = 1e-10,
+  min_prob = 10^10,
+  winsorise_minval = -20,
+  winsorise_maxval = 20,
+  p = NULL,
+  cost = negative_log_likelihood,
+  cost_gradient = cost_update_gradient,
+  cost_hessian = cost_update_hessian
+)
+\end{Code}
+%
+where each parameters have the following usages:
+\begin{itemize}
+  \item \code{data}: A data frame containing the data to be segmented where each
+    row denotes each data point. In regression settings, the first column is the
+    response variable while the rest are covariates.
+  \item \code{beta}: Initial cost value specified in Algorithm~1 in
+    \cite{zhang2022sequential}.
+  \item \code{segment_count}: Number of segments for initial guess. If not
+    specified, the initial guess on the number of segments is 10.
+  \item \code{trim} Trimming for the boundary change points so that a change
+    point close to the boundary will not be counted as a change point. This
+    parameter also specifies the minimum distance between two change points. If
+    several change points have mutual distances smaller than
+    \code{trim * nrow(data)}, those change points will be merged into one single
+    change point.
+  \item \code{momentum_coef} Momentum coefficient to be applied to each update.
+    This parameter is used when the loss function is bad-shaped so that
+    maintaining a momentum from previous update is desired. Default value is 0,
+    meaning the algorithm doesn't maintain a momentum by default.
+  \item \code{sgd_k} Number of epochs in for each update whenever the algorithm
+    takes a new data point, in the sense that the data are analyzed sequentially
+    according to the nature of Pruned Exact Linear Time (PELT) algorithm
+    \citep{killick2012optimal}.
+  \item \code{family} Family of the model. Can be ``\code{binomial}'', ``\code{poisson}'',
+    ``\code{lasso}'', ``\code{gaussian}'' or ``\code{custom}''. For simplicity,
+    user can also omit this parameter, indicating that they will be using their
+    own cost functions. If specified as ``\code{custom}'' or ``\code{NULL}'', the user must
+    specify the cost function, gradient and corresponding Hessian matrix.
+    Hessian is preferred when the user want to specify their own cost function,
+    but not analytically available, the user should provide a single number
+    (diagonal matrix) to replace the Hessian matrix. Should be left as
+    \code{NULL} if the user would like to use their own cost functions.
+  \item \code{epsilon} Epsilon to avoid numerical issues. Only used for Logistic
+    Regression and Poisson Regression.
+  \item \code{min_prob} Minimum probability to avoid numerical issues. Only used
+    for Poisson Regression.
+  \item \code{winsorise_minval} Minimum value for the parameter in Poisson
+    Regression to be winsorised.
+  \item \code{winsorise_maxval} Maximum value for the parameter in Poisson
+    Regression to be winsorised.
+  \item \code{lambda} Lambda for L1 regularization. Only used in ``lasso''.
+  \item \code{cost} Cost function to be used. This and the following two
+    parameters should not be specified at the same time with \code{family}.
+    If not specified, the default is the negative log-likelihood for the
+    corresponding family.
+  \item \code{cost_gradient} Gradient function for the custom cost function.
+  \item \code{cost_hessian} Hessian function for the custom cost function.
+\end{itemize}
+Return of the function is a list containing two elements:
+\begin{itemize}
+  \item \code{cp_set}: A vector containing the change points.
+  \item \code{cost_value}: Values of the cost function for each data segments
+    separated by the change points.
+\end{itemize}
+
+A \class{fastcpd} object is returned by the function. This object can be used
+to plot the change points and the cost function values. Compatible functions
+include \fct{plot}, \fct{print} and \fct{summary}.
+
+\begin{table}[t!]
+\centering
+\begin{tabular}{llp{10cm}}
+\hline
+Model               & \code{family}   & Description \\ \hline
+Linear Regression   & \code{gaussian} & Will be using pre-defined cost functions,
+                                        details can be found in
+                                        Section~\ref{sec:linear model} \\
+Logistic Regression & \code{binomial} & Will be using pre-defined cost functions,
+                                        details can be found in
+                                        Section~\ref{sec:logistic_regression} \\
+Poisson Regression  & \code{poisson}  & Will be using pre-defined cost functions,
+                                        details can be found in
+                                        Section~\ref{sec:poisson} \\
+LASSO               & \code{lasso}    & Will be using pre-defined cost functions,
+                                        details can be found in
+                                        Section~\ref{sec:linear model} \\ \hline
+User-defined Model  & \code{custom}   & If \code{family} is specified as ``custom''
+                                        or \code{NULL}, \code{cost}, \code{cost_gradient}
+                                        and \code{cost_hessian} must be provided. \\
+Huber Regression    & \code{custom}   & Instead of providing Huber Regression
+                                        as a built-in model, we provide an example
+                                        of how to use \code{custom} model. Details
+                                        can be found in Section~\ref{sec:huber} \\
+Quantile Regression & \code{custom}   & Instead of providing Quantile Regression
+                                        as a built-in model, we provide an example
+                                        of how to use \code{custom} model. Details
+                                        can be found in Section~\ref{sec:quantile} \\
+Mean Shift          & \code{custom}   & Instead of providing Quantile Regression
+                                        as a built-in model, we provide an example
+                                        of how to use \code{custom} model. Details
+                                        can be found in Section~\ref{sec:mean shift model} \\ \hline
+\end{tabular}
+\caption{\label{tab:models} All the models that have been implemented in the
+package, including an empty model so that the users are able to provide their
+own.}
+\end{table}
+
+\section{Changes in linear models} \label{sec:linear model}
+
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{summary}\hlstd{(linear_regression_result)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## fastcpd(data = data, beta = beta, k = function(x) 0, family = "gaussian", 
+##     epsilon = 1e-05)
+## 
+## [1] "Residuals:"
+##        Min         1Q     Median         3Q        Max 
+## -1.9500129 -0.4839276  0.0068760  0.4708422  1.8456402 
+## 
+## Change points:
+## [1]  76 150 225
+\end{verbatim}
+\begin{alltt}
+\hlkwd{plot}\hlstd{(linear_regression_result)}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/linear_regression_plot-1} 
+\end{knitrout}
+
+\newgeometry{margin=1cm}
+\begin{landscape}
+
+\begin{table}[t!]
+  \centering
+  \begin{tabular}{@{}cccccccccc@{}}
+  \toprule
+                          & \multicolumn{3}{c}{p=1}                                            & \multicolumn{3}{c}{p=3}                                            & \multicolumn{3}{c}{p=5}                                            \\
+                          & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               \\ \midrule
+  \multirow{4}{*}{cpc=0} & 1.00, 1.48s & 1.00, 3.88s & 1.00, 12.12s & 1.00, 1.59s & 1.00, 3.36s & 1.00, 9.72s & 1.00, 1.81s & 1.00, 3.87s & 1.00, 12.16s \\
+                          & 1.00, 103.61s & 1.00, 341.06s & 1.00, 1178.56s & 1.00, 61.17s & 1.00, 226.55s & 1.00, 1283.73s & 1.00, 96.40s & 1.00, 282.26s & 1.00, 913.02s \\
+                          & 1.00, 156.23s & 1.00, 481.71s & 1.00, 1376.99s & 1.00, 78.88s & 1.00, 228.14s & 1.00, 3373.77s & 1.00, 109.70s & 1.00, 346.53s & 1.00, 3554.79s \\
+                          & 0.90, 40.71s & 1.00, 194.13s & 1.00, 1160.40s & 1.00, 37.18s & 0.90, 168.97s & 0.91, 603.55s & 0.56, 28.89s & 0.40, 93.09s & 0.77, 473.10s \\ \midrule
+  \multirow{4}{*}{cpc=1} & 0.98, 2.40s & 0.98, 6.25s & 0.98, 14.13s & 0.98, 1.72s & 0.99, 4.53s & 0.99, 16.93s & 0.99, 2.18s & 0.99, 5.41s & 1.00, 14.97s \\
+                          & 0.91, 93.22s & 0.98, 428.46s & 1.00, 2755.46s & 0.97, 92.85s & 0.98, 348.92s & 1.00, 2078.98s & 1.00, 69.20s & 1.00, 288.67s & 1.00, 1975.72s \\
+                          & 0.96, 186.53s & 0.99, 931.36s & 0.99, 4333.45s & 0.99, 158.12s & 0.99, 602.64s & 1.00, 4723.81s & 0.98, 210.51s & 1.00, 440.30s & 1.00, 2915.44s \\
+                          & 0.96, 31.05s & 1.00, 110.85s & 0.97, 650.02s & 0.92, 19.16s & 0.97, 87.13s & 0.97, 574.22s & 0.98, 21.14s & 0.88, 73.06s & 0.92, 417.99s \\ \midrule
+  \multirow{4}{*}{cpc=3} & 0.75, 2.58s & 0.99, 7.00s & 0.99, 16.35s & 0.83, 2.01s & 0.99, 4.20s & 1.00, 10.48s & 0.84, 2.14s & 0.99, 4.95s & 1.00, 14.83s \\
+                          & 0.83, 116.19s & 0.97, 586.45s & 0.99, 2609.28s & 0.82, 74.45s & 0.99, 218.70s & 1.00, 1940.88s & 0.92, 77.67s & 0.99, 323.52s & 1.00, 1697.94s \\
+                          & 0.82, 227.43s & 0.97, 903.17s & 0.99, 3847.89s & 0.81, 199.59s & 0.99, 517.29s & 1.00, 2144.98s & 0.92, 113.10s & 0.92, 618.55s & 1.00, 3090.91s \\
+                          & 0.92, 23.83s & 0.96, 70.75s & 0.98, 373.69s & 0.98, 14.70s & 0.98, 45.15s & 1.00, 289.93s & 0.95, 10.81s & 0.94, 44.93s & 0.98, 242.29s \\ \midrule
+  \multirow{4}{*}{cpc=5} & 0.67, 2.82s & 0.82, 7.87s & 0.99, 15.63s & 0.55, 2.32s & 0.88, 7.17s & 0.99, 16.55s & 0.75, 1.86s & 0.96, 4.67s & 1.00, 10.74s \\
+                          & 0.79, 111.85s & 0.83, 455.71s & 0.99, 2270.08s & 0.83, 46.30s & 0.93, 311.22s & 0.99, 1719.32s & 0.79, 72.71s & 1.00, 115.01s & 1.00, 1357.81s \\
+                          & 0.52, 200.35s & 0.89, 848.59s & 0.99, 2710.85s & 0.94, 92.61s & 0.99, 294.48s & 0.99, 2647.00s & 0.91, 138.84s & 1.00, 366.56s & 0.99, 2266.15s \\
+                          & 0.87, 17.31s & 0.97, 59.14s & 0.99, 225.48s & 0.97, 10.93s & 0.99, 42.71s & 0.99, 203.91s & 0.96, 9.39s & 0.98, 30.35s & 0.98, 150.41s \\ \bottomrule
+  \end{tabular}
+  \caption{\label{tab:linear regression comparison} Comparison of the algorithms for the linear regression model in mean.}
+\end{table}
+
+\end{landscape}
+\restoregeometry
+
+\section{Changes in generalized linear models: Logistic regression} \label{sec:logistic_regression}
+
+We first consider the change-point detection problem in the generalized linear
+models (GLM). Suppose we have a data set containing a set of
+predictors/covariates and corresponding response variables, i.e. each data point
+\code{data[i, ]} contains a set of predictors/covariates \code{data[i, -1]} and
+a response \code{data[i, 1]}. The reason we set the first column to be the
+response variables are that in \proglang{R}, we can use \code{-1} to denote all
+columns other than the first column without the need to consider number of
+columns altogether.
+
+Suppose the response variables follows a binomial distribution with specifics
+defined as
+%
+\begin{equation} \label{eq:logistic_regression}
+y_i \sim \mathrm{Bernoulli}\left(\frac{1}{1 + e^{- x_i^\top \theta_i}}\right),
+\quad x_i \sim \mathcal{N}_p(0, \Sigma)\ \mathrm{with}\ \Sigma =
+(0.9^{\lvert i - j \rvert})_{p \times p}, \quad 1 \le i \le n,
+\end{equation}
+%
+where $\{y_i\}$ is the response variable, $\{x_i\}$ is the covariate vector,
+$\Sigma$ is the covariance matrix for the sampling of $\{x_i\}$, $p$ is the
+number of predictors, $n$ is the total number of data points.
+
+We now use the \pkg{fastcpd} package to detect the change points in the data set
+\code{data}.
+%
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: fit\_glm: fitted probabilities numerically 0 or 1 occurred}}
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: fit\_glm: fitted probabilities numerically 0 or 1 occurred}}
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: fit\_glm: fitted probabilities numerically 0 or 1 occurred}}
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: fit\_glm: fitted probabilities numerically 0 or 1 occurred}}
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: fit\_glm: fitted probabilities numerically 0 or 1 occurred}}
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: fit\_glm: fitted probabilities numerically 0 or 1 occurred}}
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: fit\_glm: fitted probabilities numerically 0 or 1 occurred}}\end{kframe}
+\end{knitrout}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{summary}\hlstd{(logistic_regression_result)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## fastcpd(data = data, beta = beta, k = function(x) 0, family = "binomial", 
+##     epsilon = 1e-05)
+## 
+## [1] "Residuals:"
+##       Min        1Q    Median        3Q       Max 
+## -22.20031  -1.01676  -0.00002   1.02329  58.02099 
+## 
+## Change points:
+## [1]  26  73 104 117 144 212 250 267 278
+\end{verbatim}
+\begin{alltt}
+\hlkwd{plot}\hlstd{(logistic_regression_result)}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/logistic_regression_plot-1} 
+\begin{kframe}\begin{alltt}
+\hlcom{# n <- 500}
+\hlcom{# p <- 8}
+\hlcom{# x <- cbind(1, mvtnorm::rmvnorm(n, rep(0, p - 1), diag(p - 1)))}
+\hlcom{# xb <- c(}
+\hlcom{#   x[1:225, ] %*% c(-1, rnorm(p - 1, 0.5, 0.1)),}
+\hlcom{#   x[226:500, ] %*% c(1, rnorm(p - 1, 0.5, 0.1))}
+\hlcom{# )}
+\hlcom{# y <- rbinom(n, size = 1, prob = 1 / (1 + exp(-xb)))}
+\hlcom{# data <- cbind(y, x)}
+\hlcom{# logistic_regression_result <- fastcpd(}
+\hlcom{#   data = data,}
+\hlcom{#   beta = (p + 1) * log(n) / 2,}
+\hlcom{#   family = "binomial"}
+\hlcom{# )}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\newgeometry{margin=1cm}
+\begin{landscape}
+
+  \begin{table}[t!]
+    \centering
+    \begin{tabular}{@{}cccccccccc@{}}
+    \toprule
+                           & \multicolumn{3}{c}{p=1}                                            & \multicolumn{3}{c}{p=3}                                            & \multicolumn{3}{c}{p=5}                                            \\
+                           & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               \\ \midrule
+    \multirow{4}{*}{cpc=0} & 0.61, 1.34s & 0.64, 2.96s & 0.61, 8.70s & 0.22, 1.01s & 0.21, 2.16s & 0.30, 6.24s & 0.12, 0.96s & 0.10, 1.93s & 0.11, 5.35s \\
+                           & 0.67, 23.88s & 0.66, 101.76s & 0.88, 405.55s & 0.15, 6.41s & 0.11, 14.61s & 0.15, 91.25s & 0.07, 4.94s & 0.07, 10.64s & 0.15, 31.18s \\
+                           & 0.77, 45.09s & 0.85, 185.40s & 0.82, 784.56s & 0.09, 6.70s & 0.08, 18.90s & 0.15, 101.19s & 0.07, 7.75s & 0.07, 16.13s & 0.16, 60.53s \\
+                           & 0.48, 23.04s & 0.53, 79.22s & 0.65, 238.85s & 0.06, 10.93s & 0.09, 21.36s & 0.20, 78.12s & 0.07, 10.18s & 0.06, 21.70s & 0.27, 64.66s \\ \midrule
+    \multirow{4}{*}{cpc=1} & 0.69, 1.47s & 0.78, 3.30s & 0.85, 10.43s & 0.67, 0.91s & 0.65, 2.19s & 0.68, 6.29s & 0.58, 0.94s & 0.60, 1.88s & 0.61, 5.68s \\
+                           & 0.64, 22.21s & 0.75, 76.50s & 0.81, 452.43s & 0.63, 4.55s & 0.60, 15.78s & 0.61, 80.27s & 0.57, 4.42s & 0.57, 10.38s & 0.67, 30.22s \\
+                           & 0.84, 33.11s & 0.69, 143.66s & 0.68, 681.70s & 0.57, 6.26s & 0.59, 17.69s & 0.64, 128.01s & 0.57, 7.94s & 0.57, 18.31s & 0.61, 81.24s \\
+                           & 0.71, 22.97s & 0.70, 73.92s & 0.83, 253.55s & 0.56, 9.30s & 0.59, 22.18s & 0.65, 88.01s & 0.57, 9.86s & 0.56, 24.33s & 0.61, 74.32s \\ \midrule
+    \multirow{4}{*}{cpc=3} & 0.76, 1.28s & 0.76, 2.79s & 0.87, 10.19s & 0.85, 0.94s & 0.87, 2.27s & 0.82, 5.94s & 0.83, 0.97s & 0.83, 1.92s & 0.82, 5.16s \\
+                           & 0.71, 18.69s & 0.78, 90.92s & 0.75, 405.34s & 0.83, 5.63s & 0.83, 16.40s & 0.86, 86.75s & 0.82, 4.81s & 0.81, 10.35s & 0.82, 37.93s \\
+                           & 0.62, 35.17s & 0.76, 99.60s & 0.67, 609.95s & 0.82, 7.69s & 0.82, 25.64s & 0.85, 104.59s & 0.81, 8.07s & 0.81, 15.89s & 0.83, 64.66s \\
+                           & 0.58, 28.55s & 0.74, 66.22s & 0.84, 225.26s & 0.82, 12.20s & 0.83, 22.50s & 0.81, 83.54s & 0.82, 11.57s & 0.80, 23.02s & 0.81, 71.49s \\ \midrule
+    \multirow{4}{*}{cpc=5} & 0.67, 1.13s & 0.80, 3.01s & 0.78, 9.63s & 0.86, 0.88s & 0.90, 2.02s & 0.90, 6.32s & 0.89, 0.89s & 0.89, 1.79s & 0.88, 5.04s \\
+                           & 0.71, 19.48s & 0.72, 59.59s & 0.81, 349.84s & 0.89, 4.97s & 0.88, 12.10s & 0.90, 55.76s & 0.89, 5.49s & 0.88, 9.70s & 0.89, 33.49s \\
+                           & 0.83, 38.36s & 0.63, 142.46s & 0.80, 592.42s & 0.89, 8.16s & 0.90, 23.92s & 0.90, 99.00s & 0.90, 8.36s & 0.89, 19.43s & 0.87, 60.18s \\
+                           & 0.51, 24.90s & 0.67, 70.35s & 0.83, 221.87s & 0.88, 9.02s & 0.89, 25.20s & 0.87, 68.76s & 0.89, 9.85s & 0.88, 20.84s & 0.80, 49.09s \\ \bottomrule
+    \end{tabular}
+    \caption{\label{tab:logistic regression comparison} Comparison of the algorithms for the logistic regression model in mean.}
+  \end{table}
+
+\end{landscape}
+\restoregeometry
+
+% \begin{figure}[t!]
+% \centering
+% <<logistic regression visualization, echo=FALSE, fig=TRUE, height=5.2, width=7>>=
+% benchmarked <- microbenchmark::microbenchmark(
+%   "SGD PELT k = 1" = fastcpd(
+%     data = data, beta = (p + 1) * log(n) / 2, k = function(x) 0, family = "binomial"
+%   ),
+%   "SGD PELT k = 3" = fastcpd(
+%     data = data, beta = (p + 1) * log(n) / 2, k = function(x) 2, family = "binomial"
+%   ),
+%   "SGD PELT k = 5" = fastcpd(
+%     data = data, beta = (p + 1) * log(n) / 2, k = function(x) 4, family = "binomial"
+%   ),
+%   "Vanilla PELT" = CP_vanilla_binomial(data[, c(1:p + 1, 1)], (p + 1) * log(n) / 2)$cp,
+%   times = 2
+% )
+% ggplot2::autoplot(benchmarked)
+% @
+% \caption{\label{fig:logistic regression bench mark} Benchmarking results for
+% the logistic regression model.}
+% \end{figure}
+
+% \begin{table}[t!]
+% \centering
+% \begin{tabular}{llp{10cm}}
+% \hline
+% Algorithm        & Median Time (s)   & Change Points \\ \hline
+% SGD PELT $k = 1$ & summary(benchmarked)[1, 5] & fastcpd(data, (p + 1) * log(n) / 2, k = function(x) 0, family = "binomial")@cp_set \\
+% SGD PELT $k = 3$ & summary(benchmarked)[2, 5] & fastcpd(data, (p + 1) * log(n) / 2, k = function(x) 2, family = "binomial")@cp_set \\
+% SGD PELT $k = 5$ & summary(benchmarked)[3, 5] & fastcpd(data, (p + 1) * log(n) / 2, k = function(x) 4, family = "binomial")@cp_set \\
+% Vanilla PELT     & summary(benchmarked)[4, 5] & CP_vanilla_binomial(data[, c(1:p + 1, 1)], (p + 1) * log(n) / 2)$cp \\ \hline
+% \end{tabular}
+% \caption{\label{tab:logistic regression comparison} Comparison of the
+% algorithms for the logistic regression model.}
+% \end{table}
+
+\section{Changes in generalized linear models: Poisson regression} \label{sec:poisson}
+
+We now consider the change-point detection problem in the Poisson Regression
+setting.
+%
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{data_gen_poisson} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{n}\hlstd{,} \hlkwc{p}\hlstd{,} \hlkwc{true.coef}\hlstd{,} \hlkwc{true.cp.loc}\hlstd{,} \hlkwc{Sigma}\hlstd{,} \hlkwc{evar}\hlstd{) \{}
+  \hlstd{loc} \hlkwb{<-} \hlkwd{unique}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{, true.cp.loc, n))}
+  \hlkwa{if}\hlstd{(}\hlkwd{dim}\hlstd{(true.coef)[}\hlnum{2}\hlstd{]} \hlopt{!=} \hlkwd{length}\hlstd{(loc)}\hlopt{-}\hlnum{1}\hlstd{)} \hlkwd{stop}\hlstd{(}\hlstr{"true.coef and true.cp.loc do not match"}\hlstd{)}
+  \hlstd{x} \hlkwb{<-} \hlstd{mvtnorm}\hlopt{::}\hlkwd{rmvnorm}\hlstd{(n,} \hlkwc{mean} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{, p),} \hlkwc{sigma} \hlstd{= Sigma)}
+  \hlstd{y} \hlkwb{<-} \hlkwa{NULL}
+  \hlkwa{for}\hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlstd{(}\hlkwd{length}\hlstd{(loc)}\hlopt{-}\hlnum{1}\hlstd{))}
+  \hlstd{\{}
+    \hlstd{Xb} \hlkwb{<-} \hlstd{x[(loc[i]} \hlopt{+} \hlnum{1}\hlstd{)}\hlopt{:}\hlstd{loc[i} \hlopt{+} \hlnum{1}\hlstd{], ,}\hlkwc{drop}\hlstd{=}\hlnum{FALSE}\hlstd{]}\hlopt{%*%}\hlstd{true.coef[,i,}\hlkwc{drop}\hlstd{=}\hlnum{FALSE}\hlstd{]}
+    \hlstd{y} \hlkwb{<-} \hlkwd{c}\hlstd{(y,} \hlkwd{rpois}\hlstd{(loc[i} \hlopt{+} \hlnum{1}\hlstd{]} \hlopt{-} \hlstd{loc[i],} \hlkwd{exp}\hlstd{(Xb)))}
+  \hlstd{\}}
+  \hlstd{data} \hlkwb{<-} \hlkwd{cbind}\hlstd{(y, x)}
+  \hlstd{true_cluster} \hlkwb{<-} \hlkwd{rep}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{(}\hlkwd{length}\hlstd{(loc)}\hlopt{-}\hlnum{1}\hlstd{),} \hlkwd{diff}\hlstd{(loc))}
+  \hlstd{result} \hlkwb{<-} \hlkwd{list}\hlstd{(data, true_cluster)}
+  \hlkwd{return}\hlstd{(result)}
+\hlstd{\}}
+
+\hlstd{cost_glm_poisson} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{data}\hlstd{,} \hlkwc{family}\hlstd{=}\hlstr{"poisson"}\hlstd{)}
+\hlstd{\{}
+\hlstd{data} \hlkwb{<-} \hlkwd{as.matrix}\hlstd{(data)}
+\hlstd{p} \hlkwb{<-} \hlkwd{dim}\hlstd{(data)[}\hlnum{2}\hlstd{]} \hlopt{-} \hlnum{1}
+\hlstd{out} \hlkwb{<-} \hlkwd{fastglm}\hlstd{(}\hlkwd{as.matrix}\hlstd{(data[,}\hlnum{1}\hlopt{:}\hlstd{p]), data[,p}\hlopt{+}\hlnum{1}\hlstd{],} \hlkwc{family}\hlstd{=family)}
+\hlkwd{return}\hlstd{(out}\hlopt{$}\hlstd{deviance}\hlopt{/}\hlnum{2}\hlstd{)}
+\hlstd{\}}
+
+\hlstd{CP_vanilla_poisson} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{data}\hlstd{,} \hlkwc{beta}\hlstd{,} \hlkwc{cost}\hlstd{=cost_glm_poisson,} \hlkwc{trim} \hlstd{=} \hlnum{0.025}\hlstd{)}
+\hlstd{\{}
+\hlstd{n} \hlkwb{<-} \hlkwd{dim}\hlstd{(data)[}\hlnum{1}\hlstd{]}
+\hlstd{p} \hlkwb{<-} \hlkwd{dim}\hlstd{(data)[}\hlnum{2}\hlstd{]} \hlopt{-} \hlnum{1}
+\hlstd{Fobj} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlopt{-}\hlstd{beta,} \hlnum{0}\hlstd{)}
+\hlstd{cp_set} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwa{NULL}\hlstd{,}\hlnum{0}\hlstd{)}
+\hlstd{set} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{)}
+ \hlkwa{for}\hlstd{(t} \hlkwa{in} \hlnum{2}\hlopt{:}\hlstd{n)}
+ \hlstd{\{}
+ \hlstd{m} \hlkwb{<-} \hlkwd{length}\hlstd{(set)}
+ \hlstd{cval} \hlkwb{<-} \hlkwd{rep}\hlstd{(}\hlnum{NA}\hlstd{, m)}
+  \hlkwa{for}\hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlstd{m)}
+  \hlstd{\{}
+  \hlstd{k} \hlkwb{<-} \hlstd{set[i]} \hlopt{+} \hlnum{1}
+  \hlkwa{if}\hlstd{(t}\hlopt{-}\hlstd{k}\hlopt{>=}\hlstd{p}\hlopt{-}\hlnum{1}\hlstd{) cval[i]} \hlkwb{<-} \hlkwd{suppressWarnings}\hlstd{(}\hlkwd{cost}\hlstd{(data[k}\hlopt{:}\hlstd{t,,} \hlkwc{drop} \hlstd{=} \hlnum{FALSE}\hlstd{]))} \hlkwa{else} \hlstd{cval[i]} \hlkwb{<-} \hlnum{0}
+  \hlstd{\}}
+ \hlstd{obj} \hlkwb{<-} \hlstd{cval} \hlopt{+} \hlstd{Fobj[set}\hlopt{+}\hlnum{1}\hlstd{]} \hlopt{+} \hlstd{beta}
+ \hlstd{min_val} \hlkwb{<-} \hlkwd{min}\hlstd{(obj)}
+ \hlstd{ind} \hlkwb{<-} \hlkwd{which}\hlstd{(obj}\hlopt{==}\hlstd{min_val)[}\hlnum{1}\hlstd{]}
+ \hlstd{cp_set_add} \hlkwb{<-} \hlkwd{c}\hlstd{(cp_set[[set[ind]}\hlopt{+}\hlnum{1}\hlstd{]], set[ind])}
+ \hlstd{cp_set} \hlkwb{<-} \hlkwd{append}\hlstd{(cp_set,}\hlkwd{list}\hlstd{(cp_set_add))}
+ \hlstd{ind2} \hlkwb{<-} \hlstd{(cval} \hlopt{+} \hlstd{Fobj[set}\hlopt{+}\hlnum{1}\hlstd{])} \hlopt{<=} \hlstd{min_val}
+ \hlstd{set} \hlkwb{<-} \hlkwd{c}\hlstd{(set[ind2], t)}
+ \hlstd{Fobj} \hlkwb{<-} \hlkwd{c}\hlstd{(Fobj, min_val)}
+ \hlstd{\}}
+\hlstd{cp} \hlkwb{<-} \hlstd{cp_set[[n}\hlopt{+}\hlnum{1}\hlstd{]]}
+\hlstd{nLL} \hlkwb{<-} \hlnum{0}
+
+\hlstd{cp} \hlkwb{<-} \hlstd{cp[(cp} \hlopt{>=} \hlstd{trim} \hlopt{*} \hlstd{n)} \hlopt{&} \hlstd{(cp} \hlopt{<=} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{trim)} \hlopt{*} \hlstd{n)]}
+\hlstd{cp} \hlkwb{<-} \hlkwd{sort}\hlstd{(}\hlkwd{unique}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{, cp)))}
+
+\hlstd{segment_indices} \hlkwb{<-} \hlkwd{which}\hlstd{((}\hlkwd{diff}\hlstd{(cp)} \hlopt{<} \hlstd{trim} \hlopt{*} \hlstd{n)} \hlopt{==} \hlnum{TRUE}\hlstd{)}
+\hlkwa{if} \hlstd{(}\hlkwd{length}\hlstd{(segment_indices)} \hlopt{>} \hlnum{0}\hlstd{) \{}
+  \hlstd{cp} \hlkwb{<-} \hlkwd{floor}\hlstd{(}
+    \hlstd{(cp[}\hlopt{-}\hlstd{(segment_indices} \hlopt{+} \hlnum{1}\hlstd{)]} \hlopt{+} \hlstd{cp[}\hlopt{-}\hlstd{segment_indices])} \hlopt{/} \hlnum{2}
+  \hlstd{)}
+\hlstd{\}}
+\hlstd{cp_loc} \hlkwb{<-} \hlkwd{unique}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,cp,n))}
+\hlkwa{for}\hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlstd{(}\hlkwd{length}\hlstd{(cp_loc)}\hlopt{-}\hlnum{1}\hlstd{))}
+ \hlstd{\{}
+ \hlstd{seg} \hlkwb{<-} \hlstd{(cp_loc[i]}\hlopt{+}\hlnum{1}\hlstd{)}\hlopt{:}\hlstd{cp_loc[i}\hlopt{+}\hlnum{1}\hlstd{]}
+ \hlstd{data_seg} \hlkwb{<-} \hlstd{data[seg,]}
+ \hlstd{out} \hlkwb{<-} \hlkwd{fastglm}\hlstd{(}\hlkwd{as.matrix}\hlstd{(data_seg[,} \hlnum{1}\hlopt{:}\hlstd{p]), data_seg[, p}\hlopt{+}\hlnum{1}\hlstd{],} \hlkwc{family}\hlstd{=}\hlstr{"poisson"}\hlstd{)}
+ \hlstd{nLL} \hlkwb{<-} \hlstd{out}\hlopt{$}\hlstd{deviance}\hlopt{/}\hlnum{2} \hlopt{+} \hlstd{nLL}
+ \hlstd{\}}
+
+\hlstd{output} \hlkwb{<-} \hlkwd{list}\hlstd{(cp, nLL)}
+\hlkwd{names}\hlstd{(output)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"cp"}\hlstd{,} \hlstr{"nLL"}\hlstd{)}
+\hlkwd{return}\hlstd{(output)}
+\hlstd{\}}
+\hlstd{experiment_setup} \hlkwb{<-} \hlstd{purrr}\hlopt{::}\hlkwd{cross_df}\hlstd{(}
+  \hlkwd{list}\hlstd{(}
+    \hlkwc{n} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{300}\hlstd{,} \hlnum{600}\hlstd{,} \hlnum{1500}\hlstd{),}
+    \hlkwc{p} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{5}\hlstd{),}
+    \hlkwc{change_points_count} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{5}\hlstd{),}
+    \hlkwc{sgd_k} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{5}\hlstd{,} \hlnum{7}\hlstd{)}
+  \hlstd{)}
+\hlstd{)}
+\hlstd{experiment_num} \hlkwb{<-} \hlnum{10}
+
+\hlstd{rand_gd} \hlkwb{<-} \hlstd{time_gd} \hlkwb{<-} \hlkwd{rep}\hlstd{(}\hlkwd{list}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{NA}\hlstd{, experiment_num)),} \hlkwd{nrow}\hlstd{(experiment_setup))}
+\hlstd{rng} \hlkwb{<-} \hlkwd{RNGseq}\hlstd{(experiment_num} \hlopt{*} \hlkwd{nrow}\hlstd{(experiment_setup),} \hlnum{3}\hlstd{)}
+
+\hlstd{cl} \hlkwb{<-} \hlstd{parallel}\hlopt{::}\hlkwd{makeCluster}\hlstd{(parallel}\hlopt{::}\hlkwd{detectCores}\hlstd{(),} \hlkwc{outfile} \hlstd{=} \hlkwd{paste0}\hlstd{(}\hlstr{"log/poisson.log"}\hlstd{))}
+\hlstd{doParallel}\hlopt{::}\hlkwd{registerDoParallel}\hlstd{(cl)}
+\hlstd{experiment_result} \hlkwb{<-} \hlstd{foreach}\hlopt{::}\hlkwd{foreach}\hlstd{(}\hlkwc{experiment_setup_index} \hlstd{=} \hlkwd{seq_len}\hlstd{(}\hlkwd{nrow}\hlstd{(experiment_setup)),} \hlkwc{.packages} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"fastglm"}\hlstd{,} \hlstr{"fastcpd"}\hlstd{,} \hlstr{"fossil"}\hlstd{))} \hlopt{%:%}
+  \hlstd{foreach}\hlopt{::}\hlkwd{foreach}\hlstd{(}\hlkwc{experiment_index} \hlstd{=} \hlkwd{seq_len}\hlstd{(}\hlnum{5}\hlstd{),} \hlkwc{rrng} \hlstd{= rng[(experiment_setup_index} \hlopt{-} \hlnum{1}\hlstd{)} \hlopt{*} \hlstd{experiment_num} \hlopt{+} \hlkwd{seq_len}\hlstd{(}\hlnum{5}\hlstd{)],} \hlkwc{.combine} \hlstd{=} \hlstr{"rbind"}\hlstd{)} \hlopt{%dopar%} \hlstd{\{}
+    \hlstd{rngtools}\hlopt{::}\hlkwd{setRNG}\hlstd{(rrng)}
+    \hlstd{experiment_setup_row} \hlkwb{<-} \hlstd{experiment_setup[experiment_setup_index, ]}
+    \hlstd{n} \hlkwb{<-} \hlstd{experiment_setup_row}\hlopt{$}\hlstd{n}
+    \hlstd{p} \hlkwb{<-} \hlstd{experiment_setup_row}\hlopt{$}\hlstd{p}
+    \hlstd{change_points_count} \hlkwb{<-} \hlstd{experiment_setup_row}\hlopt{$}\hlstd{change_points_count}
+    \hlstd{sgd_k} \hlkwb{<-} \hlstd{experiment_setup_row}\hlopt{$}\hlstd{sgd_k}
+
+    \hlkwa{if} \hlstd{(p} \hlopt{==} \hlnum{1}\hlstd{) \{}
+      \hlstd{theta_0} \hlkwb{<-} \hlnum{1.2}
+    \hlstd{\}} \hlkwa{else} \hlstd{\{}
+      \hlstd{theta_0} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{1.2}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{,} \hlnum{0.5}\hlstd{,} \hlopt{-}\hlnum{2}\hlstd{)[}\hlkwd{seq_len}\hlstd{(p)]}
+    \hlstd{\}}
+
+    \hlstd{true.coef} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{rep}\hlstd{(theta_0, change_points_count} \hlopt{+} \hlnum{1}\hlstd{),} \hlkwc{nrow} \hlstd{= p,} \hlkwc{ncol} \hlstd{= change_points_count} \hlopt{+} \hlnum{1}\hlstd{)}
+
+    \hlstd{theta_norm} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0.36}\hlstd{,} \hlnum{NA}\hlstd{,} \hlnum{0.81}\hlstd{,} \hlnum{NA}\hlstd{,} \hlnum{1.96}\hlstd{)[p]}
+    \hlstd{delta} \hlkwb{<-} \hlkwd{rnorm}\hlstd{(p)}
+    \hlstd{sigma_} \hlkwb{<-} \hlnum{0.9}\hlopt{**}\hlkwd{abs}\hlstd{(}\hlkwd{row}\hlstd{(}\hlkwd{diag}\hlstd{(p))} \hlopt{-} \hlkwd{col}\hlstd{(}\hlkwd{diag}\hlstd{(p)))}
+    \hlstd{delta_coef} \hlkwb{<-} \hlkwd{sqrt}\hlstd{(theta_norm} \hlopt{/} \hlkwd{t}\hlstd{(delta)} \hlopt{%*%} \hlstd{sigma_} \hlopt{%*%} \hlstd{delta)}
+
+    \hlkwa{if} \hlstd{(change_points_count} \hlopt{==} \hlnum{0}\hlstd{) \{}
+      \hlstd{true.cp.loc} \hlkwb{<-} \hlkwa{NULL}
+    \hlstd{\}} \hlkwa{else if} \hlstd{(change_points_count} \hlopt{==} \hlnum{1}\hlstd{) \{}
+      \hlstd{true.cp.loc} \hlkwb{<-} \hlstd{n} \hlopt{/} \hlnum{2} \hlopt{*} \hlkwd{seq_len}\hlstd{(change_points_count)}
+      \hlstd{true.coef[,} \hlnum{2}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{+} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+    \hlstd{\}} \hlkwa{else if} \hlstd{(change_points_count} \hlopt{==} \hlnum{3}\hlstd{) \{}
+      \hlstd{true.cp.loc} \hlkwb{<-} \hlstd{n} \hlopt{/} \hlnum{4} \hlopt{*} \hlkwd{seq_len}\hlstd{(change_points_count)}
+      \hlstd{true.coef[,} \hlnum{2}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{+} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+      \hlstd{true.coef[,} \hlnum{4}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{-} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+    \hlstd{\}} \hlkwa{else if} \hlstd{(change_points_count} \hlopt{==} \hlnum{5}\hlstd{) \{}
+      \hlstd{true.cp.loc} \hlkwb{<-} \hlstd{n} \hlopt{/} \hlnum{6} \hlopt{*} \hlkwd{seq_len}\hlstd{(change_points_count)}
+      \hlstd{true.coef[,} \hlnum{2}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{+} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+      \hlstd{true.coef[,} \hlnum{4}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{-} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+      \hlstd{true.coef[,} \hlnum{6}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{+} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+    \hlstd{\}}
+
+    \hlstd{Sigma} \hlkwb{<-} \hlkwd{diag}\hlstd{(}\hlnum{1}\hlstd{, p)}
+    \hlstd{evar} \hlkwb{<-} \hlnum{0.5}
+    \hlstd{out} \hlkwb{<-} \hlkwd{data_gen_poisson}\hlstd{(n, p, true.coef, true.cp.loc, Sigma, evar)}
+    \hlstd{data} \hlkwb{<-} \hlstd{out[[}\hlnum{1}\hlstd{]]}
+    \hlstd{g_tr} \hlkwb{<-} \hlstd{out[[}\hlnum{2}\hlstd{]]}
+    \hlstd{beta} \hlkwb{<-} \hlkwd{log}\hlstd{(n)}\hlopt{/}\hlnum{2}
+
+    \hlkwa{if} \hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlkwd{paste0}\hlstd{(}\hlstr{"cache/poisson"}\hlstd{, experiment_setup_index,} \hlstr{"_"}\hlstd{, experiment_index,} \hlstr{".rds"}\hlstd{))) \{}
+      \hlstd{rds_file} \hlkwb{<-} \hlkwd{readRDS}\hlstd{(}\hlkwd{paste0}\hlstd{(}\hlstr{"cache/poisson"}\hlstd{, experiment_setup_index,} \hlstr{"_"}\hlstd{, experiment_index,} \hlstr{".rds"}\hlstd{))}
+      \hlstd{cp_set} \hlkwb{<-} \hlstd{rds_file}\hlopt{$}\hlstd{cp_set}
+      \hlstd{time_used} \hlkwb{<-} \hlstd{rds_file}\hlopt{$}\hlstd{time_used}
+    \hlstd{\}} \hlkwa{else} \hlstd{\{}
+      \hlstd{start} \hlkwb{<-} \hlkwd{proc.time}\hlstd{()}
+      \hlkwa{if} \hlstd{(sgd_k} \hlopt{==} \hlnum{7}\hlstd{) \{}
+        \hlstd{cp_set} \hlkwb{<-} \hlkwd{CP_vanilla_poisson}\hlstd{(data[,} \hlkwd{c}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{p} \hlopt{+} \hlnum{1}\hlstd{,} \hlnum{1}\hlstd{)], beta)}\hlopt{$}\hlstd{cp}
+      \hlstd{\}} \hlkwa{else} \hlstd{\{}
+        \hlstd{poisson_regression_result} \hlkwb{<-} \hlkwd{fastcpd}\hlstd{(}
+          \hlkwc{data} \hlstd{= data,}
+          \hlkwc{beta} \hlstd{= beta,}
+          \hlkwc{family} \hlstd{=} \hlstr{"poisson"}\hlstd{,}
+          \hlkwc{k} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) sgd_k} \hlopt{-} \hlnum{1}\hlstd{,}
+          \hlkwc{epsilon} \hlstd{=} \hlnum{1e-5}
+        \hlstd{)}
+        \hlstd{cp_set} \hlkwb{<-} \hlstd{poisson_regression_result}\hlopt{@}\hlkwc{cp_set}
+      \hlstd{\}}
+      \hlstd{time_used} \hlkwb{<-} \hlkwd{unname}\hlstd{((}\hlkwd{proc.time}\hlstd{()} \hlopt{-} \hlstd{start)[}\hlnum{3}\hlstd{])}
+      \hlkwd{saveRDS}\hlstd{(}\hlkwd{list}\hlstd{(}\hlkwc{data} \hlstd{= data,} \hlkwc{cp_set} \hlstd{= cp_set,} \hlkwc{time_used} \hlstd{= time_used),} \hlkwd{paste0}\hlstd{(}\hlstr{"cache/poisson"}\hlstd{, experiment_setup_index,} \hlstr{"_"}\hlstd{, experiment_index,} \hlstr{".rds"}\hlstd{))}
+    \hlstd{\}}
+    \hlstd{cp_gd} \hlkwb{<-} \hlstd{cp_set[}\hlopt{!}\hlstd{(cp_set}\hlopt{==}\hlnum{0}\hlstd{)]}
+    \hlstd{K_est} \hlkwb{<-} \hlkwd{length}\hlstd{(cp_gd)} \hlopt{+} \hlnum{1}
+    \hlstd{cp_un} \hlkwb{<-} \hlkwd{unique}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{, cp_gd, n))}
+    \hlstd{g_est} \hlkwb{<-} \hlkwd{rep}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{K_est,} \hlkwd{diff}\hlstd{(cp_un))}
+    \hlkwd{c}\hlstd{(fossil}\hlopt{::}\hlkwd{rand.index}\hlstd{(g_tr, g_est), time_used)}
+  \hlstd{\}}
+\hlstd{parallel}\hlopt{::}\hlkwd{stopCluster}\hlstd{(cl)}
+
+\hlstd{experiment_setup_index} \hlkwb{<-} \hlnum{25}
+\hlstd{experiment_setup_row} \hlkwb{<-} \hlstd{experiment_setup[experiment_setup_index, ]}
+\hlstd{n} \hlkwb{<-} \hlstd{experiment_setup_row}\hlopt{$}\hlstd{n}
+\hlstd{p} \hlkwb{<-} \hlstd{experiment_setup_row}\hlopt{$}\hlstd{p}
+\hlstd{change_points_count} \hlkwb{<-} \hlstd{experiment_setup_row}\hlopt{$}\hlstd{change_points_count}
+\hlstd{sgd_k} \hlkwb{<-} \hlstd{experiment_setup_row}\hlopt{$}\hlstd{sgd_k}
+
+\hlkwa{if} \hlstd{(p} \hlopt{==} \hlnum{1}\hlstd{) \{}
+  \hlstd{theta_0} \hlkwb{<-} \hlnum{1.2}
+\hlstd{\}} \hlkwa{else} \hlstd{\{}
+  \hlstd{theta_0} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{1.2}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{,} \hlnum{0.5}\hlstd{,} \hlopt{-}\hlnum{2}\hlstd{)[}\hlkwd{seq_len}\hlstd{(p)]}
+\hlstd{\}}
+
+\hlstd{true.coef} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{rep}\hlstd{(theta_0, change_points_count} \hlopt{+} \hlnum{1}\hlstd{),} \hlkwc{nrow} \hlstd{= p,} \hlkwc{ncol} \hlstd{= change_points_count} \hlopt{+} \hlnum{1}\hlstd{)}
+
+\hlstd{theta_norm} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0.36}\hlstd{,} \hlnum{NA}\hlstd{,} \hlnum{0.81}\hlstd{,} \hlnum{NA}\hlstd{,} \hlnum{1.96}\hlstd{)[p]}
+\hlstd{delta} \hlkwb{<-} \hlkwd{rnorm}\hlstd{(p)}
+\hlstd{sigma_} \hlkwb{<-} \hlnum{0.9}\hlopt{**}\hlkwd{abs}\hlstd{(}\hlkwd{row}\hlstd{(}\hlkwd{diag}\hlstd{(p))} \hlopt{-} \hlkwd{col}\hlstd{(}\hlkwd{diag}\hlstd{(p)))}
+\hlstd{delta_coef} \hlkwb{<-} \hlkwd{sqrt}\hlstd{(theta_norm} \hlopt{/} \hlkwd{t}\hlstd{(delta)} \hlopt{%*%} \hlstd{sigma_} \hlopt{%*%} \hlstd{delta)}
+
+\hlkwa{if} \hlstd{(change_points_count} \hlopt{==} \hlnum{0}\hlstd{) \{}
+  \hlstd{true.cp.loc} \hlkwb{<-} \hlkwa{NULL}
+\hlstd{\}} \hlkwa{else if} \hlstd{(change_points_count} \hlopt{==} \hlnum{1}\hlstd{) \{}
+  \hlstd{true.cp.loc} \hlkwb{<-} \hlstd{n} \hlopt{/} \hlnum{2} \hlopt{*} \hlkwd{seq_len}\hlstd{(change_points_count)}
+  \hlstd{true.coef[,} \hlnum{2}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{+} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+\hlstd{\}} \hlkwa{else if} \hlstd{(change_points_count} \hlopt{==} \hlnum{3}\hlstd{) \{}
+  \hlstd{true.cp.loc} \hlkwb{<-} \hlstd{n} \hlopt{/} \hlnum{4} \hlopt{*} \hlkwd{seq_len}\hlstd{(change_points_count)}
+  \hlstd{true.coef[,} \hlnum{2}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{+} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+  \hlstd{true.coef[,} \hlnum{4}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{-} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+\hlstd{\}} \hlkwa{else if} \hlstd{(change_points_count} \hlopt{==} \hlnum{5}\hlstd{) \{}
+  \hlstd{true.cp.loc} \hlkwb{<-} \hlstd{n} \hlopt{/} \hlnum{6} \hlopt{*} \hlkwd{seq_len}\hlstd{(change_points_count)}
+  \hlstd{true.coef[,} \hlnum{2}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{+} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+  \hlstd{true.coef[,} \hlnum{4}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{-} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+  \hlstd{true.coef[,} \hlnum{6}\hlstd{]} \hlkwb{<-} \hlstd{theta_0} \hlopt{+} \hlkwd{c}\hlstd{(delta_coef)} \hlopt{*} \hlstd{delta}
+\hlstd{\}}
+
+\hlstd{Sigma} \hlkwb{<-} \hlkwd{diag}\hlstd{(}\hlnum{1}\hlstd{, p)}
+\hlstd{evar} \hlkwb{<-} \hlnum{0.5}
+\hlstd{out} \hlkwb{<-} \hlkwd{data_gen_poisson}\hlstd{(n, p, true.coef, true.cp.loc, Sigma, evar)}
+\hlstd{data} \hlkwb{<-} \hlstd{out[[}\hlnum{1}\hlstd{]]}
+\hlstd{g_tr} \hlkwb{<-} \hlstd{out[[}\hlnum{2}\hlstd{]]}
+\hlstd{beta} \hlkwb{<-} \hlkwd{log}\hlstd{(n)}\hlopt{/}\hlnum{2}
+\hlstd{poisson_regression_result} \hlkwb{<-} \hlkwd{fastcpd}\hlstd{(}
+  \hlkwc{data} \hlstd{= data,}
+  \hlkwc{beta} \hlstd{= beta,}
+  \hlkwc{family} \hlstd{=} \hlstr{"poisson"}\hlstd{,}
+  \hlkwc{k} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)} \hlnum{0}\hlstd{,}
+  \hlkwc{epsilon} \hlstd{=} \hlnum{1e-4}
+\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+%
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{summary}\hlstd{(poisson_regression_result)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## fastcpd(data = data, beta = beta, k = function(x) 0, family = "poisson", 
+##     epsilon = 1e-04)
+## 
+## [1] "Residuals:"
+##       Min        1Q    Median        3Q       Max 
+## -1.000000 -1.000000 -0.577591  0.372314 12.995381 
+## 
+## Change points:
+## [1] 150
+\end{verbatim}
+\begin{alltt}
+\hlkwd{plot}\hlstd{(poisson_regression_result)}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/poisson_regression_plot-1} 
+\end{knitrout}
+
+\newgeometry{margin=1cm}
+\begin{landscape}
+
+  \begin{table}[t!]
+    \centering
+    \begin{tabular}{@{}cccccccccc@{}}
+    \toprule
+                           & \multicolumn{3}{c}{p=1}                                            & \multicolumn{3}{c}{p=3}                                            & \multicolumn{3}{c}{p=5}                                            \\
+                           & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               \\ \midrule
+    \multirow{4}{*}{cpc=0} & 0.57, 4.11s & 0.69, 5.24s & 0.65, 9.85s & 0.14, 3.62s & 0.12, 4.08s & 0.12, 6.50s & 0.46, 7.12s & 0.50, 10.33s & 0.50, 14.94s \\
+                           & 0.71, 24.17s & 0.64, 62.72s & 0.64, 413.16s & 0.21, 2.49s & 0.17, 10.75s & 0.15, 45.75s & 0.47, 8.53s & 0.50, 15.08s & 0.50, 33.78s \\
+                           & 0.58, 41.26s & 0.41, 145.26s & 0.51, 739.57s & 0.20, 4.70s & 0.16, 16.23s & 0.18, 61.29s & 0.44, 10.64s & 0.50, 15.78s & 0.50, 36.28s \\
+                           & 0.74, 38.22s & 0.64, 102.88s & 0.80, 541.88s & 0.15, 20.08s & 0.17, 66.15s & 0.12, 212.00s & 0.08, 16.57s & 0.09, 48.26s & 0.09, 159.42s \\ \midrule
+    \multirow{4}{*}{cpc=1} & 0.88, 3.87s & 0.86, 5.36s & 0.80, 7.44s & 0.64, 0.62s & 0.62, 1.30s & 0.63, 3.76s & 0.98, 6.45s & 0.93, 8.36s & 1.00, 14.05s \\
+                           & 0.83, 18.51s & 0.92, 71.90s & 0.95, 442.40s & 0.63, 3.56s & 0.64, 10.45s & 0.63, 42.62s & 0.90, 9.38s & 0.97, 17.97s & 1.00, 32.82s \\
+                           & 0.84, 26.55s & 0.86, 117.91s & 0.84, 739.52s & 0.63, 6.38s & 0.62, 18.79s & 0.67, 67.00s & 0.93, 7.69s & 1.00, 14.66s & 1.00, 34.34s \\
+                           & 0.90, 26.55s & 0.92, 88.83s & 0.90, 440.15s & 0.69, 17.74s & 0.67, 58.88s & 0.62, 207.08s & 0.58, 19.86s & 0.59, 56.14s & 0.60, 156.02s \\ \midrule
+    \multirow{4}{*}{cpc=3} & 0.92, 0.94s & 0.94, 2.19s & 0.94, 6.29s & 0.83, 0.59s & 0.84, 1.25s & 0.82, 3.73s & 0.76, 7.97s & 0.75, 9.53s & 0.76, 13.27s \\
+                           & 0.88, 12.19s & 0.92, 43.29s & 0.94, 219.21s & 0.83, 2.69s & 0.83, 5.79s & 0.85, 38.09s & 0.74, 10.30s & 0.75, 14.61s & 0.75, 33.68s \\
+                           & 0.91, 29.64s & 0.95, 110.69s & 0.95, 575.92s & 0.82, 5.40s & 0.81, 12.36s & 0.83, 51.83s & 0.75, 7.57s & 0.75, 16.40s & 0.75, 11.59s \\
+                           & 0.96, 26.71s & 0.94, 77.56s & 0.99, 309.25s & 0.87, 15.29s & 0.85, 50.04s & 0.88, 214.72s & 0.81, 16.48s & 0.84, 50.63s & 0.82, 150.00s \\ \midrule
+    \multirow{4}{*}{cpc=5} & 0.92, 1.18s & 0.96, 2.33s & 0.97, 5.91s & 0.87, 0.60s & 0.88, 1.34s & 0.90, 5.44s & 0.67, 6.54s & 0.67, 9.73s & 0.67, 11.56s \\
+                           & 0.89, 10.81s & 0.95, 45.44s & 0.96, 204.24s & 0.88, 2.68s & 0.87, 10.02s & 0.86, 36.15s & 0.69, 12.01s & 0.68, 15.26s & 0.67, 30.63s \\
+                           & 0.94, 21.44s & 0.96, 76.84s & 0.97, 403.26s & 0.89, 5.56s & 0.87, 11.39s & 0.87, 46.96s & 0.68, 8.50s & 0.67, 13.21s & 0.67, 11.73s \\
+                           & 0.96, 22.01s & 0.97, 61.44s & 0.98, 220.29s & 0.91, 16.81s & 0.92, 44.63s & 0.93, 153.21s & 0.89, 14.07s & 0.90, 37.67s & 0.90, 107.41s \\ \bottomrule
+    \end{tabular}
+    \caption{\label{tab:poisson regression comparison} Comparison of the algorithms for the poisson regression model in mean.}
+  \end{table}
+
+\end{landscape}
+\restoregeometry
+
+\section{Changes in penalized linear models} \label{sec:penalized linear model}
+
+We now consider the change-point detection problem in the penalized linear
+models.
+%
+
+%
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{summary}\hlstd{(lasso_regression_result)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## fastcpd(data = data, beta = beta, k = function(x) 0, family = "lasso", 
+##     epsilon = 1e-04)
+## 
+## [1] "Residuals:"
+##       Min        1Q    Median        3Q       Max 
+## -7.348485 -1.209673  0.094231  1.271128  6.672489 
+## 
+## Change points:
+## [1]  251  497  752 1000 1249
+\end{verbatim}
+\begin{alltt}
+\hlkwd{plot}\hlstd{(lasso_regression_result)}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/lasso_regression_plot-1} 
+\end{knitrout}
+
+\begin{table}[t!]
+  \centering
+  \begin{tabular}{@{}cccccccccc@{}}
+  \toprule
+                         & \multicolumn{3}{c}{s=3}           & \multicolumn{3}{c}{s=6}           & \multicolumn{3}{c}{s=10}          \\ \midrule
+  \multirow{4}{*}{cpc=0} & 1.00, 65.24s & 1.00, 35.13s & 1.00, 29.76s \\
+                         & 0.89, 2496.32s & 1.00, 4380.03s & 1.00, 1849.64s \\
+                         & 1.00, 4922.51s & 1.00, 3153.90s & 1.00, 2737.14s \\
+                         & 0.00, 0.00s & 0.00, 0.00s & 0.00, 0.00s \\ \midrule
+  \multirow{4}{*}{cpc=1} & 1.00, 48.68s & 0.99, 32.39s & 0.99, 33.05s \\
+                         & 0.98, 2571.30s & 0.99, 3523.90s & 1.00, 2049.49s \\
+                         & 0.98, 3551.50s & 1.00, 2679.05s & 0.99, 2218.52s \\
+                         & 0.00, 0.00s & 0.00, 0.00s & 0.00, 0.00s \\ \midrule
+  \multirow{4}{*}{cpc=3} & 0.96, 53.23s & 1.00, 40.23s & 0.99, 32.94s \\
+                         & 0.98, 1720.88s & 0.99, 1187.46s & 1.00, 858.13s \\
+                         & 0.98, 2608.36s & 0.99, 2164.48s & 1.00, 1440.42s \\
+                         & 0.00, 0.00s & 0.00, 0.00s & 0.00, 0.00s \\ \midrule
+  \multirow{4}{*}{cpc=5} & 1.00, 33.08s & 0.99, 26.20s & 1.00, 21.56s \\
+                         & 0.97, 1152.88s & 1.00, 852.29s & 0.99, 587.59s \\
+                         & 0.98, 1492.22s & 1.00, 1267.07s & 1.00, 698.19s \\
+                         & 0.00, 0.00s & 0.00, 0.00s & 0.00, 0.00s \\ \bottomrule
+  \end{tabular}
+  \caption{\label{tab:poisson regression comparison} Comparison of the algorithms for the poisson regression model in mean.}
+\end{table}
+
+\section{Changes in user specified models with custom cost functions} \label{sec:custom}
+
+\subsection{Reproducing built-in models} \label{sec:reproduce}
+
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{logistic_regression_result} \hlkwb{<-} \hlkwd{fastcpd}\hlstd{(}
+  \hlkwc{data} \hlstd{= data,}
+  \hlkwc{beta} \hlstd{= beta,}
+  \hlkwc{family} \hlstd{=} \hlstr{"binomial"}\hlstd{,}
+  \hlkwc{k} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)} \hlnum{20}\hlstd{,}
+  \hlkwc{epsilon} \hlstd{=} \hlnum{1e-5}
+\hlstd{)}
+\hlstd{logistic_loss} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{data}\hlstd{,} \hlkwc{theta}\hlstd{) \{}
+  \hlstd{u} \hlkwb{<-} \hlkwd{c}\hlstd{(data[,} \hlopt{-}\hlnum{1}\hlstd{,} \hlkwc{drop} \hlstd{=} \hlnum{FALSE}\hlstd{]} \hlopt{%*%} \hlstd{theta)}
+  \hlkwd{sum}\hlstd{(}\hlopt{-}\hlstd{data[,} \hlnum{1}\hlstd{]} \hlopt{*} \hlstd{u} \hlopt{+} \hlkwd{log}\hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(u)))}
+\hlstd{\}}
+
+\hlstd{logistic_loss_gradient} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{data}\hlstd{,} \hlkwc{theta}\hlstd{) \{}
+  \hlstd{x} \hlkwb{<-} \hlstd{data[}\hlopt{-}\hlnum{1}\hlstd{]}
+  \hlstd{y} \hlkwb{<-} \hlstd{data[}\hlnum{1}\hlstd{]}
+  \hlkwd{c}\hlstd{(}\hlopt{-}\hlstd{(y} \hlopt{-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{x} \hlopt{%*%} \hlstd{theta))))} \hlopt{*} \hlstd{x}
+\hlstd{\}}
+
+\hlstd{logistic_loss_hessian} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{data}\hlstd{,} \hlkwc{theta}\hlstd{,} \hlkwc{hessian}\hlstd{) \{}
+  \hlstd{data_x} \hlkwb{<-} \hlstd{data[}\hlopt{-}\hlnum{1}\hlstd{]}
+  \hlstd{prob} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{data_x} \hlopt{%*%} \hlstd{theta))}
+  \hlstd{hessian} \hlopt{+} \hlstd{(data_x} \hlopt{%o%} \hlstd{data_x)} \hlopt{*} \hlkwd{c}\hlstd{((}\hlnum{1} \hlopt{-} \hlstd{prob)} \hlopt{*} \hlstd{prob)}
+\hlstd{\}}
+\hlstd{logistic_regression_result_custom} \hlkwb{<-} \hlkwd{fastcpd}\hlstd{(}
+  \hlkwc{data} \hlstd{= data,}
+  \hlkwc{beta} \hlstd{= beta,}
+  \hlkwc{k} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)} \hlnum{20}\hlstd{,}
+  \hlkwc{epsilon} \hlstd{=} \hlnum{1e-5}\hlstd{,}
+  \hlkwc{cost} \hlstd{= logistic_loss,}
+  \hlkwc{cost_gradient} \hlstd{= logistic_loss_gradient,}
+  \hlkwc{cost_hessian} \hlstd{= logistic_loss_hessian}
+\hlstd{)}
+\hlstd{logistic_regression_result}\hlopt{@}\hlkwc{cp_set}
+\end{alltt}
+\begin{verbatim}
+## [1]   64  301  681 1130 1444
+\end{verbatim}
+\begin{alltt}
+\hlstd{logistic_regression_result_custom}\hlopt{@}\hlkwc{cp_set}
+\end{alltt}
+\begin{verbatim}
+## [1]  291  685 1163
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\subsection{Changes in Huber regression models} \label{sec:huber}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{n} \hlkwb{<-} \hlnum{400} \hlopt{+} \hlnum{300} \hlopt{+} \hlnum{400}
+\hlstd{p} \hlkwb{<-} \hlnum{3}
+\hlstd{x} \hlkwb{<-} \hlstd{mvtnorm}\hlopt{::}\hlkwd{rmvnorm}\hlstd{(n,} \hlkwc{mean} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{, p),} \hlkwc{sigma} \hlstd{=} \hlkwd{diag}\hlstd{(p))}
+\hlstd{theta} \hlkwb{<-} \hlkwd{rbind}\hlstd{(}
+  \hlstd{mvtnorm}\hlopt{::}\hlkwd{rmvnorm}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwc{mean} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{, p),} \hlkwc{sigma} \hlstd{=} \hlkwd{diag}\hlstd{(p)),}
+  \hlstd{mvtnorm}\hlopt{::}\hlkwd{rmvnorm}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwc{mean} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{3}\hlstd{, p),} \hlkwc{sigma} \hlstd{=} \hlkwd{diag}\hlstd{(p)),}
+  \hlstd{mvtnorm}\hlopt{::}\hlkwd{rmvnorm}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwc{mean} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{5}\hlstd{, p),} \hlkwc{sigma} \hlstd{=} \hlkwd{diag}\hlstd{(p))}
+\hlstd{)}
+\hlstd{theta} \hlkwb{<-} \hlstd{theta[}\hlkwd{rep}\hlstd{(}\hlkwd{seq_len}\hlstd{(}\hlnum{3}\hlstd{),} \hlkwd{c}\hlstd{(}\hlnum{400}\hlstd{,} \hlnum{300}\hlstd{,} \hlnum{400}\hlstd{)), ]}
+\hlstd{y_true} \hlkwb{<-} \hlkwd{rowSums}\hlstd{(x} \hlopt{*} \hlstd{theta)}
+\hlstd{factor} \hlkwb{<-} \hlkwd{c}\hlstd{(}
+  \hlnum{2} \hlopt{*} \hlstd{stats}\hlopt{::}\hlkwd{rbinom}\hlstd{(}\hlnum{400}\hlstd{,} \hlkwc{size} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{prob} \hlstd{=} \hlnum{0.95}\hlstd{)} \hlopt{-} \hlnum{1}\hlstd{,}
+  \hlnum{2} \hlopt{*} \hlstd{stats}\hlopt{::}\hlkwd{rbinom}\hlstd{(}\hlnum{300}\hlstd{,} \hlkwc{size} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{prob} \hlstd{=} \hlnum{0.95}\hlstd{)} \hlopt{-} \hlnum{1}\hlstd{,}
+  \hlnum{2} \hlopt{*} \hlstd{stats}\hlopt{::}\hlkwd{rbinom}\hlstd{(}\hlnum{400}\hlstd{,} \hlkwc{size} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{prob} \hlstd{=} \hlnum{0.95}\hlstd{)} \hlopt{-} \hlnum{1}
+\hlstd{)}
+\hlstd{y} \hlkwb{<-} \hlstd{factor} \hlopt{*} \hlstd{y_true} \hlopt{+} \hlstd{stats}\hlopt{::}\hlkwd{rnorm}\hlstd{(n)}
+\hlstd{data} \hlkwb{<-} \hlkwd{cbind}\hlstd{(y, x)}
+
+\hlstd{huber_loss} \hlkwb{<-} \hlkwa{function}\hlstd{(}
+  \hlkwc{data}\hlstd{,}
+  \hlkwc{theta}\hlstd{,}
+  \hlkwc{threshold} \hlstd{=} \hlnum{1}
+\hlstd{) \{}
+  \hlstd{residual} \hlkwb{<-} \hlstd{data[,} \hlnum{1}\hlstd{]} \hlopt{-} \hlstd{data[,} \hlopt{-}\hlnum{1}\hlstd{,} \hlkwc{drop} \hlstd{=} \hlnum{FALSE}\hlstd{]} \hlopt{%*%} \hlstd{theta}
+  \hlstd{indicator} \hlkwb{<-} \hlkwd{abs}\hlstd{(residual)} \hlopt{<=} \hlstd{threshold}
+  \hlkwd{sum}\hlstd{(residual} \hlopt{^} \hlnum{2} \hlopt{/} \hlnum{2} \hlopt{*} \hlstd{indicator} \hlopt{+} \hlstd{threshold} \hlopt{*} \hlstd{(}\hlkwd{abs}\hlstd{(residual)} \hlopt{-} \hlstd{threshold} \hlopt{/} \hlnum{2}\hlstd{)} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{indicator))}
+\hlstd{\}}
+
+\hlstd{huber_loss_gradient} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{data}\hlstd{,} \hlkwc{theta}\hlstd{,} \hlkwc{threshold} \hlstd{=} \hlnum{1}\hlstd{) \{}
+  \hlstd{residual} \hlkwb{<-} \hlkwd{c}\hlstd{(data[}\hlnum{1}\hlstd{]} \hlopt{-} \hlstd{data[}\hlopt{-}\hlnum{1}\hlstd{]} \hlopt{%*%} \hlstd{theta)}
+  \hlkwa{if} \hlstd{(}\hlkwd{abs}\hlstd{(residual)} \hlopt{<=} \hlstd{threshold) \{}
+    \hlopt{-} \hlstd{residual} \hlopt{*} \hlstd{data[}\hlopt{-}\hlnum{1}\hlstd{]}
+  \hlstd{\}} \hlkwa{else} \hlstd{\{}
+    \hlopt{-} \hlstd{threshold} \hlopt{*} \hlkwd{sign}\hlstd{(residual)} \hlopt{*} \hlstd{data[}\hlopt{-}\hlnum{1}\hlstd{]}
+  \hlstd{\}}
+\hlstd{\}}
+
+\hlstd{huber_loss_hessian} \hlkwb{<-} \hlkwa{function}\hlstd{(}
+  \hlkwc{data}\hlstd{,}
+  \hlkwc{theta}\hlstd{,}
+  \hlkwc{hessian}\hlstd{,}
+  \hlkwc{threshold} \hlstd{=} \hlnum{1}
+\hlstd{) \{}
+  \hlstd{residual} \hlkwb{<-} \hlkwd{c}\hlstd{(data[}\hlnum{1}\hlstd{]} \hlopt{-} \hlstd{data[}\hlopt{-}\hlnum{1}\hlstd{]} \hlopt{%*%} \hlstd{theta)}
+  \hlkwa{if} \hlstd{(}\hlkwd{abs}\hlstd{(residual)} \hlopt{<=} \hlstd{threshold) \{}
+    \hlstd{hessian} \hlopt{+} \hlkwd{outer}\hlstd{(data[}\hlopt{-}\hlnum{1}\hlstd{], data[}\hlopt{-}\hlnum{1}\hlstd{])}
+  \hlstd{\}} \hlkwa{else} \hlstd{\{}
+    \hlstd{hessian} \hlopt{+} \hlnum{0.01} \hlopt{*} \hlkwd{diag}\hlstd{(}\hlkwd{length}\hlstd{(theta))}
+  \hlstd{\}}
+\hlstd{\}}
+
+\hlstd{huber_regression_result} \hlkwb{<-} \hlkwd{fastcpd}\hlstd{(}
+  \hlkwc{data} \hlstd{= data,}
+  \hlkwc{beta} \hlstd{= (p} \hlopt{+} \hlnum{1}\hlstd{)} \hlopt{*} \hlkwd{log}\hlstd{(n),}
+  \hlkwc{cost} \hlstd{= huber_loss,}
+  \hlkwc{cost_gradient} \hlstd{= huber_loss_gradient,}
+  \hlkwc{cost_hessian} \hlstd{= huber_loss_hessian}
+\hlstd{)}
+
+\hlkwd{summary}\hlstd{(huber_regression_result)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## fastcpd(data = data, beta = (p + 1) * log(n), cost = huber_loss, 
+##     cost_gradient = huber_loss_gradient, cost_hessian = huber_loss_hessian)
+## 
+## Change points:
+## [1] 396 715
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\subsection{Changes in quantile regression models} \label{sec:quantile}
+
+%
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{n} \hlkwb{<-} \hlnum{450}
+\hlstd{p} \hlkwb{<-} \hlnum{3}
+\hlstd{data} \hlkwb{<-} \hlstd{mvtnorm}\hlopt{::}\hlkwd{rmvnorm}\hlstd{(n} \hlopt{/} \hlnum{5}\hlstd{,} \hlkwc{mean} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{, p),} \hlkwc{sigma} \hlstd{=} \hlkwd{diag}\hlstd{(p))[}\hlkwd{rep}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{(n} \hlopt{/} \hlnum{5}\hlstd{),} \hlkwc{each} \hlstd{=} \hlnum{5}\hlstd{), ]}
+\hlstd{theta} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwd{rnorm}\hlstd{(p} \hlopt{*} \hlnum{2}\hlstd{),} \hlnum{2}\hlstd{, p)[}\hlkwd{rep}\hlstd{(}\hlnum{1}\hlopt{:}\hlnum{2}\hlstd{,} \hlkwd{c}\hlstd{(n} \hlopt{*} \hlnum{2} \hlopt{/} \hlnum{3}\hlstd{, n} \hlopt{/} \hlnum{3}\hlstd{)), ]}
+\hlstd{xb} \hlkwb{<-} \hlkwd{rowSums}\hlstd{(data} \hlopt{*} \hlstd{theta)}
+\hlstd{xb[}\hlnum{1}\hlopt{:}\hlstd{(n} \hlopt{/} \hlnum{3} \hlopt{/} \hlnum{5}\hlstd{)} \hlopt{*} \hlnum{5} \hlopt{+} \hlstd{(n} \hlopt{/} \hlnum{3}\hlstd{)} \hlopt{-} \hlnum{4}\hlstd{]} \hlkwb{<-} \hlstd{xb[}\hlnum{1}\hlopt{:}\hlstd{(n} \hlopt{/} \hlnum{3} \hlopt{/} \hlnum{5}\hlstd{)} \hlopt{*} \hlnum{5} \hlopt{+} \hlstd{(n} \hlopt{/} \hlnum{3}\hlstd{)} \hlopt{-} \hlnum{4}\hlstd{]} \hlopt{+} \hlnum{50}
+\hlstd{xb[}\hlnum{1}\hlopt{:}\hlstd{(n} \hlopt{/} \hlnum{3} \hlopt{/} \hlnum{5}\hlstd{)} \hlopt{*} \hlnum{5} \hlopt{+} \hlstd{(n} \hlopt{/} \hlnum{3}\hlstd{)} \hlopt{-} \hlnum{3}\hlstd{]} \hlkwb{<-} \hlstd{xb[}\hlnum{1}\hlopt{:}\hlstd{(n} \hlopt{/} \hlnum{3} \hlopt{/} \hlnum{5}\hlstd{)} \hlopt{*} \hlnum{5} \hlopt{+} \hlstd{(n} \hlopt{/} \hlnum{3}\hlstd{)} \hlopt{-} \hlnum{3}\hlstd{]} \hlopt{+} \hlnum{40}
+\hlstd{xb[}\hlnum{1}\hlopt{:}\hlstd{(n} \hlopt{/} \hlnum{3} \hlopt{/} \hlnum{5}\hlstd{)} \hlopt{*} \hlnum{5} \hlopt{+} \hlstd{(n} \hlopt{/} \hlnum{3}\hlstd{)} \hlopt{-} \hlnum{1}\hlstd{]} \hlkwb{<-} \hlstd{xb[}\hlnum{1}\hlopt{:}\hlstd{(n} \hlopt{/} \hlnum{3} \hlopt{/} \hlnum{5}\hlstd{)} \hlopt{*} \hlnum{5} \hlopt{+} \hlstd{(n} \hlopt{/} \hlnum{3}\hlstd{)} \hlopt{-} \hlnum{1}\hlstd{]} \hlopt{-} \hlnum{5}
+\hlstd{xb[}\hlnum{1}\hlopt{:}\hlstd{(n} \hlopt{/} \hlnum{3} \hlopt{/} \hlnum{5}\hlstd{)} \hlopt{*} \hlnum{5} \hlopt{+} \hlstd{(n} \hlopt{/} \hlnum{3}\hlstd{)]} \hlkwb{<-} \hlstd{xb[}\hlnum{1}\hlopt{:}\hlstd{(n} \hlopt{/} \hlnum{3} \hlopt{/} \hlnum{5}\hlstd{)} \hlopt{*} \hlnum{5} \hlopt{+} \hlstd{(n} \hlopt{/} \hlnum{3}\hlstd{)]} \hlopt{-} \hlnum{10}
+\hlstd{data} \hlkwb{<-} \hlkwd{cbind}\hlstd{(xb, data)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+%
+Verify that the data contains three parts with two segments. The first segment
+is from 1 to 300 and the second segment is from 301 to 450. By doing piecewise
+quantile regression and linear regression, we can verify that coefficients of
+quantile regression in the first 150 observations are the same as those in the
+second 150 observations. The coefficients of linear regression in the first 150
+observations are different from those in the second 150 observations.
+
+\begin{table}[t!]
+\centering
+\begin{tabular}{llp{10cm}}
+\hline
+Algorithm           & Data    & Coefficients \\ \hline
+Quantile Regression & 1st 150 & -1.3890396, 1.8959482, -0.5951861 \\
+Quantile Regression & 2nd 150 & -1.3890396, 1.8959482, -0.5951861 \\
+Quantile Regression & 3rd 150 & 0.4124297, -0.7807476, -1.481476 \\
+Linear Regression   & 1st 150 & -1.3890396, 1.8959482, -0.5951861 \\ \hline
+Linear Regression   & 2nd 150 & -2.5457644, 2.9560383, 0.5427844 \\ \hline
+Linear Regression   & 3rd 150 & 0.4124297, -0.7807476, -1.481476 \\ \hline
+\end{tabular}
+\caption{\label{tab:logistic regression comparison} Comparison of the
+algorithms for the logistic regression model.}
+\end{table}
+
+Let see what is the output if we misspecify the model.
+%
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# linear_regression_result <- fastcpd(}
+\hlcom{#   data = data,}
+\hlcom{#   beta = log(n) / 2,}
+\hlcom{#   segment_count = 10,}
+\hlcom{#   trim = 0.025,}
+\hlcom{#   k = function(x) 0,}
+\hlcom{#   family = "gaussian",}
+\hlcom{#   epsilon = 1e-5}
+\hlcom{# )}
+
+\hlcom{# summary(linear_regression_result)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+%
+The output is not correct. Now let see what is the output if we specify the
+model to be a quantile regression model using the custom cost function.
+%
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{quantile_loss} \hlkwb{<-} \hlkwa{function}\hlstd{(}
+  \hlkwc{data}\hlstd{,}
+  \hlkwc{theta}\hlstd{,}
+  \hlkwc{quant} \hlstd{=} \hlnum{0.5}\hlstd{,}
+  \hlkwc{smoothing} \hlstd{=} \hlnum{0.25}
+\hlstd{) \{}
+  \hlstd{residual} \hlkwb{<-} \hlstd{data[,} \hlnum{1}\hlstd{]} \hlopt{-} \hlstd{data[,} \hlopt{-}\hlnum{1}\hlstd{,} \hlkwc{drop} \hlstd{=} \hlnum{FALSE}\hlstd{]} \hlopt{%*%} \hlstd{theta}
+  \hlkwd{mean}\hlstd{(residual} \hlopt{*} \hlstd{(quant} \hlopt{-} \hlstd{(residual} \hlopt{<} \hlnum{0}\hlstd{)))}
+\hlstd{\}}
+
+\hlstd{quantile_loss_gradient} \hlkwb{<-} \hlkwa{function}\hlstd{(}
+  \hlkwc{data}\hlstd{,} \hlkwc{theta}\hlstd{,} \hlkwc{quant} \hlstd{=} \hlnum{0.5}\hlstd{,} \hlkwc{smoothing} \hlstd{=} \hlnum{0.25}
+\hlstd{) \{}
+  \hlkwd{c}\hlstd{(quant} \hlopt{-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlkwd{c}\hlstd{(data[}\hlnum{1}\hlstd{]} \hlopt{-} \hlstd{data[}\hlopt{-}\hlnum{1}\hlstd{]} \hlopt{%*%} \hlstd{theta)} \hlopt{/} \hlstd{smoothing)))} \hlopt{*} \hlstd{data[}\hlopt{-}\hlnum{1}\hlstd{]}
+\hlstd{\}}
+
+\hlstd{quantile_loss_hessian} \hlkwb{<-} \hlkwa{function}\hlstd{(}
+  \hlkwc{data}\hlstd{,}
+  \hlkwc{theta}\hlstd{,}
+  \hlkwc{hessian}\hlstd{,}
+  \hlkwc{quant} \hlstd{=} \hlnum{0.5}\hlstd{,}
+  \hlkwc{smoothing} \hlstd{=} \hlnum{0.25}
+\hlstd{) \{}
+  \hlcom{# hessian - exp(c(data[1] - data[-1] %*% theta) / smoothing) / (smoothing * (1 + exp(c(data[1] - data[-1] %*% theta) / smoothing))^2) * data[-1] %o% data[-1]}
+  \hlstd{hessian} \hlopt{+} \hlnum{0.01} \hlopt{*} \hlkwd{diag}\hlstd{(}\hlkwd{length}\hlstd{(theta))}
+\hlstd{\}}
+
+\hlcom{# print(fastcpd(}
+\hlcom{#   data = data,}
+\hlcom{#   beta = log(n) / 2,}
+\hlcom{#   segment_count = 5,}
+\hlcom{#   trim = 0.025,}
+\hlcom{#   k = function(x) 0,}
+\hlcom{#   cost = quantile_loss,}
+\hlcom{#   cost_gradient = quantile_loss_gradient,}
+\hlcom{#   cost_hessian = quantile_loss_hessian}
+\hlcom{# ))}
+
+\hlcom{# print(fastcpd(}
+\hlcom{#   data = data,}
+\hlcom{#   beta = log(n) / 2,}
+\hlcom{#   segment_count = 5,}
+\hlcom{#   trim = 0.025,}
+\hlcom{#   k = function(x) 4,}
+\hlcom{#   cost = quantile_loss,}
+\hlcom{#   cost_gradient = quantile_loss_gradient,}
+\hlcom{#   cost_hessian = quantile_loss_hessian}
+\hlcom{# ))}
+
+\hlcom{# print(fastcpd(}
+\hlcom{#   data = data,}
+\hlcom{#   beta = log(n) / 2,}
+\hlcom{#   segment_count = 5,}
+\hlcom{#   trim = 0.025,}
+\hlcom{#   k = function(x) 9,}
+\hlcom{#   cost = quantile_loss,}
+\hlcom{#   cost_gradient = quantile_loss_gradient,}
+\hlcom{#   cost_hessian = quantile_loss_hessian}
+\hlcom{# ))}
+
+\hlcom{# benchmarked <- microbenchmark::microbenchmark(}
+\hlcom{#   "k = 1" = fastcpd(}
+\hlcom{#     data = data,}
+\hlcom{#     beta = log(n) / 2,}
+\hlcom{#     segment_count = 5,}
+\hlcom{#     trim = 0.025,}
+\hlcom{#     k = function(x) 0,}
+\hlcom{#     cost = quantile_loss,}
+\hlcom{#     cost_gradient = quantile_loss_gradient,}
+\hlcom{#     cost_hessian = quantile_loss_hessian}
+\hlcom{#   ),}
+\hlcom{#   "k = 5" = fastcpd(}
+\hlcom{#     data = data,}
+\hlcom{#     beta = log(n) / 2,}
+\hlcom{#     segment_count = 5,}
+\hlcom{#     trim = 0.025,}
+\hlcom{#     k = function(x) 4,}
+\hlcom{#     cost = quantile_loss,}
+\hlcom{#     cost_gradient = quantile_loss_gradient,}
+\hlcom{#     cost_hessian = quantile_loss_hessian}
+\hlcom{#   ),}
+\hlcom{#   "k = 10" = fastcpd(}
+\hlcom{#     data = data,}
+\hlcom{#     beta = log(n) / 2,}
+\hlcom{#     segment_count = 5,}
+\hlcom{#     trim = 0.025,}
+\hlcom{#     k = function(x) 9,}
+\hlcom{#     cost = quantile_loss,}
+\hlcom{#     cost_gradient = quantile_loss_gradient,}
+\hlcom{#     cost_hessian = quantile_loss_hessian}
+\hlcom{#   ),}
+\hlcom{#   times = 2}
+\hlcom{# )}
+\hlcom{# print(benchmarked)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+%
+
+\begin{figure}[t!]
+\centering
+% <<quantile regression visualization, echo=FALSE, fig=TRUE, height=5.2, width=7>>=
+% ggplot2::autoplot(benchmarked)
+% @
+\caption{\label{fig:quantile regression bench mark} Benchmarking results for
+the quantile regression model.}
+\end{figure}
+
+\subsection{Changes in mean shift models} \label{sec:mean shift model}
+
+Now let's consider the mean shift model using custom cost function. Since a
+mean shift model is a special case of a linear regression model, by specifying a
+response variable we can use the linear regression model to detect the change
+points.
+%
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{p} \hlkwb{<-} \hlnum{1}
+\hlstd{data} \hlkwb{<-} \hlkwd{rbind}\hlstd{(}
+  \hlstd{mvtnorm}\hlopt{::}\hlkwd{rmvnorm}\hlstd{(}\hlnum{100}\hlstd{,} \hlkwc{mean} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{, p),} \hlkwc{sigma} \hlstd{=} \hlkwd{diag}\hlstd{(}\hlnum{1}\hlstd{, p)),}
+  \hlstd{mvtnorm}\hlopt{::}\hlkwd{rmvnorm}\hlstd{(}\hlnum{100}\hlstd{,} \hlkwc{mean} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{5}\hlstd{, p),} \hlkwc{sigma} \hlstd{=} \hlkwd{diag}\hlstd{(}\hlnum{1}\hlstd{, p))}
+\hlstd{)}
+\hlstd{data} \hlkwb{<-} \hlkwd{cbind}\hlstd{(}\hlkwd{c}\hlstd{(data[}\hlnum{1}\hlopt{:}\hlnum{100}\hlstd{, ,} \hlkwc{drop} \hlstd{=} \hlnum{FALSE}\hlstd{]} \hlopt{%*%} \hlkwd{colMeans}\hlstd{(data[}\hlnum{1}\hlopt{:}\hlnum{100}\hlstd{, ,} \hlkwc{drop} \hlstd{=} \hlnum{FALSE}\hlstd{]), data[}\hlnum{101}\hlopt{:}\hlnum{200}\hlstd{, ,} \hlkwc{drop} \hlstd{=} \hlnum{FALSE}\hlstd{]} \hlopt{%*%} \hlkwd{colMeans}\hlstd{(data[}\hlnum{101}\hlopt{:}\hlnum{200}\hlstd{, ,} \hlkwc{drop} \hlstd{=} \hlnum{FALSE}\hlstd{])), data)}
+
+\hlstd{mean_shift_linear_result} \hlkwb{<-} \hlkwd{fastcpd}\hlstd{(}
+  \hlkwc{data} \hlstd{= data,}
+  \hlkwc{beta} \hlstd{=} \hlkwd{log}\hlstd{(}\hlnum{200}\hlstd{)} \hlopt{/} \hlnum{2}\hlstd{,}
+  \hlkwc{segment_count} \hlstd{=} \hlnum{3}\hlstd{,}
+  \hlkwc{trim} \hlstd{=} \hlnum{0.025}\hlstd{,}
+  \hlkwc{k} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)} \hlnum{0}\hlstd{,}
+  \hlkwc{family} \hlstd{=} \hlstr{"gaussian"}\hlstd{,}
+  \hlkwc{epsilon} \hlstd{=} \hlnum{1e-5}
+\hlstd{)}
+\hlkwd{summary}\hlstd{(mean_shift_linear_result)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## fastcpd(data = data, beta = log(200)/2, segment_count = 3, trim = 0.025, 
+##     k = function(x) 0, family = "gaussian", epsilon = 1e-05)
+## 
+## [1] "Residuals:"
+##           Min            1Q        Median            3Q           Max 
+## -1.387779e-17 -4.336810e-19  0.000000e+00  0.000000e+00  2.775558e-17 
+## 
+## Change points:
+## [1] 100
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+%
+Now let's see what would be the output if we use the custom cost function.
+%
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{data} \hlkwb{<-} \hlstd{data[,} \hlopt{-}\hlnum{1}\hlstd{,} \hlkwc{drop} \hlstd{=} \hlnum{FALSE}\hlstd{]}
+
+\hlstd{mean_loss} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{data}\hlstd{,} \hlkwc{theta}\hlstd{) \{}
+  \hlkwd{norm}\hlstd{(}\hlkwd{sweep}\hlstd{(data,} \hlnum{2}\hlstd{, theta),} \hlkwc{type} \hlstd{=} \hlstr{"F"}\hlstd{)} \hlopt{^} \hlnum{2} \hlopt{/} \hlnum{2}
+\hlstd{\}}
+
+\hlstd{mean_loss_gradient} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{data}\hlstd{,} \hlkwc{theta}\hlstd{) \{}
+  \hlstd{theta} \hlopt{-} \hlstd{data}
+\hlstd{\}}
+
+\hlstd{mean_loss_hessian} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{data}\hlstd{,} \hlkwc{theta}\hlstd{,} \hlkwc{hessian}\hlstd{) \{}
+  \hlstd{hessian} \hlopt{+} \hlkwd{diag}\hlstd{(p)}
+\hlstd{\}}
+
+\hlstd{mean_loss_result} \hlkwb{<-} \hlkwd{fastcpd}\hlstd{(}
+  \hlkwc{data} \hlstd{= data,}
+  \hlkwc{beta} \hlstd{=} \hlnum{10}\hlstd{,}
+  \hlkwc{segment_count} \hlstd{=} \hlnum{4}\hlstd{,}
+  \hlkwc{trim} \hlstd{=} \hlnum{0.025}\hlstd{,}
+  \hlkwc{k} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)} \hlnum{0}\hlstd{,}
+  \hlkwc{p} \hlstd{= p,}
+  \hlkwc{cost} \hlstd{= mean_loss,}
+  \hlkwc{cost_gradient} \hlstd{= mean_loss_gradient,}
+  \hlkwc{cost_hessian} \hlstd{= mean_loss_hessian}
+\hlstd{)}
+
+\hlkwd{summary}\hlstd{(mean_loss_result)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## fastcpd(data = data, beta = 10, segment_count = 4, trim = 0.025, 
+##     k = function(x) 0, p = p, cost = mean_loss, cost_gradient = mean_loss_gradient, 
+##     cost_hessian = mean_loss_hessian)
+## 
+## Change points:
+## [1] 100
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\section{Adaptive number of epochs} \label{sec:adaptive number of epochs}
+
+In this section, we will discuss how to use the adaptive number of epochs
+feature in \pkg{fastcpd}. The adaptive number of epochs feature is designed to
+automatically determine the number of epochs to run the algorithm. The criteria
+for determining the number of epochs is based on the following function:
+%
+\begin{equation} \label{eq:adaptive number of epochs}
+  K = \min(\max(\boldsymbol{k}, \lceil \frac{1000}{\text{segment length}} \rceil), 10)
+\end{equation}
+%
+where $K$ is the number of epochs to run the algorithm, $\boldsymbol{k}$ is the
+number of epochs specified by the user parameter \code{sgd_k}, and \code{segment length} is the
+length of the segment. The goal is to upper limit the number of epochs to 10
+when the segment length is small and to lower limit the number of epochs to
+$\boldsymbol{k}$. The transition between the upper limit and lower limit is
+calculated by $\lceil 1000 / \text{segment length} \rceil$.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{k} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{,} \hlkwc{n} \hlstd{=} \hlnum{1500}\hlstd{) \{}
+  \hlkwa{if} \hlstd{(x} \hlopt{<} \hlstd{n} \hlopt{/} \hlnum{10} \hlopt{*} \hlnum{1} \hlopt{/} \hlnum{3}\hlstd{)} \hlnum{3}
+  \hlkwa{else if} \hlstd{(x} \hlopt{<} \hlstd{n} \hlopt{/} \hlnum{10} \hlopt{*} \hlnum{2} \hlopt{/} \hlnum{3}\hlstd{)} \hlnum{2}
+  \hlkwa{else if} \hlstd{(x} \hlopt{<} \hlstd{n} \hlopt{/} \hlnum{10}\hlstd{)} \hlnum{1}
+  \hlkwa{else} \hlnum{0}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+%% -- Summary/conclusions/discussion -------------------------------------------
+
+\section{Summary and discussion} \label{sec:summary}
+
+Our package \pkg{fastcpd} provides a fast and flexible implementation of
+change point detection algorithms. The package is designed to be easy to use
+and to provide a wide range of options for the user. The package is
+implemented in \proglang{R} and is available on GitHub.
+
+
+%% -- Optional special unnumbered sections -------------------------------------
+
+\section*{Computational details}
+
+\begin{leftbar}
+If necessary or useful, information about certain computational details
+such as version numbers, operating systems, or compilers could be included
+in an unnumbered section. Also, auxiliary packages (say, for visualizations,
+maps, tables, \dots) that are not cited in the main text can be credited here.
+\end{leftbar}
+
+The results in this paper were obtained using
+\proglang{R}~4.1.3 with the
+\pkg{MASS}~7.3.58.1 package. \proglang{R} itself
+and all packages used are available from the Comprehensive
+\proglang{R} Archive Network (CRAN) at
+\url{https://CRAN.R-project.org/}.
+
+
+\section*{Acknowledgments}
+
+\begin{leftbar}
+All acknowledgments (note the AE spelling) should be collected in this
+unnumbered section before the references. It may contain the usual information
+about funding and feedback from colleagues/reviewers/etc. Furthermore,
+information such as relative contributions of the authors may be added here
+(if any).
+\end{leftbar}
+
+
+%% -- Bibliography -------------------------------------------------------------
+%% - References need to be provided in a .bib BibTeX database.
+%% - All references should be made with \cite, \citet, \citep, \citealp etc.
+%%   (and never hard-coded). See the FAQ for details.
+%% - JSS-specific markup (\proglang, \pkg, \code) should be used in the .bib.
+%% - Titles in the .bib should be in title case.
+%% - DOIs should be included where available.
+
+\bibliography{refs}
+
+
+%% -- Appendix (if any) --------------------------------------------------------
+%% - After the bibliography with page break.
+%% - With proper section titles and _not_ just "Appendix".
+
+\newpage
+
+\begin{appendix}
+
+\section{More technical details} \label{app:technical}
+
+\begin{leftbar}
+Appendices can be included after the bibliography (with a page break). Each
+section within the appendix should have a proper section title (rather than
+just \emph{Appendix}).
+
+For more technical style details, please check out JSS's style FAQ at
+\url{https://www.jstatsoft.org/pages/view/style#frequently-asked-questions}
+which includes the following topics:
+\begin{itemize}
+  \item Title vs.\ sentence case.
+  \item Graphics formatting.
+  \item Naming conventions.
+  \item Turning JSS manuscripts into \proglang{R} package vignettes.
+  \item Trouble shooting.
+  \item Many other potentially helpful details\dots
+\end{itemize}
+\end{leftbar}
+
+
+\section[Using BibTeX]{Using \textsc{Bib}{\TeX}} \label{app:bibtex}
+
+\begin{leftbar}
+References need to be provided in a \textsc{Bib}{\TeX} file (\code{.bib}). All
+references should be made with \verb|\cite|, \verb|\citet|, \verb|\citep|,
+\verb|\citealp| etc.\ (and never hard-coded). This commands yield different
+formats of author-year citations and allow to include additional details (e.g.,
+pages, chapters, \dots) in brackets. In case you are not familiar with these
+commands see the JSS style FAQ for details.
+
+Cleaning up \textsc{Bib}{\TeX} files is a somewhat tedious task -- especially
+when acquiring the entries automatically from mixed online sources. However,
+it is important that informations are complete and presented in a consistent
+style to avoid confusions. JSS requires the following format.
+\begin{itemize}
+  \item JSS-specific markup (\verb|\proglang|, \verb|\pkg|, \verb|\code|) should
+    be used in the references.
+  \item Titles should be in title case.
+  \item Journal titles should not be abbreviated and in title case.
+  \item DOIs should be included where available.
+  \item Software should be properly cited as well. For \proglang{R} packages
+    \code{citation("pkgname")} typically provides a good starting point.
+\end{itemize}
+\end{leftbar}
+
+\end{appendix}
+
+%% -----------------------------------------------------------------------------
+
+
+\end{document}
