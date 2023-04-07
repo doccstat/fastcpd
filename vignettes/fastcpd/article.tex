@@ -1,4 +1,5 @@
 % \citep[][Chapter~7.4]{Venables+Ripley:2002}
+% knitr::Sweave2knitr("article.Rnw"); knitr::knit("article-knitr.Rnw")
 \documentclass[article]{jss}
 
 %% -- LaTeX packages and custom commands ---------------------------------------
@@ -6,6 +7,11 @@
 %% recommended packages
 \usepackage{orcidlink,thumbpdf,lmodern}
 \usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\usepackage{geometry}
+\usepackage{pdflscape}
 
 %% another package (only for this demo article)
 \usepackage{framed}
@@ -16,32 +22,1161 @@
 
 %% For Sweave-based articles about R packages:
 %% need no \usepackage{Sweave}
-\SweaveOpts{engine=R, eps=FALSE, keep.source = TRUE}
 
 
 
+%% -- Article metainformation (author, title, ...) -----------------------------
+
+%% - \author{} with primary affiliation (and optionally ORCID link)
+%% - \Plainauthor{} without affiliations
+%% - Separate authors by \And or \AND (in \author) or by comma (in \Plainauthor).
+%% - \AND starts a new line, \And does not.
+\author{First Author~\orcidlink{0009-0006-2493-0853}\\Texas A\&M University
+   \And Second Author~\orcidlink{0009-0006-2493-0853}\\Texas A\&M University}
+\Plainauthor{First Author, Second Author}
+
+%% - \title{} in title case
+%% - \Plaintitle{} without LaTeX markup (if any)
+%% - \Shorttitle{} with LaTeX markup (if any), used as running title
+\title{\pkg{fastcpd}: Fast Change Point Detection in \proglang{R}}
+\Plaintitle{fastcpd: Fast Change Point Detection in R}
+\Shorttitle{Fast Change Point Detection in \proglang{R}}
+
+%% - \Abstract{} almost as usual
+\Abstract{
+  TBD
+}
+
+%% - \Keywords{} with LaTeX markup, at least one required
+%% - \Plainkeywords{} without LaTeX markup (if necessary)
+%% - Should be comma-separated and in sentence case.
+\Keywords{change point detection, gradient descent, quasi-newton, incremental gradient, \proglang{R}}
+\Plainkeywords{change point detection, gradient descent, quasi-newton, incremental gradient, R}
+
+%% - \Address{} of at least one author
+%% - May contain multiple affiliations for each author
+%%   (in extra lines, separated by \emph{and}\\).
+%% - May contain multiple authors for the same affiliation
+%%   (in the same first line, separated by comma).
+\Address{
+  Contact Author\\
+  Journal of Statistical Software\\
+  \emph{and}\\
+  Department of Statistics\\
+  Faculty of Economics and Statistics\\
+  Universit\"at Innsbruck\\
+  Universit\"atsstr.~15\\
+  6020 Innsbruck, Austria\\
+  E-mail: \email{Achim.Zeileis@R-project.org}\\
+  URL: \url{https://www.zeileis.org/}
+}
+
+\begin{document}
 
 
+%% -- Introduction -------------------------------------------------------------
+
+\section[Introduction: Fast change point detection in R]{Introduction: Fast change point detection in \proglang{R}} \label{sec:intro}
+
+Change-point analysis is a statistical technique used to detect changes in the
+underlying properties of a data series. This technique has been widely applied
+in various fields, such as finance, ecology, and signal processing, to identify
+abrupt changes in time series data. Over the years, many different methods have
+been proposed for change-point analysis, including both parametric and
+nonparametric approaches.
+
+Change points are also called switch points, break points, broken line
+regression, broken stick regression, bilinear regression, piecewise linear
+regression, local linear regression, segmented regression, and (performance)
+discontinuity models \citep{lindelov2020mcp}. Industries often refer to another term called anomaly
+detection without the need to specify the underlying distribution of
+the data and the anomaly often comes from some external source, for example
+a cyber attack. There are extensive research done on anomaly detection on time
+series including \cite{shipmon2017time}, but the focus of this paper is on
+change-point detection with the underlying distribution of the data known.
+
+Change-point analysis involves identifying and localizing structural changes in
+the underlying model of a data sequence. The earliest work on this topic dates
+back to the 1950s when the focus was on detecting a shift in the mean of an
+independent and identically distributed Gaussian sequence for quality control
+purposes in industry\cite{page1954continuous}. Since then, change-point analysis
+has become an active
+area of research in statistics and has found applications in diverse fields
+such as signal processing, climate science, economics, finance, medicine, and
+bioinformatics.
+
+For readers interested in delving deeper into this subject, we recommend the
+book-length treatments by \cite{brodsky1993nonparametric}, \cite{csorgo1997limit},
+and \cite{tartakovsky2014sequential}. Additionally, reviews by
+\cite{aue2013structural, niu2016multiple, aminikhanghahi2017survey, truong2020selective, liu2022high}
+offer valuable insights into the current state-of-the-art and
+recent developments in change-point analysis.
+
+This paper is focused on offline change-point detection methods, which are used
+to retrospectively detect changes in data sequences. There are two main branches
+of change-point detection methods: online methods and offline methods. Online
+methods aim to detect changes as early as possible, while offline methods detect
+changes once all samples have been observed. Another subject called anomaly
+detection is also often studied in industry companies for security reasons,
+which can be considered as a subset of the online detection problems.
+\cite{shipmon2017time} conducted research on anomaly detection based on time
+series. The offline approach typically
+involves three components: the cost function, the search method, and the
+penalty/constraint \cite{truong2020selective}. The choice of the cost function
+and search method has a
+significant impact on computational complexity. As large data sets become more
+common in modern applications, more efficient algorithms are needed to handle
+them. One popular approach is to cast change-point detection as a
+model-selection problem by solving a penalized optimization problem over
+possible numbers and locations of change-points. Dynamic programming is used to
+solve this optimization problem exactly, but this can be computationally
+expensive \cite{auger1989algorithms, jackson2005algorithm}. Two pruning
+strategies \cite{killick2012optimal, rigaill2010pruned} have been introduced to
+reduce computational
+cost: PELT and an alternative pruned dynamic programming algorithm. However,
+these pruning strategies still result in a computational cost of
+$O(\sum_{t = 1}^T \sum_{s = 1}^t q(s))$
+in the worst case scenario, where $T$ is the number of data points and $q(s)$
+denotes the time complexity for calculating the cost function value based on $s$
+data points. \cite{zhang2022sequential} proposes a new sequential updating
+method (SE)
+that can be coupled with the gradient descent (SeGD) and quasi-Newton's method
+(SeN) to update the parameter estimate and cost value in dynamic programming.
+The new strategy significantly improves computational efficiency by avoiding
+repeated optimization of the objective function based on each data segment. The
+proposed method applies to a broad class of statistical models and can be
+regarded as a new approximation scheme for the $l_0$ penalization problem.
+
+Based on the manuscript from \citep{zhang2022sequential}, we have developed an
+R package with proper extension and modifications, called
+\pkg{fastcpd} (\textbf{FAST} \textbf{C}hange \textbf{P}oint \textbf{D}etection)
+for fast offline change-point detection.
+Change-point detection is an important problem in many fields, including signal
+processing, finance, and biology. Given a sequence of data points, a
+change-point detection algorithm identifies points where the underlying
+statistical properties of the data change. \pkg{fastcpd} implements a novel
+approach for change-point detection that is orders of magnitude faster than
+existing methods, without sacrificing accuracy.
+
+The \pkg{fastcpd} method is based on a sequential optimization algorithm that
+uses gradient descent to efficiently search for change-points. The algorithm is
+designed to minimize a cost function that captures the likelihood of observing
+the data given a particular segmentation. The key idea is to update the cost
+function using information from previous steps, rather than re-optimizing the
+objective function at each step. This allows \pkg{fastcpd} to quickly identify
+change-points in long sequences of data, even when the cost function involves
+solving a non-trivial optimization problem.
+
+\pkg{fastcpd} supports change-point detection in a variety of settings,
+including generalized linear models and penalized regression. The package
+provides a simple and intuitive interface for users to specify their data and
+desired parameters, and produces output in a convenient format for further
+analysis. In addition, \pkg{fastcpd} includes a suite of visualization tools for
+exploring the results of the change-point detection algorithm.
+
+We believe that \pkg{fastcpd} will be a valuable tool for researchers and
+practitioners working with change-point detection problems. By providing fast
+and accurate change-point detection in a user-friendly package, \pkg{fastcpd}
+will enable users to more easily analyze and understand complex datasets.
+
+% We will only brief introduce some of the existing packages for online change
+% point detection since our focus is on offline change point detection.
+% The \proglang{R} package \pkg{onlineBcp} from \citep{yiugiter2015online} provides a set of tools for online Bayesian
+% change-point detection. It includes functions for fitting several Bayesian
+% models, such as the Normal-Inverse-Gamma model and the Normal-Gamma model, and
+% for updating the posterior distributions as new data becomes available. The
+% package also allows for online inference of the change-point location and for
+% estimating the parameters of the underlying distributions before and after the
+% change-point. The package is useful for applications where data arrives
+% sequentially and quickly, such as in sensor networks or social media analysis.
+
+% https://www.marinedatascience.co/blog/2019/09/28/comparison-of-change-point-detection-methods/
+% https://lindeloev.github.io/mcp/articles/packages.html
+% are good sources for comparison of change point detection methods
+The \proglang{R} package \pkg{changepoint} from \cite{killick2014changepoint}
+has been developed to detect change points in mean and variance in the data with
+the PELT algorithm.
+The \proglang{R} package \pkg{bcp} from \citep{erdman2008bcp} is a implementation
+of Bayesian methods from \cite{barry1993bayesian}.
+The \proglang{R} package \pkg{strucchange} from \cite{zeileis2002strucchange}
+reviews tests for structural change in linear regression models from the
+generalized fluctuation test framework as well as from the F test (Chow test)
+framework.
+The \proglang{R} \pkg{segmented} from \cite{muggeo2008segmented} uses piecewise
+linear regression to detect change points in the data.
+The \proglang{R} package \pkg{cpm} from \citep{ross2015parametric} provides a
+implementation of several change point models from 2003 to 2014 in both online
+and offline settings.
+The \proglang{R} package \pkg{ecp} from \citep{james2013ecp} is designed to
+perform multiple change point analysis while making as few assumptions as possible.
+The \proglang{R} package \pkg{mcp} from \citep{lindelov2020mcp} does regression
+with one or Multiple Change Points (MCP) between Generalized and hierarchical
+Linear Segments using Bayesian inference, aiming to provide maximum
+flexibility for analyses with a priori knowledge about the number of change
+points and the form of the segments in between.
+Although the \proglang{R} package \pkg{tree} can also be used to detect change
+points occasionally, it is not the main purpose of this package.
+The \proglang{R} package \pkg{changepoints} \citep{changepoints2022} provides
+implementation of several change point models from 2019 to 2021.
+
+Overall there is not a method that is universal and fast enough for all
+applications as far as we know. The \pkg{fastcpd} package is designed to be a
+general framework for change point detection which is also fast enough to be
+applied in all different kinds of data sets.
+
+%% -- Manuscript ---------------------------------------------------------------
+
+\section{Models and software} \label{sec:models}
+
+Logistic regression, Poisson regression, linear regression, and penalized
+linear regression have already been implemented in \pkg{fastcpd} package. Some
+specifications are listed in Table~\ref{tab:models}. The signature of the main
+function \fct{fastcpd} is
+%
+\begin{Code}
+fastcpd(
+  data,
+  beta,
+  segment_count = 10,
+  trim = 0.025,
+  momentum_coef = 0,
+  sgd_k = 3,
+  family = NULL,
+  epsilon = 1e-10,
+  min_prob = 10^10,
+  winsorise_minval = -20,
+  winsorise_maxval = 20,
+  p = NULL,
+  cost = negative_log_likelihood,
+  cost_gradient = cost_update_gradient,
+  cost_hessian = cost_update_hessian
+)
+\end{Code}
+%
+where each parameters have the following usages:
+\begin{itemize}
+  \item \code{data}: A data frame containing the data to be segmented where each
+    row denotes each data point. In regression settings, the first column is the
+    response variable while the rest are covariates.
+  \item \code{beta}: Initial cost value specified in Algorithm~1 in
+    \cite{zhang2022sequential}.
+  \item \code{segment_count}: Number of segments for initial guess. If not
+    specified, the initial guess on the number of segments is 10.
+  \item \code{trim} Trimming for the boundary change points so that a change
+    point close to the boundary will not be counted as a change point. This
+    parameter also specifies the minimum distance between two change points. If
+    several change points have mutual distances smaller than
+    \code{trim * nrow(data)}, those change points will be merged into one single
+    change point.
+  \item \code{momentum_coef} Momentum coefficient to be applied to each update.
+    This parameter is used when the loss function is bad-shaped so that
+    maintaining a momentum from previous update is desired. Default value is 0,
+    meaning the algorithm doesn't maintain a momentum by default.
+  \item \code{sgd_k} Number of epochs in for each update whenever the algorithm
+    takes a new data point, in the sense that the data are analyzed sequentially
+    according to the nature of Pruned Exact Linear Time (PELT) algorithm
+    \citep{killick2012optimal}.
+  \item \code{family} Family of the model. Can be ``\code{binomial}'', ``\code{poisson}'',
+    ``\code{lasso}'', ``\code{gaussian}'' or ``\code{custom}''. For simplicity,
+    user can also omit this parameter, indicating that they will be using their
+    own cost functions. If specified as ``\code{custom}'' or ``\code{NULL}'', the user must
+    specify the cost function, gradient and corresponding Hessian matrix.
+    Hessian is preferred when the user want to specify their own cost function,
+    but not analytically available, the user should provide a single number
+    (diagonal matrix) to replace the Hessian matrix. Should be left as
+    \code{NULL} if the user would like to use their own cost functions.
+  \item \code{epsilon} Epsilon to avoid numerical issues. Only used for Logistic
+    Regression and Poisson Regression.
+  \item \code{min_prob} Minimum probability to avoid numerical issues. Only used
+    for Poisson Regression.
+  \item \code{winsorise_minval} Minimum value for the parameter in Poisson
+    Regression to be winsorised.
+  \item \code{winsorise_maxval} Maximum value for the parameter in Poisson
+    Regression to be winsorised.
+  \item \code{lambda} Lambda for L1 regularization. Only used in ``lasso''.
+  \item \code{cost} Cost function to be used. This and the following two
+    parameters should not be specified at the same time with \code{family}.
+    If not specified, the default is the negative log-likelihood for the
+    corresponding family.
+  \item \code{cost_gradient} Gradient function for the custom cost function.
+  \item \code{cost_hessian} Hessian function for the custom cost function.
+\end{itemize}
+Return of the function is a list containing two elements:
+\begin{itemize}
+  \item \code{cp_set}: A vector containing the change points.
+  \item \code{cost_value}: Values of the cost function for each data segments
+    separated by the change points.
+\end{itemize}
+
+A \class{fastcpd} object is returned by the function. This object can be used
+to plot the change points and the cost function values. Compatible functions
+include \fct{plot}, \fct{print} and \fct{summary}.
+
+\begin{table}[t!]
+\centering
+\begin{tabular}{llp{10cm}}
+\hline
+Model               & \code{family}   & Description \\ \hline
+Linear Regression   & \code{gaussian} & Will be using pre-defined cost functions,
+                                        details can be found in
+                                        Section~\ref{sec:linear model} \\
+Logistic Regression & \code{binomial} & Will be using pre-defined cost functions,
+                                        details can be found in
+                                        Section~\ref{sec:logistic_regression} \\
+Poisson Regression  & \code{poisson}  & Will be using pre-defined cost functions,
+                                        details can be found in
+                                        Section~\ref{sec:poisson} \\
+LASSO               & \code{lasso}    & Will be using pre-defined cost functions,
+                                        details can be found in
+                                        Section~\ref{sec:linear model} \\ \hline
+User-defined Model  & \code{custom}   & If \code{family} is specified as ``custom''
+                                        or \code{NULL}, \code{cost}, \code{cost_gradient}
+                                        and \code{cost_hessian} must be provided. \\
+Huber Regression    & \code{custom}   & Instead of providing Huber Regression
+                                        as a built-in model, we provide an example
+                                        of how to use \code{custom} model. Details
+                                        can be found in Section~\ref{sec:huber} \\
+Quantile Regression & \code{custom}   & Instead of providing Quantile Regression
+                                        as a built-in model, we provide an example
+                                        of how to use \code{custom} model. Details
+                                        can be found in Section~\ref{sec:quantile} \\
+Mean Shift          & \code{custom}   & Instead of providing Quantile Regression
+                                        as a built-in model, we provide an example
+                                        of how to use \code{custom} model. Details
+                                        can be found in Section~\ref{sec:mean shift model} \\ \hline
+\end{tabular}
+\caption{\label{tab:models} All the models that have been implemented in the
+package, including an empty model so that the users are able to provide their
+own.}
+\end{table}
+
+\section{Changes in linear models} \label{sec:linear model}
+
+\begin{Schunk}
+\begin{Sinput}
+R> summary(linear_regression_result)
+\end{Sinput}
+\begin{Soutput}
+Call:
+fastcpd(data = data, beta = beta, k = function(x) 0, family = "gaussian", 
+    epsilon = 1e-05)
+
+[1] "Residuals:"
+       Min         1Q     Median         3Q        Max 
+-2.0212698 -0.4542351  0.0110035  0.5265664  1.9231798 
+
+Change points:
+[1]  85 188 275
+\end{Soutput}
+\begin{Sinput}
+R> plot(linear_regression_result)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{article-linear regression plot}
+
+\newgeometry{margin=1cm}
+\begin{landscape}
+
+\begin{table}[t!]
+  \centering
+  \begin{tabular}{@{}cccccccccc@{}}
+  \toprule
+                          & \multicolumn{3}{c}{p=1}                                            & \multicolumn{3}{c}{p=3}                                            & \multicolumn{3}{c}{p=5}                                            \\
+                          & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               \\ \midrule
+  \multirow{4}{*}{cpc=0} & 1.000, 1.570s & 1.000, 4.021s & 1.000, 9.968s & 1.000, 1.846s & 1.000, 4.443s & 1.000, 10.256s & 1.000, 1.729s & 1.000, 3.961s & 1.000, 20.745s \\
+                          & 1.000, 30.840s & 1.000, 231.490s & 1.000, 909.016s & 1.000, 27.601s & 1.000, 139.578s & 1.000, 401.631s & 1.000, 27.667s & 1.000, 105.941s & 1.000, 1164.284s \\
+                          & 1.000, 56.689s & 1.000, 413.163s & 1.000, 1599.071s & 1.000, 49.369s & 1.000, 224.257s & 1.000, 883.933s & 1.000, 55.541s & 1.000, 208.858s & 1.000, 2253.338s \\
+                          & 1.000, 45.707s & 1.000, 202.601s & 1.000, 1373.327s & 0.795, 30.589s & 0.693, 127.826s & 0.890, 598.338s & 0.503, 23.661s & 0.740, 123.029s & 0.751, 707.734s \\ \midrule
+  \multirow{4}{*}{cpc=1} & 0.926, 2.193s & 0.974, 5.718s & 0.995, 17.134s & 0.961, 1.750s & 0.993, 3.939s & 0.984, 22.134s & 0.975, 2.810s & 0.992, 5.011s & 0.998, 12.124s \\
+                          & 0.937, 52.883s & 0.975, 264.012s & 0.993, 2419.447s & 0.963, 33.434s & 0.993, 99.637s & 0.988, 2567.556s & 0.977, 68.288s & 0.984, 136.401s & 0.997, 529.213s \\
+                          & 0.937, 109.082s & 0.977, 521.743s & 0.993, 4078.207s & 0.963, 63.304s & 0.993, 185.043s & 0.989, 3914.269s & 0.977, 130.413s & 0.984, 263.126s & 0.997, 1169.759s \\
+                          & 0.983, 42.460s & 0.942, 127.226s & 0.996, 937.156s & 0.873, 22.601s & 0.981, 103.836s & 0.981, 616.505s & 0.799, 23.410s & 0.812, 74.076s & 0.836, 373.167s \\ \midrule
+  \multirow{4}{*}{cpc=3} & 0.748, 2.111s & 0.793, 5.503s & 0.992, 20.999s & 0.873, 1.611s & 0.928, 4.997s & 0.977, 14.940s & 0.959, 2.320s & 0.988, 4.834s & 0.990, 21.725s \\
+                          & 0.749, 50.243s & 0.794, 223.741s & 0.987, 1502.482s & 0.868, 27.800s & 0.925, 172.166s & 0.977, 782.230s & 0.906, 47.497s & 0.986, 155.277s & 0.989, 1439.218s \\
+                          & 0.749, 99.414s & 0.794, 429.954s & 0.987, 3273.339s & 0.868, 53.318s & 0.925, 317.865s & 0.977, 1974.234s & 0.906, 86.465s & 0.984, 304.305s & 0.989, 2532.795s \\
+                          & 0.821, 28.088s & 0.953, 103.967s & 0.993, 451.589s & 0.892, 21.074s & 0.982, 59.986s & 0.977, 372.544s & 0.920, 17.436s & 0.906, 61.760s & 0.905, 358.853s \\ \midrule
+  \multirow{4}{*}{cpc=5} & 0.758, 2.463s & 0.856, 5.878s & 0.913, 19.537s & 0.873, 2.090s & 0.652, 4.901s & 0.931, 16.818s & 0.872, 2.119s & 0.964, 5.710s & 0.992, 15.798s \\
+                          & 0.790, 58.482s & 0.862, 215.959s & 0.913, 1240.471s & 0.889, 43.476s & 0.653, 156.593s & 0.930, 906.390s & 0.883, 38.640s & 0.962, 185.898s & 0.990, 888.918s \\
+                          & 0.790, 111.999s & 0.861, 426.119s & 0.912, 2745.320s & 0.890, 80.778s & 0.654, 338.410s & 0.930, 1941.267s & 0.883, 78.305s & 0.962, 352.640s & 0.990, 1645.430s \\
+                          & 0.814, 24.577s & 0.919, 85.286s & 0.953, 349.660s & 0.919, 15.480s & 0.969, 64.646s & 0.976, 238.301s & 0.915, 12.354s & 0.978, 39.836s & 0.911, 197.641s \\ \bottomrule
+  \end{tabular}
+  \caption{\label{tab:linear regression comparison} Comparison of the algorithms for the linear regression model in mean.}
+\end{table}
+
+\end{landscape}
+\restoregeometry
+
+\section{Changes in generalized linear models: Logistic regression} \label{sec:logistic_regression}
+
+We first consider the change-point detection problem in the generalized linear
+models (GLM). Suppose we have a data set containing a set of
+predictors/covariates and corresponding response variables, i.e. each data point
+\code{data[i, ]} contains a set of predictors/covariates \code{data[i, -1]} and
+a response \code{data[i, 1]}. The reason we set the first column to be the
+response variables are that in \proglang{R}, we can use \code{-1} to denote all
+columns other than the first column without the need to consider number of
+columns altogether.
+
+Suppose the response variables follows a binomial distribution with specifics
+defined as
+%
+\begin{equation} \label{eq:logistic_regression}
+y_i \sim \mathrm{Bernoulli}\left(\frac{1}{1 + e^{- x_i^\top \theta_i}}\right),
+\quad x_i \sim \mathcal{N}_p(0, \Sigma)\ \mathrm{with}\ \Sigma =
+(0.9^{\lvert i - j \rvert})_{p \times p}, \quad 1 \le i \le n,
+\end{equation}
+%
+where $\{y_i\}$ is the response variable, $\{x_i\}$ is the covariate vector,
+$\Sigma$ is the covariance matrix for the sampling of $\{x_i\}$, $p$ is the
+number of predictors, $n$ is the total number of data points.
+
+We now use the \pkg{fastcpd} package to detect the change points in the data set
+\code{data}. During the simulations, we vary the number of data points in
+$\{300, 500, 1500\}$ and the dimensions $p$ to $\{1, 3, 5\}$ while varying $\theta_i$
+to produce different magnitudes of change. We define $\delta_p$ as the difference
+between the coefficients before and after a change-point and selected its value
+such that $M(\delta_p):=\delta_p^\top \Sigma \delta_p \in \{0.36, 0.81, 1.96\}$,
+representing small, medium, and large magnitudes of change, respectively. The
+specific choice of $\delta_p$ does not affect the results as long as $M(\delta_p)$
+is consistent. We evaluated the number of change-points at 0, 1, 3, and 5 for
+each configuration, and the detailed simulation settings for each case are given
+below.
+%
+\begin{Schunk}
+\begin{Sinput}
+R> summary(logistic_regression_result)
+\end{Sinput}
+\begin{Soutput}
+Call:
+fastcpd(data = data, beta = beta, k = function(x) 0, family = "binomial", 
+    epsilon = 1e-05)
+
+[1] "Residuals:"
+       Min         1Q     Median         3Q        Max 
+-24.299636  -1.000003  -1.000000   1.000001   8.091945 
+
+Change points:
+ [1]  14  42  60  70  97 113 134 158 168 183 204 233 242
+\end{Soutput}
+\begin{Sinput}
+R> plot(logistic_regression_result)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{article-logistic regression plot}
+
+\newgeometry{margin=1cm}
+\begin{landscape}
+
+  \begin{table}[t!]
+    \centering
+    \begin{tabular}{@{}cccccccccc@{}}
+    \toprule
+                           & \multicolumn{3}{c}{p=1}                                            & \multicolumn{3}{c}{p=3}                                            & \multicolumn{3}{c}{p=5}                                            \\
+                           & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               \\ \midrule
+    \multirow{4}{*}{cpc=0} & 0.605, 1.330s & 0.760, 3.096s & 0.577, 11.772s & 0.120, 1.030s & 0.122, 2.203s & 0.246, 6.864s & 0.087, 1.102s & 0.084, 1.912s & 0.089, 5.588s \\
+                           & 0.372, 12.885s & 0.675, 53.665s & 0.661, 312.167s & 0.116, 3.145s & 0.105, 10.166s & 0.217, 57.963s & 0.076, 3.042s & 0.074, 6.301s & 0.118, 21.654s \\
+                           & 0.372, 22.539s & 0.660, 78.715s & 0.661, 502.429s & 0.101, 4.695s & 0.115, 14.216s & 0.214, 96.086s & 0.075, 4.409s & 0.072, 9.358s & 0.139, 35.160s \\
+                           & 0.350, 24.271s & 0.567, 70.958s & 0.437, 272.301s & 0.057, 10.170s & 0.090, 22.496s & 0.234, 78.239s & 0.077, 8.879s & 0.051, 18.831s & 0.286, 68.094s \\ \midrule
+    \multirow{4}{*}{cpc=1} & 0.600, 1.361s & 0.854, 2.984s & 0.712, 9.723s & 0.492, 0.947s & 0.516, 2.344s & 0.525, 6.497s & 0.250, 1.042s & 0.493, 2.071s & 0.391, 5.641s \\
+                           & 0.595, 10.538s & 0.746, 48.793s & 0.639, 250.611s & 0.369, 2.728s & 0.527, 11.299s & 0.468, 42.347s & 0.233, 4.412s & 0.464, 7.567s & 0.394, 22.882s \\
+                           & 0.605, 18.499s & 0.660, 78.009s & 0.646, 380.522s & 0.367, 4.200s & 0.503, 14.211s & 0.483, 70.608s & 0.239, 7.460s & 0.466, 11.393s & 0.391, 34.378s \\
+                           & 0.558, 19.583s & 0.601, 64.023s & 0.505, 214.571s & 0.316, 8.864s & 0.484, 21.949s & 0.464, 89.643s & 0.232, 12.136s & 0.456, 20.441s & 0.473, 70.764s \\ \midrule
+    \multirow{4}{*}{cpc=3} & 0.679, 1.169s & 0.626, 3.158s & 0.894, 11.382s & 0.665, 0.935s & 0.700, 2.109s & 0.707, 7.079s & 0.635, 0.987s & 0.665, 1.875s & 0.611, 5.409s \\
+                           & 0.645, 10.357s & 0.680, 54.751s & 0.791, 261.388s & 0.632, 2.351s & 0.663, 10.105s & 0.675, 37.185s & 0.623, 3.272s & 0.651, 5.981s & 0.631, 21.520s \\
+                           & 0.640, 17.013s & 0.684, 98.208s & 0.790, 384.776s & 0.628, 3.866s & 0.657, 16.737s & 0.692, 67.237s & 0.622, 5.376s & 0.651, 9.949s & 0.643, 35.101s \\
+                           & 0.644, 21.539s & 0.679, 75.442s & 0.872, 249.727s & 0.619, 9.116s & 0.617, 26.863s & 0.699, 81.578s & 0.620, 9.856s & 0.637, 21.674s & 0.675, 65.085s \\ \midrule
+    \multirow{4}{*}{cpc=5} & 0.683, 1.343s & 0.582, 2.978s & 0.821, 8.990s & 0.817, 0.910s & 0.853, 2.213s & 0.870, 6.447s & 0.827, 0.953s & 0.821, 1.854s & 0.774, 5.257s \\
+                           & 0.659, 14.030s & 0.691, 40.185s & 0.832, 175.882s & 0.792, 2.963s & 0.817, 9.022s & 0.827, 42.531s & 0.824, 2.753s & 0.818, 5.901s & 0.786, 22.069s \\
+                           & 0.621, 25.651s & 0.680, 62.815s & 0.840, 284.395s & 0.790, 4.035s & 0.825, 11.950s & 0.838, 76.895s & 0.821, 4.448s & 0.822, 9.957s & 0.765, 36.008s \\
+                           & 0.781, 23.809s & 0.790, 65.170s & 0.838, 176.669s & 0.787, 8.503s & 0.813, 26.225s & 0.795, 70.330s & 0.818, 10.078s & 0.809, 18.632s & 0.765, 47.846s \\ \bottomrule
+    \end{tabular}
+    \caption{\label{tab:logistic regression comparison} Comparison of the algorithms for the logistic regression model in mean.}
+  \end{table}
+
+\end{landscape}
+\restoregeometry
+
+\section{Changes in generalized linear models: Poisson regression} \label{sec:poisson}
+
+We now consider the change-point detection problem in the Poisson Regression
+setting. Suppose we have a data set containing a set of
+predictors/covariates and corresponding response variables, i.e. each data point
+\code{data[i, ]} contains a set of predictors/covariates \code{data[i, -1]} and
+a response \code{data[i, 1]}. The reason we set the first column to be the
+response variables are that in \proglang{R}, we can use \code{-1} to denote all
+columns other than the first column without the need to consider number of
+columns altogether.
+
+Suppose the response variables follows a poisson distribution with specifics
+defined as
+%
+\begin{equation} \label{eq:logistic_regression}
+y_i \sim \mathrm{Poisson}\left(e^{x_i^\top \theta_i}\right),
+\quad x_i \sim \mathcal{N}_p(0, \Sigma)\ \mathrm{with}\ \Sigma =
+(0.9^{\lvert i - j \rvert})_{p \times p}, \quad 1 \le i \le n,
+\end{equation}
+%
+where $\{y_i\}$ is the response variable, $\{x_i\}$ is the covariate vector,
+$\Sigma$ is the covariance matrix for the sampling of $\{x_i\}$, $p$ is the
+number of predictors, $n$ is the total number of data points.
+
+We now use the \pkg{fastcpd} package to detect the change points in the data set
+\code{data}. During the simulations, we vary the number of data points in
+$\{300, 500, 1500\}$ and the dimensions $p$ to $\{1, 3, 5\}$ while varying $\theta_i$
+to produce different magnitudes of change. We define $\delta_p$ as the difference
+between the coefficients before and after a change-point and selected its value
+such that $M(\delta_p):=\delta_p^\top \Sigma \delta_p \in \{0.36, 0.81, 1.96\}$,
+representing small, medium, and large magnitudes of change, respectively. The
+specific choice of $\delta_p$ does not affect the results as long as $M(\delta_p)$
+is consistent. We evaluated the number of change-points at 0, 1, 3, and 5 for
+each configuration, and the detailed simulation settings for each case are given
+below.
+%
+%
+
+\begin{Schunk}
+\begin{Sinput}
+R> summary(poisson_regression_result)
+\end{Sinput}
+\begin{Soutput}
+Call:
+fastcpd(data = data, beta = beta, k = function(x) 0, family = "poisson", 
+    epsilon = 1e-04)
+
+[1] "Residuals:"
+      Min        1Q    Median        3Q       Max 
+-1.000000 -1.000000 -0.570526  0.108220 13.209825 
+
+Change points:
+[1]  30  90 211
+\end{Soutput}
+\begin{Sinput}
+R> plot(poisson_regression_result)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{article-poisson regression plot}
+
+\newgeometry{margin=1cm}
+\begin{landscape}
+
+  \begin{table}[t!]
+    \centering
+    \begin{tabular}{@{}cccccccccc@{}}
+    \toprule
+                           & \multicolumn{3}{c}{p=1}                                            & \multicolumn{3}{c}{p=3}                                            & \multicolumn{3}{c}{p=5}                                            \\
+                           & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               & n=300                & n=600                & n=1500               \\ \midrule
+    \multirow{4}{*}{cpc=0} & 0.573, 2.674s & 0.761, 3.914s & 0.621, 8.328s & 0.151, 2.250s & 0.124, 2.835s & 0.145, 5.347s & 0.465, 2.415s & 0.499, 3.121s & 0.500, 5.628s \\
+                           & 0.536, 13.161s & 0.725, 64.242s & 0.627, 253.467s & 0.169, 1.865s & 0.151, 4.812s & 0.182, 18.710s & 0.460, 1.951s & 0.499, 3.561s & 0.500, 10.423s \\
+                           & 0.536, 21.031s & 0.724, 134.303s & 0.652, 442.059s & 0.180, 2.940s & 0.171, 7.258s & 0.138, 30.660s & 0.460, 3.102s & 0.499, 6.694s & 0.500, 12.215s \\
+                           & 0.688, 47.338s & 0.795, 121.881s & 0.669, 393.445s & 0.178, 22.530s & 0.190, 60.561s & 0.156, 217.569s & 0.082, 19.646s & 0.107, 51.560s & 0.103, 160.377s \\ \midrule
+    \multirow{4}{*}{cpc=1} & 0.703, 2.430s & 0.748, 3.995s & 0.693, 6.170s & 0.525, 0.585s & 0.472, 1.302s & 0.395, 3.454s & 0.651, 0.910s & 0.669, 1.531s & 0.696, 3.820s \\
+                           & 0.730, 10.161s & 0.741, 45.109s & 0.654, 146.840s & 0.539, 1.529s & 0.479, 4.456s & 0.422, 14.922s & 0.687, 2.058s & 0.648, 2.748s & 0.696, 8.956s \\
+                           & 0.738, 16.621s & 0.739, 81.725s & 0.647, 267.028s & 0.558, 2.349s & 0.508, 8.022s & 0.444, 26.761s & 0.685, 3.748s & 0.648, 4.864s & 0.696, 13.197s \\
+                           & 0.869, 36.315s & 0.906, 118.940s & 0.776, 341.056s & 0.527, 17.410s & 0.489, 60.070s & 0.383, 229.860s & 0.439, 19.629s & 0.412, 42.851s & 0.424, 131.141s \\ \midrule
+    \multirow{4}{*}{cpc=3} & 0.888, 1.114s & 0.873, 2.380s & 0.858, 6.123s & 0.764, 0.627s & 0.736, 1.629s & 0.660, 3.717s & 0.649, 0.841s & 0.644, 1.489s & 0.725, 3.503s \\
+                           & 0.884, 8.529s & 0.860, 28.128s & 0.860, 120.071s & 0.757, 1.802s & 0.701, 4.904s & 0.673, 16.255s & 0.682, 1.814s & 0.644, 3.038s & 0.725, 8.556s \\
+                           & 0.884, 16.054s & 0.864, 50.780s & 0.860, 257.884s & 0.762, 2.525s & 0.716, 6.762s & 0.683, 21.856s & 0.678, 3.319s & 0.644, 4.729s & 0.725, 11.262s \\
+                           & 0.914, 28.205s & 0.892, 88.754s & 0.913, 282.897s & 0.816, 19.628s & 0.748, 50.766s & 0.656, 184.262s & 0.688, 17.732s & 0.599, 45.561s & 0.698, 145.432s \\ \midrule
+    \multirow{4}{*}{cpc=5} & 0.877, 1.032s & 0.948, 2.209s & 0.971, 5.891s & 0.770, 0.620s & 0.784, 1.195s & 0.744, 3.235s & 0.734, 0.870s & 0.726, 1.610s & 0.670, 3.558s \\
+                           & 0.887, 9.669s & 0.907, 25.651s & 0.965, 137.499s & 0.754, 1.804s & 0.761, 3.543s & 0.746, 13.158s & 0.734, 1.716s & 0.726, 4.090s & 0.670, 10.147s \\
+                           & 0.859, 18.205s & 0.862, 48.036s & 0.968, 270.360s & 0.749, 2.741s & 0.769, 5.675s & 0.743, 20.089s & 0.729, 3.051s & 0.726, 5.451s & 0.670, 13.277s \\
+                           & 0.880, 28.661s & 0.971, 78.486s & 0.989, 247.079s & 0.815, 18.677s & 0.857, 45.678s & 0.794, 132.357s & 0.804, 17.996s & 0.821, 33.979s & 0.781, 107.795s \\ \bottomrule
+    \end{tabular}
+    \caption{\label{tab:poisson regression comparison} Comparison of the algorithms for the poisson regression model in mean.}
+  \end{table}
+
+\end{landscape}
+\restoregeometry
+
+\section{Changes in penalized linear models} \label{sec:penalized linear model}
+
+We now consider the change-point detection problem in the penalized linear
+models. Suppose we have a data set containing a set of
+predictors/covariates and corresponding response variables, i.e. each data point
+\code{data[i, ]} contains a set of predictors/covariates \code{data[i, -1]} and
+a response \code{data[i, 1]}. The reason we set the first column to be the
+response variables are that in \proglang{R}, we can use \code{-1} to denote all
+columns other than the first column without the need to consider number of
+columns altogether.
+
+Suppose the response variables follows a linear model with sparse coefficients.
+%
+\begin{equation} \label{eq:logistic_regression}
+y_i = x_i^\top \theta_i + \epsilon_i,
+\quad x_i \sim \mathcal{N}_p(0, \Sigma)\ \mathrm{with}\ \Sigma =
+0.5I_{p \times p}, \quad \epsilon_i \sim \mathcal{N}(0, 0.5), \quad 1 \le i \le n,
+\end{equation}
+%
+where $\{y_i\}$ is the response variable, $\{x_i\}$ is the covariate vector,
+$\Sigma$ is the covariance matrix for the sampling of $\{x_i\}$, $p$ is the
+number of predictors, $n$ is the total number of data points.
+
+We now use the \pkg{fastcpd} package to detect the change points in the data set
+\code{data}. During the simulations, we set the numeber of data points to be
+1500 and the dimensions $p$ to be 50 while varying $\theta_i$
+to produce different magnitudes of change. We define $\delta_p$ as the difference
+between the coefficients before and after a change-point and selected its value
+such that $M(\delta_p):=\delta_p^\top \Sigma \delta_p \in \{0.36, 0.81, 1.96\}$,
+representing small, medium, and large magnitudes of change, respectively. The
+specific choice of $\delta_p$ does not affect the results as long as $M(\delta_p)$
+is consistent. We evaluated the number of change-points at 0, 1, 3, and 5 for
+each configuration, and the detailed simulation settings for each case are given
+below.
+%
+%
+
+\begin{Schunk}
+\begin{Sinput}
+R> summary(lasso_regression_result)
+\end{Sinput}
+\begin{Soutput}
+Call:
+fastcpd(data = data, beta = beta, k = function(x) 0, family = "lasso", 
+    epsilon = 1e-04)
+
+[1] "Residuals:"
+      Min        1Q    Median        3Q       Max 
+-4.668282 -0.803135 -0.002573  0.783939  5.571568 
+
+Change points:
+[1]  464 1346 1414
+\end{Soutput}
+\begin{Sinput}
+R> plot(lasso_regression_result)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{article-lasso regression plot}
+
+\begin{table}[t!]
+  \centering
+  \begin{tabular}{@{}cccc@{}}
+  \toprule
+                         & s=3                               & s=6                               & s=10                               \\ \midrule
+  \multirow{4}{*}{cpc=0} & 1.000, 64.890s & 1.000, 29.143s & 0.989, 32.011s \\
+                         & 0.988, 1634.390s & 1.000, 1598.660s & 0.988, 1753.604s \\
+                         & 0.988, 2562.742s & 1.000, 2747.117s & 0.990, 2373.280s \\
+                         & 1.000, 16.571s & 1.000, 14.734s & 1.000, 15.267s \\ \midrule
+  \multirow{4}{*}{cpc=1} & 0.998, 40.824s & 0.999, 40.435s & 0.998, 28.243s \\
+                         & 0.980, 1093.891s & 0.998, 1977.765s & 0.999, 678.622s \\
+                         & 0.980, 1947.181s & 0.998, 3083.845s & 0.999, 1147.687s \\
+                         & 0.999, 21.734s & 0.998, 50.006s & 1.000, 21.989s \\ \midrule
+  \multirow{4}{*}{cpc=3} & 0.988, 35.006s & 0.990, 35.015s & 0.995, 34.892s \\
+                         & 0.984, 584.249s & 0.994, 1219.082s & 0.998, 1152.133s \\
+                         & 0.982, 1189.819s & 0.993, 2046.467s & 0.998, 1593.156s \\
+                         & 0.998, 38.934s & 0.995, 43.189s & 0.999, 46.825s \\ \midrule
+  \multirow{4}{*}{cpc=5} & 0.990, 38.354s & 0.992, 31.189s & 0.993, 20.499s \\
+                         & 0.980, 654.719s & 0.994, 590.370s & 0.996, 606.117s \\
+                         & 0.982, 1256.162s & 0.994, 1006.215s & 0.996, 963.025s \\
+                         & 0.988, 38.752s & 0.993, 29.417s & 0.997, 33.151s \\ \bottomrule
+  \end{tabular}
+  \caption{\label{tab:poisson regression comparison} Comparison of the algorithms for the poisson regression model in mean.}
+\end{table}
+
+\section{Changes in user specified models with custom cost functions} \label{sec:custom}
+
+\subsection{Reproducing built-in models} \label{sec:reproduce}
 
 
+\begin{Schunk}
+\begin{Sinput}
+R> logistic_regression_result <- fastcpd(
++    data = data,
++    beta = beta,
++    family = "binomial",
++    k = function(x) 20,
++    epsilon = 1e-5
++  )
+R> logistic_loss <- function(data, theta) {
++    u <- c(data[, -1, drop = FALSE] %*% theta)
++    sum(-data[, 1] * u + log(1 + exp(u)))
++  }
+R> logistic_loss_gradient <- function(data, theta) {
++    x <- data[-1]
++    y <- data[1]
++    c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
++  }
+R> logistic_loss_hessian <- function(data, theta, hessian) {
++    data_x <- data[-1]
++    prob <- 1 / (1 + exp(-data_x %*% theta))
++    hessian + (data_x %o% data_x) * c((1 - prob) * prob)
++  }
+R> logistic_regression_result_custom <- fastcpd(
++    data = data,
++    beta = beta,
++    k = function(x) 20,
++    epsilon = 1e-5,
++    cost = logistic_loss,
++    cost_gradient = logistic_loss_gradient,
++    cost_hessian = logistic_loss_hessian
++  )
+R> logistic_regression_result@cp_set
+\end{Sinput}
+\begin{Soutput}
+[1]   64  301  681 1130 1444
+\end{Soutput}
+\begin{Sinput}
+R> logistic_regression_result_custom@cp_set
+\end{Sinput}
+\begin{Soutput}
+[1]  291  685 1163
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Changes in Huber regression models} \label{sec:huber}
+
+\begin{Schunk}
+\begin{Sinput}
+R> n <- 400 + 300 + 400
+R> p <- 3
+R> x <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(p))
+R> theta <- rbind(
++    mvtnorm::rmvnorm(1, mean = rep(0, p), sigma = diag(p)),
++    mvtnorm::rmvnorm(1, mean = rep(3, p), sigma = diag(p)),
++    mvtnorm::rmvnorm(1, mean = rep(5, p), sigma = diag(p))
++  )
+R> theta <- theta[rep(seq_len(3), c(400, 300, 400)), ]
+R> y_true <- rowSums(x * theta)
+R> factor <- c(
++    2 * stats::rbinom(400, size = 1, prob = 0.95) - 1,
++    2 * stats::rbinom(300, size = 1, prob = 0.95) - 1,
++    2 * stats::rbinom(400, size = 1, prob = 0.95) - 1
++  )
+R> y <- factor * y_true + stats::rnorm(n)
+R> data <- cbind(y, x)
+R> huber_loss <- function(
++    data,
++    theta,
++    threshold = 1
++  ) {
++    residual <- data[, 1] - data[, -1, drop = FALSE] %*% theta
++    indicator <- abs(residual) <= threshold
++    sum(residual ^ 2 / 2 * indicator + threshold * (abs(residual) - threshold / 2) * (1 - indicator))
++  }
+R> huber_loss_gradient <- function(data, theta, threshold = 1) {
++    residual <- c(data[1] - data[-1] %*% theta)
++    if (abs(residual) <= threshold) {
++      - residual * data[-1]
++    } else {
++      - threshold * sign(residual) * data[-1]
++    }
++  }
+R> huber_loss_hessian <- function(
++    data,
++    theta,
++    hessian,
++    threshold = 1
++  ) {
++    residual <- c(data[1] - data[-1] %*% theta)
++    if (abs(residual) <= threshold) {
++      hessian + outer(data[-1], data[-1])
++    } else {
++      hessian + 0.01 * diag(length(theta))
++    }
++  }
+R> huber_regression_result <- fastcpd(
++    data = data,
++    beta = (p + 1) * log(n),
++    cost = huber_loss,
++    cost_gradient = huber_loss_gradient,
++    cost_hessian = huber_loss_hessian
++  )
+R> summary(huber_regression_result)
+\end{Sinput}
+\begin{Soutput}
+Call:
+fastcpd(data = data, beta = (p + 1) * log(n), cost = huber_loss, 
+    cost_gradient = huber_loss_gradient, cost_hessian = huber_loss_hessian)
+
+Change points:
+[1] 396 715
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Changes in quantile regression models} \label{sec:quantile}
+
+%
+\begin{Schunk}
+\begin{Sinput}
+R> n <- 450
+R> p <- 3
+R> data <- mvtnorm::rmvnorm(n / 5, mean = rep(0, p), sigma = diag(p))[rep(1:(n / 5), each = 5), ]
+R> theta <- matrix(rnorm(p * 2), 2, p)[rep(1:2, c(n * 2 / 3, n / 3)), ]
+R> xb <- rowSums(data * theta)
+R> xb[1:(n / 3 / 5) * 5 + (n / 3) - 4] <- xb[1:(n / 3 / 5) * 5 + (n / 3) - 4] + 50
+R> xb[1:(n / 3 / 5) * 5 + (n / 3) - 3] <- xb[1:(n / 3 / 5) * 5 + (n / 3) - 3] + 40
+R> xb[1:(n / 3 / 5) * 5 + (n / 3) - 1] <- xb[1:(n / 3 / 5) * 5 + (n / 3) - 1] - 5
+R> xb[1:(n / 3 / 5) * 5 + (n / 3)] <- xb[1:(n / 3 / 5) * 5 + (n / 3)] - 10
+R> data <- cbind(xb, data)
+\end{Sinput}
+\end{Schunk}
+%
+Verify that the data contains three parts with two segments. The first segment
+is from 1 to 300 and the second segment is from 301 to 450. By doing piecewise
+quantile regression and linear regression, we can verify that coefficients of
+quantile regression in the first 150 observations are the same as those in the
+second 150 observations. The coefficients of linear regression in the first 150
+observations are different from those in the second 150 observations.
+
+\begin{table}[t!]
+\centering
+\begin{tabular}{llp{10cm}}
+\hline
+Algorithm           & Data    & Coefficients \\ \hline
+Quantile Regression & 1st 150 & -1.38903956963763 \\
+Quantile Regression & 2nd 150 & -1.38903956963763 \\
+Quantile Regression & 3rd 150 & 0.41242974576805 \\
+Linear Regression   & 1st 150 & -1.38903956963763 \\ \hline
+Linear Regression   & 2nd 150 & -2.5457644038007 \\ \hline
+Linear Regression   & 3rd 150 & 0.412429745768049 \\ \hline
+\end{tabular}
+\caption{\label{tab:logistic regression comparison} Comparison of the
+algorithms for the logistic regression model.}
+\end{table}
+
+Let see what is the output if we misspecify the model.
+%
+\begin{Schunk}
+\begin{Sinput}
+R> # linear_regression_result <- fastcpd(
+R> #   data = data,
+R> #   beta = log(n) / 2,
+R> #   segment_count = 10,
+R> #   trim = 0.025,
+R> #   k = function(x) 0,
+R> #   family = "gaussian",
+R> #   epsilon = 1e-5
+R> # )
+R> 
+R> # summary(linear_regression_result)
+\end{Sinput}
+\end{Schunk}
+%
+The output is not correct. Now let see what is the output if we specify the
+model to be a quantile regression model using the custom cost function.
+%
+\begin{Schunk}
+\begin{Sinput}
+R> quantile_loss <- function(
++    data,
++    theta,
++    quant = 0.5,
++    smoothing = 0.25
++  ) {
++    residual <- data[, 1] - data[, -1, drop = FALSE] %*% theta
++    mean(residual * (quant - (residual < 0)))
++  }
+R> quantile_loss_gradient <- function(
++    data, theta, quant = 0.5, smoothing = 0.25
++  ) {
++    c(quant - 1 / (1 + exp(c(data[1] - data[-1] %*% theta) / smoothing))) * data[-1]
++  }
+R> quantile_loss_hessian <- function(
++    data,
++    theta,
++    hessian,
++    quant = 0.5,
++    smoothing = 0.25
++  ) {
++    # hessian - exp(c(data[1] - data[-1] %*% theta) / smoothing) / (smoothing * (1 + exp(c(data[1] - data[-1] %*% theta) / smoothing))^2) * data[-1] %o% data[-1]
++    hessian + 0.01 * diag(length(theta))
++  }
+R> 
+R> # print(fastcpd(
+R> #   data = data,
+R> #   beta = log(n) / 2,
+R> #   segment_count = 5,
+R> #   trim = 0.025,
+R> #   k = function(x) 0,
+R> #   cost = quantile_loss,
+R> #   cost_gradient = quantile_loss_gradient,
+R> #   cost_hessian = quantile_loss_hessian
+R> # ))
+R> 
+R> # print(fastcpd(
+R> #   data = data,
+R> #   beta = log(n) / 2,
+R> #   segment_count = 5,
+R> #   trim = 0.025,
+R> #   k = function(x) 4,
+R> #   cost = quantile_loss,
+R> #   cost_gradient = quantile_loss_gradient,
+R> #   cost_hessian = quantile_loss_hessian
+R> # ))
+R> 
+R> # print(fastcpd(
+R> #   data = data,
+R> #   beta = log(n) / 2,
+R> #   segment_count = 5,
+R> #   trim = 0.025,
+R> #   k = function(x) 9,
+R> #   cost = quantile_loss,
+R> #   cost_gradient = quantile_loss_gradient,
+R> #   cost_hessian = quantile_loss_hessian
+R> # ))
+R> 
+R> # benchmarked <- microbenchmark::microbenchmark(
+R> #   "k = 1" = fastcpd(
+R> #     data = data,
+R> #     beta = log(n) / 2,
+R> #     segment_count = 5,
+R> #     trim = 0.025,
+R> #     k = function(x) 0,
+R> #     cost = quantile_loss,
+R> #     cost_gradient = quantile_loss_gradient,
+R> #     cost_hessian = quantile_loss_hessian
+R> #   ),
+R> #   "k = 5" = fastcpd(
+R> #     data = data,
+R> #     beta = log(n) / 2,
+R> #     segment_count = 5,
+R> #     trim = 0.025,
+R> #     k = function(x) 4,
+R> #     cost = quantile_loss,
+R> #     cost_gradient = quantile_loss_gradient,
+R> #     cost_hessian = quantile_loss_hessian
+R> #   ),
+R> #   "k = 10" = fastcpd(
+R> #     data = data,
+R> #     beta = log(n) / 2,
+R> #     segment_count = 5,
+R> #     trim = 0.025,
+R> #     k = function(x) 9,
+R> #     cost = quantile_loss,
+R> #     cost_gradient = quantile_loss_gradient,
+R> #     cost_hessian = quantile_loss_hessian
+R> #   ),
+R> #   times = 2
+R> # )
+R> # print(benchmarked)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{article-quantile regression correct model}
+%
+
+\begin{figure}[t!]
+\centering
+% <<quantile regression visualization, echo=FALSE, fig=TRUE, height=5.2, width=7>>=
+% ggplot2::autoplot(benchmarked)
+% @
+\caption{\label{fig:quantile regression bench mark} Benchmarking results for
+the quantile regression model.}
+\end{figure}
+
+\subsection{Changes in mean shift models} \label{sec:mean shift model}
+
+Now let's consider the mean shift model using custom cost function. Since a
+mean shift model is a special case of a linear regression model, by specifying a
+response variable we can use the linear regression model to detect the change
+points.
+%
+\begin{Schunk}
+\begin{Sinput}
+R> p <- 100
+R> data <- rbind(
++    mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(1, p)),
++    mvtnorm::rmvnorm(300, mean = rep(5, p), sigma = diag(1, p)),
++    mvtnorm::rmvnorm(400, mean = rep(2, p), sigma = diag(1, p))
++  )
+R> data <- cbind(c(data[1:100, , drop = FALSE] %*% colMeans(data[1:100, , drop = FALSE]), data[101:200, , drop = FALSE] %*% colMeans(data[101:200, , drop = FALSE])), data)
+R> mean_shift_linear_result <- fastcpd(
++    data = data,
++    beta = log(200) / 2,
++    segment_count = 3,
++    trim = 0.025,
++    k = function(x) 0,
++    family = "gaussian",
++    epsilon = 1e-5
++  )
+R> summary(mean_shift_linear_result)
+\end{Sinput}
+\begin{Soutput}
+Call:
+fastcpd(data = data, beta = log(200)/2, segment_count = 3, trim = 0.025, 
+    k = function(x) 0, family = "gaussian", epsilon = 1e-05)
+
+[1] "Residuals:"
+      Min        1Q    Median        3Q       Max 
+-2.876349 -0.297375  0.403960  1.081707  4.430467 
+
+No change points found
+\end{Soutput}
+\end{Schunk}
+%
+Now let's see what would be the output if we use the custom cost function.
+%
+\begin{Schunk}
+\begin{Sinput}
+R> data <- data[, -1, drop = FALSE]
+R> mean_loss <- function(data, theta) {
++    norm(sweep(data, 2, theta), type = "F") ^ 2 / 2
++  }
+R> mean_loss_gradient <- function(data, theta) {
++    theta - data
++  }
+R> mean_loss_hessian <- function(data, theta, hessian) {
++    hessian + diag(p)
++  }
+R> mean_loss_result <- fastcpd(
++    data = data,
++    beta = 10,
++    segment_count = 4,
++    trim = 0.025,
++    k = function(x) 0,
++    p = p,
++    cost = mean_loss,
++    cost_gradient = mean_loss_gradient,
++    cost_hessian = mean_loss_hessian
++  )
+R> summary(mean_loss_result)
+\end{Sinput}
+\begin{Soutput}
+Call:
+fastcpd(data = data, beta = 10, segment_count = 4, trim = 0.025, 
+    k = function(x) 0, p = p, cost = mean_loss, cost_gradient = mean_loss_gradient, 
+    cost_hessian = mean_loss_hessian)
+
+Change points:
+[1] 550
+\end{Soutput}
+\end{Schunk}
+
+\section{Adaptive number of epochs} \label{sec:adaptive number of epochs}
+
+In this section, we will discuss how to use the adaptive number of epochs
+feature in \pkg{fastcpd}. The adaptive number of epochs feature is designed to
+automatically determine the number of epochs to run the algorithm. The criteria
+for determining the number of epochs is based on the following function:
+%
+\begin{equation} \label{eq:adaptive number of epochs}
+  K = \min(\max(\boldsymbol{k}, \lceil \frac{1000}{\text{segment length}} \rceil), 10)
+\end{equation}
+%
+where $K$ is the number of epochs to run the algorithm, $\boldsymbol{k}$ is the
+number of epochs specified by the user parameter \code{sgd_k}, and \code{segment length} is the
+length of the segment. The goal is to upper limit the number of epochs to 10
+when the segment length is small and to lower limit the number of epochs to
+$\boldsymbol{k}$. The transition between the upper limit and lower limit is
+calculated by $\lceil 1000 / \text{segment length} \rceil$.
+
+\begin{Schunk}
+\begin{Sinput}
+R> k <- function(x, n = 1500) {
++    if (x < n / 10 * 1 / 3) 3
++    else if (x < n / 10 * 2 / 3) 2
++    else if (x < n / 10) 1
++    else 0
++  }
+\end{Sinput}
+\end{Schunk}
+
+%% -- Summary/conclusions/discussion -------------------------------------------
+
+\section{Summary and discussion} \label{sec:summary}
+
+Our package \pkg{fastcpd} provides a fast and flexible implementation of
+change point detection algorithms. The package is designed to be easy to use
+and to provide a wide range of options for the user. The package is
+implemented in \proglang{R} and is available on GitHub.
 
 
+%% -- Optional special unnumbered sections -------------------------------------
+
+\section*{Computational details}
+
+\begin{leftbar}
+If necessary or useful, information about certain computational details
+such as version numbers, operating systems, or compilers could be included
+in an unnumbered section. Also, auxiliary packages (say, for visualizations,
+maps, tables, \dots) that are not cited in the main text can be credited here.
+\end{leftbar}
+
+The results in this paper were obtained using
+\proglang{R}~4.1.3 with the
+\pkg{MASS}~7.3.58.1 package. \proglang{R} itself
+and all packages used are available from the Comprehensive
+\proglang{R} Archive Network (CRAN) at
+\url{https://CRAN.R-project.org/}.
 
 
+\section*{Acknowledgments}
+
+\begin{leftbar}
+All acknowledgments (note the AE spelling) should be collected in this
+unnumbered section before the references. It may contain the usual information
+about funding and feedback from colleagues/reviewers/etc. Furthermore,
+information such as relative contributions of the authors may be added here
+(if any).
+\end{leftbar}
 
 
+%% -- Bibliography -------------------------------------------------------------
+%% - References need to be provided in a .bib BibTeX database.
+%% - All references should be made with \cite, \citet, \citep, \citealp etc.
+%%   (and never hard-coded). See the FAQ for details.
+%% - JSS-specific markup (\proglang, \pkg, \code) should be used in the .bib.
+%% - Titles in the .bib should be in title case.
+%% - DOIs should be included where available.
+
+\bibliography{refs}
 
 
+%% -- Appendix (if any) --------------------------------------------------------
+%% - After the bibliography with page break.
+%% - With proper section titles and _not_ just "Appendix".
+
+\newpage
+
+\begin{appendix}
+
+\section{More technical details} \label{app:technical}
+
+\begin{leftbar}
+Appendices can be included after the bibliography (with a page break). Each
+section within the appendix should have a proper section title (rather than
+just \emph{Appendix}).
+
+For more technical style details, please check out JSS's style FAQ at
+\url{https://www.jstatsoft.org/pages/view/style#frequently-asked-questions}
+which includes the following topics:
+\begin{itemize}
+  \item Title vs.\ sentence case.
+  \item Graphics formatting.
+  \item Naming conventions.
+  \item Turning JSS manuscripts into \proglang{R} package vignettes.
+  \item Trouble shooting.
+  \item Many other potentially helpful details\dots
+\end{itemize}
+\end{leftbar}
 
 
+\section[Using BibTeX]{Using \textsc{Bib}{\TeX}} \label{app:bibtex}
+
+\begin{leftbar}
+References need to be provided in a \textsc{Bib}{\TeX} file (\code{.bib}). All
+references should be made with \verb|\cite|, \verb|\citet|, \verb|\citep|,
+\verb|\citealp| etc.\ (and never hard-coded). This commands yield different
+formats of author-year citations and allow to include additional details (e.g.,
+pages, chapters, \dots) in brackets. In case you are not familiar with these
+commands see the JSS style FAQ for details.
+
+Cleaning up \textsc{Bib}{\TeX} files is a somewhat tedious task -- especially
+when acquiring the entries automatically from mixed online sources. However,
+it is important that informations are complete and presented in a consistent
+style to avoid confusions. JSS requires the following format.
+\begin{itemize}
+  \item JSS-specific markup (\verb|\proglang|, \verb|\pkg|, \verb|\code|) should
+    be used in the references.
+  \item Titles should be in title case.
+  \item Journal titles should not be abbreviated and in title case.
+  \item DOIs should be included where available.
+  \item Software should be properly cited as well. For \proglang{R} packages
+    \code{citation("pkgname")} typically provides a good starting point.
+\end{itemize}
+\end{leftbar}
+
+\end{appendix}
+
+%% -----------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
+\end{document}
