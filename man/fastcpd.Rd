@@ -11,7 +11,7 @@ fastcpd(
   segment_count = 10,
   trim = 0.025,
   momentum_coef = 0,
-  sgd_k = 3,
+  k = function(x) 0,
   family = NULL,
   epsilon = 1e-10,
   min_prob = 10^10,
@@ -34,7 +34,7 @@ fastcpd(
 
 \item{momentum_coef}{Momentum coefficient to be applied to each update.}
 
-\item{sgd_k}{Number of epochs in SGD.}
+\item{k}{Function on number of epochs in SGD.}
 
 \item{family}{Family of the model. Can be "binomial", "poisson", "lasso" or
 "gaussian". If not provided, the user must specify the cost function and
