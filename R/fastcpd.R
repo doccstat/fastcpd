@@ -1,3 +1,19 @@
+#' fastcpd: A package for computating the notorious bar statistic.
+#'
+#' The fastcpd package provides three categories of important functions:
+#' foo, bar and baz.
+#'
+#' @section fastcpd functions:
+#' The fastcpd functions ...
+#'
+#' @docType package
+#' @name fastcpd
+#' @useDynLib fastcpd, .registration = TRUE
+#' @importFrom Rcpp evalCpp
+NULL
+#> NULL
+
+
 # Class and Methods ------------------------------------------------------------
 #' An S4 class to store the three data.frames created with \link{lnt_read}
 #'
@@ -85,7 +101,7 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
     sep = ""
   )
   if (object@family != "custom") {
-    print("Residuals:")
+    cat("Residuals:\n")
     print(structure(
       zapsmall(quantile(object@residuals)),
       names = c("Min", "1Q", "Median", "3Q", "Max")
@@ -94,7 +110,7 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
   }
   if (length(object@cp_set)) {
     cat("Change points:\n")
-    print.default(object@cp_set)
+    cat(object@cp_set, "\n")
   } else {
     cat("No change points found\n")
   }
@@ -127,6 +143,8 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'   the negative log-likelihood for the corresponding family.
 #' @param cost_gradient Gradient for custom cost function.
 #' @param cost_hessian Hessian for custom cost function.
+#' @param cp_only Whether to return only the change points or with the cost
+#'   values for each segment.
 #'
 #' @return Change points and corresponding cost values.
 #' @export
@@ -145,7 +163,8 @@ fastcpd <- function(
   p = NULL,
   cost = negative_log_likelihood,
   cost_gradient = cost_update_gradient,
-  cost_hessian = cost_update_hessian
+  cost_hessian = cost_update_hessian,
+  cp_only = TRUE
 ) {
 
   if (is.null(family)) {
@@ -161,12 +180,20 @@ fastcpd <- function(
     err_sd <- act_num <- rep(NA, segment_count)
   }
 
+  # After t = 1, the r_t_set R_t contains 0 and 1.
+  r_t_set <- c(0, 1)
+  # C(0)=NULL, C(1)={0}
+  cp_set <- append(list(NULL), rep(list(0), n))
+  # Objective function: F(0) = -beta
+  f_t <- c(-beta, rep(0, n))
+  momentum <- 0
+
   # choose the initial values based on pre-segmentation
 
-  segment_indices <- seq_len(n) %/% (n %/% segment_count + 1) + 1
+  segment_indices <- ceiling(seq_len(n) / ceiling(n / segment_count))
   segment_theta_hat <- matrix(NA, segment_count, p)
   # Remark 3.4: initialize theta_hat_t_t to be the estimate in the segment
-  for (segment_index in 1:segment_count) {
+  for (segment_index in seq_len(segment_count)) {
     data_segment <- data[segment_indices == segment_index, , drop = FALSE]
     segment_theta <- if (family == "custom") {
       if (p == 1) {
@@ -249,14 +276,6 @@ fastcpd <- function(
     )
   }
 
-  # After t = 1, the r_t_set R_t contains 0 and 1.
-  r_t_set <- c(0, 1)
-  # C(0)=NULL, C(1)={0}
-  cp_set <- append(list(NULL), rep(list(0), n))
-  # Objective function: F(0) = -beta
-  f_t <- c(-beta, rep(0, n))
-  momentum <- 0
-
   for (t in 2:n) {
     r_t_count <- length(r_t_set)
     # number of cost values is the same as number of elemnts in R_t
@@ -294,10 +313,10 @@ fastcpd <- function(
       theta_sum[, i] <- cost_update_result[[2]]
       hessian[, , i] <- cost_update_result[[3]]
       momentum <- cost_update_result[[4]]
-    }
+    # }
 
-    # Step 2
-    for (i in 1:(r_t_count - 1)) {
+    # # Step 2
+    # for (i in 1:(r_t_count - 1)) {
       tau <- r_t_set[i]
       theta <- theta_sum[, i] / (t - tau)
       if (family == "poisson" && t - tau >= p) {
@@ -346,6 +365,7 @@ fastcpd <- function(
     hessian <- abind::abind(hessian, hessian_new, along = 3)
 
     # Step 3
+    cval[r_t_count] <- 0
     obj <- cval + f_t[r_t_set + 1] + beta
     min_val <- min(obj)
     tau_star <- r_t_set[which(obj == min_val)[1]]
@@ -380,38 +400,44 @@ fastcpd <- function(
   cp_set <- cp_set[cp_set > 0]
   cost_values <- thetas <- NULL
   residual <- 0[family == "custom"]
-  cp_loc <- unique(c(0, cp_set, n))
-  for (i in 1:(length(cp_loc) - 1)) {
-    if (family == "custom") {
-      if (p == 1) {
-        optim_result <- optim(
-          par = 0,
-          fn = function(theta, data) {
-            cost(data = data, theta = log(theta / (1 - theta)))
-          },
-          method = "Brent",
-          lower = 0,
-          upper = 1,
-          data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
-        )
-        cost_result <- list(
-          par = log(optim_result$par / (1 - optim_result$par)),
-          value = exp(optim_result$value) / (1 + exp(optim_result$value))
-        )
+
+  if (cp_only) {
+    cost_values <- numeric(0)
+    thetas <- matrix(NA, nrow = 0, ncol = 0)
+  } else {
+    cp_loc <- unique(c(0, cp_set, n))
+    for (i in 1:(length(cp_loc) - 1)) {
+      if (family == "custom") {
+        if (p == 1) {
+          optim_result <- optim(
+            par = 0,
+            fn = function(theta, data) {
+              cost(data = data, theta = log(theta / (1 - theta)))
+            },
+            method = "Brent",
+            lower = 0,
+            upper = 1,
+            data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
+          )
+          cost_result <- list(
+            par = log(optim_result$par / (1 - optim_result$par)),
+            value = exp(optim_result$value) / (1 + exp(optim_result$value))
+          )
+        } else {
+          cost_result <- optim(
+            par = rep(0, p),
+            fn = cost,
+            gr = cost_gradient,
+            data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
+          )
+        }
       } else {
-        cost_result <- optim(
-          par = rep(0, p),
-          fn = cost,
-          gr = cost_gradient,
-          data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
-        )
+        cost_result <- cost(data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE], NULL, family, lambda)
+        residual <- c(residual, cost_result$residuals)
       }
-    } else {
-      cost_result <- cost(data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE], NULL, family, lambda)
-      residual <- c(residual, cost_result$residuals)
+      cost_values <- c(cost_values, cost_result$value)
+      thetas <- cbind(thetas, cost_result$par)
     }
-    cost_values <- c(cost_values, cost_result$value)
-    thetas <- cbind(thetas, cost_result$par)
   }
 
   methods::new(
