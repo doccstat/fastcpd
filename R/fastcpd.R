@@ -212,8 +212,8 @@ fastcpd <- function(
         optim(
           par = rep(0, p),
           fn = cost,
-          gr = cost_gradient,
-          data = data_segment
+          data = data_segment,
+          method = "L-BFGS-B"
         )$par
       }
     } else {
@@ -427,8 +427,8 @@ fastcpd <- function(
           cost_result <- optim(
             par = rep(0, p),
             fn = cost,
-            gr = cost_gradient,
-            data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
+            data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE],
+            method = "L-BFGS-B"
           )
         }
       } else {
