@@ -44,11 +44,12 @@ cost_update <- function(
   cost_gradient,
   cost_hessian
 ) {
-  hessian[, , i] <- if (family == "custom") {
-    cost_hessian(data[nrow(data), ], theta_hat[, i], hessian[, , i])
+  hessian_i <- as.matrix(hessian[, , i])
+  hessian_i <- if (family == "custom") {
+    hessian_i + cost_hessian(data[nrow(data), ], theta_hat[, i])
   } else {
-    cost_hessian(
-      data[nrow(data), ], theta_hat[, i], hessian[, , i], family, min_prob
+    hessian_i + cost_hessian(
+      data[nrow(data), ], theta_hat[, i], family, min_prob
     )
   }
   gradient <- if (family == "custom") {
@@ -56,7 +57,7 @@ cost_update <- function(
   } else {
     cost_gradient(data[nrow(data), ], theta_hat[, i], family)
   }
-  hessian_psd <- hessian[, , i] + epsilon * diag(1, nrow(theta_hat))
+  hessian_psd <- hessian_i + epsilon * diag(1, nrow(theta_hat))
   momentum_step <- solve(hessian_psd, gradient)
   momentum <- momentum_coef * momentum - momentum_step
   theta_hat[, i] <- theta_hat[, i] + momentum
@@ -68,18 +69,18 @@ cost_update <- function(
   } else if (family %in% c("lasso", "gaussian")) {
     # the choice of norm affects the speed.
     # Spectral norm is more accurate but slower than F norm.
-    hessian_norm <- norm(as.matrix(hessian[, , i]), type = "F")
+    hessian_norm <- norm(hessian_i, type = "F")
     normd <- abs(theta_hat[, i]) - lambda / hessian_norm
     theta_hat[, i] <- sign(theta_hat[, i]) * pmax(normd, 0)
   }
 
   for (kk in 1 + seq_len(k(nrow(data) - tau))) {
     for (j in (tau + 1):nrow(data)) {
-      hessian[, , i] <- if (family == "custom") {
-        cost_hessian(data[j, ], theta_hat[, i], hessian[, , i])
+      hessian_i <- if (family == "custom") {
+        hessian_i + cost_hessian(data[j, ], theta_hat[, i])
       } else {
-        cost_hessian(
-          data[j, ], theta_hat[, i], hessian[, , i], family, min_prob
+        hessian_i + cost_hessian(
+          data[j, ], theta_hat[, i], family, min_prob
         )
       }
       gradient <- if (family == "custom") {
@@ -87,7 +88,7 @@ cost_update <- function(
       } else {
         cost_gradient(data[j, ], theta_hat[, i], family)
       }
-      hessian_psd <- hessian[, , i] + epsilon * diag(1, nrow(theta_hat))
+      hessian_psd <- hessian_i + epsilon * diag(1, nrow(theta_hat))
       momentum_step <- solve(hessian_psd, gradient)
       momentum <- momentum_coef * momentum - momentum_step
       theta_hat[, i] <- theta_hat[, i] + momentum
@@ -99,7 +100,7 @@ cost_update <- function(
           maxval = winsorise_maxval
         )
       } else if (family %in% c("lasso", "gaussian")) {
-        hessian_norm <- norm(as.matrix(hessian[, , i]), type = "F")
+        hessian_norm <- norm(hessian_i, type = "F")
         normd <- abs(theta_hat[, i]) - lambda / hessian_norm
         theta_hat[, i] <- sign(theta_hat[, i]) * pmax(normd, 0)
       }
@@ -107,5 +108,6 @@ cost_update <- function(
   }
 
   theta_sum[, i] <- theta_sum[, i] + theta_hat[, i]
+  hessian[, , i] <- hessian_i
   return(list(theta_hat[, i], theta_sum[, i], hessian[, , i], momentum))
 }
