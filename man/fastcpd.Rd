@@ -6,8 +6,9 @@
 \title{fastcpd: A package for computating the notorious bar statistic.}
 \usage{
 fastcpd(
+  formula = y ~ .,
   data,
-  beta,
+  beta = NULL,
   segment_count = 10,
   trim = 0.025,
   momentum_coef = 0,
@@ -62,8 +63,6 @@ the negative log-likelihood for the corresponding family.}
 
 \item{cp_only}{Whether to return only the change points or with the cost
 values for each segment.}
-
-\item{lambda}{Lambda for L1 regularization. Only used for lasso.}
 }
 \value{
 Change points and corresponding cost values.

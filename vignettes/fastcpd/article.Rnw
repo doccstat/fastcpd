@@ -1522,7 +1522,7 @@ experiment_result <- foreach::foreach(experiment_setup_index = seq_len(nrow(expe
     out <- data_gen_lin(n, p, true.coef, true.cp.loc, Sigma, evar)
     data <- out[[1]]
     g_tr <- out[[2]]
-    beta <- log(n)/2
+    beta <- (50 + 1) * log(n) / 2
 
     if (file.exists(paste0("cache/lasso", experiment_setup_index, "_", experiment_index, ".rds"))) {
       rds_file <- readRDS(paste0("cache/lasso", experiment_setup_index, "_", experiment_index, ".rds"))
@@ -1549,6 +1549,7 @@ experiment_result <- foreach::foreach(experiment_setup_index = seq_len(nrow(expe
         cp_set <- lasso_regression_result@cp_set
       } else {
         lasso_regression_result <- fastcpd(
+          formula = y ~ . - 1,
           data = data,
           beta = beta,
           family = "lasso",
@@ -1909,74 +1910,6 @@ quantile_loss_hessian <- function(
   # - exp(c(data[1] - data[-1] %*% theta) / smoothing) / (smoothing * (1 + exp(c(data[1] - data[-1] %*% theta) / smoothing))^2) * data[-1] %o% data[-1]
   0.01 * diag(length(theta))
 }
-
-# print(fastcpd(
-#   data = data,
-#   beta = log(n) / 2,
-#   segment_count = 5,
-#   trim = 0.025,
-#   k = function(x) 0,
-#   cost = quantile_loss,
-#   cost_gradient = quantile_loss_gradient,
-#   cost_hessian = quantile_loss_hessian
-# ))
-
-# print(fastcpd(
-#   data = data,
-#   beta = log(n) / 2,
-#   segment_count = 5,
-#   trim = 0.025,
-#   k = function(x) 4,
-#   cost = quantile_loss,
-#   cost_gradient = quantile_loss_gradient,
-#   cost_hessian = quantile_loss_hessian
-# ))
-
-# print(fastcpd(
-#   data = data,
-#   beta = log(n) / 2,
-#   segment_count = 5,
-#   trim = 0.025,
-#   k = function(x) 9,
-#   cost = quantile_loss,
-#   cost_gradient = quantile_loss_gradient,
-#   cost_hessian = quantile_loss_hessian
-# ))
-
-# benchmarked <- microbenchmark::microbenchmark(
-#   "k = 1" = fastcpd(
-#     data = data,
-#     beta = log(n) / 2,
-#     segment_count = 5,
-#     trim = 0.025,
-#     k = function(x) 0,
-#     cost = quantile_loss,
-#     cost_gradient = quantile_loss_gradient,
-#     cost_hessian = quantile_loss_hessian
-#   ),
-#   "k = 5" = fastcpd(
-#     data = data,
-#     beta = log(n) / 2,
-#     segment_count = 5,
-#     trim = 0.025,
-#     k = function(x) 4,
-#     cost = quantile_loss,
-#     cost_gradient = quantile_loss_gradient,
-#     cost_hessian = quantile_loss_hessian
-#   ),
-#   "k = 10" = fastcpd(
-#     data = data,
-#     beta = log(n) / 2,
-#     segment_count = 5,
-#     trim = 0.025,
-#     k = function(x) 9,
-#     cost = quantile_loss,
-#     cost_gradient = quantile_loss_gradient,
-#     cost_hessian = quantile_loss_hessian
-#   ),
-#   times = 2
-# )
-# print(benchmarked)
 @
 %
 
