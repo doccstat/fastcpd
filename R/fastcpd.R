@@ -148,8 +148,9 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #' @return Change points and corresponding cost values.
 #' @export
 fastcpd <- function(
+  formula = y ~ .,
   data,
-  beta,
+  beta = NULL,
   segment_count = 10,
   trim = 0.025,
   momentum_coef = 0,
@@ -166,12 +167,27 @@ fastcpd <- function(
   cp_only = TRUE
 ) {
 
+  # The following code is adapted from the `lm` function from base R.
+  match_formula <- match.call(expand.dots = FALSE)
+  matched_formula <- match(c("formula", "data"), names(match_formula), 0L)
+  match_formula <- match_formula[c(1L, matched_formula)]
+  match_formula$drop.unused.levels <- TRUE
+  match_formula[[1L]] <- quote(stats::model.frame)
+  match_formula <- eval(match_formula, parent.frame())
+  mt <- attr(match_formula, "terms")
+  y <- model.response(match_formula, "numeric")
+  x <- model.matrix(mt, match_formula)
+  data <- cbind(y, x)
+
   # User provided cost function with explicit expression.
   if (length(formals(cost)) == 1) {
     family <- "custom"
     n <- nrow(data)
     if (is.null(p)) {
       p <- ncol(data) - 1
+    }
+    if (is.null(beta)) {
+      beta <- (p + 1) * log(nrow(data)) / 2
     }
 
     # After t = 1, the r_t_set R_t contains 0 and 1.
@@ -224,45 +240,16 @@ fastcpd <- function(
       )
     }
     cp_set <- cp_set[cp_set > 0]
-    cost_values <- thetas <- NULL
+    thetas <- matrix(NA, nrow = 0, ncol = 0)
     residual <- 0[family == "custom"]
 
     if (cp_only) {
       cost_values <- numeric(0)
-      thetas <- matrix(NA, nrow = 0, ncol = 0)
     } else {
       cp_loc <- unique(c(0, cp_set, n))
+      cost_values <- rep(0, length(cp_loc) - 1)
       for (i in 1:(length(cp_loc) - 1)) {
-        if (family == "custom") {
-          if (p == 1) {
-            optim_result <- optim(
-              par = 0,
-              fn = function(theta, data) {
-                cost(data = data, theta = log(theta / (1 - theta)))
-              },
-              method = "Brent",
-              lower = 0,
-              upper = 1,
-              data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
-            )
-            cost_result <- list(
-              par = log(optim_result$par / (1 - optim_result$par)),
-              value = exp(optim_result$value) / (1 + exp(optim_result$value))
-            )
-          } else {
-            cost_result <- optim(
-              par = rep(0, p),
-              fn = cost,
-              data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE],
-              method = "L-BFGS-B"
-            )
-          }
-        } else {
-          cost_result <- cost(data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE], NULL, family, lambda)
-          residual <- c(residual, cost_result$residuals)
-        }
-        cost_values <- c(cost_values, cost_result$value)
-        thetas <- cbind(thetas, cost_result$par)
+        cost_values[i] <- cost(data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE])
       }
     }
 
@@ -276,6 +263,7 @@ fastcpd <- function(
       residuals = residual,
       thetas = thetas
     )
+
   } else {
 
     # Built in cost functions or custom cost functions with no explicit expression.
@@ -286,6 +274,9 @@ fastcpd <- function(
     n <- nrow(data)
     if (is.null(p)) {
       p <- ncol(data) - 1
+    }
+    if (is.null(beta)) {
+      beta <- (p + 1) * log(nrow(data)) / 2
     }
 
     if (family %in% c("lasso", "gaussian")) {
