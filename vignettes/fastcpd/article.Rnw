@@ -89,7 +89,8 @@ set.seed(1)
 Change-point analysis is a statistical technique used to detect changes in the
 underlying properties of a data series. This technique has been widely applied
 in various fields, such as finance, ecology, and signal processing, to identify
-abrupt changes in time series data. Over the years, many different methods have
+abrupt distributional changes in time series data.
+Over the years, many different methods have
 been proposed for change-point analysis, including both parametric and
 nonparametric approaches.
 
@@ -101,7 +102,7 @@ detection without the need to specify the underlying distribution of
 the data and the anomaly often comes from some external source, for example
 a cyber attack. There are extensive research done on anomaly detection on time
 series including \cite{shipmon2017time}, but the focus of this paper is on
-change-point detection with the underlying distribution of the data known.
+change-point detection with the underlying distribution of the data known prior change.
 
 Change-point analysis involves identifying and localizing structural changes in
 the underlying model of a data sequence. The earliest work on this topic dates
@@ -450,7 +451,7 @@ data_setup <- purrr::cross_df(
 experiment_setup <- purrr::cross_df(
   list(
     data_setup_index = seq_len(nrow(data_setup)),
-    sgd_k = c(1, 2, 3, 7)
+    sgd_k = c(1, 2, 3, 5, 7)
   )
 )
 experiment_num <- 100
@@ -461,7 +462,7 @@ rng <- RNGseq(experiment_num * nrow(data_setup), 1)
 cl <- parallel::makeCluster(parallel::detectCores(), outfile = paste0("log/ex.log"))
 doParallel::registerDoParallel(cl)
 experiment_result <- foreach::foreach(experiment_setup_index = seq_len(nrow(experiment_setup)), .packages = c("fastglm", "fastcpd", "fossil", "glmnet")) %:%
-  foreach::foreach(experiment_index = seq_len(5), rrng = rng[(experiment_setup$data_setup_index[experiment_setup_index] - 1) * experiment_num + seq_len(5)], .combine = "rbind") %dopar% {
+  foreach::foreach(experiment_index = seq_len(experiment_num), rrng = rng[(experiment_setup$data_setup_index[experiment_setup_index] - 1) * experiment_num + seq_len(experiment_num)], .combine = "rbind") %dopar% {
     rngtools::setRNG(rrng)
     experiment_setup_row <- experiment_setup[experiment_setup_index, ]
     n <- data_setup[experiment_setup$data_setup_index[experiment_setup_index], ]$n
@@ -509,6 +510,20 @@ experiment_result <- foreach::foreach(experiment_setup_index = seq_len(nrow(expe
       start <- proc.time()
       if (sgd_k == 7) {
         cp_set <- CP_vanilla_gaussian(data[, c(1:p + 1, 1)], beta)$cp
+      } else if (sgd_k == 5) {
+        linear_regression_result <- fastcpd(
+          data = data,
+          beta = beta,
+          family = "gaussian",
+          k = function(x, data_length = n) {
+            if (x < data_length / 10 * 1 / 4) 5
+            else if (x < data_length / 10 * 2 / 4) 3
+            else if (x < data_length / 10 * 3 / 4) 1
+            else 0
+          },
+          epsilon = 1e-5
+        )
+        cp_set <- linear_regression_result@cp_set
       } else {
         linear_regression_result <- fastcpd(
           data = data,
@@ -607,18 +622,22 @@ plot(linear_regression_result)
   \multirow{4}{*}{cpc=0} & \Sexpr{get_result(300, 1, 0, 1)} & \Sexpr{get_result(600, 1, 0, 1)} & \Sexpr{get_result(1500, 1, 0, 1)} & \Sexpr{get_result(300, 3, 0, 1)} & \Sexpr{get_result(600, 3, 0, 1)} & \Sexpr{get_result(1500, 3, 0, 1)} & \Sexpr{get_result(300, 5, 0, 1)} & \Sexpr{get_result(600, 5, 0, 1)} & \Sexpr{get_result(1500, 5, 0, 1)} \\
                           & \Sexpr{get_result(300, 1, 0, 2)} & \Sexpr{get_result(600, 1, 0, 2)} & \Sexpr{get_result(1500, 1, 0, 2)} & \Sexpr{get_result(300, 3, 0, 2)} & \Sexpr{get_result(600, 3, 0, 2)} & \Sexpr{get_result(1500, 3, 0, 2)} & \Sexpr{get_result(300, 5, 0, 2)} & \Sexpr{get_result(600, 5, 0, 2)} & \Sexpr{get_result(1500, 5, 0, 2)} \\
                           & \Sexpr{get_result(300, 1, 0, 3)} & \Sexpr{get_result(600, 1, 0, 3)} & \Sexpr{get_result(1500, 1, 0, 3)} & \Sexpr{get_result(300, 3, 0, 3)} & \Sexpr{get_result(600, 3, 0, 3)} & \Sexpr{get_result(1500, 3, 0, 3)} & \Sexpr{get_result(300, 5, 0, 3)} & \Sexpr{get_result(600, 5, 0, 3)} & \Sexpr{get_result(1500, 5, 0, 3)} \\
+                          & \Sexpr{get_result(300, 1, 0, 5)} & \Sexpr{get_result(600, 1, 0, 5)} & \Sexpr{get_result(1500, 1, 0, 5)} & \Sexpr{get_result(300, 3, 0, 5)} & \Sexpr{get_result(600, 3, 0, 5)} & \Sexpr{get_result(1500, 3, 0, 5)} & \Sexpr{get_result(300, 5, 0, 5)} & \Sexpr{get_result(600, 5, 0, 5)} & \Sexpr{get_result(1500, 5, 0, 5)} \\
                           & \Sexpr{get_result(300, 1, 0, 7)} & \Sexpr{get_result(600, 1, 0, 7)} & \Sexpr{get_result(1500, 1, 0, 7)} & \Sexpr{get_result(300, 3, 0, 7)} & \Sexpr{get_result(600, 3, 0, 7)} & \Sexpr{get_result(1500, 3, 0, 7)} & \Sexpr{get_result(300, 5, 0, 7)} & \Sexpr{get_result(600, 5, 0, 7)} & \Sexpr{get_result(1500, 5, 0, 7)} \\ \midrule
   \multirow{4}{*}{cpc=1} & \Sexpr{get_result(300, 1, 1, 1)} & \Sexpr{get_result(600, 1, 1, 1)} & \Sexpr{get_result(1500, 1, 1, 1)} & \Sexpr{get_result(300, 3, 1, 1)} & \Sexpr{get_result(600, 3, 1, 1)} & \Sexpr{get_result(1500, 3, 1, 1)} & \Sexpr{get_result(300, 5, 1, 1)} & \Sexpr{get_result(600, 5, 1, 1)} & \Sexpr{get_result(1500, 5, 1, 1)} \\
                           & \Sexpr{get_result(300, 1, 1, 2)} & \Sexpr{get_result(600, 1, 1, 2)} & \Sexpr{get_result(1500, 1, 1, 2)} & \Sexpr{get_result(300, 3, 1, 2)} & \Sexpr{get_result(600, 3, 1, 2)} & \Sexpr{get_result(1500, 3, 1, 2)} & \Sexpr{get_result(300, 5, 1, 2)} & \Sexpr{get_result(600, 5, 1, 2)} & \Sexpr{get_result(1500, 5, 1, 2)} \\
                           & \Sexpr{get_result(300, 1, 1, 3)} & \Sexpr{get_result(600, 1, 1, 3)} & \Sexpr{get_result(1500, 1, 1, 3)} & \Sexpr{get_result(300, 3, 1, 3)} & \Sexpr{get_result(600, 3, 1, 3)} & \Sexpr{get_result(1500, 3, 1, 3)} & \Sexpr{get_result(300, 5, 1, 3)} & \Sexpr{get_result(600, 5, 1, 3)} & \Sexpr{get_result(1500, 5, 1, 3)} \\
+                          & \Sexpr{get_result(300, 1, 1, 5)} & \Sexpr{get_result(600, 1, 1, 5)} & \Sexpr{get_result(1500, 1, 1, 5)} & \Sexpr{get_result(300, 3, 1, 5)} & \Sexpr{get_result(600, 3, 1, 5)} & \Sexpr{get_result(1500, 3, 1, 5)} & \Sexpr{get_result(300, 5, 1, 5)} & \Sexpr{get_result(600, 5, 1, 5)} & \Sexpr{get_result(1500, 5, 1, 5)} \\
                           & \Sexpr{get_result(300, 1, 1, 7)} & \Sexpr{get_result(600, 1, 1, 7)} & \Sexpr{get_result(1500, 1, 1, 7)} & \Sexpr{get_result(300, 3, 1, 7)} & \Sexpr{get_result(600, 3, 1, 7)} & \Sexpr{get_result(1500, 3, 1, 7)} & \Sexpr{get_result(300, 5, 1, 7)} & \Sexpr{get_result(600, 5, 1, 7)} & \Sexpr{get_result(1500, 5, 1, 7)} \\ \midrule
   \multirow{4}{*}{cpc=3} & \Sexpr{get_result(300, 1, 3, 1)} & \Sexpr{get_result(600, 1, 3, 1)} & \Sexpr{get_result(1500, 1, 3, 1)} & \Sexpr{get_result(300, 3, 3, 1)} & \Sexpr{get_result(600, 3, 3, 1)} & \Sexpr{get_result(1500, 3, 3, 1)} & \Sexpr{get_result(300, 5, 3, 1)} & \Sexpr{get_result(600, 5, 3, 1)} & \Sexpr{get_result(1500, 5, 3, 1)} \\
                           & \Sexpr{get_result(300, 1, 3, 2)} & \Sexpr{get_result(600, 1, 3, 2)} & \Sexpr{get_result(1500, 1, 3, 2)} & \Sexpr{get_result(300, 3, 3, 2)} & \Sexpr{get_result(600, 3, 3, 2)} & \Sexpr{get_result(1500, 3, 3, 2)} & \Sexpr{get_result(300, 5, 3, 2)} & \Sexpr{get_result(600, 5, 3, 2)} & \Sexpr{get_result(1500, 5, 3, 2)} \\
                           & \Sexpr{get_result(300, 1, 3, 3)} & \Sexpr{get_result(600, 1, 3, 3)} & \Sexpr{get_result(1500, 1, 3, 3)} & \Sexpr{get_result(300, 3, 3, 3)} & \Sexpr{get_result(600, 3, 3, 3)} & \Sexpr{get_result(1500, 3, 3, 3)} & \Sexpr{get_result(300, 5, 3, 3)} & \Sexpr{get_result(600, 5, 3, 3)} & \Sexpr{get_result(1500, 5, 3, 3)} \\
+                          & \Sexpr{get_result(300, 1, 3, 5)} & \Sexpr{get_result(600, 1, 3, 5)} & \Sexpr{get_result(1500, 1, 3, 5)} & \Sexpr{get_result(300, 3, 3, 5)} & \Sexpr{get_result(600, 3, 3, 5)} & \Sexpr{get_result(1500, 3, 3, 5)} & \Sexpr{get_result(300, 5, 3, 5)} & \Sexpr{get_result(600, 5, 3, 5)} & \Sexpr{get_result(1500, 5, 3, 5)} \\
                           & \Sexpr{get_result(300, 1, 3, 7)} & \Sexpr{get_result(600, 1, 3, 7)} & \Sexpr{get_result(1500, 1, 3, 7)} & \Sexpr{get_result(300, 3, 3, 7)} & \Sexpr{get_result(600, 3, 3, 7)} & \Sexpr{get_result(1500, 3, 3, 7)} & \Sexpr{get_result(300, 5, 3, 7)} & \Sexpr{get_result(600, 5, 3, 7)} & \Sexpr{get_result(1500, 5, 3, 7)} \\ \midrule
   \multirow{4}{*}{cpc=5} & \Sexpr{get_result(300, 1, 5, 1)} & \Sexpr{get_result(600, 1, 5, 1)} & \Sexpr{get_result(1500, 1, 5, 1)} & \Sexpr{get_result(300, 3, 5, 1)} & \Sexpr{get_result(600, 3, 5, 1)} & \Sexpr{get_result(1500, 3, 5, 1)} & \Sexpr{get_result(300, 5, 5, 1)} & \Sexpr{get_result(600, 5, 5, 1)} & \Sexpr{get_result(1500, 5, 5, 1)} \\
                           & \Sexpr{get_result(300, 1, 5, 2)} & \Sexpr{get_result(600, 1, 5, 2)} & \Sexpr{get_result(1500, 1, 5, 2)} & \Sexpr{get_result(300, 3, 5, 2)} & \Sexpr{get_result(600, 3, 5, 2)} & \Sexpr{get_result(1500, 3, 5, 2)} & \Sexpr{get_result(300, 5, 5, 2)} & \Sexpr{get_result(600, 5, 5, 2)} & \Sexpr{get_result(1500, 5, 5, 2)} \\
                           & \Sexpr{get_result(300, 1, 5, 3)} & \Sexpr{get_result(600, 1, 5, 3)} & \Sexpr{get_result(1500, 1, 5, 3)} & \Sexpr{get_result(300, 3, 5, 3)} & \Sexpr{get_result(600, 3, 5, 3)} & \Sexpr{get_result(1500, 3, 5, 3)} & \Sexpr{get_result(300, 5, 5, 3)} & \Sexpr{get_result(600, 5, 5, 3)} & \Sexpr{get_result(1500, 5, 5, 3)} \\
+                          & \Sexpr{get_result(300, 1, 5, 5)} & \Sexpr{get_result(600, 1, 5, 5)} & \Sexpr{get_result(1500, 1, 5, 5)} & \Sexpr{get_result(300, 3, 5, 5)} & \Sexpr{get_result(600, 3, 5, 5)} & \Sexpr{get_result(1500, 3, 5, 5)} & \Sexpr{get_result(300, 5, 5, 5)} & \Sexpr{get_result(600, 5, 5, 5)} & \Sexpr{get_result(1500, 5, 5, 5)} \\
                           & \Sexpr{get_result(300, 1, 5, 7)} & \Sexpr{get_result(600, 1, 5, 7)} & \Sexpr{get_result(1500, 1, 5, 7)} & \Sexpr{get_result(300, 3, 5, 7)} & \Sexpr{get_result(600, 3, 5, 7)} & \Sexpr{get_result(1500, 3, 5, 7)} & \Sexpr{get_result(300, 5, 5, 7)} & \Sexpr{get_result(600, 5, 5, 7)} & \Sexpr{get_result(1500, 5, 5, 7)} \\ \bottomrule
   \end{tabular}
   \caption{\label{tab:linear regression comparison} Comparison of the algorithms for the linear regression model in mean.}
@@ -750,7 +769,7 @@ data_setup <- purrr::cross_df(
 experiment_setup <- purrr::cross_df(
   list(
     data_setup_index = seq_len(nrow(data_setup)),
-    sgd_k = c(1, 2, 3, 7)
+    sgd_k = c(1, 2, 3, 5, 7)
   )
 )
 experiment_num <- 100
@@ -761,7 +780,7 @@ rng <- RNGseq(experiment_num * nrow(data_setup), 2)
 cl <- parallel::makeCluster(parallel::detectCores(), outfile = paste0("log/binom.log"))
 doParallel::registerDoParallel(cl)
 experiment_result <- foreach::foreach(experiment_setup_index = seq_len(nrow(experiment_setup)), .packages = c("fastglm", "fastcpd", "fossil", "glmnet")) %:%
-  foreach::foreach(experiment_index = seq_len(5), rrng = rng[(experiment_setup$data_setup_index[experiment_setup_index] - 1) * experiment_num + seq_len(5)], .combine = "rbind") %dopar% {
+  foreach::foreach(experiment_index = seq_len(experiment_num), rrng = rng[(experiment_setup$data_setup_index[experiment_setup_index] - 1) * experiment_num + seq_len(experiment_num)], .combine = "rbind") %dopar% {
     rngtools::setRNG(rrng)
     experiment_setup_row <- experiment_setup[experiment_setup_index, ]
     n <- data_setup[experiment_setup$data_setup_index[experiment_setup_index], ]$n
@@ -809,6 +828,20 @@ experiment_result <- foreach::foreach(experiment_setup_index = seq_len(nrow(expe
       start <- proc.time()
       if (sgd_k == 7) {
         cp_set <- CP_vanilla_binomial(data[, c(1:p + 1, 1)], beta)$cp
+      } else if (sgd_k == 5) {
+        logistic_regression_result <- fastcpd(
+          data = data,
+          beta = beta,
+          family = "binomial",
+          k = function(x, data_length = n) {
+            if (x < data_length / 10 * 1 / 4) 5
+            else if (x < data_length / 10 * 2 / 4) 3
+            else if (x < data_length / 10 * 3 / 4) 1
+            else 0
+          },
+          epsilon = 1e-5
+        )
+        cp_set <- logistic_regression_result@cp_set
       } else {
         logistic_regression_result <- fastcpd(
           data = data,
@@ -893,18 +926,22 @@ plot(logistic_regression_result)
     \multirow{4}{*}{cpc=0} & \Sexpr{get_result(300, 1, 0, 1)} & \Sexpr{get_result(600, 1, 0, 1)} & \Sexpr{get_result(1500, 1, 0, 1)} & \Sexpr{get_result(300, 3, 0, 1)} & \Sexpr{get_result(600, 3, 0, 1)} & \Sexpr{get_result(1500, 3, 0, 1)} & \Sexpr{get_result(300, 5, 0, 1)} & \Sexpr{get_result(600, 5, 0, 1)} & \Sexpr{get_result(1500, 5, 0, 1)} \\
                            & \Sexpr{get_result(300, 1, 0, 2)} & \Sexpr{get_result(600, 1, 0, 2)} & \Sexpr{get_result(1500, 1, 0, 2)} & \Sexpr{get_result(300, 3, 0, 2)} & \Sexpr{get_result(600, 3, 0, 2)} & \Sexpr{get_result(1500, 3, 0, 2)} & \Sexpr{get_result(300, 5, 0, 2)} & \Sexpr{get_result(600, 5, 0, 2)} & \Sexpr{get_result(1500, 5, 0, 2)} \\
                            & \Sexpr{get_result(300, 1, 0, 3)} & \Sexpr{get_result(600, 1, 0, 3)} & \Sexpr{get_result(1500, 1, 0, 3)} & \Sexpr{get_result(300, 3, 0, 3)} & \Sexpr{get_result(600, 3, 0, 3)} & \Sexpr{get_result(1500, 3, 0, 3)} & \Sexpr{get_result(300, 5, 0, 3)} & \Sexpr{get_result(600, 5, 0, 3)} & \Sexpr{get_result(1500, 5, 0, 3)} \\
+                           & \Sexpr{get_result(300, 1, 0, 5)} & \Sexpr{get_result(600, 1, 0, 5)} & \Sexpr{get_result(1500, 1, 0, 5)} & \Sexpr{get_result(300, 3, 0, 5)} & \Sexpr{get_result(600, 3, 0, 5)} & \Sexpr{get_result(1500, 3, 0, 5)} & \Sexpr{get_result(300, 5, 0, 5)} & \Sexpr{get_result(600, 5, 0, 5)} & \Sexpr{get_result(1500, 5, 0, 5)} \\
                            & \Sexpr{get_result(300, 1, 0, 7)} & \Sexpr{get_result(600, 1, 0, 7)} & \Sexpr{get_result(1500, 1, 0, 7)} & \Sexpr{get_result(300, 3, 0, 7)} & \Sexpr{get_result(600, 3, 0, 7)} & \Sexpr{get_result(1500, 3, 0, 7)} & \Sexpr{get_result(300, 5, 0, 7)} & \Sexpr{get_result(600, 5, 0, 7)} & \Sexpr{get_result(1500, 5, 0, 7)} \\ \midrule
     \multirow{4}{*}{cpc=1} & \Sexpr{get_result(300, 1, 1, 1)} & \Sexpr{get_result(600, 1, 1, 1)} & \Sexpr{get_result(1500, 1, 1, 1)} & \Sexpr{get_result(300, 3, 1, 1)} & \Sexpr{get_result(600, 3, 1, 1)} & \Sexpr{get_result(1500, 3, 1, 1)} & \Sexpr{get_result(300, 5, 1, 1)} & \Sexpr{get_result(600, 5, 1, 1)} & \Sexpr{get_result(1500, 5, 1, 1)} \\
                            & \Sexpr{get_result(300, 1, 1, 2)} & \Sexpr{get_result(600, 1, 1, 2)} & \Sexpr{get_result(1500, 1, 1, 2)} & \Sexpr{get_result(300, 3, 1, 2)} & \Sexpr{get_result(600, 3, 1, 2)} & \Sexpr{get_result(1500, 3, 1, 2)} & \Sexpr{get_result(300, 5, 1, 2)} & \Sexpr{get_result(600, 5, 1, 2)} & \Sexpr{get_result(1500, 5, 1, 2)} \\
                            & \Sexpr{get_result(300, 1, 1, 3)} & \Sexpr{get_result(600, 1, 1, 3)} & \Sexpr{get_result(1500, 1, 1, 3)} & \Sexpr{get_result(300, 3, 1, 3)} & \Sexpr{get_result(600, 3, 1, 3)} & \Sexpr{get_result(1500, 3, 1, 3)} & \Sexpr{get_result(300, 5, 1, 3)} & \Sexpr{get_result(600, 5, 1, 3)} & \Sexpr{get_result(1500, 5, 1, 3)} \\
+                           & \Sexpr{get_result(300, 1, 1, 5)} & \Sexpr{get_result(600, 1, 1, 5)} & \Sexpr{get_result(1500, 1, 1, 5)} & \Sexpr{get_result(300, 3, 1, 5)} & \Sexpr{get_result(600, 3, 1, 5)} & \Sexpr{get_result(1500, 3, 1, 5)} & \Sexpr{get_result(300, 5, 1, 5)} & \Sexpr{get_result(600, 5, 1, 5)} & \Sexpr{get_result(1500, 5, 1, 5)} \\
                            & \Sexpr{get_result(300, 1, 1, 7)} & \Sexpr{get_result(600, 1, 1, 7)} & \Sexpr{get_result(1500, 1, 1, 7)} & \Sexpr{get_result(300, 3, 1, 7)} & \Sexpr{get_result(600, 3, 1, 7)} & \Sexpr{get_result(1500, 3, 1, 7)} & \Sexpr{get_result(300, 5, 1, 7)} & \Sexpr{get_result(600, 5, 1, 7)} & \Sexpr{get_result(1500, 5, 1, 7)} \\ \midrule
     \multirow{4}{*}{cpc=3} & \Sexpr{get_result(300, 1, 3, 1)} & \Sexpr{get_result(600, 1, 3, 1)} & \Sexpr{get_result(1500, 1, 3, 1)} & \Sexpr{get_result(300, 3, 3, 1)} & \Sexpr{get_result(600, 3, 3, 1)} & \Sexpr{get_result(1500, 3, 3, 1)} & \Sexpr{get_result(300, 5, 3, 1)} & \Sexpr{get_result(600, 5, 3, 1)} & \Sexpr{get_result(1500, 5, 3, 1)} \\
                            & \Sexpr{get_result(300, 1, 3, 2)} & \Sexpr{get_result(600, 1, 3, 2)} & \Sexpr{get_result(1500, 1, 3, 2)} & \Sexpr{get_result(300, 3, 3, 2)} & \Sexpr{get_result(600, 3, 3, 2)} & \Sexpr{get_result(1500, 3, 3, 2)} & \Sexpr{get_result(300, 5, 3, 2)} & \Sexpr{get_result(600, 5, 3, 2)} & \Sexpr{get_result(1500, 5, 3, 2)} \\
                            & \Sexpr{get_result(300, 1, 3, 3)} & \Sexpr{get_result(600, 1, 3, 3)} & \Sexpr{get_result(1500, 1, 3, 3)} & \Sexpr{get_result(300, 3, 3, 3)} & \Sexpr{get_result(600, 3, 3, 3)} & \Sexpr{get_result(1500, 3, 3, 3)} & \Sexpr{get_result(300, 5, 3, 3)} & \Sexpr{get_result(600, 5, 3, 3)} & \Sexpr{get_result(1500, 5, 3, 3)} \\
+                           & \Sexpr{get_result(300, 1, 3, 5)} & \Sexpr{get_result(600, 1, 3, 5)} & \Sexpr{get_result(1500, 1, 3, 5)} & \Sexpr{get_result(300, 3, 3, 5)} & \Sexpr{get_result(600, 3, 3, 5)} & \Sexpr{get_result(1500, 3, 3, 5)} & \Sexpr{get_result(300, 5, 3, 5)} & \Sexpr{get_result(600, 5, 3, 5)} & \Sexpr{get_result(1500, 5, 3, 5)} \\
                            & \Sexpr{get_result(300, 1, 3, 7)} & \Sexpr{get_result(600, 1, 3, 7)} & \Sexpr{get_result(1500, 1, 3, 7)} & \Sexpr{get_result(300, 3, 3, 7)} & \Sexpr{get_result(600, 3, 3, 7)} & \Sexpr{get_result(1500, 3, 3, 7)} & \Sexpr{get_result(300, 5, 3, 7)} & \Sexpr{get_result(600, 5, 3, 7)} & \Sexpr{get_result(1500, 5, 3, 7)} \\ \midrule
     \multirow{4}{*}{cpc=5} & \Sexpr{get_result(300, 1, 5, 1)} & \Sexpr{get_result(600, 1, 5, 1)} & \Sexpr{get_result(1500, 1, 5, 1)} & \Sexpr{get_result(300, 3, 5, 1)} & \Sexpr{get_result(600, 3, 5, 1)} & \Sexpr{get_result(1500, 3, 5, 1)} & \Sexpr{get_result(300, 5, 5, 1)} & \Sexpr{get_result(600, 5, 5, 1)} & \Sexpr{get_result(1500, 5, 5, 1)} \\
                            & \Sexpr{get_result(300, 1, 5, 2)} & \Sexpr{get_result(600, 1, 5, 2)} & \Sexpr{get_result(1500, 1, 5, 2)} & \Sexpr{get_result(300, 3, 5, 2)} & \Sexpr{get_result(600, 3, 5, 2)} & \Sexpr{get_result(1500, 3, 5, 2)} & \Sexpr{get_result(300, 5, 5, 2)} & \Sexpr{get_result(600, 5, 5, 2)} & \Sexpr{get_result(1500, 5, 5, 2)} \\
                            & \Sexpr{get_result(300, 1, 5, 3)} & \Sexpr{get_result(600, 1, 5, 3)} & \Sexpr{get_result(1500, 1, 5, 3)} & \Sexpr{get_result(300, 3, 5, 3)} & \Sexpr{get_result(600, 3, 5, 3)} & \Sexpr{get_result(1500, 3, 5, 3)} & \Sexpr{get_result(300, 5, 5, 3)} & \Sexpr{get_result(600, 5, 5, 3)} & \Sexpr{get_result(1500, 5, 5, 3)} \\
+                           & \Sexpr{get_result(300, 1, 5, 5)} & \Sexpr{get_result(600, 1, 5, 5)} & \Sexpr{get_result(1500, 1, 5, 5)} & \Sexpr{get_result(300, 3, 5, 5)} & \Sexpr{get_result(600, 3, 5, 5)} & \Sexpr{get_result(1500, 3, 5, 5)} & \Sexpr{get_result(300, 5, 5, 5)} & \Sexpr{get_result(600, 5, 5, 5)} & \Sexpr{get_result(1500, 5, 5, 5)} \\
                            & \Sexpr{get_result(300, 1, 5, 7)} & \Sexpr{get_result(600, 1, 5, 7)} & \Sexpr{get_result(1500, 1, 5, 7)} & \Sexpr{get_result(300, 3, 5, 7)} & \Sexpr{get_result(600, 3, 5, 7)} & \Sexpr{get_result(1500, 3, 5, 7)} & \Sexpr{get_result(300, 5, 5, 7)} & \Sexpr{get_result(600, 5, 5, 7)} & \Sexpr{get_result(1500, 5, 5, 7)} \\ \bottomrule
     \end{tabular}
     \caption{\label{tab:logistic regression comparison} Comparison of the algorithms for the logistic regression model in mean.}
@@ -1039,7 +1076,7 @@ data_setup <- purrr::cross_df(
 experiment_setup <- purrr::cross_df(
   list(
     data_setup_index = seq_len(nrow(data_setup)),
-    sgd_k = c(1, 2, 3, 7)
+    sgd_k = c(1, 2, 3, 5, 7)
   )
 )
 experiment_num <- 100
@@ -1050,7 +1087,7 @@ rng <- RNGseq(experiment_num * nrow(data_setup), 3)
 cl <- parallel::makeCluster(parallel::detectCores(), outfile = paste0("log/poisson.log"))
 doParallel::registerDoParallel(cl)
 experiment_result <- foreach::foreach(experiment_setup_index = seq_len(nrow(experiment_setup)), .packages = c("fastglm", "fastcpd", "fossil", "glmnet")) %:%
-  foreach::foreach(experiment_index = seq_len(5), rrng = rng[(experiment_setup$data_setup_index[experiment_setup_index] - 1) * experiment_num + seq_len(5)], .combine = "rbind") %dopar% {
+  foreach::foreach(experiment_index = seq_len(experiment_num), rrng = rng[(experiment_setup$data_setup_index[experiment_setup_index] - 1) * experiment_num + seq_len(experiment_num)], .combine = "rbind") %dopar% {
     rngtools::setRNG(rrng)
     experiment_setup_row <- experiment_setup[experiment_setup_index, ]
     n <- data_setup[experiment_setup$data_setup_index[experiment_setup_index], ]$n
@@ -1098,6 +1135,68 @@ experiment_result <- foreach::foreach(experiment_setup_index = seq_len(nrow(expe
       start <- proc.time()
       if (sgd_k == 7) {
         cp_set <- CP_vanilla_poisson(data[, c(1:p + 1, 1)], beta)$cp
+      } else if (sgd_k == 5) {
+        poisson_regression_result <- tryCatch(
+            fastcpd(
+            data = data,
+            beta = beta,
+            family = "poisson",
+            k = function(x, data_length = n) {
+              if (x < data_length / 10 * 1 / 4) 5
+              else if (x < data_length / 10 * 2 / 4) 3
+              else if (x < data_length / 10 * 3 / 4) 1
+              else 0
+            },
+            epsilon = 1e-5
+          ),
+          error = function(e1) {
+            tryCatch(
+              fastcpd(
+                data = data,
+                beta = beta,
+                family = "poisson",
+                k = function(x, data_length = n) {
+                  if (x < data_length / 10 * 1 / 4) 5
+                  else if (x < data_length / 10 * 2 / 4) 3
+                  else if (x < data_length / 10 * 3 / 4) 1
+                  else 0
+                },
+                epsilon = 1e-4
+              ),
+              error = function(e2) {
+                tryCatch(
+                  fastcpd(
+                    data = data,
+                    beta = beta,
+                    family = "poisson",
+                    k = function(x, data_length = n) {
+                      if (x < data_length / 10 * 1 / 4) 5
+                      else if (x < data_length / 10 * 2 / 4) 3
+                      else if (x < data_length / 10 * 3 / 4) 1
+                      else 0
+                    },
+                    epsilon = 1e-3
+                  ),
+                  error = function(e3) {
+                    fastcpd(
+                      data = data,
+                      beta = beta,
+                      family = "poisson",
+                      k = function(x, data_length = n) {
+                        if (x < data_length / 10 * 1 / 4) 5
+                        else if (x < data_length / 10 * 2 / 4) 3
+                        else if (x < data_length / 10 * 3 / 4) 1
+                        else 0
+                      },
+                      epsilon = 1e-2
+                    )
+                  }
+                )
+              }
+            )
+          }
+        )
+        cp_set <- poisson_regression_result@cp_set
       } else {
         poisson_regression_result <- tryCatch(
             fastcpd(
@@ -1217,18 +1316,22 @@ plot(poisson_regression_result)
     \multirow{4}{*}{cpc=0} & \Sexpr{get_result(300, 1, 0, 1)} & \Sexpr{get_result(600, 1, 0, 1)} & \Sexpr{get_result(1500, 1, 0, 1)} & \Sexpr{get_result(300, 3, 0, 1)} & \Sexpr{get_result(600, 3, 0, 1)} & \Sexpr{get_result(1500, 3, 0, 1)} & \Sexpr{get_result(300, 5, 0, 1)} & \Sexpr{get_result(600, 5, 0, 1)} & \Sexpr{get_result(1500, 5, 0, 1)} \\
                            & \Sexpr{get_result(300, 1, 0, 2)} & \Sexpr{get_result(600, 1, 0, 2)} & \Sexpr{get_result(1500, 1, 0, 2)} & \Sexpr{get_result(300, 3, 0, 2)} & \Sexpr{get_result(600, 3, 0, 2)} & \Sexpr{get_result(1500, 3, 0, 2)} & \Sexpr{get_result(300, 5, 0, 2)} & \Sexpr{get_result(600, 5, 0, 2)} & \Sexpr{get_result(1500, 5, 0, 2)} \\
                            & \Sexpr{get_result(300, 1, 0, 3)} & \Sexpr{get_result(600, 1, 0, 3)} & \Sexpr{get_result(1500, 1, 0, 3)} & \Sexpr{get_result(300, 3, 0, 3)} & \Sexpr{get_result(600, 3, 0, 3)} & \Sexpr{get_result(1500, 3, 0, 3)} & \Sexpr{get_result(300, 5, 0, 3)} & \Sexpr{get_result(600, 5, 0, 3)} & \Sexpr{get_result(1500, 5, 0, 3)} \\
+                           & \Sexpr{get_result(300, 1, 0, 5)} & \Sexpr{get_result(600, 1, 0, 5)} & \Sexpr{get_result(1500, 1, 0, 5)} & \Sexpr{get_result(300, 3, 0, 5)} & \Sexpr{get_result(600, 3, 0, 5)} & \Sexpr{get_result(1500, 3, 0, 5)} & \Sexpr{get_result(300, 5, 0, 5)} & \Sexpr{get_result(600, 5, 0, 5)} & \Sexpr{get_result(1500, 5, 0, 5)} \\
                            & \Sexpr{get_result(300, 1, 0, 7)} & \Sexpr{get_result(600, 1, 0, 7)} & \Sexpr{get_result(1500, 1, 0, 7)} & \Sexpr{get_result(300, 3, 0, 7)} & \Sexpr{get_result(600, 3, 0, 7)} & \Sexpr{get_result(1500, 3, 0, 7)} & \Sexpr{get_result(300, 5, 0, 7)} & \Sexpr{get_result(600, 5, 0, 7)} & \Sexpr{get_result(1500, 5, 0, 7)} \\ \midrule
     \multirow{4}{*}{cpc=1} & \Sexpr{get_result(300, 1, 1, 1)} & \Sexpr{get_result(600, 1, 1, 1)} & \Sexpr{get_result(1500, 1, 1, 1)} & \Sexpr{get_result(300, 3, 1, 1)} & \Sexpr{get_result(600, 3, 1, 1)} & \Sexpr{get_result(1500, 3, 1, 1)} & \Sexpr{get_result(300, 5, 1, 1)} & \Sexpr{get_result(600, 5, 1, 1)} & \Sexpr{get_result(1500, 5, 1, 1)} \\
                            & \Sexpr{get_result(300, 1, 1, 2)} & \Sexpr{get_result(600, 1, 1, 2)} & \Sexpr{get_result(1500, 1, 1, 2)} & \Sexpr{get_result(300, 3, 1, 2)} & \Sexpr{get_result(600, 3, 1, 2)} & \Sexpr{get_result(1500, 3, 1, 2)} & \Sexpr{get_result(300, 5, 1, 2)} & \Sexpr{get_result(600, 5, 1, 2)} & \Sexpr{get_result(1500, 5, 1, 2)} \\
                            & \Sexpr{get_result(300, 1, 1, 3)} & \Sexpr{get_result(600, 1, 1, 3)} & \Sexpr{get_result(1500, 1, 1, 3)} & \Sexpr{get_result(300, 3, 1, 3)} & \Sexpr{get_result(600, 3, 1, 3)} & \Sexpr{get_result(1500, 3, 1, 3)} & \Sexpr{get_result(300, 5, 1, 3)} & \Sexpr{get_result(600, 5, 1, 3)} & \Sexpr{get_result(1500, 5, 1, 3)} \\
+                           & \Sexpr{get_result(300, 1, 1, 5)} & \Sexpr{get_result(600, 1, 1, 5)} & \Sexpr{get_result(1500, 1, 1, 5)} & \Sexpr{get_result(300, 3, 1, 5)} & \Sexpr{get_result(600, 3, 1, 5)} & \Sexpr{get_result(1500, 3, 1, 5)} & \Sexpr{get_result(300, 5, 1, 5)} & \Sexpr{get_result(600, 5, 1, 5)} & \Sexpr{get_result(1500, 5, 1, 5)} \\
                            & \Sexpr{get_result(300, 1, 1, 7)} & \Sexpr{get_result(600, 1, 1, 7)} & \Sexpr{get_result(1500, 1, 1, 7)} & \Sexpr{get_result(300, 3, 1, 7)} & \Sexpr{get_result(600, 3, 1, 7)} & \Sexpr{get_result(1500, 3, 1, 7)} & \Sexpr{get_result(300, 5, 1, 7)} & \Sexpr{get_result(600, 5, 1, 7)} & \Sexpr{get_result(1500, 5, 1, 7)} \\ \midrule
     \multirow{4}{*}{cpc=3} & \Sexpr{get_result(300, 1, 3, 1)} & \Sexpr{get_result(600, 1, 3, 1)} & \Sexpr{get_result(1500, 1, 3, 1)} & \Sexpr{get_result(300, 3, 3, 1)} & \Sexpr{get_result(600, 3, 3, 1)} & \Sexpr{get_result(1500, 3, 3, 1)} & \Sexpr{get_result(300, 5, 3, 1)} & \Sexpr{get_result(600, 5, 3, 1)} & \Sexpr{get_result(1500, 5, 3, 1)} \\
                            & \Sexpr{get_result(300, 1, 3, 2)} & \Sexpr{get_result(600, 1, 3, 2)} & \Sexpr{get_result(1500, 1, 3, 2)} & \Sexpr{get_result(300, 3, 3, 2)} & \Sexpr{get_result(600, 3, 3, 2)} & \Sexpr{get_result(1500, 3, 3, 2)} & \Sexpr{get_result(300, 5, 3, 2)} & \Sexpr{get_result(600, 5, 3, 2)} & \Sexpr{get_result(1500, 5, 3, 2)} \\
                            & \Sexpr{get_result(300, 1, 3, 3)} & \Sexpr{get_result(600, 1, 3, 3)} & \Sexpr{get_result(1500, 1, 3, 3)} & \Sexpr{get_result(300, 3, 3, 3)} & \Sexpr{get_result(600, 3, 3, 3)} & \Sexpr{get_result(1500, 3, 3, 3)} & \Sexpr{get_result(300, 5, 3, 3)} & \Sexpr{get_result(600, 5, 3, 3)} & \Sexpr{get_result(1500, 5, 3, 3)} \\
+                           & \Sexpr{get_result(300, 1, 3, 5)} & \Sexpr{get_result(600, 1, 3, 5)} & \Sexpr{get_result(1500, 1, 3, 5)} & \Sexpr{get_result(300, 3, 3, 5)} & \Sexpr{get_result(600, 3, 3, 5)} & \Sexpr{get_result(1500, 3, 3, 5)} & \Sexpr{get_result(300, 5, 3, 5)} & \Sexpr{get_result(600, 5, 3, 5)} & \Sexpr{get_result(1500, 5, 3, 5)} \\
                            & \Sexpr{get_result(300, 1, 3, 7)} & \Sexpr{get_result(600, 1, 3, 7)} & \Sexpr{get_result(1500, 1, 3, 7)} & \Sexpr{get_result(300, 3, 3, 7)} & \Sexpr{get_result(600, 3, 3, 7)} & \Sexpr{get_result(1500, 3, 3, 7)} & \Sexpr{get_result(300, 5, 3, 7)} & \Sexpr{get_result(600, 5, 3, 7)} & \Sexpr{get_result(1500, 5, 3, 7)} \\ \midrule
     \multirow{4}{*}{cpc=5} & \Sexpr{get_result(300, 1, 5, 1)} & \Sexpr{get_result(600, 1, 5, 1)} & \Sexpr{get_result(1500, 1, 5, 1)} & \Sexpr{get_result(300, 3, 5, 1)} & \Sexpr{get_result(600, 3, 5, 1)} & \Sexpr{get_result(1500, 3, 5, 1)} & \Sexpr{get_result(300, 5, 5, 1)} & \Sexpr{get_result(600, 5, 5, 1)} & \Sexpr{get_result(1500, 5, 5, 1)} \\
                            & \Sexpr{get_result(300, 1, 5, 2)} & \Sexpr{get_result(600, 1, 5, 2)} & \Sexpr{get_result(1500, 1, 5, 2)} & \Sexpr{get_result(300, 3, 5, 2)} & \Sexpr{get_result(600, 3, 5, 2)} & \Sexpr{get_result(1500, 3, 5, 2)} & \Sexpr{get_result(300, 5, 5, 2)} & \Sexpr{get_result(600, 5, 5, 2)} & \Sexpr{get_result(1500, 5, 5, 2)} \\
                            & \Sexpr{get_result(300, 1, 5, 3)} & \Sexpr{get_result(600, 1, 5, 3)} & \Sexpr{get_result(1500, 1, 5, 3)} & \Sexpr{get_result(300, 3, 5, 3)} & \Sexpr{get_result(600, 3, 5, 3)} & \Sexpr{get_result(1500, 3, 5, 3)} & \Sexpr{get_result(300, 5, 5, 3)} & \Sexpr{get_result(600, 5, 5, 3)} & \Sexpr{get_result(1500, 5, 5, 3)} \\
+                           & \Sexpr{get_result(300, 1, 5, 5)} & \Sexpr{get_result(600, 1, 5, 5)} & \Sexpr{get_result(1500, 1, 5, 5)} & \Sexpr{get_result(300, 3, 5, 5)} & \Sexpr{get_result(600, 3, 5, 5)} & \Sexpr{get_result(1500, 3, 5, 5)} & \Sexpr{get_result(300, 5, 5, 5)} & \Sexpr{get_result(600, 5, 5, 5)} & \Sexpr{get_result(1500, 5, 5, 5)} \\
                            & \Sexpr{get_result(300, 1, 5, 7)} & \Sexpr{get_result(600, 1, 5, 7)} & \Sexpr{get_result(1500, 1, 5, 7)} & \Sexpr{get_result(300, 3, 5, 7)} & \Sexpr{get_result(600, 3, 5, 7)} & \Sexpr{get_result(1500, 3, 5, 7)} & \Sexpr{get_result(300, 5, 5, 7)} & \Sexpr{get_result(600, 5, 5, 7)} & \Sexpr{get_result(1500, 5, 5, 7)} \\ \bottomrule
     \end{tabular}
     \caption{\label{tab:poisson regression comparison} Comparison of the algorithms for the poisson regression model in mean.}
@@ -1381,7 +1484,7 @@ data_setup <- purrr::cross_df(
 experiment_setup <- purrr::cross_df(
   list(
     data_setup_index = seq_len(nrow(data_setup)),
-    sgd_k = c(1, 2, 3, 7)
+    sgd_k = c(1, 2, 3, 5, 7)
   )
 )
 
@@ -1393,7 +1496,7 @@ rng <- RNGseq(experiment_num * nrow(data_setup), 4)
 cl <- parallel::makeCluster(parallel::detectCores(), outfile = paste0("log/lasso.log"))
 doParallel::registerDoParallel(cl)
 experiment_result <- foreach::foreach(experiment_setup_index = seq_len(nrow(experiment_setup)), .packages = c("fastglm", "fastcpd", "fossil", "glmnet")) %:%
-  foreach::foreach(experiment_index = seq_len(5), rrng = rng[(experiment_setup$data_setup_index[experiment_setup_index] - 1) * experiment_num + seq_len(5)], .combine = "rbind") %dopar% {
+  foreach::foreach(experiment_index = seq_len(experiment_num), rrng = rng[(experiment_setup$data_setup_index[experiment_setup_index] - 1) * experiment_num + seq_len(experiment_num)], .combine = "rbind") %dopar% {
     rngtools::setRNG(rrng)
     experiment_setup_row <- experiment_setup[experiment_setup_index, ]
     change_points_count <- data_setup[experiment_setup$data_setup_index[experiment_setup_index], ]$change_points_count
@@ -1430,6 +1533,20 @@ experiment_result <- foreach::foreach(experiment_setup_index = seq_len(nrow(expe
       start <- proc.time()
       if (sgd_k == 7) {
         cp_set <- CP_vanilla_lasso(data[, c(1:p + 1, 1)], beta)$cp
+      } else if (sgd_k == 5) {
+        lasso_regression_result <- fastcpd(
+          data = data,
+          beta = beta,
+          family = "lasso",
+          k = function(x, data_length = n) {
+            if (x < data_length / 10 * 1 / 4) 5
+            else if (x < data_length / 10 * 2 / 4) 3
+            else if (x < data_length / 10 * 3 / 4) 1
+            else 0
+          },
+          epsilon = 1e-5
+        )
+        cp_set <- lasso_regression_result@cp_set
       } else {
         lasso_regression_result <- fastcpd(
           data = data,
@@ -1534,18 +1651,22 @@ plot(lasso_regression_result)
   \multirow{4}{*}{cpc=0} & \Sexpr{get_result_lasso(3, 0, 1)} & \Sexpr{get_result_lasso(6, 0, 1)} & \Sexpr{get_result_lasso(10, 0, 1)} \\
                          & \Sexpr{get_result_lasso(3, 0, 2)} & \Sexpr{get_result_lasso(6, 0, 2)} & \Sexpr{get_result_lasso(10, 0, 2)} \\
                          & \Sexpr{get_result_lasso(3, 0, 3)} & \Sexpr{get_result_lasso(6, 0, 3)} & \Sexpr{get_result_lasso(10, 0, 3)} \\
+                         & \Sexpr{get_result_lasso(3, 0, 5)} & \Sexpr{get_result_lasso(6, 0, 5)} & \Sexpr{get_result_lasso(10, 0, 5)} \\
                          & \Sexpr{get_result_lasso(3, 0, 7)} & \Sexpr{get_result_lasso(6, 0, 7)} & \Sexpr{get_result_lasso(10, 0, 7)} \\ \midrule
   \multirow{4}{*}{cpc=1} & \Sexpr{get_result_lasso(3, 1, 1)} & \Sexpr{get_result_lasso(6, 1, 1)} & \Sexpr{get_result_lasso(10, 1, 1)} \\
                          & \Sexpr{get_result_lasso(3, 1, 2)} & \Sexpr{get_result_lasso(6, 1, 2)} & \Sexpr{get_result_lasso(10, 1, 2)} \\
                          & \Sexpr{get_result_lasso(3, 1, 3)} & \Sexpr{get_result_lasso(6, 1, 3)} & \Sexpr{get_result_lasso(10, 1, 3)} \\
+                         & \Sexpr{get_result_lasso(3, 1, 5)} & \Sexpr{get_result_lasso(6, 1, 5)} & \Sexpr{get_result_lasso(10, 1, 5)} \\
                          & \Sexpr{get_result_lasso(3, 1, 7)} & \Sexpr{get_result_lasso(6, 1, 7)} & \Sexpr{get_result_lasso(10, 1, 7)} \\ \midrule
   \multirow{4}{*}{cpc=3} & \Sexpr{get_result_lasso(3, 3, 1)} & \Sexpr{get_result_lasso(6, 3, 1)} & \Sexpr{get_result_lasso(10, 3, 1)} \\
                          & \Sexpr{get_result_lasso(3, 3, 2)} & \Sexpr{get_result_lasso(6, 3, 2)} & \Sexpr{get_result_lasso(10, 3, 2)} \\
                          & \Sexpr{get_result_lasso(3, 3, 3)} & \Sexpr{get_result_lasso(6, 3, 3)} & \Sexpr{get_result_lasso(10, 3, 3)} \\
+                         & \Sexpr{get_result_lasso(3, 3, 5)} & \Sexpr{get_result_lasso(6, 3, 5)} & \Sexpr{get_result_lasso(10, 3, 5)} \\
                          & \Sexpr{get_result_lasso(3, 3, 7)} & \Sexpr{get_result_lasso(6, 3, 7)} & \Sexpr{get_result_lasso(10, 3, 7)} \\ \midrule
   \multirow{4}{*}{cpc=5} & \Sexpr{get_result_lasso(3, 5, 1)} & \Sexpr{get_result_lasso(6, 5, 1)} & \Sexpr{get_result_lasso(10, 5, 1)} \\
                          & \Sexpr{get_result_lasso(3, 5, 2)} & \Sexpr{get_result_lasso(6, 5, 2)} & \Sexpr{get_result_lasso(10, 5, 2)} \\
                          & \Sexpr{get_result_lasso(3, 5, 3)} & \Sexpr{get_result_lasso(6, 5, 3)} & \Sexpr{get_result_lasso(10, 5, 3)} \\
+                         & \Sexpr{get_result_lasso(3, 5, 5)} & \Sexpr{get_result_lasso(6, 5, 5)} & \Sexpr{get_result_lasso(10, 5, 5)} \\
                          & \Sexpr{get_result_lasso(3, 5, 7)} & \Sexpr{get_result_lasso(6, 5, 7)} & \Sexpr{get_result_lasso(10, 5, 7)} \\ \bottomrule
   \end{tabular}
   \caption{\label{tab:poisson regression comparison} Comparison of the algorithms for the poisson regression model in mean.}
@@ -1591,10 +1712,30 @@ logistic_regression_result <- fastcpd(
   k = function(x) 20,
   epsilon = 1e-5
 )
+
 logistic_loss <- function(data, theta) {
-  u <- c(data[, -1, drop = FALSE] %*% theta)
-  sum(-data[, 1] * u + log(1 + exp(u)))
+  x <- data[, -1]
+  y <- data[, 1]
+  u <- x %*% theta
+  sum(-y * u + log(1 + exp(u)))
 }
+
+# logistic_loss2 <- function(data, theta) {
+#   x <- data[-1]
+#   y <- data[1]
+#   u <- x %*% theta
+#   -y * u + log(1 + exp(u))
+# }
+
+# x <- matrix(rnorm(10000 * 100), ncol = 100)
+# theta <- c(0.25, 0, -0.25, rep(0, 97))
+# y <- rbinom(10000, 1, 1 / (1 + exp(-x %*% theta)))
+# data <- cbind(y, x)
+
+# microbenchmark::microbenchmark(
+#   "vectorized" = logistic_loss(data, theta),
+#   "consistent" = sum(apply(data, 1, logistic_loss2, theta = theta))
+# )
 
 logistic_loss_gradient <- function(data, theta) {
   x <- data[-1]
@@ -1602,10 +1743,10 @@ logistic_loss_gradient <- function(data, theta) {
   c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
 }
 
-logistic_loss_hessian <- function(data, theta, hessian) {
-  data_x <- data[-1]
-  prob <- 1 / (1 + exp(-data_x %*% theta))
-  hessian + (data_x %o% data_x) * c((1 - prob) * prob)
+logistic_loss_hessian <- function(data, theta) {
+  x <- data[-1]
+  prob <- 1 / (1 + exp(-x %*% theta))
+  (x %o% x) * c((1 - prob) * prob)
 }
 logistic_regression_result_custom <- fastcpd(
   data = data,
@@ -1663,14 +1804,13 @@ huber_loss_gradient <- function(data, theta, threshold = 1) {
 huber_loss_hessian <- function(
   data,
   theta,
-  hessian,
   threshold = 1
 ) {
   residual <- c(data[1] - data[-1] %*% theta)
   if (abs(residual) <= threshold) {
-    hessian + outer(data[-1], data[-1])
+    outer(data[-1], data[-1])
   } else {
-    hessian + 0.01 * diag(length(theta))
+    0.01 * diag(length(theta))
   }
 }
 
@@ -1763,12 +1903,11 @@ quantile_loss_gradient <- function(
 quantile_loss_hessian <- function(
   data,
   theta,
-  hessian,
   quant = 0.5,
   smoothing = 0.25
 ) {
-  # hessian - exp(c(data[1] - data[-1] %*% theta) / smoothing) / (smoothing * (1 + exp(c(data[1] - data[-1] %*% theta) / smoothing))^2) * data[-1] %o% data[-1]
-  hessian + 0.01 * diag(length(theta))
+  # - exp(c(data[1] - data[-1] %*% theta) / smoothing) / (smoothing * (1 + exp(c(data[1] - data[-1] %*% theta) / smoothing))^2) * data[-1] %o% data[-1]
+  0.01 * diag(length(theta))
 }
 
 # print(fastcpd(
@@ -1855,21 +1994,52 @@ the quantile regression model.}
 Now let's consider the mean shift model using custom cost function. Since a
 mean shift model is a special case of a linear regression model, by specifying a
 response variable we can use the linear regression model to detect the change
-points.
+points. Now let's see what would be the output if we use the custom cost function.
 %
 <<mean shift model with gaussian family>>=
-p <- 100
+p <- 1
 data <- rbind(
-  mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(5, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(2, p), sigma = diag(1, p))
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(400, mean = rep(5, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(1, p))
 )
-data <- cbind(c(data[1:100, , drop = FALSE] %*% colMeans(data[1:100, , drop = FALSE]), data[101:200, , drop = FALSE] %*% colMeans(data[101:200, , drop = FALSE])), data)
+
+mean_loss <- function(data) {
+  # norm(sweep(data, 2, theta), type = "F") ^ 2 / 2
+  (norm(data, type = "F") ^ 2 - colSums(data) ^ 2 / nrow(data)) / 2 / cov(data) + nrow(data) / 2 * (log(cov(data)) + log(2 * pi))
+}
+
+# mean_loss_gradient <- function(data, theta) {
+#   (theta - data[nrow(data), ]) / c(cov(data))
+# }
+
+# mean_loss_hessian <- function(data, theta) {
+#   diag(1 / c(cov(data)), p)
+# }
+
+mean_loss_result <- fastcpd(
+  data = data,
+  beta = (p + 1) * log(nrow(data)) / 2,
+  p = p,
+  cost = mean_loss
+)
+
+summary(mean_loss_result)
+changepoint::cpt.mean(c(data), method = "PELT")
+
+data <- cbind(
+  c(
+    data[1:300, , drop = FALSE] %*% colMeans(data[1:300, , drop = FALSE]),
+    data[301:700, , drop = FALSE] %*% colMeans(data[301:700, , drop = FALSE]),
+    data[701:1000, , drop = FALSE] %*% colMeans(data[701:1000, , drop = FALSE])
+  ),
+  data
+)
 
 mean_shift_linear_result <- fastcpd(
   data = data,
-  beta = log(200) / 2,
-  segment_count = 3,
+  beta = log(1000) / 2,
+  segment_count = 5,
   trim = 0.025,
   k = function(x) 0,
   family = "gaussian",
@@ -1877,37 +2047,90 @@ mean_shift_linear_result <- fastcpd(
 )
 summary(mean_shift_linear_result)
 @
-%
-Now let's see what would be the output if we use the custom cost function.
-%
-<<mean shift model with custom cost function>>=
-data <- data[, -1, drop = FALSE]
 
-mean_loss <- function(data, theta) {
-  norm(sweep(data, 2, theta), type = "F") ^ 2 / 2
-}
-
-mean_loss_gradient <- function(data, theta) {
-  theta - data
-}
-
-mean_loss_hessian <- function(data, theta, hessian) {
-  hessian + diag(p)
-}
-
-mean_loss_result <- fastcpd(
-  data = data,
-  beta = 10,
-  segment_count = 4,
-  trim = 0.025,
-  k = function(x) 0,
-  p = p,
-  cost = mean_loss,
-  cost_gradient = mean_loss_gradient,
-  cost_hessian = mean_loss_hessian
+<<variance change model with gaussian family>>=
+p <- 1
+data <- rbind(
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(50, p)),
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
 )
 
-summary(mean_loss_result)
+data_all_mu <- colMeans(data)
+
+var_loss <- function(data) {
+  demeaned_data <- sweep(data, 2, data_all_mu)
+  # norm(demeaned_data, type = "F") ^ 2 / 2 / theta ^ 2 + nrow(data) * log(theta ^ 2) / 2
+  nrow(data) * (1 + log(2 * pi) + log(norm(demeaned_data, type = "F") ^ 2 / nrow(data))) / 2
+}
+
+# var_loss_gradient <- function(data, theta) {
+#   # -data ^ 2 / theta^3 + 1 / theta
+#   - (data[nrow(data), ] - data_all_mu) ^ 2 / theta ^ 2 + 1 / 2 / theta
+# }
+
+# var_loss_hessian <- function(data, theta) {
+#   # 3 * data ^ 2 / theta^4 - 1 / theta ^ 2
+#   (data[nrow(data), ] - data_all_mu) ^ 2 / theta ^ 3 - 1 / 2 / theta ^ 2
+# }
+
+var_loss_result <- fastcpd(
+  data = data,
+  beta = (p + 1) * log(nrow(data)) / 2,
+  p = p,
+  cost = var_loss
+)
+
+summary(var_loss_result)
+changepoint::cpt.var(c(data), method = "PELT")
+@
+
+<<mean and variance change model with gaussian family>>=
+p <- 1
+data <- rbind(
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(50, p)),
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
+)
+
+meanvar_loss <- function(data) {
+  # mu <- theta[seq_len(p)]
+  # sigma_2 <- theta[-seq_len(p)]
+  # norm(sweep(data, 2, mu), type = "F") ^ 2 / 2 / sigma_2 ^ 2 + nrow(data) * log(sigma_2 ^ 2) / 2
+  nrow(data) * (1 + log(2 * pi) + log((colSums(data ^ 2) - colSums(data) ^ 2 / nrow(data)) / nrow(data))) / 2
+}
+
+# meanvar_loss_gradient <- function(data, theta) {
+#   mu <- theta[seq_len(p)]
+#   sigma_2 <- theta[-seq_len(p)]
+#   # c((mu - data) / sigma_2 ^ 2, -(data - mu) ^ 2 / sigma_2^3 + 1 / sigma_2)
+#   c((mu - data[nrow(data), ]) / sigma_2, -(data[nrow(data), ] - mu) ^ 2 / 2 / sigma_2 ^ 2 + 1 / 2 / sigma_2)
+# }
+
+# meanvar_loss_hessian <- function(data, theta) {
+#   mu <- theta[seq_len(p)]
+#   sigma_2 <- theta[-seq_len(p)]
+#   # matrix(c(1 / sigma_2 ^ 2, -2 * (mu - data) / sigma_2 ^ 3, -2 * (mu - data) / sigma_2 ^ 3, 3 * (data - mu) ^ 2 / sigma_2^4 - 1 / sigma_2 ^ 2), nrow = 2, ncol = 2)
+#   matrix(c(
+#     1 / sigma_2,
+#     (data[nrow(data), ] - mu) / sigma_2 ^ 2,
+#     (data[nrow(data), ] - mu) / sigma_2 ^ 2,
+#     (data[nrow(data), ] - mu) ^ 2 / sigma_2 ^ 3 - 1 / 2 / sigma_2 ^ 2
+#   ), nrow = 2, ncol = 2)
+# }
+
+meanvar_loss_result <- fastcpd(
+  data = data,
+  beta = (2 * p + 1) * log(nrow(data)) / 2,
+  p = 2 * p,
+  cost = meanvar_loss
+)
+
+summary(meanvar_loss_result)
+changepoint::cpt.meanvar(c(data), method = "PELT")
 @
 
 \section{Adaptive number of epochs} \label{sec:adaptive number of epochs}
@@ -1929,10 +2152,10 @@ $\boldsymbol{k}$. The transition between the upper limit and lower limit is
 calculated by $\lceil 1000 / \text{segment length} \rceil$.
 
 <<adaptive number of epochs>>=
-k <- function(x, n = 1500) {
-  if (x < n / 10 * 1 / 3) 3
-  else if (x < n / 10 * 2 / 3) 2
-  else if (x < n / 10) 1
+kfunc <- function(x, data_length = n) {
+  if (x < data_length / 10 * 1 / 4) 5
+  else if (x < data_length / 10 * 2 / 4) 3
+  else if (x < data_length / 10 * 3 / 4) 1
   else 0
 }
 @
