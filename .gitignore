@@ -42,5 +42,6 @@ fastcpd.Rproj
 .DS_Store
 src/*.o
 src/*.so
+src/*.dll
 inst/doc
 vignettes/*.aux

@@ -14,7 +14,8 @@ arma::mat cost_update_hessian(arma::rowvec data,
                               arma::colvec theta,
                               std::string family,
                               double min_prob) {
-    arma::rowvec x = data.tail(data.n_elem - 1);
+    arma::rowvec new_data = data.row(data.n_rows - 1);
+    arma::rowvec x = new_data.tail(new_data.n_elem - 1);
     arma::mat hessian;
     if (family.compare("binomial") == 0) {
         double prob = 1 / (1 + exp(-arma::as_scalar(x * theta)));
