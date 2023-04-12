@@ -11,13 +11,38 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// cost_update_builtin
+Rcpp::List cost_update_builtin(const arma::mat data, arma::mat theta_hat, arma::mat theta_sum, arma::cube hessian, const int tau, const int i, Rcpp::Function k, const std::string family, arma::colvec momentum, const double momentum_coef, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const double lambda);
+RcppExport SEXP _fastcpd_cost_update_builtin(SEXP dataSEXP, SEXP theta_hatSEXP, SEXP theta_sumSEXP, SEXP hessianSEXP, SEXP tauSEXP, SEXP iSEXP, SEXP kSEXP, SEXP familySEXP, SEXP momentumSEXP, SEXP momentum_coefSEXP, SEXP epsilonSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP lambdaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type theta_hat(theta_hatSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type theta_sum(theta_sumSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type hessian(hessianSEXP);
+    Rcpp::traits::input_parameter< const int >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< const int >::type i(iSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Function >::type k(kSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type family(familySEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type momentum(momentumSEXP);
+    Rcpp::traits::input_parameter< const double >::type momentum_coef(momentum_coefSEXP);
+    Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
+    Rcpp::traits::input_parameter< const double >::type min_prob(min_probSEXP);
+    Rcpp::traits::input_parameter< const double >::type winsorise_minval(winsorise_minvalSEXP);
+    Rcpp::traits::input_parameter< const double >::type winsorise_maxval(winsorise_maxvalSEXP);
+    Rcpp::traits::input_parameter< const double >::type lambda(lambdaSEXP);
+    rcpp_result_gen = Rcpp::wrap(cost_update_builtin(data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cost_update_gradient
-arma::colvec cost_update_gradient(arma::rowvec data, arma::colvec theta, std::string family);
+arma::colvec cost_update_gradient(arma::mat data, arma::colvec theta, std::string family);
 RcppExport SEXP _fastcpd_cost_update_gradient(SEXP dataSEXP, SEXP thetaSEXP, SEXP familySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::rowvec >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< std::string >::type family(familySEXP);
     rcpp_result_gen = Rcpp::wrap(cost_update_gradient(data, theta, family));
@@ -25,12 +50,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // cost_update_hessian
-arma::mat cost_update_hessian(arma::rowvec data, arma::colvec theta, std::string family, double min_prob);
+arma::mat cost_update_hessian(arma::mat data, arma::colvec theta, std::string family, double min_prob);
 RcppExport SEXP _fastcpd_cost_update_hessian(SEXP dataSEXP, SEXP thetaSEXP, SEXP familySEXP, SEXP min_probSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::rowvec >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< std::string >::type family(familySEXP);
     Rcpp::traits::input_parameter< double >::type min_prob(min_probSEXP);
@@ -42,6 +67,7 @@ END_RCPP
 RcppExport SEXP run_testthat_tests(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_fastcpd_cost_update_builtin", (DL_FUNC) &_fastcpd_cost_update_builtin, 15},
     {"_fastcpd_cost_update_gradient", (DL_FUNC) &_fastcpd_cost_update_gradient, 3},
     {"_fastcpd_cost_update_hessian", (DL_FUNC) &_fastcpd_cost_update_hessian, 4},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},

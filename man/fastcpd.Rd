@@ -6,7 +6,7 @@
 \title{fastcpd: A package for computating the notorious bar statistic.}
 \usage{
 fastcpd(
-  formula = y ~ .,
+  formula = y ~ . - 1,
   data,
   beta = NULL,
   segment_count = 10,
@@ -26,6 +26,8 @@ fastcpd(
 )
 }
 \arguments{
+\item{formula}{A symbolic description of the model to be fitted.}
+
 \item{data}{A data frame containing the data to be segmented.}
 
 \item{beta}{Initial cost value.}

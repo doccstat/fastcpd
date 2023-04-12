@@ -7,9 +7,8 @@
 //' @param family Family of the model.
 //'
 //' @return Gradient at the current data.
-//' @export
 // [[Rcpp::export]]
-arma::colvec cost_update_gradient(arma::rowvec data,
+arma::colvec cost_update_gradient(arma::mat data,
                                   arma::colvec theta,
                                   std::string family) {
     arma::rowvec new_data = data.row(data.n_rows - 1);

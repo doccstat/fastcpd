@@ -8,9 +8,8 @@
 //' @param min_prob Minimum probability to avoid numerical issues.
 //'
 //' @return Hessian at the current data.
-//' @export
 // [[Rcpp::export]]
-arma::mat cost_update_hessian(arma::rowvec data,
+arma::mat cost_update_hessian(arma::mat data,
                               arma::colvec theta,
                               std::string family,
                               double min_prob) {
