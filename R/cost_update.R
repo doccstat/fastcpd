@@ -52,11 +52,13 @@ cost_update <- function(
       data, theta_hat[, i], family, min_prob
     )
   }
+
   gradient <- if (family == "custom") {
     cost_gradient(data, theta_hat[, i])
   } else {
     cost_gradient(data, theta_hat[, i], family)
   }
+
   hessian_psd <- hessian_i + epsilon * diag(1, nrow(theta_hat))
   momentum_step <- solve(hessian_psd, gradient)
   momentum <- momentum_coef * momentum - momentum_step

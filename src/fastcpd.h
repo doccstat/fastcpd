@@ -6,7 +6,7 @@
 
 arma::colvec cost_update_gradient(arma::mat, arma::colvec, std::string);
 arma::mat cost_update_hessian(arma::mat, arma::colvec, std::string, double);
-Rcpp::List cost_update_builtin(
+Rcpp::List cost_update_c(
     const arma::cube,
     arma::mat,
     arma::mat,
@@ -21,7 +21,10 @@ Rcpp::List cost_update_builtin(
     const double,
     const double,
     const double,
-    const double
+    const double,
+    Rcpp::Function,
+    Rcpp::Function
 );
+double negative_log_likelihood_c(arma::mat, arma::colvec, std::string, double, bool);
 
 #endif
