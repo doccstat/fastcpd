@@ -29,7 +29,7 @@
 #' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 #'   \code{hessian}, and \code{momentum}.
 cost_update <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian) {
-    .Call(`_fastcpd_cost_update`, data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian)
+    .Call('_fastcpd_cost_update', PACKAGE = 'fastcpd', data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian)
 }
 
 #' Function to calculate the gradient at the current data.
@@ -40,7 +40,7 @@ cost_update <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, 
 #'
 #' @return Gradient at the current data.
 cost_update_gradient <- function(data, theta, family) {
-    .Call(`_fastcpd_cost_update_gradient`, data, theta, family)
+    .Call('_fastcpd_cost_update_gradient', PACKAGE = 'fastcpd', data, theta, family)
 }
 
 #' Function to calculate the Hessian matrix at the current data.
@@ -52,7 +52,7 @@ cost_update_gradient <- function(data, theta, family) {
 #'
 #' @return Hessian at the current data.
 cost_update_hessian <- function(data, theta, family, min_prob) {
-    .Call(`_fastcpd_cost_update_hessian`, data, theta, family, min_prob)
+    .Call('_fastcpd_cost_update_hessian', PACKAGE = 'fastcpd', data, theta, family, min_prob)
 }
 
 #' Solve logistic/poisson regression using Gradient Descent Extension to the
@@ -68,6 +68,6 @@ cost_update_hessian <- function(data, theta, family, min_prob) {
 #' @return Negative log likelihood of the corresponding data with the given
 #'   family.
 negative_log_likelihood <- function(data, theta, family, lambda, cv = FALSE) {
-    .Call(`_fastcpd_negative_log_likelihood`, data, theta, family, lambda, cv)
+    .Call('_fastcpd_negative_log_likelihood', PACKAGE = 'fastcpd', data, theta, family, lambda, cv)
 }
 

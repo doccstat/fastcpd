@@ -1,7 +1,9 @@
-#' fastcpd: A package for computating the notorious bar statistic.
+#' fastcpd: A package for finding change points in an efficient way
 #'
-#' The fastcpd package provides three categories of important functions:
-#' foo, bar and baz.
+#' The fastcpd package provides a function \code{\link{fastcpd}} to find change
+#' points in a data set. The function is based on the paper "Sequential Gradient
+#' Descent and Quasi-Newton’s Method for Change-Point Analysis" by
+#' Xianyang Zhang and Trisha Dawn.
 #'
 #' @section fastcpd functions:
 #' The fastcpd functions ...
@@ -10,31 +12,36 @@
 #' @name fastcpd
 #' @useDynLib fastcpd, .registration = TRUE
 #' @importFrom Rcpp evalCpp
+#' @importFrom methods show
+#' @importFrom DescTools Winsorize
+#' @importFrom fastglm fastglm
+#' @importFrom stats deviance
+#' @importFrom glmnet glmnet cv.glmnet predict.glmnet
 NULL
 #> NULL
 
 
-# Class and Methods ------------------------------------------------------------
-#' An S4 class to store the three data.frames created with \link{lnt_read}
+#' An S4 class to store the output created with \link{fastcpd}
 #'
-#' This S4 class stores the output from \link{lnt_read}. Just like a spreadsheet
-#' with multiple worksheets, an fastcpd object consist of three data.frames
-#' which you can select using \code{@}. This object class is intended to be an
-#' intermediate container. As it stores articles and paragraphs in two separate
-#' data.frames, nested in an S4 object, the relevant text data is stored twice
-#' in almost the same format. This has the advantage, that there is no need to
-#' use special characters, such as "\\n" to indicate a new paragraph. However,
-#' it makes the files rather big when you save them directly. They should thus
-#' usually be subsetted using \code{@} or converted to a different format using
-#' \link{lnt_convert}.
+#' This S4 class stores the output from \link{fastcpd}. A fastcpd object consist
+#' of several slots including the call to \link{fastcpd}, the data used, the
+#' family of the model, the change points, the cost values, the residuals, the
+#' estimated parameters and a boolean indicating whether the model was fitted
+#' with only change points or with change points and parameters, which you can
+#' select using \code{@}.
 #'
-#' @slot meta The metadata of the articles read in.
-#' @slot articles The article texts and respective IDs.
-#' @slot paragraphs The paragraphs (if the data.frame exists) and respective
-#'   article and paragraph IDs.
+#' @slot call The call to \link{fastcpd}.
+#' @slot data The data used.
+#' @slot family The family of the model.
+#' @slot cp_set The change points.
+#' @slot cost_values The cost values for each segment.
+#' @slot residuals The residuals for each segment.
+#' @slot thetas The estimated parameters for each segment.
+#' @slot cp_only A boolean indicating whether the model was fitted with only
+#'   change points or with change points and parameters.
 #' @name fastcpd
 #' @export
-setClass(
+fastcpd <- setClass(
   "fastcpd",
   representation(
     call = "language",
@@ -48,8 +55,11 @@ setClass(
   )
 )
 
+#' Plot the data and the change points for a \code{fastcpd} object
+#' @param x \code{fastcpd} object.
+#'
 #' @export
-setMethod("plot", signature(x = "fastcpd"), function(x, ...) {
+setMethod("plot", signature(x = "fastcpd"), function(x) {
   y <- x@data[, 1]
   p <- ggplot2::ggplot(data = data.frame(y = y, x = x@data[, -1, drop = FALSE], label = "response"), ggplot2::aes(x = x, y = y)) +
     ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = y)) +
@@ -62,6 +72,9 @@ setMethod("plot", signature(x = "fastcpd"), function(x, ...) {
   invisible()
 })
 
+#' Print the call and the change points for a \code{fastcpd} object
+#' @param x \code{fastcpd} object.
+#'
 #' @export
 setMethod("print", signature(x = "fastcpd"), function(x) {
   cat(
@@ -79,6 +92,9 @@ setMethod("print", signature(x = "fastcpd"), function(x) {
   invisible(x)
 })
 
+#' Show the available methods for a \code{fastcpd} object
+#' @param object \code{fastcpd} object.
+#'
 #' @export
 setMethod("show", signature(object = "fastcpd"), function(object) {
   cat(
@@ -90,6 +106,9 @@ setMethod("show", signature(object = "fastcpd"), function(object) {
   print(object)
 })
 
+#' Show the summary of a \code{fastcpd} object
+#' @param object \code{fastcpd} object.
+#'
 #' @export
 setMethod("summary", signature(object = "fastcpd"), function(object) {
   cat(
