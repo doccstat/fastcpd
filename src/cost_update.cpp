@@ -28,7 +28,7 @@
 //' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 //'   \code{hessian}, and \code{momentum}.
 // [[Rcpp::export]]
-Rcpp::List cost_update_c(
+Rcpp::List cost_update(
     const arma::mat data,
     arma::mat theta_hat,
     arma::mat theta_sum,
