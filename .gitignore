@@ -45,3 +45,4 @@ src/*.so
 src/*.dll
 inst/doc
 vignettes/*.aux
+.vscode/

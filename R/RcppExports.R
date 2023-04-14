@@ -23,11 +23,13 @@
 #' @param winsorise_maxval Maximum value to be winsorised. Only used for
 #'   poisson.
 #' @param lambda Lambda for L1 regularization. Only used for lasso.
+#' @param cost_gradient Gradient for custom cost function.
+#' @param cost_hessian Hessian for custom cost function.
 #'
 #' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 #'   \code{hessian}, and \code{momentum}.
-cost_update_builtin <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda) {
-    .Call(`_fastcpd_cost_update_builtin`, data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda)
+cost_update_c <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian) {
+    .Call(`_fastcpd_cost_update_c`, data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian)
 }
 
 #' Function to calculate the gradient at the current data.
