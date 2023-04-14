@@ -89,7 +89,7 @@ Rcpp::List cost_update(
     }
 
     for (int kk = 1; kk <= Rcpp::as<int>(k(data.n_rows - tau)); kk++) {
-        for (int j = tau + 1; j <= data.n_rows; j++) {
+        for (unsigned j = tau + 1; j <= data.n_rows; j++) {
             if (family == "custom") {
                 Rcpp::NumericMatrix cost_hessian_result = cost_hessian(data.rows(tau, j - 1), theta_hat.col(i - 1));
                 hessian_i += arma::mat(cost_hessian_result.begin(), cost_hessian_result.nrow(), cost_hessian_result.ncol());

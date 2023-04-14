@@ -100,7 +100,7 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
   if (object@family != "custom") {
     cat("Residuals:\n")
     print(structure(
-      zapsmall(quantile(object@residuals)),
+      zapsmall(stats::quantile(object@residuals)),
       names = c("Min", "1Q", "Median", "3Q", "Max")
     ))
     cat("\n")
@@ -136,6 +136,7 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'   poisson.
 #' @param winsorise_maxval Maximum value to be winsorised. Only used for
 #'   poisson.
+#' @param p Number of parameters to be estimated.
 #' @param cost Cost function to be used. If not specified, the default is
 #'   the negative log-likelihood for the corresponding family.
 #' @param cost_gradient Gradient for custom cost function.
@@ -173,8 +174,8 @@ fastcpd <- function(
   match_formula[[1L]] <- quote(stats::model.frame)
   match_formula <- eval(match_formula, parent.frame())
   mt <- attr(match_formula, "terms")
-  y <- model.response(match_formula, "numeric")
-  x <- model.matrix(mt, match_formula)
+  y <- stats::model.response(match_formula, "numeric")
+  x <- stats::model.matrix(mt, match_formula)
   data <- cbind(y, x)
 
   # User provided cost function with explicit expression.
@@ -299,7 +300,7 @@ fastcpd <- function(
       data_segment <- data[segment_indices == segment_index, , drop = FALSE]
       segment_theta <- if (family == "custom") {
         if (p == 1) {
-          optim_result <- optim(
+          optim_result <- stats::optim(
             par = 0,
             fn = function(theta, data) {
               cost(data = data, theta = log(theta / (1 - theta)))
@@ -311,7 +312,7 @@ fastcpd <- function(
           )
           log(optim_result$par / (1 - optim_result$par))
         } else {
-          optim(
+          stats::optim(
             par = rep(0, p),
             fn = cost,
             data = data_segment,
@@ -508,7 +509,7 @@ fastcpd <- function(
       for (i in 1:(length(cp_loc) - 1)) {
         if (family == "custom") {
           if (p == 1) {
-            optim_result <- optim(
+            optim_result <- stats::optim(
               par = 0,
               fn = function(theta, data) {
                 cost(data = data, theta = log(theta / (1 - theta)))
@@ -523,7 +524,7 @@ fastcpd <- function(
               value = exp(optim_result$value) / (1 + exp(optim_result$value))
             )
           } else {
-            cost_result <- optim(
+            cost_result <- stats::optim(
               par = rep(0, p),
               fn = cost,
               data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE],

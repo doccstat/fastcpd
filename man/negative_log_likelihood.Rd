@@ -16,6 +16,8 @@ the parameters.}
 \item{family}{Family of the model.}
 
 \item{lambda}{Lambda for L1 regularization. Only used for lasso.}
+
+\item{cv}{Whether to perform cross-validation to find the best lambda.}
 }
 \value{
 Negative log likelihood of the corresponding data with the given
