@@ -430,7 +430,7 @@ fastcpd <- function(
           (family %in% c("binomial", "poisson") && t - tau >= p) ||
           (family %in% c("lasso", "gaussian") && t - tau >= 3)
         ) {
-          cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta, family, lambda)
+          cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta, family, lambda)$value
         } else if (family == "custom" && t - tau >= 1) {
           cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta)
         }
