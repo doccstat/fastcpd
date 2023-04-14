@@ -324,7 +324,7 @@ fastcpd <- function(
           data = data_segment,
           theta = NULL,
           family = family,
-          lambda = NULL,
+          lambda = 0,
           cv = TRUE
         )$par
       }
