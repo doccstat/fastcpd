@@ -56,6 +56,8 @@ poisson.}
 \item{winsorise_maxval}{Maximum value to be winsorised. Only used for
 poisson.}
 
+\item{p}{Number of parameters to be estimated.}
+
 \item{cost}{Cost function to be used. If not specified, the default is
 the negative log-likelihood for the corresponding family.}
 
