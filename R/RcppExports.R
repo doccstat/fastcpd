@@ -66,7 +66,7 @@ cost_update_hessian <- function(data, theta, family, min_prob) {
 #'
 #' @return Negative log likelihood of the corresponding data with the given
 #'   family.
-negative_log_likelihood_c <- function(data, theta, family, lambda, cv = FALSE) {
-    .Call(`_fastcpd_negative_log_likelihood_c`, data, theta, family, lambda, cv)
+negative_log_likelihood <- function(data, theta, family, lambda, cv = FALSE) {
+    .Call(`_fastcpd_negative_log_likelihood`, data, theta, family, lambda, cv)
 }
 

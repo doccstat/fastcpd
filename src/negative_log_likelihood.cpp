@@ -12,7 +12,7 @@
 //' @return Negative log likelihood of the corresponding data with the given
 //'   family.
 // [[Rcpp::export]]
-Rcpp::List negative_log_likelihood_c(
+Rcpp::List negative_log_likelihood(
     arma::mat data,
     Rcpp::Nullable<arma::colvec> theta,
     std::string family,
