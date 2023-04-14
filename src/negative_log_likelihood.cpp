@@ -21,15 +21,13 @@ Rcpp::List negative_log_likelihood(
     bool cv = false
 ) {
     if (theta.isNull() && family == "lasso" && cv) {
-        Rcpp::Environment glmnet("package:glmnet");
-        Rcpp::Function cv_glmnet = glmnet["cv.glmnet"];
-        Rcpp::Function glmnet_predict = glmnet["predict.glmnet"];
+        Rcpp::Function cv_glmnet("cv.glmnet"), predict_glmnet("predict.glmnet");
         Rcpp::List out = cv_glmnet(
             data.cols(1, data.n_cols - 1),
             data.col(0),
             Rcpp::Named("family") = "gaussian"
         );
-        Rcpp::S4 out_coef = glmnet_predict(
+        Rcpp::S4 out_coef = predict_glmnet(
             out["glmnet.fit"],
             Rcpp::Named("s") = out["lambda.1se"],
             Rcpp::Named("type") = "coefficients",
@@ -44,9 +42,8 @@ Rcpp::List negative_log_likelihood(
         return Rcpp::List::create(Rcpp::Named("par") = par,
                                   Rcpp::Named("value") = R_NilValue);
     } else if (theta.isNull() && family == "lasso" && !cv) {
-        Rcpp::Environment glmnet("package:glmnet"), stats("package:stats");
-        Rcpp::Function glmnet_fit = glmnet["glmnet"], glmnet_predict = glmnet["predict.glmnet"], deviance = stats["deviance"];
-        Rcpp::List out = glmnet_fit(
+        Rcpp::Function glmnet("glmnet"), predict_glmnet("predict.glmnet"), deviance("deviance");
+        Rcpp::List out = glmnet(
             data.cols(1, data.n_cols - 1),
             data.col(0),
             Rcpp::Named("family") = "gaussian",
@@ -60,7 +57,7 @@ Rcpp::List negative_log_likelihood(
             par(par_i(i)) = par_x(i);
         }
         double value = Rcpp::as<double>(deviance(out));
-        arma::vec fitted_values = Rcpp::as<arma::vec>(glmnet_predict(out, data.cols(1, data.n_cols - 1), Rcpp::Named("s") = lambda));
+        arma::vec fitted_values = Rcpp::as<arma::vec>(predict_glmnet(out, data.cols(1, data.n_cols - 1), Rcpp::Named("s") = lambda));
         arma::vec residuals = data.col(0) - fitted_values;
         return Rcpp::List::create(Rcpp::Named("par") = par,
                                   Rcpp::Named("value") = value / 2,
@@ -69,9 +66,8 @@ Rcpp::List negative_log_likelihood(
         // Estimate theta in binomial/poisson/gaussian family
         arma::mat x = data.cols(1, data.n_cols - 1);
         arma::vec y = data.col(0);
-        Rcpp::Environment fastglm("package:fastglm");
-        Rcpp::Function fastglm_fit = fastglm["fastglm"];
-        Rcpp::List out = fastglm_fit(x, y, family);
+        Rcpp::Function fastglm("fastglm");
+        Rcpp::List out = fastglm(x, y, family);
         arma::vec par = Rcpp::as<arma::vec>(out["coefficients"]);
         arma::vec residuals = Rcpp::as<arma::vec>(out["residuals"]);
         double value = out["deviance"];

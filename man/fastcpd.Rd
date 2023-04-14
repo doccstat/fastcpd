@@ -3,8 +3,28 @@
 \docType{package}
 \name{fastcpd}
 \alias{fastcpd}
-\title{fastcpd: A package for computating the notorious bar statistic.}
+\title{fastcpd: A package for finding change points in an efficient way}
 \usage{
+fastcpd(
+  formula = y ~ . - 1,
+  data,
+  beta = NULL,
+  segment_count = 10,
+  trim = 0.025,
+  momentum_coef = 0,
+  k = function(x) 0,
+  family = NULL,
+  epsilon = 1e-10,
+  min_prob = 10^10,
+  winsorise_minval = -20,
+  winsorise_maxval = 20,
+  p = NULL,
+  cost = negative_log_likelihood,
+  cost_gradient = cost_update_gradient,
+  cost_hessian = cost_update_hessian,
+  cp_only = TRUE
+)
+
 fastcpd(
   formula = y ~ . - 1,
   data,
@@ -72,29 +92,37 @@ values for each segment.}
 Change points and corresponding cost values.
 }
 \description{
-The fastcpd package provides three categories of important functions:
-foo, bar and baz.
+The fastcpd package provides a function \code{\link{fastcpd}} to find change
+points in a data set. The function is based on the paper "Sequential Gradient
+Descent and Quasi-Newton’s Method for Change-Point Analysis" by
+Xianyang Zhang and Trisha Dawn.
 
-This S4 class stores the output from \link{lnt_read}. Just like a spreadsheet
-with multiple worksheets, an fastcpd object consist of three data.frames
-which you can select using \code{@}. This object class is intended to be an
-intermediate container. As it stores articles and paragraphs in two separate
-data.frames, nested in an S4 object, the relevant text data is stored twice
-in almost the same format. This has the advantage, that there is no need to
-use special characters, such as "\\n" to indicate a new paragraph. However,
-it makes the files rather big when you save them directly. They should thus
-usually be subsetted using \code{@} or converted to a different format using
-\link{lnt_convert}.
+This S4 class stores the output from \link{fastcpd}. A fastcpd object consist
+of several slots including the call to \link{fastcpd}, the data used, the
+family of the model, the change points, the cost values, the residuals, the
+estimated parameters and a boolean indicating whether the model was fitted
+with only change points or with change points and parameters, which you can
+select using \code{@}.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{meta}}{The metadata of the articles read in.}
+\item{\code{call}}{The call to \link{fastcpd}.}
 
-\item{\code{articles}}{The article texts and respective IDs.}
+\item{\code{data}}{The data used.}
 
-\item{\code{paragraphs}}{The paragraphs (if the data.frame exists) and respective
-article and paragraph IDs.}
+\item{\code{family}}{The family of the model.}
+
+\item{\code{cp_set}}{The change points.}
+
+\item{\code{cost_values}}{The cost values for each segment.}
+
+\item{\code{residuals}}{The residuals for each segment.}
+
+\item{\code{thetas}}{The estimated parameters for each segment.}
+
+\item{\code{cp_only}}{A boolean indicating whether the model was fitted with only
+change points or with change points and parameters.}
 }}
 
 \section{fastcpd functions}{
