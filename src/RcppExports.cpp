@@ -11,9 +11,9 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// cost_update_c
-Rcpp::List cost_update_c(const arma::mat data, arma::mat theta_hat, arma::mat theta_sum, arma::cube hessian, const int tau, const int i, Rcpp::Function k, const std::string family, arma::colvec momentum, const double momentum_coef, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const double lambda, Rcpp::Function cost_gradient, Rcpp::Function cost_hessian);
-RcppExport SEXP _fastcpd_cost_update_c(SEXP dataSEXP, SEXP theta_hatSEXP, SEXP theta_sumSEXP, SEXP hessianSEXP, SEXP tauSEXP, SEXP iSEXP, SEXP kSEXP, SEXP familySEXP, SEXP momentumSEXP, SEXP momentum_coefSEXP, SEXP epsilonSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP lambdaSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP) {
+// cost_update
+Rcpp::List cost_update(const arma::mat data, arma::mat theta_hat, arma::mat theta_sum, arma::cube hessian, const int tau, const int i, Rcpp::Function k, const std::string family, arma::colvec momentum, const double momentum_coef, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const double lambda, Rcpp::Function cost_gradient, Rcpp::Function cost_hessian);
+RcppExport SEXP _fastcpd_cost_update(SEXP dataSEXP, SEXP theta_hatSEXP, SEXP theta_sumSEXP, SEXP hessianSEXP, SEXP tauSEXP, SEXP iSEXP, SEXP kSEXP, SEXP familySEXP, SEXP momentumSEXP, SEXP momentum_coefSEXP, SEXP epsilonSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP lambdaSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -34,7 +34,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< Rcpp::Function >::type cost_gradient(cost_gradientSEXP);
     Rcpp::traits::input_parameter< Rcpp::Function >::type cost_hessian(cost_hessianSEXP);
-    rcpp_result_gen = Rcpp::wrap(cost_update_c(data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian));
+    rcpp_result_gen = Rcpp::wrap(cost_update(data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -65,13 +65,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// negative_log_likelihood_c
+Rcpp::List negative_log_likelihood_c(arma::mat data, Rcpp::Nullable<arma::colvec> theta, std::string family, double lambda, bool cv);
+RcppExport SEXP _fastcpd_negative_log_likelihood_c(SEXP dataSEXP, SEXP thetaSEXP, SEXP familySEXP, SEXP lambdaSEXP, SEXP cvSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<arma::colvec> >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< std::string >::type family(familySEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< bool >::type cv(cvSEXP);
+    rcpp_result_gen = Rcpp::wrap(negative_log_likelihood_c(data, theta, family, lambda, cv));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 RcppExport SEXP run_testthat_tests(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_fastcpd_cost_update_c", (DL_FUNC) &_fastcpd_cost_update_c, 17},
+    {"_fastcpd_cost_update", (DL_FUNC) &_fastcpd_cost_update, 17},
     {"_fastcpd_cost_update_gradient", (DL_FUNC) &_fastcpd_cost_update_gradient, 3},
     {"_fastcpd_cost_update_hessian", (DL_FUNC) &_fastcpd_cost_update_hessian, 4},
+    {"_fastcpd_negative_log_likelihood_c", (DL_FUNC) &_fastcpd_negative_log_likelihood_c, 5},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };

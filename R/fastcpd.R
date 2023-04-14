@@ -392,7 +392,7 @@ fastcpd <- function(
           lambda <- 0
         }
 
-        cost_update_result <- cost_update_c(
+        cost_update_result <- cost_update(
           data = data[seq_len(t), , drop = FALSE],
           theta_hat = theta_hat,
           theta_sum = theta_sum,
