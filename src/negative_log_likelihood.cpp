@@ -20,46 +20,51 @@ Rcpp::List negative_log_likelihood(
     double lambda,
     bool cv = false
 ) {
-    if (theta.isNull() && family == "lasso") {
-        if (cv) {
-            Rcpp::Environment glmnet("package:glmnet");
-            Rcpp::Function cv_glmnet = glmnet["cv.glmnet"];
-            Rcpp::Function predict_glmnet = glmnet["predict.glmnet"];
-            Rcpp::List out = cv_glmnet(
-                data.cols(1, data.n_cols - 1),
-                data.col(0),
-                Rcpp::Named("family") = "gaussian"
-            );
-            Rcpp::S4 out_coef = predict_glmnet(
-                out["glmnet.fit"],
-                Rcpp::Named("s") = out["lambda.1se"],
-                Rcpp::Named("type") = "coefficients",
-                Rcpp::Named("exact") = false
-            );
-            arma::vec glmnet_i = Rcpp::as<arma::vec>(out_coef.slot("i"));
-            arma::vec glmnet_x = Rcpp::as<arma::vec>(out_coef.slot("x"));
-            arma::vec par = arma::zeros(data.n_cols - 1);
-            for (int i = 1; i < glmnet_i.n_elem; i++) {
-                par(glmnet_i(i) - 1) = glmnet_x(i);
-            }
-            return Rcpp::List::create(Rcpp::Named("par") = par,
-                                      Rcpp::Named("value") = R_NilValue);
-        } else {
-            Rcpp::Environment glmnet("package:glmnet");
-            Rcpp::Function glmnet_fit = glmnet["glmnet"];
-            Rcpp::List out = glmnet_fit(
-                data.cols(1, data.n_cols - 1),
-                data.col(0),
-                Rcpp::Named("family") = "gaussian",
-                Rcpp::Named("lambda") = lambda
-            );
-            Rcpp::Function glmnet_predict = glmnet["predict.glmnet"];
-            arma::vec fitted_values = Rcpp::as<arma::vec>(glmnet_predict(out, data.cols(1, data.n_cols - 1), Rcpp::Named("s") = lambda));
-            double value = out["deviance"];
-            return Rcpp::List::create(Rcpp::Named("par") = Rcpp::as<arma::vec>(out["beta"]).col(0),
-                                      Rcpp::Named("value") = value / 2,
-                                      Rcpp::Named("residuals") = data.col(0) - fitted_values);
+    if (theta.isNull() && family == "lasso" && cv) {
+        Rcpp::Environment glmnet("package:glmnet");
+        Rcpp::Function cv_glmnet = glmnet["cv.glmnet"];
+        Rcpp::Function glmnet_predict = glmnet["predict.glmnet"];
+        Rcpp::List out = cv_glmnet(
+            data.cols(1, data.n_cols - 1),
+            data.col(0),
+            Rcpp::Named("family") = "gaussian"
+        );
+        Rcpp::S4 out_coef = glmnet_predict(
+            out["glmnet.fit"],
+            Rcpp::Named("s") = out["lambda.1se"],
+            Rcpp::Named("type") = "coefficients",
+            Rcpp::Named("exact") = false
+        );
+        arma::vec glmnet_i = Rcpp::as<arma::vec>(out_coef.slot("i"));
+        arma::vec glmnet_x = Rcpp::as<arma::vec>(out_coef.slot("x"));
+        arma::vec par = arma::zeros(data.n_cols - 1);
+        for (unsigned int i = 1; i < glmnet_i.n_elem; i++) {
+            par(glmnet_i(i) - 1) = glmnet_x(i);
         }
+        return Rcpp::List::create(Rcpp::Named("par") = par,
+                                  Rcpp::Named("value") = R_NilValue);
+    } else if (theta.isNull() && family == "lasso" && !cv) {
+        Rcpp::Environment glmnet("package:glmnet"), stats("package:stats");
+        Rcpp::Function glmnet_fit = glmnet["glmnet"], glmnet_predict = glmnet["predict.glmnet"], deviance = stats["deviance"];
+        Rcpp::List out = glmnet_fit(
+            data.cols(1, data.n_cols - 1),
+            data.col(0),
+            Rcpp::Named("family") = "gaussian",
+            Rcpp::Named("lambda") = lambda
+        );
+        Rcpp::S4 out_par = out["beta"];
+        arma::vec par_i = Rcpp::as<arma::vec>(out_par.slot("i"));
+        arma::vec par_x = Rcpp::as<arma::vec>(out_par.slot("x"));
+        arma::vec par = arma::zeros(data.n_cols - 1);
+        for (unsigned int i = 0; i < par_i.n_elem; i++) {
+            par(par_i(i)) = par_x(i);
+        }
+        double value = Rcpp::as<double>(deviance(out));
+        arma::vec fitted_values = Rcpp::as<arma::vec>(glmnet_predict(out, data.cols(1, data.n_cols - 1), Rcpp::Named("s") = lambda));
+        arma::vec residuals = data.col(0) - fitted_values;
+        return Rcpp::List::create(Rcpp::Named("par") = par,
+                                  Rcpp::Named("value") = value / 2,
+                                  Rcpp::Named("residuals") = residuals);
     } else if (theta.isNull()) {
         // Estimate theta in binomial/poisson/gaussian family
         arma::mat x = data.cols(1, data.n_cols - 1);
