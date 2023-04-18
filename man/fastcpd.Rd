@@ -24,26 +24,6 @@ fastcpd(
   cost_hessian = cost_update_hessian,
   cp_only = TRUE
 )
-
-fastcpd(
-  formula = y ~ . - 1,
-  data,
-  beta = NULL,
-  segment_count = 10,
-  trim = 0.025,
-  momentum_coef = 0,
-  k = function(x) 0,
-  family = NULL,
-  epsilon = 1e-10,
-  min_prob = 10^10,
-  winsorise_minval = -20,
-  winsorise_maxval = 20,
-  p = NULL,
-  cost = negative_log_likelihood,
-  cost_gradient = cost_update_gradient,
-  cost_hessian = cost_update_hessian,
-  cp_only = TRUE
-)
 }
 \arguments{
 \item{formula}{A symbolic description of the model to be fitted.}
@@ -96,35 +76,7 @@ The fastcpd package provides a function \code{\link{fastcpd}} to find change
 points in a data set. The function is based on the paper "Sequential Gradient
 Descent and Quasi-Newton’s Method for Change-Point Analysis" by
 Xianyang Zhang and Trisha Dawn.
-
-This S4 class stores the output from \link{fastcpd}. A fastcpd object consist
-of several slots including the call to \link{fastcpd}, the data used, the
-family of the model, the change points, the cost values, the residuals, the
-estimated parameters and a boolean indicating whether the model was fitted
-with only change points or with change points and parameters, which you can
-select using \code{@}.
 }
-\section{Slots}{
-
-\describe{
-\item{\code{call}}{The call to \link{fastcpd}.}
-
-\item{\code{data}}{The data used.}
-
-\item{\code{family}}{The family of the model.}
-
-\item{\code{cp_set}}{The change points.}
-
-\item{\code{cost_values}}{The cost values for each segment.}
-
-\item{\code{residuals}}{The residuals for each segment.}
-
-\item{\code{thetas}}{The estimated parameters for each segment.}
-
-\item{\code{cp_only}}{A boolean indicating whether the model was fitted with only
-change points or with change points and parameters.}
-}}
-
 \section{fastcpd functions}{
 
 The fastcpd functions ...

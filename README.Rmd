@@ -23,7 +23,7 @@ options(cli.hyperlink = FALSE)
 
 ## Overview
 
-The fastcpd (__FAST__ __C__hange __P__oint __D__etection) is a fast implmentation
+The fastcpd (**FAST** **C**hange **P**oint **D**etection) is a fast implmentation
 of change point detection methods in R. The __fastcpd__ package is designed to
 find change points in a fast manner. It is easy to install and extensible to
 all kinds of change point problems with a user specified cost function apart

@@ -71,7 +71,7 @@ Rcpp::List fastcpd_vanilla(
 
         cval[r_t_count - 1] = 0;
         arma::vec f_subset(r_t_set.size());
-        for (int i = 0; i < r_t_set.size(); i++) {
+        for (unsigned int i = 0; i < r_t_set.size(); i++) {
             f_subset[i] = f_t[r_t_set[i]];
         }
 
@@ -113,7 +113,7 @@ Rcpp::List fastcpd_vanilla(
     std::sort(cp_set_trimmed.begin(), cp_set_trimmed.end());
 
     std::vector<int> segment_indices;
-    for (int i = 1; i < cp_set_trimmed.size(); i++) {
+    for (unsigned int i = 1; i < cp_set_trimmed.size(); i++) {
         if (cp_set_trimmed[i] - cp_set_trimmed[i - 1] < trim * n) {
             segment_indices.push_back(i - 1);
         }
