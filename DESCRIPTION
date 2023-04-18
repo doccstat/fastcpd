@@ -4,14 +4,16 @@ Title: Fast Change Point Detection Based on Dynamic Programming with Pruning
     with Sequential Gradient Descent
 Version: 0.2.0
 Authors@R: c(
-    person("Xingchi", "Li", email = "anthony.li@stat.tamu.edu", role = c("aut", "cre"),
+    person("Xingchi", "Li", email = "anthony.li@stat.tamu.edu",
+           role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0006-2493-0853")),
-    person("Xianyang", "Zhang", email = "zhangxiany@stat.tamu.edu", role = "aut"))
-Description: Change-Point Detection Based on Dynamic Programming with Pruning
-    with Sequential Gradient Descent based on the paper "Sequential Gradient
-    Descent and Quasi-Newton's Method for Change-Point Analysis" by Xianyang
-    Zhang, Trisha Dawn.
-License: GPL-2
+    person("Xianyang", "Zhang", email = "zhangxiany@stat.tamu.edu",
+           role = c("aut", "cph")))
+Description: Implements fast change point detection algorithm based on the paper
+    "Sequential Gradient Descent and Quasi-Newton's Method for Change-Point
+    Analysis" by Xianyang Zhang, Trisha Dawn
+    <https://proceedings.mlr.press/v206/zhang23b.html>.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: methods, stats, mvtnorm, fastglm, abind, DescTools, glmnet, ggplot2

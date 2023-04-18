@@ -159,8 +159,25 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #' @param cp_only Whether to return only the change points or with the cost
 #'   values for each segment.
 #'
-#' @return Change points and corresponding cost values.
+#' @return A class \code{fastcpd} object.
 #' @export
+#' @examples
+#' library(fastcpd)
+#' # Binomial
+#' x <- matrix(rnorm(1500, 0, 1), ncol = 5)
+#' theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
+#' y <- c(
+#'   rbinom(125, 1, 1 / (1 + exp(-x[1:125, ] %*% theta[1, ]))),
+#'   rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] %*% theta[2, ])))
+#' )
+#' result <- fastcpd(
+#'   formula = y ~ . - 1,
+#'   data = data.frame(y = y, x = x),
+#'   family = "binomial",
+#'   cp_only = FALSE
+#' )
+#' plot(result)
+#' summary(result)
 fastcpd <- function(
   formula = y ~ . - 1,
   data,
