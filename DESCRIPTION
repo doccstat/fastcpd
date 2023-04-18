@@ -21,6 +21,7 @@ Depends: Rcpp
 LinkingTo: Rcpp, RcppArmadillo, testthat
 RoxygenNote: 7.2.3
 Suggests:
+    xml2,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
