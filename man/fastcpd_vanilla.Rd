@@ -2,8 +2,8 @@
 % Please edit documentation in R/RcppExports.R
 \name{fastcpd_vanilla}
 \alias{fastcpd_vanilla}
-\title{Sequential Gradient Descent and Quasi-Newton’s Method for Change-Point
-Analysis}
+\title{Vanilla PELT implementation.
+This function is not meant to be called directly by the user.}
 \usage{
 fastcpd_vanilla(
   data,
@@ -63,6 +63,6 @@ values for each segment.}
 Change points and corresponding cost values.
 }
 \description{
-Sequential Gradient Descent and Quasi-Newton’s Method for Change-Point
-Analysis
+Vanilla PELT implementation.
+This function is not meant to be called directly by the user.
 }

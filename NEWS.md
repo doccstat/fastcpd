@@ -1,3 +1,8 @@
+# fastcpd 0.2.2
+
+* Add more examples to illustrate the use of the `fastcpd` function.
+* Indicating internal functions so that the users should not use them.
+
 # fastcpd 0.2.1
 
 * Add more examples to the README.

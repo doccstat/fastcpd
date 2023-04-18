@@ -2,7 +2,8 @@
 % Please edit documentation in R/RcppExports.R
 \name{cost_update_hessian}
 \alias{cost_update_hessian}
-\title{Function to calculate the Hessian matrix at the current data.}
+\title{Function to calculate the Hessian matrix at the current data.
+This function is not meant to be called directly by the user.}
 \usage{
 cost_update_hessian(data, theta, family, min_prob)
 }
@@ -20,4 +21,5 @@ Hessian at the current data.
 }
 \description{
 Function to calculate the Hessian matrix at the current data.
+This function is not meant to be called directly by the user.
 }

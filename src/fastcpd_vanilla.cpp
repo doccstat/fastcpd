@@ -1,7 +1,7 @@
 #include "fastcpd.h"
 
-//' Sequential Gradient Descent and Quasi-Newton’s Method for Change-Point
-//' Analysis
+//' Vanilla PELT implementation.
+//' This function is not meant to be called directly by the user.
 //'
 //' @param data A data frame containing the data to be segmented.
 //' @param beta Initial cost value.
