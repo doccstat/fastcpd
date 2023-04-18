@@ -6,6 +6,7 @@
 //' @param data A data frame containing the data to be segmented.
 //' @param theta Estimated theta from the previous iteration.
 //' @param family Family of the model.
+//' @keywords internal
 //'
 //' @return Gradient at the current data.
 // [[Rcpp::export]]

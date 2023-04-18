@@ -5,8 +5,10 @@
 #' Descent and Quasi-Newton’s Method for Change-Point Analysis" by
 #' Xianyang Zhang and Trisha Dawn.
 #'
-#' @section fastcpd functions:
-#' The fastcpd functions ...
+#' @section CITATION:
+#' Zhang, Xianyang, and Trisha Dawn.
+#' "Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis."
+#' arXiv preprint arXiv:2210.12235 (2022).
 #'
 #' @docType package
 #' @name fastcpd

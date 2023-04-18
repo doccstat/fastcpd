@@ -73,3 +73,4 @@ A list containing new values of \code{theta_hat}, \code{theta_sum},
 Update the cost values for the segmentation.
 This function is not meant to be called directly by the user.
 }
+\keyword{internal}

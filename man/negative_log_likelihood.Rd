@@ -29,3 +29,4 @@ Solve logistic/poisson regression using Gradient Descent Extension to the
 multivariate case
 This function is not meant to be called directly by the user.
 }
+\keyword{internal}

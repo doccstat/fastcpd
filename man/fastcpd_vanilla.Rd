@@ -66,3 +66,4 @@ Change points and corresponding cost values.
 Vanilla PELT implementation.
 This function is not meant to be called directly by the user.
 }
+\keyword{internal}

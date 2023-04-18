@@ -7,6 +7,7 @@
 //' @param theta Estimated theta from the previous iteration.
 //' @param family Family of the model.
 //' @param min_prob Minimum probability to avoid numerical issues.
+//' @keywords internal
 //'
 //' @return Hessian at the current data.
 // [[Rcpp::export]]

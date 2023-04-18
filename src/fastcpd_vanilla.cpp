@@ -25,6 +25,7 @@
 //'   the negative log-likelihood for the corresponding family.
 //' @param cp_only Whether to return only the change points or with the cost
 //'   values for each segment.
+//' @keywords internal
 //'
 //' @return Change points and corresponding cost values.
 // [[Rcpp::export]]
