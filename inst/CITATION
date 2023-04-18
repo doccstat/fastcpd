@@ -1,0 +1,16 @@
+bibentry(
+  "InProceedings",
+  title = "Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis",
+  author = "Xianyang Zhang, Trisha Dawn",
+  year = 2023,
+  booktitle = 	 {Proceedings of The 26th International Conference on Artificial Intelligence and Statistics},
+  volume = 206,
+  pages = 	 {1129--1143},
+  editor = 	 {Ruiz, Francisco and Dy, Jennifer and van de Meent, Jan-Willem},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {25--27 Apr},
+  publisher =    {PMLR},
+  pdf = 	 {https://proceedings.mlr.press/v206/zhang23b/zhang23b.pdf},
+  url = 	 {https://proceedings.mlr.press/v206/zhang23b.html},
+  abstract = 	 {One common approach to detecting change-points is minimizing a cost function over possible numbers and locations of change-points. The framework includes several well-established procedures, such as the penalized likelihood and minimum description length. Such an approach requires finding the cost value repeatedly over different segments of the data set, which can be time-consuming when (i) the data sequence is long and (ii) obtaining the cost value involves solving a non-trivial optimization problem. This paper introduces a new sequential updating method (SE) to find the cost value effectively. The core idea is to update the cost value using the information from previous steps without re-optimizing the objective function. The new method is applied to change-point detection in generalized linear models and penalized regression. Numerical studies show that the new approach can be orders of magnitude faster than the Pruned Exact Linear Time (PELT) method without sacrificing estimation accuracy.}
+)
