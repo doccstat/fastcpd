@@ -65,6 +65,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// fastcpd_vanilla
+Rcpp::List fastcpd_vanilla(arma::mat data, double beta, double segment_count, double trim, double momentum_coef, Rcpp::Function k, std::string family, double epsilon, double min_prob, double winsorise_minval, double winsorise_maxval, double p, Rcpp::Function cost, bool cp_only);
+RcppExport SEXP _fastcpd_fastcpd_vanilla(SEXP dataSEXP, SEXP betaSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP kSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP pSEXP, SEXP costSEXP, SEXP cp_onlySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< double >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< double >::type segment_count(segment_countSEXP);
+    Rcpp::traits::input_parameter< double >::type trim(trimSEXP);
+    Rcpp::traits::input_parameter< double >::type momentum_coef(momentum_coefSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Function >::type k(kSEXP);
+    Rcpp::traits::input_parameter< std::string >::type family(familySEXP);
+    Rcpp::traits::input_parameter< double >::type epsilon(epsilonSEXP);
+    Rcpp::traits::input_parameter< double >::type min_prob(min_probSEXP);
+    Rcpp::traits::input_parameter< double >::type winsorise_minval(winsorise_minvalSEXP);
+    Rcpp::traits::input_parameter< double >::type winsorise_maxval(winsorise_maxvalSEXP);
+    Rcpp::traits::input_parameter< double >::type p(pSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Function >::type cost(costSEXP);
+    Rcpp::traits::input_parameter< bool >::type cp_only(cp_onlySEXP);
+    rcpp_result_gen = Rcpp::wrap(fastcpd_vanilla(data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only));
+    return rcpp_result_gen;
+END_RCPP
+}
 // negative_log_likelihood
 Rcpp::List negative_log_likelihood(arma::mat data, Rcpp::Nullable<arma::colvec> theta, std::string family, double lambda, bool cv);
 RcppExport SEXP _fastcpd_negative_log_likelihood(SEXP dataSEXP, SEXP thetaSEXP, SEXP familySEXP, SEXP lambdaSEXP, SEXP cvSEXP) {
@@ -87,6 +111,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_fastcpd_cost_update", (DL_FUNC) &_fastcpd_cost_update, 17},
     {"_fastcpd_cost_update_gradient", (DL_FUNC) &_fastcpd_cost_update_gradient, 3},
     {"_fastcpd_cost_update_hessian", (DL_FUNC) &_fastcpd_cost_update_hessian, 4},
+    {"_fastcpd_fastcpd_vanilla", (DL_FUNC) &_fastcpd_fastcpd_vanilla, 14},
     {"_fastcpd_negative_log_likelihood", (DL_FUNC) &_fastcpd_negative_log_likelihood, 5},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}

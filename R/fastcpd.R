@@ -13,10 +13,6 @@
 #' @useDynLib fastcpd, .registration = TRUE
 #' @importFrom Rcpp evalCpp
 #' @importFrom methods show
-#' @importFrom DescTools Winsorize
-#' @importFrom fastglm fastglm
-#' @importFrom stats deviance
-#' @importFrom glmnet glmnet cv.glmnet predict.glmnet
 NULL
 #> NULL
 
@@ -208,6 +204,11 @@ fastcpd <- function(
       beta <- (p + 1) * log(nrow(data)) / 2
     }
 
+    # fastcpd_vanilla(
+    #   data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
+    #   min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only
+    # )
+
     # After t = 1, the r_t_set R_t contains 0 and 1.
     r_t_set <- c(0, 1)
     # C(0)=NULL, C(1)={0}
@@ -237,6 +238,12 @@ fastcpd <- function(
 
       # Step 4
       cp_set[[t + 1]] <- c(cp_set[[tau_star + 1]], tau_star)
+      # print(cp_set[[t + 1]])
+      # print(cval)
+      # print(f_t[r_t_set + 1])
+      # print(obj)
+      # print(min_val)
+      # print((cval + f_t[r_t_set + 1]) <= min_val)
 
       # Step 5
       pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
