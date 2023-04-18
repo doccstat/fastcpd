@@ -10,7 +10,6 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 options(cli.hyperlink = FALSE)
-set.seed(1)
 ```
 
 # fastcpd
