@@ -63,14 +63,11 @@ part:
 - [ggplot2](https://github.com/tidyverse/ggplot2), for data
   visualization.
 
-### Binomial
+### Linear regression
+
+### Logistic regression
 
 ``` r
-# TODO: examples in roxygen docs and multivariate custom cost functions, pkgdown references
-
-# Linear regression
-
-# Logistic regression
 library(fastcpd)
 set.seed(1)
 x <- matrix(rnorm(1500, 0, 1), ncol = 5)
@@ -97,8 +94,11 @@ summary(result)
 #>
 #> Change points:
 #> 126
+```
 
-# Poisson regression
+### Poisson regression
+
+``` r
 library(fastcpd)
 set.seed(1)
 x <- matrix(rnorm(1500, 0, 1), ncol = 5)
@@ -115,10 +115,13 @@ result <- fastcpd(
 )
 plot(result)
 summary(result)
+```
 
-# Penalized linear regression
+### Penalized linear regression
 
-# Custom cost function: mean shift
+### Custom cost function: mean shift
+
+``` r
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -150,8 +153,11 @@ mean_loss_result <- fastcpd(
 )
 
 summary(mean_loss_result)
+```
 
-# Custom cost function: variance change
+### Custom cost function: variance change
+
+``` r
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -176,8 +182,11 @@ var_loss_result <- fastcpd(
 )
 
 summary(var_loss_result)
+```
 
-# Custom cost function: mean shift and variance change
+### Custom cost function: mean shift and variance change
+
+``` r
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -203,8 +212,11 @@ meanvar_loss_result <- fastcpd(
 )
 
 summary(meanvar_loss_result)
+```
 
-# Custom cost function: Huber loss
+### Custom cost function: Huber loss
+
+``` r
 library(fastcpd)
 set.seed(1)
 n <- 400 + 300 + 400
@@ -262,3 +274,8 @@ huber_regression_result <- fastcpd(
 
 summary(huber_regression_result)
 ```
+
+## TODO
+
+- examples in roxygen docs and multivariate custom cost functions,
+  pkgdown references

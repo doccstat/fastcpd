@@ -59,14 +59,15 @@ If you're compiling from source, you can run `pak::pkg_system_requirements("fast
 * [glmnet](https://glmnet.stanford.edu/), for penalized regression.
 * [ggplot2](https://github.com/tidyverse/ggplot2), for data visualization.
 
-### Binomial
+### Linear regression
 
-```{r binomial, eval = FALSE}
-# TODO: examples in roxygen docs and multivariate custom cost functions, pkgdown references
+```{r linear regression, eval = FALSE}
 
-# Linear regression
+```
 
-# Logistic regression
+### Logistic regression
+
+```{r logistic regression, eval = FALSE}
 library(fastcpd)
 set.seed(1)
 x <- matrix(rnorm(1500, 0, 1), ncol = 5)
@@ -93,8 +94,11 @@ summary(result)
 #>
 #> Change points:
 #> 126
+```
 
-# Poisson regression
+### Poisson regression
+
+```{r poisson regression, eval = FALSE}
 library(fastcpd)
 set.seed(1)
 x <- matrix(rnorm(1500, 0, 1), ncol = 5)
@@ -111,10 +115,17 @@ result <- fastcpd(
 )
 plot(result)
 summary(result)
+```
 
-# Penalized linear regression
+### Penalized linear regression
 
-# Custom cost function: mean shift
+```{r penalized linear regression, eval = FALSE}
+
+```
+
+### Custom cost function: mean shift
+
+```{r custom cost function: mean shift, eval = FALSE}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -146,8 +157,11 @@ mean_loss_result <- fastcpd(
 )
 
 summary(mean_loss_result)
+```
 
-# Custom cost function: variance change
+### Custom cost function: variance change
+
+```{r custom cost function: variance change, eval = FALSE}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -172,8 +186,11 @@ var_loss_result <- fastcpd(
 )
 
 summary(var_loss_result)
+```
 
-# Custom cost function: mean shift and variance change
+### Custom cost function: mean shift and variance change
+
+```{r custom cost function: mean shift and variance change, eval = FALSE}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -199,8 +216,11 @@ meanvar_loss_result <- fastcpd(
 )
 
 summary(meanvar_loss_result)
+```
 
-# Custom cost function: Huber loss
+### Custom cost function: Huber loss
+
+```{r custom cost function: Huber loss, eval = FALSE}
 library(fastcpd)
 set.seed(1)
 n <- 400 + 300 + 400
@@ -258,3 +278,7 @@ huber_regression_result <- fastcpd(
 
 summary(huber_regression_result)
 ```
+
+## TODO
+
+* examples in roxygen docs and multivariate custom cost functions, pkgdown references
