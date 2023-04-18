@@ -16,12 +16,11 @@ Commit](https://img.shields.io/github/last-commit/doccstat/fastcpd)](https://git
 
 ## Overview
 
-The fastcpd (**FAST** \_\_C\_\_hange \_\_P\_\_oint \_\_D\_\_etection) is
-a fast implmentation of change point detection methods in R. The
-**fastcpd** package is designed to find change points in a fast manner.
-It is easy to install and extensible to all kinds of change point
-problems with a user specified cost function apart from the built-in
-cost functions.
+The fastcpd (**FAST** **C**hange **P**oint **D**etection) is a fast
+implmentation of change point detection methods in R. The **fastcpd**
+package is designed to find change points in a fast manner. It is easy
+to install and extensible to all kinds of change point problems with a
+user specified cost function apart from the built-in cost functions.
 
 If you’d like to learn how to use the fastcpd effectively, please refer
 to the following references:
