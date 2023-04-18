@@ -139,7 +139,12 @@ y <- c(
   rbinom(125, 1, 1 / (1 + exp(-x[1:125, ] \%*\% theta[1, ]))),
   rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] \%*\% theta[2, ])))
 )
-result <- fastcpd(y ~ . - 1, data.frame(y = y, x = x), family = "binomial")
+result <- fastcpd(
+  formula = y ~ . - 1,
+  data = data.frame(y = y, x = x),
+  family = "binomial",
+  cp_only = FALSE
+)
 plot(result)
 summary(result)
 }
