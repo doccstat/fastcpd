@@ -3,3 +3,4 @@
 ^\.vscode$
 ^cran-comments\.md$
 ^LICENSE\.md$
+^\.github$
