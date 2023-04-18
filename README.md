@@ -18,24 +18,16 @@ If you'd like to learn how to use the fastcpd effectively, please refer to the f
 
 ## Installation
 
-::: .pkgdown-release
-
 ``` {.r}
 # Install from CRAN, (not yet available)
 install.packages("fastcpd")
 ```
-
-:::
-
-::: .pkgdown-devel
 
 ``` {.r}
 # Install the development version from GitHub
 # install.packages("pak")
 pak::pak("doccstat/fastcpd")
 ```
-
-:::
 
 If you're compiling from source, you can run `pak::pkg_system_requirements("fastcpd")`, to see the complete set of system packages needed on your machine.
 
