@@ -21,3 +21,4 @@ Gradient at the current data.
 Function to calculate the gradient at the current data.
 This function is not meant to be called directly by the user.
 }
+\keyword{internal}

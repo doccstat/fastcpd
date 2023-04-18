@@ -26,6 +26,7 @@
 #' @param lambda Lambda for L1 regularization. Only used for lasso.
 #' @param cost_gradient Gradient for custom cost function.
 #' @param cost_hessian Hessian for custom cost function.
+#' @keywords internal
 #'
 #' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 #'   \code{hessian}, and \code{momentum}.
@@ -39,6 +40,7 @@ cost_update <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, 
 #' @param data A data frame containing the data to be segmented.
 #' @param theta Estimated theta from the previous iteration.
 #' @param family Family of the model.
+#' @keywords internal
 #'
 #' @return Gradient at the current data.
 cost_update_gradient <- function(data, theta, family) {
@@ -52,6 +54,7 @@ cost_update_gradient <- function(data, theta, family) {
 #' @param theta Estimated theta from the previous iteration.
 #' @param family Family of the model.
 #' @param min_prob Minimum probability to avoid numerical issues.
+#' @keywords internal
 #'
 #' @return Hessian at the current data.
 cost_update_hessian <- function(data, theta, family, min_prob) {
@@ -83,6 +86,7 @@ cost_update_hessian <- function(data, theta, family, min_prob) {
 #'   the negative log-likelihood for the corresponding family.
 #' @param cp_only Whether to return only the change points or with the cost
 #'   values for each segment.
+#' @keywords internal
 #'
 #' @return Change points and corresponding cost values.
 fastcpd_vanilla <- function(data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only) {
@@ -99,6 +103,7 @@ fastcpd_vanilla <- function(data, beta, segment_count, trim, momentum_coef, k, f
 #' @param family Family of the model.
 #' @param lambda Lambda for L1 regularization. Only used for lasso.
 #' @param cv Whether to perform cross-validation to find the best lambda.
+#' @keywords internal
 #'
 #' @return Negative log likelihood of the corresponding data with the given
 #'   family.

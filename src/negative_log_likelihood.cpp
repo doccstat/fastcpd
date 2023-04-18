@@ -10,6 +10,7 @@
 //' @param family Family of the model.
 //' @param lambda Lambda for L1 regularization. Only used for lasso.
 //' @param cv Whether to perform cross-validation to find the best lambda.
+//' @keywords internal
 //'
 //' @return Negative log likelihood of the corresponding data with the given
 //'   family.
