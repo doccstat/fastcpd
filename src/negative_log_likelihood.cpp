@@ -21,7 +21,8 @@ Rcpp::List negative_log_likelihood(
     bool cv = false
 ) {
     if (theta.isNull() && family == "lasso" && cv) {
-        Rcpp::Function cv_glmnet("cv.glmnet"), predict_glmnet("predict.glmnet");
+        Rcpp::Environment glmnet = Rcpp::Environment::namespace_env("glmnet");
+        Rcpp::Function cv_glmnet = glmnet["cv.glmnet"], predict_glmnet = glmnet["predict.glmnet"];
         Rcpp::List out = cv_glmnet(
             data.cols(1, data.n_cols - 1),
             data.col(0),
@@ -42,8 +43,9 @@ Rcpp::List negative_log_likelihood(
         return Rcpp::List::create(Rcpp::Named("par") = par,
                                   Rcpp::Named("value") = R_NilValue);
     } else if (theta.isNull() && family == "lasso" && !cv) {
-        Rcpp::Function glmnet("glmnet"), predict_glmnet("predict.glmnet"), deviance("deviance");
-        Rcpp::List out = glmnet(
+        Rcpp::Environment stats = Rcpp::Environment::namespace_env("stats"), glmnet = Rcpp::Environment::namespace_env("glmnet");
+        Rcpp::Function deviance = stats["deviance"], glmnet_ = glmnet["glmnet"], predict_glmnet = glmnet["predict.glmnet"];
+        Rcpp::List out = glmnet_(
             data.cols(1, data.n_cols - 1),
             data.col(0),
             Rcpp::Named("family") = "gaussian",
@@ -66,8 +68,9 @@ Rcpp::List negative_log_likelihood(
         // Estimate theta in binomial/poisson/gaussian family
         arma::mat x = data.cols(1, data.n_cols - 1);
         arma::vec y = data.col(0);
-        Rcpp::Function fastglm("fastglm");
-        Rcpp::List out = fastglm(x, y, family);
+        Rcpp::Environment fastglm = Rcpp::Environment::namespace_env("fastglm");
+        Rcpp::Function fastglm_ = fastglm["fastglm"];
+        Rcpp::List out = fastglm_(x, y, family);
         arma::vec par = Rcpp::as<arma::vec>(out["coefficients"]);
         arma::vec residuals = Rcpp::as<arma::vec>(out["residuals"]);
         double value = out["deviance"];

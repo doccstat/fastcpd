@@ -73,7 +73,8 @@ Rcpp::List cost_update(
 
     // Winsorize if family is Poisson
     if (family == "poisson") {
-        Rcpp::Function winsorize("Winsorize");
+        Rcpp::Environment desc_tools = Rcpp::Environment::namespace_env("DescTools");
+        Rcpp::Function winsorize = desc_tools["Winsorize"];
         Rcpp::NumericVector winsorize_result = winsorize(
             Rcpp::_["x"] = theta_hat.col(i - 1),
             Rcpp::_["minval"] = winsorise_minval,
@@ -106,7 +107,8 @@ Rcpp::List cost_update(
 
             // Winsorize if family is Poisson
             if (family == "poisson") {
-                Rcpp::Function winsorize("Winsorize");
+                Rcpp::Environment desc_tools = Rcpp::Environment::namespace_env("DescTools");
+                Rcpp::Function winsorize = desc_tools["Winsorize"];
                 Rcpp::NumericVector winsorize_result = winsorize(
                     Rcpp::_["x"] = theta_hat.col(i - 1),
                     Rcpp::_["minval"] = winsorise_minval,
