@@ -57,11 +57,16 @@ setClass(
 #' @export
 setMethod("plot", signature(x = "fastcpd"), function(x) {
   y <- x@data[, 1]
-  p <- ggplot2::ggplot(data = data.frame(y = y, x = x@data[, -1, drop = FALSE], label = "response"), ggplot2::aes(x = x, y = y)) +
+  p <- ggplot2::ggplot(data = data.frame(y = y,
+                                         x = x@data[, -1, drop = FALSE],
+                                         label = "response"),
+                       ggplot2::aes(x = x, y = y)) +
     ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = y)) +
     ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
   if (x@family != "custom" && !x@cp_only) {
-    p <- p + ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = x@residuals, label = "residual")) +
+    p <- p + ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)),
+                                                   y = x@residuals,
+                                                   label = "residual")) +
       ggplot2::facet_wrap(c("label"), ncol = 1, scales = "free_y")
   }
   print(p)
@@ -112,14 +117,14 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
     paste(deparse(object@call), sep = "\n", collapse = "\n"), "\n\n",
     sep = ""
   )
-  if (object@family != "custom") {
-    cat("Residuals:\n")
-    print(structure(
-      zapsmall(stats::quantile(object@residuals)),
-      names = c("Min", "1Q", "Median", "3Q", "Max")
-    ))
-    cat("\n")
-  }
+  # if (object@family != "custom") {
+  #   cat("Residuals:\n")
+  #   print(structure(
+  #     zapsmall(stats::quantile(object@residuals)),
+  #     names = c("Min", "1Q", "Median", "3Q", "Max")
+  #   ))
+  #   cat("\n")
+  # }
   if (length(object@cp_set)) {
     cat("Change points:\n")
     cat(object@cp_set, "\n")
@@ -179,23 +184,56 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #' )
 #' plot(result)
 #' summary(result)
+#' #> Call:
+#' #> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),
+#' #>     family = "binomial", cp_only = FALSE)
+#' #>
+#' #> Residuals:
+#' #>       Min        1Q    Median        3Q       Max
+#' #> -14.09576  -1.07218  -1.00000   1.07353  35.39472
+#' #>
+#' #> Change points:
+#' #> 126
+#'
 #' # Poisson regression
 #' library(fastcpd)
 #' set.seed(1)
-#' x <- matrix(rnorm(1500, 0, 1), ncol = 5)
-#' theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
+#' p <- 3
+#' x <- mvtnorm::rmvnorm(1500, rep(0, p), diag(p))
+#' delta <- rnorm(p)
+#' theta_0 <- c(1, 1.2, -1)
 #' y <- c(
-#'   rpois(125, exp(x[1:125, ] %*% theta[1, ])),
-#'   rpois(175, exp(x[126:300, ] %*% theta[2, ]))
+#'   rpois(300, exp(x[1:300, ] %*% theta_0)),
+#'   rpois(400, exp(x[301:700, ] %*% (theta_0 + delta))),
+#'   rpois(300, exp(x[701:1000, ] %*% theta_0)),
+#'   rpois(100, exp(x[1001:1100, ] %*% (theta_0 - delta))),
+#'   rpois(200, exp(x[1101:1300, ] %*% theta_0)),
+#'   rpois(200, exp(x[1301:1500, ] %*% (theta_0 + delta)))
 #' )
 #' result <- fastcpd(
 #'   formula = y ~ . - 1,
 #'   data = data.frame(y = y, x = x),
+#'   beta = (p + 1) * log(1500) / 2,
+#'   k = function(x) 0,
 #'   family = "poisson",
+#'   epsilon = 1e-5,
 #'   cp_only = FALSE
 #' )
 #' plot(result)
 #' summary(result)
+#' #> Call:
+#' #> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),
+#' #>     beta = (p + 1) * log(1500)/2, k = function(x) 0, family = "poisson",
+#' #>     epsilon = 1e-05, cp_only = FALSE)
+#' #>
+#' #> Residuals:
+#' #>       Min        1Q    Median        3Q       Max
+#' #>   -1.0000   -1.0000   -0.5785    0.3564 1793.2299
+#' #>
+#' #> Change points:
+#' #> 329 728 1021 1107 1325
+#'
+#' # Custom cost function: mean shift
 #' library(fastcpd)
 #' set.seed(1)
 #' p <- 1
@@ -204,20 +242,21 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'   mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
 #'   mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
 #' )
-#'
 #' segment_count_guess <- 10
 #' block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
 #' block_count <- ceiling(nrow(data) / block_size)
 #' data_all_vars <- rep(0, block_count)
 #' for (block_index in seq_len(block_count)) {
-#'   data_all_vars[block_index] <- var(data[((block_index - 1) * block_size + 1):(min(block_index * block_size, nrow(data))), , drop = FALSE])
+#'   block_start <- (block_index - 1) * block_size + 1
+#'   block_end <- min(block_index * block_size, nrow(data))
+#'   data_all_vars[block_index] <- var(data[block_start:block_end, ])
 #' }
 #' data_all_var <- mean(data_all_vars)
-#'
 #' mean_loss <- function(data) {
-#'   (norm(data, type = "F") ^ 2 - colSums(data) ^ 2 / nrow(data)) / 2 / data_all_var + nrow(data) / 2 * (log(data_all_var) + log(2 * pi))
+#'   n <- nrow(data)
+#'   (norm(data, type = "F") ^ 2 - colSums(data) ^ 2 / n) / 2 / data_all_var +
+#'     n / 2 * (log(data_all_var) + log(2 * pi))
 #' }
-#'
 #' mean_loss_result <- fastcpd(
 #'   formula = ~ . - 1,
 #'   data = data.frame(data),
@@ -225,8 +264,15 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'   p = p,
 #'   cost = mean_loss
 #' )
-#'
 #' summary(mean_loss_result)
+#' #> Call:
+#' #> fastcpd(formula = ~. - 1, data = data.frame(data), beta = (p +
+#' #>     1) * log(nrow(data))/2, p = p, cost = mean_loss)
+#' #>
+#' #> Change points:
+#' #> 300 700
+#'
+#' # Custom cost function: variance change
 #' library(fastcpd)
 #' set.seed(1)
 #' p <- 1
@@ -236,12 +282,10 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
 #' )
 #' data_all_mu <- colMeans(data)
-#'
 #' var_loss <- function(data) {
 #'   demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
 #'   nrow(data) * (1 + log(2 * pi) + log(demeaned_data_norm ^ 2 / nrow(data))) / 2
 #' }
-#'
 #' var_loss_result <- fastcpd(
 #'   formula = ~ . - 1,
 #'   data = data,
@@ -249,8 +293,15 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'   p = p,
 #'   cost = var_loss
 #' )
-#'
 #' summary(var_loss_result)
+#' #> Call:
+#' #> fastcpd(formula = ~. - 1, data = data, beta = (p + 1) * log(nrow(data))/2,
+#' #>     p = p, cost = var_loss)
+#' #>
+#' #> Change points:
+#' #> 300 699
+#'
+#' # Custom cost function: mean shift and variance change
 #' library(fastcpd)
 #' set.seed(1)
 #' p <- 1
@@ -262,11 +313,10 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
 #'   mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
 #' )
-#'
 #' meanvar_loss <- function(data) {
-#'   nrow(data) * (1 + log(2 * pi) + log((colSums(data ^ 2) - colSums(data) ^ 2 / nrow(data)) / nrow(data))) / 2
+#'   loss_part <- (colSums(data ^ 2) - colSums(data) ^ 2 / nrow(data)) / nrow(data)
+#'   nrow(data) * (1 + log(2 * pi) + log(loss_part)) / 2
 #' }
-#'
 #' meanvar_loss_result <- fastcpd(
 #'   formula = ~ . - 1,
 #'   data = data,
@@ -274,36 +324,44 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'   p = 2 * p,
 #'   cost = meanvar_loss
 #' )
-#'
 #' summary(meanvar_loss_result)
+#' #> Call:
+#' #> fastcpd(formula = ~. - 1, data = data, beta = (2 * p + 1) * log(nrow(data))/2,
+#' #>     p = 2 * p, cost = meanvar_loss)
+#' #>
+#' #> Change points:
+#' #> 300 700 1000 1300 1700
+#'
+#' # Custom cost function: Huber loss
 #' library(fastcpd)
 #' set.seed(1)
-#' n <- 400 + 300 + 400
-#' p <- 3
+#' n <- 500 + 700 + 500
+#' p <- 8
 #' x <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(p))
 #' theta <- rbind(
-#'   mvtnorm::rmvnorm(1, mean = rep(0, p), sigma = diag(p)),
-#'   mvtnorm::rmvnorm(1, mean = rep(3, p), sigma = diag(p)),
-#'   mvtnorm::rmvnorm(1, mean = rep(5, p), sigma = diag(p))
+#'   mvtnorm::rmvnorm(1, mean = rep(0, p - 3), sigma = diag(p - 3)),
+#'   mvtnorm::rmvnorm(1, mean = rep(5, p - 3), sigma = diag(p - 3)),
+#'   mvtnorm::rmvnorm(1, mean = rep(9, p - 3), sigma = diag(p - 3))
 #' )
-#' theta <- theta[rep(seq_len(3), c(400, 300, 400)), ]
+#' theta <- cbind(theta, matrix(0, 3, 3))
+#' theta <- theta[rep(seq_len(3), c(500, 700, 500)), ]
 #' y_true <- rowSums(x * theta)
 #' factor <- c(
-#'   2 * stats::rbinom(400, size = 1, prob = 0.95) - 1,
-#'   2 * stats::rbinom(300, size = 1, prob = 0.95) - 1,
-#'   2 * stats::rbinom(400, size = 1, prob = 0.95) - 1
+#'   2 * stats::rbinom(500, size = 1, prob = 0.95) - 1,
+#'   2 * stats::rbinom(700, size = 1, prob = 0.95) - 1,
+#'   2 * stats::rbinom(500, size = 1, prob = 0.95) - 1
 #' )
 #' y <- factor * y_true + stats::rnorm(n)
 #' data <- cbind.data.frame(y, x)
-#'
 #' huber_threshold <- 1
-#'
 #' huber_loss <- function(data, theta) {
 #'   residual <- data[, 1] - data[, -1, drop = FALSE] %*% theta
 #'   indicator <- abs(residual) <= huber_threshold
-#'   sum(residual ^ 2 / 2 * indicator + huber_threshold * (abs(residual) - huber_threshold / 2) * (1 - indicator))
+#'   sum(
+#'     residual ^ 2 / 2 * indicator +
+#'     huber_threshold * (abs(residual) - huber_threshold / 2) * (1 - indicator)
+#'   )
 #' }
-#'
 #' huber_loss_gradient <- function(data, theta) {
 #'   residual <- c(data[nrow(data), 1] - data[nrow(data), -1] %*% theta)
 #'   if (abs(residual) <= huber_threshold) {
@@ -312,7 +370,6 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'     - huber_threshold * sign(residual) * data[nrow(data), -1]
 #'   }
 #' }
-#'
 #' huber_loss_hessian <- function(data, theta) {
 #'   residual <- c(data[nrow(data), 1] - data[nrow(data), -1] %*% theta)
 #'   if (abs(residual) <= huber_threshold) {
@@ -321,7 +378,6 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'     0.01 * diag(length(theta))
 #'   }
 #' }
-#'
 #' huber_regression_result <- fastcpd(
 #'   formula = y ~ . - 1,
 #'   data = data,
@@ -330,8 +386,13 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'   cost_gradient = huber_loss_gradient,
 #'   cost_hessian = huber_loss_hessian
 #' )
-#'
 #' summary(huber_regression_result)
+#' #> Call:
+#' #> fastcpd(formula = y ~ . - 1, data = data, beta = (p + 1) * log(n)/2,
+#' #>     cost = huber_loss, cost_gradient = huber_loss_gradient, cost_hessian = huber_loss_hessian)
+#' #>
+#' #> Change points:
+#' #> 575 1215 1395
 fastcpd <- function(
   formula = y ~ . - 1,
   data,

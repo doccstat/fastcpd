@@ -3,7 +3,8 @@
 \name{negative_log_likelihood}
 \alias{negative_log_likelihood}
 \title{Solve logistic/poisson regression using Gradient Descent Extension to the
-multivariate case}
+multivariate case
+This function is not meant to be called directly by the user.}
 \usage{
 negative_log_likelihood(data, theta, family, lambda, cv = FALSE)
 }
@@ -26,4 +27,5 @@ Negative log likelihood of the corresponding data with the given
 \description{
 Solve logistic/poisson regression using Gradient Descent Extension to the
 multivariate case
+This function is not meant to be called directly by the user.
 }

@@ -2,6 +2,7 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' Update the cost values for the segmentation.
+#' This function is not meant to be called directly by the user.
 #'
 #' @param data A data frame containing the data to be segmented.
 #' @param theta_hat Estimated theta from the previous iteration.
@@ -33,6 +34,7 @@ cost_update <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, 
 }
 
 #' Function to calculate the gradient at the current data.
+#' This function is not meant to be called directly by the user.
 #'
 #' @param data A data frame containing the data to be segmented.
 #' @param theta Estimated theta from the previous iteration.
@@ -44,6 +46,7 @@ cost_update_gradient <- function(data, theta, family) {
 }
 
 #' Function to calculate the Hessian matrix at the current data.
+#' This function is not meant to be called directly by the user.
 #'
 #' @param data A data frame containing the data to be segmented.
 #' @param theta Estimated theta from the previous iteration.
@@ -55,8 +58,8 @@ cost_update_hessian <- function(data, theta, family, min_prob) {
     .Call(`_fastcpd_cost_update_hessian`, data, theta, family, min_prob)
 }
 
-#' Sequential Gradient Descent and Quasi-Newton’s Method for Change-Point
-#' Analysis
+#' Vanilla PELT implementation.
+#' This function is not meant to be called directly by the user.
 #'
 #' @param data A data frame containing the data to be segmented.
 #' @param beta Initial cost value.
@@ -88,6 +91,7 @@ fastcpd_vanilla <- function(data, beta, segment_count, trim, momentum_coef, k, f
 
 #' Solve logistic/poisson regression using Gradient Descent Extension to the
 #' multivariate case
+#' This function is not meant to be called directly by the user.
 #'
 #' @param data A data frame containing the data to be segmented.
 #' @param theta Estimate of the parameters. If null, the function will estimate

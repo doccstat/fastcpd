@@ -2,7 +2,8 @@
 % Please edit documentation in R/RcppExports.R
 \name{cost_update}
 \alias{cost_update}
-\title{Update the cost values for the segmentation.}
+\title{Update the cost values for the segmentation.
+This function is not meant to be called directly by the user.}
 \usage{
 cost_update(
   data,
@@ -70,4 +71,5 @@ A list containing new values of \code{theta_hat}, \code{theta_sum},
 }
 \description{
 Update the cost values for the segmentation.
+This function is not meant to be called directly by the user.
 }

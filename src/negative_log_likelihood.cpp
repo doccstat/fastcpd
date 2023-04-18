@@ -2,6 +2,7 @@
 
 //' Solve logistic/poisson regression using Gradient Descent Extension to the
 //' multivariate case
+//' This function is not meant to be called directly by the user.
 //'
 //' @param data A data frame containing the data to be segmented.
 //' @param theta Estimate of the parameters. If null, the function will estimate

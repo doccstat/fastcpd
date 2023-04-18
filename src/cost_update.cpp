@@ -1,6 +1,7 @@
 #include "fastcpd.h"
 
 //' Update the cost values for the segmentation.
+//' This function is not meant to be called directly by the user.
 //'
 //' @param data A data frame containing the data to be segmented.
 //' @param theta_hat Estimated theta from the previous iteration.

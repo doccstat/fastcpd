@@ -2,7 +2,8 @@
 % Please edit documentation in R/RcppExports.R
 \name{cost_update_gradient}
 \alias{cost_update_gradient}
-\title{Function to calculate the gradient at the current data.}
+\title{Function to calculate the gradient at the current data.
+This function is not meant to be called directly by the user.}
 \usage{
 cost_update_gradient(data, theta, family)
 }
@@ -18,4 +19,5 @@ Gradient at the current data.
 }
 \description{
 Function to calculate the gradient at the current data.
+This function is not meant to be called directly by the user.
 }

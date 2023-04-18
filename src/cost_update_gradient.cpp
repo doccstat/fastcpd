@@ -1,6 +1,7 @@
 #include "fastcpd.h"
 
 //' Function to calculate the gradient at the current data.
+//' This function is not meant to be called directly by the user.
 //'
 //' @param data A data frame containing the data to be segmented.
 //' @param theta Estimated theta from the previous iteration.
