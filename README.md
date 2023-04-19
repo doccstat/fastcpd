@@ -12,7 +12,7 @@ status](https://www.r-pkg.org/badges/version/fastcpd)](https://cran.r-project.or
 coverage](https://codecov.io/gh/doccstat/fastcpd/branch/main/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd?branch=main)
 [![Last
 Commit](https://img.shields.io/github/last-commit/doccstat/fastcpd)](https://github.com/doccstat/fastcpd)
-![r-universe](https://r-lib.r-universe.dev/badges/fastcpd)
+![r-universe](https://doccstat.r-universe.dev/badges/fastcpd)
 <!-- badges: end -->
 
 ## Overview
