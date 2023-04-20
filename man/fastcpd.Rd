@@ -40,7 +40,7 @@ fastcpd(
 
 \item{k}{Function on number of epochs in SGD.}
 
-\item{family}{Family of the model. Can be "binomial", "poisson", "lasso" or
+\item{family}{Family of the models. Can be "binomial", "poisson", "lasso" or
 "gaussian". If not provided, the user must specify the cost function and
 its gradient (and Hessian).}
 
@@ -85,6 +85,26 @@ arXiv preprint arXiv:2210.12235 (2022).
 }
 
 \examples{
+# Linear regression
+library(fastcpd)
+set.seed(1)
+p <- 3
+x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
+theta_0 <- rbind(c(1, 1.2, -1), c(-1, 0, 0.5), c(0.5, -0.3, 0.2))
+y <- c(
+  x[1:100, ] \%*\% theta_0[1, ] + rnorm(100, 0, 1),
+  x[101:200, ] \%*\% theta_0[2, ] + rnorm(100, 0, 1),
+  x[201:300, ] \%*\% theta_0[3, ] + rnorm(100, 0, 1)
+)
+result <- fastcpd(
+  formula = y ~ . - 1,
+  data = data.frame(y = y, x = x),
+  family = "gaussian",
+  cp_only = FALSE
+)
+plot(result)
+summary(result)
+
 # Logistic regression
 library(fastcpd)
 set.seed(1)
@@ -102,16 +122,6 @@ result <- fastcpd(
 )
 plot(result)
 summary(result)
-#> Call:
-#> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),
-#>     family = "binomial", cp_only = FALSE)
-#>
-#> Residuals:
-#>       Min        1Q    Median        3Q       Max
-#> -14.09576  -1.07218  -1.00000   1.07353  35.39472
-#>
-#> Change points:
-#> 126
 
 # Poisson regression
 library(fastcpd)
@@ -139,17 +149,35 @@ result <- fastcpd(
 )
 plot(result)
 summary(result)
-#> Call:
-#> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),
-#>     beta = (p + 1) * log(1500)/2, k = function(x) 0, family = "poisson",
-#>     epsilon = 1e-05, cp_only = FALSE)
-#>
-#> Residuals:
-#>       Min        1Q    Median        3Q       Max
-#>   -1.0000   -1.0000   -0.5785    0.3564 1793.2299
-#>
-#> Change points:
-#> 329 728 1021 1107 1325
+
+# Penalized linear regression
+library(fastcpd)
+set.seed(1)
+n <- 1500
+p_true <- 6
+p <- 50
+x <- mvtnorm::rmvnorm(1500, rep(0, p), diag(p))
+theta_0 <- rbind(
+  runif(p_true, -5, -2),
+  runif(p_true, -3, 3),
+  runif(p_true, 2, 5),
+  runif(p_true, -5, 5)
+)
+theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+y <- c(
+  x[1:300, ] \%*\% theta_0[1, ] + rnorm(300, 0, 1),
+  x[301:700, ] \%*\% theta_0[2, ] + rnorm(400, 0, 1),
+  x[701:1000, ] \%*\% theta_0[3, ] + rnorm(300, 0, 1),
+  x[1001:1500, ] \%*\% theta_0[4, ] + rnorm(500, 0, 1)
+)
+result <- fastcpd(
+  formula = y ~ . - 1,
+  data = data.frame(y = y, x = x),
+  family = "lasso",
+  cp_only = FALSE
+)
+plot(result)
+summary(result)
 
 # Custom cost function: mean shift
 library(fastcpd)
@@ -183,12 +211,6 @@ mean_loss_result <- fastcpd(
   cost = mean_loss
 )
 summary(mean_loss_result)
-#> Call:
-#> fastcpd(formula = ~. - 1, data = data.frame(data), beta = (p +
-#>     1) * log(nrow(data))/2, p = p, cost = mean_loss)
-#>
-#> Change points:
-#> 300 700
 
 # Custom cost function: variance change
 library(fastcpd)
@@ -212,12 +234,6 @@ var_loss_result <- fastcpd(
   cost = var_loss
 )
 summary(var_loss_result)
-#> Call:
-#> fastcpd(formula = ~. - 1, data = data, beta = (p + 1) * log(nrow(data))/2,
-#>     p = p, cost = var_loss)
-#>
-#> Change points:
-#> 300 699
 
 # Custom cost function: mean shift and variance change
 library(fastcpd)
@@ -243,12 +259,6 @@ meanvar_loss_result <- fastcpd(
   cost = meanvar_loss
 )
 summary(meanvar_loss_result)
-#> Call:
-#> fastcpd(formula = ~. - 1, data = data, beta = (2 * p + 1) * log(nrow(data))/2,
-#>     p = 2 * p, cost = meanvar_loss)
-#>
-#> Change points:
-#> 300 700 1000 1300 1700
 
 # Custom cost function: Huber loss
 library(fastcpd)
@@ -305,10 +315,4 @@ huber_regression_result <- fastcpd(
   cost_hessian = huber_loss_hessian
 )
 summary(huber_regression_result)
-#> Call:
-#> fastcpd(formula = y ~ . - 1, data = data, beta = (p + 1) * log(n)/2,
-#>     cost = huber_loss, cost_gradient = huber_loss_gradient, cost_hessian = huber_loss_hessian)
-#>
-#> Change points:
-#> 575 1215 1395
 }

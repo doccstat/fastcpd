@@ -64,7 +64,38 @@ part:
 - [ggplot2](https://github.com/tidyverse/ggplot2), for data
   visualization.
 
+### Documentation
+
+<https://www.xingchi.li/fastcpd>
+
 ### Linear regression
+
+``` r
+library(fastcpd)
+set.seed(1)
+p <- 3
+x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
+theta_0 <- rbind(c(1, 1.2, -1), c(-1, 0, 0.5), c(0.5, -0.3, 0.2))
+y <- c(
+  x[1:100, ] %*% theta_0[1, ] + rnorm(100, 0, 1),
+  x[101:200, ] %*% theta_0[2, ] + rnorm(100, 0, 1),
+  x[201:300, ] %*% theta_0[3, ] + rnorm(100, 0, 1)
+)
+result <- fastcpd(
+  formula = y ~ . - 1,
+  data = data.frame(y = y, x = x),
+  family = "gaussian",
+  cp_only = FALSE
+)
+plot(result)
+summary(result)
+#> Call:
+#> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),
+#>     family = "gaussian", cp_only = FALSE)
+#>
+#> Change points:
+#> 98 202
+```
 
 ### Logistic regression
 
@@ -139,6 +170,42 @@ summary(result)
 ```
 
 ### Penalized linear regression
+
+``` r
+library(fastcpd)
+set.seed(1)
+n <- 1500
+p_true <- 6
+p <- 50
+x <- mvtnorm::rmvnorm(1500, rep(0, p), diag(p))
+theta_0 <- rbind(
+  runif(p_true, -5, -2),
+  runif(p_true, -3, 3),
+  runif(p_true, 2, 5),
+  runif(p_true, -5, 5)
+)
+theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+y <- c(
+  x[1:300, ] %*% theta_0[1, ] + rnorm(300, 0, 1),
+  x[301:700, ] %*% theta_0[2, ] + rnorm(400, 0, 1),
+  x[701:1000, ] %*% theta_0[3, ] + rnorm(300, 0, 1),
+  x[1001:1500, ] %*% theta_0[4, ] + rnorm(500, 0, 1)
+)
+result <- fastcpd(
+  formula = y ~ . - 1,
+  data = data.frame(y = y, x = x),
+  family = "lasso",
+  cp_only = FALSE
+)
+plot(result)
+summary(result)
+#> Call:
+#> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),
+#>     family = "lasso", cp_only = FALSE)
+#>
+#> Change points:
+#> 300 700 1000
+```
 
 ### Custom cost function: mean shift
 
