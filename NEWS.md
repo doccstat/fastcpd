@@ -1,3 +1,7 @@
+# fastcpd 0.2.3
+
+* Add missing examples for linear regression and LASSO.
+
 # fastcpd 0.2.2
 
 * Add more examples to illustrate the use of the `fastcpd` function.

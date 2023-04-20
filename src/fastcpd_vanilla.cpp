@@ -47,7 +47,7 @@ Rcpp::List fastcpd_vanilla(
 ) {
 
     int n = data.n_rows;
-    std::vector<int> r_t_set = {0, 1};
+    std::vector<int> r_t_set = {-1, 0};
     std::vector<std::vector<int>> cp_set(n + 1);
     std::fill(cp_set.begin(), cp_set.end(), std::vector<int>(1));
     cp_set[0] = {};
@@ -55,7 +55,7 @@ Rcpp::List fastcpd_vanilla(
     f_t[0] = -beta;
     std::fill(f_t.begin() + 1, f_t.end(), 0);
 
-    for (int t = 2; t <= n; t++) {
+    for (int t = 1; t < n; t++) {
         int r_t_count = r_t_set.size();
         // number of cost values is the same as number of elemnts in R_t
         arma::vec cval(r_t_count);
@@ -66,14 +66,14 @@ Rcpp::List fastcpd_vanilla(
             int tau = r_t_set[i];
 
             if (t - tau >= 1) {
-                cval[i] = Rcpp::as<double>(cost(data.rows(tau, t - 1)));
+                cval[i] = Rcpp::as<double>(cost(data.rows(tau + 1, t)));
             }
         }
 
         cval[r_t_count - 1] = 0;
         arma::vec f_subset(r_t_set.size());
         for (unsigned int i = 0; i < r_t_set.size(); i++) {
-            f_subset[i] = f_t[r_t_set[i]];
+            f_subset[i] = f_t[r_t_set[i] + 1];
         }
 
         arma::vec obj = cval + f_subset + beta;
@@ -83,7 +83,11 @@ Rcpp::List fastcpd_vanilla(
         std::vector<int> tau_star_cp_set = cp_set[tau_star + 1];
         cp_set[t] = tau_star_cp_set;
         cp_set[t].push_back(tau_star);
-        // for (int i = 0; i < cp_set[t].size(); i++) {
+        // for (unsigned int i = 0; i < r_t_set.size(); i++) {
+        //     std::cout << r_t_set[i] << " ";
+        // }
+        // std::cout << std::endl;
+        // for (unsigned int i = 0; i < cp_set[t].size(); i++) {
         //     std::cout << cp_set[t][i] << " ";
         // }
         // std::cout << std::endl;
@@ -99,7 +103,7 @@ Rcpp::List fastcpd_vanilla(
             new_r_t_set[i] = r_t_set[pruned_left[i]];
         }
         new_r_t_set[pruned_left.n_elem] = t;
-        r_t_set = arma::conv_to<std::vector<int> >::from(new_r_t_set);
+        r_t_set = arma::conv_to<std::vector<int>>::from(new_r_t_set);
 
         f_t[t] = min_val;
     }
