@@ -19,124 +19,6 @@ NULL
 #> NULL
 
 
-#' An S4 class to store the output created with \link{fastcpd}
-#'
-#' This S4 class stores the output from \link{fastcpd}. A fastcpd object consist
-#' of several slots including the call to \link{fastcpd}, the data used, the
-#' family of the model, the change points, the cost values, the residuals, the
-#' estimated parameters and a boolean indicating whether the model was fitted
-#' with only change points or with change points and parameters, which you can
-#' select using \code{@}.
-#'
-#' @slot call The call to \link{fastcpd}.
-#' @slot data The data used.
-#' @slot family The family of the model.
-#' @slot cp_set The change points.
-#' @slot cost_values The cost values for each segment.
-#' @slot residuals The residuals for each segment.
-#' @slot thetas The estimated parameters for each segment.
-#' @slot cp_only A boolean indicating whether the model was fitted with only
-#'   change points or with change points and parameters.
-#' @name fastcpd-class
-#' @rdname fastcpd-class
-setClass(
-  "fastcpd",
-  representation(
-    call = "language",
-    data = "data.frame",
-    family = "character",
-    cp_set = "numeric",
-    cost_values = "numeric",
-    residuals = "numeric",
-    thetas = "matrix",
-    cp_only = "logical"
-  )
-)
-
-#' Plot the data and the change points for a \code{fastcpd} object
-#' @param x \code{fastcpd} object.
-#'
-#' @export
-setMethod("plot", signature(x = "fastcpd"), function(x) {
-  y <- x@data[, 1]
-  p <- ggplot2::ggplot(data = data.frame(y = y,
-                                         x = x@data[, -1, drop = FALSE],
-                                         label = "response"),
-                       ggplot2::aes(x = x, y = y)) +
-    ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)), y = y)) +
-    ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
-  if (x@family != "custom" && !x@cp_only) {
-    p <- p + ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)),
-                                                   y = x@residuals,
-                                                   label = "residual")) +
-      ggplot2::facet_wrap(c("label"), ncol = 1, scales = "free_y")
-  }
-  print(p)
-  invisible()
-})
-
-#' Print the call and the change points for a \code{fastcpd} object
-#' @param x \code{fastcpd} object.
-#'
-#' @export
-setMethod("print", signature(x = "fastcpd"), function(x) {
-  cat(
-    "\nCall:\n",
-    paste(deparse(x@call), sep = "\n", collapse = "\n"), "\n\n",
-    sep = ""
-  )
-  if (length(x@cp_set)) {
-    cat("Change points:\n")
-    print.default(x@cp_set)
-  } else {
-    cat("No change points found\n")
-  }
-  cat("\n")
-  invisible(x)
-})
-
-#' Show the available methods for a \code{fastcpd} object
-#' @param object \code{fastcpd} object.
-#'
-#' @export
-setMethod("show", signature(object = "fastcpd"), function(object) {
-  cat(
-    "\nA fastcpd object.\n",
-    "Available methods to evaluate the object are:\n",
-    "plot, print, show, summary\n\n",
-    sep = ""
-  )
-  print(object)
-})
-
-#' Show the summary of a \code{fastcpd} object
-#' @param object \code{fastcpd} object.
-#'
-#' @export
-setMethod("summary", signature(object = "fastcpd"), function(object) {
-  cat(
-    "\nCall:\n",
-    paste(deparse(object@call), sep = "\n", collapse = "\n"), "\n\n",
-    sep = ""
-  )
-  # if (object@family != "custom") {
-  #   cat("Residuals:\n")
-  #   print(structure(
-  #     zapsmall(stats::quantile(object@residuals)),
-  #     names = c("Min", "1Q", "Median", "3Q", "Max")
-  #   ))
-  #   cat("\n")
-  # }
-  if (length(object@cp_set)) {
-    cat("Change points:\n")
-    cat(object@cp_set, "\n")
-  } else {
-    cat("No change points found\n")
-  }
-  cat("\n")
-  invisible(object)
-})
-
 #' Sequential Gradient Descent and Quasi-Newton’s Method for Change-Point
 #' Analysis
 #'
@@ -165,6 +47,8 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #' @param cost_hessian Hessian for custom cost function.
 #' @param cp_only Whether to return only the change points or with the cost
 #'   values for each segment.
+#' @param vanilla Whether to use vanilla PELT or SeN.
+#' @param warm_start Whether to use warm start.
 #'
 #' @return A class \code{fastcpd} object.
 #' @export
@@ -183,8 +67,7 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #' result <- fastcpd(
 #'   formula = y ~ . - 1,
 #'   data = data.frame(y = y, x = x),
-#'   family = "gaussian",
-#'   cp_only = FALSE
+#'   family = "gaussian"
 #' )
 #' plot(result)
 #' summary(result)
@@ -201,8 +84,7 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #' result <- fastcpd(
 #'   formula = y ~ . - 1,
 #'   data = data.frame(y = y, x = x),
-#'   family = "binomial",
-#'   cp_only = FALSE
+#'   family = "binomial"
 #' )
 #' plot(result)
 #' summary(result)
@@ -228,8 +110,7 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'   beta = (p + 1) * log(1500) / 2,
 #'   k = function(x) 0,
 #'   family = "poisson",
-#'   epsilon = 1e-5,
-#'   cp_only = FALSE
+#'   epsilon = 1e-5
 #' )
 #' plot(result)
 #' summary(result)
@@ -257,11 +138,60 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #' result <- fastcpd(
 #'   formula = y ~ . - 1,
 #'   data = data.frame(y = y, x = x),
-#'   family = "lasso",
-#'   cp_only = FALSE
+#'   family = "lasso"
 #' )
 #' plot(result)
 #' summary(result)
+#'
+#' # Custom cost function: logistic regression
+#' library(fastcpd)
+#' set.seed(1)
+#' p <- 5
+#' x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
+#' theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
+#' y <- c(
+#'   rbinom(200, 1, 1 / (1 + exp(-x[1:200, ] %*% theta[1, ]))),
+#'   rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] %*% theta[2, ])))
+#' )
+#' data <- data.frame(y = y, x = x)
+#' result_builtin <- fastcpd(
+#'   formula = y ~ . - 1,
+#'   data = data,
+#'   family = "binomial"
+#' )
+#' logistic_loss <- function(data, theta) {
+#'   x <- data[, -1]
+#'   y <- data[, 1]
+#'   u <- x %*% theta
+#'   nll <- -y * u + log(1 + exp(u))
+#'   nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
+#'   sum(nll)
+#' }
+#' logistic_loss_gradient <- function(data, theta) {
+#'   x <- data[nrow(data), -1]
+#'   y <- data[nrow(data), 1]
+#'   c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
+#' }
+#' logistic_loss_hessian <- function(data, theta) {
+#'   x <- data[nrow(data), -1]
+#'   prob <- 1 / (1 + exp(-x %*% theta))
+#'   (x %o% x) * c((1 - prob) * prob)
+#' }
+#' result_custom <- fastcpd(
+#'   formula = y ~ . - 1,
+#'   data = data,
+#'   epsilon = 1e-5,
+#'   cost = logistic_loss,
+#'   cost_gradient = logistic_loss_gradient,
+#'   cost_hessian = logistic_loss_hessian
+#' )
+#' cat(
+#'   "Change points detected by built-in logistic regression model:",
+#'   result_builtin@cp_set, "\n",
+#'   "Change points detected by custom logistic regression model:",
+#'   result_custom@cp_set, "\n",
+#'   sep = ""
+#' )
 #'
 #' # Custom cost function: mean shift
 #' library(fastcpd)
@@ -347,8 +277,8 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #' # Custom cost function: Huber loss
 #' library(fastcpd)
 #' set.seed(1)
-#' n <- 500 + 700 + 500
-#' p <- 8
+#' n <- 400 + 300 + 500
+#' p <- 5
 #' x <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(p))
 #' theta <- rbind(
 #'   mvtnorm::rmvnorm(1, mean = rep(0, p - 3), sigma = diag(p - 3)),
@@ -356,11 +286,11 @@ setMethod("summary", signature(object = "fastcpd"), function(object) {
 #'   mvtnorm::rmvnorm(1, mean = rep(9, p - 3), sigma = diag(p - 3))
 #' )
 #' theta <- cbind(theta, matrix(0, 3, 3))
-#' theta <- theta[rep(seq_len(3), c(500, 700, 500)), ]
+#' theta <- theta[rep(seq_len(3), c(400, 300, 500)), ]
 #' y_true <- rowSums(x * theta)
 #' factor <- c(
-#'   2 * stats::rbinom(500, size = 1, prob = 0.95) - 1,
-#'   2 * stats::rbinom(700, size = 1, prob = 0.95) - 1,
+#'   2 * stats::rbinom(400, size = 1, prob = 0.95) - 1,
+#'   2 * stats::rbinom(300, size = 1, prob = 0.95) - 1,
 #'   2 * stats::rbinom(500, size = 1, prob = 0.95) - 1
 #' )
 #' y <- factor * y_true + stats::rnorm(n)
@@ -416,7 +346,9 @@ fastcpd <- function(
   cost = negative_log_likelihood,
   cost_gradient = cost_update_gradient,
   cost_hessian = cost_update_hessian,
-  cp_only = TRUE
+  cp_only = FALSE,
+  vanilla = FALSE,
+  warm_start = FALSE
 ) {
 
   # The following code is adapted from the `lm` function from base R.
@@ -431,140 +363,380 @@ fastcpd <- function(
   x <- stats::model.matrix(mt, match_formula)
   data <- cbind(y, x)
 
-  # User provided cost function with explicit expression.
-  if (length(formals(cost)) == 1) {
+  if (is.null(family)) {
     family <- "custom"
-    n <- nrow(data)
-    if (is.null(p)) {
-      p <- ncol(data) - 1
-    }
-    if (is.null(beta)) {
-      beta <- (p + 1) * log(nrow(data)) / 2
-    }
+  }
+  n <- nrow(data)
+  if (is.null(p)) {
+    p <- ncol(data) - 1
+  }
+  if (is.null(beta)) {
+    beta <- (p + 1) * log(nrow(data)) / 2
+  }
 
-    # fastcpd_vanilla(
-    #   data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
-    #   min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only
-    # )
+  # User provided cost function with explicit expression.
+  result <- if (length(formals(cost)) == 1) {
+    fastcpd_vanilla_custom(
+      data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
+      min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only
+    )
+  } else if (vanilla) {
+    fastcpd_vanilla_custom(
+      data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
+      min_prob, winsorise_minval, winsorise_maxval, p, warm_start,
+      function(data) {
+        cost(data = data, theta = NULL, family = family, lambda = 0)
+      }, cp_only
+    )
+  } else {
+    fastcpd_builtin(
+      data, n, beta, segment_count, trim, momentum_coef, k, family, epsilon,
+      min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
+      cost_hessian, cp_only, vanilla, warm_start
+    )
+  }
+  methods::new(
+    Class = "fastcpd",
+    call = match.call(),
+    data = data.frame(data),
+    family = family,
+    cp_set = result$cp_set,
+    cost_values = result$cost_values,
+    residuals = result$residual,
+    thetas = result$thetas,
+    cp_only = cp_only
+  )
+}
 
-    # After t = 1, the r_t_set R_t contains 0 and 1.
-    r_t_set <- c(0, 1)
-    # C(0)=NULL, C(1)={0}
-    cp_set <- append(list(NULL), rep(list(0), n))
-    # Objective function: F(0) = -beta
-    f_t <- c(-beta, rep(0, n))
+fastcpd_vanilla_custom <- function(
+  data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
+  min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only, warm_start = FALSE
+) {
+  # fastcpd_vanilla(
+  #   data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
+  #   min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only
+  # )
 
-    for (t in 2:n) {
-      r_t_count <- length(r_t_set)
-      # number of cost values is the same as number of elemnts in R_t
-      cval <- rep(0, r_t_count)
+  # After t = 1, the r_t_set R_t contains 0 and 1.
+  r_t_set <- c(0, 1)
+  # C(0)=NULL, C(1)={0}
+  cp_set <- append(list(NULL), rep(list(0), n))
+  # Objective function: F(0) = -beta
+  f_t <- c(-beta, rep(0, n))
 
-      # for tau in R_t\{t-1}
-      for (i in 1:(r_t_count - 1)) {
-        tau <- r_t_set[i]
+  start <- matrix(0, p, n)
 
-        if (t - tau >= 1) {
+  for (t in 2:n) {
+    r_t_count <- length(r_t_set)
+    # number of cost values is the same as number of elemnts in R_t
+    cval <- rep(0, r_t_count)
+
+    # for tau in R_t\{t-1}
+    for (i in 1:(r_t_count - 1)) {
+      tau <- r_t_set[i]
+
+      if (t - tau >= 1) {
+        if (warm_start && t - tau >= 50) {
+          cost_result <- cost(data[(tau + 1):t, , drop = FALSE], start = start[, tau + 1])
+          start[, tau + 1] <- cost_result$par
+          cval[i] <- cost_result$value
+        } else {
           cval[i] <- cost(data[(tau + 1):t, , drop = FALSE])
         }
       }
-
-      # Step 3
-      cval[r_t_count] <- 0
-      obj <- cval + f_t[r_t_set + 1] + beta
-      min_val <- min(obj)
-      tau_star <- r_t_set[which(obj == min_val)[1]]
-
-      # Step 4
-      cp_set[[t + 1]] <- c(cp_set[[tau_star + 1]], tau_star)
-      # print(r_t_set)
-      # print(cp_set[[t + 1]])
-      # print(cval)
-      # print(f_t[r_t_set + 1])
-      # print(obj)
-      # print(min_val)
-      # print((cval + f_t[r_t_set + 1]) <= min_val)
-
-      # Step 5
-      pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
-      r_t_set <- c(r_t_set[pruned_left], t)
-
-      # Objective function F(t).
-      f_t[t + 1] <- min_val
     }
-    # print(cp_set)
 
-    # Remove change-points close to the boundaries
-    cp_set <- cp_set[[n + 1]]
-    cp_set <- cp_set[(cp_set >= trim * n) & (cp_set <= (1 - trim) * n)]
-    cp_set <- sort(unique(c(0, cp_set)))
+    # Step 3
+    cval[r_t_count] <- 0
+    obj <- cval + f_t[r_t_set + 1] + beta
+    min_val <- min(obj)
+    tau_star <- r_t_set[which(obj == min_val)[1]]
 
-    segment_indices <- which((diff(cp_set) < trim * n) == TRUE)
-    if (length(segment_indices) > 0) {
-      cp_set <- floor(
-        (cp_set[-(segment_indices + 1)] + cp_set[-segment_indices]) / 2
-      )
+    # Step 4
+    cp_set[[t + 1]] <- c(cp_set[[tau_star + 1]], tau_star)
+    # print(r_t_set)
+    # print(cp_set[[t + 1]])
+    # print(cval)
+    # print(f_t[r_t_set + 1])
+    # print(obj)
+    # print(min_val)
+    # print((cval + f_t[r_t_set + 1]) <= min_val)
+
+    # Step 5
+    pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
+    r_t_set <- c(r_t_set[pruned_left], t)
+
+    # Objective function F(t).
+    f_t[t + 1] <- min_val
+  }
+  # print(cp_set)
+
+  # Remove change-points close to the boundaries
+  cp_set <- cp_set[[n + 1]]
+  cp_set <- cp_set[(cp_set >= trim * n) & (cp_set <= (1 - trim) * n)]
+  cp_set <- sort(unique(c(0, cp_set)))
+
+  segment_indices <- which((diff(cp_set) < trim * n) == TRUE)
+  if (length(segment_indices) > 0) {
+    cp_set <- floor(
+      (cp_set[-(segment_indices + 1)] + cp_set[-segment_indices]) / 2
+    )
+  }
+  cp_set <- cp_set[cp_set > 0]
+  thetas <- matrix(NA, nrow = 0, ncol = 0)
+
+  if (cp_only) {
+    cost_values <- numeric(0)
+  } else {
+    cp_loc <- unique(c(0, cp_set, n))
+    cost_values <- rep(0, length(cp_loc) - 1)
+    for (i in 1:(length(cp_loc) - 1)) {
+      cost_values[i] <- cost(data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE])
     }
-    cp_set <- cp_set[cp_set > 0]
-    thetas <- matrix(NA, nrow = 0, ncol = 0)
-    residual <- 0[family == "custom"]
+  }
+  thetas <- data.frame(thetas)
+  list(
+    cp_set = cp_set,
+    cost_values = cost_values,
+    residual = 0,
+    thetas = thetas
+  )
+}
 
-    if (cp_only) {
-      cost_values <- numeric(0)
+fastcpd_builtin <- function(
+  data, n, beta, segment_count, trim, momentum_coef, k, family, epsilon,
+  min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
+  cost_hessian, cp_only, vanilla, warm_start
+) {
+  if (family %in% c("lasso", "gaussian")) {
+    err_sd <- act_num <- rep(NA, segment_count)
+  }
+
+  # After t = 1, the r_t_set R_t contains 0 and 1.
+  r_t_set <- c(0, 1)
+  # C(0)=NULL, C(1)={0}
+  cp_set <- append(list(NULL), rep(list(0), n))
+  # Objective function: F(0) = -beta
+  f_t <- c(-beta, rep(0, n))
+  momentum <- rep(0, p)
+
+  # choose the initial values based on pre-segmentation
+
+  segment_indices <- ceiling(seq_len(n) / ceiling(n / segment_count))
+  segment_theta_hat <- matrix(NA, segment_count, p)
+  # Remark 3.4: initialize theta_hat_t_t to be the estimate in the segment
+  for (segment_index in seq_len(segment_count)) {
+    data_segment <- data[segment_indices == segment_index, , drop = FALSE]
+    segment_theta <- if (family == "custom") {
+      if (p == 1) {
+        optim_result <- stats::optim(
+          par = 0,
+          fn = function(theta, data) {
+            cost(data = data, theta = log(theta / (1 - theta)))
+          },
+          method = "Brent",
+          lower = 0,
+          upper = 1,
+          data = data_segment
+        )
+        log(optim_result$par / (1 - optim_result$par))
+      } else {
+        stats::optim(
+          par = rep(0, p),
+          fn = cost,
+          data = data_segment,
+          method = "L-BFGS-B"
+        )$par
+      }
     } else {
-      cp_loc <- unique(c(0, cp_set, n))
-      cost_values <- rep(0, length(cp_loc) - 1)
-      for (i in 1:(length(cp_loc) - 1)) {
-        cost_values[i] <- cost(data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE])
+      cost(
+        data = data_segment,
+        theta = NULL,
+        family = family,
+        lambda = 0,
+        cv = TRUE
+      )$par
+    }
+    segment_theta_hat[segment_index, ] <- segment_theta
+    if (family %in% c("lasso", "gaussian")) {
+      response_estimate <- data_segment[, -1, drop = FALSE] %*% c(segment_theta)
+      segment_residual <- data_segment[, 1] - response_estimate
+      err_sd[segment_index] <- sqrt(mean(segment_residual^2))
+      act_num[segment_index] <- sum(abs(segment_theta) > 0)
+    }
+  }
+
+  if (family %in% c("lasso", "gaussian")) {
+    # only works if error sd is unchanged.
+    err_sd_mean <- mean(err_sd)
+
+    act_num_mean <- mean(act_num)
+
+    # seems to work but there might be better choices
+    beta <- (act_num_mean + 1) * beta
+  }
+
+  # For the first data.
+  if (family == "binomial") {
+    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
+    prob <- 1 / (1 + exp(-theta_hat %*% data[1, -1]))
+    hessian <- array(
+      (data[1, -1] %o% data[1, -1]) * c(prob * (1 - prob)),
+      c(p, p, 1)
+    )
+  } else if (family == "poisson") {
+    theta_sum <- theta_hat <- DescTools::Winsorize(
+      matrix(segment_theta_hat[1, ]),
+      minval = winsorise_minval,
+      maxval = winsorise_maxval
+    )
+    hessian <- array(
+      (data[1, -1] %o% data[1, -1]) * c(exp(theta_hat %*% data[1, -1])),
+      c(p, p, 1)
+    )
+  } else if (family %in% c("lasso", "gaussian")) {
+    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
+    hessian <- array(
+      data[1, -1] %o% data[1, -1] + epsilon * diag(1, p),
+      c(p, p, 1)
+    )
+  } else if (family == "custom") {
+    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
+    hessian <- array(
+      matrix(0, p, p),
+      c(p, p, 1)
+    )
+  }
+
+  for (t in 2:n) {
+    r_t_count <- length(r_t_set)
+    # number of cost values is the same as number of elemnts in R_t
+    cval <- rep(0, r_t_count)
+
+    # for tau in R_t\{t-1}
+    for (i in 1:(r_t_count - 1)) {
+      tau <- r_t_set[i]
+      if (family == "lasso") {
+        lambda <- err_sd_mean * sqrt(2 * log(p) / (t - tau))
+      } else {
+        lambda <- 0
+      }
+
+      cost_update_result <- cost_update(
+        data = data[seq_len(t), , drop = FALSE],
+        theta_hat = theta_hat,
+        theta_sum = theta_sum,
+        hessian = hessian,
+        tau = tau,
+        i = i,
+        k = k,
+        family = family,
+        momentum = momentum,
+        momentum_coef = momentum_coef,
+        min_prob = min_prob,
+        winsorise_minval = winsorise_minval,
+        winsorise_maxval = winsorise_maxval,
+        epsilon = epsilon,
+        lambda = lambda,
+        cost_gradient = cost_gradient,
+        cost_hessian = cost_hessian
+      )
+      theta_hat[, i] <- cost_update_result[[1]]
+      theta_sum[, i] <- cost_update_result[[2]]
+      hessian[, , i] <- cost_update_result[[3]]
+      momentum <- cost_update_result[[4]]
+
+      tau <- r_t_set[i]
+      theta <- theta_sum[, i] / (t - tau)
+      if (family == "poisson" && t - tau >= p) {
+        theta <- DescTools::Winsorize(
+          theta,
+          minval = winsorise_minval,
+          maxval = winsorise_maxval
+        )
+      }
+
+      if (
+        (family %in% c("binomial", "poisson") && t - tau >= p) ||
+        (family %in% c("lasso", "gaussian") && t - tau >= 3)
+      ) {
+        cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta, family, lambda)$value
+      } else if (family == "custom" && t - tau >= 1) {
+        cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta)
       }
     }
 
-    methods::new(
-      Class = "fastcpd",
-      call = match.call(),
-      data = data.frame(data),
-      family = family,
-      cp_set = cp_set,
-      cost_values = cost_values,
-      residuals = residual,
-      thetas = thetas,
-      cp_only = cp_only
+    # the choice of initial values requires further investigation
+
+    # for tau = t-1
+    new_data <- data[t, -1]
+    if (family == "binomial") {
+      cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
+      prob <- 1 / (1 + exp(-coef_add %*% new_data))
+      hessian_new <- (new_data %o% new_data) * c(prob * (1 - prob))
+    } else if (family == "poisson") {
+      cum_coef_add <- coef_add <- DescTools::Winsorize(
+        x = segment_theta_hat[segment_indices[t], ],
+        minval = winsorise_minval,
+        maxval = winsorise_maxval
+      )
+      hessian_new <- (new_data %o% new_data) * c(exp(coef_add %*% new_data))
+    } else if (family %in% c("lasso", "gaussian")) {
+      cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
+      hessian_new <- new_data %o% new_data + epsilon * diag(1, p)
+    } else if (family == "custom") {
+      cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
+      hessian_new <- matrix(0, p, p)
+    }
+
+    theta_hat <- cbind(theta_hat, coef_add)
+    theta_sum <- cbind(theta_sum, cum_coef_add)
+    hessian <- abind::abind(hessian, hessian_new, along = 3)
+
+    # Step 3
+    cval[r_t_count] <- 0
+    obj <- cval + f_t[r_t_set + 1] + beta
+    min_val <- min(obj)
+    tau_star <- r_t_set[which(obj == min_val)[1]]
+
+    # Step 4
+    cp_set[[t + 1]] <- c(cp_set[[tau_star + 1]], tau_star)
+
+    # Step 5
+    pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
+    r_t_set <- c(r_t_set[pruned_left], t)
+
+    theta_hat <- theta_hat[, pruned_left, drop = FALSE]
+    theta_sum <- theta_sum[, pruned_left, drop = FALSE]
+    hessian <- hessian[, , pruned_left, drop = FALSE]
+
+    # Objective function F(t).
+    f_t[t + 1] <- min_val
+  }
+
+  # Remove change-points close to the boundaries
+
+  cp_set <- cp_set[[n + 1]]
+  cp_set <- cp_set[(cp_set >= trim * n) & (cp_set <= (1 - trim) * n)]
+  cp_set <- sort(unique(c(0, cp_set)))
+
+  segment_indices <- which((diff(cp_set) < trim * n) == TRUE)
+  if (length(segment_indices) > 0) {
+    cp_set <- floor(
+      (cp_set[-(segment_indices + 1)] + cp_set[-segment_indices]) / 2
     )
+  }
+  cp_set <- cp_set[cp_set > 0]
+  cost_values <- thetas <- NULL
+  residual <- 0[family == "custom"]
 
+  if (cp_only) {
+    cost_values <- numeric(0)
+    thetas <- matrix(NA, nrow = 0, ncol = 0)
   } else {
-
-    # Built in cost functions or custom cost functions with no explicit expression.
-    if (is.null(family)) {
-      family <- "custom"
-    }
-
-    n <- nrow(data)
-    if (is.null(p)) {
-      p <- ncol(data) - 1
-    }
-    if (is.null(beta)) {
-      beta <- (p + 1) * log(nrow(data)) / 2
-    }
-
-    if (family %in% c("lasso", "gaussian")) {
-      err_sd <- act_num <- rep(NA, segment_count)
-    }
-
-    # After t = 1, the r_t_set R_t contains 0 and 1.
-    r_t_set <- c(0, 1)
-    # C(0)=NULL, C(1)={0}
-    cp_set <- append(list(NULL), rep(list(0), n))
-    # Objective function: F(0) = -beta
-    f_t <- c(-beta, rep(0, n))
-    momentum <- rep(0, p)
-
-    # choose the initial values based on pre-segmentation
-
-    segment_indices <- ceiling(seq_len(n) / ceiling(n / segment_count))
-    segment_theta_hat <- matrix(NA, segment_count, p)
-    # Remark 3.4: initialize theta_hat_t_t to be the estimate in the segment
-    for (segment_index in seq_len(segment_count)) {
-      data_segment <- data[segment_indices == segment_index, , drop = FALSE]
-      segment_theta <- if (family == "custom") {
+    cp_loc <- unique(c(0, cp_set, n))
+    for (i in 1:(length(cp_loc) - 1)) {
+      if (family == "custom") {
         if (p == 1) {
           optim_result <- stats::optim(
             par = 0,
@@ -574,248 +746,34 @@ fastcpd <- function(
             method = "Brent",
             lower = 0,
             upper = 1,
-            data = data_segment
+            data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
           )
-          log(optim_result$par / (1 - optim_result$par))
+          cost_result <- list(
+            par = log(optim_result$par / (1 - optim_result$par)),
+            value = exp(optim_result$value) / (1 + exp(optim_result$value))
+          )
         } else {
-          stats::optim(
+          cost_result <- stats::optim(
             par = rep(0, p),
             fn = cost,
-            data = data_segment,
+            data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE],
             method = "L-BFGS-B"
-          )$par
-        }
-      } else {
-        cost(
-          data = data_segment,
-          theta = NULL,
-          family = family,
-          lambda = 0,
-          cv = TRUE
-        )$par
-      }
-      segment_theta_hat[segment_index, ] <- segment_theta
-      if (family %in% c("lasso", "gaussian")) {
-        response_estimate <- data_segment[, -1, drop = FALSE] %*% c(segment_theta)
-        segment_residual <- data_segment[, 1] - response_estimate
-        err_sd[segment_index] <- sqrt(mean(segment_residual^2))
-        act_num[segment_index] <- sum(abs(segment_theta) > 0)
-      }
-    }
-
-    if (family %in% c("lasso", "gaussian")) {
-      # only works if error sd is unchanged.
-      err_sd_mean <- mean(err_sd)
-
-      act_num_mean <- mean(act_num)
-
-      # seems to work but there might be better choices
-      beta <- (act_num_mean + 1) * beta
-    }
-
-    # For the first data.
-    if (family == "binomial") {
-      theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
-      prob <- 1 / (1 + exp(-theta_hat %*% data[1, -1]))
-      hessian <- array(
-        (data[1, -1] %o% data[1, -1]) * c(prob * (1 - prob)),
-        c(p, p, 1)
-      )
-    } else if (family == "poisson") {
-      theta_sum <- theta_hat <- DescTools::Winsorize(
-        matrix(segment_theta_hat[1, ]),
-        minval = winsorise_minval,
-        maxval = winsorise_maxval
-      )
-      hessian <- array(
-        (data[1, -1] %o% data[1, -1]) * c(exp(theta_hat %*% data[1, -1])),
-        c(p, p, 1)
-      )
-    } else if (family %in% c("lasso", "gaussian")) {
-      theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
-      hessian <- array(
-        data[1, -1] %o% data[1, -1] + epsilon * diag(1, p),
-        c(p, p, 1)
-      )
-    } else if (family == "custom") {
-      theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
-      hessian <- array(
-        matrix(0, p, p),
-        c(p, p, 1)
-      )
-    }
-
-    for (t in 2:n) {
-      r_t_count <- length(r_t_set)
-      # number of cost values is the same as number of elemnts in R_t
-      cval <- rep(0, r_t_count)
-
-      # for tau in R_t\{t-1}
-      for (i in 1:(r_t_count - 1)) {
-        tau <- r_t_set[i]
-        if (family == "lasso") {
-          lambda <- err_sd_mean * sqrt(2 * log(p) / (t - tau))
-        } else {
-          lambda <- 0
-        }
-
-        cost_update_result <- cost_update(
-          data = data[seq_len(t), , drop = FALSE],
-          theta_hat = theta_hat,
-          theta_sum = theta_sum,
-          hessian = hessian,
-          tau = tau,
-          i = i,
-          k = k,
-          family = family,
-          momentum = momentum,
-          momentum_coef = momentum_coef,
-          min_prob = min_prob,
-          winsorise_minval = winsorise_minval,
-          winsorise_maxval = winsorise_maxval,
-          epsilon = epsilon,
-          lambda = lambda,
-          cost_gradient = cost_gradient,
-          cost_hessian = cost_hessian
-        )
-        theta_hat[, i] <- cost_update_result[[1]]
-        theta_sum[, i] <- cost_update_result[[2]]
-        hessian[, , i] <- cost_update_result[[3]]
-        momentum <- cost_update_result[[4]]
-
-        tau <- r_t_set[i]
-        theta <- theta_sum[, i] / (t - tau)
-        if (family == "poisson" && t - tau >= p) {
-          theta <- DescTools::Winsorize(
-            theta,
-            minval = winsorise_minval,
-            maxval = winsorise_maxval
           )
         }
-
-        if (
-          (family %in% c("binomial", "poisson") && t - tau >= p) ||
-          (family %in% c("lasso", "gaussian") && t - tau >= 3)
-        ) {
-          cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta, family, lambda)$value
-        } else if (family == "custom" && t - tau >= 1) {
-          cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta)
-        }
+      } else {
+        cost_result <- cost(data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE], NULL, family, lambda)
+        residual <- c(residual, cost_result$residuals)
       }
-
-      # the choice of initial values requires further investigation
-
-      # for tau = t-1
-      new_data <- data[t, -1]
-      if (family == "binomial") {
-        cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
-        prob <- 1 / (1 + exp(-coef_add %*% new_data))
-        hessian_new <- (new_data %o% new_data) * c(prob * (1 - prob))
-      } else if (family == "poisson") {
-        cum_coef_add <- coef_add <- DescTools::Winsorize(
-          x = segment_theta_hat[segment_indices[t], ],
-          minval = winsorise_minval,
-          maxval = winsorise_maxval
-        )
-        hessian_new <- (new_data %o% new_data) * c(exp(coef_add %*% new_data))
-      } else if (family %in% c("lasso", "gaussian")) {
-        cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
-        hessian_new <- new_data %o% new_data + epsilon * diag(1, p)
-      } else if (family == "custom") {
-        cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
-        hessian_new <- matrix(0, p, p)
-      }
-
-      theta_hat <- cbind(theta_hat, coef_add)
-      theta_sum <- cbind(theta_sum, cum_coef_add)
-      hessian <- abind::abind(hessian, hessian_new, along = 3)
-
-      # Step 3
-      cval[r_t_count] <- 0
-      obj <- cval + f_t[r_t_set + 1] + beta
-      min_val <- min(obj)
-      tau_star <- r_t_set[which(obj == min_val)[1]]
-
-      # Step 4
-      cp_set[[t + 1]] <- c(cp_set[[tau_star + 1]], tau_star)
-
-      # Step 5
-      pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
-      r_t_set <- c(r_t_set[pruned_left], t)
-
-      theta_hat <- theta_hat[, pruned_left, drop = FALSE]
-      theta_sum <- theta_sum[, pruned_left, drop = FALSE]
-      hessian <- hessian[, , pruned_left, drop = FALSE]
-
-      # Objective function F(t).
-      f_t[t + 1] <- min_val
+      cost_values <- c(cost_values, cost_result$value)
+      thetas <- cbind(thetas, cost_result$par)
     }
-
-    # Remove change-points close to the boundaries
-
-    cp_set <- cp_set[[n + 1]]
-    cp_set <- cp_set[(cp_set >= trim * n) & (cp_set <= (1 - trim) * n)]
-    cp_set <- sort(unique(c(0, cp_set)))
-
-    segment_indices <- which((diff(cp_set) < trim * n) == TRUE)
-    if (length(segment_indices) > 0) {
-      cp_set <- floor(
-        (cp_set[-(segment_indices + 1)] + cp_set[-segment_indices]) / 2
-      )
-    }
-    cp_set <- cp_set[cp_set > 0]
-    cost_values <- thetas <- NULL
-    residual <- 0[family == "custom"]
-
-    if (cp_only) {
-      cost_values <- numeric(0)
-      thetas <- matrix(NA, nrow = 0, ncol = 0)
-    } else {
-      cp_loc <- unique(c(0, cp_set, n))
-      for (i in 1:(length(cp_loc) - 1)) {
-        if (family == "custom") {
-          if (p == 1) {
-            optim_result <- stats::optim(
-              par = 0,
-              fn = function(theta, data) {
-                cost(data = data, theta = log(theta / (1 - theta)))
-              },
-              method = "Brent",
-              lower = 0,
-              upper = 1,
-              data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
-            )
-            cost_result <- list(
-              par = log(optim_result$par / (1 - optim_result$par)),
-              value = exp(optim_result$value) / (1 + exp(optim_result$value))
-            )
-          } else {
-            cost_result <- stats::optim(
-              par = rep(0, p),
-              fn = cost,
-              data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE],
-              method = "L-BFGS-B"
-            )
-          }
-        } else {
-          cost_result <- cost(data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE], NULL, family, lambda)
-          residual <- c(residual, cost_result$residuals)
-        }
-        cost_values <- c(cost_values, cost_result$value)
-        thetas <- cbind(thetas, cost_result$par)
-      }
-    }
-
-    methods::new(
-      Class = "fastcpd",
-      call = match.call(),
-      data = data.frame(data),
-      family = family,
-      cp_set = cp_set,
-      cost_values = cost_values,
-      residuals = residual,
-      thetas = thetas,
-      cp_only = cp_only
-    )
   }
+  thetas <- data.frame(thetas)
+  names(thetas) <- paste0("segment ", seq_len(ncol(thetas)))
+  list(
+    cp_set = cp_set,
+    cost_values = cost_values,
+    residual = residual,
+    thetas = thetas
+  )
 }

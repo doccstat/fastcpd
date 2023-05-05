@@ -90,8 +90,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // negative_log_likelihood
-Rcpp::List negative_log_likelihood(arma::mat data, Rcpp::Nullable<arma::colvec> theta, std::string family, double lambda, bool cv);
-RcppExport SEXP _fastcpd_negative_log_likelihood(SEXP dataSEXP, SEXP thetaSEXP, SEXP familySEXP, SEXP lambdaSEXP, SEXP cvSEXP) {
+Rcpp::List negative_log_likelihood(arma::mat data, Rcpp::Nullable<arma::colvec> theta, std::string family, double lambda, bool cv, Rcpp::Nullable<arma::colvec> start);
+RcppExport SEXP _fastcpd_negative_log_likelihood(SEXP dataSEXP, SEXP thetaSEXP, SEXP familySEXP, SEXP lambdaSEXP, SEXP cvSEXP, SEXP startSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -100,19 +100,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type family(familySEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< bool >::type cv(cvSEXP);
-    rcpp_result_gen = Rcpp::wrap(negative_log_likelihood(data, theta, family, lambda, cv));
+    Rcpp::traits::input_parameter< Rcpp::Nullable<arma::colvec> >::type start(startSEXP);
+    rcpp_result_gen = Rcpp::wrap(negative_log_likelihood(data, theta, family, lambda, cv, start));
     return rcpp_result_gen;
 END_RCPP
 }
 
-RcppExport SEXP run_testthat_tests(SEXP);
+RcppExport SEXP run_testthat_tests(void *);
 
 static const R_CallMethodDef CallEntries[] = {
     {"_fastcpd_cost_update", (DL_FUNC) &_fastcpd_cost_update, 17},
     {"_fastcpd_cost_update_gradient", (DL_FUNC) &_fastcpd_cost_update_gradient, 3},
     {"_fastcpd_cost_update_hessian", (DL_FUNC) &_fastcpd_cost_update_hessian, 4},
     {"_fastcpd_fastcpd_vanilla", (DL_FUNC) &_fastcpd_fastcpd_vanilla, 14},
-    {"_fastcpd_negative_log_likelihood", (DL_FUNC) &_fastcpd_negative_log_likelihood, 5},
+    {"_fastcpd_negative_log_likelihood", (DL_FUNC) &_fastcpd_negative_log_likelihood, 6},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };

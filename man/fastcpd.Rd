@@ -22,7 +22,9 @@ fastcpd(
   cost = negative_log_likelihood,
   cost_gradient = cost_update_gradient,
   cost_hessian = cost_update_hessian,
-  cp_only = TRUE
+  cp_only = FALSE,
+  vanilla = FALSE,
+  warm_start = FALSE
 )
 }
 \arguments{
@@ -67,6 +69,10 @@ the negative log-likelihood for the corresponding family.}
 
 \item{cp_only}{Whether to return only the change points or with the cost
 values for each segment.}
+
+\item{vanilla}{Whether to use vanilla PELT or SeN.}
+
+\item{warm_start}{Whether to use warm start.}
 }
 \value{
 A class \code{fastcpd} object.
@@ -99,8 +105,7 @@ y <- c(
 result <- fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
-  family = "gaussian",
-  cp_only = FALSE
+  family = "gaussian"
 )
 plot(result)
 summary(result)
@@ -117,8 +122,7 @@ y <- c(
 result <- fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
-  family = "binomial",
-  cp_only = FALSE
+  family = "binomial"
 )
 plot(result)
 summary(result)
@@ -144,8 +148,7 @@ result <- fastcpd(
   beta = (p + 1) * log(1500) / 2,
   k = function(x) 0,
   family = "poisson",
-  epsilon = 1e-5,
-  cp_only = FALSE
+  epsilon = 1e-5
 )
 plot(result)
 summary(result)
@@ -173,11 +176,60 @@ y <- c(
 result <- fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
-  family = "lasso",
-  cp_only = FALSE
+  family = "lasso"
 )
 plot(result)
 summary(result)
+
+# Custom cost function: logistic regression
+library(fastcpd)
+set.seed(1)
+p <- 5
+x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
+theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
+y <- c(
+  rbinom(200, 1, 1 / (1 + exp(-x[1:200, ] \%*\% theta[1, ]))),
+  rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] \%*\% theta[2, ])))
+)
+data <- data.frame(y = y, x = x)
+result_builtin <- fastcpd(
+  formula = y ~ . - 1,
+  data = data,
+  family = "binomial"
+)
+logistic_loss <- function(data, theta) {
+  x <- data[, -1]
+  y <- data[, 1]
+  u <- x \%*\% theta
+  nll <- -y * u + log(1 + exp(u))
+  nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
+  sum(nll)
+}
+logistic_loss_gradient <- function(data, theta) {
+  x <- data[nrow(data), -1]
+  y <- data[nrow(data), 1]
+  c(-(y - 1 / (1 + exp(-x \%*\% theta)))) * x
+}
+logistic_loss_hessian <- function(data, theta) {
+  x <- data[nrow(data), -1]
+  prob <- 1 / (1 + exp(-x \%*\% theta))
+  (x \%o\% x) * c((1 - prob) * prob)
+}
+result_custom <- fastcpd(
+  formula = y ~ . - 1,
+  data = data,
+  epsilon = 1e-5,
+  cost = logistic_loss,
+  cost_gradient = logistic_loss_gradient,
+  cost_hessian = logistic_loss_hessian
+)
+cat(
+  "Change points detected by built-in logistic regression model:",
+  result_builtin@cp_set, "\n",
+  "Change points detected by custom logistic regression model:",
+  result_custom@cp_set, "\n",
+  sep = ""
+)
 
 # Custom cost function: mean shift
 library(fastcpd)
@@ -263,8 +315,8 @@ summary(meanvar_loss_result)
 # Custom cost function: Huber loss
 library(fastcpd)
 set.seed(1)
-n <- 500 + 700 + 500
-p <- 8
+n <- 400 + 300 + 500
+p <- 5
 x <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(p))
 theta <- rbind(
   mvtnorm::rmvnorm(1, mean = rep(0, p - 3), sigma = diag(p - 3)),
@@ -272,11 +324,11 @@ theta <- rbind(
   mvtnorm::rmvnorm(1, mean = rep(9, p - 3), sigma = diag(p - 3))
 )
 theta <- cbind(theta, matrix(0, 3, 3))
-theta <- theta[rep(seq_len(3), c(500, 700, 500)), ]
+theta <- theta[rep(seq_len(3), c(400, 300, 500)), ]
 y_true <- rowSums(x * theta)
 factor <- c(
-  2 * stats::rbinom(500, size = 1, prob = 0.95) - 1,
-  2 * stats::rbinom(700, size = 1, prob = 0.95) - 1,
+  2 * stats::rbinom(400, size = 1, prob = 0.95) - 1,
+  2 * stats::rbinom(300, size = 1, prob = 0.95) - 1,
   2 * stats::rbinom(500, size = 1, prob = 0.95) - 1
 )
 y <- factor * y_true + stats::rnorm(n)

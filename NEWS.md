@@ -1,3 +1,10 @@
+# fastcpd 0.2.4
+
+* Add column name for `thetas` slot in `fastcpd` class.
+* Fix plot where residuals and responses appear in the same plot.
+* Default `cp_only` to `FALSE`.
+* Remove residuals from `summary` method.
+
 # fastcpd 0.2.3
 
 * Add missing examples for linear regression and LASSO.
