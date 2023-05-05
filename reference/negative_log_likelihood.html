@@ -18,7 +18,7 @@ This function is not meant to be called directly by the user."><!-- mathjax --><
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,7 @@ This function is not meant to be called directly by the user.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">negative_log_likelihood</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span>, <span class="va">family</span>, <span class="va">lambda</span>, cv <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">negative_log_likelihood</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span>, <span class="va">family</span>, <span class="va">lambda</span>, cv <span class="op">=</span> <span class="cn">FALSE</span>, start <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -81,6 +81,10 @@ the parameters.</p></dd>
 
 <dt>cv</dt>
 <dd><p>Whether to perform cross-validation to find the best lambda.</p></dd>
+
+
+<dt>start</dt>
+<dd><p>Starting point for the optimization for warm start.</p></dd>
 
 </dl></div>
     <div class="section level2">
