@@ -10,7 +10,10 @@
 //' @param family Family of the model.
 //' @param lambda Lambda for L1 regularization. Only used for lasso.
 //' @param cv Whether to perform cross-validation to find the best lambda.
+//' @param start Starting point for the optimization for warm start.
 //' @keywords internal
+//' @importFrom glmnet glmnet cv.glmnet predict.glmnet
+//' @importFrom fastglm fastglm
 //'
 //' @return Negative log likelihood of the corresponding data with the given
 //'   family.
@@ -20,7 +23,8 @@ Rcpp::List negative_log_likelihood(
     Rcpp::Nullable<arma::colvec> theta,
     std::string family,
     double lambda,
-    bool cv = false
+    bool cv = false,
+    Rcpp::Nullable<arma::colvec> start = R_NilValue
 ) {
     if (theta.isNull() && family == "lasso" && cv) {
         Rcpp::Environment glmnet = Rcpp::Environment::namespace_env("glmnet");
@@ -72,7 +76,13 @@ Rcpp::List negative_log_likelihood(
         arma::vec y = data.col(0);
         Rcpp::Environment fastglm = Rcpp::Environment::namespace_env("fastglm");
         Rcpp::Function fastglm_ = fastglm["fastglm"];
-        Rcpp::List out = fastglm_(x, y, family);
+        Rcpp::List out;
+        if (start.isNull()) {
+            out = fastglm_(x, y, family);
+        } else {
+            arma::colvec start_ = Rcpp::as<arma::colvec>(start);
+            out = fastglm_(x, y, family, Rcpp::Named("start") = start_);
+        }
         arma::vec par = Rcpp::as<arma::vec>(out["coefficients"]);
         arma::vec residuals = Rcpp::as<arma::vec>(out["residuals"]);
         double value = out["deviance"];

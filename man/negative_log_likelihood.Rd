@@ -6,7 +6,7 @@
 multivariate case
 This function is not meant to be called directly by the user.}
 \usage{
-negative_log_likelihood(data, theta, family, lambda, cv = FALSE)
+negative_log_likelihood(data, theta, family, lambda, cv = FALSE, start = NULL)
 }
 \arguments{
 \item{data}{A data frame containing the data to be segmented.}
@@ -19,6 +19,8 @@ the parameters.}
 \item{lambda}{Lambda for L1 regularization. Only used for lasso.}
 
 \item{cv}{Whether to perform cross-validation to find the best lambda.}
+
+\item{start}{Starting point for the optimization for warm start.}
 }
 \value{
 Negative log likelihood of the corresponding data with the given

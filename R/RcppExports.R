@@ -27,6 +27,7 @@
 #' @param cost_gradient Gradient for custom cost function.
 #' @param cost_hessian Hessian for custom cost function.
 #' @keywords internal
+#' @importFrom DescTools Winsorize
 #'
 #' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 #'   \code{hessian}, and \code{momentum}.
@@ -103,11 +104,14 @@ fastcpd_vanilla <- function(data, beta, segment_count, trim, momentum_coef, k, f
 #' @param family Family of the model.
 #' @param lambda Lambda for L1 regularization. Only used for lasso.
 #' @param cv Whether to perform cross-validation to find the best lambda.
+#' @param start Starting point for the optimization for warm start.
 #' @keywords internal
+#' @importFrom glmnet glmnet cv.glmnet predict.glmnet
+#' @importFrom fastglm fastglm
 #'
 #' @return Negative log likelihood of the corresponding data with the given
 #'   family.
-negative_log_likelihood <- function(data, theta, family, lambda, cv = FALSE) {
-    .Call(`_fastcpd_negative_log_likelihood`, data, theta, family, lambda, cv)
+negative_log_likelihood <- function(data, theta, family, lambda, cv = FALSE, start = NULL) {
+    .Call(`_fastcpd_negative_log_likelihood`, data, theta, family, lambda, cv, start)
 }
 

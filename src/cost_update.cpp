@@ -26,6 +26,7 @@
 //' @param cost_gradient Gradient for custom cost function.
 //' @param cost_hessian Hessian for custom cost function.
 //' @keywords internal
+//' @importFrom DescTools Winsorize
 //'
 //' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 //'   \code{hessian}, and \code{momentum}.
