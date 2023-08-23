@@ -2,6 +2,7 @@
 
 * Add sanity check for Logistic regression data, i.e. binomial family.
 * Rename C++ source files to follow Unix convention.
+* Update documentation link in README.
 
 # fastcpd 0.2.5
 
