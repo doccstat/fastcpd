@@ -43,7 +43,7 @@ If you're compiling from source, you can run `pak::pkg_system_requirements("fast
 
 ### Documentation
 
-[<https://www.xingchi.li/fastcpd>](https://www.xingchi.li/fastcpd)
+[<https://fastcpd.xingchi.li>](https://fastcpd.xingchi.li)
 
 ### Linear regression
 
