@@ -28,6 +28,7 @@
 //' @keywords internal
 //' @importFrom DescTools Winsorize
 //'
+//' @noRd
 //' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 //'   \code{hessian}, and \code{momentum}.
 // [[Rcpp::export]]

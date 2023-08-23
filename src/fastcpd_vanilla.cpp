@@ -27,6 +27,7 @@
 //'   values for each segment.
 //' @keywords internal
 //'
+//' @noRd
 //' @return Change points and corresponding cost values.
 // [[Rcpp::export]]
 Rcpp::List fastcpd_vanilla(

@@ -2,7 +2,7 @@ Package: fastcpd
 Type: Package
 Title: Fast Change Point Detection Based on Dynamic Programming with Pruning
     with Sequential Gradient Descent
-Version: 0.2.4
+Version: 0.2.5
 Authors@R: c(
     person("Xingchi", "Li", email = "anthony.li@stat.tamu.edu",
            role = c("aut", "cre", "cph"),

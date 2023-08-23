@@ -9,6 +9,7 @@
 //' @param min_prob Minimum probability to avoid numerical issues.
 //' @keywords internal
 //'
+//' @noRd
 //' @return Hessian at the current data.
 // [[Rcpp::export]]
 arma::mat cost_update_hessian(arma::mat data,

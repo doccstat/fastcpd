@@ -8,6 +8,7 @@
 //' @param family Family of the model.
 //' @keywords internal
 //'
+//' @noRd
 //' @return Gradient at the current data.
 // [[Rcpp::export]]
 arma::colvec cost_update_gradient(arma::mat data,

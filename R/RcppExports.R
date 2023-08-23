@@ -29,6 +29,7 @@
 #' @keywords internal
 #' @importFrom DescTools Winsorize
 #'
+#' @noRd
 #' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 #'   \code{hessian}, and \code{momentum}.
 cost_update <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian) {
@@ -43,6 +44,7 @@ cost_update <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, 
 #' @param family Family of the model.
 #' @keywords internal
 #'
+#' @noRd
 #' @return Gradient at the current data.
 cost_update_gradient <- function(data, theta, family) {
     .Call(`_fastcpd_cost_update_gradient`, data, theta, family)
@@ -57,6 +59,7 @@ cost_update_gradient <- function(data, theta, family) {
 #' @param min_prob Minimum probability to avoid numerical issues.
 #' @keywords internal
 #'
+#' @noRd
 #' @return Hessian at the current data.
 cost_update_hessian <- function(data, theta, family, min_prob) {
     .Call(`_fastcpd_cost_update_hessian`, data, theta, family, min_prob)
@@ -89,6 +92,7 @@ cost_update_hessian <- function(data, theta, family, min_prob) {
 #'   values for each segment.
 #' @keywords internal
 #'
+#' @noRd
 #' @return Change points and corresponding cost values.
 fastcpd_vanilla <- function(data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only) {
     .Call(`_fastcpd_fastcpd_vanilla`, data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only)
@@ -109,6 +113,7 @@ fastcpd_vanilla <- function(data, beta, segment_count, trim, momentum_coef, k, f
 #' @importFrom glmnet glmnet cv.glmnet predict.glmnet
 #' @importFrom fastglm fastglm
 #'
+#' @noRd
 #' @return Negative log likelihood of the corresponding data with the given
 #'   family.
 negative_log_likelihood <- function(data, theta, family, lambda, cv = FALSE, start = NULL) {

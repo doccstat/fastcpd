@@ -15,6 +15,7 @@
 //' @importFrom glmnet glmnet cv.glmnet predict.glmnet
 //' @importFrom fastglm fastglm
 //'
+//' @noRd
 //' @return Negative log likelihood of the corresponding data with the given
 //'   family.
 // [[Rcpp::export]]

@@ -383,10 +383,10 @@ fastcpd <- function(
   } else if (vanilla) {
     fastcpd_vanilla_custom(
       data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
-      min_prob, winsorise_minval, winsorise_maxval, p, warm_start,
+      min_prob, winsorise_minval, winsorise_maxval, p,
       function(data) {
         cost(data = data, theta = NULL, family = family, lambda = 0)
-      }, cp_only
+      }, cp_only, warm_start
     )
   } else {
     fastcpd_builtin(
@@ -769,7 +769,9 @@ fastcpd_builtin <- function(
     }
   }
   thetas <- data.frame(thetas)
-  names(thetas) <- paste0("segment ", seq_len(ncol(thetas)))
+  if (ncol(thetas) > 0) {
+    names(thetas) <- paste0("segment ", seq_len(ncol(thetas)))
+  }
   list(
     cp_set = cp_set,
     cost_values = cost_values,
