@@ -19,39 +19,24 @@
     <loc>http://www.xingchi.li/fastcpd/news/index.html</loc>
   </url>
   <url>
-    <loc>http://www.xingchi.li/fastcpd/reference/cost_update.html</loc>
-  </url>
-  <url>
-    <loc>http://www.xingchi.li/fastcpd/reference/cost_update_gradient.html</loc>
-  </url>
-  <url>
-    <loc>http://www.xingchi.li/fastcpd/reference/cost_update_hessian.html</loc>
-  </url>
-  <url>
     <loc>http://www.xingchi.li/fastcpd/reference/fastcpd-class.html</loc>
   </url>
   <url>
     <loc>http://www.xingchi.li/fastcpd/reference/fastcpd.html</loc>
   </url>
   <url>
-    <loc>http://www.xingchi.li/fastcpd/reference/fastcpd_vanilla.html</loc>
-  </url>
-  <url>
     <loc>http://www.xingchi.li/fastcpd/reference/index.html</loc>
   </url>
   <url>
-    <loc>http://www.xingchi.li/fastcpd/reference/negative_log_likelihood.html</loc>
+    <loc>http://www.xingchi.li/fastcpd/reference/plot.html</loc>
   </url>
   <url>
-    <loc>http://www.xingchi.li/fastcpd/reference/plot.fastcpd.html</loc>
+    <loc>http://www.xingchi.li/fastcpd/reference/print.html</loc>
   </url>
   <url>
-    <loc>http://www.xingchi.li/fastcpd/reference/print.fastcpd.html</loc>
+    <loc>http://www.xingchi.li/fastcpd/reference/show.html</loc>
   </url>
   <url>
-    <loc>http://www.xingchi.li/fastcpd/reference/show.fastcpd.html</loc>
-  </url>
-  <url>
-    <loc>http://www.xingchi.li/fastcpd/reference/summary.fastcpd.html</loc>
+    <loc>http://www.xingchi.li/fastcpd/reference/summary.html</loc>
   </url>
 </urlset>
