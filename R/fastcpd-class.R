@@ -16,6 +16,7 @@
 #' @slot thetas The estimated parameters for each segment.
 #' @slot cp_only A boolean indicating whether the model was fitted with only
 #'   change points or with change points and parameters.
+#' @export
 setClass(
   "fastcpd",
   representation(
@@ -31,7 +32,7 @@ setClass(
 )
 
 #' @method plot fastcpd
-#' @rdname plot.fastcpd
+#' @rdname plot
 #' @export
 plot.fastcpd <- function(x, ...) {
   y <- x@data[, 1]
@@ -57,12 +58,12 @@ plot.fastcpd <- function(x, ...) {
 #' @param y Ignored.
 #' @param ... Ignored.
 #'
-#' @rdname plot.fastcpd
+#' @rdname plot
 #' @export
 setMethod("plot", signature(x = "fastcpd", y = "missing"), plot.fastcpd)
 
 #' @method print fastcpd
-#' @rdname print.fastcpd
+#' @rdname print
 #' @export
 print.fastcpd <- function(x, ...) {
   if (length(x@cp_set)) {
@@ -78,12 +79,12 @@ print.fastcpd <- function(x, ...) {
 #' @param x \code{fastcpd} object.
 #' @param ... Ignored.
 #'
-#' @rdname print.fastcpd
+#' @rdname print
 #' @export
 setMethod("print", "fastcpd", print.fastcpd)
 
 #' @method show fastcpd
-#' @rdname show.fastcpd
+#' @rdname show
 #' @export
 show.fastcpd <- function(object) {
   cat(
@@ -98,12 +99,12 @@ show.fastcpd <- function(object) {
 #' Show the available methods for a \code{fastcpd} object
 #' @param object \code{fastcpd} object.
 #'
-#' @rdname show.fastcpd
+#' @rdname show
 #' @export
 setMethod("show", "fastcpd", show.fastcpd)
 
 #' @method summary fastcpd
-#' @rdname summary.fastcpd
+#' @rdname summary
 #' @export
 summary.fastcpd <- function(object, ...) {
   cat(
@@ -132,6 +133,6 @@ summary.fastcpd <- function(object, ...) {
 #' @param object \code{fastcpd} object.
 #' @param ... Ignored.
 #'
-#' @rdname summary.fastcpd
+#' @rdname summary
 #' @export
 setMethod("summary", "fastcpd", summary.fastcpd)

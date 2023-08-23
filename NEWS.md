@@ -1,3 +1,8 @@
+# fastcpd 0.2.5
+
+* Hide internal functions from the documentation.
+* Export `fastcpd` class.
+
 # fastcpd 0.2.4
 
 * Add column name for `thetas` slot in `fastcpd` class.
