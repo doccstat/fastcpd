@@ -30,4 +30,4 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-URL: http://www.xingchi.li/fastcpd/
+URL: https://fastcpd.xingchi.li

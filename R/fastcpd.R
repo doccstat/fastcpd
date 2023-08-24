@@ -84,7 +84,6 @@ NULL
 #'   data = data.frame(y = y, x = x),
 #'   family = "binomial"
 #' )
-#' plot(result)
 #' summary(result)
 #'
 #' # Poisson regression
@@ -110,7 +109,6 @@ NULL
 #'   family = "poisson",
 #'   epsilon = 1e-5
 #' )
-#' plot(result)
 #' summary(result)
 #'
 #' # Penalized linear regression
@@ -421,6 +419,7 @@ fastcpd_vanilla_custom <- function(
 
   for (t in 2:n) {
     r_t_count <- length(r_t_set)
+
     # number of cost values is the same as number of elemnts in R_t
     cval <- rep(0, r_t_count)
 
