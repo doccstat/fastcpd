@@ -1,3 +1,8 @@
+# fastcpd 0.2.7
+
+* Fix mean change example bug.
+* Update documentation to redirect README to `pkgdown` generated webpage.
+
 # fastcpd 0.2.6
 
 * Add C++ sanity check for Logistic regression data, i.e. binomial family.
