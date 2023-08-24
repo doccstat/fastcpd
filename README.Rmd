@@ -61,3 +61,10 @@ If you're compiling from source, you can run `pak::pkg_system_requirements("fast
 ### Documentation
 
 [documentation & examples](https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples)
+
+### Contact us
+
+Encountered a bug or unintended behavior?
+
+1.  File a ticket at [GitHub Issues](https://github.com/doccstat/fastcpd/issues).
+2.  Contact the developers specified in [DESCRIPTION](/DESCRIPTION).

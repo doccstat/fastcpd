@@ -2,6 +2,7 @@
 
 * Fix mean change example bug.
 * Update documentation to redirect README to `pkgdown` generated webpage.
+* Add contact methods and ways to file a ticket.
 
 # fastcpd 0.2.6
 
