@@ -41,11 +41,11 @@ If you're compiling from source, you can run `pak::pkg_system_requirements("fast
 -   [glmnet](https://glmnet.stanford.edu/), for penalized regression.
 -   [ggplot2](https://github.com/tidyverse/ggplot2), for data visualization.
 
-### Documentation
+## Documentation
 
 [documentation & examples](https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples)
 
-### Contact us
+## Contact us
 
 Encountered a bug or unintended behavior?
 
