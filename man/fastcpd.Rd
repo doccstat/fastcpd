@@ -118,7 +118,6 @@ result <- fastcpd(
   data = data.frame(y = y, x = x),
   family = "binomial"
 )
-plot(result)
 summary(result)
 
 # Poisson regression
@@ -144,7 +143,6 @@ result <- fastcpd(
   family = "poisson",
   epsilon = 1e-5
 )
-plot(result)
 summary(result)
 
 # Penalized linear regression
