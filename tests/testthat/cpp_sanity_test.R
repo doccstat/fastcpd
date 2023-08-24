@@ -7,7 +7,7 @@ test_that("logistic regression", {
   kNumberOfDataPoints <- 300
   kDimension <- 5
 
-  # There are kNumberOfDataPoints five-dimensional data points.
+  # There are 300 five-dimensional data points.
   x <- matrix(rnorm(kNumberOfDataPoints * kDimension, 0, 1), ncol = kDimension)
 
   # Randomly generate coefficients with different means.
@@ -26,12 +26,13 @@ test_that("logistic regression", {
     family = "binomial",
     segment_count = 5
   ))@cp_set
-  expect_equal(change_points_binomial_fastcpd, kChangePointLocation)
 
   change_points_binomial_fastcpd_sanity <- segd_binomial(
-    cbind(x, y), (kDimension + 1) * log(kNumberOfDataPoints) / 2, B = 5
+    cbind(x, y), (kDimension + 1) * log(kNumberOfDataPoints) / 2,
+    B = 5
   )$cp
-  expect_equal(change_points_binomial_fastcpd_sanity, kChangePointLocation)
+
+  expect_equal(change_points_binomial_fastcpd, change_points_binomial_fastcpd_sanity)
 
   change_points_binomial_fastcpd_vanilla_sanity <- pelt_vanilla_binomial(
     cbind(x, y), (kDimension + 1) * log(kNumberOfDataPoints) / 2

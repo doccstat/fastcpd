@@ -1,6 +1,7 @@
 # fastcpd 0.2.6
 
-* Add sanity check for Logistic regression data, i.e. binomial family.
+* Add C++ sanity check for Logistic regression data, i.e. binomial family.
+* Add examples as tests for `fastcpd`.
 * Rename C++ source files to follow Unix convention.
 * Update documentation link in README.
 

@@ -8,7 +8,7 @@
 #'     the response variable.
 #' @param family Family of the distribution.
 #' @keywords internal
-#' 
+#'
 #' @noRd
 #' @return Cost value for the corresponding segment of data.
 cost_glm_binomial <- function(data, family = "binomial") {
@@ -24,7 +24,7 @@ cost_glm_binomial <- function(data, family = "binomial") {
 #' @param beta Penalty coefficient for the number of change points.
 #' @param cost Cost function to be used to calculate cost values.
 #' @keywords internal
-#' 
+#'
 #' @noRd
 #' @return A list consisting of two: change point locations and negative log
 #'     likelihood values for each segment.
@@ -78,7 +78,7 @@ pelt_vanilla_binomial <- function(data, beta, cost = cost_glm_binomial) {
 #' @param epsilon Small adjustment to avoid singularity when doing inverse on
 #'     the Hessian matrix.
 #' @keywords internal
-#' 
+#'
 #' @noRd
 #' @return A list of values containing the new coefficients, summation of
 #'     coefficients so far and all the Hessian matrices.
@@ -100,7 +100,7 @@ cost_logistic_update <- function(data_new, coef, cum_coef, cmatrix, epsilon = 1e
 #' @param data Data to be used to calculate the negative log likelihood.
 #' @param b Guess of the coefficient.
 #' @keywords internal
-#' 
+#'
 #' @noRd
 #' @return Negative log likelihood.
 neg_log_lik_binomial <- function(data, b) {
@@ -120,7 +120,7 @@ neg_log_lik_binomial <- function(data, b) {
 #' @param trim Propotion of the data to ignore the change points at the
 #'     beginning, ending and between change points.
 #' @keywords internal
-#' 
+#'
 #' @noRd
 #' @return A list containing potential change point locations and negative log
 #'     likelihood for each segment based on the change points guess.
