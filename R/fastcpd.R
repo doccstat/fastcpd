@@ -200,11 +200,11 @@ NULL
 #' )
 #' segment_count_guess <- 10
 #' block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
-#' block_count <- ceiling(nrow(data) / block_size)
+#' block_count <- floor(nrow(data) / block_size)
 #' data_all_vars <- rep(0, block_count)
 #' for (block_index in seq_len(block_count)) {
 #'   block_start <- (block_index - 1) * block_size + 1
-#'   block_end <- min(block_index * block_size, nrow(data))
+#'   block_end <- if (block_index < block_count) block_index * block_size else nrow(data)
 #'   data_all_vars[block_index] <- var(data[block_start:block_end, ])
 #' }
 #' data_all_var <- mean(data_all_vars)
