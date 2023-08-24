@@ -43,10 +43,14 @@ plot.fastcpd <- function(x, ...) {
     ) +
     ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
   if (x@family != "custom" && !x@cp_only) {
-    p <- p + ggplot2::geom_point(data = data.frame(x = seq_len(nrow(x@data)),
-                                                   y = x@residuals,
-                                                   label = "residual"),
-                                 ggplot2::aes(x = x, y = y)) +
+    p <- p + ggplot2::geom_point(
+      data = data.frame(
+        x = seq_len(nrow(x@data)),
+        y = x@residuals,
+        label = "residual"
+      ),
+      ggplot2::aes(x = x, y = y)
+    ) +
       ggplot2::facet_wrap(c("label"), ncol = 1, scales = "free_y")
   }
   print(p)

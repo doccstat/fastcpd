@@ -22,9 +22,7 @@ fastcpd(
   cost = negative_log_likelihood,
   cost_gradient = cost_update_gradient,
   cost_hessian = cost_update_hessian,
-  cp_only = FALSE,
-  vanilla = FALSE,
-  warm_start = FALSE
+  cp_only = FALSE
 )
 }
 \arguments{
@@ -69,10 +67,6 @@ the negative log-likelihood for the corresponding family.}
 
 \item{cp_only}{Whether to return only the change points or with the cost
 values for each segment.}
-
-\item{vanilla}{Whether to use vanilla PELT or SeN.}
-
-\item{warm_start}{Whether to use warm start.}
 }
 \value{
 A class \code{fastcpd} object.
@@ -252,7 +246,7 @@ for (block_index in seq_len(block_count)) {
 data_all_var <- mean(data_all_vars)
 mean_loss <- function(data) {
   n <- nrow(data)
-  (norm(data, type = "F") ^ 2 - colSums(data) ^ 2 / n) / 2 / data_all_var +
+  (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
     n / 2 * (log(data_all_var) + log(2 * pi))
 }
 mean_loss_result <- fastcpd(
@@ -276,7 +270,7 @@ data <- rbind.data.frame(
 data_all_mu <- colMeans(data)
 var_loss <- function(data) {
   demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
-  nrow(data) * (1 + log(2 * pi) + log(demeaned_data_norm ^ 2 / nrow(data))) / 2
+  nrow(data) * (1 + log(2 * pi) + log(demeaned_data_norm^2 / nrow(data))) / 2
 }
 var_loss_result <- fastcpd(
   formula = ~ . - 1,
@@ -300,7 +294,7 @@ data <- rbind.data.frame(
   mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
 )
 meanvar_loss <- function(data) {
-  loss_part <- (colSums(data ^ 2) - colSums(data) ^ 2 / nrow(data)) / nrow(data)
+  loss_part <- (colSums(data^2) - colSums(data)^2 / nrow(data)) / nrow(data)
   nrow(data) * (1 + log(2 * pi) + log(loss_part)) / 2
 }
 meanvar_loss_result <- fastcpd(
@@ -338,16 +332,16 @@ huber_loss <- function(data, theta) {
   residual <- data[, 1] - data[, -1, drop = FALSE] \%*\% theta
   indicator <- abs(residual) <= huber_threshold
   sum(
-    residual ^ 2 / 2 * indicator +
-    huber_threshold * (abs(residual) - huber_threshold / 2) * (1 - indicator)
+    residual^2 / 2 * indicator +
+      huber_threshold * (abs(residual) - huber_threshold / 2) * (1 - indicator)
   )
 }
 huber_loss_gradient <- function(data, theta) {
   residual <- c(data[nrow(data), 1] - data[nrow(data), -1] \%*\% theta)
   if (abs(residual) <= huber_threshold) {
-    - residual * data[nrow(data), -1]
+    -residual * data[nrow(data), -1]
   } else {
-    - huber_threshold * sign(residual) * data[nrow(data), -1]
+    -huber_threshold * sign(residual) * data[nrow(data), -1]
   }
 }
 huber_loss_hessian <- function(data, theta) {

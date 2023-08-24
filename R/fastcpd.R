@@ -47,8 +47,6 @@ NULL
 #' @param cost_hessian Hessian for custom cost function.
 #' @param cp_only Whether to return only the change points or with the cost
 #'   values for each segment.
-#' @param vanilla Whether to use vanilla PELT or SeN.
-#' @param warm_start Whether to use warm start.
 #'
 #' @return A class \code{fastcpd} object.
 #' @export
@@ -214,7 +212,7 @@ NULL
 #' data_all_var <- mean(data_all_vars)
 #' mean_loss <- function(data) {
 #'   n <- nrow(data)
-#'   (norm(data, type = "F") ^ 2 - colSums(data) ^ 2 / n) / 2 / data_all_var +
+#'   (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
 #'     n / 2 * (log(data_all_var) + log(2 * pi))
 #' }
 #' mean_loss_result <- fastcpd(
@@ -238,7 +236,7 @@ NULL
 #' data_all_mu <- colMeans(data)
 #' var_loss <- function(data) {
 #'   demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
-#'   nrow(data) * (1 + log(2 * pi) + log(demeaned_data_norm ^ 2 / nrow(data))) / 2
+#'   nrow(data) * (1 + log(2 * pi) + log(demeaned_data_norm^2 / nrow(data))) / 2
 #' }
 #' var_loss_result <- fastcpd(
 #'   formula = ~ . - 1,
@@ -262,7 +260,7 @@ NULL
 #'   mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
 #' )
 #' meanvar_loss <- function(data) {
-#'   loss_part <- (colSums(data ^ 2) - colSums(data) ^ 2 / nrow(data)) / nrow(data)
+#'   loss_part <- (colSums(data^2) - colSums(data)^2 / nrow(data)) / nrow(data)
 #'   nrow(data) * (1 + log(2 * pi) + log(loss_part)) / 2
 #' }
 #' meanvar_loss_result <- fastcpd(
@@ -300,16 +298,16 @@ NULL
 #'   residual <- data[, 1] - data[, -1, drop = FALSE] %*% theta
 #'   indicator <- abs(residual) <= huber_threshold
 #'   sum(
-#'     residual ^ 2 / 2 * indicator +
-#'     huber_threshold * (abs(residual) - huber_threshold / 2) * (1 - indicator)
+#'     residual^2 / 2 * indicator +
+#'       huber_threshold * (abs(residual) - huber_threshold / 2) * (1 - indicator)
 #'   )
 #' }
 #' huber_loss_gradient <- function(data, theta) {
 #'   residual <- c(data[nrow(data), 1] - data[nrow(data), -1] %*% theta)
 #'   if (abs(residual) <= huber_threshold) {
-#'     - residual * data[nrow(data), -1]
+#'     -residual * data[nrow(data), -1]
 #'   } else {
-#'     - huber_threshold * sign(residual) * data[nrow(data), -1]
+#'     -huber_threshold * sign(residual) * data[nrow(data), -1]
 #'   }
 #' }
 #' huber_loss_hessian <- function(data, theta) {
@@ -330,27 +328,23 @@ NULL
 #' )
 #' summary(huber_regression_result)
 fastcpd <- function(
-  formula = y ~ . - 1,
-  data,
-  beta = NULL,
-  segment_count = 10,
-  trim = 0.025,
-  momentum_coef = 0,
-  k = function(x) 0,
-  family = NULL,
-  epsilon = 1e-10,
-  min_prob = 10^10,
-  winsorise_minval = -20,
-  winsorise_maxval = 20,
-  p = NULL,
-  cost = negative_log_likelihood,
-  cost_gradient = cost_update_gradient,
-  cost_hessian = cost_update_hessian,
-  cp_only = FALSE,
-  vanilla = FALSE,
-  warm_start = FALSE
-) {
-
+    formula = y ~ . - 1,
+    data,
+    beta = NULL,
+    segment_count = 10,
+    trim = 0.025,
+    momentum_coef = 0,
+    k = function(x) 0,
+    family = NULL,
+    epsilon = 1e-10,
+    min_prob = 10^10,
+    winsorise_minval = -20,
+    winsorise_maxval = 20,
+    p = NULL,
+    cost = negative_log_likelihood,
+    cost_gradient = cost_update_gradient,
+    cost_hessian = cost_update_hessian,
+    cp_only = FALSE) {
   # The following code is adapted from the `lm` function from base R.
   match_formula <- match.call(expand.dots = FALSE)
   matched_formula <- match(c("formula", "data"), names(match_formula), 0L)
@@ -380,19 +374,19 @@ fastcpd <- function(
       data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
       min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only
     )
-  } else if (vanilla) {
-    fastcpd_vanilla_custom(
-      data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
-      min_prob, winsorise_minval, winsorise_maxval, p,
-      function(data) {
-        cost(data = data, theta = NULL, family = family, lambda = 0)
-      }, cp_only, warm_start
-    )
+    # } else if (vanilla) {
+    #   fastcpd_vanilla_custom(
+    #     data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
+    #     min_prob, winsorise_minval, winsorise_maxval, p,
+    #     function(data) {
+    #       cost(data = data, theta = NULL, family = family, lambda = 0)
+    #     }, cp_only, warm_start
+    #   )
   } else {
     fastcpd_builtin(
       data, n, beta, segment_count, trim, momentum_coef, k, family, epsilon,
       min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
-      cost_hessian, cp_only, vanilla, warm_start
+      cost_hessian, cp_only
     )
   }
   methods::new(
@@ -409,9 +403,8 @@ fastcpd <- function(
 }
 
 fastcpd_vanilla_custom <- function(
-  data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
-  min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only, warm_start = FALSE
-) {
+    data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
+    min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only) {
   # fastcpd_vanilla(
   #   data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
   #   min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only
@@ -436,13 +429,13 @@ fastcpd_vanilla_custom <- function(
       tau <- r_t_set[i]
 
       if (t - tau >= 1) {
-        if (warm_start && t - tau >= 50) {
-          cost_result <- cost(data[(tau + 1):t, , drop = FALSE], start = start[, tau + 1])
-          start[, tau + 1] <- cost_result$par
-          cval[i] <- cost_result$value
-        } else {
-          cval[i] <- cost(data[(tau + 1):t, , drop = FALSE])
-        }
+        # if (warm_start && t - tau >= 50) {
+        #   cost_result <- cost(data[(tau + 1):t, , drop = FALSE], start = start[, tau + 1])
+        #   start[, tau + 1] <- cost_result$par
+        #   cval[i] <- cost_result$value
+        # } else {
+        cval[i] <- cost(data[(tau + 1):t, , drop = FALSE])
+        # }
       }
     }
 
@@ -504,10 +497,9 @@ fastcpd_vanilla_custom <- function(
 }
 
 fastcpd_builtin <- function(
-  data, n, beta, segment_count, trim, momentum_coef, k, family, epsilon,
-  min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
-  cost_hessian, cp_only, vanilla, warm_start
-) {
+    data, n, beta, segment_count, trim, momentum_coef, k, family, epsilon,
+    min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
+    cost_hessian, cp_only) {
   if (family %in% c("lasso", "gaussian")) {
     err_sd <- act_num <- rep(NA, segment_count)
   }
@@ -658,7 +650,7 @@ fastcpd_builtin <- function(
 
       if (
         (family %in% c("binomial", "poisson") && t - tau >= p) ||
-        (family %in% c("lasso", "gaussian") && t - tau >= 3)
+          (family %in% c("lasso", "gaussian") && t - tau >= 3)
       ) {
         cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta, family, lambda)$value
       } else if (family == "custom" && t - tau >= 1) {
