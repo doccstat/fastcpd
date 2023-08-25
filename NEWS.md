@@ -1,3 +1,7 @@
+# fastcpd 0.2.8
+
+* Make penalized linear regression estimated coefficients output sparse.
+
 # fastcpd 0.2.7
 
 * Fix mean change example bug.

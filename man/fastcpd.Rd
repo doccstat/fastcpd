@@ -113,11 +113,11 @@ y <- c(
   rbinom(125, 1, 1 / (1 + exp(-x[1:125, ] \%*\% theta[1, ]))),
   rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] \%*\% theta[2, ])))
 )
-result <- fastcpd(
+result <- suppressWarnings(fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
   family = "binomial"
-)
+))
 summary(result)
 
 # Poisson regression
