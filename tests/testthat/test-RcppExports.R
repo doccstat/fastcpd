@@ -2,7 +2,6 @@ run_cpp_tests("fastcpd")
 
 # Everything in this script is provided as is. The purpose of this script is to
 # do a sanity check on the C++ implementation of `fastcpd`.
-# Usage of this script can be found at `tests/testthat/test-cpp_sanity_test.R`.
 
 #' Cost function for Logistic regression, i.e. binomial family in GLM.
 #'
