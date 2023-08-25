@@ -2,7 +2,7 @@ Package: fastcpd
 Type: Package
 Title: Fast Change Point Detection Based on Dynamic Programming with Pruning
     with Sequential Gradient Descent
-Version: 0.2.7
+Version: 0.2.8
 Authors@R: c(
     person("Xingchi", "Li", email = "anthony.li@stat.tamu.edu",
            role = c("aut", "cre", "cph"),
@@ -18,7 +18,7 @@ Description: Implements fast change point detection algorithm based on the paper
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: methods, stats, fastglm, abind, DescTools, glmnet, ggplot2
+Imports: methods, stats, fastglm, abind, DescTools, glmnet, ggplot2, Matrix
 Depends: Rcpp
 LinkingTo: Rcpp, RcppArmadillo, testthat
 RoxygenNote: 7.2.3

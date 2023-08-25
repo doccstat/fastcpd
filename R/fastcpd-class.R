@@ -125,7 +125,11 @@ summary.fastcpd <- function(object, ...) {
     }
     if (ncol(object@thetas) > 0) {
       cat("\nParameters:\n")
-      print(object@thetas)
+      if (object@family != "lasso") {
+        print(object@thetas)
+      } else {
+        print(Matrix::Matrix(as.matrix(object@thetas), sparse = TRUE))
+      }
     }
   } else {
     cat("No change points found\n")

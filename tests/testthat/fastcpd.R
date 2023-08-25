@@ -171,7 +171,7 @@ test_that("confidence interval experiment", {
       change_point_locations_cookie_bucket <- c(change_point_locations_cookie_bucket, ordinal_mapped_cp)
     }
   }
-  
+
   table_change_point_locations <- table(change_point_locations)
   expect_equal(rownames(table_change_point_locations), c("269", "299", "300", "700"))
   expect_equal(unname(table_change_point_locations), c(1, 1, 19, 20), ignore_attr = TRUE)
