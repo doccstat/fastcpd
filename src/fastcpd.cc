@@ -119,6 +119,28 @@ arma::colvec cost_update_gradient(
   return gradient;
 }
 
+arma::mat cost_update_hessian(
+    arma::mat data,
+    arma::colvec theta,
+    std::string family,
+    double min_prob
+) {
+  arma::rowvec new_data = data.row(data.n_rows - 1);
+  arma::rowvec x = new_data.tail(new_data.n_elem - 1);
+  arma::mat hessian;
+  if (family.compare("binomial") == 0) {
+    double prob = 1 / (1 + exp(-arma::as_scalar(x * theta)));
+    hessian = (x.t() * x) * arma::as_scalar((1 - prob) * prob);
+  } else if (family.compare("poisson") == 0) {
+    double prob = exp(arma::as_scalar(x * theta));
+    hessian = (x.t() * x) * std::min(arma::as_scalar(prob), min_prob);
+  } else {
+    // `family` is either "lasso" or "gaussian".
+    hessian = x.t() * x;
+  }
+  return hessian;
+}
+
 Rcpp::List cost_update(
     const arma::mat data,
     arma::mat theta_hat,
