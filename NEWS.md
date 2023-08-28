@@ -1,3 +1,7 @@
+# fastcpd 0.2.9
+
+* Fix Poisson regression bug related to `lfactorial`.
+
 # fastcpd 0.2.8
 
 * Make penalized linear regression estimated coefficients output sparse.
