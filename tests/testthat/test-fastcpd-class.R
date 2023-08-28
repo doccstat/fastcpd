@@ -60,6 +60,24 @@ test_that("class methods", {
       "[1,]         1         2"
     )
   )
+
+  class_instance@family <- "custom"
+
+  expect_equal(
+    capture.output(summary(class_instance)),
+    c(
+      "",
+      "Call:",
+      "structure(\"\", class = \"language\")",
+      "",
+      "Change points:",
+      "3 ",
+      "",
+      "Parameters:",
+      "  segment 1 segment 2",
+      "1         1         2"
+    )
+  )
 })
 
 test_that("output methods without change points", {
