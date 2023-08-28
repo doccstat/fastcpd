@@ -28,7 +28,7 @@ find change points in a fast manner. It is easy to install and extensible to
 all kinds of change point problems with a user specified cost function apart
 from the built-in cost functions.
 
-If you'd like to learn how to use the fastcpd effectively, please refer to the following references:
+If you'd like to learn how to use the fastcpd effectively, please refer to:
 
 * [Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis](https://proceedings.mlr.press/v206/zhang23b.html)
 
@@ -45,7 +45,11 @@ install.packages("fastcpd")
 pak::pak("doccstat/fastcpd")
 ```
 
-If you're compiling from source, you can run `pak::pkg_system_requirements("fastcpd")`, to see the complete set of system packages needed on your machine.
+If you're compiling from source, you can run
+`pak::pkg_system_requirements("fastcpd")`, to see the complete set of system
+packages needed on your machine.
+
+[documentation & examples](https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples)
 
 ## Dependency
 
@@ -57,10 +61,6 @@ If you're compiling from source, you can run `pak::pkg_system_requirements("fast
 * [DescTools](https://github.com/AndriSignorell/DescTools), for Winsorizing Poisson data.
 * [glmnet](https://glmnet.stanford.edu/), for penalized regression.
 * [ggplot2](https://github.com/tidyverse/ggplot2), for data visualization.
-
-## Documentation
-
-[documentation & examples](https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples)
 
 ## Contact us
 

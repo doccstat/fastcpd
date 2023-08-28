@@ -94,8 +94,17 @@ Rcpp::List negative_log_likelihood(
     arma::vec y = data.col(0);
     arma::mat x = data.cols(1, data.n_cols - 1);
     arma::colvec u = x * theta_nonnull;
-    Rcpp::NumericVector y_factorial = Rcpp::lfactorial(Rcpp::wrap(y));
-    return Rcpp::List::create(Rcpp::Named("value") = arma::accu(-y % u + arma::exp(u) + arma::vec(y_factorial.begin(), y_factorial.size(), false)));
+
+    arma::colvec y_factorial(y.n_elem);
+    for (unsigned int i = 0; i < y.n_elem; i++) {
+      double log_factorial = 0;
+      for (int j = 1; j <= y(i); ++j) {
+        log_factorial += std::log(j);
+      }
+      y_factorial(i) = log_factorial;
+    }
+
+    return Rcpp::List::create(Rcpp::Named("value") = arma::accu(-y % u + arma::exp(u) + y_factorial));
   }
 }
 
