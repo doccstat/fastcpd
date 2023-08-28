@@ -1,3 +1,7 @@
+# fastcpd 0.3.0
+
+* Bump test coverage for class methods of `fastcpd`.
+
 # fastcpd 0.2.9
 
 * Fix Poisson regression bug related to `lfactorial`.
