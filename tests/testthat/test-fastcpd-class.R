@@ -8,7 +8,7 @@ test_that("class methods", {
     Class = "fastcpd",
     call = match_call,
     data = data.frame(y = c(1, 1, 2, 2), x = rep(1, 4)),
-    family = "gaussian",
+    family = "lasso",
     cp_set = c(3),
     cost_values = c(9.5, 10.5),
     residuals = rep(0, 4),
@@ -20,24 +20,44 @@ test_that("class methods", {
 
   expect_equal(
     capture.output(print(class_instance)),
-    c("", "Change points:", "[1] 3")
+    c(
+      "",
+      "Change points:",
+      "[1] 3"
+    )
   )
 
   expect_equal(
     capture.output(show(class_instance)),
     c(
-      "", "A fastcpd object.", "Available methods to evaluate the object are:",
-      "plot, print, show, summary", "", "", "Change points:", "[1] 3"
+      "",
+      "A fastcpd object.",
+      "Available methods to evaluate the object are:",
+      "plot, print, show, summary",
+      "",
+      "",
+      "Change points:",
+      "[1] 3"
     )
   )
 
   expect_equal(
     capture.output(summary(class_instance)),
     c(
-      "", "Call:", "structure(\"\", class = \"language\")", "",
-      "Change points:", "3 ", "",
-      "Cost values:", "9.5 10.5 ", "",
-      "Parameters:", "  segment 1 segment 2", "1         1         2"
+      "",
+      "Call:",
+      "structure(\"\", class = \"language\")",
+      "",
+      "Change points:",
+      "3 ",
+      "",
+      "Cost values:",
+      "9.5 10.5 ",
+      "",
+      "Parameters:",
+      "1 x 2 sparse Matrix of class \"dgCMatrix\"",
+      "     segment 1 segment 2",
+      "[1,]         1         2"
     )
   )
 })
@@ -60,13 +80,19 @@ test_that("output methods without change points", {
 
   expect_equal(
     capture.output(print(class_instance)),
-    c("", "No change points found")
+    c(
+      "",
+      "No change points found"
+    )
   )
 
   expect_equal(
     capture.output(summary(class_instance)),
     c(
-      "", "Call:", "structure(\"\", class = \"language\")", "",
+      "",
+      "Call:",
+      "structure(\"\", class = \"language\")",
+      "",
       "No change points found"
     )
   )
