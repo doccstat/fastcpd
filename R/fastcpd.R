@@ -30,23 +30,29 @@ NULL
 #' @param momentum_coef Momentum coefficient to be applied to each update.
 #' @param k Function on number of epochs in SGD.
 #' @param family Family of the models. Can be "binomial", "poisson", "lasso" or
-#'   "gaussian". If not provided, the user must specify the cost function and
-#'   its gradient (and Hessian).
+#'     "gaussian". If not provided, the user must specify the cost function and
+#'     its gradient (and Hessian).
 #' @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
-#'   poisson.
+#'     poisson.
 #' @param min_prob Minimum probability to avoid numerical issues. Only used for
-#'   poisson.
+#'     poisson.
 #' @param winsorise_minval Minimum value to be winsorised. Only used for
-#'   poisson.
+#'     poisson.
 #' @param winsorise_maxval Maximum value to be winsorised. Only used for
-#'   poisson.
+#'     poisson.
 #' @param p Number of parameters to be estimated.
 #' @param cost Cost function to be used. If not specified, the default is
-#'   the negative log-likelihood for the corresponding family.
+#'     the negative log-likelihood for the corresponding family.
 #' @param cost_gradient Gradient for custom cost function.
 #' @param cost_hessian Hessian for custom cost function.
 #' @param cp_only Whether to return only the change points or with the cost
-#'   values for each segment.
+#'     values for each segment.
+#' @param vanilla_percentage How many of the data should be processed through
+#'     vanilla PELT. Range should be between 0 and 1. If set to be 0, all data
+#'     will be processed through sequential gradient descnet. If set to be 1,
+#'     all data will be processed through vaniall PELT. If the cost function
+#'     have an explicit solution, i.e. does not depend on coefficients like
+#'     the mean change case, this parameter will be set to be 1.
 #'
 #' @return A class \code{fastcpd} object.
 #' @export
@@ -342,7 +348,9 @@ fastcpd <- function(
     cost = negative_log_likelihood,
     cost_gradient = cost_update_gradient,
     cost_hessian = cost_update_hessian,
-    cp_only = FALSE) {
+    cp_only = FALSE,
+    vanilla_percentage = 0
+) {
   # The following code is adapted from the `lm` function from base R.
   match_formula <- match.call(expand.dots = FALSE)
   matched_formula <- match(c("formula", "data"), names(match_formula), 0L)
@@ -371,11 +379,15 @@ fastcpd <- function(
     beta <- (p + 1) * log(nrow(data)) / 2
   }
 
+  if (length(formals(cost)) == 1) {
+    vanilla_percentage <- 1
+  }
+
   # User provided cost function with explicit expression.
-  result <- if (length(formals(cost)) == 1) {
+  result <- if (vanilla_percentage == 1) {
     fastcpd_vanilla_custom(
       data, beta, segment_count, trim, momentum_coef, k, epsilon,
-      min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only
+      min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only, vanilla_percentage
     )
     # } else if (vanilla) {
     #   fastcpd_vanilla_custom(
@@ -389,7 +401,7 @@ fastcpd <- function(
     fastcpd_builtin(
       data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
       min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
-      cost_hessian, cp_only
+      cost_hessian, cp_only, vanilla_percentage
     )
   }
   methods::new(
@@ -407,7 +419,7 @@ fastcpd <- function(
 
 fastcpd_vanilla_custom <- function(
     data, beta, segment_count, trim, momentum_coef, k, epsilon,
-    min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only) {
+    min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only, vanilla_percentage) {
   n <- nrow(data)
   # fastcpd_vanilla(
   #   data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
@@ -504,11 +516,17 @@ fastcpd_vanilla_custom <- function(
 fastcpd_builtin <- function(
     data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
     min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
-    cost_hessian, cp_only) {
+    cost_hessian, cp_only, vanilla_percentage
+) {
+  # Set up the initial values.
   n <- nrow(data)
-  if (family %in% c("lasso", "gaussian")) {
-    err_sd <- act_num <- rep(NA, segment_count)
-  }
+
+  # `error_sd` is used in Gaussian family only. `act_num` is used in Lasso
+  # and Gaussian families only.
+  err_sd <- act_num <- rep(NA, segment_count)
+
+  # Momentum will be used in the update step if `momentum_coef` is not 0.
+  momentum <- rep(0, p)
 
   # After t = 1, the r_t_set R_t contains 0 and 1.
   r_t_set <- c(0, 1)
@@ -516,7 +534,6 @@ fastcpd_builtin <- function(
   cp_set <- append(list(NULL), rep(list(0), n))
   # Objective function: F(0) = -beta
   f_t <- c(-beta, rep(0, n))
-  momentum <- rep(0, p)
 
   # choose the initial values based on pre-segmentation
 
@@ -525,36 +542,7 @@ fastcpd_builtin <- function(
   # Remark 3.4: initialize theta_hat_t_t to be the estimate in the segment
   for (segment_index in seq_len(segment_count)) {
     data_segment <- data[segment_indices == segment_index, , drop = FALSE]
-    segment_theta <- if (family == "custom") {
-      if (p == 1) {
-        optim_result <- stats::optim(
-          par = 0,
-          fn = function(theta, data) {
-            cost(data = data, theta = log(theta / (1 - theta)))
-          },
-          method = "Brent",
-          lower = 0,
-          upper = 1,
-          data = data_segment
-        )
-        log(optim_result$par / (1 - optim_result$par))
-      } else {
-        stats::optim(
-          par = rep(0, p),
-          fn = cost,
-          data = data_segment,
-          method = "L-BFGS-B"
-        )$par
-      }
-    } else {
-      cost(
-        data = data_segment,
-        theta = NULL,
-        family = family,
-        lambda = 0,
-        cv = TRUE
-      )$par
-    }
+    segment_theta <- estimate_theta(family, p, data_segment, cost, 0, TRUE)$par
     segment_theta_hat[segment_index, ] <- segment_theta
     if (family %in% c("lasso", "gaussian")) {
       response_estimate <- data_segment[, -1, drop = FALSE] %*% c(segment_theta)
