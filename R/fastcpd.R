@@ -720,36 +720,12 @@ fastcpd_builtin <- function(
     thetas <- matrix(NA, nrow = 0, ncol = 0)
   } else {
     cp_loc <- unique(c(0, cp_set, n))
+    cost_values <- rep(0, length(cp_loc) - 1)
     for (i in 1:(length(cp_loc) - 1)) {
-      if (family == "custom") {
-        if (p == 1) {
-          optim_result <- stats::optim(
-            par = 0,
-            fn = function(theta, data) {
-              cost(data = data, theta = log(theta / (1 - theta)))
-            },
-            method = "Brent",
-            lower = 0,
-            upper = 1,
-            data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
-          )
-          cost_result <- list(
-            par = log(optim_result$par / (1 - optim_result$par)),
-            value = exp(optim_result$value) / (1 + exp(optim_result$value))
-          )
-        } else {
-          cost_result <- stats::optim(
-            par = rep(0, p),
-            fn = cost,
-            data = data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE],
-            method = "L-BFGS-B"
-          )
-        }
-      } else {
-        cost_result <- cost(data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE], NULL, family, lambda)
-        residual <- c(residual, cost_result$residuals)
-      }
-      cost_values <- c(cost_values, cost_result$value)
+      data_segment <- data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
+      cost_result <- estimate_theta(family, p, data_segment, cost, lambda, FALSE)
+      residual <- c(residual, cost_result$residuals)
+      cost_values[i] <- cost_result$value
       thetas <- cbind(thetas, cost_result$par)
     }
   }
@@ -763,6 +739,40 @@ fastcpd_builtin <- function(
     residual = residual,
     thetas = thetas
   )
+}
+
+estimate_theta <- function(family, p, data_segment, cost, lambda, cv) {
+  if (family == "custom" && p == 1) {
+    optim_result <- stats::optim(
+      par = 0,
+      fn = function(theta, data) {
+        cost(data = data, theta = log(theta / (1 - theta)))
+      },
+      method = "Brent",
+      lower = 0,
+      upper = 1,
+      data = data_segment
+    )
+    list(
+      par = log(optim_result$par / (1 - optim_result$par)),
+      value = exp(optim_result$value) / (1 + exp(optim_result$value)),
+      residuals = NULL
+    )
+  } else if (family == "custom" && p > 1) {
+    optim_result <- stats::optim(
+      par = rep(0, p),
+      fn = cost,
+      data = data_segment,
+      method = "L-BFGS-B"
+    )
+    list(
+      par = optim_result$par,
+      value = optim_result$value,
+      residuals = NULL
+    )
+  } else {
+    cost(data_segment, NULL, family, lambda, cv)
+  }
 }
 
 initialize_theta_hat_sum_hessian <- function(
