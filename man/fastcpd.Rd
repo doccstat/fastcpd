@@ -22,7 +22,8 @@ fastcpd(
   cost = negative_log_likelihood,
   cost_gradient = cost_update_gradient,
   cost_hessian = cost_update_hessian,
-  cp_only = FALSE
+  cp_only = FALSE,
+  vanilla_percentage = 0
 )
 }
 \arguments{
