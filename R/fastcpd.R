@@ -574,37 +574,18 @@ fastcpd_builtin <- function(
     beta <- (act_num_mean + 1) * beta
   }
 
-  # For the first data.
-  if (family == "binomial") {
-    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
-    prob <- 1 / (1 + exp(-theta_hat %*% data[1, -1]))
-    hessian <- array(
-      (data[1, -1] %o% data[1, -1]) * c(prob * (1 - prob)),
-      c(p, p, 1)
-    )
-  } else if (family == "poisson") {
-    theta_sum <- theta_hat <- DescTools::Winsorize(
-      matrix(segment_theta_hat[1, ]),
-      minval = winsorise_minval,
-      maxval = winsorise_maxval
-    )
-    hessian <- array(
-      (data[1, -1] %o% data[1, -1]) * c(exp(theta_hat %*% data[1, -1])),
-      c(p, p, 1)
-    )
-  } else if (family %in% c("lasso", "gaussian")) {
-    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
-    hessian <- array(
-      data[1, -1] %o% data[1, -1] + epsilon * diag(1, p),
-      c(p, p, 1)
-    )
-  } else if (family == "custom") {
-    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
-    hessian <- array(
-      matrix(0, p, p),
-      c(p, p, 1)
-    )
-  }
+  theta_hat_sum_hessian <- initialize_theta_hat_sum_hessian(
+    family,
+    segment_theta_hat,
+    data,
+    p,
+    winsorise_minval,
+    winsorise_maxval,
+    epsilon
+  )
+  theta_hat <- theta_hat_sum_hessian$theta_hat
+  theta_sum <- theta_hat_sum_hessian$theta_sum
+  hessian <- theta_hat_sum_hessian$hessian
 
   for (t in 2:n) {
     r_t_count <- length(r_t_set)
@@ -704,9 +685,15 @@ fastcpd_builtin <- function(
     pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
     r_t_set <- c(r_t_set[pruned_left], t)
 
-    theta_hat <- theta_hat[, pruned_left, drop = FALSE]
-    theta_sum <- theta_sum[, pruned_left, drop = FALSE]
-    hessian <- hessian[, , pruned_left, drop = FALSE]
+    theta_hat_sum_hessian <- update_theta_hat_sum_hessian(
+      theta_hat,
+      theta_sum,
+      hessian,
+      pruned_left
+    )
+    theta_hat <- theta_hat_sum_hessian$theta_hat
+    theta_sum <- theta_hat_sum_hessian$theta_sum
+    hessian <- theta_hat_sum_hessian$hessian
 
     # Objective function F(t).
     f_t[t + 1] <- min_val
@@ -775,5 +762,63 @@ fastcpd_builtin <- function(
     cost_values = cost_values,
     residual = residual,
     thetas = thetas
+  )
+}
+
+initialize_theta_hat_sum_hessian <- function(
+    family,
+    segment_theta_hat,
+    data,
+    p,
+    winsorise_minval,
+    winsorise_maxval,
+    epsilon) {
+  if (family == "binomial") {
+    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
+    prob <- 1 / (1 + exp(-theta_hat %*% data[1, -1]))
+    hessian <- array(
+      (data[1, -1] %o% data[1, -1]) * c(prob * (1 - prob)),
+      c(p, p, 1)
+    )
+  } else if (family == "poisson") {
+    theta_sum <- theta_hat <- DescTools::Winsorize(
+      matrix(segment_theta_hat[1, ]),
+      minval = winsorise_minval,
+      maxval = winsorise_maxval
+    )
+    hessian <- array(
+      (data[1, -1] %o% data[1, -1]) * c(exp(theta_hat %*% data[1, -1])),
+      c(p, p, 1)
+    )
+  } else if (family %in% c("lasso", "gaussian")) {
+    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
+    hessian <- array(
+      data[1, -1] %o% data[1, -1] + epsilon * diag(1, p),
+      c(p, p, 1)
+    )
+  } else if (family == "custom") {
+    theta_sum <- theta_hat <- matrix(segment_theta_hat[1, ])
+    hessian <- array(
+      matrix(0, p, p),
+      c(p, p, 1)
+    )
+  }
+
+  list(
+      theta_hat = theta_hat,
+      theta_sum = theta_sum,
+      hessian = hessian
+  )
+}
+
+update_theta_hat_sum_hessian <- function(
+    theta_hat,
+    theta_sum,
+    hessian,
+    pruned_left) {
+  list(
+    theta_hat = theta_hat[, pruned_left, drop = FALSE],
+    theta_sum = theta_sum[, pruned_left, drop = FALSE],
+    hessian = hessian[, , pruned_left, drop = FALSE]
   )
 }
