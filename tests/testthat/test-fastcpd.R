@@ -103,6 +103,136 @@ test_that("penalized linear regression", {
   expect_equal(result@cp_set, c(300, 700, 1000))
 })
 
+test_that("custom logistic regression", {
+  set.seed(1)
+  p <- 5
+  x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
+  theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
+  y <- c(
+    rbinom(200, 1, 1 / (1 + exp(-x[1:200, ] %*% theta[1, ]))),
+    rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] %*% theta[2, ])))
+  )
+  data <- data.frame(y = y, x = x)
+  result_builtin <- suppressWarnings(fastcpd(
+    formula = y ~ . - 1,
+    data = data,
+    family = "binomial"
+  ))
+  logistic_loss <- function(data, theta) {
+    x <- data[, -1]
+    y <- data[, 1]
+    u <- x %*% theta
+    nll <- -y * u + log(1 + exp(u))
+    nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
+    sum(nll)
+  }
+  logistic_loss_gradient <- function(data, theta) {
+    x <- data[nrow(data), -1]
+    y <- data[nrow(data), 1]
+    c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
+  }
+  logistic_loss_hessian <- function(data, theta) {
+    x <- data[nrow(data), -1]
+    prob <- 1 / (1 + exp(-x %*% theta))
+    (x %o% x) * c((1 - prob) * prob)
+  }
+  result_custom <- fastcpd(
+    formula = y ~ . - 1,
+    data = data,
+    epsilon = 1e-5,
+    cost = logistic_loss,
+    cost_gradient = logistic_loss_gradient,
+    cost_hessian = logistic_loss_hessian
+  )
+
+  expect_equal(result_builtin@cp_set, 202)
+  expect_equal(result_custom@cp_set, 201)
+})
+
+test_that("mean change", {
+  set.seed(1)
+  p <- 1
+  data <- rbind(
+    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
+    mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
+    mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
+  )
+  segment_count_guess <- 10
+  block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
+  block_count <- floor(nrow(data) / block_size)
+  data_all_vars <- rep(0, block_count)
+  for (block_index in seq_len(block_count)) {
+    block_start <- (block_index - 1) * block_size + 1
+    block_end <- if (block_index < block_count) block_index * block_size else nrow(data)
+    data_all_vars[block_index] <- var(data[block_start:block_end, ])
+  }
+  data_all_var <- mean(data_all_vars)
+  mean_loss <- function(data) {
+    n <- nrow(data)
+    (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
+      n / 2 * (log(data_all_var) + log(2 * pi))
+  }
+  mean_loss_result <- fastcpd(
+    formula = ~ . - 1,
+    data = data.frame(data),
+    beta = (p + 1) * log(nrow(data)) / 2,
+    p = p,
+    cost = mean_loss
+  )
+
+  expect_equal(mean_loss_result@cp_set, c(300, 700))
+})
+
+test_that("variance change", {
+  set.seed(1)
+  p <- 1
+  data <- rbind.data.frame(
+    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+    mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(50, p)),
+    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
+  )
+  data_all_mu <- colMeans(data)
+  var_loss <- function(data) {
+    demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
+    nrow(data) * (1 + log(2 * pi) + log(demeaned_data_norm^2 / nrow(data))) / 2
+  }
+  var_loss_result <- fastcpd(
+    formula = ~ . - 1,
+    data = data,
+    beta = (p + 1) * log(nrow(data)) / 2,
+    p = p,
+    cost = var_loss
+  )
+
+  expect_equal(var_loss_result@cp_set, c(300, 699))
+})
+
+test_that("mean / variance change", {
+  set.seed(1)
+  p <- 1
+  data <- rbind.data.frame(
+    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+    mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
+    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(50, p)),
+    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+    mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
+    mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
+  )
+  meanvar_loss <- function(data) {
+    loss_part <- (colSums(data^2) - colSums(data)^2 / nrow(data)) / nrow(data)
+    nrow(data) * (1 + log(2 * pi) + log(loss_part)) / 2
+  }
+  meanvar_loss_result <- fastcpd(
+    formula = ~ . - 1,
+    data = data,
+    beta = (2 * p + 1) * log(nrow(data)) / 2,
+    p = 2 * p,
+    cost = meanvar_loss
+  )
+
+  expect_equal(meanvar_loss_result@cp_set, c(300, 700, 1000, 1300, 1700))
+})
+
 test_that("huber regression", {
   set.seed(1)
   n <- 400 + 300 + 500
