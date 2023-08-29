@@ -4,6 +4,34 @@
 #include <RcppArmadillo.h>
 #include <testthat.h>
 
+//' Solve logistic/poisson regression using Gradient Descent Extension to the
+//' multivariate case
+//' This function is not meant to be called directly by the user.
+//'
+//' @param data A data frame containing the data to be segmented.
+//' @param theta Estimate of the parameters. If null, the function will estimate
+//'   the parameters.
+//' @param family Family of the model.
+//' @param lambda Lambda for L1 regularization. Only used for lasso.
+//' @param cv Whether to perform cross-validation to find the best lambda.
+//' @param start Starting point for the optimization for warm start.
+//' @keywords internal
+//' @importFrom glmnet glmnet cv.glmnet predict.glmnet
+//' @importFrom fastglm fastglm
+//'
+//' @noRd
+//' @return Negative log likelihood of the corresponding data with the given
+//'   family.
+// [[Rcpp::export]]
+Rcpp::List negative_log_likelihood(
+    arma::mat data,
+    Rcpp::Nullable<arma::colvec> theta,
+    std::string family,
+    double lambda,
+    bool cv = false,
+    Rcpp::Nullable<arma::colvec> start = R_NilValue
+);
+
 //' Function to calculate the gradient at the current data.
 //' This function is not meant to be called directly by the user.
 //'
@@ -90,34 +118,6 @@ Rcpp::List cost_update(
     const double lambda,
     Rcpp::Function cost_gradient,
     Rcpp::Function cost_hessian
-);
-
-//' Solve logistic/poisson regression using Gradient Descent Extension to the
-//' multivariate case
-//' This function is not meant to be called directly by the user.
-//'
-//' @param data A data frame containing the data to be segmented.
-//' @param theta Estimate of the parameters. If null, the function will estimate
-//'   the parameters.
-//' @param family Family of the model.
-//' @param lambda Lambda for L1 regularization. Only used for lasso.
-//' @param cv Whether to perform cross-validation to find the best lambda.
-//' @param start Starting point for the optimization for warm start.
-//' @keywords internal
-//' @importFrom glmnet glmnet cv.glmnet predict.glmnet
-//' @importFrom fastglm fastglm
-//'
-//' @noRd
-//' @return Negative log likelihood of the corresponding data with the given
-//'   family.
-// [[Rcpp::export]]
-Rcpp::List negative_log_likelihood(
-    arma::mat data,
-    Rcpp::Nullable<arma::colvec> theta,
-    std::string family,
-    double lambda,
-    bool cv = false,
-    Rcpp::Nullable<arma::colvec> start = R_NilValue
 );
 
 #endif

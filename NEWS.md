@@ -1,3 +1,9 @@
+# fastcpd 0.3.1
+
+* Add examples as tests for `fastcpd`.
+* Rearrange C++ functions.
+* Add more precondition check.
+
 # fastcpd 0.3.0
 
 * Bump test coverage for class methods of `fastcpd`.

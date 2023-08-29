@@ -355,13 +355,18 @@ fastcpd <- function(
   x <- stats::model.matrix(mt, match_formula)
   data <- cbind(y, x)
 
-  if (is.null(family)) {
+  if (is.null(family) || length(formals(cost)) == 1) {
     family <- "custom"
   }
-  n <- nrow(data)
+
+  if (family == "custom") {
+    cp_only <- TRUE
+  }
+
   if (is.null(p)) {
     p <- ncol(data) - 1
   }
+
   if (is.null(beta)) {
     beta <- (p + 1) * log(nrow(data)) / 2
   }
@@ -369,12 +374,12 @@ fastcpd <- function(
   # User provided cost function with explicit expression.
   result <- if (length(formals(cost)) == 1) {
     fastcpd_vanilla_custom(
-      data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
+      data, beta, segment_count, trim, momentum_coef, k, epsilon,
       min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only
     )
     # } else if (vanilla) {
     #   fastcpd_vanilla_custom(
-    #     data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
+    #     data, beta, segment_count, trim, momentum_coef, k, epsilon,
     #     min_prob, winsorise_minval, winsorise_maxval, p,
     #     function(data) {
     #       cost(data = data, theta = NULL, family = family, lambda = 0)
@@ -382,7 +387,7 @@ fastcpd <- function(
     #   )
   } else {
     fastcpd_builtin(
-      data, n, beta, segment_count, trim, momentum_coef, k, family, epsilon,
+      data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
       min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
       cost_hessian, cp_only
     )
@@ -401,8 +406,9 @@ fastcpd <- function(
 }
 
 fastcpd_vanilla_custom <- function(
-    data, n, beta, segment_count, trim, momentum_coef, k, epsilon,
+    data, beta, segment_count, trim, momentum_coef, k, epsilon,
     min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only) {
+  n <- nrow(data)
   # fastcpd_vanilla(
   #   data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
   #   min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only
@@ -415,7 +421,7 @@ fastcpd_vanilla_custom <- function(
   # Objective function: F(0) = -beta
   f_t <- c(-beta, rep(0, n))
 
-  start <- matrix(0, p, n)
+  # start <- matrix(0, p, n)
 
   for (t in 2:n) {
     r_t_count <- length(r_t_set)
@@ -496,9 +502,10 @@ fastcpd_vanilla_custom <- function(
 }
 
 fastcpd_builtin <- function(
-    data, n, beta, segment_count, trim, momentum_coef, k, family, epsilon,
+    data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
     min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
     cost_hessian, cp_only) {
+  n <- nrow(data)
   if (family %in% c("lasso", "gaussian")) {
     err_sd <- act_num <- rep(NA, segment_count)
   }
