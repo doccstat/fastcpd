@@ -67,7 +67,15 @@ the negative log-likelihood for the corresponding family.}
 \item{cost_hessian}{Hessian for custom cost function.}
 
 \item{cp_only}{Whether to return only the change points or with the cost
-values for each segment.}
+values for each segment. If family is not provided or set to be "custom",
+this parameter will be set to be true.}
+
+\item{vanilla_percentage}{How many of the data should be processed through
+vanilla PELT. Range should be between 0 and 1. If set to be 0, all data
+will be processed through sequential gradient descnet. If set to be 1,
+all data will be processed through vaniall PELT. If the cost function
+have an explicit solution, i.e. does not depend on coefficients like
+the mean change case, this parameter will be set to be 1.}
 }
 \value{
 A class \code{fastcpd} object.
@@ -217,9 +225,9 @@ result_custom <- fastcpd(
   cost_hessian = logistic_loss_hessian
 )
 cat(
-  "Change points detected by built-in logistic regression model:",
+  "Change points detected by built-in logistic regression model: ",
   result_builtin@cp_set, "\n",
-  "Change points detected by custom logistic regression model:",
+  "Change points detected by custom logistic regression model: ",
   result_custom@cp_set, "\n",
   sep = ""
 )
