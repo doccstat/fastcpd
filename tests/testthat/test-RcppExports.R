@@ -197,7 +197,7 @@ segd_binomial <- function(data, beta, B = 10, trim = 0.025) {
 
   cp <- cp_set[[n + 1]]
   if (length(cp) > 0) {
-    ind3 <- (1:length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
+    ind3 <- (seq_len(length(cp)))[(cp < trim * n) | (cp > (1 - trim) * n)]
     cp <- cp[-ind3]
   }
 

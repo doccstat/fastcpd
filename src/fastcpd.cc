@@ -72,7 +72,6 @@ Rcpp::List negative_log_likelihood(
                   Rcpp::Named("value") = value / 2,
                   Rcpp::Named("residuals") = residuals);
   } else if (family == "lasso" || family == "gaussian") {
-
     arma::colvec theta_nonnull = Rcpp::as<arma::colvec>(theta);
     // Calculate negative log likelihood in gaussian family
     arma::vec y = data.col(0);
@@ -81,7 +80,6 @@ Rcpp::List negative_log_likelihood(
     return Rcpp::List::create(Rcpp::Named("value") = arma::accu(arma::pow(y - x * theta_nonnull, 2)) / 2 + penalty);
 
   } else if (family == "binomial") {
-
     // Calculate negative log likelihood in binomial family
     arma::colvec theta_nonnull = Rcpp::as<arma::colvec>(theta);
     arma::vec y = data.col(0);

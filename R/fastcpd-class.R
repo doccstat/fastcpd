@@ -51,7 +51,7 @@ plot.fastcpd <- function(x, ...) {
       ),
       ggplot2::aes(x = x, y = y)
     ) +
-      ggplot2::facet_wrap(c("label"), ncol = 1, scales = "free_y")
+      ggplot2::facet_wrap("label", ncol = 1, scales = "free_y")
   }
   print(p)
   invisible()
