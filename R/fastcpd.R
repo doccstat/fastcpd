@@ -417,6 +417,7 @@ fastcpd_builtin <- function(
     cost_hessian, cp_only, vanilla_percentage) {
   # Set up the initial values.
   n <- nrow(data)
+  lambda <- 0
 
   # `error_sd` is used in Gaussian family only. `act_num` is used in Lasso
   # and Gaussian families only.
@@ -454,7 +455,7 @@ fastcpd_builtin <- function(
       beta <- (mean(act_num) + 1) * beta
     }
 
-    theta_hat_sum_hessian <- initialize_theta_hat_sum_hessian(
+    theta_hat_sum_hessian <- init_theta_hat_sum_hessian(
       family,
       segment_theta_hat,
       data,
@@ -481,8 +482,6 @@ fastcpd_builtin <- function(
         if (family == "lasso") {
           # Mean of `err_sd` only works if error sd is unchanged.
           lambda <- mean(err_sd) * sqrt(2 * log(p) / (t - tau))
-        } else {
-          lambda <- 0
         }
 
         cost_update_result <- cost_update(
@@ -541,32 +540,23 @@ fastcpd_builtin <- function(
     }
 
     if (vanilla_percentage != 1) {
-      # the choice of initial values requires further investigation
-
-      # for tau = t-1
-      new_data <- data[t, -1]
-      if (family == "binomial") {
-        cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
-        prob <- 1 / (1 + exp(-coef_add %*% new_data))
-        hessian_new <- (new_data %o% new_data) * c(prob * (1 - prob))
-      } else if (family == "poisson") {
-        cum_coef_add <- coef_add <- DescTools::Winsorize(
-          x = segment_theta_hat[segment_indices[t], ],
-          minval = winsorise_minval,
-          maxval = winsorise_maxval
-        )
-        hessian_new <- (new_data %o% new_data) * c(exp(coef_add %*% new_data))
-      } else if (family %in% c("lasso", "gaussian")) {
-        cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
-        hessian_new <- new_data %o% new_data + epsilon * diag(1, p)
-      } else if (family == "custom") {
-        cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
-        hessian_new <- matrix(0, p, p)
-      }
-
-      theta_hat <- cbind(theta_hat, coef_add)
-      theta_sum <- cbind(theta_sum, cum_coef_add)
-      hessian <- abind::abind(hessian, hessian_new, along = 3)
+      theta_hat_sum_hessian <- bind_theta_hat_sum_hessian(
+          data,
+          segment_theta_hat,
+          segment_indices,
+          t,
+          family,
+          winsorise_minval,
+          winsorise_maxval,
+          p,
+          epsilon,
+          theta_hat,
+          theta_sum,
+          hessian
+      )
+      theta_hat <- theta_hat_sum_hessian$theta_hat
+      theta_sum <- theta_hat_sum_hessian$theta_sum
+      hessian <- theta_hat_sum_hessian$hessian
     }
 
     # Step 3
@@ -690,7 +680,7 @@ estimate_theta <- function(family, p, data_segment, cost, lambda, cv) {
   }
 }
 
-initialize_theta_hat_sum_hessian <- function(
+init_theta_hat_sum_hessian <- function(
     family,
     segment_theta_hat,
     data,
@@ -733,6 +723,49 @@ initialize_theta_hat_sum_hessian <- function(
     theta_hat = theta_hat,
     theta_sum = theta_sum,
     hessian = hessian
+  )
+}
+
+bind_theta_hat_sum_hessian <- function(
+    data,
+    segment_theta_hat,
+    segment_indices,
+    t,
+    family,
+    winsorise_minval,
+    winsorise_maxval,
+    p,
+    epsilon,
+    theta_hat,
+    theta_sum,
+    hessian) {
+  # the choice of initial values requires further investigation
+
+  # for tau = t-1
+  new_data <- data[t, -1]
+  if (family == "binomial") {
+    cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
+    prob <- 1 / (1 + exp(-coef_add %*% new_data))
+    hessian_new <- (new_data %o% new_data) * c(prob * (1 - prob))
+  } else if (family == "poisson") {
+    cum_coef_add <- coef_add <- DescTools::Winsorize(
+      x = segment_theta_hat[segment_indices[t], ],
+      minval = winsorise_minval,
+      maxval = winsorise_maxval
+    )
+    hessian_new <- (new_data %o% new_data) * c(exp(coef_add %*% new_data))
+  } else if (family %in% c("lasso", "gaussian")) {
+    cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
+    hessian_new <- new_data %o% new_data + epsilon * diag(1, p)
+  } else if (family == "custom") {
+    cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
+    hessian_new <- matrix(0, p, p)
+  }
+
+  list(
+    theta_hat = cbind(theta_hat, coef_add),
+    theta_sum = cbind(theta_sum, cum_coef_add),
+    hessian = abind::abind(hessian, hessian_new, along = 3)
   )
 }
 
