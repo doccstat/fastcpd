@@ -18,8 +18,16 @@ Description: Implements fast change point detection algorithm based on the paper
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: methods, stats, fastglm, abind, DescTools, glmnet, ggplot2, Matrix
-Depends: Rcpp
+Imports:
+    methods,
+    stats,
+    fastglm,
+    abind,
+    DescTools,
+    glmnet,
+    ggplot2,
+    Matrix,
+    Rcpp (>= 0.11.0)
 LinkingTo: Rcpp, RcppArmadillo, testthat
 RoxygenNote: 7.2.3
 Suggests:
