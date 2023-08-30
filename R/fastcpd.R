@@ -449,12 +449,13 @@ fastcpd_builtin <- function(
         cost_gradient, cost_hessian, r_t_set, p,
         momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon
       )
+      theta <- fastcpd_parameters$theta
 
       if (
         (family %in% c("binomial", "poisson") && t - tau >= p) ||
           (family %in% c("lasso", "gaussian") && t - tau >= 3)
       ) {
-        cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], fastcpd_parameters$theta, family, lambda)$value
+        cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta, family, lambda)$value
       } else if (family == "custom" && t - tau >= 1) {
         # if (warm_start && t - tau >= 50) {
         #   cost_result <- cost(data[(tau + 1):t, , drop = FALSE], start = start[, tau + 1])
@@ -464,7 +465,7 @@ fastcpd_builtin <- function(
         if (vanilla_percentage == 1) {
           cval[i] <- cost(data[(tau + 1):t, , drop = FALSE])
         } else {
-          cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], fastcpd_parameters$theta)
+          cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta)
         }
         # }
       }
@@ -496,7 +497,7 @@ fastcpd_builtin <- function(
     pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
     r_t_set <- c(r_t_set[pruned_left], t)
 
-    fastcpd_parameters <- update_fastcpd_parameters3(fastcpd_parameters, vanilla_percentage, pruned_left)
+    fastcpd_parameters <- prune_fastcpd_parameters(fastcpd_parameters, vanilla_percentage, pruned_left)
 
     # Objective function F(t).
     f_t[t + 1] <- min_val
@@ -659,38 +660,45 @@ update_fastcpd_parameters2 <- function(
     fastcpd_parameters, vanilla_percentage, data, t, family,
     winsorise_minval, winsorise_maxval, p, epsilon) {
   if (vanilla_percentage != 1) {
-    theta_hat_sum_hessian <- bind_theta_hat_sum_hessian(
-      data,
-      fastcpd_parameters$segment_theta_hat,
-      fastcpd_parameters$segment_indices,
-      t,
-      family,
-      winsorise_minval,
-      winsorise_maxval,
-      p,
-      epsilon,
-      fastcpd_parameters$theta_hat,
-      fastcpd_parameters$theta_sum,
-      fastcpd_parameters$hessian
+    # the choice of initial values requires further investigation
+
+    # for tau = t-1
+    new_data <- data[t, -1]
+    if (family == "binomial") {
+      cum_coef_add <- coef_add <- fastcpd_parameters$segment_theta_hat[fastcpd_parameters$segment_indices[t], ]
+      prob <- 1 / (1 + exp(-coef_add %*% new_data))
+      hessian_new <- (new_data %o% new_data) * c(prob * (1 - prob))
+    } else if (family == "poisson") {
+      cum_coef_add <- coef_add <- DescTools::Winsorize(
+        x = fastcpd_parameters$segment_theta_hat[fastcpd_parameters$segment_indices[t], ],
+        minval = winsorise_minval,
+        maxval = winsorise_maxval
+      )
+      hessian_new <- (new_data %o% new_data) * c(exp(coef_add %*% new_data))
+    } else if (family %in% c("lasso", "gaussian")) {
+      cum_coef_add <- coef_add <- fastcpd_parameters$segment_theta_hat[fastcpd_parameters$segment_indices[t], ]
+      hessian_new <- new_data %o% new_data + epsilon * diag(1, p)
+    } else if (family == "custom") {
+      cum_coef_add <- coef_add <- fastcpd_parameters$segment_theta_hat[fastcpd_parameters$segment_indices[t], ]
+      hessian_new <- matrix(0, p, p)
+    }
+
+    fastcpd_parameters$theta_hat <- cbind(fastcpd_parameters$theta_hat, coef_add)
+    fastcpd_parameters$theta_sum <- cbind(fastcpd_parameters$theta_sum, cum_coef_add)
+    fastcpd_parameters$hessian <- abind::abind(
+      fastcpd_parameters$hessian,
+      hessian_new,
+      along = 3
     )
-    fastcpd_parameters$theta_hat <- theta_hat_sum_hessian$theta_hat
-    fastcpd_parameters$theta_sum <- theta_hat_sum_hessian$theta_sum
-    fastcpd_parameters$hessian <- theta_hat_sum_hessian$hessian
   }
   fastcpd_parameters
 }
 
-update_fastcpd_parameters3 <- function(fastcpd_parameters, vanilla_percentage, pruned_left) {
+prune_fastcpd_parameters <- function(fastcpd_parameters, vanilla_percentage, pruned_left) {
   if (vanilla_percentage != 1) {
-    theta_hat_sum_hessian <- update_theta_hat_sum_hessian(
-      fastcpd_parameters$theta_hat,
-      fastcpd_parameters$theta_sum,
-      fastcpd_parameters$hessian,
-      pruned_left
-    )
-    fastcpd_parameters$theta_hat <- theta_hat_sum_hessian$theta_hat
-    fastcpd_parameters$theta_sum <- theta_hat_sum_hessian$theta_sum
-    fastcpd_parameters$hessian <- theta_hat_sum_hessian$hessian
+    fastcpd_parameters$theta_hat <- fastcpd_parameters$theta_hat[, pruned_left, drop = FALSE]
+    fastcpd_parameters$theta_sum <- fastcpd_parameters$theta_sum[, pruned_left, drop = FALSE]
+    fastcpd_parameters$hessian <- fastcpd_parameters$hessian[, , pruned_left, drop = FALSE]
   }
   fastcpd_parameters
 }
@@ -772,60 +780,5 @@ init_theta_hat_sum_hessian <- function(
     theta_hat = theta_hat,
     theta_sum = theta_sum,
     hessian = hessian
-  )
-}
-
-bind_theta_hat_sum_hessian <- function(
-    data,
-    segment_theta_hat,
-    segment_indices,
-    t,
-    family,
-    winsorise_minval,
-    winsorise_maxval,
-    p,
-    epsilon,
-    theta_hat,
-    theta_sum,
-    hessian) {
-  # the choice of initial values requires further investigation
-
-  # for tau = t-1
-  new_data <- data[t, -1]
-  if (family == "binomial") {
-    cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
-    prob <- 1 / (1 + exp(-coef_add %*% new_data))
-    hessian_new <- (new_data %o% new_data) * c(prob * (1 - prob))
-  } else if (family == "poisson") {
-    cum_coef_add <- coef_add <- DescTools::Winsorize(
-      x = segment_theta_hat[segment_indices[t], ],
-      minval = winsorise_minval,
-      maxval = winsorise_maxval
-    )
-    hessian_new <- (new_data %o% new_data) * c(exp(coef_add %*% new_data))
-  } else if (family %in% c("lasso", "gaussian")) {
-    cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
-    hessian_new <- new_data %o% new_data + epsilon * diag(1, p)
-  } else if (family == "custom") {
-    cum_coef_add <- coef_add <- segment_theta_hat[segment_indices[t], ]
-    hessian_new <- matrix(0, p, p)
-  }
-
-  list(
-    theta_hat = cbind(theta_hat, coef_add),
-    theta_sum = cbind(theta_sum, cum_coef_add),
-    hessian = abind::abind(hessian, hessian_new, along = 3)
-  )
-}
-
-update_theta_hat_sum_hessian <- function(
-    theta_hat,
-    theta_sum,
-    hessian,
-    pruned_left) {
-  list(
-    theta_hat = theta_hat[, pruned_left, drop = FALSE],
-    theta_sum = theta_sum[, pruned_left, drop = FALSE],
-    hessian = hessian[, , pruned_left, drop = FALSE]
   )
 }
