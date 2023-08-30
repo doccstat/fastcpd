@@ -9,7 +9,7 @@ test_that("class methods", {
     call = match_call,
     data = data.frame(y = c(1, 1, 2, 2), x = rep(1, 4)),
     family = "lasso",
-    cp_set = c(3),
+    cp_set = 3,
     cost_values = c(9.5, 10.5),
     residuals = rep(0, 4),
     thetas = thetas,
