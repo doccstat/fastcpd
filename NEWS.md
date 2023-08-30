@@ -1,6 +1,8 @@
 # fastcpd 0.3.3
 
 *   Merge the implementation of vanilla PELT and SeN.
+*   Encapsulate the implementation of binding new coefficients into the previous
+    coefficients.
 
 # fastcpd 0.3.2
 
