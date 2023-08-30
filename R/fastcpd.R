@@ -516,17 +516,13 @@ fastcpd_builtin <- function(
     )
   }
   cp_set <- cp_set[cp_set > 0]
-  if (vanilla_percentage != 1) {
-    cost_values <- thetas <- NULL
-  } else {
-    thetas <- matrix(NA, nrow = 0, ncol = 0)
-  }
 
   residual <- 0[family == "custom"]
   if (cp_only) {
     cost_values <- numeric(0)
     thetas <- matrix(NA, nrow = 0, ncol = 0)
   } else {
+    thetas <- NULL
     cp_loc <- unique(c(0, cp_set, n))
     cost_values <- rep(0, length(cp_loc) - 1)
     for (i in 1:(length(cp_loc) - 1)) {
