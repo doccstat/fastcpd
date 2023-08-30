@@ -1,3 +1,7 @@
+# fastcpd 0.3.3
+
+*   Merge the implementation of vanilla PELT and SeN.
+
 # fastcpd 0.3.2
 
 *   Integrate initialization and update for `theta_hat`, `theta_sum` and

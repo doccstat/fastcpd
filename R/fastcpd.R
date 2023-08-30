@@ -350,8 +350,7 @@ fastcpd <- function(
     cost_gradient = cost_update_gradient,
     cost_hessian = cost_update_hessian,
     cp_only = FALSE,
-    vanilla_percentage = 0
-) {
+    vanilla_percentage = 0) {
   # The following code is adapted from the `lm` function from base R.
   match_formula <- match.call(expand.dots = FALSE)
   matched_formula <- match(c("formula", "data"), names(match_formula), 0L)
@@ -385,26 +384,20 @@ fastcpd <- function(
   }
 
   # User provided cost function with explicit expression.
-  result <- if (vanilla_percentage == 1) {
-    fastcpd_vanilla_custom(
-      data, beta, segment_count, trim, momentum_coef, k, epsilon,
-      min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only, vanilla_percentage
-    )
-    # } else if (vanilla) {
-    #   fastcpd_vanilla_custom(
-    #     data, beta, segment_count, trim, momentum_coef, k, epsilon,
-    #     min_prob, winsorise_minval, winsorise_maxval, p,
-    #     function(data) {
-    #       cost(data = data, theta = NULL, family = family, lambda = 0)
-    #     }, cp_only, warm_start
-    #   )
-  } else {
-    fastcpd_builtin(
-      data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
-      min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
-      cost_hessian, cp_only, vanilla_percentage
-    )
-  }
+  # } else if (vanilla) {
+  #   fastcpd_vanilla_custom(
+  #     data, beta, segment_count, trim, momentum_coef, k, epsilon,
+  #     min_prob, winsorise_minval, winsorise_maxval, p,
+  #     function(data) {
+  #       cost(data = data, theta = NULL, family = family, lambda = 0)
+  #     }, cp_only, warm_start
+  #   )
+  result <- fastcpd_builtin(
+    data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
+    min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
+    cost_hessian, cp_only, vanilla_percentage
+  )
+
   methods::new(
     Class = "fastcpd",
     call = match.call(),
@@ -418,107 +411,10 @@ fastcpd <- function(
   )
 }
 
-fastcpd_vanilla_custom <- function(
-    data, beta, segment_count, trim, momentum_coef, k, epsilon,
-    min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only, vanilla_percentage) {
-  n <- nrow(data)
-  # fastcpd_vanilla(
-  #   data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
-  #   min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only
-  # )
-
-  # After t = 1, the r_t_set R_t contains 0 and 1.
-  r_t_set <- c(0, 1)
-  # C(0)=NULL, C(1)={0}
-  cp_set <- append(list(NULL), rep(list(0), n))
-  # Objective function: F(0) = -beta
-  f_t <- c(-beta, rep(0, n))
-
-  # start <- matrix(0, p, n)
-
-  for (t in 2:n) {
-    r_t_count <- length(r_t_set)
-
-    # number of cost values is the same as number of elemnts in R_t
-    cval <- rep(0, r_t_count)
-
-    # for tau in R_t\{t-1}
-    for (i in 1:(r_t_count - 1)) {
-      tau <- r_t_set[i]
-
-      if (t - tau >= 1) {
-        # if (warm_start && t - tau >= 50) {
-        #   cost_result <- cost(data[(tau + 1):t, , drop = FALSE], start = start[, tau + 1])
-        #   start[, tau + 1] <- cost_result$par
-        #   cval[i] <- cost_result$value
-        # } else {
-        cval[i] <- cost(data[(tau + 1):t, , drop = FALSE])
-        # }
-      }
-    }
-
-    # Step 3
-    cval[r_t_count] <- 0
-    obj <- cval + f_t[r_t_set + 1] + beta
-    min_val <- min(obj)
-    tau_star <- r_t_set[which(obj == min_val)[1]]
-
-    # Step 4
-    cp_set[[t + 1]] <- c(cp_set[[tau_star + 1]], tau_star)
-    # print(r_t_set)
-    # print(cp_set[[t + 1]])
-    # print(cval)
-    # print(f_t[r_t_set + 1])
-    # print(obj)
-    # print(min_val)
-    # print((cval + f_t[r_t_set + 1]) <= min_val)
-
-    # Step 5
-    pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
-    r_t_set <- c(r_t_set[pruned_left], t)
-
-    # Objective function F(t).
-    f_t[t + 1] <- min_val
-  }
-  # print(cp_set)
-
-  # Remove change-points close to the boundaries
-  cp_set <- cp_set[[n + 1]]
-  cp_set <- cp_set[(cp_set >= trim * n) & (cp_set <= (1 - trim) * n)]
-  cp_set <- sort(unique(c(0, cp_set)))
-
-  segment_indices <- which((diff(cp_set) < trim * n) == TRUE)
-  if (length(segment_indices) > 0) {
-    cp_set <- floor(
-      (cp_set[-(segment_indices + 1)] + cp_set[-segment_indices]) / 2
-    )
-  }
-  cp_set <- cp_set[cp_set > 0]
-  thetas <- matrix(NA, nrow = 0, ncol = 0)
-
-  if (cp_only) {
-    cost_values <- numeric(0)
-  } else {
-    cp_loc <- unique(c(0, cp_set, n))
-    cost_values <- rep(0, length(cp_loc) - 1)
-    for (i in 1:(length(cp_loc) - 1)) {
-      cost_values[i] <- cost(data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE])
-    }
-  }
-  thetas <- data.frame(thetas)
-  list(
-    cp_set = cp_set,
-    cost_values = cost_values,
-    residual = 0,
-    thetas = thetas
-  )
-}
-
 fastcpd_builtin <- function(
     data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
     min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
-    cost_hessian, cp_only, vanilla_percentage
-) {
+    cost_hessian, cp_only, vanilla_percentage) {
   # Set up the initial values.
   n <- nrow(data)
 
@@ -554,13 +450,8 @@ fastcpd_builtin <- function(
     }
 
     if (family %in% c("lasso", "gaussian")) {
-      # only works if error sd is unchanged.
-      err_sd_mean <- mean(err_sd)
-
-      act_num_mean <- mean(act_num)
-
       # seems to work but there might be better choices
-      beta <- (act_num_mean + 1) * beta
+      beta <- (mean(act_num) + 1) * beta
     }
 
     theta_hat_sum_hessian <- initialize_theta_hat_sum_hessian(
@@ -589,7 +480,7 @@ fastcpd_builtin <- function(
       if (vanilla_percentage != 1) {
         if (family == "lasso") {
           # Mean of `err_sd` only works if error sd is unchanged.
-          lambda <- err_sd_mean * sqrt(2 * log(p) / (t - tau))
+          lambda <- mean(err_sd) * sqrt(2 * log(p) / (t - tau))
         } else {
           lambda <- 0
         }
@@ -839,9 +730,9 @@ initialize_theta_hat_sum_hessian <- function(
   }
 
   list(
-      theta_hat = theta_hat,
-      theta_sum = theta_sum,
-      hessian = hessian
+    theta_hat = theta_hat,
+    theta_sum = theta_sum,
+    hessian = hessian
   )
 }
 
