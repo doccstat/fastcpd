@@ -120,4 +120,54 @@ Rcpp::List cost_update(
     Rcpp::Function cost_hessian
 );
 
+//' Update the parameters related to fastcpd.
+//' This function is not meant to be called directly by the user.
+//'
+//' @param fastcpd_parameters A list containing the parameters related to
+//'   fastcpd.
+//' @param data A data frame containing the data to be segmented.
+//' @param t Current iteration.
+//' @param i Index of the current data in the whole data set.
+//' @param k Number of epochs in SGD.
+//' @param tau Start of the current segment.
+//' @param lambda Lambda for L1 regularization.
+//' @param family Family of the model.
+//' @param vanilla_percentage Percentage of the data to be used for the vanilla
+//'   PELT.
+//' @param cost_gradient Gradient for custom cost function.
+//' @param cost_hessian Hessian for custom cost function.
+//' @param r_t_set Set of r_t values for the current iteration.
+//' @param p Number of parameters.
+//' @param momentum_coef Momentum coefficient to be applied to the current
+//'   momentum.
+//' @param min_prob Minimum probability to avoid numerical issues.
+//' @param winsorise_minval Minimum value to be winsorised.
+//' @param winsorise_maxval Maximum value to be winsorised.
+//' @param epsilon Epsilon to avoid numerical issues.
+//' @keywords internal
+//'
+//' @noRd
+//' @return A list containing new values of \code{fastcpd_parameters}.
+// [[Rcpp::export]]
+Rcpp::List update_fastcpd_parameters(
+    Rcpp::List fastcpd_parameters,
+    arma::mat data,
+    const int t,
+    const int i,
+    Rcpp::Function k,
+    const int tau,
+    const double lambda,
+    const std::string family,
+    const double vanilla_percentage,
+    Rcpp::Function cost_gradient,
+    Rcpp::Function cost_hessian,
+    arma::vec r_t_set,
+    const int p,
+    const double momentum_coef,
+    const double min_prob,
+    const double winsorise_minval,
+    const double winsorise_maxval,
+    const double epsilon
+);
+
 #endif

@@ -87,6 +87,38 @@ cost_update <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, 
     .Call(`_fastcpd_cost_update`, data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian)
 }
 
+#' Update the parameters related to fastcpd.
+#' This function is not meant to be called directly by the user.
+#'
+#' @param fastcpd_parameters A list containing the parameters related to
+#'   fastcpd.
+#' @param data A data frame containing the data to be segmented.
+#' @param t Current iteration.
+#' @param i Index of the current data in the whole data set.
+#' @param k Number of epochs in SGD.
+#' @param tau Start of the current segment.
+#' @param lambda Lambda for L1 regularization.
+#' @param family Family of the model.
+#' @param vanilla_percentage Percentage of the data to be used for the vanilla
+#'   PELT.
+#' @param cost_gradient Gradient for custom cost function.
+#' @param cost_hessian Hessian for custom cost function.
+#' @param r_t_set Set of r_t values for the current iteration.
+#' @param p Number of parameters.
+#' @param momentum_coef Momentum coefficient to be applied to the current
+#'   momentum.
+#' @param min_prob Minimum probability to avoid numerical issues.
+#' @param winsorise_minval Minimum value to be winsorised.
+#' @param winsorise_maxval Maximum value to be winsorised.
+#' @param epsilon Epsilon to avoid numerical issues.
+#' @keywords internal
+#'
+#' @noRd
+#' @return A list containing new values of \code{fastcpd_parameters}.
+update_fastcpd_parameters <- function(fastcpd_parameters, data, t, i, k, tau, lambda, family, vanilla_percentage, cost_gradient, cost_hessian, r_t_set, p, momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon) {
+    .Call(`_fastcpd_update_fastcpd_parameters`, fastcpd_parameters, data, t, i, k, tau, lambda, family, vanilla_percentage, cost_gradient, cost_hessian, r_t_set, p, momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon)
+}
+
 #' Vanilla PELT implementation.
 #' This function is not meant to be called directly by the user.
 #'

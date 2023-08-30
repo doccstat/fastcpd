@@ -249,3 +249,70 @@ Rcpp::List cost_update(
   hessian.slice(i - 1) = hessian_i;
   return Rcpp::List::create(theta_hat.col(i - 1), theta_sum.col(i - 1), hessian.slice(i - 1), momentum);
 }
+
+Rcpp::List update_fastcpd_parameters(
+    Rcpp::List fastcpd_parameters,
+    arma::mat data,
+    const int t,
+    const int i,
+    Rcpp::Function k,
+    const int tau,
+    const double lambda,
+    const std::string family,
+    const double vanilla_percentage,
+    Rcpp::Function cost_gradient,
+    Rcpp::Function cost_hessian,
+    arma::vec r_t_set,
+    const int p,
+    const double momentum_coef,
+    const double min_prob,
+    const double winsorise_minval,
+    const double winsorise_maxval,
+    const double epsilon
+) {
+  if (vanilla_percentage != 1) {
+    Rcpp::List cost_update_result = cost_update(
+      data.rows(0, t - 1),
+      Rcpp::as<arma::mat>(fastcpd_parameters["theta_hat"]),
+      Rcpp::as<arma::mat>(fastcpd_parameters["theta_sum"]),
+      Rcpp::as<arma::cube>(fastcpd_parameters["hessian"]),
+      tau,
+      i,
+      k,
+      family,
+      Rcpp::as<arma::colvec>(fastcpd_parameters["momentum"]),
+      momentum_coef,
+      epsilon,
+      min_prob,
+      winsorise_minval,
+      winsorise_maxval,
+      lambda,
+      cost_gradient,
+      cost_hessian
+    );
+    arma::mat theta_hat = fastcpd_parameters["theta_hat"],
+              theta_sum = fastcpd_parameters["theta_sum"];
+    arma::cube hessian = fastcpd_parameters["hessian"];
+    theta_hat.col(i - 1) = Rcpp::as<arma::colvec>(cost_update_result[0]);
+    theta_sum.col(i - 1) = Rcpp::as<arma::colvec>(cost_update_result[1]);
+    hessian.slice(i - 1) = Rcpp::as<arma::mat>(cost_update_result[2]);
+    fastcpd_parameters["theta_hat"] = theta_hat;
+    fastcpd_parameters["theta_sum"] = theta_sum;
+    fastcpd_parameters["hessian"] = hessian;
+    fastcpd_parameters["momentum"] = cost_update_result[3];
+
+    int tau_ = r_t_set(i - 1);
+    fastcpd_parameters["theta"] = theta_sum.col(i - 1) / static_cast<double>(t - tau_);
+    if (family == "poisson" && t - tau_ >= p) {
+      Rcpp::Environment desc_tools = Rcpp::Environment::namespace_env("DescTools");
+      Rcpp::Function winsorize = desc_tools["Winsorize"];
+      Rcpp::NumericVector winsorize_result = winsorize(
+        Rcpp::_["x"] = fastcpd_parameters["theta"],
+        Rcpp::_["minval"] = winsorise_minval,
+        Rcpp::_["maxval"] = winsorise_maxval
+      );
+      fastcpd_parameters["theta"] = arma::vec(winsorize_result.begin(), winsorize_result.size(), false);
+    }
+  }
+  return fastcpd_parameters;
+}

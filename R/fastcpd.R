@@ -614,48 +614,6 @@ init_fastcpd_parameters <- function(
   fastcpd_parameters
 }
 
-update_fastcpd_parameters <- function(
-    fastcpd_parameters, data, t, i, k, tau, lambda, family, vanilla_percentage,
-    cost_gradient, cost_hessian, r_t_set, p,
-    momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon) {
-  if (vanilla_percentage != 1) {
-    cost_update_result <- cost_update(
-      data = data[seq_len(t), , drop = FALSE],
-      theta_hat = fastcpd_parameters$theta_hat,
-      theta_sum = fastcpd_parameters$theta_sum,
-      hessian = fastcpd_parameters$hessian,
-      tau = tau,
-      i = i,
-      k = k,
-      family = family,
-      momentum = fastcpd_parameters$momentum,
-      momentum_coef = momentum_coef,
-      min_prob = min_prob,
-      winsorise_minval = winsorise_minval,
-      winsorise_maxval = winsorise_maxval,
-      epsilon = epsilon,
-      lambda = lambda,
-      cost_gradient = cost_gradient,
-      cost_hessian = cost_hessian
-    )
-    fastcpd_parameters$theta_hat[, i] <- cost_update_result[[1]]
-    fastcpd_parameters$theta_sum[, i] <- cost_update_result[[2]]
-    fastcpd_parameters$hessian[, , i] <- cost_update_result[[3]]
-    fastcpd_parameters$momentum <- cost_update_result[[4]]
-
-    tau <- r_t_set[i]
-    fastcpd_parameters$theta <- fastcpd_parameters$theta_sum[, i] / (t - tau)
-    if (family == "poisson" && t - tau >= p) {
-      fastcpd_parameters$theta <- DescTools::Winsorize(
-        fastcpd_parameters$theta,
-        minval = winsorise_minval,
-        maxval = winsorise_maxval
-      )
-    }
-  }
-  fastcpd_parameters
-}
-
 update_fastcpd_parameters2 <- function(
     fastcpd_parameters, vanilla_percentage, data, t, family,
     winsorise_minval, winsorise_maxval, p, epsilon) {
