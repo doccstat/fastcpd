@@ -419,13 +419,6 @@ fastcpd_builtin <- function(
   n <- nrow(data)
   lambda <- 0
 
-  # `error_sd` is used in Gaussian family only. `act_num` is used in Lasso
-  # and Gaussian families only.
-  err_sd <- act_num <- rep(NA, segment_count)
-
-  # Momentum will be used in the update step if `momentum_coef` is not 0.
-  momentum <- rep(0, p)
-
   # After t = 1, the r_t_set R_t contains 0 and 1.
   r_t_set <- c(0, 1)
   # C(0)=NULL, C(1)={0}
@@ -433,41 +426,10 @@ fastcpd_builtin <- function(
   # Objective function: F(0) = -beta
   f_t <- c(-beta, rep(0, n))
 
-  if (vanilla_percentage != 1) {
-    # choose the initial values based on pre-segmentation
-    segment_indices <- ceiling(seq_len(n) / ceiling(n / segment_count))
-    segment_theta_hat <- matrix(NA, segment_count, p)
-    # Remark 3.4: initialize theta_hat_t_t to be the estimate in the segment
-    for (segment_index in seq_len(segment_count)) {
-      data_segment <- data[segment_indices == segment_index, , drop = FALSE]
-      segment_theta <- estimate_theta(family, p, data_segment, cost, 0, TRUE)$par
-      segment_theta_hat[segment_index, ] <- segment_theta
-      if (family %in% c("lasso", "gaussian")) {
-        response_estimate <- data_segment[, -1, drop = FALSE] %*% c(segment_theta)
-        segment_residual <- data_segment[, 1] - response_estimate
-        err_sd[segment_index] <- sqrt(mean(segment_residual^2))
-        act_num[segment_index] <- sum(abs(segment_theta) > 0)
-      }
-    }
-
-    if (family %in% c("lasso", "gaussian")) {
-      # seems to work but there might be better choices
-      beta <- (mean(act_num) + 1) * beta
-    }
-
-    theta_hat_sum_hessian <- init_theta_hat_sum_hessian(
-      family,
-      segment_theta_hat,
-      data,
-      p,
-      winsorise_minval,
-      winsorise_maxval,
-      epsilon
-    )
-    theta_hat <- theta_hat_sum_hessian$theta_hat
-    theta_sum <- theta_hat_sum_hessian$theta_sum
-    hessian <- theta_hat_sum_hessian$hessian
-  }
+  fastcpd_parameters <- init_fastcpd_parameters(
+    data, p, family, segment_count, cost, winsorise_minval, winsorise_maxval,
+    epsilon, vanilla_percentage, beta
+  )
 
   for (t in 2:n) {
     r_t_count <- length(r_t_set)
@@ -478,52 +440,21 @@ fastcpd_builtin <- function(
     # for tau in R_t\{t-1}
     for (i in 1:(r_t_count - 1)) {
       tau <- r_t_set[i]
-      if (vanilla_percentage != 1) {
-        if (family == "lasso") {
-          # Mean of `err_sd` only works if error sd is unchanged.
-          lambda <- mean(err_sd) * sqrt(2 * log(p) / (t - tau))
-        }
-
-        cost_update_result <- cost_update(
-          data = data[seq_len(t), , drop = FALSE],
-          theta_hat = theta_hat,
-          theta_sum = theta_sum,
-          hessian = hessian,
-          tau = tau,
-          i = i,
-          k = k,
-          family = family,
-          momentum = momentum,
-          momentum_coef = momentum_coef,
-          min_prob = min_prob,
-          winsorise_minval = winsorise_minval,
-          winsorise_maxval = winsorise_maxval,
-          epsilon = epsilon,
-          lambda = lambda,
-          cost_gradient = cost_gradient,
-          cost_hessian = cost_hessian
-        )
-        theta_hat[, i] <- cost_update_result[[1]]
-        theta_sum[, i] <- cost_update_result[[2]]
-        hessian[, , i] <- cost_update_result[[3]]
-        momentum <- cost_update_result[[4]]
-
-        tau <- r_t_set[i]
-        theta <- theta_sum[, i] / (t - tau)
-        if (family == "poisson" && t - tau >= p) {
-          theta <- DescTools::Winsorize(
-            theta,
-            minval = winsorise_minval,
-            maxval = winsorise_maxval
-          )
-        }
+      if (family == "lasso") {
+        # Mean of `err_sd` only works if error sd is unchanged.
+        lambda <- mean(fastcpd_parameters$err_sd) * sqrt(2 * log(p) / (t - tau))
       }
+      fastcpd_parameters <- update_fastcpd_parameters(
+        fastcpd_parameters, data, t, i, k, tau, lambda, family, vanilla_percentage,
+        cost_gradient, cost_hessian, r_t_set, p,
+        momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon
+      )
 
       if (
         (family %in% c("binomial", "poisson") && t - tau >= p) ||
           (family %in% c("lasso", "gaussian") && t - tau >= 3)
       ) {
-        cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta, family, lambda)$value
+        cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], fastcpd_parameters$theta, family, lambda)$value
       } else if (family == "custom" && t - tau >= 1) {
         # if (warm_start && t - tau >= 50) {
         #   cost_result <- cost(data[(tau + 1):t, , drop = FALSE], start = start[, tau + 1])
@@ -533,31 +464,16 @@ fastcpd_builtin <- function(
         if (vanilla_percentage == 1) {
           cval[i] <- cost(data[(tau + 1):t, , drop = FALSE])
         } else {
-          cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta)
+          cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], fastcpd_parameters$theta)
         }
         # }
       }
     }
 
-    if (vanilla_percentage != 1) {
-      theta_hat_sum_hessian <- bind_theta_hat_sum_hessian(
-          data,
-          segment_theta_hat,
-          segment_indices,
-          t,
-          family,
-          winsorise_minval,
-          winsorise_maxval,
-          p,
-          epsilon,
-          theta_hat,
-          theta_sum,
-          hessian
-      )
-      theta_hat <- theta_hat_sum_hessian$theta_hat
-      theta_sum <- theta_hat_sum_hessian$theta_sum
-      hessian <- theta_hat_sum_hessian$hessian
-    }
+    fastcpd_parameters <- update_fastcpd_parameters2(
+      fastcpd_parameters, vanilla_percentage, data, t, family,
+      winsorise_minval, winsorise_maxval, p, epsilon
+    )
 
     # Step 3
     cval[r_t_count] <- 0
@@ -580,17 +496,7 @@ fastcpd_builtin <- function(
     pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
     r_t_set <- c(r_t_set[pruned_left], t)
 
-    if (vanilla_percentage != 1) {
-      theta_hat_sum_hessian <- update_theta_hat_sum_hessian(
-        theta_hat,
-        theta_sum,
-        hessian,
-        pruned_left
-      )
-      theta_hat <- theta_hat_sum_hessian$theta_hat
-      theta_sum <- theta_hat_sum_hessian$theta_sum
-      hessian <- theta_hat_sum_hessian$hessian
-    }
+    fastcpd_parameters <- update_fastcpd_parameters3(fastcpd_parameters, vanilla_percentage, pruned_left)
 
     # Objective function F(t).
     f_t[t + 1] <- min_val
@@ -602,10 +508,10 @@ fastcpd_builtin <- function(
   cp_set <- cp_set[(cp_set >= trim * n) & (cp_set <= (1 - trim) * n)]
   cp_set <- sort(unique(c(0, cp_set)))
 
-  segment_indices <- which((diff(cp_set) < trim * n) == TRUE)
-  if (length(segment_indices) > 0) {
+  cp_set_too_close <- which((diff(cp_set) < trim * n) == TRUE)
+  if (length(cp_set_too_close) > 0) {
     cp_set <- floor(
-      (cp_set[-(segment_indices + 1)] + cp_set[-segment_indices]) / 2
+      (cp_set[-(cp_set_too_close + 1)] + cp_set[-cp_set_too_close]) / 2
     )
   }
   cp_set <- cp_set[cp_set > 0]
@@ -644,6 +550,149 @@ fastcpd_builtin <- function(
     residual = residual,
     thetas = thetas
   )
+}
+
+init_fastcpd_parameters <- function(
+    data, p, family, segment_count, cost, winsorise_minval, winsorise_maxval,
+    epsilon, vanilla_percentage, beta) {
+  # `error_sd` is used in Gaussian family only. `act_num` is used in Lasso
+  # and Gaussian families only.
+  fastcpd_parameters <- list(
+    segment_indices = NULL,
+    segment_theta_hat = NULL,
+    err_sd = rep(NA, segment_count),
+    act_num = rep(NA, segment_count),
+    theta_hat = NULL,
+    theta_sum = NULL,
+    hessian = NULL,
+    theta = NULL,
+    # Momentum will be used in the update step if `momentum_coef` is not 0.
+    momentum = rep(0, p)
+  )
+
+
+  if (vanilla_percentage != 1) {
+    n <- nrow(data)
+
+    # Choose the initial values based on pre-segmentation.
+    fastcpd_parameters$segment_indices <- ceiling(seq_len(n) / ceiling(n / segment_count))
+    fastcpd_parameters$segment_theta_hat <- matrix(NA, segment_count, p)
+
+    # Remark 3.4: initialize theta_hat_t_t to be the estimate in the segment
+    for (segment_index in seq_len(segment_count)) {
+      data_segment <- data[fastcpd_parameters$segment_indices == segment_index, , drop = FALSE]
+      segment_theta <- estimate_theta(family, p, data_segment, cost, 0, TRUE)$par
+      fastcpd_parameters$segment_theta_hat[segment_index, ] <- segment_theta
+      if (family %in% c("lasso", "gaussian")) {
+        response_estimate <- data_segment[, -1, drop = FALSE] %*% c(segment_theta)
+        segment_residual <- data_segment[, 1] - response_estimate
+        fastcpd_parameters$err_sd[segment_index] <- sqrt(mean(segment_residual^2))
+        fastcpd_parameters$act_num[segment_index] <- sum(abs(segment_theta) > 0)
+      }
+    }
+
+    if (family %in% c("lasso", "gaussian")) {
+      # seems to work but there might be better choices
+      beta <- (mean(fastcpd_parameters$act_num) + 1) * beta
+    }
+
+    theta_hat_sum_hessian <- init_theta_hat_sum_hessian(
+      family,
+      fastcpd_parameters$segment_theta_hat,
+      data,
+      p,
+      winsorise_minval,
+      winsorise_maxval,
+      epsilon
+    )
+    fastcpd_parameters$theta_hat <- theta_hat_sum_hessian$theta_hat
+    fastcpd_parameters$theta_sum <- theta_hat_sum_hessian$theta_sum
+    fastcpd_parameters$hessian <- theta_hat_sum_hessian$hessian
+  }
+
+  fastcpd_parameters
+}
+
+update_fastcpd_parameters <- function(
+    fastcpd_parameters, data, t, i, k, tau, lambda, family, vanilla_percentage,
+    cost_gradient, cost_hessian, r_t_set, p,
+    momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon) {
+  if (vanilla_percentage != 1) {
+    cost_update_result <- cost_update(
+      data = data[seq_len(t), , drop = FALSE],
+      theta_hat = fastcpd_parameters$theta_hat,
+      theta_sum = fastcpd_parameters$theta_sum,
+      hessian = fastcpd_parameters$hessian,
+      tau = tau,
+      i = i,
+      k = k,
+      family = family,
+      momentum = fastcpd_parameters$momentum,
+      momentum_coef = momentum_coef,
+      min_prob = min_prob,
+      winsorise_minval = winsorise_minval,
+      winsorise_maxval = winsorise_maxval,
+      epsilon = epsilon,
+      lambda = lambda,
+      cost_gradient = cost_gradient,
+      cost_hessian = cost_hessian
+    )
+    fastcpd_parameters$theta_hat[, i] <- cost_update_result[[1]]
+    fastcpd_parameters$theta_sum[, i] <- cost_update_result[[2]]
+    fastcpd_parameters$hessian[, , i] <- cost_update_result[[3]]
+    fastcpd_parameters$momentum <- cost_update_result[[4]]
+
+    tau <- r_t_set[i]
+    fastcpd_parameters$theta <- fastcpd_parameters$theta_sum[, i] / (t - tau)
+    if (family == "poisson" && t - tau >= p) {
+      fastcpd_parameters$theta <- DescTools::Winsorize(
+        fastcpd_parameters$theta,
+        minval = winsorise_minval,
+        maxval = winsorise_maxval
+      )
+    }
+  }
+  fastcpd_parameters
+}
+
+update_fastcpd_parameters2 <- function(
+    fastcpd_parameters, vanilla_percentage, data, t, family,
+    winsorise_minval, winsorise_maxval, p, epsilon) {
+  if (vanilla_percentage != 1) {
+    theta_hat_sum_hessian <- bind_theta_hat_sum_hessian(
+      data,
+      fastcpd_parameters$segment_theta_hat,
+      fastcpd_parameters$segment_indices,
+      t,
+      family,
+      winsorise_minval,
+      winsorise_maxval,
+      p,
+      epsilon,
+      fastcpd_parameters$theta_hat,
+      fastcpd_parameters$theta_sum,
+      fastcpd_parameters$hessian
+    )
+    fastcpd_parameters$theta_hat <- theta_hat_sum_hessian$theta_hat
+    fastcpd_parameters$theta_sum <- theta_hat_sum_hessian$theta_sum
+    fastcpd_parameters$hessian <- theta_hat_sum_hessian$hessian
+  }
+  fastcpd_parameters
+}
+
+update_fastcpd_parameters3 <- function(fastcpd_parameters, vanilla_percentage, pruned_left) {
+  if (vanilla_percentage != 1) {
+    theta_hat_sum_hessian <- update_theta_hat_sum_hessian(
+      fastcpd_parameters$theta_hat,
+      fastcpd_parameters$theta_sum,
+      fastcpd_parameters$hessian,
+      pruned_left
+    )
+    fastcpd_parameters$theta_hat <- theta_hat_sum_hessian$theta_hat
+    fastcpd_parameters$theta_sum <- theta_hat_sum_hessian$theta_sum
+    fastcpd_parameters$hessian <- theta_hat_sum_hessian$hessian
+  }
+  fastcpd_parameters
 }
 
 estimate_theta <- function(family, p, data_segment, cost, lambda, cv) {
