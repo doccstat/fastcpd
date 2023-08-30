@@ -119,6 +119,25 @@ update_fastcpd_parameters <- function(fastcpd_parameters, data, t, i, k, tau, la
     .Call(`_fastcpd_update_fastcpd_parameters`, fastcpd_parameters, data, t, i, k, tau, lambda, family, vanilla_percentage, cost_gradient, cost_hessian, r_t_set, p, momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon)
 }
 
+#' Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
+#' This function is not meant to be called directly by the user.
+#'
+#' @param family Family of the model.
+#' @param segment_theta_hat Estimated theta for the current segment.
+#' @param data A data frame containing the data to be segmented.
+#' @param p Number of parameters.
+#' @param winsorise_minval Minimum value to be winsorised.
+#' @param winsorise_maxval Maximum value to be winsorised.
+#' @param epsilon Epsilon to avoid numerical issues.
+#' @keywords internal
+#'
+#' @noRd
+#' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
+#'   and \code{hessian}.
+init_theta_hat_sum_hessian <- function(family, segment_theta_hat, data, p, winsorise_minval, winsorise_maxval, epsilon) {
+    .Call(`_fastcpd_init_theta_hat_sum_hessian`, family, segment_theta_hat, data, p, winsorise_minval, winsorise_maxval, epsilon)
+}
+
 #' Vanilla PELT implementation.
 #' This function is not meant to be called directly by the user.
 #'

@@ -78,7 +78,6 @@ Rcpp::List negative_log_likelihood(
     arma::mat x = data.cols(1, data.n_cols - 1);
     double penalty = lambda * arma::accu(arma::abs(theta_nonnull));
     return Rcpp::List::create(Rcpp::Named("value") = arma::accu(arma::pow(y - x * theta_nonnull, 2)) / 2 + penalty);
-
   } else if (family == "binomial") {
     // Calculate negative log likelihood in binomial family
     arma::colvec theta_nonnull = Rcpp::as<arma::colvec>(theta);
@@ -313,4 +312,52 @@ Rcpp::List update_fastcpd_parameters(
     }
   }
   return fastcpd_parameters;
+}
+
+Rcpp::List init_theta_hat_sum_hessian(
+    const std::string family,
+    const arma::mat segment_theta_hat,
+    const arma::mat data,
+    const int p,
+    const double winsorise_minval,
+    const double winsorise_maxval,
+    const double epsilon
+) {
+  arma::colvec theta_hat, theta_sum;
+  arma::cube hessian;
+  if (family == "binomial") {
+    theta_sum = segment_theta_hat.row(0).t();
+    theta_hat = segment_theta_hat.row(0).t();
+    double prob = 1 / (1 + exp(-arma::as_scalar(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())));
+    hessian = arma::cube(p, p, 1);
+    hessian.slice(0) = (data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)) * arma::as_scalar(prob * (1 - prob));
+  } else if (family == "poisson") {
+    Rcpp::Environment desc_tools = Rcpp::Environment::namespace_env("DescTools");
+    Rcpp::Function winsorize = desc_tools["Winsorize"];
+    Rcpp::NumericVector winsorize_result = winsorize(
+      Rcpp::_["x"] = segment_theta_hat.row(0).t(),
+      Rcpp::_["minval"] = winsorise_minval,
+      Rcpp::_["maxval"] = winsorise_maxval
+    );
+    theta_hat = arma::vec(winsorize_result.begin(), winsorize_result.size(), false);
+    theta_sum = arma::vec(winsorize_result.begin(), winsorize_result.size(), false);
+    hessian = arma::cube(p, p, 1);
+    hessian.slice(0) = (data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)) * arma::as_scalar(exp(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t()));
+  } else if (family == "lasso" || family == "gaussian") {
+    theta_hat = segment_theta_hat.row(0).t();
+    theta_sum = segment_theta_hat.row(0).t();
+    hessian = arma::cube(p, p, 1);
+    hessian.slice(0) = data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1) + epsilon * arma::eye<arma::mat>(p, p);
+  } else if (family == "custom") {
+    theta_hat = segment_theta_hat.row(0).t();
+    theta_sum = segment_theta_hat.row(0).t();
+    hessian = arma::cube(p, p, 1);
+    hessian.slice(0) = arma::zeros<arma::mat>(p, p);
+  }
+
+  return Rcpp::List::create(
+      Rcpp::Named("theta_hat") = theta_hat,
+      Rcpp::Named("theta_sum") = theta_sum,
+      Rcpp::Named("hessian") = hessian
+  );
 }
