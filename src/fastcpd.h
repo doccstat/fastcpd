@@ -170,4 +170,30 @@ Rcpp::List update_fastcpd_parameters(
     const double epsilon
 );
 
+//' Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
+//' This function is not meant to be called directly by the user.
+//'
+//' @param family Family of the model.
+//' @param segment_theta_hat Estimated theta for the current segment.
+//' @param data A data frame containing the data to be segmented.
+//' @param p Number of parameters.
+//' @param winsorise_minval Minimum value to be winsorised.
+//' @param winsorise_maxval Maximum value to be winsorised.
+//' @param epsilon Epsilon to avoid numerical issues.
+//' @keywords internal
+//'
+//' @noRd
+//' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
+//'   and \code{hessian}.
+// [[Rcpp::export]]
+Rcpp::List init_theta_hat_sum_hessian(
+    const std::string family,
+    const arma::mat segment_theta_hat,
+    const arma::mat data,
+    const int p,
+    const double winsorise_minval,
+    const double winsorise_maxval,
+    const double epsilon
+);
+
 #endif
