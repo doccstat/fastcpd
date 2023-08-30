@@ -4,6 +4,14 @@
 #include <RcppArmadillo.h>
 #include <testthat.h>
 
+// using ::arma::colvec;
+// using ::arma::cube;
+// using ::arma::mat;
+using ::Rcpp::Function;
+using ::Rcpp::List;
+using ::Rcpp::Nullable;
+// using ::std::string;
+
 //' Solve logistic/poisson regression using Gradient Descent Extension to the
 //' multivariate case
 //' This function is not meant to be called directly by the user.
@@ -23,13 +31,13 @@
 //' @return Negative log likelihood of the corresponding data with the given
 //'   family.
 // [[Rcpp::export]]
-Rcpp::List negative_log_likelihood(
+List negative_log_likelihood(
     arma::mat data,
-    Rcpp::Nullable<arma::colvec> theta,
+    Nullable<arma::colvec> theta,
     std::string family,
     double lambda,
     bool cv = false,
-    Rcpp::Nullable<arma::colvec> start = R_NilValue
+    Nullable<arma::colvec> start = R_NilValue
 );
 
 //' Function to calculate the gradient at the current data.
@@ -100,14 +108,14 @@ arma::mat cost_update_hessian(
 //' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 //'   \code{hessian}, and \code{momentum}.
 // [[Rcpp::export]]
-Rcpp::List cost_update(
+List cost_update(
     const arma::mat data,
     arma::mat theta_hat,
     arma::mat theta_sum,
     arma::cube hessian,
     const int tau,
     const int i,
-    Rcpp::Function k,
+    Function k,
     const std::string family,
     arma::colvec momentum,
     const double momentum_coef,
@@ -116,8 +124,8 @@ Rcpp::List cost_update(
     const double winsorise_minval,
     const double winsorise_maxval,
     const double lambda,
-    Rcpp::Function cost_gradient,
-    Rcpp::Function cost_hessian
+    Function cost_gradient,
+    Function cost_hessian
 );
 
 //' Update the parameters related to fastcpd.
@@ -149,18 +157,18 @@ Rcpp::List cost_update(
 //' @noRd
 //' @return A list containing new values of \code{fastcpd_parameters}.
 // [[Rcpp::export]]
-Rcpp::List update_fastcpd_parameters(
-    Rcpp::List fastcpd_parameters,
+List update_fastcpd_parameters(
+    List fastcpd_parameters,
     arma::mat data,
     const int t,
     const int i,
-    Rcpp::Function k,
+    Function k,
     const int tau,
     const double lambda,
     const std::string family,
     const double vanilla_percentage,
-    Rcpp::Function cost_gradient,
-    Rcpp::Function cost_hessian,
+    Function cost_gradient,
+    Function cost_hessian,
     arma::vec r_t_set,
     const int p,
     const double momentum_coef,
@@ -186,7 +194,7 @@ Rcpp::List update_fastcpd_parameters(
 //' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 //'   and \code{hessian}.
 // [[Rcpp::export]]
-Rcpp::List init_theta_hat_sum_hessian(
+List init_theta_hat_sum_hessian(
     const std::string family,
     const arma::mat segment_theta_hat,
     const arma::mat data,
