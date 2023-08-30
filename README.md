@@ -11,6 +11,7 @@ coverage](https://codecov.io/gh/doccstat/fastcpd/branch/main/graph/badge.svg)](h
 [![Last
 Commit](https://img.shields.io/github/last-commit/doccstat/fastcpd)](https://github.com/doccstat/fastcpd)
 [![r-universe](https://doccstat.r-universe.dev/badges/fastcpd)](https://doccstat.r-universe.dev)
+[![CodeFactor](https://www.codefactor.io/repository/github/doccstat/fastcpd/badge)](https://www.codefactor.io/repository/github/doccstat/fastcpd)
 
 ## Overview
 
