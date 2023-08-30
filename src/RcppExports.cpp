@@ -12,17 +12,17 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // negative_log_likelihood
-Rcpp::List negative_log_likelihood(arma::mat data, Rcpp::Nullable<arma::colvec> theta, std::string family, double lambda, bool cv, Rcpp::Nullable<arma::colvec> start);
+List negative_log_likelihood(arma::mat data, Nullable<arma::colvec> theta, std::string family, double lambda, bool cv, Nullable<arma::colvec> start);
 RcppExport SEXP _fastcpd_negative_log_likelihood(SEXP dataSEXP, SEXP thetaSEXP, SEXP familySEXP, SEXP lambdaSEXP, SEXP cvSEXP, SEXP startSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<arma::colvec> >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< Nullable<arma::colvec> >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< std::string >::type family(familySEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< bool >::type cv(cvSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<arma::colvec> >::type start(startSEXP);
+    Rcpp::traits::input_parameter< Nullable<arma::colvec> >::type start(startSEXP);
     rcpp_result_gen = Rcpp::wrap(negative_log_likelihood(data, theta, family, lambda, cv, start));
     return rcpp_result_gen;
 END_RCPP
@@ -55,7 +55,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // cost_update
-Rcpp::List cost_update(const arma::mat data, arma::mat theta_hat, arma::mat theta_sum, arma::cube hessian, const int tau, const int i, Rcpp::Function k, const std::string family, arma::colvec momentum, const double momentum_coef, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const double lambda, Rcpp::Function cost_gradient, Rcpp::Function cost_hessian);
+List cost_update(const arma::mat data, arma::mat theta_hat, arma::mat theta_sum, arma::cube hessian, const int tau, const int i, Function k, const std::string family, arma::colvec momentum, const double momentum_coef, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const double lambda, Function cost_gradient, Function cost_hessian);
 RcppExport SEXP _fastcpd_cost_update(SEXP dataSEXP, SEXP theta_hatSEXP, SEXP theta_sumSEXP, SEXP hessianSEXP, SEXP tauSEXP, SEXP iSEXP, SEXP kSEXP, SEXP familySEXP, SEXP momentumSEXP, SEXP momentum_coefSEXP, SEXP epsilonSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP lambdaSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -66,7 +66,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::cube >::type hessian(hessianSEXP);
     Rcpp::traits::input_parameter< const int >::type tau(tauSEXP);
     Rcpp::traits::input_parameter< const int >::type i(iSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Function >::type k(kSEXP);
+    Rcpp::traits::input_parameter< Function >::type k(kSEXP);
     Rcpp::traits::input_parameter< const std::string >::type family(familySEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type momentum(momentumSEXP);
     Rcpp::traits::input_parameter< const double >::type momentum_coef(momentum_coefSEXP);
@@ -75,29 +75,29 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double >::type winsorise_minval(winsorise_minvalSEXP);
     Rcpp::traits::input_parameter< const double >::type winsorise_maxval(winsorise_maxvalSEXP);
     Rcpp::traits::input_parameter< const double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Function >::type cost_gradient(cost_gradientSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Function >::type cost_hessian(cost_hessianSEXP);
+    Rcpp::traits::input_parameter< Function >::type cost_gradient(cost_gradientSEXP);
+    Rcpp::traits::input_parameter< Function >::type cost_hessian(cost_hessianSEXP);
     rcpp_result_gen = Rcpp::wrap(cost_update(data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian));
     return rcpp_result_gen;
 END_RCPP
 }
 // update_fastcpd_parameters
-Rcpp::List update_fastcpd_parameters(Rcpp::List fastcpd_parameters, arma::mat data, const int t, const int i, Rcpp::Function k, const int tau, const double lambda, const std::string family, const double vanilla_percentage, Rcpp::Function cost_gradient, Rcpp::Function cost_hessian, arma::vec r_t_set, const int p, const double momentum_coef, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const double epsilon);
+List update_fastcpd_parameters(List fastcpd_parameters, arma::mat data, const int t, const int i, Function k, const int tau, const double lambda, const std::string family, const double vanilla_percentage, Function cost_gradient, Function cost_hessian, arma::vec r_t_set, const int p, const double momentum_coef, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const double epsilon);
 RcppExport SEXP _fastcpd_update_fastcpd_parameters(SEXP fastcpd_parametersSEXP, SEXP dataSEXP, SEXP tSEXP, SEXP iSEXP, SEXP kSEXP, SEXP tauSEXP, SEXP lambdaSEXP, SEXP familySEXP, SEXP vanilla_percentageSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP r_t_setSEXP, SEXP pSEXP, SEXP momentum_coefSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP epsilonSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::List >::type fastcpd_parameters(fastcpd_parametersSEXP);
+    Rcpp::traits::input_parameter< List >::type fastcpd_parameters(fastcpd_parametersSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
     Rcpp::traits::input_parameter< const int >::type t(tSEXP);
     Rcpp::traits::input_parameter< const int >::type i(iSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Function >::type k(kSEXP);
+    Rcpp::traits::input_parameter< Function >::type k(kSEXP);
     Rcpp::traits::input_parameter< const int >::type tau(tauSEXP);
     Rcpp::traits::input_parameter< const double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< const std::string >::type family(familySEXP);
     Rcpp::traits::input_parameter< const double >::type vanilla_percentage(vanilla_percentageSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Function >::type cost_gradient(cost_gradientSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Function >::type cost_hessian(cost_hessianSEXP);
+    Rcpp::traits::input_parameter< Function >::type cost_gradient(cost_gradientSEXP);
+    Rcpp::traits::input_parameter< Function >::type cost_hessian(cost_hessianSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type r_t_set(r_t_setSEXP);
     Rcpp::traits::input_parameter< const int >::type p(pSEXP);
     Rcpp::traits::input_parameter< const double >::type momentum_coef(momentum_coefSEXP);
@@ -110,7 +110,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // init_theta_hat_sum_hessian
-Rcpp::List init_theta_hat_sum_hessian(const std::string family, const arma::mat segment_theta_hat, const arma::mat data, const int p, const double winsorise_minval, const double winsorise_maxval, const double epsilon);
+List init_theta_hat_sum_hessian(const std::string family, const arma::mat segment_theta_hat, const arma::mat data, const int p, const double winsorise_minval, const double winsorise_maxval, const double epsilon);
 RcppExport SEXP _fastcpd_init_theta_hat_sum_hessian(SEXP familySEXP, SEXP segment_theta_hatSEXP, SEXP dataSEXP, SEXP pSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP epsilonSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
