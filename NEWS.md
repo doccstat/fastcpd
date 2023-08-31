@@ -1,3 +1,8 @@
+# fastcpd 0.4.0
+
+*   Add the transition from vanilla PELT to SeN by using `vanilla_percentage`
+    parameter.
+
 # fastcpd 0.3.3
 
 *   Merge the implementation of vanilla PELT and SeN.
