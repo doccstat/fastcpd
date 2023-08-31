@@ -446,10 +446,10 @@ fastcpd_builtin <- function(
       }
 
       data_segment <- data[(tau + 1):t, , drop = FALSE]
-      if (vanilla_percentage == 1) {
+      if (t <= vanilla_percentage * n) {
         cost_optim_result <- cost_optim(family, p, data_segment, cost, 0, TRUE)
-        # fastcpd_parameters$theta_hat[, i] <- cost_optim_result$par
-        # fastcpd_parameters$theta_sum[, i] <- fastcpd_parameters$theta_sum[, i] + cost_optim_result$par
+        fastcpd_parameters$theta_hat[, i] <- cost_optim_result$par
+        fastcpd_parameters$theta_sum[, i] <- fastcpd_parameters$theta_sum[, i] + cost_optim_result$par
         cval[i] <- cost_optim_result$value
       } else {
         fastcpd_parameters <- update_fastcpd_parameters(
