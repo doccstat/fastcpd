@@ -449,7 +449,13 @@ fastcpd_builtin <- function(
         cost_gradient, cost_hessian, r_t_set, p,
         momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon
       )
-      theta <- fastcpd_parameters$theta
+
+      theta <- fastcpd_parameters$theta_sum[, i] / (t - tau)
+      if (family == "poisson" && t - tau >= p) {
+        theta <- DescTools::Winsorize(
+          x = theta, minval = winsorise_minval, maxval = winsorise_maxval
+        )
+      }
 
       if (
         (family %in% c("binomial", "poisson") && t - tau >= p) ||
@@ -562,7 +568,6 @@ init_fastcpd_parameters <- function(
     theta_hat = NULL,
     theta_sum = NULL,
     hessian = NULL,
-    theta = NULL,
     # Momentum will be used in the update step if `momentum_coef` is not 0.
     momentum = rep(0, p)
   )
@@ -571,25 +576,32 @@ init_fastcpd_parameters <- function(
   if (vanilla_percentage != 1) {
     n <- nrow(data)
 
-    # Choose the initial values based on pre-segmentation.
+    # Segment the whole data set evenly based on the number of segments
+    # specified in the `segment_count` parameter.
     fastcpd_parameters$segment_indices <- ceiling(seq_len(n) / ceiling(n / segment_count))
+
+    # Create a matrix to store the estimated coefficients in each segment,
+    # where each row represents estimated coefficients for a segment.
     fastcpd_parameters$segment_theta_hat <- matrix(NA, segment_count, p)
 
     # Remark 3.4: initialize theta_hat_t_t to be the estimate in the segment
     for (segment_index in seq_len(segment_count)) {
       data_segment <- data[fastcpd_parameters$segment_indices == segment_index, , drop = FALSE]
       segment_theta <- estimate_theta(family, p, data_segment, cost, 0, TRUE)$par
+
+      # Initialize the estimated coefficients for each segment to be the
+      # estimated coefficients in the segment.
       fastcpd_parameters$segment_theta_hat[segment_index, ] <- segment_theta
       if (family %in% c("lasso", "gaussian")) {
-        response_estimate <- data_segment[, -1, drop = FALSE] %*% c(segment_theta)
-        segment_residual <- data_segment[, 1] - response_estimate
+        segment_residual <- data_segment[, 1] - data_segment[, -1, drop = FALSE] %*% c(segment_theta)
         fastcpd_parameters$err_sd[segment_index] <- sqrt(mean(segment_residual^2))
         fastcpd_parameters$act_num[segment_index] <- sum(abs(segment_theta) > 0)
       }
     }
 
+    # Adjust `beta` for Lasso and Gaussian families. This seems to be working
+    # but there might be better choices.
     if (family %in% c("lasso", "gaussian")) {
-      # seems to work but there might be better choices
       beta <- (mean(fastcpd_parameters$act_num) + 1) * beta
     }
 

@@ -361,22 +361,6 @@ List update_fastcpd_parameters(
     fastcpd_parameters["theta_sum"] = theta_sum;
     fastcpd_parameters["hessian"] = hessian;
     fastcpd_parameters["momentum"] = cost_update_result[3];
-
-    int tau_ = r_t_set(i - 1);
-    fastcpd_parameters["theta"] =
-        theta_sum.col(i - 1) / static_cast<double>(t - tau_);
-    if (family == "poisson" && t - tau_ >= p) {
-      Environment desc_tools = Environment::namespace_env("DescTools");
-      Function winsorize = desc_tools["Winsorize"];
-      NumericVector winsorize_result = winsorize(
-        Rcpp::_["x"] = fastcpd_parameters["theta"],
-        Rcpp::_["minval"] = winsorise_minval,
-        Rcpp::_["maxval"] = winsorise_maxval
-      );
-      fastcpd_parameters["theta"] = arma::vec(
-        winsorize_result.begin(), winsorize_result.size(), false
-      );
-    }
   }
   return fastcpd_parameters;
 }
