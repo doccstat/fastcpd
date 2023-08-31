@@ -154,7 +154,7 @@ NULL
 #' theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
 #' y <- c(
 #'   rbinom(200, 1, 1 / (1 + exp(-x[1:200, ] %*% theta[1, ]))),
-#'   rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] %*% theta[2, ])))
+#'   rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] %*% theta[2, ])))
 #' )
 #' data <- data.frame(y = y, x = x)
 #' result_builtin <- fastcpd(
