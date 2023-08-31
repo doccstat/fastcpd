@@ -4,13 +4,9 @@
 #include <RcppArmadillo.h>
 #include <testthat.h>
 
-// using ::arma::colvec;
-// using ::arma::cube;
-// using ::arma::mat;
 using ::Rcpp::Function;
 using ::Rcpp::List;
 using ::Rcpp::Nullable;
-// using ::std::string;
 
 //' Solve logistic/poisson regression using Gradient Descent Extension to the
 //' multivariate case

@@ -458,11 +458,11 @@ fastcpd_builtin <- function(
       }
 
       if (
-        (family %in% c("binomial", "poisson") && t - tau >= p) ||
-          (family %in% c("lasso", "gaussian") && t - tau >= 3)
+        (family %in% c("gaussian", "binomial", "poisson") && t - tau >= p) ||
+          (family == "lasso" && t - tau >= 3)
       ) {
         cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta, family, lambda)$value
-      } else if (family == "custom" && t - tau >= 1) {
+      } else if (family == "custom") {
         # if (warm_start && t - tau >= 50) {
         #   cost_result <- cost(data[(tau + 1):t, , drop = FALSE], start = start[, tau + 1])
         #   start[, tau + 1] <- cost_result$par
@@ -477,7 +477,7 @@ fastcpd_builtin <- function(
       }
     }
 
-    fastcpd_parameters <- update_fastcpd_parameters2(
+    fastcpd_parameters <- append_fastcpd_parameters(
       fastcpd_parameters, vanilla_percentage, data, t, family,
       winsorise_minval, winsorise_maxval, p, epsilon
     )
@@ -491,13 +491,6 @@ fastcpd_builtin <- function(
 
     # Step 4
     cp_set[[t + 1]] <- c(cp_set[[tau_star + 1]], tau_star)
-    # print(r_t_set)
-    # print(cp_set[[t + 1]])
-    # print(cval)
-    # print(f_t[r_t_set + 1])
-    # print(obj)
-    # print(min_val)
-    # print((cval + f_t[r_t_set + 1]) <= min_val)
 
     # Step 5
     pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
@@ -508,7 +501,6 @@ fastcpd_builtin <- function(
     # Objective function F(t).
     f_t[t + 1] <- min_val
   }
-  # print(cp_set)
 
   # Remove change-points close to the boundaries
   cp_set <- cp_set[[n + 1]]
@@ -523,24 +515,20 @@ fastcpd_builtin <- function(
   }
   cp_set <- cp_set[cp_set > 0]
 
-  residual <- 0[family == "custom"]
+  residual <- numeric(0)
   if (cp_only) {
     cost_values <- numeric(0)
     thetas <- matrix(NA, nrow = 0, ncol = 0)
   } else {
-    thetas <- NULL
     cp_loc <- unique(c(0, cp_set, n))
     cost_values <- rep(0, length(cp_loc) - 1)
+    thetas <- matrix(NA, nrow = p, ncol = length(cp_loc) - 1)
     for (i in 1:(length(cp_loc) - 1)) {
       data_segment <- data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
-      if (length(formals(cost)) == 1) {
-        cost_values[i] <- cost(data_segment)
-      } else {
-        cost_result <- estimate_theta(family, p, data_segment, cost, lambda, FALSE)
-        residual <- c(residual, cost_result$residuals)
-        cost_values[i] <- cost_result$value
-        thetas <- cbind(thetas, cost_result$par)
-      }
+      cost_result <- estimate_theta(family, p, data_segment, cost, lambda, FALSE)
+      residual <- c(residual, cost_result$residuals)
+      cost_values[i] <- cost_result$value
+      thetas[, i] <- cost_result$par
     }
   }
   thetas <- data.frame(thetas)
@@ -622,7 +610,7 @@ init_fastcpd_parameters <- function(
   fastcpd_parameters
 }
 
-update_fastcpd_parameters2 <- function(
+append_fastcpd_parameters <- function(
     fastcpd_parameters, vanilla_percentage, data, t, family,
     winsorise_minval, winsorise_maxval, p, epsilon) {
   if (vanilla_percentage != 1) {
