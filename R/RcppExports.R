@@ -99,8 +99,6 @@ cost_update <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, 
 #' @param tau Start of the current segment.
 #' @param lambda Lambda for L1 regularization.
 #' @param family Family of the model.
-#' @param vanilla_percentage Percentage of the data to be used for the vanilla
-#'   PELT.
 #' @param cost_gradient Gradient for custom cost function.
 #' @param cost_hessian Hessian for custom cost function.
 #' @param r_t_set Set of r_t values for the current iteration.
@@ -115,8 +113,8 @@ cost_update <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, 
 #'
 #' @noRd
 #' @return A list containing new values of \code{fastcpd_parameters}.
-update_fastcpd_parameters <- function(fastcpd_parameters, data, t, i, k, tau, lambda, family, vanilla_percentage, cost_gradient, cost_hessian, r_t_set, p, momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon) {
-    .Call(`_fastcpd_update_fastcpd_parameters`, fastcpd_parameters, data, t, i, k, tau, lambda, family, vanilla_percentage, cost_gradient, cost_hessian, r_t_set, p, momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon)
+update_fastcpd_parameters <- function(fastcpd_parameters, data, t, i, k, tau, lambda, family, cost_gradient, cost_hessian, r_t_set, p, momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon) {
+    .Call(`_fastcpd_update_fastcpd_parameters`, fastcpd_parameters, data, t, i, k, tau, lambda, family, cost_gradient, cost_hessian, r_t_set, p, momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon)
 }
 
 #' Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.

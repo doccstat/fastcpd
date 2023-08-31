@@ -136,8 +136,6 @@ List cost_update(
 //' @param tau Start of the current segment.
 //' @param lambda Lambda for L1 regularization.
 //' @param family Family of the model.
-//' @param vanilla_percentage Percentage of the data to be used for the vanilla
-//'   PELT.
 //' @param cost_gradient Gradient for custom cost function.
 //' @param cost_hessian Hessian for custom cost function.
 //' @param r_t_set Set of r_t values for the current iteration.
@@ -162,7 +160,6 @@ List update_fastcpd_parameters(
     const int tau,
     const double lambda,
     const std::string family,
-    const double vanilla_percentage,
     Function cost_gradient,
     Function cost_hessian,
     arma::vec r_t_set,
