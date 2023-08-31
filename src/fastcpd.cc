@@ -316,7 +316,6 @@ List update_fastcpd_parameters(
     const int tau,
     const double lambda,
     const std::string family,
-    const double vanilla_percentage,
     Function cost_gradient,
     Function cost_hessian,
     arma::vec r_t_set,
@@ -327,37 +326,35 @@ List update_fastcpd_parameters(
     const double winsorise_maxval,
     const double epsilon
 ) {
-  if (vanilla_percentage != 1) {
-    List cost_update_result = cost_update(
-      data.rows(0, t - 1),
-      as<arma::mat>(fastcpd_parameters["theta_hat"]),
-      as<arma::mat>(fastcpd_parameters["theta_sum"]),
-      as<arma::cube>(fastcpd_parameters["hessian"]),
-      tau,
-      i,
-      k,
-      family,
-      as<arma::colvec>(fastcpd_parameters["momentum"]),
-      momentum_coef,
-      epsilon,
-      min_prob,
-      winsorise_minval,
-      winsorise_maxval,
-      lambda,
-      cost_gradient,
-      cost_hessian
-    );
-    arma::mat theta_hat = fastcpd_parameters["theta_hat"],
-              theta_sum = fastcpd_parameters["theta_sum"];
-    arma::cube hessian = fastcpd_parameters["hessian"];
-    theta_hat.col(i - 1) = as<arma::colvec>(cost_update_result[0]);
-    theta_sum.col(i - 1) = as<arma::colvec>(cost_update_result[1]);
-    hessian.slice(i - 1) = as<arma::mat>(cost_update_result[2]);
-    fastcpd_parameters["theta_hat"] = theta_hat;
-    fastcpd_parameters["theta_sum"] = theta_sum;
-    fastcpd_parameters["hessian"] = hessian;
-    fastcpd_parameters["momentum"] = cost_update_result[3];
-  }
+  List cost_update_result = cost_update(
+    data.rows(0, t - 1),
+    as<arma::mat>(fastcpd_parameters["theta_hat"]),
+    as<arma::mat>(fastcpd_parameters["theta_sum"]),
+    as<arma::cube>(fastcpd_parameters["hessian"]),
+    tau,
+    i,
+    k,
+    family,
+    as<arma::colvec>(fastcpd_parameters["momentum"]),
+    momentum_coef,
+    epsilon,
+    min_prob,
+    winsorise_minval,
+    winsorise_maxval,
+    lambda,
+    cost_gradient,
+    cost_hessian
+  );
+  arma::mat theta_hat = fastcpd_parameters["theta_hat"],
+            theta_sum = fastcpd_parameters["theta_sum"];
+  arma::cube hessian = fastcpd_parameters["hessian"];
+  theta_hat.col(i - 1) = as<arma::colvec>(cost_update_result[0]);
+  theta_sum.col(i - 1) = as<arma::colvec>(cost_update_result[1]);
+  hessian.slice(i - 1) = as<arma::mat>(cost_update_result[2]);
+  fastcpd_parameters["theta_hat"] = theta_hat;
+  fastcpd_parameters["theta_sum"] = theta_sum;
+  fastcpd_parameters["hessian"] = hessian;
+  fastcpd_parameters["momentum"] = cost_update_result[3];
   return fastcpd_parameters;
 }
 

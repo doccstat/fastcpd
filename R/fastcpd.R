@@ -444,36 +444,41 @@ fastcpd_builtin <- function(
         # Mean of `err_sd` only works if error sd is unchanged.
         lambda <- mean(fastcpd_parameters$err_sd) * sqrt(2 * log(p) / (t - tau))
       }
-      fastcpd_parameters <- update_fastcpd_parameters(
-        fastcpd_parameters, data, t, i, k, tau, lambda, family, vanilla_percentage,
-        cost_gradient, cost_hessian, r_t_set, p,
-        momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon
-      )
 
-      theta <- fastcpd_parameters$theta_sum[, i] / (t - tau)
-      if (family == "poisson" && t - tau >= p) {
-        theta <- DescTools::Winsorize(
-          x = theta, minval = winsorise_minval, maxval = winsorise_maxval
+      data_segment <- data[(tau + 1):t, , drop = FALSE]
+      if (vanilla_percentage == 1) {
+        cost_optim_result <- cost_optim(family, p, data_segment, cost, 0, TRUE)
+        # fastcpd_parameters$theta_hat[, i] <- cost_optim_result$par
+        # fastcpd_parameters$theta_sum[, i] <- fastcpd_parameters$theta_sum[, i] + cost_optim_result$par
+        cval[i] <- cost_optim_result$value
+      } else {
+        fastcpd_parameters <- update_fastcpd_parameters(
+          fastcpd_parameters, data, t, i, k, tau, lambda, family,
+          cost_gradient, cost_hessian, r_t_set, p,
+          momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon
         )
-      }
 
-      if (
-        (family %in% c("gaussian", "binomial", "poisson") && t - tau >= p) ||
-          (family == "lasso" && t - tau >= 3)
-      ) {
-        cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta, family, lambda)$value
-      } else if (family == "custom") {
-        # if (warm_start && t - tau >= 50) {
-        #   cost_result <- cost(data[(tau + 1):t, , drop = FALSE], start = start[, tau + 1])
-        #   start[, tau + 1] <- cost_result$par
-        #   cval[i] <- cost_result$value
-        # } else {
-        if (vanilla_percentage == 1) {
-          cval[i] <- cost(data[(tau + 1):t, , drop = FALSE])
-        } else {
-          cval[i] <- cost(data[(tau + 1):t, , drop = FALSE], theta)
+        theta <- fastcpd_parameters$theta_sum[, i] / (t - tau)
+        if (family == "poisson" && t - tau >= p) {
+          theta <- DescTools::Winsorize(
+            x = theta, minval = winsorise_minval, maxval = winsorise_maxval
+          )
         }
-        # }
+
+        if (
+          (family %in% c("gaussian", "binomial", "poisson") && t - tau >= p) ||
+            (family == "lasso" && t - tau >= 3)
+        ) {
+          cval[i] <- cost(data_segment, theta, family, lambda)$value
+        } else if (family == "custom") {
+          # if (warm_start && t - tau >= 50) {
+          #   cost_result <- cost(data_segment, start = start[, tau + 1])
+          #   start[, tau + 1] <- cost_result$par
+          #   cval[i] <- cost_result$value
+          # } else {
+          cval[i] <- cost(data_segment, theta)
+          # }
+        }
       }
     }
 
@@ -525,7 +530,7 @@ fastcpd_builtin <- function(
     thetas <- matrix(NA, nrow = p, ncol = length(cp_loc) - 1)
     for (i in 1:(length(cp_loc) - 1)) {
       data_segment <- data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
-      cost_result <- estimate_theta(family, p, data_segment, cost, lambda, FALSE)
+      cost_result <- cost_optim(family, p, data_segment, cost, lambda, FALSE)
       residual <- c(residual, cost_result$residuals)
       cost_values[i] <- cost_result$value
       thetas[, i] <- cost_result$par
@@ -575,7 +580,7 @@ init_fastcpd_parameters <- function(
     # Remark 3.4: initialize theta_hat_t_t to be the estimate in the segment
     for (segment_index in seq_len(segment_count)) {
       data_segment <- data[fastcpd_parameters$segment_indices == segment_index, , drop = FALSE]
-      segment_theta <- estimate_theta(family, p, data_segment, cost, 0, TRUE)$par
+      segment_theta <- cost_optim(family, p, data_segment, cost, 0, TRUE)$par
 
       # Initialize the estimated coefficients for each segment to be the
       # estimated coefficients in the segment.
@@ -657,8 +662,14 @@ prune_fastcpd_parameters <- function(fastcpd_parameters, vanilla_percentage, pru
   fastcpd_parameters
 }
 
-estimate_theta <- function(family, p, data_segment, cost, lambda, cv) {
-  if (family == "custom" && p == 1) {
+cost_optim <- function(family, p, data_segment, cost, lambda, cv) {
+  if (length(formals(cost)) == 1) {
+    list(
+      par = NULL,
+      value = cost(data_segment),
+      residuals = NULL
+    )
+  } else if (family == "custom" && p == 1) {
     optim_result <- stats::optim(
       par = 0,
       fn = function(theta, data) {
