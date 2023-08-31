@@ -23,9 +23,7 @@ List negative_log_likelihood(
     Function cv_glmnet = glmnet["cv.glmnet"],
         predict_glmnet = glmnet["predict.glmnet"];
     List out = cv_glmnet(
-      data.cols(1, data.n_cols - 1),
-      data.col(0),
-      Named("family") = "gaussian"
+      data.cols(1, data.n_cols - 1), data.col(0), Named("family") = "gaussian"
     );
     S4 out_coef = predict_glmnet(
       out["glmnet.fit"],
@@ -47,10 +45,8 @@ List negative_log_likelihood(
     Function deviance = stats["deviance"], glmnet_ = glmnet["glmnet"],
        predict_glmnet = glmnet["predict.glmnet"];
     List out = glmnet_(
-      data.cols(1, data.n_cols - 1),
-      data.col(0),
-      Named("family") = "gaussian",
-      Named("lambda") = lambda
+      data.cols(1, data.n_cols - 1), data.col(0),
+      Named("family") = "gaussian", Named("lambda") = lambda
     );
     S4 out_par = out["beta"];
     arma::vec par_i = as<arma::vec>(out_par.slot("i"));
