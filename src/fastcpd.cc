@@ -367,11 +367,11 @@ List init_theta_hat_sum_hessian(
     const double winsorise_maxval,
     const double epsilon
 ) {
-  arma::colvec theta_hat, theta_sum;
+  arma::mat theta_hat(p, 1), theta_sum(p, 1);
   arma::cube hessian;
   if (family == "binomial") {
-    theta_sum = segment_theta_hat.row(0).t();
-    theta_hat = segment_theta_hat.row(0).t();
+    theta_sum.col(0) = segment_theta_hat.row(0).t();
+    theta_hat.col(0) = segment_theta_hat.row(0).t();
     double prob = 1 / (1 + exp(-arma::as_scalar(
       theta_hat.t() * data.row(0).tail(data.n_cols - 1).t()
     )));
@@ -387,10 +387,10 @@ List init_theta_hat_sum_hessian(
       Rcpp::_["minval"] = winsorise_minval,
       Rcpp::_["maxval"] = winsorise_maxval
     );
-    theta_hat = arma::vec(
+    theta_hat.col(0) = arma::vec(
       winsorize_result.begin(), winsorize_result.size(), false
     );
-    theta_sum = arma::vec(
+    theta_sum.col(0) = arma::vec(
       winsorize_result.begin(), winsorize_result.size(), false
     );
     hessian = arma::cube(p, p, 1);
@@ -400,14 +400,14 @@ List init_theta_hat_sum_hessian(
       exp(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
     );
   } else if (family == "lasso" || family == "gaussian") {
-    theta_hat = segment_theta_hat.row(0).t();
-    theta_sum = segment_theta_hat.row(0).t();
+    theta_hat.col(0) = segment_theta_hat.row(0).t();
+    theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian = arma::cube(p, p, 1);
     hessian.slice(0) = epsilon * arma::eye<arma::mat>(p, p) +
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1);
   } else if (family == "custom") {
-    theta_hat = segment_theta_hat.row(0).t();
-    theta_sum = segment_theta_hat.row(0).t();
+    theta_hat.col(0) = segment_theta_hat.row(0).t();
+    theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian = arma::cube(p, p, 1);
     hessian.slice(0) = arma::zeros<arma::mat>(p, p);
   }
