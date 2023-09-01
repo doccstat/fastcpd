@@ -256,4 +256,14 @@ test_that("logistic regression", {
     cbind(x, y), (kDimension + 1) * log(kNumberOfDataPoints) / 2
   )$cp
   expect_equal(change_points_binomial_fastcpd_vanilla_sanity, c(0, kChangePointLocation))
+
+  # change_points_binomial_fastcpd_vanilla <- fastcpd(
+  #   formula = y ~ . - 1,
+  #   data = data.frame(y = y, x = x),
+  #   family = "binomial",
+  #   segment_count = 5,
+  #   vanilla_percentage = 1
+  # )@cp_set
+
+  # expect_equal(change_points_binomial_fastcpd_vanilla, 0)
 })

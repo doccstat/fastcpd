@@ -446,11 +446,13 @@ fastcpd_builtin <- function(
       }
 
       data_segment <- data[(tau + 1):t, , drop = FALSE]
-      if (t <= vanilla_percentage * n) {
+      if (vanilla_percentage == 1 || t <= vanilla_percentage * n) {
         cost_optim_result <- cost_optim(family, p, data_segment, cost, 0, TRUE)
-        fastcpd_parameters$theta_hat[, i] <- cost_optim_result$par
-        fastcpd_parameters$theta_sum[, i] <- fastcpd_parameters$theta_sum[, i] + cost_optim_result$par
         cval[i] <- cost_optim_result$value
+        if (vanilla_percentage < 1 && t == vanilla_percentage * n) {
+          fastcpd_parameters$theta_hat[, i] <- cost_optim_result$par
+          fastcpd_parameters$theta_sum[, i] <- fastcpd_parameters$theta_sum[, i] + cost_optim_result$par
+        }
       } else {
         fastcpd_parameters <- update_fastcpd_parameters(
           fastcpd_parameters, data, t, i, k, tau, lambda, family,
@@ -501,7 +503,11 @@ fastcpd_builtin <- function(
     pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
     r_t_set <- c(r_t_set[pruned_left], t)
 
-    fastcpd_parameters <- prune_fastcpd_parameters(fastcpd_parameters, vanilla_percentage, pruned_left)
+    if (vanilla_percentage != 1) {
+      fastcpd_parameters$theta_hat <- fastcpd_parameters$theta_hat[, pruned_left, drop = FALSE]
+      fastcpd_parameters$theta_sum <- fastcpd_parameters$theta_sum[, pruned_left, drop = FALSE]
+      fastcpd_parameters$hessian <- fastcpd_parameters$hessian[, , pruned_left, drop = FALSE]
+    }
 
     # Objective function F(t).
     f_t[t + 1] <- min_val
@@ -558,8 +564,8 @@ init_fastcpd_parameters <- function(
     segment_theta_hat = NULL,
     err_sd = rep(NA, segment_count),
     act_num = rep(NA, segment_count),
-    theta_hat = NULL,
-    theta_sum = NULL,
+    theta_hat = matrix(NA, p, 1),
+    theta_sum = matrix(NA, p, 1),
     hessian = NULL,
     # Momentum will be used in the update step if `momentum_coef` is not 0.
     momentum = rep(0, p)
@@ -649,15 +655,6 @@ append_fastcpd_parameters <- function(
       hessian_new,
       along = 3
     )
-  }
-  fastcpd_parameters
-}
-
-prune_fastcpd_parameters <- function(fastcpd_parameters, vanilla_percentage, pruned_left) {
-  if (vanilla_percentage != 1) {
-    fastcpd_parameters$theta_hat <- fastcpd_parameters$theta_hat[, pruned_left, drop = FALSE]
-    fastcpd_parameters$theta_sum <- fastcpd_parameters$theta_sum[, pruned_left, drop = FALSE]
-    fastcpd_parameters$hessian <- fastcpd_parameters$hessian[, , pruned_left, drop = FALSE]
   }
   fastcpd_parameters
 }
