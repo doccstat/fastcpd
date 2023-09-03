@@ -19,23 +19,23 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-    methods,
-    stats,
-    fastglm,
-    abind,
     DescTools,
-    glmnet,
+    fastglm,
     ggplot2,
+    glmnet,
     Matrix,
-    Rcpp (>= 0.11.0)
+    methods,
+    Rcpp (>= 0.11.0),
+    stats
 LinkingTo: Rcpp, RcppArmadillo, testthat
 RoxygenNote: 7.2.3
 Suggests:
-    xml2,
+    abind,
     knitr,
     mvtnorm,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    xml2
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://fastcpd.xingchi.li

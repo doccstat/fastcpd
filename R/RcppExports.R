@@ -136,6 +136,27 @@ init_theta_hat_sum_hessian <- function(family, segment_theta_hat, data, p, winso
     .Call(`_fastcpd_init_theta_hat_sum_hessian`, family, segment_theta_hat, data, p, winsorise_minval, winsorise_maxval, epsilon)
 }
 
+#' Append new values to \code{fastcpd_parameters}.
+#' This function is not meant to be called directly by the user.
+#'
+#' @param fastcpd_parameters A list containing the parameters related to
+#'   fastcpd.
+#' @param vanilla_percentage Percentage of vanilla gradient descent.
+#' @param data A data frame containing the data to be segmented.
+#' @param t Current iteration.
+#' @param family Family of the model.
+#' @param winsorise_minval Minimum value to be winsorised.
+#' @param winsorise_maxval Maximum value to be winsorised.
+#' @param p Number of parameters.
+#' @param epsilon Epsilon to avoid numerical issues.
+#' @keywords internal
+#'
+#' @noRd
+#' @return A list containing new values of \code{fastcpd_parameters}.
+append_fastcpd_parameters <- function(fastcpd_parameters, vanilla_percentage, data, t, family, winsorise_minval, winsorise_maxval, p, epsilon) {
+    .Call(`_fastcpd_append_fastcpd_parameters`, fastcpd_parameters, vanilla_percentage, data, t, family, winsorise_minval, winsorise_maxval, p, epsilon)
+}
+
 #' Vanilla PELT implementation.
 #' This function is not meant to be called directly by the user.
 #'

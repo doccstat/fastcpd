@@ -197,4 +197,34 @@ List init_theta_hat_sum_hessian(
     const double epsilon
 );
 
+//' Append new values to \code{fastcpd_parameters}.
+//' This function is not meant to be called directly by the user.
+//'
+//' @param fastcpd_parameters A list containing the parameters related to
+//'   fastcpd.
+//' @param vanilla_percentage Percentage of vanilla gradient descent.
+//' @param data A data frame containing the data to be segmented.
+//' @param t Current iteration.
+//' @param family Family of the model.
+//' @param winsorise_minval Minimum value to be winsorised.
+//' @param winsorise_maxval Maximum value to be winsorised.
+//' @param p Number of parameters.
+//' @param epsilon Epsilon to avoid numerical issues.
+//' @keywords internal
+//'
+//' @noRd
+//' @return A list containing new values of \code{fastcpd_parameters}.
+// [[Rcpp::export]]
+List append_fastcpd_parameters(
+    List fastcpd_parameters,
+    const double vanilla_percentage,
+    const arma::mat data,
+    const int t,
+    const std::string family,
+    const double winsorise_minval,
+    const double winsorise_maxval,
+    const int p,
+    const double epsilon
+);
+
 #endif
