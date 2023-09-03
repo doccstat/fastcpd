@@ -3,6 +3,7 @@
 using ::Rcpp::as;
 using ::Rcpp::Environment;
 using ::Rcpp::Function;
+using ::Rcpp::InternalFunction;
 using ::Rcpp::List;
 using ::Rcpp::Named;
 using ::Rcpp::Nullable;
@@ -301,7 +302,7 @@ List cost_update(
   }
 
   theta_sum.col(i - 1) += theta_hat.col(i - 1);
-  hessian.slice(i - 1) = hessian_i;
+  hessian.slice(i - 1) = std::move(hessian_i);
   return List::create(
     theta_hat.col(i - 1), theta_sum.col(i - 1), hessian.slice(i - 1), momentum
   );
@@ -372,8 +373,8 @@ List init_theta_hat_sum_hessian(
   if (family == "binomial") {
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     theta_hat.col(0) = segment_theta_hat.row(0).t();
-    double prob = 1 / (1 + exp(-arma::as_scalar(
-      theta_hat.t() * data.row(0).tail(data.n_cols - 1).t()
+    double prob(1 / (1 + exp(
+      -arma::as_scalar(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
     )));
     hessian = arma::cube(p, p, 1);
     hessian.slice(0) = (
@@ -417,6 +418,60 @@ List init_theta_hat_sum_hessian(
       Named("theta_sum") = theta_sum,
       Named("hessian") = hessian
   );
+}
+
+List cost_optim_cpp(
+    const std::string family,
+    const int p,
+    const arma::mat data_segment,
+    Function cost,
+    const double lambda,
+    const bool cv
+) {
+  if (family == "custom" && p == 1) {
+    Environment stats = Environment::namespace_env("stats");
+    Function optim = stats["optim"];
+    List optim_result = optim(
+      Named("par") = 0,
+      Named("fn") = InternalFunction(
+        +[](arma::colvec theta, arma::mat data, Function cost) {
+          return cost(
+            Named("data") = data,
+            Named("theta") = log(theta / (1 - theta))
+          );
+        }
+      ),
+      Named("method") = "Brent",
+      Named("lower") = 0,
+      Named("upper") = 1,
+      Named("data") = data_segment,
+      Named("cost") = cost
+    );
+    return List::create(
+      Named("par") = log(
+        as<double>(optim_result["par"]) / (1 - as<double>(optim_result["par"]))
+      ),
+      Named("value") = exp(as<double>(optim_result["value"])) /
+        (1 + exp(as<double>(optim_result["value"]))),
+      Named("residuals") = R_NilValue
+    );
+  } else if (family == "custom" && p > 1) {
+    Environment stats = Environment::namespace_env("stats");
+    Function optim = stats["optim"];
+    List optim_result = optim(
+      Named("par") = arma::zeros<arma::vec>(p),
+      Named("fn") = cost,
+      Named("method") = "L-BFGS-B",
+      Named("data") = data_segment
+    );
+    return List::create(
+      Named("par") = optim_result["par"],
+      Named("value") = optim_result["value"],
+      Named("residuals") = R_NilValue
+    );
+  } else {
+    return cost(data_segment, R_NilValue, family, lambda, cv);
+  }
 }
 
 List append_fastcpd_parameters(
