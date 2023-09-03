@@ -418,3 +418,60 @@ List init_theta_hat_sum_hessian(
       Named("hessian") = hessian
   );
 }
+
+List append_fastcpd_parameters(
+    List fastcpd_parameters,
+    const double vanilla_percentage,
+    const arma::mat data,
+    const int t,
+    const std::string family,
+    const double winsorise_minval,
+    const double winsorise_maxval,
+    const int p,
+    const double epsilon
+) {
+  if (vanilla_percentage != 1) {
+    // for tau = t-1
+    arma::rowvec new_data = data.row(t - 1).tail(data.n_cols - 1);
+    arma::vec segment_indices = fastcpd_parameters["segment_indices"];
+    const int segment_index = segment_indices(t - 1);
+    arma::mat segment_theta_hat = fastcpd_parameters["segment_theta_hat"];
+    arma::rowvec cum_coef_add = segment_theta_hat.row(segment_index - 1),
+                     coef_add = segment_theta_hat.row(segment_index - 1);
+    arma::mat hessian_new;
+    if (family == "binomial") {
+      const double prob =
+          1 / (1 + exp(-arma::as_scalar(coef_add * new_data.t())));
+      hessian_new =
+          (new_data.t() * new_data) * arma::as_scalar(prob * (1 - prob));
+    } else if (family == "poisson") {
+      Environment desc_tools = Environment::namespace_env("DescTools");
+      Function winsorize = desc_tools["Winsorize"];
+      NumericVector winsorize_result = winsorize(
+        Rcpp::_["x"] = coef_add,
+        Rcpp::_["minval"] = winsorise_minval,
+        Rcpp::_["maxval"] = winsorise_maxval
+      );
+      coef_add = as<arma::rowvec>(winsorize_result);
+      cum_coef_add = as<arma::rowvec>(winsorize_result);
+      hessian_new =
+          (new_data.t() * new_data) * arma::as_scalar(
+            exp(coef_add * new_data.t())
+          );
+    } else if (family == "lasso" || family == "gaussian") {
+      hessian_new =
+          new_data.t() * new_data + epsilon * arma::eye<arma::mat>(p, p);
+    } else if (family == "custom") {
+      hessian_new = arma::zeros<arma::mat>(p, p);
+    }
+
+    arma::mat theta_hat = fastcpd_parameters["theta_hat"],
+              theta_sum = fastcpd_parameters["theta_sum"];
+    arma::cube hessian = fastcpd_parameters["hessian"];
+    fastcpd_parameters["theta_hat"] = arma::join_rows(theta_hat, coef_add.t());
+    fastcpd_parameters["theta_sum"] =
+        arma::join_rows(theta_sum, cum_coef_add.t());
+    fastcpd_parameters["hessian"] = arma::join_slices(hessian, hessian_new);
+  }
+  return fastcpd_parameters;
+}
