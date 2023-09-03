@@ -627,35 +627,7 @@ cost_optim <- function(family, p, data_segment, cost, lambda, cv) {
       value = cost(data_segment),
       residuals = NULL
     )
-  } else if (family == "custom" && p == 1) {
-    optim_result <- stats::optim(
-      par = 0,
-      fn = function(theta, data) {
-        cost(data = data, theta = log(theta / (1 - theta)))
-      },
-      method = "Brent",
-      lower = 0,
-      upper = 1,
-      data = data_segment
-    )
-    list(
-      par = log(optim_result$par / (1 - optim_result$par)),
-      value = exp(optim_result$value) / (1 + exp(optim_result$value)),
-      residuals = NULL
-    )
-  } else if (family == "custom" && p > 1) {
-    optim_result <- stats::optim(
-      par = rep(0, p),
-      fn = cost,
-      data = data_segment,
-      method = "L-BFGS-B"
-    )
-    list(
-      par = optim_result$par,
-      value = optim_result$value,
-      residuals = NULL
-    )
   } else {
-    cost(data_segment, NULL, family, lambda, cv)
+    cost_optim_cpp(family, p, data_segment, cost, lambda, cv)
   }
 }

@@ -117,6 +117,24 @@ update_fastcpd_parameters <- function(fastcpd_parameters, data, t, i, k, tau, la
     .Call(`_fastcpd_update_fastcpd_parameters`, fastcpd_parameters, data, t, i, k, tau, lambda, family, cost_gradient, cost_hessian, r_t_set, p, momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon)
 }
 
+#' Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
+#' This function is not meant to be called directly by the user.
+#'
+#' @param family Family of the model.
+#' @param p Number of parameters.
+#' @param data_segment A data frame containing a segment of the data.
+#' @param cost Cost function.
+#' @param lambda Lambda for L1 regularization.
+#' @param cv Whether to perform cross-validation to find the best lambda.
+#' @keywords internal
+#'
+#' @noRd
+#' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
+#'   and \code{hessian}.
+cost_optim_cpp <- function(family, p, data_segment, cost, lambda, cv) {
+    .Call(`_fastcpd_cost_optim_cpp`, family, p, data_segment, cost, lambda, cv)
+}
+
 #' Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
 #' This function is not meant to be called directly by the user.
 #'

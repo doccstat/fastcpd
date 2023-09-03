@@ -108,6 +108,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cost_optim_cpp
+List cost_optim_cpp(const std::string family, const int p, const arma::mat data_segment, Function cost, const double lambda, const bool cv);
+RcppExport SEXP _fastcpd_cost_optim_cpp(SEXP familySEXP, SEXP pSEXP, SEXP data_segmentSEXP, SEXP costSEXP, SEXP lambdaSEXP, SEXP cvSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string >::type family(familySEXP);
+    Rcpp::traits::input_parameter< const int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type data_segment(data_segmentSEXP);
+    Rcpp::traits::input_parameter< Function >::type cost(costSEXP);
+    Rcpp::traits::input_parameter< const double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< const bool >::type cv(cvSEXP);
+    rcpp_result_gen = Rcpp::wrap(cost_optim_cpp(family, p, data_segment, cost, lambda, cv));
+    return rcpp_result_gen;
+END_RCPP
+}
 // init_theta_hat_sum_hessian
 List init_theta_hat_sum_hessian(const std::string family, const arma::mat segment_theta_hat, const arma::mat data, const int p, const double winsorise_minval, const double winsorise_maxval, const double epsilon);
 RcppExport SEXP _fastcpd_init_theta_hat_sum_hessian(SEXP familySEXP, SEXP segment_theta_hatSEXP, SEXP dataSEXP, SEXP pSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP epsilonSEXP) {

@@ -171,6 +171,30 @@ List update_fastcpd_parameters(
     const double epsilon
 );
 
+//' Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
+//' This function is not meant to be called directly by the user.
+//'
+//' @param family Family of the model.
+//' @param p Number of parameters.
+//' @param data_segment A data frame containing a segment of the data.
+//' @param cost Cost function.
+//' @param lambda Lambda for L1 regularization.
+//' @param cv Whether to perform cross-validation to find the best lambda.
+//' @keywords internal
+//'
+//' @noRd
+//' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
+//'   and \code{hessian}.
+// [[Rcpp::export]]
+List cost_optim_cpp(
+    const std::string family,
+    const int p,
+    const arma::mat data_segment,
+    Function cost,
+    const double lambda,
+    const bool cv
+);
+
 //' Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
 //' This function is not meant to be called directly by the user.
 //'
