@@ -434,7 +434,7 @@ List cost_optim_cpp(
     List optim_result = optim(
       Named("par") = 0,
       Named("fn") = InternalFunction(
-        +[](arma::colvec theta, arma::mat data, Function cost) {
+        +[](double theta, arma::mat data, Function cost) {
           return cost(
             Named("data") = data,
             Named("theta") = log(theta / (1 - theta))
