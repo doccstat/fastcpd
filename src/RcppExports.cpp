@@ -193,6 +193,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_fastcpd_cost_update_hessian", (DL_FUNC) &_fastcpd_cost_update_hessian, 4},
     {"_fastcpd_cost_update", (DL_FUNC) &_fastcpd_cost_update, 17},
     {"_fastcpd_update_fastcpd_parameters", (DL_FUNC) &_fastcpd_update_fastcpd_parameters, 17},
+    {"_fastcpd_cost_optim_cpp", (DL_FUNC) &_fastcpd_cost_optim_cpp, 6},
     {"_fastcpd_init_theta_hat_sum_hessian", (DL_FUNC) &_fastcpd_init_theta_hat_sum_hessian, 7},
     {"_fastcpd_append_fastcpd_parameters", (DL_FUNC) &_fastcpd_append_fastcpd_parameters, 9},
     {"_fastcpd_fastcpd_vanilla", (DL_FUNC) &_fastcpd_fastcpd_vanilla, 14},
