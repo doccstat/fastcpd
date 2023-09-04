@@ -197,11 +197,25 @@ arXiv preprint arXiv:2210.12235 (2022).</p>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  family <span class="op">=</span> <span class="st">"gaussian"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cost_optim_cpp(family, p, data_segment, cost, lambda, cv):</span> object '_fastcpd_cost_optim_cpp' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'result' not found</span>
+<span class="r-plt img"><img src="fastcpd-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'summary': object 'result' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     family = "gaussian")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 98 202 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 53.44023 53.1441 45.04974 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    segment 1   segment 2  segment 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.9704022 -1.07884004  0.5925092</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1.1786074 -0.01757927 -0.5287126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.9258587  0.63906143  0.1929411</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Logistic regression</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span></span>
@@ -217,9 +231,25 @@ arXiv preprint arXiv:2210.12235 (2022).</p>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  family <span class="op">=</span> <span class="st">"binomial"</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cost_optim_cpp(family, p, data_segment, cost, lambda, cv):</span> object '_fastcpd_cost_optim_cpp' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'summary': object 'result' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     family = "binomial")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 126 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 56.90525 30.76875 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    segment 1 segment 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.7259293  1.878525</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -1.0294802  2.704376</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1.0576503  3.702310</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.8812767  2.258796</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.2419351  2.524173</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Poisson regression</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span></span>
@@ -244,9 +274,24 @@ arXiv preprint arXiv:2210.12235 (2022).</p>
 <span class="r-in"><span>  family <span class="op">=</span> <span class="st">"poisson"</span>,</span></span>
 <span class="r-in"><span>  epsilon <span class="op">=</span> <span class="fl">1e-5</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cost_optim_cpp(family, p, data_segment, cost, lambda, cv):</span> object '_fastcpd_cost_optim_cpp' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'summary': object 'result' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     beta = (p + 1) * log(1500)/2, k = function(x) 0, family = "poisson", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     epsilon = 1e-05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 329 728 1021 1107 1325 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14425.87 13971.23 697.2187 107.5353 380.7153 51.93594 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     segment 1  segment 2  segment 3  segment 4 segment 5  segment 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  2.60927673  1.9255183  0.7405125 -0.3965022  1.117753  2.5479308</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.02398457  0.1068924  1.4721444  1.8677797  1.019035  0.4947115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -1.34361104 -2.7353603 -0.8906937  0.4651667 -1.178933 -2.5038966</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Penalized linear regression</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span></span>
@@ -273,11 +318,73 @@ arXiv preprint arXiv:2210.12235 (2022).</p>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  family <span class="op">=</span> <span class="st">"lasso"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cost_optim_cpp(family, p, data_segment, cost, lambda, cv):</span> object '_fastcpd_cost_optim_cpp' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'result' not found</span>
+<span class="r-plt img"><img src="fastcpd-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'summary': object 'result' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     family = "lasso")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300 700 1000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202.6103 254.6904 183.5909 302.4998 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50 x 4 sparse Matrix of class "dgCMatrix"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       segment 1  segment 2 segment 3  segment 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -2.892654  0.3344843  4.046784  .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -2.831352 -0.3687367  3.907948  3.1109044</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -2.817023 -0.1990682  2.574074  2.7732194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -1.926208  0.4740742  3.322680 -0.5366242</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -3.066517 -0.4659526  2.092768 -3.3781507</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -1.842233  0.4168482  4.798087  .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [12,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [14,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [15,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [16,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [18,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [21,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [22,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [23,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [24,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [25,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [26,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [27,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [28,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [29,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [30,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [31,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [32,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [33,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [34,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [35,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [36,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [37,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [38,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [40,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [41,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [42,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [43,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [44,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [45,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [46,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [47,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [48,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [49,]  .         .          .         .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [50,]  .         .          .         .        </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Custom cost function: logistic regression</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span></span>
@@ -295,7 +402,8 @@ arXiv preprint arXiv:2210.12235 (2022).</p>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">data</span>,</span></span>
 <span class="r-in"><span>  family <span class="op">=</span> <span class="st">"binomial"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cost_optim_cpp(family, p, data_segment, cost, lambda, cv):</span> object '_fastcpd_cost_optim_cpp' not found</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>fit_glm: fitted probabilities numerically 0 or 1 occurred</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>fit_glm: fitted probabilities numerically 0 or 1 occurred</span>
 <span class="r-in"><span><span class="va">logistic_loss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span></span>
 <span class="r-in"><span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span></span>
@@ -322,7 +430,6 @@ arXiv preprint arXiv:2210.12235 (2022).</p>
 <span class="r-in"><span>  cost_gradient <span class="op">=</span> <span class="va">logistic_loss_gradient</span>,</span></span>
 <span class="r-in"><span>  cost_hessian <span class="op">=</span> <span class="va">logistic_loss_hessian</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cost_optim_cpp(family, p, data_segment, cost, lambda, cv):</span> object '_fastcpd_cost_optim_cpp' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"Change points detected by built-in logistic regression model: "</span>,</span></span>
 <span class="r-in"><span>  <span class="va">result_builtin</span><span class="op">@</span><span class="va">cp_set</span>, <span class="st">"\n"</span>,</span></span>
@@ -330,7 +437,8 @@ arXiv preprint arXiv:2210.12235 (2022).</p>
 <span class="r-in"><span>  <span class="va">result_custom</span><span class="op">@</span><span class="va">cp_set</span>, <span class="st">"\n"</span>,</span></span>
 <span class="r-in"><span>  sep <span class="op">=</span> <span class="st">""</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'result_builtin' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points detected by built-in logistic regression model: 200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points detected by custom logistic regression model: 201</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Custom cost function: mean shift</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span></span>
@@ -488,9 +596,14 @@ arXiv preprint arXiv:2210.12235 (2022).</p>
 <span class="r-in"><span>  cost_gradient <span class="op">=</span> <span class="va">huber_loss_gradient</span>,</span></span>
 <span class="r-in"><span>  cost_hessian <span class="op">=</span> <span class="va">huber_loss_hessian</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cost_optim_cpp(family, p, data_segment, cost, lambda, cv):</span> object '_fastcpd_cost_optim_cpp' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">huber_regression_result</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'summary': object 'huber_regression_result' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = y ~ . - 1, data = data, beta = (p + 1) * log(n)/2, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     cost = huber_loss, cost_gradient = huber_loss_gradient, cost_hessian = huber_loss_hessian)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 401 726 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
