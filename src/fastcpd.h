@@ -186,7 +186,7 @@ List update_fastcpd_parameters(
 //' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 //'   and \code{hessian}.
 // [[Rcpp::export]]
-List cost_optim_cpp(
+List cost_optim(
     const std::string family,
     const int p,
     const arma::mat data_segment,

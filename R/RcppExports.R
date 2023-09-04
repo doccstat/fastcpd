@@ -131,8 +131,8 @@ update_fastcpd_parameters <- function(fastcpd_parameters, data, t, i, k, tau, la
 #' @noRd
 #' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 #'   and \code{hessian}.
-cost_optim_cpp <- function(family, p, data_segment, cost, lambda, cv) {
-    .Call(`_fastcpd_cost_optim_cpp`, family, p, data_segment, cost, lambda, cv)
+cost_optim <- function(family, p, data_segment, cost, lambda, cv) {
+    .Call(`_fastcpd_cost_optim`, family, p, data_segment, cost, lambda, cv)
 }
 
 #' Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.

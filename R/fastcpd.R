@@ -619,15 +619,3 @@ init_fastcpd_parameters <- function(
 
   fastcpd_parameters
 }
-
-cost_optim <- function(family, p, data_segment, cost, lambda, cv) {
-  if (length(formals(cost)) == 1) {
-    list(
-      par = NULL,
-      value = cost(data_segment),
-      residuals = NULL
-    )
-  } else {
-    cost_optim_cpp(family, p, data_segment, cost, lambda, cv)
-  }
-}

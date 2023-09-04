@@ -39,6 +39,7 @@ test_that("logistic regression", {
     rbinom(kNumberOfDataPoints - kChangePointLocation, 1, 1 / (1 + exp(-x[(kChangePointLocation + 1):kNumberOfDataPoints, ] %*% theta[2, ])))
   )
 
+  # TODO(doccstat): Catch the warnings and verify the content.
   change_points_binomial_fastcpd <- suppressWarnings(fastcpd(
     formula = y ~ . - 1,
     data = data.frame(y = y, x = x),
@@ -113,6 +114,8 @@ test_that("custom logistic regression", {
     rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] %*% theta[2, ])))
   )
   data <- data.frame(y = y, x = x)
+
+  # TODO(doccstat): Catch the warnings and verify the content.
   result_builtin <- suppressWarnings(fastcpd(
     formula = y ~ . - 1,
     data = data,
@@ -159,6 +162,8 @@ test_that("custom one-dimensional logistic regression", {
     rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] * theta[2, ])))
   )
   data <- data.frame(y = y, x = x)
+
+  # TODO(doccstat): Catch the warnings and verify the content.
   result_builtin <- suppressWarnings(fastcpd(
     formula = y ~ . - 1,
     data = data,

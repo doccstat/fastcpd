@@ -108,9 +108,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// cost_optim_cpp
-List cost_optim_cpp(const std::string family, const int p, const arma::mat data_segment, Function cost, const double lambda, const bool cv);
-RcppExport SEXP _fastcpd_cost_optim_cpp(SEXP familySEXP, SEXP pSEXP, SEXP data_segmentSEXP, SEXP costSEXP, SEXP lambdaSEXP, SEXP cvSEXP) {
+// cost_optim
+List cost_optim(const std::string family, const int p, const arma::mat data_segment, Function cost, const double lambda, const bool cv);
+RcppExport SEXP _fastcpd_cost_optim(SEXP familySEXP, SEXP pSEXP, SEXP data_segmentSEXP, SEXP costSEXP, SEXP lambdaSEXP, SEXP cvSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -120,7 +120,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Function >::type cost(costSEXP);
     Rcpp::traits::input_parameter< const double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< const bool >::type cv(cvSEXP);
-    rcpp_result_gen = Rcpp::wrap(cost_optim_cpp(family, p, data_segment, cost, lambda, cv));
+    rcpp_result_gen = Rcpp::wrap(cost_optim(family, p, data_segment, cost, lambda, cv));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -193,7 +193,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_fastcpd_cost_update_hessian", (DL_FUNC) &_fastcpd_cost_update_hessian, 4},
     {"_fastcpd_cost_update", (DL_FUNC) &_fastcpd_cost_update, 17},
     {"_fastcpd_update_fastcpd_parameters", (DL_FUNC) &_fastcpd_update_fastcpd_parameters, 17},
-    {"_fastcpd_cost_optim_cpp", (DL_FUNC) &_fastcpd_cost_optim_cpp, 6},
+    {"_fastcpd_cost_optim", (DL_FUNC) &_fastcpd_cost_optim, 6},
     {"_fastcpd_init_theta_hat_sum_hessian", (DL_FUNC) &_fastcpd_init_theta_hat_sum_hessian, 7},
     {"_fastcpd_append_fastcpd_parameters", (DL_FUNC) &_fastcpd_append_fastcpd_parameters, 9},
     {"_fastcpd_fastcpd_vanilla", (DL_FUNC) &_fastcpd_fastcpd_vanilla, 14},
