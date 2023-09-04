@@ -483,6 +483,107 @@ List cost_optim(
   }
 }
 
+List init_fastcpd_parameters(
+    const arma::mat data,
+    const int p,
+    const std::string family,
+    const int segment_count,
+    Function cost,
+    const double winsorise_minval,
+    const double winsorise_maxval,
+    const double epsilon,
+    const double vanilla_percentage,
+    double& beta
+) {
+  // `error_sd` is used in Gaussian family only. `act_num` is used in Lasso
+  // and Gaussian families only.
+  List fastcpd_parameters = List::create(
+    Named("segment_indices") = R_NilValue,
+    Named("segment_theta_hat") = R_NilValue,
+    Named("err_sd") = arma::zeros<arma::vec>(segment_count),
+    Named("act_num") = arma::zeros<arma::vec>(segment_count),
+    Named("theta_hat") = arma::zeros<arma::mat>(p, 1),
+    Named("theta_sum") = arma::zeros<arma::mat>(p, 1),
+    Named("hessian") = R_NilValue,
+    // Momentum will be used in the update step if `momentum_coef` is not 0.
+    Named("momentum") = arma::zeros<arma::vec>(p)
+  );
+  if (vanilla_percentage != 1) {
+    const int n = data.n_rows;
+
+    // Segment the whole data set evenly based on the number of segments
+    // specified in the `segment_count` parameter.
+    unsigned int segment_length = floor(n / segment_count);
+    int segment_remainder = n % segment_count;
+    arma::colvec segment_indices = arma::zeros<arma::vec>(n);
+    for (
+      int segment_index = 1; segment_index <= segment_count; segment_index++
+    ) {
+      if (segment_index <= segment_remainder) {
+        segment_indices(arma::span(
+          (segment_index - 1) * (segment_length + 1),
+          segment_index * (segment_length + 1)
+        )).fill(segment_index);
+      } else {
+        segment_indices(arma::span(
+          (segment_index - 1) * segment_length + segment_remainder,
+          segment_index * segment_length + segment_remainder - 1
+        )).fill(segment_index);
+      }
+    }
+    fastcpd_parameters["segment_indices"] = segment_indices;
+
+    // Create a matrix to store the estimated coefficients in each segment,
+    // where each row represents estimated coefficients for a segment.
+    arma::mat segment_theta_hat = arma::zeros<arma::mat>(segment_count, p);
+    arma::colvec err_sd = arma::zeros<arma::vec>(segment_count),
+                act_num = arma::zeros<arma::vec>(segment_count);
+
+    // Initialize theta_hat_t_t to be the estimate in the segment.
+    for (
+      int segment_index = 0; segment_index < segment_count; ++segment_index
+    ) {
+      arma::ucolvec segment_indices_ =
+          arma::find(segment_indices == segment_index + 1);
+      arma::mat data_segment = data.rows(segment_indices_);
+      arma::rowvec segment_theta = as<arma::rowvec>(
+        cost_optim(family, p, data_segment, cost, 0, false)["par"]
+      );
+
+      // Initialize the estimated coefficients for each segment to be the
+      // estimated coefficients in the segment.
+      segment_theta_hat.row(segment_index) = segment_theta;
+      if (family == "lasso" || family == "gaussian") {
+        arma::colvec segment_residual = data_segment.col(0) -
+          data_segment.cols(1, data_segment.n_cols - 1) * segment_theta.t();
+          double err_var =
+              arma::as_scalar(arma::mean(arma::pow(segment_residual, 2)));
+          err_sd(segment_index) = sqrt(err_var);
+          act_num(segment_index) = arma::accu(arma::abs(segment_theta) > 0);
+      }
+    }
+    fastcpd_parameters["segment_theta_hat"] = segment_theta_hat;
+    fastcpd_parameters["err_sd"] = err_sd;
+    fastcpd_parameters["act_num"] = act_num;
+
+    // Adjust `beta` for Lasso and Gaussian families. This seems to be working
+    // but there might be better choices.
+    if (family == "lasso" || family == "gaussian") {
+      beta = beta * (1 + mean(act_num));
+    }
+
+    List theta_hat_sum_hessian = init_theta_hat_sum_hessian(
+      family, segment_theta_hat, data, p, winsorise_minval, winsorise_maxval,
+      epsilon
+    );
+    fastcpd_parameters["theta_hat"] = theta_hat_sum_hessian["theta_hat"];
+    fastcpd_parameters["theta_sum"] = theta_hat_sum_hessian["theta_sum"];
+    fastcpd_parameters["hessian"] = theta_hat_sum_hessian["hessian"];
+  }
+
+  return fastcpd_parameters;
+}
+
 List append_fastcpd_parameters(
     List fastcpd_parameters,
     const double vanilla_percentage,

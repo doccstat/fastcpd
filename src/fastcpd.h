@@ -195,6 +195,37 @@ List cost_optim(
     const bool cv
 );
 
+//' Initialize \code{fastcpd_parameters}.
+//' This function is not meant to be called directly by the user.
+//'
+//' @param data A data frame containing the data to be segmented.
+//' @param p Number of parameters.
+//' @param family Family of the model.
+//' @param segment_count Number of segments.
+//' @param cost Cost function.
+//' @param winsorise_minval Minimum value to be winsorised.
+//' @param winsorise_maxval Maximum value to be winsorised.
+//' @param epsilon Epsilon to avoid numerical issues.
+//' @param vanilla_percentage Percentage of vanilla gradient descent.
+//' @param beta Beta for the momentum.
+//' @keywords internal
+//'
+//' @noRd
+//' @return A list containing new values of \code{fastcpd_parameters}.
+// [[Rcpp::export]]
+List init_fastcpd_parameters(
+    const arma::mat data,
+    const int p,
+    const std::string family,
+    const int segment_count,
+    Function cost,
+    const double winsorise_minval,
+    const double winsorise_maxval,
+    const double epsilon,
+    const double vanilla_percentage,
+    double& beta
+);
+
 //' Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
 //' This function is not meant to be called directly by the user.
 //'

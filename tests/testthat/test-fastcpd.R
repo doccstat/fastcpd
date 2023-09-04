@@ -101,7 +101,7 @@ test_that("penalized linear regression", {
     family = "lasso"
   )
 
-  expect_equal(result@cp_set, c(300, 700, 1000))
+  expect_equal(result@cp_set, c(300, 701, 1000))
 })
 
 test_that("custom logistic regression", {

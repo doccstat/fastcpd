@@ -124,6 +124,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// init_fastcpd_parameters
+List init_fastcpd_parameters(const arma::mat data, const int p, const std::string family, const int segment_count, Function cost, const double winsorise_minval, const double winsorise_maxval, const double epsilon, const double vanilla_percentage, double& beta);
+RcppExport SEXP _fastcpd_init_fastcpd_parameters(SEXP dataSEXP, SEXP pSEXP, SEXP familySEXP, SEXP segment_countSEXP, SEXP costSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP epsilonSEXP, SEXP vanilla_percentageSEXP, SEXP betaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type family(familySEXP);
+    Rcpp::traits::input_parameter< const int >::type segment_count(segment_countSEXP);
+    Rcpp::traits::input_parameter< Function >::type cost(costSEXP);
+    Rcpp::traits::input_parameter< const double >::type winsorise_minval(winsorise_minvalSEXP);
+    Rcpp::traits::input_parameter< const double >::type winsorise_maxval(winsorise_maxvalSEXP);
+    Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
+    Rcpp::traits::input_parameter< const double >::type vanilla_percentage(vanilla_percentageSEXP);
+    Rcpp::traits::input_parameter< double& >::type beta(betaSEXP);
+    rcpp_result_gen = Rcpp::wrap(init_fastcpd_parameters(data, p, family, segment_count, cost, winsorise_minval, winsorise_maxval, epsilon, vanilla_percentage, beta));
+    return rcpp_result_gen;
+END_RCPP
+}
 // init_theta_hat_sum_hessian
 List init_theta_hat_sum_hessian(const std::string family, const arma::mat segment_theta_hat, const arma::mat data, const int p, const double winsorise_minval, const double winsorise_maxval, const double epsilon);
 RcppExport SEXP _fastcpd_init_theta_hat_sum_hessian(SEXP familySEXP, SEXP segment_theta_hatSEXP, SEXP dataSEXP, SEXP pSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP epsilonSEXP) {
@@ -194,6 +214,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_fastcpd_cost_update", (DL_FUNC) &_fastcpd_cost_update, 17},
     {"_fastcpd_update_fastcpd_parameters", (DL_FUNC) &_fastcpd_update_fastcpd_parameters, 17},
     {"_fastcpd_cost_optim", (DL_FUNC) &_fastcpd_cost_optim, 6},
+    {"_fastcpd_init_fastcpd_parameters", (DL_FUNC) &_fastcpd_init_fastcpd_parameters, 10},
     {"_fastcpd_init_theta_hat_sum_hessian", (DL_FUNC) &_fastcpd_init_theta_hat_sum_hessian, 7},
     {"_fastcpd_append_fastcpd_parameters", (DL_FUNC) &_fastcpd_append_fastcpd_parameters, 9},
     {"_fastcpd_fastcpd_vanilla", (DL_FUNC) &_fastcpd_fastcpd_vanilla, 14},
