@@ -135,6 +135,27 @@ cost_optim <- function(family, p, data_segment, cost, lambda, cv) {
     .Call(`_fastcpd_cost_optim`, family, p, data_segment, cost, lambda, cv)
 }
 
+#' Initialize \code{fastcpd_parameters}.
+#' This function is not meant to be called directly by the user.
+#'
+#' @param data A data frame containing the data to be segmented.
+#' @param p Number of parameters.
+#' @param family Family of the model.
+#' @param segment_count Number of segments.
+#' @param cost Cost function.
+#' @param winsorise_minval Minimum value to be winsorised.
+#' @param winsorise_maxval Maximum value to be winsorised.
+#' @param epsilon Epsilon to avoid numerical issues.
+#' @param vanilla_percentage Percentage of vanilla gradient descent.
+#' @param beta Beta for the momentum.
+#' @keywords internal
+#'
+#' @noRd
+#' @return A list containing new values of \code{fastcpd_parameters}.
+init_fastcpd_parameters <- function(data, p, family, segment_count, cost, winsorise_minval, winsorise_maxval, epsilon, vanilla_percentage, beta) {
+    .Call(`_fastcpd_init_fastcpd_parameters`, data, p, family, segment_count, cost, winsorise_minval, winsorise_maxval, epsilon, vanilla_percentage, beta)
+}
+
 #' Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
 #' This function is not meant to be called directly by the user.
 #'
