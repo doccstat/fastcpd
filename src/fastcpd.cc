@@ -420,7 +420,7 @@ List init_theta_hat_sum_hessian(
   );
 }
 
-List cost_optim_cpp(
+List cost_optim(
     const std::string family,
     const int p,
     const arma::mat data_segment,
@@ -428,7 +428,16 @@ List cost_optim_cpp(
     const double lambda,
     const bool cv
 ) {
-  if (family == "custom" && p == 1) {
+  Environment base = Environment::namespace_env("base");
+  Function formals = base["formals"],
+            length = base["length"];
+  if (as<unsigned int>(length(formals(cost))) == 1) {
+    return List::create(
+      Named("par") = R_NilValue,
+      Named("value") = cost(data_segment),
+      Named("residuals") = R_NilValue
+    );
+  } else if (family == "custom" && p == 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result = optim(
