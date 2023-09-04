@@ -73,7 +73,17 @@ test_that("poisson regression", {
     epsilon = 1e-5
   )
 
+  result_two_epochs <- fastcpd(
+    formula = y ~ . - 1,
+    data = data.frame(y = y, x = x),
+    beta = (p + 1) * log(1500) / 2,
+    k = function(x) 1,
+    family = "poisson",
+    epsilon = 1e-5
+  )
+
   expect_equal(result@cp_set, c(329, 728, 1021, 1107, 1325))
+  expect_equal(result_two_epochs@cp_set, c(328, 716, 1020, 1102, 1323))
 })
 
 test_that("penalized linear regression", {

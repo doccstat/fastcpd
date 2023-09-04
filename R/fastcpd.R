@@ -383,20 +383,16 @@ fastcpd <- function(
     vanilla_percentage <- 1
   }
 
-  # User provided cost function with explicit expression.
-  # } else if (vanilla) {
-  #   fastcpd_vanilla_custom(
-  #     data, beta, segment_count, trim, momentum_coef, k, epsilon,
-  #     min_prob, winsorise_minval, winsorise_maxval, p,
-  #     function(data) {
-  #       cost(data = data, theta = NULL, family = family, lambda = 0)
-  #     }, cp_only, warm_start
-  #   )
   result <- fastcpd_impl(
     data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
     min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
     cost_hessian, cp_only, vanilla_percentage
   )
+
+  result$thetas <- data.frame(result$thetas)
+  if (ncol(result$thetas) > 0) {
+    names(result$thetas) <- paste0("segment ", seq_len(ncol(result$thetas)))
+  }
 
   methods::new(
     Class = "fastcpd",
@@ -492,14 +488,14 @@ fastcpd_impl <- function(
     cval[r_t_count] <- 0
     # `beta` adjustment seems to work but there might be better choices.
     obj <- cval + f_t[r_t_set + 1] + beta
-    min_val <- min(obj)
-    tau_star <- r_t_set[which(obj == min_val)[1]]
+    min_obj <- min(obj)
+    tau_star <- r_t_set[which(obj == min_obj)[1]]
 
     # Step 4
     cp_set[[t + 1]] <- c(cp_set[[tau_star + 1]], tau_star)
 
     # Step 5
-    pruned_left <- (cval + f_t[r_t_set + 1]) <= min_val
+    pruned_left <- (cval + f_t[r_t_set + 1]) <= min_obj
     r_t_set <- c(r_t_set[pruned_left], t)
 
     if (vanilla_percentage != 1) {
@@ -509,7 +505,7 @@ fastcpd_impl <- function(
     }
 
     # Objective function F(t).
-    f_t[t + 1] <- min_val
+    f_t[t + 1] <- min_obj
   }
 
   # Remove change-points close to the boundaries

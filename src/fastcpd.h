@@ -162,7 +162,7 @@ List update_fastcpd_parameters(
     const std::string family,
     Function cost_gradient,
     Function cost_hessian,
-    arma::vec r_t_set,
+    arma::ucolvec r_t_set,
     const int p,
     const double momentum_coef,
     const double min_prob,
