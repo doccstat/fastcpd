@@ -8,6 +8,67 @@ using ::Rcpp::Function;
 using ::Rcpp::List;
 using ::Rcpp::Nullable;
 
+class FastcpdParameters {
+ public:
+  FastcpdParameters(
+    arma::mat data,
+    const double beta,
+    const int p,
+    const std::string family,
+    const int segment_count,
+    Function cost,
+    const double winsorise_minval,
+    const double winsorise_maxval,
+    const double epsilon
+  );
+  // Create a matrix to store the estimated coefficients in each segment,
+  // where each row represents estimated coefficients for a segment.
+  arma::mat segment_theta_hat;
+
+  // `error_sd` is used in Gaussian family only.
+  arma::colvec err_sd;
+
+  // `act_num` is used in Lasso and Gaussian families only.
+  arma::colvec act_num;
+  arma::mat theta_hat;
+  arma::mat theta_sum;
+  arma::cube hessian;
+
+  // Momentum will be used in the update step if `momentum_coef` is not 0.
+  arma::colvec momentum;
+  void create_segment_indices();
+  arma::colvec read_segment_indices();
+
+  // Initialize theta_hat_t_t to be the estimate in the segment.
+  void get_segment_statistics();
+
+  // Adjust `beta` for Lasso and Gaussian families. This seems to be working
+  // but there might be better choices.
+  void adjust_beta();
+
+  // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
+  void create_gradients();
+
+ private:
+  arma::mat data;
+  double beta;
+  int n;
+  const int p;
+  const std::string family;
+  const int segment_count;
+  Function cost;
+  const double winsorise_minval;
+  const double winsorise_maxval;
+  const double epsilon;
+  arma::colvec segment_indices;
+
+//   Function* winsorize;
+
+  void init_fastcpd_parameters();
+  void append_fastcpd_parameters();
+  void create_environment_functions();
+};
+
 //' Solve logistic/poisson regression using Gradient Descent Extension to the
 //' multivariate case
 //' This function is not meant to be called directly by the user.
@@ -224,32 +285,6 @@ List init_fastcpd_parameters(
     const double epsilon,
     const double vanilla_percentage,
     double& beta
-);
-
-//' Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
-//' This function is not meant to be called directly by the user.
-//'
-//' @param family Family of the model.
-//' @param segment_theta_hat Estimated theta for the current segment.
-//' @param data A data frame containing the data to be segmented.
-//' @param p Number of parameters.
-//' @param winsorise_minval Minimum value to be winsorised.
-//' @param winsorise_maxval Maximum value to be winsorised.
-//' @param epsilon Epsilon to avoid numerical issues.
-//' @keywords internal
-//'
-//' @noRd
-//' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
-//'   and \code{hessian}.
-// [[Rcpp::export]]
-List init_theta_hat_sum_hessian(
-    const std::string family,
-    const arma::mat segment_theta_hat,
-    const arma::mat data,
-    const int p,
-    const double winsorise_minval,
-    const double winsorise_maxval,
-    const double epsilon
 );
 
 //' Append new values to \code{fastcpd_parameters}.
