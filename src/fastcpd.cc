@@ -640,3 +640,226 @@ List append_fastcpd_parameters(
   }
   return fastcpd_parameters;
 }
+
+List fastcpd_impl(
+    arma::mat data,
+    double beta,
+    const int segment_count,
+    const double trim,
+    const double momentum_coef,
+    Function k,
+    const std::string family,
+    const double epsilon,
+    const double min_prob,
+    const double winsorise_minval,
+    const double winsorise_maxval,
+    const int p,
+    Function cost,
+    Function cost_gradient,
+    Function cost_hessian,
+    const bool cp_only,
+    const double vanilla_percentage
+) {
+  // Set up the initial values.
+  const int n = data.n_rows;
+  double lambda = 0;
+
+  // After t = 1, the r_t_set R_t contains 0 and 1.
+  arma::ucolvec r_t_set = {0, 1};
+  // C(0) = NULL, C(1) = {0}.
+  std::vector<arma::colvec> cp_sets = {arma::zeros<arma::vec>(0)};
+  arma::linspace(1, n, n).for_each([&](int i) {
+    cp_sets.push_back(arma::zeros<arma::vec>(1));
+  });
+  // Objective function: F(0) = -beta.
+  arma::colvec f_t = arma::zeros<arma::vec>(n + 1);
+  f_t(0) = -beta;
+
+  List fastcpd_parameters = init_fastcpd_parameters(
+    data, p, family, segment_count, cost, winsorise_minval, winsorise_maxval,
+    epsilon, vanilla_percentage, beta
+  );
+
+  for (int t = 2; t <= n; t++) {
+    unsigned int r_t_count = r_t_set.n_elem;
+
+    // Number of cost values is the same as the number of elements in R_t.
+    arma::colvec cval = arma::zeros<arma::vec>(r_t_count);
+
+    // For tau in R_t \ {t-1}.
+    for (unsigned int i = 1; i < r_t_count; i++) {
+      int tau = r_t_set(i - 1);
+      if (family == "lasso") {
+        // Mean of `err_sd` only works if error sd is unchanged.
+        arma::colvec err_sd = fastcpd_parameters["err_sd"];
+        lambda = mean(err_sd) * sqrt(2 * log(p) / (t - tau));
+      }
+      arma::mat data_segment = data.rows(tau, t - 1);
+      if (vanilla_percentage == 1 || t <= vanilla_percentage * n) {
+        List cost_optim_result =
+            cost_optim(family, p, data_segment, cost, 0, true);
+        cval(i - 1) = as<double>(cost_optim_result["value"]);
+        if (vanilla_percentage < 1 && t <= vanilla_percentage * n) {
+          arma::mat theta_hat = fastcpd_parameters["theta_hat"],
+                    theta_sum = fastcpd_parameters["theta_sum"];
+          theta_hat.col(i - 1) =
+              as<arma::colvec>(cost_optim_result["par"]);
+          theta_sum.col(i - 1) +=
+              as<arma::colvec>(cost_optim_result["par"]);
+          fastcpd_parameters["theta_hat"] = theta_hat;
+          fastcpd_parameters["theta_sum"] = theta_sum;
+        }
+      } else {
+        fastcpd_parameters = update_fastcpd_parameters(
+          fastcpd_parameters, data, t, i, k, tau, lambda, family,
+          cost_gradient, cost_hessian, r_t_set, p, momentum_coef, min_prob,
+          winsorise_minval, winsorise_maxval, epsilon
+        );
+        arma::mat theta_sum = fastcpd_parameters["theta_sum"];
+        arma::colvec theta = theta_sum.col(i - 1) / (t - tau);
+        if (family == "poisson" && t - tau >= p) {
+          Environment desc_tools = Environment::namespace_env("DescTools");
+          Function winsorize = desc_tools["Winsorize"];
+          NumericVector winsorize_result = winsorize(
+            Rcpp::_["x"] = theta,
+            Rcpp::_["minval"] = winsorise_minval,
+            Rcpp::_["maxval"] = winsorise_maxval
+          );
+          theta = as<arma::colvec>(winsorize_result);
+        }
+        if (
+          family != "custom" && family != "lasso" && t - tau >= p ||
+          family == "lasso" && t - tau >= 3
+        ) {
+          List cost_result = cost(data_segment, theta, family, lambda);
+          cval(i - 1) = as<double>(cost_result["value"]);
+        } else if (family == "custom") {
+          // if (warm_start && t - tau >= 50) {
+          //   cost_result <- cost(data_segment, start = start[, tau + 1])
+          //   start[, tau + 1] <- cost_result$par
+          //   cval[i] <- cost_result$value
+          // } else {
+            SEXP cost_result = cost(data_segment, theta);
+            cval(i - 1) = as<double>(cost_result);
+          // }
+        }
+      }
+    }
+    fastcpd_parameters = append_fastcpd_parameters(
+      fastcpd_parameters, vanilla_percentage, data, t, family,
+      winsorise_minval, winsorise_maxval, p, epsilon
+    );
+
+    // Step 3
+    cval(r_t_count - 1) = 0;
+
+    // `beta` adjustment seems to work but there might be better choices.
+    arma::colvec obj = cval + f_t.rows(r_t_set) + beta;
+    double min_obj = arma::min(obj);
+    double tau_star = r_t_set(arma::index_min(obj));
+
+    // Step 4
+    cp_sets[t] = arma::join_cols(cp_sets[tau_star], arma::colvec{tau_star});
+
+    // Step 5
+    arma::ucolvec pruned_left =
+        arma::find(cval + f_t.rows(r_t_set) <= min_obj);
+    arma::ucolvec pruned_r_t_set =
+        arma::zeros<arma::ucolvec>(pruned_left.n_elem + 1);
+    pruned_r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
+    pruned_r_t_set(pruned_left.n_elem) = t;
+    r_t_set = std::move(pruned_r_t_set);
+
+    if (vanilla_percentage != 1) {
+      arma::mat theta_hat = fastcpd_parameters["theta_hat"],
+                theta_sum = fastcpd_parameters["theta_sum"];
+      arma::cube hessian = fastcpd_parameters["hessian"];
+      theta_hat = theta_hat.cols(pruned_left);
+      theta_sum = theta_sum.cols(pruned_left);
+      hessian = hessian.slices(pruned_left);
+      fastcpd_parameters["theta_hat"] = theta_hat;
+      fastcpd_parameters["theta_sum"] = theta_sum;
+      fastcpd_parameters["hessian"] = hessian;
+    }
+
+    // Objective function F(t).
+    f_t(t) = min_obj;
+  }
+
+  // Remove change points close to the boundaries.
+  arma::colvec cp_set = cp_sets[n];
+  cp_set = cp_set(arma::find(cp_set >= trim * n));
+  cp_set = cp_set(arma::find(cp_set <= (1 - trim) * n));
+  arma::colvec cp_set_ = arma::zeros<arma::vec>(cp_set.n_elem + 1);
+  cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set); 
+  cp_set = arma::sort(arma::unique(std::move(cp_set_)));
+
+  // Remove change points close to each other.
+  arma::ucolvec cp_set_too_close = arma::find(arma::diff(cp_set) <= trim * n);
+  if (cp_set_too_close.n_elem > 0) {
+    int rest_element_count = cp_set.n_elem - cp_set_too_close.n_elem;
+    arma::colvec cp_set_rest_left = arma::zeros<arma::vec>(rest_element_count),
+                cp_set_rest_right = arma::zeros<arma::vec>(rest_element_count);
+    for (unsigned int i = 0, i_left = 0, i_right = 0; i < cp_set.n_elem; i++) {
+      if (
+        arma::ucolvec left_find = arma::find(cp_set_too_close == i);
+        left_find.n_elem == 0
+      ) {
+        cp_set_rest_left(i_left) = cp_set(i);
+        i_left++;
+      }
+      if (
+        arma::ucolvec right_find = arma::find(cp_set_too_close == i - 1);
+        right_find.n_elem == 0
+      ) {
+        cp_set_rest_right(i_right) = cp_set(i);
+        i_right++;
+      }
+    }
+    cp_set = arma::floor((cp_set_rest_left + cp_set_rest_right) / 2);
+  }
+  cp_set = cp_set(arma::find(cp_set > 0));
+
+  if (cp_only) {
+    return List::create(
+      Named("cp_set") = cp_set,
+      Named("cost_values") = R_NilValue,
+      Named("residual") = R_NilValue,
+      Named("thetas") = R_NilValue
+    );
+  }
+
+  arma::colvec cp_loc_ = arma::zeros<arma::colvec>(cp_set.n_elem + 2);
+  cp_loc_.rows(1, cp_loc_.n_elem - 2) = cp_set;
+  cp_loc_(cp_loc_.n_elem - 1) = n;
+  arma::colvec cp_loc = arma::unique(std::move(cp_loc_));
+  arma::colvec cost_values = arma::zeros<arma::vec>(cp_loc.n_elem - 1);
+  arma::mat thetas = arma::zeros<arma::mat>(p, cp_loc.n_elem - 1);
+  arma::colvec residual = arma::zeros<arma::colvec>(n);
+  unsigned int residual_next_start = 0;
+  for (unsigned int i = 0; i < cp_loc.n_elem - 1; i++) {
+    arma::colvec segment_data_index_ =
+        arma::linspace(cp_loc(i), cp_loc(i + 1) - 1, cp_loc(i + 1) - cp_loc(i));
+    arma::ucolvec segment_data_index =
+        arma::conv_to<arma::ucolvec>::from(std::move(segment_data_index_));
+    arma::mat data_segment = data.rows(segment_data_index);
+    List cost_optim_result =
+        cost_optim(family, p, data_segment, cost, lambda, false);
+    arma::colvec cost_optim_par = as<arma::colvec>(cost_optim_result["par"]);
+    double cost_optim_value = as<double>(cost_optim_result["value"]);
+    arma::colvec cost_optim_residual =
+        as<arma::colvec>(cost_optim_result["residuals"]);
+    thetas.col(i) = cost_optim_par;
+    cost_values(i) = cost_optim_value;
+    residual.rows(
+      residual_next_start, residual_next_start + cost_optim_residual.n_elem - 1
+    ) = cost_optim_residual;
+    residual_next_start += cost_optim_residual.n_elem;
+  }
+  return List::create(
+    Named("cp_set") = cp_set,
+    Named("cost_values") = cost_values,
+    Named("residual") = residual,
+    Named("thetas") = thetas
+  );
+}

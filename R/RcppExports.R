@@ -196,6 +196,49 @@ append_fastcpd_parameters <- function(fastcpd_parameters, vanilla_percentage, da
     .Call(`_fastcpd_append_fastcpd_parameters`, fastcpd_parameters, vanilla_percentage, data, t, family, winsorise_minval, winsorise_maxval, p, epsilon)
 }
 
+#' Implementation of the fastcpd algorithm.
+#' This function is not meant to be called directly by the user.
+#'
+#' @param data A data frame containing the data to be segmented.
+#' @param beta Initial cost value.
+#' @param segment_count Number of segments for initial guess.
+#' @param trim Trimming for the boundary change points.
+#' @param momentum_coef Momentum coefficient to be applied to each update.
+#' @param k Function on number of epochs in SGD.
+#' @param family Family of the models. Can be "binomial", "poisson", "lasso" or
+#'     "gaussian". If not provided, the user must specify the cost function and
+#'     its gradient (and Hessian).
+#' @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
+#'     poisson.
+#' @param min_prob Minimum probability to avoid numerical issues. Only used for
+#'     poisson.
+#' @param winsorise_minval Minimum value to be winsorised. Only used for
+#'     poisson.
+#' @param winsorise_maxval Maximum value to be winsorised. Only used for
+#'     poisson.
+#' @param p Number of parameters to be estimated.
+#' @param cost Cost function to be used. If not specified, the default is
+#'     the negative log-likelihood for the corresponding family.
+#' @param cost_gradient Gradient for custom cost function.
+#' @param cost_hessian Hessian for custom cost function.
+#' @param cp_only Whether to return only the change points or with the cost
+#'     values for each segment. If family is not provided or set to be "custom",
+#'     this parameter will be set to be true.
+#' @param vanilla_percentage How many of the data should be processed through
+#'     vanilla PELT. Range should be between 0 and 1. If set to be 0, all data
+#'     will be processed through sequential gradient descnet. If set to be 1,
+#'     all data will be processed through vaniall PELT. If the cost function
+#'     have an explicit solution, i.e. does not depend on coefficients like
+#'     the mean change case, this parameter will be set to be 1.
+#' @keywords internal
+#'
+#' @noRd
+#' @return A list containing the change points and the cost values for each
+#'   segment.
+fastcpd_impl <- function(data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage) {
+    .Call(`_fastcpd_fastcpd_impl`, data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage)
+}
+
 #' Vanilla PELT implementation.
 #' This function is not meant to be called directly by the user.
 #'
