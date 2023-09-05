@@ -8,6 +8,11 @@ using ::Rcpp::Function;
 using ::Rcpp::List;
 using ::Rcpp::Nullable;
 
+// template <typename ReType, typename... Args>
+// constexpr auto foo(ReType(*)(Args...)) noexcept {
+//    return sizeof...(Args);
+// }
+
 class FastcpdParameters {
  public:
   FastcpdParameters(
@@ -39,8 +44,20 @@ class FastcpdParameters {
   void create_segment_indices();
   arma::colvec read_segment_indices();
 
+  void update_theta_hat(const unsigned int col, arma::colvec new_theta_hat);
+  void update_theta_hat(arma::colvec new_theta_hat);
+  void create_theta_sum(const unsigned int col, arma::colvec new_theta_sum);
+  void update_theta_sum(const unsigned int col, arma::colvec new_theta_sum);
+  void update_theta_sum(arma::colvec new_theta_sum);
+  void update_hessian(const unsigned int slice, arma::mat new_hessian);
+  void update_hessian(arma::mat new_hessian);
+
+  void update_theta_hat(arma::ucolvec pruned_left);
+  void update_theta_sum(arma::ucolvec pruned_left);
+  void update_hessian(arma::ucolvec pruned_left);
+
   // Initialize theta_hat_t_t to be the estimate in the segment.
-  void get_segment_statistics();
+  void create_segment_statistics();
 
   // Adjust `beta` for Lasso and Gaussian families. This seems to be working
   // but there might be better choices.
@@ -48,6 +65,9 @@ class FastcpdParameters {
 
   // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   void create_gradients();
+
+  // Append new values to \code{fastcpd_parameters}.
+  void append_fastcpd_parameters(const unsigned int t);
 
  private:
   arma::mat data;
@@ -63,10 +83,7 @@ class FastcpdParameters {
   arma::colvec segment_indices;
 
 //   Function* winsorize;
-
-  void init_fastcpd_parameters();
-  void append_fastcpd_parameters();
-  void create_environment_functions();
+//   void create_environment_functions();
 };
 
 //' Solve logistic/poisson regression using Gradient Descent Extension to the
@@ -185,53 +202,6 @@ List cost_update(
     Function cost_hessian
 );
 
-//' Update the parameters related to fastcpd.
-//' This function is not meant to be called directly by the user.
-//'
-//' @param fastcpd_parameters A list containing the parameters related to
-//'   fastcpd.
-//' @param data A data frame containing the data to be segmented.
-//' @param t Current iteration.
-//' @param i Index of the current data in the whole data set.
-//' @param k Number of epochs in SGD.
-//' @param tau Start of the current segment.
-//' @param lambda Lambda for L1 regularization.
-//' @param family Family of the model.
-//' @param cost_gradient Gradient for custom cost function.
-//' @param cost_hessian Hessian for custom cost function.
-//' @param r_t_set Set of r_t values for the current iteration.
-//' @param p Number of parameters.
-//' @param momentum_coef Momentum coefficient to be applied to the current
-//'   momentum.
-//' @param min_prob Minimum probability to avoid numerical issues.
-//' @param winsorise_minval Minimum value to be winsorised.
-//' @param winsorise_maxval Maximum value to be winsorised.
-//' @param epsilon Epsilon to avoid numerical issues.
-//' @keywords internal
-//'
-//' @noRd
-//' @return A list containing new values of \code{fastcpd_parameters}.
-// [[Rcpp::export]]
-List update_fastcpd_parameters(
-    List fastcpd_parameters,
-    arma::mat data,
-    const int t,
-    const int i,
-    Function k,
-    const int tau,
-    const double lambda,
-    const std::string family,
-    Function cost_gradient,
-    Function cost_hessian,
-    arma::ucolvec r_t_set,
-    const int p,
-    const double momentum_coef,
-    const double min_prob,
-    const double winsorise_minval,
-    const double winsorise_maxval,
-    const double epsilon
-);
-
 //' Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
 //' This function is not meant to be called directly by the user.
 //'
@@ -254,67 +224,6 @@ List cost_optim(
     Function cost,
     const double lambda,
     const bool cv
-);
-
-//' Initialize \code{fastcpd_parameters}.
-//' This function is not meant to be called directly by the user.
-//'
-//' @param data A data frame containing the data to be segmented.
-//' @param p Number of parameters.
-//' @param family Family of the model.
-//' @param segment_count Number of segments.
-//' @param cost Cost function.
-//' @param winsorise_minval Minimum value to be winsorised.
-//' @param winsorise_maxval Maximum value to be winsorised.
-//' @param epsilon Epsilon to avoid numerical issues.
-//' @param vanilla_percentage Percentage of vanilla gradient descent.
-//' @param beta Beta for the momentum.
-//' @keywords internal
-//'
-//' @noRd
-//' @return A list containing new values of \code{fastcpd_parameters}.
-// [[Rcpp::export]]
-List init_fastcpd_parameters(
-    const arma::mat data,
-    const int p,
-    const std::string family,
-    const int segment_count,
-    Function cost,
-    const double winsorise_minval,
-    const double winsorise_maxval,
-    const double epsilon,
-    const double vanilla_percentage,
-    double& beta
-);
-
-//' Append new values to \code{fastcpd_parameters}.
-//' This function is not meant to be called directly by the user.
-//'
-//' @param fastcpd_parameters A list containing the parameters related to
-//'   fastcpd.
-//' @param vanilla_percentage Percentage of vanilla gradient descent.
-//' @param data A data frame containing the data to be segmented.
-//' @param t Current iteration.
-//' @param family Family of the model.
-//' @param winsorise_minval Minimum value to be winsorised.
-//' @param winsorise_maxval Maximum value to be winsorised.
-//' @param p Number of parameters.
-//' @param epsilon Epsilon to avoid numerical issues.
-//' @keywords internal
-//'
-//' @noRd
-//' @return A list containing new values of \code{fastcpd_parameters}.
-// [[Rcpp::export]]
-List append_fastcpd_parameters(
-    List fastcpd_parameters,
-    const double vanilla_percentage,
-    const arma::mat data,
-    const int t,
-    const std::string family,
-    const double winsorise_minval,
-    const double winsorise_maxval,
-    const int p,
-    const double epsilon
 );
 
 //' Implementation of the fastcpd algorithm.
