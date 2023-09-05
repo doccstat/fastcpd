@@ -39,13 +39,12 @@ test_that("logistic regression", {
     rbinom(kNumberOfDataPoints - kChangePointLocation, 1, 1 / (1 + exp(-x[(kChangePointLocation + 1):kNumberOfDataPoints, ] %*% theta[2, ])))
   )
 
-  # TODO(doccstat): Catch the warnings and verify the content.
-  change_points_binomial_fastcpd <- suppressWarnings(fastcpd(
+  change_points_binomial_fastcpd <- fastcpd(
     formula = y ~ . - 1,
     data = data.frame(y = y, x = x),
     family = "binomial",
     segment_count = 5
-  ))@cp_set
+  )@cp_set
 
   expect_equal(change_points_binomial_fastcpd, kChangePointLocation)
 })
@@ -79,7 +78,7 @@ test_that("poisson regression", {
     beta = (p + 1) * log(1500) / 2,
     k = function(x) 1,
     family = "poisson",
-    epsilon = 1e-5
+    epsilon = 1e-4
   )
 
   expect_equal(result@cp_set, c(329, 728, 1021, 1107, 1325))
@@ -149,14 +148,15 @@ test_that("custom logistic regression", {
     prob <- 1 / (1 + exp(-x %*% theta))
     (x %o% x) * c((1 - prob) * prob)
   }
-  result_custom <- fastcpd(
+  # TODO(doccstat): Catch the warnings and verify the content.
+  result_custom <- suppressWarnings(fastcpd(
     formula = y ~ . - 1,
     data = data,
     epsilon = 1e-5,
     cost = logistic_loss,
     cost_gradient = logistic_loss_gradient,
     cost_hessian = logistic_loss_hessian
-  )
+  ))
 
   expect_equal(result_builtin@cp_set, 200)
   expect_equal(result_custom@cp_set, 201)
@@ -179,7 +179,6 @@ test_that("custom one-dimensional logistic regression", {
     data = data,
     family = "binomial"
   ))
-  result_builtin
   logistic_loss <- function(data, theta) {
     x <- data[, -1]
     y <- data[, 1]
@@ -198,14 +197,15 @@ test_that("custom one-dimensional logistic regression", {
     prob <- 1 / (1 + exp(-x * theta))
     (x %o% x) * c((1 - prob) * prob)
   }
-  result_custom <- fastcpd(
+  # TODO(doccstat): Catch the warnings and verify the content.
+  result_custom <- suppressWarnings(fastcpd(
     formula = y ~ . - 1,
     data = data,
     epsilon = 1e-5,
     cost = logistic_loss,
     cost_gradient = logistic_loss_gradient,
     cost_hessian = logistic_loss_hessian
-  )
+  ))
 
   expect_equal(result_builtin@cp_set, 198)
   expect_equal(result_custom@cp_set, 200)
