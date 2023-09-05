@@ -1,3 +1,8 @@
+# fastcpd 0.5.0
+
+*   Rewrite the whole package in C++ except LASSO due to the excessive calls
+    between R and C++ of `glmnet`.
+
 # fastcpd 0.4.0
 
 *   Add the transition from vanilla PELT to SeN by using `vanilla_percentage`
