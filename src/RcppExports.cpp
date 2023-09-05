@@ -144,23 +144,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// init_theta_hat_sum_hessian
-List init_theta_hat_sum_hessian(const std::string family, const arma::mat segment_theta_hat, const arma::mat data, const int p, const double winsorise_minval, const double winsorise_maxval, const double epsilon);
-RcppExport SEXP _fastcpd_init_theta_hat_sum_hessian(SEXP familySEXP, SEXP segment_theta_hatSEXP, SEXP dataSEXP, SEXP pSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP epsilonSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string >::type family(familySEXP);
-    Rcpp::traits::input_parameter< const arma::mat >::type segment_theta_hat(segment_theta_hatSEXP);
-    Rcpp::traits::input_parameter< const arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< const double >::type winsorise_minval(winsorise_minvalSEXP);
-    Rcpp::traits::input_parameter< const double >::type winsorise_maxval(winsorise_maxvalSEXP);
-    Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
-    rcpp_result_gen = Rcpp::wrap(init_theta_hat_sum_hessian(family, segment_theta_hat, data, p, winsorise_minval, winsorise_maxval, epsilon));
-    return rcpp_result_gen;
-END_RCPP
-}
 // append_fastcpd_parameters
 List append_fastcpd_parameters(List fastcpd_parameters, const double vanilla_percentage, const arma::mat data, const int t, const std::string family, const double winsorise_minval, const double winsorise_maxval, const int p, const double epsilon);
 RcppExport SEXP _fastcpd_append_fastcpd_parameters(SEXP fastcpd_parametersSEXP, SEXP vanilla_percentageSEXP, SEXP dataSEXP, SEXP tSEXP, SEXP familySEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP pSEXP, SEXP epsilonSEXP) {
@@ -242,7 +225,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_fastcpd_update_fastcpd_parameters", (DL_FUNC) &_fastcpd_update_fastcpd_parameters, 17},
     {"_fastcpd_cost_optim", (DL_FUNC) &_fastcpd_cost_optim, 6},
     {"_fastcpd_init_fastcpd_parameters", (DL_FUNC) &_fastcpd_init_fastcpd_parameters, 10},
-    {"_fastcpd_init_theta_hat_sum_hessian", (DL_FUNC) &_fastcpd_init_theta_hat_sum_hessian, 7},
     {"_fastcpd_append_fastcpd_parameters", (DL_FUNC) &_fastcpd_append_fastcpd_parameters, 9},
     {"_fastcpd_fastcpd_impl", (DL_FUNC) &_fastcpd_fastcpd_impl, 17},
     {"_fastcpd_fastcpd_vanilla", (DL_FUNC) &_fastcpd_fastcpd_vanilla, 14},
