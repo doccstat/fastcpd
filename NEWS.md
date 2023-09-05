@@ -1,3 +1,7 @@
+# fastcpd 0.5.1
+
+*   Prepare for CRAN release.
+
 # fastcpd 0.5.0
 
 *   Rewrite the whole package in C++ except LASSO due to the excessive calls

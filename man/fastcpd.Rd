@@ -82,14 +82,14 @@ A class \code{fastcpd} object.
 }
 \description{
 The fastcpd package provides a function \code{\link{fastcpd}} to find change
-points in a data set. The function is based on the paper "Sequential Gradient
-Descent and Quasi-Newton’s Method for Change-Point Analysis" by
+points in a data set. The function is based on the paper ``Sequential
+Gradient Descent and Quasi-Newton's Method for Change-Point Analysis'' by
 Xianyang Zhang and Trisha Dawn.
 }
 \section{CITATION}{
 
 Zhang, Xianyang, and Trisha Dawn.
-"Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis."
+``Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis.''
 arXiv preprint arXiv:2210.12235 (2022).
 }
 

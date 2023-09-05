@@ -2,7 +2,7 @@ Package: fastcpd
 Type: Package
 Title: Fast Change Point Detection Based on Dynamic Programming with Pruning
     with Sequential Gradient Descent
-Version: 0.5.0
+Version: 0.5.1
 Authors@R: c(
     person("Xingchi", "Li", email = "anthony.li@stat.tamu.edu",
            role = c("aut", "cre", "cph"),
@@ -17,7 +17,6 @@ Description: Implements fast change point detection algorithm based on the paper
     <https://proceedings.mlr.press/v206/zhang23b.html>.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Imports:
     DescTools,
     fastglm,
@@ -36,6 +35,5 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     xml2
-VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://fastcpd.xingchi.li
