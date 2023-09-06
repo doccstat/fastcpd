@@ -73,6 +73,7 @@
 <ul>
 <li><a href="https://proceedings.mlr.press/v206/zhang23b.html" class="external-link">Sequential Gradient Descent and Quasi-Newton’s Method for Change-Point Analysis</a></li>
 </ul>
+<p><a href="https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples">documentation &amp; examples</a></p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -81,16 +82,19 @@
 <code class="sourceCode R"><span><span class="co"># Install from CRAN, (not yet available)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"fastcpd"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install the development version from GitHub</span></span>
-<span><span class="co"># install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span></code></pre></div>
-<p>If you’re compiling from source, you can run <code>pak::pkg_system_requirements("fastcpd")</code>, to see the complete set of system packages needed on your machine.</p>
-<p><a href="https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples">documentation &amp; examples</a></p>
+<code class="sourceCode R"><span><span class="co"># Install the development version from GitHub using either of the following</span></span>
+<span><span class="co"># commands:</span></span>
+<span></span>
+<span><span class="co">## install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="dependency">Dependency<a class="anchor" aria-label="anchor" href="#dependency"></a>
 </h2>
-<p><code><a href="https://fastcpd.xingchi.li">library(fastcpd)</a></code> will load the following packages:</p>
+<p><code><a href="https://fastcpd.xingchi.li">library(fastcpd)</a></code> depends on the following packages:</p>
 <ul>
 <li>
 <a href="https://github.com/RcppCore/Rcpp" class="external-link">Rcpp</a>, for C++ source code compilation.</li>
@@ -105,6 +109,21 @@
 <li>
 <a href="https://github.com/tidyverse/ggplot2" class="external-link">ggplot2</a>, for data visualization.</li>
 </ul>
+<p>If you’re compiling from source, you can run the following command to see the complete set of system packages needed on your machine.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_sysreqs.html" class="external-link">pkg_sysreqs</a></span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ℹ Loading metadata database</span></span>
+<span><span class="co">#&gt; ✔ Loading metadata database ... done</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Install scripts ───────────────────────────────────────────── Ubuntu 20.04 ──</span></span>
+<span><span class="co">#&gt; apt-get -y update</span></span>
+<span><span class="co">#&gt; apt-get -y install libcurl4-openssl-dev libssl-dev zlib1g-dev make</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Packages and their system dependencies ──────────────────────────────────────</span></span>
+<span><span class="co">#&gt; curl       – libcurl4-openssl-dev, libssl-dev</span></span>
+<span><span class="co">#&gt; data.table – zlib1g-dev</span></span>
+<span><span class="co">#&gt; fs         – make</span></span>
+<span><span class="co">#&gt; openssl    – libssl-dev</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="contact-us">Contact us<a class="anchor" aria-label="anchor" href="#contact-us"></a>
