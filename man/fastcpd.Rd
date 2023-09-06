@@ -89,8 +89,8 @@ Xianyang Zhang and Trisha Dawn.
 \section{Citation}{
 
 Zhang, Xianyang, and Trisha Dawn.
-``Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis''
-arXiv preprint arXiv:2210.12235 (2022).
+``Sequential Gradient Descent and Quasi-Newton's Method for Change-Point
+Analysis'' arXiv preprint arXiv:2210.12235 (2022).
 }
 
 \examples{
@@ -172,6 +172,15 @@ result <- fastcpd(
   epsilon = 1e-5
 )
 summary(result)
+result_two_epochs <- fastcpd(
+  formula = y ~ . - 1,
+  data = data.frame(y = y, x = x),
+  beta = (p + 1) * log(1500) / 2,
+  k = function(x) 1,
+  family = "poisson",
+  epsilon = 1e-4
+)
+summary(result_two_epochs)
 
 # Penalized linear regression
 library(fastcpd)
@@ -250,6 +259,16 @@ cat(
   result_custom@cp_set, "\n",
   sep = ""
 )
+result_custom_two_epochs <- fastcpd(
+  formula = y ~ . - 1,
+  data = data,
+  k = function(x) 1,
+  epsilon = 1e-5,
+  cost = logistic_loss,
+  cost_gradient = logistic_loss_gradient,
+  cost_hessian = logistic_loss_hessian
+)
+summary(result_custom_two_epochs)
 
 # Custom cost function: mean shift
 library(fastcpd)
@@ -266,7 +285,11 @@ block_count <- floor(nrow(data) / block_size)
 data_all_vars <- rep(0, block_count)
 for (block_index in seq_len(block_count)) {
   block_start <- (block_index - 1) * block_size + 1
-  block_end <- if (block_index < block_count) block_index * block_size else nrow(data)
+  block_end <- if (block_index < block_count) {
+    block_index * block_size
+  } else {
+    nrow(data)
+  }
   data_all_vars[block_index] <- var(data[block_start:block_end, ])
 }
 data_all_var <- mean(data_all_vars)
@@ -359,7 +382,9 @@ huber_loss <- function(data, theta) {
   indicator <- abs(residual) <= huber_threshold
   sum(
     residual^2 / 2 * indicator +
-      huber_threshold * (abs(residual) - huber_threshold / 2) * (1 - indicator)
+      huber_threshold * (
+        abs(residual) - huber_threshold / 2
+      ) * (1 - indicator)
   )
 }
 huber_loss_gradient <- function(data, theta) {

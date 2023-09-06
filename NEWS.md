@@ -6,6 +6,7 @@
 *   Add CRAN manual using
     `R CMD Rd2pdf . --output=man/figures/manual.pdf --force --no-preview` from
     [stackoverflow](https://stackoverflow.com/a/50134068).
+*   Add example for multiple epochs using custom cost functions.
 
 # fastcpd 0.5.2
 

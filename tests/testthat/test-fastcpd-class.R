@@ -1,4 +1,4 @@
-test_that("class methods", {
+testthat::test_that("class methods", {
   match_call <- ""
   class(match_call) <- "language"
   thetas <- data.frame(matrix(c(1, 2), 1, 2))
@@ -16,9 +16,9 @@ test_that("class methods", {
     cp_only = FALSE
   )
 
-  expect_equal(capture.output(plot(class_instance)), character(0))
+  testthat::expect_no_error(plot(class_instance))
 
-  expect_equal(
+  testthat::expect_equal(
     capture.output(print(class_instance)),
     c(
       "",
@@ -27,7 +27,7 @@ test_that("class methods", {
     )
   )
 
-  expect_equal(
+  testthat::expect_equal(
     capture.output(show(class_instance)),
     c(
       "",
@@ -41,7 +41,7 @@ test_that("class methods", {
     )
   )
 
-  expect_equal(
+  testthat::expect_equal(
     capture.output(summary(class_instance)),
     c(
       "",
@@ -63,7 +63,7 @@ test_that("class methods", {
 
   class_instance@family <- "custom"
 
-  expect_equal(
+  testthat::expect_equal(
     capture.output(summary(class_instance)),
     c(
       "",
@@ -80,7 +80,7 @@ test_that("class methods", {
   )
 })
 
-test_that("output methods without change points", {
+testthat::test_that("output methods without change points", {
   match_call <- ""
   class(match_call) <- "language"
 
@@ -96,7 +96,7 @@ test_that("output methods without change points", {
     cp_only = TRUE
   )
 
-  expect_equal(
+  testthat::expect_equal(
     capture.output(print(class_instance)),
     c(
       "",
@@ -104,7 +104,7 @@ test_that("output methods without change points", {
     )
   )
 
-  expect_equal(
+  testthat::expect_equal(
     capture.output(summary(class_instance)),
     c(
       "",

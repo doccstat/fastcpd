@@ -15,7 +15,9 @@ run_cpp_tests("fastcpd")
 cost_glm_binomial <- function(data, family = "binomial") {
   data <- as.matrix(data)
   p <- dim(data)[2] - 1
-  out <- fastglm::fastglm(as.matrix(data[, 1:p]), data[, p + 1], family = family)
+  out <- fastglm::fastglm(
+    as.matrix(data[, 1:p]), data[, p + 1], family = family
+  )
   return(out$deviance / 2)
 }
 
@@ -42,7 +44,8 @@ pelt_vanilla_binomial <- function(data, beta, cost = cost_glm_binomial) {
     for (i in 1:m)
     {
       k <- set[i] + 1
-      if (t - k >= p - 1) cval[i] <- suppressWarnings(cost(data[k:t, ])) else cval[i] <- 0
+      cval[i] <- 0
+      if (t - k >= p - 1) cval[i] <- suppressWarnings(cost(data[k:t, ]))
     }
     obj <- cval + Fobj[set + 1] + beta
     min_val <- min(obj)
@@ -60,7 +63,9 @@ pelt_vanilla_binomial <- function(data, beta, cost = cost_glm_binomial) {
   {
     seg <- (cp_loc[i] + 1):cp_loc[i + 1]
     data_seg <- data[seg, ]
-    out <- fastglm::fastglm(as.matrix(data_seg[, 1:p]), data_seg[, p + 1], family = "binomial")
+    out <- fastglm::fastglm(
+      as.matrix(data_seg[, 1:p]), data_seg[, p + 1], family = "binomial"
+    )
     nLL <- out$deviance / 2 + nLL
   }
 
@@ -83,7 +88,9 @@ pelt_vanilla_binomial <- function(data, beta, cost = cost_glm_binomial) {
 #' @noRd
 #' @return A list of values containing the new coefficients, summation of
 #'     coefficients so far and all the Hessian matrices.
-cost_logistic_update <- function(data_new, coef, cum_coef, cmatrix, epsilon = 1e-10) {
+cost_logistic_update <- function(
+  data_new, coef, cum_coef, cmatrix, epsilon = 1e-10
+) {
   p <- length(data_new) - 1
   X_new <- data_new[1:p]
   Y_new <- data_new[p + 1]
@@ -96,7 +103,8 @@ cost_logistic_update <- function(data_new, coef, cum_coef, cmatrix, epsilon = 1e
   return(list(coef, cum_coef, cmatrix))
 }
 
-#' Calculate negative log likelihood given data segment and guess of coefficient.
+#' Calculate negative log likelihood given data segment and guess of
+#' coefficient.
 #'
 #' @param data Data to be used to calculate the negative log likelihood.
 #' @param b Guess of the coefficient.
@@ -138,7 +146,11 @@ segd_binomial <- function(data, beta, B = 10, trim = 0.025) {
   coef.int <- matrix(NA, B, p)
   for (i in 1:B)
   {
-    out <- fastglm::fastglm(as.matrix(data[index == i, 1:p]), data[index == i, p + 1], family = "binomial")
+    out <- fastglm::fastglm(
+      as.matrix(data[index == i, 1:p]),
+      data[index == i, p + 1],
+      family = "binomial"
+    )
     coef.int[i, ] <- coef(out)
   }
   X1 <- data[1, 1:p]
@@ -162,7 +174,11 @@ segd_binomial <- function(data, beta, B = 10, trim = 0.025) {
       cum_coef[, i] <- out[[2]]
       cmatrix[, , i] <- out[[3]]
       k <- set[i] + 1
-      if (t - k >= p - 1) cval[i] <- neg_log_lik_binomial(data[k:t, ], cum_coef[, i] / (t - k + 1)) else cval[i] <- 0
+      cval[i] <- 0
+      if (t - k >= p - 1) {
+        cval[i] <-
+          neg_log_lik_binomial(data[k:t, ], cum_coef[, i] / (t - k + 1))
+      }
     }
 
     # the choice of initial values requires further investigation
@@ -207,7 +223,9 @@ segd_binomial <- function(data, beta, B = 10, trim = 0.025) {
   {
     seg <- (cp_loc[i] + 1):cp_loc[i + 1]
     data_seg <- data[seg, ]
-    out <- fastglm::fastglm(as.matrix(data_seg[, 1:p]), data_seg[, p + 1], family = "binomial")
+    out <- fastglm::fastglm(
+      as.matrix(data_seg[, 1:p]), data_seg[, p + 1], family = "binomial"
+    )
     nLL <- out$deviance / 2 + nLL
   }
 
@@ -216,7 +234,7 @@ segd_binomial <- function(data, beta, B = 10, trim = 0.025) {
   return(output)
 }
 
-test_that("logistic regression", {
+testthat::test_that("logistic regression", {
   # This is the same example with `fastcpd` documentation. Please keep it in
   # sync if the documentation ever changes.
   set.seed(1)
@@ -234,8 +252,18 @@ test_that("logistic regression", {
   # Randomly generate response variables based on the segmented data and
   # corresponding coefficients
   y <- c(
-    rbinom(kChangePointLocation, 1, 1 / (1 + exp(-x[1:kChangePointLocation, ] %*% theta[1, ]))),
-    rbinom(kNumberOfDataPoints - kChangePointLocation, 1, 1 / (1 + exp(-x[(kChangePointLocation + 1):kNumberOfDataPoints, ] %*% theta[2, ])))
+    rbinom(
+      kChangePointLocation,
+      1,
+      1 / (1 + exp(-x[1:kChangePointLocation, ] %*% theta[1, ]))
+    ),
+    rbinom(
+      kNumberOfDataPoints - kChangePointLocation,
+      1,
+      1 / (1 + exp(
+        -x[(kChangePointLocation + 1):kNumberOfDataPoints, ] %*% theta[2, ]
+      ))
+    )
   )
 
   change_points_binomial_fastcpd <- suppressWarnings(fastcpd(
@@ -250,12 +278,16 @@ test_that("logistic regression", {
     B = 5
   )$cp
 
-  expect_equal(change_points_binomial_fastcpd, change_points_binomial_fastcpd_sanity)
+  testthat::expect_equal(
+    change_points_binomial_fastcpd, change_points_binomial_fastcpd_sanity
+  )
 
   change_points_binomial_fastcpd_vanilla_sanity <- pelt_vanilla_binomial(
     cbind(x, y), (kDimension + 1) * log(kNumberOfDataPoints) / 2
   )$cp
-  expect_equal(change_points_binomial_fastcpd_vanilla_sanity, c(0, kChangePointLocation))
+  testthat::expect_equal(
+    change_points_binomial_fastcpd_vanilla_sanity, c(0, kChangePointLocation)
+  )
 
   # change_points_binomial_fastcpd_vanilla <- fastcpd(
   #   formula = y ~ . - 1,
@@ -265,5 +297,5 @@ test_that("logistic regression", {
   #   vanilla_percentage = 1
   # )@cp_set
 
-  # expect_equal(change_points_binomial_fastcpd_vanilla, 0)
+  # testthat::expect_equal(change_points_binomial_fastcpd_vanilla, 0)
 })
