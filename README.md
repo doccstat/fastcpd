@@ -28,6 +28,9 @@ to:
   Change-Point
   Analysis](https://proceedings.mlr.press/v206/zhang23b.html)
 
+[documentation &
+examples](https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples)
+
 ## Installation
 
 ``` r
@@ -36,21 +39,19 @@ install.packages("fastcpd")
 ```
 
 ``` r
-# Install the development version from GitHub
-# install.packages("pak")
+# Install the development version from GitHub using either of the following
+# commands:
+
+## install.packages("pak")
 pak::pak("doccstat/fastcpd")
+
+## install.packages("devtools")
+devtools::install_github("doccstat/fastcpd")
 ```
-
-If you’re compiling from source, you can run
-`pak::pkg_system_requirements("fastcpd")`, to see the complete set of
-system packages needed on your machine.
-
-[documentation &
-examples](https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples)
 
 ## Dependency
 
-`library(fastcpd)` will load the following packages:
+`library(fastcpd)` depends on the following packages:
 
 - [Rcpp](https://github.com/RcppCore/Rcpp), for C++ source code
   compilation.
@@ -63,6 +64,25 @@ examples](https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples)
 - [glmnet](https://glmnet.stanford.edu/), for penalized regression.
 - [ggplot2](https://github.com/tidyverse/ggplot2), for data
   visualization.
+
+If you’re compiling from source, you can run the following command to
+see the complete set of system packages needed on your machine.
+
+``` r
+pak::pkg_sysreqs("doccstat/fastcpd")
+#> ℹ Loading metadata database
+#> ✔ Loading metadata database ... done
+#> 
+#> ── Install scripts ───────────────────────────────────────────── Ubuntu 20.04 ──
+#> apt-get -y update
+#> apt-get -y install libcurl4-openssl-dev libssl-dev zlib1g-dev make
+#> 
+#> ── Packages and their system dependencies ──────────────────────────────────────
+#> curl       – libcurl4-openssl-dev, libssl-dev
+#> data.table – zlib1g-dev
+#> fs         – make
+#> openssl    – libssl-dev
+```
 
 ## Contact us
 
