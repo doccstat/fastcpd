@@ -35,6 +35,9 @@ setClass(
 #' @rdname plot
 #' @export
 plot.fastcpd <- function(x, ...) {
+  # Plot the built in families only.
+  stopifnot(x@family != "custom")
+
   y <- x@data[, 1]
   p <- ggplot2::ggplot() +
     ggplot2::geom_point(
@@ -42,7 +45,7 @@ plot.fastcpd <- function(x, ...) {
       ggplot2::aes(x = x, y = y)
     ) +
     ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
-  if (x@family != "custom" && !x@cp_only) {
+  if (!x@cp_only) {
     p <- p + ggplot2::geom_point(
       data = data.frame(
         x = seq_len(nrow(x@data)),
@@ -50,8 +53,29 @@ plot.fastcpd <- function(x, ...) {
         label = "residual"
       ),
       ggplot2::aes(x = x, y = y)
-    ) +
-      ggplot2::facet_wrap("label", ncol = 1, scales = "free_y")
+    )
+    if (ncol(x@data) > 2) {
+      p <- p + ggplot2::facet_wrap("label", ncol = 1, scales = "free_y")
+    } else if (ncol(x@data) == 2) {
+      xend <- c(x@cp_set, nrow(x@data))
+      yend <- as.numeric(x@thetas)
+      p <- p + ggplot2::geom_point(
+        data = data.frame(
+          x = seq_len(nrow(x@data)), y = x@data[, 2], label = "covariate"
+        ),
+        ggplot2::aes(x = x, y = y)
+      ) + ggplot2::geom_segment(
+        data = data.frame(
+          x = c(1, x@cp_set),
+          y = yend,
+          xend = xend,
+          yend = yend,
+          label = "coefficient"
+        ),
+        ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+        col = "blue"
+      ) + ggplot2::facet_wrap("label", ncol = 2, scales = "free_y")
+    }
   }
   print(p)
   invisible()
