@@ -3,7 +3,9 @@
 *   Add more experiments but commented out for the sake of test time without
     affecting the test coverage.
 *   Add examples in README.
-*   Add CRAN manual.
+*   Add CRAN manual using
+    `R CMD Rd2pdf . --output=man/figures/manual.pdf --force --no-preview` from
+    [stackoverflow](https://stackoverflow.com/a/50134068).
 
 # fastcpd 0.5.2
 
