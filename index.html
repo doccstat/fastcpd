@@ -361,16 +361,11 @@ Example usage of <code>fastcpd</code>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">175</span>, <span class="fl">1</span>, <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span><span class="op">[</span><span class="fl">201</span><span class="op">:</span><span class="fl">375</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
-<span><span class="va">result_builtin</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
+<span><span class="va">result_builtin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
 <span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">data</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"binomial"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: fit_glm: fitted probabilities numerically 0 or 1 occurred</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: fit_glm: fitted probabilities numerically 0 or 1 occurred</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning: fit_glm: fitted probabilities numerically 0 or 1 occurred</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">logistic_loss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
 <span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
