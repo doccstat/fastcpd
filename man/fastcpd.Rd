@@ -89,7 +89,7 @@ Xianyang Zhang and Trisha Dawn.
 \section{CITATION}{
 
 Zhang, Xianyang, and Trisha Dawn.
-``Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis.''
+``Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis''
 arXiv preprint arXiv:2210.12235 (2022).
 }
 
@@ -104,6 +104,25 @@ y <- c(
   x[1:100, ] \%*\% theta_0[1, ] + rnorm(100, 0, 1),
   x[101:200, ] \%*\% theta_0[2, ] + rnorm(100, 0, 1),
   x[201:300, ] \%*\% theta_0[3, ] + rnorm(100, 0, 1)
+)
+result <- fastcpd(
+  formula = y ~ . - 1,
+  data = data.frame(y = y, x = x),
+  family = "gaussian"
+)
+plot(result)
+summary(result)
+
+# Linear regression with one-dimensional covariate
+library(fastcpd)
+set.seed(1)
+p <- 1
+x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
+theta_0 <- rbind(c(1, 1.2, -1), c(-1, 0, 0.5), c(0.5, -0.3, 0.2))
+y <- c(
+  x[1:100, ] * theta_0[1, ] + rnorm(100, 0, 1),
+  x[101:200, ] * theta_0[2, ] + rnorm(100, 0, 1),
+  x[201:300, ] * theta_0[3, ] + rnorm(100, 0, 1)
 )
 result <- fastcpd(
   formula = y ~ . - 1,

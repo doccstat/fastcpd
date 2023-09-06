@@ -1,3 +1,7 @@
+# fastcpd 0.5.2
+
+*   Add one-dimensional linear regression example with plot.
+
 # fastcpd 0.5.1
 
 *   Prepare for CRAN release.
