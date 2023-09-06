@@ -47,4 +47,3 @@ inst/doc
 vignettes/*.aux
 .vscode/
 docs
-.lintr
