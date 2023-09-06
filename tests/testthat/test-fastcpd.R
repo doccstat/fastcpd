@@ -193,12 +193,19 @@ testthat::test_that("custom logistic regression", {
   )
   data <- data.frame(y = y, x = x)
 
-  # TODO(doccstat): Catch the warnings and verify the content.
-  result_builtin <- suppressWarnings(fastcpd(
-    formula = y ~ . - 1,
-    data = data,
-    family = "binomial"
-  ))
+  warning_messages <- testthat::capture_warnings(
+    result_builtin <- fastcpd(
+      formula = y ~ . - 1,
+      data = data,
+      family = "binomial"
+    )
+  )
+
+  testthat::expect_equal(
+    warning_messages,
+    rep("fit_glm: fitted probabilities numerically 0 or 1 occurred", 3)
+  )
+
   logistic_loss <- function(data, theta) {
     x <- data[, -1]
     y <- data[, 1]
@@ -217,15 +224,14 @@ testthat::test_that("custom logistic regression", {
     prob <- 1 / (1 + exp(-x %*% theta))
     (x %o% x) * c((1 - prob) * prob)
   }
-  # TODO(doccstat): Catch the warnings and verify the content.
-  result_custom <- suppressWarnings(fastcpd(
+  result_custom <- fastcpd(
     formula = y ~ . - 1,
     data = data,
     epsilon = 1e-5,
     cost = logistic_loss,
     cost_gradient = logistic_loss_gradient,
     cost_hessian = logistic_loss_hessian
-  ))
+  )
 
   result_custom_two_epochs <- fastcpd(
     formula = y ~ . - 1,
@@ -253,12 +259,11 @@ testthat::test_that("custom one-dimensional logistic regression", {
   )
   data <- data.frame(y = y, x = x)
 
-  # TODO(doccstat): Catch the warnings and verify the content.
-  result_builtin <- suppressWarnings(fastcpd(
+  result_builtin <- fastcpd(
     formula = y ~ . - 1,
     data = data,
     family = "binomial"
-  ))
+  )
   logistic_loss <- function(data, theta) {
     x <- data[, -1]
     y <- data[, 1]
@@ -277,15 +282,25 @@ testthat::test_that("custom one-dimensional logistic regression", {
     prob <- 1 / (1 + exp(-x * theta))
     (x %o% x) * c((1 - prob) * prob)
   }
-  # TODO(doccstat): Catch the warnings and verify the content.
-  result_custom <- suppressWarnings(fastcpd(
-    formula = y ~ . - 1,
-    data = data,
-    epsilon = 1e-5,
-    cost = logistic_loss,
-    cost_gradient = logistic_loss_gradient,
-    cost_hessian = logistic_loss_hessian
-  ))
+  warning_messages <- testthat::capture_warnings(
+    result_custom <- fastcpd(
+      formula = y ~ . - 1,
+      data = data,
+      epsilon = 1e-5,
+      cost = logistic_loss,
+      cost_gradient = logistic_loss_gradient,
+      cost_hessian = logistic_loss_hessian
+    )
+  )
+  # TODO(doccstat): Deal with the warning messages instead of capturing them.
+  testthat::expect_equal(
+    warning_messages,
+    rep(paste(
+      "Recycling array of length 1 in vector-array arithmetic is deprecated.\n",
+      "  Use c() or as.vector() instead.\n",
+      sep = ""
+    ), 4805)
+  )
 
   testthat::expect_equal(result_builtin@cp_set, 198)
   testthat::expect_equal(result_custom@cp_set, 200)
