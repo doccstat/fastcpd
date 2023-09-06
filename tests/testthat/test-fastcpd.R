@@ -1,4 +1,4 @@
-test_that("linear regression with one-dimensional covariate", {
+testthat::test_that("linear regression with one-dimensional covariate", {
   set.seed(1)
   p <- 1
   x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
@@ -14,10 +14,10 @@ test_that("linear regression with one-dimensional covariate", {
     family = "gaussian"
   )
 
-  expect_equal(result@cp_set, c(100, 194))
+  testthat::expect_equal(result@cp_set, c(100, 194))
 })
 
-test_that("logistic regression", {
+testthat::test_that("logistic regression", {
   # This is the same example with `fastcpd` documentation. Please keep it in
   # sync if the documentation ever changes.
   set.seed(1)
@@ -35,8 +35,18 @@ test_that("logistic regression", {
   # Randomly generate response variables based on the segmented data and
   # corresponding coefficients
   y <- c(
-    rbinom(kChangePointLocation, 1, 1 / (1 + exp(-x[1:kChangePointLocation, ] %*% theta[1, ]))),
-    rbinom(kNumberOfDataPoints - kChangePointLocation, 1, 1 / (1 + exp(-x[(kChangePointLocation + 1):kNumberOfDataPoints, ] %*% theta[2, ])))
+    rbinom(
+      kChangePointLocation,
+      1,
+      1 / (1 + exp(-x[1:kChangePointLocation, ] %*% theta[1, ]))
+    ),
+    rbinom(
+      kNumberOfDataPoints - kChangePointLocation,
+      1,
+      1 / (1 + exp(
+        -x[(kChangePointLocation + 1):kNumberOfDataPoints, ] %*% theta[2, ]
+      ))
+    )
   )
 
   change_points_binomial_fastcpd <- fastcpd(
@@ -46,10 +56,10 @@ test_that("logistic regression", {
     segment_count = 5
   )@cp_set
 
-  expect_equal(change_points_binomial_fastcpd, kChangePointLocation)
+  testthat::expect_equal(change_points_binomial_fastcpd, kChangePointLocation)
 })
 
-test_that("linear regression", {
+testthat::test_that("linear regression", {
   set.seed(1)
   p <- 3
   x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
@@ -65,10 +75,10 @@ test_that("linear regression", {
     family = "gaussian"
   )
 
-  expect_equal(result@cp_set, c(98, 202))
+  testthat::expect_equal(result@cp_set, c(98, 202))
 })
 
-test_that("logistic regression", {
+testthat::test_that("logistic regression", {
   # This is the same example with `fastcpd` documentation. Please keep it in
   # sync if the documentation ever changes.
   set.seed(1)
@@ -86,8 +96,14 @@ test_that("logistic regression", {
   # Randomly generate response variables based on the segmented data and
   # corresponding coefficients
   y <- c(
-    rbinom(kChangePointLocation, 1, 1 / (1 + exp(-x[1:kChangePointLocation, ] %*% theta[1, ]))),
-    rbinom(kNumberOfDataPoints - kChangePointLocation, 1, 1 / (1 + exp(-x[(kChangePointLocation + 1):kNumberOfDataPoints, ] %*% theta[2, ])))
+    rbinom(
+      kChangePointLocation,
+      1,
+      1 / (1 + exp(-x[1:kChangePointLocation, ] %*% theta[1, ]))
+    ),
+    rbinom(kNumberOfDataPoints - kChangePointLocation, 1, 1 / (1 + exp(
+      -x[(kChangePointLocation + 1):kNumberOfDataPoints, ] %*% theta[2, ]
+    )))
   )
 
   change_points_binomial_fastcpd <- fastcpd(
@@ -97,10 +113,10 @@ test_that("logistic regression", {
     segment_count = 5
   )@cp_set
 
-  expect_equal(change_points_binomial_fastcpd, kChangePointLocation)
+  testthat::expect_equal(change_points_binomial_fastcpd, kChangePointLocation)
 })
 
-test_that("poisson regression", {
+testthat::test_that("poisson regression", {
   set.seed(1)
   p <- 3
   x <- mvtnorm::rmvnorm(1500, rep(0, p), diag(p))
@@ -132,11 +148,13 @@ test_that("poisson regression", {
     epsilon = 1e-4
   )
 
-  expect_equal(result@cp_set, c(329, 728, 1021, 1107, 1325))
-  expect_equal(result_two_epochs@cp_set, c(328, 716, 1020, 1102, 1323))
+  testthat::expect_equal(result@cp_set, c(329, 728, 1021, 1107, 1325))
+  testthat::expect_equal(
+    result_two_epochs@cp_set, c(328, 716, 1020, 1102, 1323)
+  )
 })
 
-test_that("penalized linear regression", {
+testthat::test_that("penalized linear regression", {
   set.seed(1)
   n <- 1500
   p_true <- 6
@@ -161,10 +179,10 @@ test_that("penalized linear regression", {
     family = "lasso"
   )
 
-  expect_equal(result@cp_set, c(300, 701, 1000))
+  testthat::expect_equal(result@cp_set, c(300, 701, 1000))
 })
 
-test_that("custom logistic regression", {
+testthat::test_that("custom logistic regression", {
   set.seed(1)
   p <- 5
   x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
@@ -209,11 +227,22 @@ test_that("custom logistic regression", {
     cost_hessian = logistic_loss_hessian
   ))
 
-  expect_equal(result_builtin@cp_set, 200)
-  expect_equal(result_custom@cp_set, 201)
+  result_custom_two_epochs <- fastcpd(
+    formula = y ~ . - 1,
+    data = data,
+    k = function(x) 1,
+    epsilon = 1e-5,
+    cost = logistic_loss,
+    cost_gradient = logistic_loss_gradient,
+    cost_hessian = logistic_loss_hessian
+  )
+
+  testthat::expect_equal(result_builtin@cp_set, 200)
+  testthat::expect_equal(result_custom@cp_set, 201)
+  testthat::expect_equal(result_custom_two_epochs@cp_set, 200)
 })
 
-test_that("custom one-dimensional logistic regression", {
+testthat::test_that("custom one-dimensional logistic regression", {
   set.seed(1)
   p <- 1
   x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
@@ -258,11 +287,11 @@ test_that("custom one-dimensional logistic regression", {
     cost_hessian = logistic_loss_hessian
   ))
 
-  expect_equal(result_builtin@cp_set, 198)
-  expect_equal(result_custom@cp_set, 200)
+  testthat::expect_equal(result_builtin@cp_set, 198)
+  testthat::expect_equal(result_custom@cp_set, 200)
 })
 
-test_that("mean change", {
+testthat::test_that("mean change", {
   set.seed(1)
   p <- 1
   data <- rbind(
@@ -276,7 +305,11 @@ test_that("mean change", {
   data_all_vars <- rep(0, block_count)
   for (block_index in seq_len(block_count)) {
     block_start <- (block_index - 1) * block_size + 1
-    block_end <- if (block_index < block_count) block_index * block_size else nrow(data)
+    block_end <- if (block_index < block_count) {
+      block_index * block_size
+    } else {
+      nrow(data)
+    }
     data_all_vars[block_index] <- var(data[block_start:block_end, ])
   }
   data_all_var <- mean(data_all_vars)
@@ -293,10 +326,10 @@ test_that("mean change", {
     cost = mean_loss
   )
 
-  expect_equal(mean_loss_result@cp_set, c(300, 700))
+  testthat::expect_equal(mean_loss_result@cp_set, c(300, 700))
 })
 
-test_that("variance change", {
+testthat::test_that("variance change", {
   set.seed(1)
   p <- 1
   data <- rbind.data.frame(
@@ -317,10 +350,10 @@ test_that("variance change", {
     cost = var_loss
   )
 
-  expect_equal(var_loss_result@cp_set, c(300, 699))
+  testthat::expect_equal(var_loss_result@cp_set, c(300, 699))
 })
 
-test_that("mean / variance change", {
+testthat::test_that("mean / variance change", {
   set.seed(1)
   p <- 1
   data <- rbind.data.frame(
@@ -343,10 +376,12 @@ test_that("mean / variance change", {
     cost = meanvar_loss
   )
 
-  expect_equal(meanvar_loss_result@cp_set, c(300, 700, 1000, 1300, 1700))
+  testthat::expect_equal(
+    meanvar_loss_result@cp_set, c(300, 700, 1000, 1300, 1700)
+  )
 })
 
-test_that("huber regression", {
+testthat::test_that("huber regression", {
   set.seed(1)
   n <- 400 + 300 + 500
   p <- 5
@@ -372,7 +407,9 @@ test_that("huber regression", {
     indicator <- abs(residual) <= huber_threshold
     sum(
       residual^2 / 2 * indicator +
-        huber_threshold * (abs(residual) - huber_threshold / 2) * (1 - indicator)
+        huber_threshold * (
+          abs(residual) - huber_threshold / 2
+        ) * (1 - indicator)
     )
   }
   huber_loss_gradient <- function(data, theta) {
@@ -400,10 +437,10 @@ test_that("huber regression", {
     cost_hessian = huber_loss_hessian
   )
 
-  expect_equal(huber_regression_result@cp_set, c(401, 726))
+  testthat::expect_equal(huber_regression_result@cp_set, c(401, 726))
 })
 
-test_that("huber regression with 0.1 vanilla", {
+testthat::test_that("huber regression with 0.1 vanilla", {
   set.seed(1)
   n <- 400 + 300 + 500
   p <- 5
@@ -429,7 +466,9 @@ test_that("huber regression with 0.1 vanilla", {
     indicator <- abs(residual) <= huber_threshold
     sum(
       residual^2 / 2 * indicator +
-        huber_threshold * (abs(residual) - huber_threshold / 2) * (1 - indicator)
+        huber_threshold * (
+          abs(residual) - huber_threshold / 2
+        ) * (1 - indicator)
     )
   }
   huber_loss_gradient <- function(data, theta) {
@@ -458,161 +497,234 @@ test_that("huber regression with 0.1 vanilla", {
     vanilla_percentage = 0.1
   )
 
-  expect_equal(huber_regression_result@cp_set, c(401, 726))
+  testthat::expect_equal(huber_regression_result@cp_set, c(401, 726))
 })
 
-# test_that("confidence interval experiment", {
-#   set.seed(1)
-#   kDimension <- 1
-#   change_point_locations <- NULL
-#   for (experiment_id in seq_len(20)) {
-#     data <- rbind(
-#       mvtnorm::rmvnorm(300, mean = rep(0, kDimension), sigma = diag(100, kDimension)),
-#       mvtnorm::rmvnorm(400, mean = rep(50, kDimension), sigma = diag(100, kDimension)),
-#       mvtnorm::rmvnorm(300, mean = rep(2, kDimension), sigma = diag(100, kDimension))
-#     )
-#     segment_count_guess <- 10
-#     block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
-#     block_count <- floor(nrow(data) / block_size)
-#     data_all_vars <- rep(0, block_count)
-#     for (block_index in seq_len(block_count)) {
-#       block_start <- (block_index - 1) * block_size + 1
-#       block_end <- if (block_index < block_count) block_index * block_size else nrow(data)
-#       data_all_vars[block_index] <- var(data[block_start:block_end, ])
-#     }
-#     data_all_var <- mean(data_all_vars)
-#     mean_loss <- function(data) {
-#       n <- nrow(data)
-#       (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
-#         n / 2 * (log(data_all_var) + log(2 * pi))
-#     }
-#     mean_loss_result <- fastcpd(
-#       formula = ~ . - 1,
-#       data = data.frame(data),
-#       beta = (kDimension + 1) * log(nrow(data)) / 2,
-#       p = kDimension,
-#       cost = mean_loss
-#     )
-#     change_point_locations <- c(change_point_locations, mean_loss_result@cp_set)
-#   }
+testthat::test_that("confidence interval experiment", {
+  testthat::skip("This test is intended to be run manually.")
+  set.seed(1)
+  kDimension <- 1
+  change_point_locations <- NULL
+  for (experiment_id in seq_len(20)) {
+    data <- rbind(
+      mvtnorm::rmvnorm(
+        300, mean = rep(0, kDimension), sigma = diag(100, kDimension)
+      ),
+      mvtnorm::rmvnorm(
+        400, mean = rep(50, kDimension), sigma = diag(100, kDimension)
+      ),
+      mvtnorm::rmvnorm(
+        300, mean = rep(2, kDimension), sigma = diag(100, kDimension)
+      )
+    )
+    segment_count_guess <- 10
+    block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
+    block_count <- floor(nrow(data) / block_size)
+    data_all_vars <- rep(0, block_count)
+    for (block_index in seq_len(block_count)) {
+      block_start <- (block_index - 1) * block_size + 1
+      block_end <- if (block_index < block_count) {
+        block_index * block_size
+      } else {
+        nrow(data)
+      }
+      data_all_vars[block_index] <- var(data[block_start:block_end, ])
+    }
+    data_all_var <- mean(data_all_vars)
+    mean_loss <- function(data) {
+      n <- nrow(data)
+      (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
+        n / 2 * (log(data_all_var) + log(2 * pi))
+    }
+    mean_loss_result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(data),
+      beta = (kDimension + 1) * log(nrow(data)) / 2,
+      p = kDimension,
+      cost = mean_loss
+    )
+    change_point_locations <- c(change_point_locations, mean_loss_result@cp_set)
+  }
 
-#   change_point_locations_cookie_bucket <- NULL
-#   cookie_bucket_id_list <- sample.int(n = 20, size = 1000, replace = TRUE)
-#   all_data <- data
-#   for (cookie_bucket_id in seq_len(20)) {
-#     data <- all_data[cookie_bucket_id_list != cookie_bucket_id, , drop = FALSE]
-#     segment_count_guess <- 10
-#     block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
-#     block_count <- floor(nrow(data) / block_size)
-#     data_all_vars <- rep(0, block_count)
-#     for (block_index in seq_len(block_count)) {
-#       block_start <- (block_index - 1) * block_size + 1
-#       block_end <- if (block_index < block_count) block_index * block_size else nrow(data)
-#       data_all_vars[block_index] <- var(data[block_start:block_end, ])
-#     }
-#     data_all_var <- mean(data_all_vars)
-#     mean_loss <- function(data) {
-#       n <- nrow(data)
-#       (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
-#         n / 2 * (log(data_all_var) + log(2 * pi))
-#     }
-#     mean_loss_result <- fastcpd(
-#       formula = ~ . - 1,
-#       data = data.frame(data),
-#       beta = (kDimension + 1) * log(nrow(data)) / 2,
-#       p = kDimension,
-#       cost = mean_loss
-#     )
+  change_point_locations_cookie_bucket <- NULL
+  cookie_bucket_id_list <- sample.int(n = 20, size = 1000, replace = TRUE)
+  all_data <- data
+  for (cookie_bucket_id in seq_len(20)) {
+    data <- all_data[cookie_bucket_id_list != cookie_bucket_id, , drop = FALSE]
+    segment_count_guess <- 10
+    block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
+    block_count <- floor(nrow(data) / block_size)
+    data_all_vars <- rep(0, block_count)
+    for (block_index in seq_len(block_count)) {
+      block_start <- (block_index - 1) * block_size + 1
+      block_end <- if (block_index < block_count) {
+        block_index * block_size
+      } else {
+        nrow(data)
+      }
+      data_all_vars[block_index] <- var(data[block_start:block_end, ])
+    }
+    data_all_var <- mean(data_all_vars)
+    mean_loss <- function(data) {
+      n <- nrow(data)
+      (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
+        n / 2 * (log(data_all_var) + log(2 * pi))
+    }
+    mean_loss_result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(data),
+      beta = (kDimension + 1) * log(nrow(data)) / 2,
+      p = kDimension,
+      cost = mean_loss
+    )
 
-#     for (cp in mean_loss_result@cp_set) {
-#       ordinal_mapped_cp <- which(cumsum(cookie_bucket_id_list != cookie_bucket_id) == cp)[1]
-#       change_point_locations_cookie_bucket <- c(change_point_locations_cookie_bucket, ordinal_mapped_cp)
-#     }
-#   }
+    for (cp in mean_loss_result@cp_set) {
+      ordinal_mapped_cp <- which(
+        cumsum(cookie_bucket_id_list != cookie_bucket_id) == cp
+      )[1]
+      change_point_locations_cookie_bucket <-
+        c(change_point_locations_cookie_bucket, ordinal_mapped_cp)
+    }
+  }
 
-#   table_change_point_locations <- table(change_point_locations)
-#   expect_equal(rownames(table_change_point_locations), c("269", "299", "300", "700"))
-#   expect_equal(unname(table_change_point_locations), c(1, 1, 19, 20), ignore_attr = TRUE)
+  table_change_point_locations <- table(change_point_locations)
+  testthat::expect_equal(
+    rownames(table_change_point_locations), c("269", "299", "300", "700")
+  )
+  testthat::expect_equal(
+    unname(table_change_point_locations), c(1, 1, 19, 20), ignore_attr = TRUE
+  )
 
-#   table_change_point_locations_cookie_bucket <- table(change_point_locations_cookie_bucket)
-#   expect_equal(rownames(table_change_point_locations_cookie_bucket), c("299", "300", "697", "700"))
-#   expect_equal(unname(table_change_point_locations_cookie_bucket), c(1, 19, 1, 19), ignore_attr = TRUE)
-# })
+  table_change_point_locations_cookie_bucket <-
+    table(change_point_locations_cookie_bucket)
+  testthat::expect_equal(
+    rownames(table_change_point_locations_cookie_bucket),
+    c("299", "300", "697", "700")
+  )
+  testthat::expect_equal(
+    unname(table_change_point_locations_cookie_bucket),
+    c(1, 19, 1, 19),
+    ignore_attr = TRUE
+  )
+})
 
-# test_that("confidence interval experiment with one change point", {
-#   set.seed(1)
-#   kDimension <- 1
-#   change_point_locations <- list()
-#   change_point_locations_cookie_bucket <- rep(list(NULL), 1000)
-#   containing_change_point <- rep(FALSE, 1000)
-#   for (experiment_id in seq_len(1000)) {
-#     data <- rbind(
-#       mvtnorm::rmvnorm(50, mean = rep(0, kDimension), sigma = diag(100, kDimension)),
-#       mvtnorm::rmvnorm(50, mean = rep(50, kDimension), sigma = diag(100, kDimension))
-#     )
-#     segment_count_guess <- 10
-#     block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
-#     block_count <- floor(nrow(data) / block_size)
-#     data_all_vars <- rep(0, block_count)
-#     for (block_index in seq_len(block_count)) {
-#       block_start <- (block_index - 1) * block_size + 1
-#       block_end <- if (block_index < block_count) block_index * block_size else nrow(data)
-#       data_all_vars[block_index] <- var(data[block_start:block_end, ])
-#     }
-#     data_all_var <- mean(data_all_vars)
-#     mean_loss <- function(data) {
-#       n <- nrow(data)
-#       (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
-#         n / 2 * (log(data_all_var) + log(2 * pi))
-#     }
-#     mean_loss_result <- fastcpd(
-#       formula = ~ . - 1,
-#       data = data.frame(data),
-#       beta = (kDimension + 1) * log(nrow(data)) / 2,
-#       p = kDimension,
-#       cost = mean_loss
-#     )
-#     change_point_locations[[experiment_id]] <- mean_loss_result@cp_set
+testthat::test_that("confidence interval experiment with one change point", {
+  testthat::skip("This test is intended to be run manually.")
+  set.seed(1)
+  kDimension <- 1
+  change_point_locations <- list()
+  change_point_locations_cookie_bucket <- rep(list(NULL), 1000)
+  containing_change_point <- rep(FALSE, 1000)
+  for (experiment_id in seq_len(1000)) {
+    data <- rbind(
+      mvtnorm::rmvnorm(
+        50, mean = rep(0, kDimension), sigma = diag(100, kDimension)
+      ),
+      mvtnorm::rmvnorm(
+        50, mean = rep(50, kDimension), sigma = diag(100, kDimension)
+      )
+    )
+    segment_count_guess <- 10
+    block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
+    block_count <- floor(nrow(data) / block_size)
+    data_all_vars <- rep(0, block_count)
+    for (block_index in seq_len(block_count)) {
+      block_start <- (block_index - 1) * block_size + 1
+      block_end <- if (block_index < block_count) {
+        block_index * block_size
+      } else {
+        nrow(data)
+      }
+      data_all_vars[block_index] <- var(data[block_start:block_end, ])
+    }
+    data_all_var <- mean(data_all_vars)
+    mean_loss <- function(data) {
+      n <- nrow(data)
+      (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
+        n / 2 * (log(data_all_var) + log(2 * pi))
+    }
+    mean_loss_result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(data),
+      beta = (kDimension + 1) * log(nrow(data)) / 2,
+      p = kDimension,
+      cost = mean_loss
+    )
+    change_point_locations[[experiment_id]] <- mean_loss_result@cp_set
 
-#     cookie_bucket_id_list <- sample.int(n = 20, size = 50 + 50, replace = TRUE)
-#     all_data <- data
-#     for (cookie_bucket_id in seq_len(20)) {
-#       data <- all_data[cookie_bucket_id_list != cookie_bucket_id, , drop = FALSE]
-#       segment_count_guess <- 10
-#       block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
-#       block_count <- floor(nrow(data) / block_size)
-#       data_all_vars <- rep(0, block_count)
-#       for (block_index in seq_len(block_count)) {
-#         block_start <- (block_index - 1) * block_size + 1
-#         block_end <- if (block_index < block_count) block_index * block_size else nrow(data)
-#         data_all_vars[block_index] <- var(data[block_start:block_end, ])
-#       }
-#       data_all_var <- mean(data_all_vars)
-#       mean_loss <- function(data) {
-#         n <- nrow(data)
-#         (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
-#           n / 2 * (log(data_all_var) + log(2 * pi))
-#       }
-#       mean_loss_result <- fastcpd(
-#         formula = ~ . - 1,
-#         data = data.frame(data),
-#         beta = (kDimension + 1) * log(nrow(data)) / 2,
-#         p = kDimension,
-#         cost = mean_loss
-#       )
+    cookie_bucket_id_list <- sample.int(n = 20, size = 50 + 50, replace = TRUE)
+    all_data <- data
+    for (cookie_bucket_id in seq_len(20)) {
+      data <-
+        all_data[cookie_bucket_id_list != cookie_bucket_id, , drop = FALSE]
+      segment_count_guess <- 10
+      block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
+      block_count <- floor(nrow(data) / block_size)
+      data_all_vars <- rep(0, block_count)
+      for (block_index in seq_len(block_count)) {
+        block_start <- (block_index - 1) * block_size + 1
+        block_end <- if (block_index < block_count) {
+          block_index * block_size
+        } else {
+          nrow(data)
+        }
+        data_all_vars[block_index] <- var(data[block_start:block_end, ])
+      }
+      data_all_var <- mean(data_all_vars)
+      mean_loss <- function(data) {
+        n <- nrow(data)
+        (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
+          n / 2 * (log(data_all_var) + log(2 * pi))
+      }
+      mean_loss_result <- fastcpd(
+        formula = ~ . - 1,
+        data = data.frame(data),
+        beta = (kDimension + 1) * log(nrow(data)) / 2,
+        p = kDimension,
+        cost = mean_loss
+      )
 
-#       for (cp in mean_loss_result@cp_set) {
-#         ordinal_mapped_cp <- which(cumsum(cookie_bucket_id_list != cookie_bucket_id) == cp)[1]
-#         change_point_locations_cookie_bucket[[experiment_id]] <- c(change_point_locations_cookie_bucket[[experiment_id]], ordinal_mapped_cp)
-#       }
-#     }
-#     if (
-#       quantile(change_point_locations_cookie_bucket[[experiment_id]], 0.025) <= 50 &&
-#       quantile(change_point_locations_cookie_bucket[[experiment_id]], 0.975) >= 50
-#     ) {
-#       containing_change_point[experiment_id] <- TRUE
-#     }
-#   }
+      for (cp in mean_loss_result@cp_set) {
+        ordinal_mapped_cp <-
+          which(cumsum(cookie_bucket_id_list != cookie_bucket_id) == cp)[1]
+        change_point_locations_cookie_bucket[[experiment_id]] <- c(
+          change_point_locations_cookie_bucket[[experiment_id]],
+          ordinal_mapped_cp
+        )
+      }
+    }
+    if (
+      quantile(
+        change_point_locations_cookie_bucket[[experiment_id]], 0.025
+      ) <= 50 && quantile(
+        change_point_locations_cookie_bucket[[experiment_id]], 0.975
+      ) >= 50
+    ) {
+      containing_change_point[experiment_id] <- TRUE
+    }
+  }
 
-#   expect_equal(sum(containing_change_point), 927)
-# })
+  testthat::expect_equal(sum(containing_change_point), 927)
+})
+
+testthat::test_that("all examples in the documentation", {
+  testthat::skip("This test is intended to be run manually.")
+  fastcpd_documentation <- readLines("R/fastcpd.R")
+  examples_index_start <-
+    which(fastcpd_documentation == "#' # Linear regression")
+  examples_index_end <-
+    which(fastcpd_documentation == "#' summary(huber_regression_result)")
+  examples <- fastcpd_documentation[examples_index_start:examples_index_end]
+  for (i in seq_along(examples)) {
+    if (fastcpd_documentation[i] == "#'") {
+      fastcpd_documentation[i] <- ""
+    } else {
+      fastcpd_documentation[i] <-
+        substr(fastcpd_documentation[i], 4, nchar(fastcpd_documentation[i]))
+    }
+  }
+  source(textConnection(paste(
+    fastcpd_documentation[examples_index_start:examples_index_end],
+    collapse = "\n"
+  )))
+})
