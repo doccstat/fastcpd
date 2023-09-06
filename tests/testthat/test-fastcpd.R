@@ -267,7 +267,7 @@ testthat::test_that("custom one-dimensional logistic regression", {
   logistic_loss <- function(data, theta) {
     x <- data[, -1]
     y <- data[, 1]
-    u <- x * theta
+    u <- x * c(theta)
     nll <- -y * u + log(1 + exp(u))
     nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
     sum(nll)
@@ -282,24 +282,13 @@ testthat::test_that("custom one-dimensional logistic regression", {
     prob <- 1 / (1 + exp(-x * theta))
     (x %o% x) * c((1 - prob) * prob)
   }
-  warning_messages <- testthat::capture_warnings(
-    result_custom <- fastcpd(
-      formula = y ~ . - 1,
-      data = data,
-      epsilon = 1e-5,
-      cost = logistic_loss,
-      cost_gradient = logistic_loss_gradient,
-      cost_hessian = logistic_loss_hessian
-    )
-  )
-  # TODO(doccstat): Deal with the warning messages instead of capturing them.
-  testthat::expect_equal(
-    warning_messages,
-    rep(paste(
-      "Recycling array of length 1 in vector-array arithmetic is deprecated.\n",
-      "  Use c() or as.vector() instead.\n",
-      sep = ""
-    ), 4805)
+  result_custom <- fastcpd(
+    formula = y ~ . - 1,
+    data = data,
+    epsilon = 1e-5,
+    cost = logistic_loss,
+    cost_gradient = logistic_loss_gradient,
+    cost_hessian = logistic_loss_hessian
   )
 
   testthat::expect_equal(result_builtin@cp_set, 198)
