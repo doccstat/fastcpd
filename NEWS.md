@@ -1,3 +1,10 @@
+# fastcpd 0.5.3
+
+*   Add more experiments but commented out for the sake of test time without
+    affecting the test coverage.
+*   Add examples in README.
+*   Add CRAN manual.
+
 # fastcpd 0.5.2
 
 *   Add one-dimensional linear regression example with plot.
