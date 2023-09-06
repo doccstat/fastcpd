@@ -22,9 +22,9 @@ testthat::test_that("logistic regression", {
   # sync if the documentation ever changes.
   set.seed(1)
 
-  kChangePointLocation <- 125
-  kNumberOfDataPoints <- 300
-  kDimension <- 5
+  kChangePointLocation <- 125  # nolint: Google Style Guide
+  kNumberOfDataPoints <- 300  # nolint: Google Style Guide
+  kDimension <- 5  # nolint: Google Style Guide
 
   # There are 300 five-dimensional data points.
   x <- matrix(rnorm(kNumberOfDataPoints * kDimension, 0, 1), ncol = kDimension)
@@ -83,9 +83,9 @@ testthat::test_that("logistic regression", {
   # sync if the documentation ever changes.
   set.seed(1)
 
-  kChangePointLocation <- 125
-  kNumberOfDataPoints <- 300
-  kDimension <- 5
+  kChangePointLocation <- 125  # nolint: Google Style Guide
+  kNumberOfDataPoints <- 300  # nolint: Google Style Guide
+  kDimension <- 5  # nolint: Google Style Guide
 
   # There are 300 five-dimensional data points.
   x <- matrix(rnorm(kNumberOfDataPoints * kDimension, 0, 1), ncol = kDimension)
@@ -503,7 +503,7 @@ testthat::test_that("huber regression with 0.1 vanilla", {
 testthat::test_that("confidence interval experiment", {
   testthat::skip("This test is intended to be run manually.")
   set.seed(1)
-  kDimension <- 1
+  kDimension <- 1  # nolint: Google Style Guide
   change_point_locations <- NULL
   for (experiment_id in seq_len(20)) {
     data <- rbind(
@@ -546,7 +546,7 @@ testthat::test_that("confidence interval experiment", {
     change_point_locations <- c(change_point_locations, mean_loss_result@cp_set)
   }
 
-  change_point_locations_cookie_bucket <- NULL
+  change_locations_cookie_bucket <- NULL
   cookie_bucket_id_list <- sample.int(n = 20, size = 1000, replace = TRUE)
   all_data <- data
   for (cookie_bucket_id in seq_len(20)) {
@@ -582,8 +582,8 @@ testthat::test_that("confidence interval experiment", {
       ordinal_mapped_cp <- which(
         cumsum(cookie_bucket_id_list != cookie_bucket_id) == cp
       )[1]
-      change_point_locations_cookie_bucket <-
-        c(change_point_locations_cookie_bucket, ordinal_mapped_cp)
+      change_locations_cookie_bucket <-
+        c(change_locations_cookie_bucket, ordinal_mapped_cp)
     }
   }
 
@@ -595,25 +595,21 @@ testthat::test_that("confidence interval experiment", {
     unname(table_change_point_locations), c(1, 1, 19, 20), ignore_attr = TRUE
   )
 
-  table_change_point_locations_cookie_bucket <-
-    table(change_point_locations_cookie_bucket)
+  table_cp_cookie_bucket <- table(change_locations_cookie_bucket)
   testthat::expect_equal(
-    rownames(table_change_point_locations_cookie_bucket),
-    c("299", "300", "697", "700")
+    rownames(table_cp_cookie_bucket), c("299", "300", "697", "700")
   )
   testthat::expect_equal(
-    unname(table_change_point_locations_cookie_bucket),
-    c(1, 19, 1, 19),
-    ignore_attr = TRUE
+    unname(table_cp_cookie_bucket), c(1, 19, 1, 19), ignore_attr = TRUE
   )
 })
 
 testthat::test_that("confidence interval experiment with one change point", {
   testthat::skip("This test is intended to be run manually.")
   set.seed(1)
-  kDimension <- 1
+  kDimension <- 1  # nolint: Google Style Guide
   change_point_locations <- list()
-  change_point_locations_cookie_bucket <- rep(list(NULL), 1000)
+  change_locations_cookie_bucket <- rep(list(NULL), 1000)
   containing_change_point <- rep(FALSE, 1000)
   for (experiment_id in seq_len(1000)) {
     data <- rbind(
@@ -687,17 +683,17 @@ testthat::test_that("confidence interval experiment with one change point", {
       for (cp in mean_loss_result@cp_set) {
         ordinal_mapped_cp <-
           which(cumsum(cookie_bucket_id_list != cookie_bucket_id) == cp)[1]
-        change_point_locations_cookie_bucket[[experiment_id]] <- c(
-          change_point_locations_cookie_bucket[[experiment_id]],
+        change_locations_cookie_bucket[[experiment_id]] <- c(
+          change_locations_cookie_bucket[[experiment_id]],
           ordinal_mapped_cp
         )
       }
     }
     if (
       quantile(
-        change_point_locations_cookie_bucket[[experiment_id]], 0.025
+        change_locations_cookie_bucket[[experiment_id]], 0.025
       ) <= 50 && quantile(
-        change_point_locations_cookie_bucket[[experiment_id]], 0.975
+        change_locations_cookie_bucket[[experiment_id]], 0.975
       ) >= 50
     ) {
       containing_change_point[experiment_id] <- TRUE
