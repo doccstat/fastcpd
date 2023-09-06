@@ -221,11 +221,11 @@ y <- c(
   rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] \%*\% theta[2, ])))
 )
 data <- data.frame(y = y, x = x)
-result_builtin <- fastcpd(
+result_builtin <- suppressWarnings(fastcpd(
   formula = y ~ . - 1,
   data = data,
   family = "binomial"
-)
+))
 logistic_loss <- function(data, theta) {
   x <- data[, -1]
   y <- data[, 1]

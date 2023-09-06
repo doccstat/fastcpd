@@ -3,6 +3,8 @@ run_cpp_tests("fastcpd")
 # Everything in this script is provided as is. The purpose of this script is to
 # do a sanity check on the C++ implementation of `fastcpd`.
 
+# nolint start: script provided as is
+
 #' Cost function for Logistic regression, i.e. binomial family in GLM.
 #'
 #' @param data Data to be used to calculate the cost values. The last column is
@@ -299,3 +301,5 @@ testthat::test_that("logistic regression", {
 
   # testthat::expect_equal(change_points_binomial_fastcpd_vanilla, 0)
 })
+
+# nolint end
