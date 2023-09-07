@@ -61,32 +61,7 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><ul>
-<li>
-<a href="#fastcpd">fastcpd</a>
-<ul>
-<li><a href="#overview">Overview</a></li>
-<li>
-<a href="#examples">Examples</a>
-<ul>
-<li><a href="#linear-regression">Linear regression</a></li>
-<li><a href="#linear-regression-with-one-dimensional-covariate">Linear regression with one-dimensional covariate</a></li>
-<li><a href="#logistic-regression">Logistic regression</a></li>
-<li><a href="#poisson-regression">Poisson regression</a></li>
-<li><a href="#penalized-linear-regression">Penalized linear regression</a></li>
-<li><a href="#custom-cost-function-logistic-regression">Custom cost function: logistic regression</a></li>
-<li><a href="#custom-cost-function-mean-shift">Custom cost function: mean shift</a></li>
-<li><a href="#custom-cost-function-variance-change">Custom cost function: variance change</a></li>
-<li><a href="#custom-cost-function-huber-loss">Custom cost function: Huber loss</a></li>
-</ul>
-</li>
-<li><a href="#installation">Installation</a></li>
-<li><a href="#dependency">Dependency</a></li>
-<li><a href="#contact-us">Contact us</a></li>
-</ul>
-</li>
-</ul>
-<!-- README.md is generated from README.Rmd. Please edit that file --><div class="section level1">
+  <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="fastcpd">fastcpd<a class="anchor" aria-label="anchor" href="#fastcpd"></a>
 </h1></div>
 <p><a href="https://cran.r-project.org/package=fastcpd" class="external-link"><img src="https://www.r-pkg.org/badges/version/fastcpd" alt="CRAN status"></a> <a href="https://github.com/doccstat/fastcpd/actions" class="external-link"><img src="https://github.com/doccstat/fastcpd/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/doccstat/fastcpd?branch=main" class="external-link"><img src="https://codecov.io/gh/doccstat/fastcpd/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://github.com/doccstat/fastcpd" class="external-link"><img src="https://img.shields.io/github/last-commit/doccstat/fastcpd" alt="Last Commit"></a> <a href="https://doccstat.r-universe.dev" class="external-link"><img src="https://doccstat.r-universe.dev/badges/fastcpd" alt="r-universe"></a> <a href="https://www.codefactor.io/repository/github/doccstat/fastcpd" class="external-link"><img src="https://www.codefactor.io/repository/github/doccstat/fastcpd/badge" alt="CodeFactor"></a></p>
@@ -94,22 +69,75 @@
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>The fastcpd (<strong>fast</strong> <strong>c</strong>hange <strong>p</strong>oint <strong>d</strong>etection) is a fast implmentation of change point detection methods in R. The <strong>fastcpd</strong> package is designed to find change points in a fast manner. It is easy to install and extensible to all kinds of change point problems with a user specified cost function apart from the built-in cost functions.</p>
-<p>If you’d like to learn how to use the fastcpd effectively, please refer to:</p>
+<p>To learn more behind the algorithms:</p>
 <ul>
 <li><a href="https://proceedings.mlr.press/v206/zhang23b.html" class="external-link">Sequential Gradient Descent and Quasi-Newton’s Method for Change-Point Analysis</a></li>
 </ul>
 </div>
 <div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Install from CRAN, (not yet available)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"fastcpd"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Install the development version from GitHub using either of the following</span></span>
+<span><span class="co"># commands:</span></span>
+<span></span>
+<span><span class="co">## install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="dependency">Dependency<a class="anchor" aria-label="anchor" href="#dependency"></a>
+</h3>
+<details close><summary>
+Package dependencies
+</summary><p><code><a href="https://fastcpd.xingchi.li">library(fastcpd)</a></code> depends on the following packages:</p>
+<ul>
+<li>
+<a href="https://github.com/RcppCore/Rcpp" class="external-link">Rcpp</a>, for C++ source code compilation.</li>
+<li>
+<a href="https://github.com/RcppCore/RcppArmadillo" class="external-link">RcppArmadillo</a>, for fast linear algebra.</li>
+<li>
+<a href="https://github.com/jaredhuling/fastglm" class="external-link">fastglm</a>, for fast generalized linear models.</li>
+<li>
+<a href="https://github.com/AndriSignorell/DescTools" class="external-link">DescTools</a>, for Winsorizing Poisson data.</li>
+<li>
+<a href="https://glmnet.stanford.edu/" class="external-link">glmnet</a>, for penalized regression.</li>
+<li>
+<a href="https://github.com/tidyverse/ggplot2" class="external-link">ggplot2</a>, for data visualization.</li>
+</ul>
+<p>If you’re compiling from source, you can run the following command to see the complete set of system packages needed on your machine.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_sysreqs.html" class="external-link">pkg_sysreqs</a></span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ℹ Loading metadata database</span></span>
+<span><span class="co">#&gt; ✔ Loading metadata database ... done</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Install scripts ───────────────────────────────────────────── Ubuntu 20.04 ──</span></span>
+<span><span class="co">#&gt; apt-get -y update</span></span>
+<span><span class="co">#&gt; apt-get -y install libcurl4-openssl-dev libssl-dev zlib1g-dev make</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Packages and their system dependencies ──────────────────────────────────────</span></span>
+<span><span class="co">#&gt; curl       – libcurl4-openssl-dev, libssl-dev</span></span>
+<span><span class="co">#&gt; data.table – zlib1g-dev</span></span>
+<span><span class="co">#&gt; fs         – make</span></span>
+<span><span class="co">#&gt; openssl    – libssl-dev</span></span></code></pre></div>
+</details>
+</div>
+</div>
+<div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
 </h2>
-<p><a href="https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples">Documentation</a></p>
+<p><a href="https://fastcpd.xingchi.li/reference/fastcpd.html">Documentation</a></p>
 <!-- This example section is a direct copy from `fastcpd` documentation -->
 <details open><summary>
-Example usage of <code>fastcpd</code>
+Example usage
 </summary><div class="section level3">
 <h3 id="linear-regression">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression"></a>
 </h3>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
@@ -127,7 +155,7 @@ Example usage of <code>fastcpd</code>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-linear_regression-1.png"><!-- --></p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -149,7 +177,7 @@ Example usage of <code>fastcpd</code>
 <div class="section level3">
 <h3 id="linear-regression-with-one-dimensional-covariate">Linear regression with one-dimensional covariate<a class="anchor" aria-label="anchor" href="#linear-regression-with-one-dimensional-covariate"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
@@ -167,7 +195,7 @@ Example usage of <code>fastcpd</code>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-linear_regression_with_one_dimensional_covariate-1.png"><!-- --></p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -187,7 +215,7 @@ Example usage of <code>fastcpd</code>
 <div class="section level3">
 <h3 id="logistic-regression">Logistic regression<a class="anchor" aria-label="anchor" href="#logistic-regression"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1500</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
@@ -224,7 +252,7 @@ Example usage of <code>fastcpd</code>
 <div class="section level3">
 <h3 id="poisson-regression">Poisson regression<a class="anchor" aria-label="anchor" href="#poisson-regression"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
@@ -295,7 +323,7 @@ Example usage of <code>fastcpd</code>
 <div class="section level3">
 <h3 id="penalized-linear-regression">Penalized linear regression<a class="anchor" aria-label="anchor" href="#penalized-linear-regression"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1500</span></span>
@@ -322,7 +350,7 @@ Example usage of <code>fastcpd</code>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-penalized_linear_regression-1.png"><!-- --></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -392,7 +420,7 @@ Example usage of <code>fastcpd</code>
 <div class="section level3">
 <h3 id="custom-cost-function-logistic-regression">Custom cost function: logistic regression<a class="anchor" aria-label="anchor" href="#custom-cost-function-logistic-regression"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
@@ -465,7 +493,7 @@ Example usage of <code>fastcpd</code>
 <div class="section level3">
 <h3 id="custom-cost-function-mean-shift">Custom cost function: mean shift<a class="anchor" aria-label="anchor" href="#custom-cost-function-mean-shift"></a>
 </h3>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
@@ -512,7 +540,7 @@ Example usage of <code>fastcpd</code>
 <div class="section level3">
 <h3 id="custom-cost-function-variance-change">Custom cost function: variance change<a class="anchor" aria-label="anchor" href="#custom-cost-function-variance-change"></a>
 </h3>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
@@ -577,7 +605,7 @@ Example usage of <code>fastcpd</code>
 <div class="section level3">
 <h3 id="custom-cost-function-huber-loss">Custom cost function: Huber loss<a class="anchor" aria-label="anchor" href="#custom-cost-function-huber-loss"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">400</span> <span class="op">+</span> <span class="fl">300</span> <span class="op">+</span> <span class="fl">500</span></span>
@@ -646,56 +674,6 @@ Example usage of <code>fastcpd</code>
 </details>
 </div>
 <div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h2>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install from CRAN, (not yet available)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"fastcpd"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install the development version from GitHub using either of the following</span></span>
-<span><span class="co"># commands:</span></span>
-<span></span>
-<span><span class="co">## install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="dependency">Dependency<a class="anchor" aria-label="anchor" href="#dependency"></a>
-</h2>
-<p><code><a href="https://fastcpd.xingchi.li">library(fastcpd)</a></code> depends on the following packages:</p>
-<ul>
-<li>
-<a href="https://github.com/RcppCore/Rcpp" class="external-link">Rcpp</a>, for C++ source code compilation.</li>
-<li>
-<a href="https://github.com/RcppCore/RcppArmadillo" class="external-link">RcppArmadillo</a>, for fast linear algebra.</li>
-<li>
-<a href="https://github.com/jaredhuling/fastglm" class="external-link">fastglm</a>, for fast generalized linear models.</li>
-<li>
-<a href="https://github.com/AndriSignorell/DescTools" class="external-link">DescTools</a>, for Winsorizing Poisson data.</li>
-<li>
-<a href="https://glmnet.stanford.edu/" class="external-link">glmnet</a>, for penalized regression.</li>
-<li>
-<a href="https://github.com/tidyverse/ggplot2" class="external-link">ggplot2</a>, for data visualization.</li>
-</ul>
-<p>If you’re compiling from source, you can run the following command to see the complete set of system packages needed on your machine.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_sysreqs.html" class="external-link">pkg_sysreqs</a></span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ℹ Loading metadata database</span></span>
-<span><span class="co">#&gt; ✔ Loading metadata database ... done</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Install scripts ───────────────────────────────────────────── Ubuntu 20.04 ──</span></span>
-<span><span class="co">#&gt; apt-get -y update</span></span>
-<span><span class="co">#&gt; apt-get -y install libcurl4-openssl-dev libssl-dev zlib1g-dev make</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Packages and their system dependencies ──────────────────────────────────────</span></span>
-<span><span class="co">#&gt; curl       – libcurl4-openssl-dev, libssl-dev</span></span>
-<span><span class="co">#&gt; data.table – zlib1g-dev</span></span>
-<span><span class="co">#&gt; fs         – make</span></span>
-<span><span class="co">#&gt; openssl    – libssl-dev</span></span></code></pre></div>
-</div>
-<div class="section level2">
 <h2 id="contact-us">Contact us<a class="anchor" aria-label="anchor" href="#contact-us"></a>
 </h2>
 <p>Encountered a bug or unintended behavior?</p>
@@ -705,7 +683,6 @@ Example usage of <code>fastcpd</code>
 </ol>
 </div>
 </div>
-
   </main><aside class="col-md-3"><div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
