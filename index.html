@@ -90,6 +90,14 @@
 <span><span class="co">## install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
+<h3 id="faq">FAQ<a class="anchor" aria-label="anchor" href="#faq"></a>
+</h3>
+<details close><summary>
+I countered problems related to gfortran on mac!
+</summary><p>The package should be able to install on mac without any problems if all the dependencies are installed. However, if you encountered problems related to gfortran, it might be because <code>RcppArmadillo</code> is not installed previously. Try this <a href="https://stackoverflow.com/a/72997915" class="external-link">stackoverflow solution</a> if you have trouble installing <code>RcppArmadillo</code>.</p>
+</details>
+</div>
+<div class="section level3">
 <h3 id="dependency">Dependency<a class="anchor" aria-label="anchor" href="#dependency"></a>
 </h3>
 <details close><summary>
