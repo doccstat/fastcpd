@@ -1,4 +1,25 @@
 
+- [fastcpd](#fastcpd)
+  - [Overview](#overview)
+  - [Examples](#examples)
+    - [Linear regression](#linear-regression)
+    - [Linear regression with one-dimensional
+      covariate](#linear-regression-with-one-dimensional-covariate)
+    - [Logistic regression](#logistic-regression)
+    - [Poisson regression](#poisson-regression)
+    - [Penalized linear regression](#penalized-linear-regression)
+    - [Custom cost function: logistic
+      regression](#custom-cost-function-logistic-regression)
+    - [Custom cost function: mean
+      shift](#custom-cost-function-mean-shift)
+    - [Custom cost function: variance
+      change](#custom-cost-function-variance-change)
+    - [Custom cost function: Huber
+      loss](#custom-cost-function-huber-loss)
+  - [Installation](#installation)
+  - [Dependency](#dependency)
+  - [Contact us](#contact-us)
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # fastcpd
@@ -33,13 +54,14 @@ to:
 [Documentation](https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples)
 
 <!-- This example section is a direct copy from `fastcpd` documentation -->
-<details close>
+<details open>
 <summary>
 Example usage of `fastcpd`
 </summary>
 
+### Linear regression
+
 ``` r
-# Linear regression
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -58,7 +80,7 @@ result <- fastcpd(
 plot(result)
 ```
 
-![](man/figures/README-examples-1.png)<!-- -->
+![](man/figures/README-Linear%20regression-1.png)<!-- -->
 
 ``` r
 summary(result)
@@ -78,8 +100,11 @@ summary(result)
 #> 1  0.9704022 -1.07884004  0.5925092
 #> 2  1.1786074 -0.01757927 -0.5287126
 #> 3 -0.9258587  0.63906143  0.1929411
+```
 
-# Linear regression with one-dimensional covariate
+### Linear regression with one-dimensional covariate
+
+``` r
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -98,7 +123,7 @@ result <- fastcpd(
 plot(result)
 ```
 
-![](man/figures/README-examples-2.png)<!-- -->
+![](man/figures/README-Linear%20regression%20with%20one-dimensional%20covariate-1.png)<!-- -->
 
 ``` r
 summary(result)
@@ -116,8 +141,11 @@ summary(result)
 #> Parameters:
 #>   segment 1  segment 2 segment 3
 #> 1 0.9520606 -0.8054074 0.3692224
+```
 
-# Logistic regression
+### Logistic regression
+
+``` r
 library(fastcpd)
 set.seed(1)
 x <- matrix(rnorm(1500, 0, 1), ncol = 5)
@@ -150,8 +178,11 @@ summary(result)
 #> 3  1.0576503  3.702310
 #> 4 -0.8812767  2.258796
 #> 5  0.2419351  2.524173
+```
 
-# Poisson regression
+### Poisson regression
+
+``` r
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -218,8 +249,11 @@ summary(result_two_epochs)
 #> 1  2.60955822  2.4484869  0.7832980 -0.5008107  1.105317  2.5479958
 #> 2  0.02371536  0.4084502  1.4456715  1.9282798  1.057743  0.4951862
 #> 3 -1.34277129 -2.5426556 -0.8989812  0.5197285 -1.128259 -2.5035143
+```
 
-# Penalized linear regression
+### Penalized linear regression
+
+``` r
 library(fastcpd)
 set.seed(1)
 n <- 1500
@@ -247,7 +281,7 @@ result <- fastcpd(
 plot(result)
 ```
 
-![](man/figures/README-examples-3.png)<!-- -->
+![](man/figures/README-Penalized%20linear%20regression-1.png)<!-- -->
 
 ``` r
 summary(result)
@@ -315,8 +349,11 @@ summary(result)
 #> [48,]  .         .          .         .         
 #> [49,]  .         .          .         .         
 #> [50,]  .         .          .         .
+```
 
-# Custom cost function: logistic regression
+### Custom cost function: logistic regression
+
+``` r
 library(fastcpd)
 set.seed(1)
 p <- 5
@@ -385,8 +422,11 @@ summary(result_custom_two_epochs)
 #> 
 #> Change points:
 #> 200
+```
 
-# Custom cost function: mean shift
+### Custom cost function: mean shift
+
+``` r
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -429,8 +469,11 @@ summary(mean_loss_result)
 #> 
 #> Change points:
 #> 300 700
+```
 
-# Custom cost function: variance change
+### Custom cost function: variance change
+
+``` r
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -491,8 +534,11 @@ summary(meanvar_loss_result)
 #> 
 #> Change points:
 #> 300 700 1000 1300 1700
+```
 
-# Custom cost function: Huber loss
+### Custom cost function: Huber loss
+
+``` r
 library(fastcpd)
 set.seed(1)
 n <- 400 + 300 + 500
