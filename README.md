@@ -1,25 +1,4 @@
 
-- [fastcpd](#fastcpd)
-  - [Overview](#overview)
-  - [Examples](#examples)
-    - [Linear regression](#linear-regression)
-    - [Linear regression with one-dimensional
-      covariate](#linear-regression-with-one-dimensional-covariate)
-    - [Logistic regression](#logistic-regression)
-    - [Poisson regression](#poisson-regression)
-    - [Penalized linear regression](#penalized-linear-regression)
-    - [Custom cost function: logistic
-      regression](#custom-cost-function-logistic-regression)
-    - [Custom cost function: mean
-      shift](#custom-cost-function-mean-shift)
-    - [Custom cost function: variance
-      change](#custom-cost-function-variance-change)
-    - [Custom cost function: Huber
-      loss](#custom-cost-function-huber-loss)
-  - [Installation](#installation)
-  - [Dependency](#dependency)
-  - [Contact us](#contact-us)
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # fastcpd
@@ -42,21 +21,80 @@ package is designed to find change points in a fast manner. It is easy
 to install and extensible to all kinds of change point problems with a
 user specified cost function apart from the built-in cost functions.
 
-If you’d like to learn how to use the fastcpd effectively, please refer
-to:
+To learn more behind the algorithms:
 
 - [Sequential Gradient Descent and Quasi-Newton’s Method for
   Change-Point
   Analysis](https://proceedings.mlr.press/v206/zhang23b.html)
 
+## Installation
+
+``` r
+# Install from CRAN, (not yet available)
+install.packages("fastcpd")
+```
+
+``` r
+# Install the development version from GitHub using either of the following
+# commands:
+
+## install.packages("pak")
+pak::pak("doccstat/fastcpd")
+
+## install.packages("devtools")
+devtools::install_github("doccstat/fastcpd")
+```
+
+### Dependency
+
+<details close>
+<summary>
+Package dependencies
+</summary>
+
+`library(fastcpd)` depends on the following packages:
+
+- [Rcpp](https://github.com/RcppCore/Rcpp), for C++ source code
+  compilation.
+- [RcppArmadillo](https://github.com/RcppCore/RcppArmadillo), for fast
+  linear algebra.
+- [fastglm](https://github.com/jaredhuling/fastglm), for fast
+  generalized linear models.
+- [DescTools](https://github.com/AndriSignorell/DescTools), for
+  Winsorizing Poisson data.
+- [glmnet](https://glmnet.stanford.edu/), for penalized regression.
+- [ggplot2](https://github.com/tidyverse/ggplot2), for data
+  visualization.
+
+If you’re compiling from source, you can run the following command to
+see the complete set of system packages needed on your machine.
+
+``` r
+pak::pkg_sysreqs("doccstat/fastcpd")
+#> ℹ Loading metadata database
+#> ✔ Loading metadata database ... done
+#> 
+#> ── Install scripts ───────────────────────────────────────────── Ubuntu 20.04 ──
+#> apt-get -y update
+#> apt-get -y install libcurl4-openssl-dev libssl-dev zlib1g-dev make
+#> 
+#> ── Packages and their system dependencies ──────────────────────────────────────
+#> curl       – libcurl4-openssl-dev, libssl-dev
+#> data.table – zlib1g-dev
+#> fs         – make
+#> openssl    – libssl-dev
+```
+
+</details>
+
 ## Examples
 
-[Documentation](https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples)
+[Documentation](https://fastcpd.xingchi.li/reference/fastcpd.html)
 
 <!-- This example section is a direct copy from `fastcpd` documentation -->
 <details open>
 <summary>
-Example usage of `fastcpd`
+Example usage
 </summary>
 
 ### Linear regression
@@ -605,59 +643,6 @@ summary(huber_regression_result)
 ```
 
 </details>
-
-## Installation
-
-``` r
-# Install from CRAN, (not yet available)
-install.packages("fastcpd")
-```
-
-``` r
-# Install the development version from GitHub using either of the following
-# commands:
-
-## install.packages("pak")
-pak::pak("doccstat/fastcpd")
-
-## install.packages("devtools")
-devtools::install_github("doccstat/fastcpd")
-```
-
-## Dependency
-
-`library(fastcpd)` depends on the following packages:
-
-- [Rcpp](https://github.com/RcppCore/Rcpp), for C++ source code
-  compilation.
-- [RcppArmadillo](https://github.com/RcppCore/RcppArmadillo), for fast
-  linear algebra.
-- [fastglm](https://github.com/jaredhuling/fastglm), for fast
-  generalized linear models.
-- [DescTools](https://github.com/AndriSignorell/DescTools), for
-  Winsorizing Poisson data.
-- [glmnet](https://glmnet.stanford.edu/), for penalized regression.
-- [ggplot2](https://github.com/tidyverse/ggplot2), for data
-  visualization.
-
-If you’re compiling from source, you can run the following command to
-see the complete set of system packages needed on your machine.
-
-``` r
-pak::pkg_sysreqs("doccstat/fastcpd")
-#> ℹ Loading metadata database
-#> ✔ Loading metadata database ... done
-#> 
-#> ── Install scripts ───────────────────────────────────────────── Ubuntu 20.04 ──
-#> apt-get -y update
-#> apt-get -y install libcurl4-openssl-dev libssl-dev zlib1g-dev make
-#> 
-#> ── Packages and their system dependencies ──────────────────────────────────────
-#> curl       – libcurl4-openssl-dev, libssl-dev
-#> data.table – zlib1g-dev
-#> fs         – make
-#> openssl    – libssl-dev
-```
 
 ## Contact us
 

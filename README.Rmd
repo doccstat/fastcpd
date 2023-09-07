@@ -1,8 +1,5 @@
 ---
-output:
-  github_document:
-    toc: true
-    toc_depth: 3
+output: github_document
 ---
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -32,19 +29,64 @@ designed to find change points in a fast manner. It is easy to install and
 extensible to all kinds of change point problems with a user specified cost
 function apart from the built-in cost functions.
 
-If you'd like to learn how to use the fastcpd effectively, please refer to:
+To learn more behind the algorithms:
 
 * [Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis](https://proceedings.mlr.press/v206/zhang23b.html)
 
+## Installation
+
+```{r eval = FALSE}
+# Install from CRAN, (not yet available)
+install.packages("fastcpd")
+```
+
+```{r eval = FALSE}
+# Install the development version from GitHub using either of the following
+# commands:
+
+## install.packages("pak")
+pak::pak("doccstat/fastcpd")
+
+## install.packages("devtools")
+devtools::install_github("doccstat/fastcpd")
+```
+
+### Dependency
+
+<details close>
+
+<summary>Package dependencies</summary>
+
+`library(fastcpd)` depends on the following packages:
+
+*   [Rcpp](https://github.com/RcppCore/Rcpp), for C++ source code compilation.
+*   [RcppArmadillo](https://github.com/RcppCore/RcppArmadillo), for fast linear
+    algebra.
+*   [fastglm](https://github.com/jaredhuling/fastglm), for fast generalized
+    linear models.
+*   [DescTools](https://github.com/AndriSignorell/DescTools), for Winsorizing
+    Poisson data.
+*   [glmnet](https://glmnet.stanford.edu/), for penalized regression.
+*   [ggplot2](https://github.com/tidyverse/ggplot2), for data visualization.
+
+If you're compiling from source, you can run the following command to see the
+complete set of system packages needed on your machine.
+
+```{r}
+pak::pkg_sysreqs("doccstat/fastcpd")
+```
+
+</details>
+
 ## Examples
 
-[Documentation](https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples)
+[Documentation](https://fastcpd.xingchi.li/reference/fastcpd.html)
 
 <!-- This example section is a direct copy from `fastcpd` documentation -->
 
 <details open>
 
-<summary>Example usage of `fastcpd`</summary>
+<summary>Example usage</summary>
 
 ### Linear regression
 
@@ -392,45 +434,6 @@ huber_regression_result <- fastcpd(
 summary(huber_regression_result)
 ```
 </details>
-
-## Installation
-
-```{r eval = FALSE}
-# Install from CRAN, (not yet available)
-install.packages("fastcpd")
-```
-
-```{r eval = FALSE}
-# Install the development version from GitHub using either of the following
-# commands:
-
-## install.packages("pak")
-pak::pak("doccstat/fastcpd")
-
-## install.packages("devtools")
-devtools::install_github("doccstat/fastcpd")
-```
-
-## Dependency
-
-`library(fastcpd)` depends on the following packages:
-
-*   [Rcpp](https://github.com/RcppCore/Rcpp), for C++ source code compilation.
-*   [RcppArmadillo](https://github.com/RcppCore/RcppArmadillo), for fast linear
-    algebra.
-*   [fastglm](https://github.com/jaredhuling/fastglm), for fast generalized
-    linear models.
-*   [DescTools](https://github.com/AndriSignorell/DescTools), for Winsorizing
-    Poisson data.
-*   [glmnet](https://glmnet.stanford.edu/), for penalized regression.
-*   [ggplot2](https://github.com/tidyverse/ggplot2), for data visualization.
-
-If you're compiling from source, you can run the following command to see the
-complete set of system packages needed on your machine.
-
-```{r}
-pak::pkg_sysreqs("doccstat/fastcpd")
-```
 
 ## Contact us
 
