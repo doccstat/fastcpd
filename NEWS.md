@@ -1,3 +1,7 @@
+# fastcpd 0.5.4
+
+*   Fix bug when no change point is detected.
+
 # fastcpd 0.5.3
 
 *   Add more experiments but commented out for the sake of test time without
