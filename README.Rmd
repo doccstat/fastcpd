@@ -48,7 +48,7 @@ If you'd like to learn how to use the fastcpd effectively, please refer to:
 
 ### Linear regression
 
-```{r Linear regression}
+```{r linear_regression}
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -70,7 +70,7 @@ summary(result)
 
 ### Linear regression with one-dimensional covariate
 
-```{r Linear regression with one-dimensional covariate}
+```{r linear_regression_with_one_dimensional_covariate}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -92,7 +92,7 @@ summary(result)
 
 ### Logistic regression
 
-```{r Logistic regression}
+```{r logistic_regression}
 library(fastcpd)
 set.seed(1)
 x <- matrix(rnorm(1500, 0, 1), ncol = 5)
@@ -111,7 +111,7 @@ summary(result)
 
 ### Poisson regression
 
-```{r Poisson regression}
+```{r poisson_regression}
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -148,7 +148,7 @@ summary(result_two_epochs)
 
 ### Penalized linear regression
 
-```{r Penalized linear regression}
+```{r penalized_linear_regression}
 library(fastcpd)
 set.seed(1)
 n <- 1500
@@ -179,7 +179,7 @@ summary(result)
 
 ### Custom cost function: logistic regression
 
-```{r Custom cost function: logistic regression}
+```{r custom_cost_function_logistic_regression}
 library(fastcpd)
 set.seed(1)
 p <- 5
@@ -242,7 +242,7 @@ summary(result_custom_two_epochs)
 
 ### Custom cost function: mean shift
 
-```{r Custom cost function: mean shift}
+```{r custom_cost_function_mean_shift}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -282,7 +282,7 @@ summary(mean_loss_result)
 
 ### Custom cost function: variance change
 
-```{r Custom cost function: variance change}
+```{r custom_cost_function_variance_change}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -333,7 +333,7 @@ summary(meanvar_loss_result)
 
 ### Custom cost function: Huber loss
 
-```{r Custom cost function: Huber loss}
+```{r custom_cost_function_huber_loss}
 library(fastcpd)
 set.seed(1)
 n <- 400 + 300 + 500

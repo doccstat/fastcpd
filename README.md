@@ -80,7 +80,7 @@ result <- fastcpd(
 plot(result)
 ```
 
-![](man/figures/README-Linear%20regression-1.png)<!-- -->
+![](man/figures/README-linear_regression-1.png)<!-- -->
 
 ``` r
 summary(result)
@@ -123,7 +123,7 @@ result <- fastcpd(
 plot(result)
 ```
 
-![](man/figures/README-Linear%20regression%20with%20one-dimensional%20covariate-1.png)<!-- -->
+![](man/figures/README-linear_regression_with_one_dimensional_covariate-1.png)<!-- -->
 
 ``` r
 summary(result)
@@ -281,7 +281,7 @@ result <- fastcpd(
 plot(result)
 ```
 
-![](man/figures/README-Penalized%20linear%20regression-1.png)<!-- -->
+![](man/figures/README-penalized_linear_regression-1.png)<!-- -->
 
 ``` r
 summary(result)
