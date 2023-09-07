@@ -767,7 +767,9 @@ List fastcpd_impl(
   cp_set = cp_set(arma::find(cp_set >= trim * n));
   cp_set = cp_set(arma::find(cp_set <= (1 - trim) * n));
   arma::colvec cp_set_ = arma::zeros<arma::vec>(cp_set.n_elem + 1);
-  cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
+  if (cp_set.n_elem) {
+    cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
+  }
   cp_set = arma::sort(arma::unique(std::move(cp_set_)));
 
   // Remove change points close to each other.
@@ -806,7 +808,9 @@ List fastcpd_impl(
   }
 
   arma::colvec cp_loc_ = arma::zeros<arma::colvec>(cp_set.n_elem + 2);
-  cp_loc_.rows(1, cp_loc_.n_elem - 2) = cp_set;
+  if (cp_set.n_elem) {
+    cp_loc_.rows(1, cp_loc_.n_elem - 2) = cp_set;
+  }
   cp_loc_(cp_loc_.n_elem - 1) = n;
   arma::colvec cp_loc = arma::unique(std::move(cp_loc_));
   arma::colvec cost_values = arma::zeros<arma::vec>(cp_loc.n_elem - 1);

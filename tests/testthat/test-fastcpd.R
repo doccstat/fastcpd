@@ -17,6 +17,16 @@ testthat::test_that("linear regression with one-dimensional covariate", {
   testthat::expect_equal(result@cp_set, c(100, 194))
 })
 
+testthat::test_that("random linear regression", {
+  result <- fastcpd(
+    formula = y ~ . - 1,
+    data = data.frame(y = seq_len(100), x = seq_len(100)),
+    family = "gaussian"
+  )
+
+  testthat::expect_length(result@cp_set, 0)
+})
+
 testthat::test_that("logistic regression", {
   # This is the same example with `fastcpd` documentation. Please keep it in
   # sync if the documentation ever changes.
@@ -613,15 +623,15 @@ testthat::test_that("confidence interval experiment with one change point", {
   set.seed(1)
   kDimension <- 1  # nolint: Google Style Guide
   change_point_locations <- list()
-  change_locations_cookie_bucket <- rep(list(NULL), 1000)
-  containing_change_point <- rep(FALSE, 1000)
-  for (experiment_id in seq_len(1000)) {
+  change_locations_cookie_bucket <- rep(list(rep(list(NULL), 20)), 500)
+  containing_change_point <- rep(FALSE, 500)
+  for (experiment_id in seq_len(500)) {
     data <- rbind(
       mvtnorm::rmvnorm(
-        50, mean = rep(0, kDimension), sigma = diag(100, kDimension)
+        121, mean = rep(0, kDimension), sigma = diag(100, kDimension)
       ),
       mvtnorm::rmvnorm(
-        50, mean = rep(50, kDimension), sigma = diag(100, kDimension)
+        121, mean = rep(50, kDimension), sigma = diag(100, kDimension)
       )
     )
     segment_count_guess <- 10
@@ -652,7 +662,8 @@ testthat::test_that("confidence interval experiment with one change point", {
     )
     change_point_locations[[experiment_id]] <- mean_loss_result@cp_set
 
-    cookie_bucket_id_list <- sample.int(n = 20, size = 50 + 50, replace = TRUE)
+    cookie_bucket_id_list <-
+      sample.int(n = 20, size = 121 + 121, replace = TRUE)
     all_data <- data
     for (cookie_bucket_id in seq_len(20)) {
       data <-
@@ -687,18 +698,33 @@ testthat::test_that("confidence interval experiment with one change point", {
       for (cp in mean_loss_result@cp_set) {
         ordinal_mapped_cp <-
           which(cumsum(cookie_bucket_id_list != cookie_bucket_id) == cp)[1]
-        change_locations_cookie_bucket[[experiment_id]] <- c(
-          change_locations_cookie_bucket[[experiment_id]],
+        change_locations_cookie_bucket[[experiment_id]][[cookie_bucket_id]] <-
           ordinal_mapped_cp
-        )
       }
     }
+
+    cp_for_eid <- Reduce("c", change_locations_cookie_bucket[[experiment_id]])
+    d_capital <- mean(cp_for_eid)
+    d_j <- rep(list(NULL), 20)
+    for (j in seq_len(20)) {
+      for (cookie_bucket_id in seq_len(20)) {
+        if (j != cookie_bucket_id) {
+          d_j[[j]] <- c(
+            d_j[[j]],
+            change_locations_cookie_bucket[[experiment_id]][[cookie_bucket_id]]
+          )
+        }
+      }
+    }
+    d_j_bar <- sapply(d_j, mean)
+    d_capital_j <- 20 * d_capital - 19 * d_j_bar
+    d_bar <- mean(d_capital_j)
+    sd_2 <- sum((d_capital_j - d_bar)^2) / 19
+    ci <- c(d_capital - 2.093 * sqrt(sd_2) / sqrt(20), d_capital +
+              2.093 * sqrt(sd_2) / sqrt(20))
+
     if (
-      quantile(
-        change_locations_cookie_bucket[[experiment_id]], 0.025
-      ) <= 50 && quantile(
-        change_locations_cookie_bucket[[experiment_id]], 0.975
-      ) >= 50
+      floor(ci[1]) <= 121 && ceiling(ci[2]) >= 121
     ) {
       containing_change_point[experiment_id] <- TRUE
     }
