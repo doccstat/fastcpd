@@ -51,6 +51,20 @@ pak::pak("doccstat/fastcpd")
 devtools::install_github("doccstat/fastcpd")
 ```
 
+### FAQ
+
+<details close>
+
+<summary>I countered problems related to gfortran on mac!</summary>
+
+The package should be able to install on mac without any problems if all the
+dependencies are installed. However, if you encountered problems related to
+gfortran, it might be because `RcppArmadillo` is not installed previously. Try
+this [stackoverflow solution](https://stackoverflow.com/a/72997915) if you have
+trouble installing `RcppArmadillo`.
+
+</details>
+
 ### Dependency
 
 <details close>
