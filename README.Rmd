@@ -1,5 +1,8 @@
 ---
-output: github_document
+output:
+  github_document:
+    toc: true
+    toc_depth: 3
 ---
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -9,7 +12,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-"
 )
-options(cli.hyperlink = FALSE)
+options(cli.hyperlink = FALSE, eval = TRUE)
 ```
 
 # fastcpd
@@ -38,11 +41,14 @@ If you'd like to learn how to use the fastcpd effectively, please refer to:
 [Documentation](https://fastcpd.xingchi.li/reference/fastcpd.html#ref-examples)
 
 <!-- This example section is a direct copy from `fastcpd` documentation -->
-<details close>
+
+<details open>
+
 <summary>Example usage of `fastcpd`</summary>
 
-```{r examples, eval = TRUE}
-# Linear regression
+### Linear regression
+
+```{r Linear regression}
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -60,8 +66,11 @@ result <- fastcpd(
 )
 plot(result)
 summary(result)
+```
 
-# Linear regression with one-dimensional covariate
+### Linear regression with one-dimensional covariate
+
+```{r Linear regression with one-dimensional covariate}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -79,8 +88,11 @@ result <- fastcpd(
 )
 plot(result)
 summary(result)
+```
 
-# Logistic regression
+### Logistic regression
+
+```{r Logistic regression}
 library(fastcpd)
 set.seed(1)
 x <- matrix(rnorm(1500, 0, 1), ncol = 5)
@@ -95,8 +107,11 @@ result <- suppressWarnings(fastcpd(
   family = "binomial"
 ))
 summary(result)
+```
 
-# Poisson regression
+### Poisson regression
+
+```{r Poisson regression}
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -129,8 +144,11 @@ result_two_epochs <- fastcpd(
   epsilon = 1e-4
 )
 summary(result_two_epochs)
+```
 
-# Penalized linear regression
+### Penalized linear regression
+
+```{r Penalized linear regression}
 library(fastcpd)
 set.seed(1)
 n <- 1500
@@ -157,8 +175,11 @@ result <- fastcpd(
 )
 plot(result)
 summary(result)
+```
 
-# Custom cost function: logistic regression
+### Custom cost function: logistic regression
+
+```{r Custom cost function: logistic regression}
 library(fastcpd)
 set.seed(1)
 p <- 5
@@ -217,8 +238,11 @@ result_custom_two_epochs <- fastcpd(
   cost_hessian = logistic_loss_hessian
 )
 summary(result_custom_two_epochs)
+```
 
-# Custom cost function: mean shift
+### Custom cost function: mean shift
+
+```{r Custom cost function: mean shift}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -254,8 +278,11 @@ mean_loss_result <- fastcpd(
   cost = mean_loss
 )
 summary(mean_loss_result)
+```
 
-# Custom cost function: variance change
+### Custom cost function: variance change
+
+```{r Custom cost function: variance change}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -302,8 +329,11 @@ meanvar_loss_result <- fastcpd(
   cost = meanvar_loss
 )
 summary(meanvar_loss_result)
+```
 
-# Custom cost function: Huber loss
+### Custom cost function: Huber loss
+
+```{r Custom cost function: Huber loss}
 library(fastcpd)
 set.seed(1)
 n <- 400 + 300 + 500
@@ -398,7 +428,7 @@ devtools::install_github("doccstat/fastcpd")
 If you're compiling from source, you can run the following command to see the
 complete set of system packages needed on your machine.
 
-```{r eval = TRUE}
+```{r}
 pak::pkg_sysreqs("doccstat/fastcpd")
 ```
 
