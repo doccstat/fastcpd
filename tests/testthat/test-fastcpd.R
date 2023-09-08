@@ -190,6 +190,12 @@ testthat::test_that("penalized linear regression", {
   )
 
   testthat::expect_equal(result@cp_set, c(300, 701, 1000))
+  testthat::expect_equal(
+    unname(sqrt(colSums((t(theta_0[, 1:6]) - result@thetas[1:6, ])^2))),
+    c(0.4427801, 0.4363999, 0.3530703, 0.3834459),
+    tolerance = 1e-7,
+    ignore_attr = TRUE
+  )
 })
 
 testthat::test_that("custom logistic regression", {
