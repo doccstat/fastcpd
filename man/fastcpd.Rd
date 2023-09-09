@@ -368,6 +368,30 @@ var_loss_result <- fastcpd(
 )
 summary(var_loss_result)
 
+# Custom cost function: multivariate variance change
+library(fastcpd)
+set.seed(1)
+p <- 3
+data <- rbind.data.frame(
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(50, p)),
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
+)
+data_all_mu <- colMeans(data)
+var_loss <- function(data) {
+  demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
+  nrow(data) / 2 *
+    (1 + p * log(2 * pi) + log(demeaned_data_norm^2 / nrow(data)))
+}
+var_loss_result <- fastcpd(
+  formula = ~ . - 1,
+  data = data,
+  beta = (p + 1) * log(nrow(data)) / 2,
+  p = p,
+  cost = var_loss
+)
+summary(var_loss_result)
+
 # Custom cost function: mean shift and variance change
 library(fastcpd)
 set.seed(1)

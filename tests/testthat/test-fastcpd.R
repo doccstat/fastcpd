@@ -412,6 +412,31 @@ testthat::test_that("variance change", {
   testthat::expect_equal(var_loss_result@cp_set, c(300, 699))
 })
 
+testthat::test_that("multivariate variance change", {
+  set.seed(1)
+  p <- 3
+  data <- rbind.data.frame(
+    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+    mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(50, p)),
+    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
+  )
+  data_all_mu <- colMeans(data)
+  var_loss <- function(data) {
+    demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
+    nrow(data) / 2 *
+      (1 + p * log(2 * pi) + log(demeaned_data_norm^2 / nrow(data)))
+  }
+  var_loss_result <- fastcpd(
+    formula = ~ . - 1,
+    data = data,
+    beta = (p + 1) * log(nrow(data)) / 2,
+    p = p,
+    cost = var_loss
+  )
+
+  testthat::expect_equal(var_loss_result@cp_set, c(300, 700))
+})
+
 testthat::test_that("mean or variance change", {
   set.seed(1)
   p <- 1
