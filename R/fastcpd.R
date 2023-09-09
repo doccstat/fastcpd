@@ -271,6 +271,44 @@ NULL
 #' )
 #' summary(mean_loss_result)
 #'
+#' # Custom cost function: multivariate mean shift
+#' library(fastcpd)
+#' set.seed(1)
+#' p <- 3
+#' data <- rbind(
+#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
+#'   mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
+#'   mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
+#' )
+#' segment_count_guess <- 5
+#' block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
+#' block_count <- floor(nrow(data) / block_size)
+#' data_all_covs <- array(NA, dim = c(block_count, p, p))
+#' for (block_index in seq_len(block_count)) {
+#'   block_start <- (block_index - 1) * block_size + 1
+#'   block_end <- if (block_index < block_count) {
+#'     block_index * block_size
+#'   } else {
+#'     nrow(data)
+#'   }
+#'   data_all_covs[block_index, , ] <- cov(data[block_start:block_end, ])
+#' }
+#' data_all_cov <- colMeans(data_all_covs)
+#' mean_loss <- function(data) {
+#'   n <- nrow(data)
+#'   sum(diag(
+#'     (data - colMeans(data)) %*% solve(data_all_cov, t(data - colMeans(data)))
+#'   )) / 2 + n / 2 * (log(det(data_all_cov)) + p * log(2 * pi))
+#' }
+#' mean_loss_result <- fastcpd(
+#'   formula = ~ . - 1,
+#'   data = data.frame(data),
+#'   beta = (p + 1) * log(nrow(data)) / 2,
+#'   p = p,
+#'   cost = mean_loss
+#' )
+#' summary(mean_loss_result)
+#'
 #' # Custom cost function: variance change
 #' library(fastcpd)
 #' set.seed(1)

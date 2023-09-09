@@ -1,3 +1,7 @@
+# fastcpd 0.5.5
+
+*   Add example and test for multivariate mean shift.
+
 # fastcpd 0.5.4
 
 *   Fix bug when no change point is detected.
