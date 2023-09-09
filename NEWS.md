@@ -2,6 +2,7 @@
 
 *   Add example and test for multivariate mean shift.
 *   Add example and test for multivariate variance change.
+*   Add example and test for multivariate mean and variance change.
 
 # fastcpd 0.5.4
 
