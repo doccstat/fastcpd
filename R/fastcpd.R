@@ -381,6 +381,41 @@ NULL
 #' )
 #' summary(meanvar_loss_result)
 #'
+#' # Custom cost function: multivariate mean or variance change
+#' library(fastcpd)
+#' set.seed(1)
+#' p <- 4
+#' data <- rbind.data.frame(
+#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+#'   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
+#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(50, p)),
+#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+#'   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
+#'   mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
+#' )
+#' meanvar_loss <- function(data) {
+#'   n <- nrow(data)
+#'   p <- ncol(data)
+#'   if (n <= p) {
+#'     data_cov <- diag(p)
+#'   } else {
+#'     data_cov <- cov(data)
+#'   }
+#'   demeaned_data <- sweep(data, 2, colMeans(data))
+#'   n / 2 * (log(det(data_cov)) + p * log(2 * pi)) +
+#'     sum(diag(
+#'       demeaned_data %*% solve(data_cov, t(demeaned_data))
+#'     )) / 2
+#' }
+#' meanvar_loss_result <- fastcpd(
+#'   formula = ~ . - 1,
+#'   data = data,
+#'   beta = (2 * p + 1) * log(nrow(data)) / 2,
+#'   p = 2 * p,
+#'   cost = meanvar_loss
+#' )
+#' summary(meanvar_loss_result)
+#'
 #' # Custom cost function: Huber loss
 #' library(fastcpd)
 #' set.seed(1)
