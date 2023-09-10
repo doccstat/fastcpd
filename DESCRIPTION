@@ -15,7 +15,7 @@ Description: Implements fast change point detection algorithm based on the paper
     "Sequential Gradient Descent and Quasi-Newton's Method for Change-Point
     Analysis" by Xianyang Zhang, Trisha Dawn
     <https://proceedings.mlr.press/v206/zhang23b.html>.
-License: MIT + file LICENSE
+License: GPL (>= 3)
 Encoding: UTF-8
 Imports:
     DescTools,

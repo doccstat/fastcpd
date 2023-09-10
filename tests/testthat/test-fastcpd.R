@@ -1,74 +1,3 @@
-testthat::test_that("linear regression with one-dimensional covariate", {
-  set.seed(1)
-  p <- 1
-  x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
-  theta_0 <- matrix(c(1, -1, 0.5))
-  y <- c(
-    x[1:100, ] * theta_0[1, ] + rnorm(100, 0, 1),
-    x[101:200, ] * theta_0[2, ] + rnorm(100, 0, 1),
-    x[201:300, ] * theta_0[3, ] + rnorm(100, 0, 1)
-  )
-  result <- fastcpd(
-    formula = y ~ . - 1,
-    data = data.frame(y = y, x = x),
-    family = "gaussian"
-  )
-
-  testthat::expect_equal(result@cp_set, c(100, 194))
-})
-
-testthat::test_that("random linear regression", {
-  result <- fastcpd(
-    formula = y ~ . - 1,
-    data = data.frame(y = seq_len(100), x = seq_len(100)),
-    family = "gaussian"
-  )
-
-  testthat::expect_length(result@cp_set, 0)
-})
-
-testthat::test_that("logistic regression", {
-  # This is the same example with `fastcpd` documentation. Please keep it in
-  # sync if the documentation ever changes.
-  set.seed(1)
-
-  kChangePointLocation <- 125  # nolint: Google Style Guide
-  kNumberOfDataPoints <- 300  # nolint: Google Style Guide
-  kDimension <- 5  # nolint: Google Style Guide
-
-  # There are 300 five-dimensional data points.
-  x <- matrix(rnorm(kNumberOfDataPoints * kDimension, 0, 1), ncol = kDimension)
-
-  # Randomly generate coefficients with different means.
-  theta <- rbind(rnorm(kDimension, 0, 1), rnorm(kDimension, 2, 1))
-
-  # Randomly generate response variables based on the segmented data and
-  # corresponding coefficients
-  y <- c(
-    rbinom(
-      kChangePointLocation,
-      1,
-      1 / (1 + exp(-x[1:kChangePointLocation, ] %*% theta[1, ]))
-    ),
-    rbinom(
-      kNumberOfDataPoints - kChangePointLocation,
-      1,
-      1 / (1 + exp(
-        -x[(kChangePointLocation + 1):kNumberOfDataPoints, ] %*% theta[2, ]
-      ))
-    )
-  )
-
-  change_points_binomial_fastcpd <- fastcpd(
-    formula = y ~ . - 1,
-    data = data.frame(y = y, x = x),
-    family = "binomial",
-    segment_count = 5
-  )@cp_set
-
-  testthat::expect_equal(change_points_binomial_fastcpd, kChangePointLocation)
-})
-
 testthat::test_that("linear regression", {
   set.seed(1)
   p <- 3
@@ -86,6 +15,35 @@ testthat::test_that("linear regression", {
   )
 
   testthat::expect_equal(result@cp_set, c(98, 202))
+})
+
+testthat::test_that("linear regression without change points", {
+  result <- fastcpd(
+    formula = y ~ . - 1,
+    data = data.frame(y = seq_len(100), x = seq_len(100)),
+    family = "gaussian"
+  )
+
+  testthat::expect_length(result@cp_set, 0)
+})
+
+testthat::test_that("linear regression with one-dimensional covariate", {
+  set.seed(1)
+  p <- 1
+  x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
+  theta_0 <- matrix(c(1, -1, 0.5))
+  y <- c(
+    x[1:100, ] * theta_0[1, ] + rnorm(100, 0, 1),
+    x[101:200, ] * theta_0[2, ] + rnorm(100, 0, 1),
+    x[201:300, ] * theta_0[3, ] + rnorm(100, 0, 1)
+  )
+  result <- fastcpd(
+    formula = y ~ . - 1,
+    data = data.frame(y = y, x = x),
+    family = "gaussian"
+  )
+
+  testthat::expect_equal(result@cp_set, c(100, 194))
 })
 
 testthat::test_that("logistic regression", {
