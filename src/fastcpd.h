@@ -13,6 +13,8 @@ using ::Rcpp::Nullable;
 //    return sizeof...(Args);
 // }
 
+namespace fastcpd {
+
 class FastcpdParameters {
  public:
   FastcpdParameters(
@@ -114,6 +116,8 @@ class FastcpdParameters {
 //   Function* winsorize;
 //   void create_environment_functions();
 };
+
+}  // namespace fastcpd
 
 //' Solve logistic/poisson regression using Gradient Descent Extension to the
 //' multivariate case

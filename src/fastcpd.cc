@@ -11,6 +11,8 @@ using ::Rcpp::NumericMatrix;
 using ::Rcpp::NumericVector;
 using ::Rcpp::S4;
 
+namespace fastcpd {
+
 FastcpdParameters::FastcpdParameters(
     arma::mat data,
     const double beta,
@@ -203,6 +205,46 @@ void FastcpdParameters::create_gradients() {
     hessian.slice(0) = arma::zeros<arma::mat>(p, p);
   }
 }
+
+void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
+  // for tau = t-1
+  arma::rowvec new_data = data.row(t - 1).tail(data.n_cols - 1);
+  const int segment_index = segment_indices(t - 1);
+  arma::rowvec cum_coef_add = segment_theta_hat.row(segment_index - 1),
+                    coef_add = segment_theta_hat.row(segment_index - 1);
+  arma::mat hessian_new;
+  if (family == "binomial") {
+    const double prob =
+        1 / (1 + exp(-arma::as_scalar(coef_add * new_data.t())));
+    hessian_new =
+        (new_data.t() * new_data) * arma::as_scalar(prob * (1 - prob));
+  } else if (family == "poisson") {
+    Environment desc_tools = Environment::namespace_env("DescTools");
+    Function winsorize = desc_tools["Winsorize"];
+    NumericVector winsorize_result = winsorize(
+      Rcpp::_["x"] = coef_add,
+      Rcpp::_["minval"] = winsorise_minval,
+      Rcpp::_["maxval"] = winsorise_maxval
+    );
+    coef_add = as<arma::rowvec>(winsorize_result);
+    cum_coef_add = as<arma::rowvec>(winsorize_result);
+    hessian_new =
+        (new_data.t() * new_data) * arma::as_scalar(
+          exp(coef_add * new_data.t())
+        );
+  } else if (family == "lasso" || family == "gaussian") {
+    hessian_new =
+        new_data.t() * new_data + epsilon * arma::eye<arma::mat>(p, p);
+  } else if (family == "custom") {
+    hessian_new = arma::zeros<arma::mat>(p, p);
+  }
+
+  update_theta_hat(coef_add.t());
+  update_theta_sum(cum_coef_add.t());
+  update_hessian(hessian_new);
+}
+
+}  // namespace fastcpd
 
 List negative_log_likelihood(
     arma::mat data,
@@ -564,44 +606,6 @@ List cost_optim(
   }
 }
 
-void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
-  // for tau = t-1
-  arma::rowvec new_data = data.row(t - 1).tail(data.n_cols - 1);
-  const int segment_index = segment_indices(t - 1);
-  arma::rowvec cum_coef_add = segment_theta_hat.row(segment_index - 1),
-                    coef_add = segment_theta_hat.row(segment_index - 1);
-  arma::mat hessian_new;
-  if (family == "binomial") {
-    const double prob =
-        1 / (1 + exp(-arma::as_scalar(coef_add * new_data.t())));
-    hessian_new =
-        (new_data.t() * new_data) * arma::as_scalar(prob * (1 - prob));
-  } else if (family == "poisson") {
-    Environment desc_tools = Environment::namespace_env("DescTools");
-    Function winsorize = desc_tools["Winsorize"];
-    NumericVector winsorize_result = winsorize(
-      Rcpp::_["x"] = coef_add,
-      Rcpp::_["minval"] = winsorise_minval,
-      Rcpp::_["maxval"] = winsorise_maxval
-    );
-    coef_add = as<arma::rowvec>(winsorize_result);
-    cum_coef_add = as<arma::rowvec>(winsorize_result);
-    hessian_new =
-        (new_data.t() * new_data) * arma::as_scalar(
-          exp(coef_add * new_data.t())
-        );
-  } else if (family == "lasso" || family == "gaussian") {
-    hessian_new =
-        new_data.t() * new_data + epsilon * arma::eye<arma::mat>(p, p);
-  } else if (family == "custom") {
-    hessian_new = arma::zeros<arma::mat>(p, p);
-  }
-
-  update_theta_hat(coef_add.t());
-  update_theta_sum(cum_coef_add.t());
-  update_hessian(hessian_new);
-}
-
 List fastcpd_impl(
     arma::mat data,
     double beta,
@@ -636,7 +640,7 @@ List fastcpd_impl(
   arma::colvec f_t = arma::zeros<arma::vec>(n + 1);
   f_t(0) = -beta;
 
-  FastcpdParameters fastcpd_parameters_class(
+  fastcpd::FastcpdParameters fastcpd_parameters_class(
     data, beta, p, family, segment_count, cost, winsorise_minval,
     winsorise_maxval, epsilon
   );
@@ -888,7 +892,7 @@ List init_fastcpd_parameters(
     const double vanilla_percentage,
     double& beta
 ) {
-  FastcpdParameters fastcpd_parameters_class(
+  fastcpd::FastcpdParameters fastcpd_parameters_class(
     data, beta, p, family, segment_count, cost, winsorise_minval,
     winsorise_maxval, epsilon
   );
