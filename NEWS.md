@@ -3,6 +3,7 @@
 *   Add example and test for multivariate mean shift.
 *   Add example and test for multivariate variance change.
 *   Add example and test for multivariate mean and variance change.
+*   Add test for linear regression with multi-dimensional responses.
 
 # fastcpd 0.5.4
 
