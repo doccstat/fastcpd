@@ -220,36 +220,3 @@ fastcpd_impl <- function(data, beta, segment_count, trim, momentum_coef, k, fami
     .Call(`_fastcpd_fastcpd_impl`, data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage)
 }
 
-#' Vanilla PELT implementation.
-#' This function is not meant to be called directly by the user.
-#'
-#' @param data A data frame containing the data to be segmented.
-#' @param beta Initial cost value.
-#' @param segment_count Number of segments for initial guess.
-#' @param trim Trimming for the boundary change points.
-#' @param momentum_coef Momentum coefficient to be applied to each update.
-#' @param k Function on number of epochs in SGD.
-#' @param family Family of the model. Can be "binomial", "poisson", "lasso" or
-#'   "gaussian". If not provided, the user must specify the cost function and
-#'   its gradient (and Hessian).
-#' @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
-#'   poisson.
-#' @param min_prob Minimum probability to avoid numerical issues. Only used for
-#'   poisson.
-#' @param winsorise_minval Minimum value to be winsorised. Only used for
-#'   poisson.
-#' @param winsorise_maxval Maximum value to be winsorised. Only used for
-#'   poisson.
-#' @param p Number of parameters to be estimated.
-#' @param cost Cost function to be used. If not specified, the default is
-#'   the negative log-likelihood for the corresponding family.
-#' @param cp_only Whether to return only the change points or with the cost
-#'   values for each segment.
-#' @keywords internal
-#'
-#' @noRd
-#' @return Change points and corresponding cost values.
-fastcpd_vanilla <- function(data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only) {
-    .Call(`_fastcpd_fastcpd_vanilla`, data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cp_only)
-}
-
