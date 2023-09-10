@@ -50,9 +50,17 @@ FastcpdParameters::FastcpdParameters(
 //   }
 // }
 
+arma::colvec FastcpdParameters::get_err_sd() {
+  return err_sd;
+}
+
+void FastcpdParameters::update_err_sd(
+  const unsigned int segment_index, const double err_var
+) {
+  err_sd(segment_index) = sqrt(err_var);
+}
+
 void FastcpdParameters::create_segment_indices() {
-  // Segment the whole data set evenly based on the number of segments
-  // specified in the `segment_count` parameter.
   const unsigned int segment_length = floor(n / segment_count);
   const int segment_remainder = n % segment_count;
   for (
@@ -72,7 +80,7 @@ void FastcpdParameters::create_segment_indices() {
   }
 }
 
-arma::vec FastcpdParameters::read_segment_indices() {
+arma::vec FastcpdParameters::get_segment_indices() {
   return segment_indices;
 }
 
@@ -143,13 +151,13 @@ void FastcpdParameters::create_segment_statistics() {
         data_segment.cols(1, data_segment.n_cols - 1) * segment_theta.t();
         double err_var =
             arma::as_scalar(arma::mean(arma::pow(segment_residual, 2)));
-        err_sd(segment_index) = sqrt(err_var);
+        update_err_sd(segment_index, err_var);
         act_num(segment_index) = arma::accu(arma::abs(segment_theta) > 0);
     }
   }
 }
 
-void FastcpdParameters::adjust_beta() {
+void FastcpdParameters::update_beta() {
   if (family == "lasso" || family == "gaussian") {
     beta = beta * (1 + mean(act_num));
   }
@@ -159,9 +167,9 @@ void FastcpdParameters::create_gradients() {
   if (family == "binomial") {
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     theta_hat.col(0) = segment_theta_hat.row(0).t();
-    const double prob(1 / (1 + exp(
+    const double prob = 1 / (1 + exp(
       -arma::as_scalar(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
-    )));
+    ));
     hessian.slice(0) = (
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
     ) * arma::as_scalar(prob * (1 - prob));
@@ -556,7 +564,7 @@ List cost_optim(
   }
 }
 
-void FastcpdParameters::append_fastcpd_parameters(const unsigned int t) {
+void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
   // for tau = t-1
   arma::rowvec new_data = data.row(t - 1).tail(data.n_cols - 1);
   const int segment_index = segment_indices(t - 1);
@@ -635,7 +643,7 @@ List fastcpd_impl(
   if (vanilla_percentage != 1) {
     fastcpd_parameters_class.create_segment_indices();
     fastcpd_parameters_class.create_segment_statistics();
-    fastcpd_parameters_class.adjust_beta();
+    fastcpd_parameters_class.update_beta();
     fastcpd_parameters_class.create_gradients();
   }
 
@@ -650,8 +658,9 @@ List fastcpd_impl(
       int tau = r_t_set(i - 1);
       if (family == "lasso") {
         // Mean of `err_sd` only works if error sd is unchanged.
-        lambda =
-          mean(fastcpd_parameters_class.err_sd) * sqrt(2 * log(p) / (t - tau));
+        lambda = mean(
+          fastcpd_parameters_class.get_err_sd()
+        ) * sqrt(2 * log(p) / (t - tau));
       }
       arma::mat data_segment = data.rows(tau, t - 1);
       if (vanilla_percentage == 1 || t <= vanilla_percentage * n) {
@@ -729,7 +738,7 @@ List fastcpd_impl(
     }
 
     if (vanilla_percentage != 1) {
-      fastcpd_parameters_class.append_fastcpd_parameters(t);
+      fastcpd_parameters_class.update_fastcpd_parameters(t);
     }
 
     // Step 3
@@ -886,13 +895,13 @@ List init_fastcpd_parameters(
   if (vanilla_percentage != 1) {
     fastcpd_parameters_class.create_segment_indices();
     fastcpd_parameters_class.create_segment_statistics();
-    fastcpd_parameters_class.adjust_beta();
+    fastcpd_parameters_class.update_beta();
     fastcpd_parameters_class.create_gradients();
   }
   return List::create(
-    Named("segment_indices") = fastcpd_parameters_class.read_segment_indices(),
+    Named("segment_indices") = fastcpd_parameters_class.get_segment_indices(),
     Named("segment_theta_hat") = fastcpd_parameters_class.segment_theta_hat,
-    Named("err_sd") = fastcpd_parameters_class.err_sd,
+    Named("err_sd") = fastcpd_parameters_class.get_err_sd(),
     Named("act_num") = fastcpd_parameters_class.act_num,
     Named("theta_hat") = fastcpd_parameters_class.theta_hat,
     Named("theta_sum") = fastcpd_parameters_class.theta_sum,
