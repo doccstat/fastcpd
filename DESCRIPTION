@@ -1,39 +1,40 @@
-Package: fastcpd
 Type: Package
-Title: Fast Change Point Detection Based on Dynamic Programming with Pruning
-    with Sequential Gradient Descent
+Package: fastcpd
+Title: Fast Change Point Detection Based on Dynamic Programming with
+    Pruning with Sequential Gradient Descent
 Version: 0.5.5
 Authors@R: c(
-    person("Xingchi", "Li", email = "anthony.li@stat.tamu.edu",
-           role = c("aut", "cre", "cph"),
+    person("Xingchi", "Li", , "anthony.li@stat.tamu.edu", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0006-2493-0853")),
-    person("Xianyang", "Zhang", email = "zhangxiany@stat.tamu.edu",
-           role = c("aut", "cph")),
-    person("Trisha", "Dawn", email = "trisha@stat.tamu.edu",
-           role = c("aut", "cph")))
-Description: Implements fast change point detection algorithm based on the paper
-    "Sequential Gradient Descent and Quasi-Newton's Method for Change-Point
-    Analysis" by Xianyang Zhang, Trisha Dawn
+    person("Xianyang", "Zhang", , "zhangxiany@stat.tamu.edu", role = c("aut", "cph")),
+    person("Trisha", "Dawn", , "trisha@stat.tamu.edu", role = c("aut", "cph"))
+  )
+Description: Implements fast change point detection algorithm based on the
+    paper "Sequential Gradient Descent and Quasi-Newton's Method for
+    Change-Point Analysis" by Xianyang Zhang, Trisha Dawn
     <https://proceedings.mlr.press/v206/zhang23b.html>.
 License: GPL (>= 3)
-Encoding: UTF-8
+URL: https://fastcpd.xingchi.li
 Imports:
     DescTools,
     fastglm,
-    ggplot2,
     glmnet,
     Matrix,
     methods,
     Rcpp (>= 0.11.0),
     stats
-LinkingTo: Rcpp, RcppArmadillo, testthat
-RoxygenNote: 7.2.3
 Suggests:
     abind,
+    ggplot2,
     knitr,
     mvtnorm,
     rmarkdown,
     testthat (>= 3.0.0),
     xml2
+LinkingTo:
+    Rcpp,
+    RcppArmadillo,
+    testthat
 Config/testthat/edition: 3
-URL: https://fastcpd.xingchi.li
+Encoding: UTF-8
+RoxygenNote: 7.2.3
