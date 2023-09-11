@@ -794,3 +794,8 @@ Encountered a bug or unintended behavior?
 1.  File a ticket at [GitHub
     Issues](https://github.com/doccstat/fastcpd/issues).
 2.  Contact the developers specified in [DESCRIPTION](/DESCRIPTION).
+
+## Stargazers over time
+
+[![Stargazers over
+time](https://starchart.cc/doccstat/fastcpd.svg)](https://starchart.cc/doccstat/fastcpd)

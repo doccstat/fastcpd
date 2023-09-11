@@ -1,3 +1,7 @@
+# fastcpd 0.5.6
+
+*   Add stargazers in README.
+
 # fastcpd 0.5.5
 
 *   Add example and test for multivariate mean shift.
