@@ -823,8 +823,10 @@ testthat::test_that("confidence interval experiment with one change point", {
     d_capital_j <- 20 * d_capital - 19 * d_j_bar
     d_bar <- mean(d_capital_j)
     sd_2 <- sum((d_capital_j - d_bar)^2) / 19
-    ci <- c(d_capital - 2.093 * sqrt(sd_2) / sqrt(20), d_capital +
-              2.093 * sqrt(sd_2) / sqrt(20))
+    ci <- c(
+      d_capital - 2.093 * sqrt(sd_2) / sqrt(20),
+      d_capital + 2.093 * sqrt(sd_2) / sqrt(20)
+    )
 
     if (
       floor(ci[1]) <= 121 && ceiling(ci[2]) >= 121
