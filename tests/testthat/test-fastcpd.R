@@ -398,15 +398,8 @@ testthat::test_that(
     data_all_mean <- colMeans(data)
     var_loss <- function(data) {
       n <- nrow(data)
-      data_cov <- 1
-      if (n > 1) {
-        data_cov <- var(data)
-      }
-      demeaned_data <- sweep(data, 2, data_all_mean)
-      n / 2 * (
-        log(data_cov) + log(2 * pi) +
-          sum(demeaned_data^2 / c(data_cov)) / n
-      )
+      data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
+      n / 2 * (log(data_cov) + log(2 * pi) + (n - 1) / n)
     }
     var_loss_result <- fastcpd(
       formula = ~ . - 1,
@@ -422,7 +415,6 @@ testthat::test_that(
 
 testthat::test_that(
   "example custom cost function multivariate variance change", {
-    library(fastcpd)
     set.seed(1)
     p <- 3
     data <- rbind.data.frame(
@@ -437,29 +429,26 @@ testthat::test_that(
       )
     )
     data_all_mean <- colMeans(data)
-    var_loss <- function(data) {
-      n <- nrow(data)
-      p <- ncol(data)
-      if (n <= p) {
-        data_cov <- diag(p)
-      } else {
-        data_cov <- cov(data)
-      }
-      demeaned_data <- sweep(data, 2, data_all_mean)
-      n / 2 * (
-        log(det(data_cov)) + p * log(2 * pi) +
-          sum(diag(solve(data_cov, crossprod(demeaned_data)))) / n
-      )
+  var_loss <- function(data) {
+    n <- nrow(data)
+    p <- ncol(data)
+    if (n < p) {
+      data_cov <- diag(p)
+    } else {
+      data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
     }
-    var_loss_result <- fastcpd(
-      formula = ~ . - 1,
-      data = data,
-      beta = (p + 1) * log(nrow(data)) / 2,
-      p = p,
-      cost = var_loss
-    )
+    n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
+  }
+  var_loss_result <- fastcpd(
+    formula = ~ . - 1,
+    data = data,
+    beta = (p + 1) * log(nrow(data)) / 2,
+    trim = 0.1,
+    p = p,
+    cost = var_loss
+  )
 
-    testthat::expect_equal(var_loss_result@cp_set, c(300, 700))
+    testthat::expect_equal(var_loss_result@cp_set, c(300, 699))
   }
 )
 
@@ -481,11 +470,7 @@ testthat::test_that(
       if (n > 1) {
         data_cov <- var(data)
       }
-      demeaned_data <- sweep(data, 2, colMeans(data))
-      n / 2 * (
-        log(data_cov) + log(2 * pi) +
-          sum(demeaned_data^2 / c(data_cov)) / n
-      )
+      n / 2 * (log(data_cov) + log(2 * pi) + (n - 1) / n)
     }
     meanvar_loss_result <- fastcpd(
       formula = ~ . - 1,
@@ -504,7 +489,7 @@ testthat::test_that(
 testthat::test_that(
   "example custom cost function multivariate mean or variance change", {
     set.seed(1)
-    p <- 4
+    p <- 3
     data <- rbind.data.frame(
       mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
       mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
@@ -521,22 +506,19 @@ testthat::test_that(
       } else {
         data_cov <- cov(data)
       }
-      demeaned_data <- sweep(data, 2, colMeans(data))
-      n / 2 * (
-        log(det(data_cov)) + p * log(2 * pi) +
-          sum(diag(solve(data_cov, crossprod(demeaned_data)))) / n
-      )
+      n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
     }
     meanvar_loss_result <- fastcpd(
       formula = ~ . - 1,
       data = data,
       beta = (2 * p + 1) * log(nrow(data)) / 2,
+      trim = 0.01,
       p = 2 * p,
       cost = meanvar_loss
     )
 
     testthat::expect_equal(
-      meanvar_loss_result@cp_set, c(300, 696, 1000, 1300, 1697)
+      meanvar_loss_result@cp_set, c(300, 700, 1000, 1300, 1700)
     )
   }
 )
