@@ -570,6 +570,39 @@ summary(mean_loss_result)
 #> 300 700
 ```
 
+### Custom cost function: variance change
+
+``` r
+library(fastcpd)
+set.seed(1)
+p <- 1
+data <- rbind.data.frame(
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(50, p)),
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
+)
+data_all_mu <- colMeans(data)
+var_loss <- function(data) {
+  demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
+  nrow(data) * (1 + log(2 * pi) + log(demeaned_data_norm^2 / nrow(data))) / 2
+}
+var_loss_result <- fastcpd(
+  formula = ~ . - 1,
+  data = data,
+  beta = (p + 1) * log(nrow(data)) / 2,
+  p = p,
+  cost = var_loss
+)
+summary(var_loss_result)
+#> 
+#> Call:
+#> fastcpd(formula = ~. - 1, data = data, beta = (p + 1) * log(nrow(data))/2, 
+#>     p = p, cost = var_loss)
+#> 
+#> Change points:
+#> 300 699
+```
+
 ### Custom cost function: multivariate variance change
 
 ``` r
@@ -602,39 +635,6 @@ summary(var_loss_result)
 #> 
 #> Change points:
 #> 300 700
-```
-
-### Custom cost function: variance change
-
-``` r
-library(fastcpd)
-set.seed(1)
-p <- 1
-data <- rbind.data.frame(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(50, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
-)
-data_all_mu <- colMeans(data)
-var_loss <- function(data) {
-  demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
-  nrow(data) * (1 + log(2 * pi) + log(demeaned_data_norm^2 / nrow(data))) / 2
-}
-var_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data,
-  beta = (p + 1) * log(nrow(data)) / 2,
-  p = p,
-  cost = var_loss
-)
-summary(var_loss_result)
-#> 
-#> Call:
-#> fastcpd(formula = ~. - 1, data = data, beta = (p + 1) * log(nrow(data))/2, 
-#>     p = p, cost = var_loss)
-#> 
-#> Change points:
-#> 300 699
 ```
 
 ### Custom cost function: mean shift and variance change
