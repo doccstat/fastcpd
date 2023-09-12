@@ -1,3 +1,7 @@
+# fastcpd 0.6.0
+
+*   Submit for CRAN release.
+
 # fastcpd 0.5.7
 
 *   Fix loss function for custom mean or variance change.

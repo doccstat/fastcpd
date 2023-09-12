@@ -27,23 +27,35 @@ fastcpd(
 )
 }
 \arguments{
-\item{formula}{A symbolic description of the model to be fitted.}
+\item{formula}{A symbolic description of the model to be fitted. A response
+variable is not necessary in the case of mean change or variance change.
+Please refer to the examples for more details.}
 
-\item{data}{A data frame containing the data to be segmented.}
+\item{data}{A data frame containing the data to be segmented. The data frame
+should contain the response variable as the first column and the
+covariates as the rest of the columns if the dataset is a regression
+problem. The response is not necessary in the case of mean change or
+variance change, in which case the formula will need to be adjusted
+as well. Please refer to the examples for more details.}
 
-\item{beta}{Initial cost value.}
+\item{beta}{Initial cost value. For the choice of `beta`, please refer to
+the paper.}
 
 \item{segment_count}{Number of segments for initial guess.}
 
-\item{trim}{Trimming for the boundary change points.}
+\item{trim}{Trimming for the boundary change points or changes points that
+are too close.}
 
 \item{momentum_coef}{Momentum coefficient to be applied to each update.}
 
-\item{k}{Function on number of epochs in SGD.}
+\item{k}{Function on number of epochs in SGD. If k is a function returning
+values larger than 0, the algorithm will run for k more epochs. By
+default k returns 0, meaning no multiple epochs will be performed.}
 
-\item{family}{Family of the models. Can be "binomial", "poisson", "lasso" or
-"gaussian". If not provided, the user must specify the cost function and
-its gradient (and Hessian).}
+\item{family}{Family of the models. Can be "binomial", "poisson", "lasso",
+"gaussian" or "custom". If not provided, the user must specify the cost
+function (and its gradient and Hessian) if the cost function does not
+have explicit solution.}
 
 \item{epsilon}{Epsilon to avoid numerical issues. Only used for binomial and
 poisson.}
@@ -57,10 +69,13 @@ poisson.}
 \item{winsorise_maxval}{Maximum value to be winsorised. Only used for
 poisson.}
 
-\item{p}{Number of parameters to be estimated.}
+\item{p}{Number of parameters to be estimated. If not provided will be set
+to be the number of columns in the data minus 1.}
 
 \item{cost}{Cost function to be used. If not specified, the default is
-the negative log-likelihood for the corresponding family.}
+the negative log-likelihood for the corresponding family. The custom
+cost function should only contain a `data` parameter (and a `theta`
+parameter if there are no explicit solutions).}
 
 \item{cost_gradient}{Gradient for custom cost function.}
 

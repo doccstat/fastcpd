@@ -3,8 +3,8 @@
 
 # fastcpd
 
-[![CRAN
-status](https://www.r-pkg.org/badges/version/fastcpd)](https://cran.r-project.org/package=fastcpd)
+<!-- [![CRAN status](https://www.r-pkg.org/badges/version/fastcpd)](https://cran.r-project.org/package=fastcpd) -->
+
 [![R-CMD-check](https://github.com/doccstat/fastcpd/workflows/R-CMD-check/badge.svg)](https://github.com/doccstat/fastcpd/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/doccstat/fastcpd/branch/main/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd?branch=main)
@@ -35,8 +35,7 @@ install.packages("fastcpd")
 ```
 
 ``` r
-# Install the development version from GitHub using either of the following
-# commands:
+# Install the development version using either of the following commands:
 
 ## install.packages("pak")
 pak::pak("doccstat/fastcpd")
