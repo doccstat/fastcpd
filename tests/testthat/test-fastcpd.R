@@ -326,8 +326,10 @@ testthat::test_that(
     data_all_var <- mean(data_all_vars)
     mean_loss <- function(data) {
       n <- nrow(data)
-      (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
-        n / 2 * (log(data_all_var) + log(2 * pi))
+      n / 2 * (
+        log(data_all_var) + log(2 * pi) +
+          sum((data - colMeans(data))^2 / data_all_var) / n
+      )
     }
     mean_loss_result <- fastcpd(
       formula = ~ . - 1,
@@ -395,8 +397,15 @@ testthat::test_that(
     data_all_mu <- colMeans(data)
     var_loss <- function(data) {
       n <- nrow(data)
-      demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
-      n / 2 * (1 + log(2 * pi) + log(demeaned_data_norm^2 / n))
+      data_cov <- 1
+      if (n > 1) {
+        data_cov <- var(data)
+      }
+      demeaned_data <- sweep(data, 2, data_all_mu)
+      n / 2 * (
+        log(data_cov) + log(2 * pi) +
+          sum(demeaned_data^2 / c(data_cov)) / n
+      )
     }
     var_loss_result <- fastcpd(
       formula = ~ . - 1,
@@ -465,10 +474,18 @@ testthat::test_that(
       mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
       mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
     )
-    meanvar_loss <- function(data) {
-      loss_part <- (colSums(data^2) - colSums(data)^2 / nrow(data)) / nrow(data)
-      nrow(data) * (1 + log(2 * pi) + log(loss_part)) / 2
-    }
+meanvar_loss <- function(data) {
+  n <- nrow(data)
+  data_cov <- 1
+  if (n > 1) {
+    data_cov <- var(data)
+  }
+  demeaned_data <- sweep(data, 2, colMeans(data))
+  n / 2 * (
+    log(data_cov) + log(2 * pi) +
+      sum(demeaned_data^2 / c(data_cov)) / n
+  )
+}
     meanvar_loss_result <- fastcpd(
       formula = ~ . - 1,
       data = data,
