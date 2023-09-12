@@ -94,7 +94,7 @@ Analysis'' arXiv preprint arXiv:2210.12235 (2022).
 }
 
 \examples{
-# Linear regression
+### linear regression
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -113,7 +113,7 @@ result <- fastcpd(
 plot(result)
 summary(result)
 
-# Linear regression with one-dimensional covariate
+### linear regression with one-dimensional covariate
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -132,7 +132,7 @@ result <- fastcpd(
 plot(result)
 summary(result)
 
-# Logistic regression
+### logistic regression
 library(fastcpd)
 set.seed(1)
 x <- matrix(rnorm(1500, 0, 1), ncol = 5)
@@ -148,7 +148,7 @@ result <- suppressWarnings(fastcpd(
 ))
 summary(result)
 
-# Poisson regression
+### poisson regression
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -182,7 +182,7 @@ result_two_epochs <- fastcpd(
 )
 summary(result_two_epochs)
 
-# Penalized linear regression
+### penalized linear regression
 library(fastcpd)
 set.seed(1)
 n <- 1500
@@ -210,7 +210,7 @@ result <- fastcpd(
 plot(result)
 summary(result)
 
-# Custom cost function: logistic regression
+### custom logistic regression
 library(fastcpd)
 set.seed(1)
 p <- 5
@@ -270,7 +270,7 @@ result_custom_two_epochs <- fastcpd(
 )
 summary(result_custom_two_epochs)
 
-# Custom cost function: mean shift
+### custom cost function mean change
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -307,7 +307,7 @@ mean_loss_result <- fastcpd(
 )
 summary(mean_loss_result)
 
-# Custom cost function: multivariate mean shift
+### custom cost function multivariate mean change
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -346,7 +346,7 @@ mean_loss_result <- fastcpd(
 )
 summary(mean_loss_result)
 
-# Custom cost function: variance change
+### custom cost function variance change
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -357,8 +357,9 @@ data <- rbind.data.frame(
 )
 data_all_mu <- colMeans(data)
 var_loss <- function(data) {
+  n <- nrow(data)
   demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
-  nrow(data) * (1 + log(2 * pi) + log(demeaned_data_norm^2 / nrow(data))) / 2
+  n / 2 * (1 + log(2 * pi) + log(demeaned_data_norm^2 / n))
 }
 var_loss_result <- fastcpd(
   formula = ~ . - 1,
@@ -369,14 +370,20 @@ var_loss_result <- fastcpd(
 )
 summary(var_loss_result)
 
-# Custom cost function: multivariate variance change
+### custom cost function multivariate variance change
 library(fastcpd)
 set.seed(1)
 p <- 3
 data <- rbind.data.frame(
-  mvtnorm::rmvnorm(300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))),
-  mvtnorm::rmvnorm(400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))),
-  mvtnorm::rmvnorm(300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p)))
+  mvtnorm::rmvnorm(
+    300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+  ),
+  mvtnorm::rmvnorm(
+    400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+  ),
+  mvtnorm::rmvnorm(
+    300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+  )
 )
 data_all_mu <- colMeans(data)
 var_loss <- function(data) {
@@ -402,7 +409,7 @@ var_loss_result <- fastcpd(
 )
 summary(var_loss_result)
 
-# Custom cost function: mean shift and variance change
+### custom cost function mean or variance change
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -427,7 +434,7 @@ meanvar_loss_result <- fastcpd(
 )
 summary(meanvar_loss_result)
 
-# Custom cost function: multivariate mean or variance change
+### custom cost function multivariate mean or variance change
 library(fastcpd)
 set.seed(1)
 p <- 4
@@ -462,7 +469,7 @@ meanvar_loss_result <- fastcpd(
 )
 summary(meanvar_loss_result)
 
-# Custom cost function: Huber loss
+### custom cost function huber regression
 library(fastcpd)
 set.seed(1)
 n <- 400 + 300 + 500

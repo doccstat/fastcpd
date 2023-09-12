@@ -110,7 +110,7 @@ pak::pkg_sysreqs("doccstat/fastcpd")
 Example usage
 </summary>
 
-### Linear regression
+### linear regression
 
 ``` r
 library(fastcpd)
@@ -153,7 +153,7 @@ summary(result)
 #> 3 -0.9258587  0.63906143  0.1929411
 ```
 
-### Linear regression with one-dimensional covariate
+### linear regression with one-dimensional covariate
 
 ``` r
 library(fastcpd)
@@ -194,7 +194,7 @@ summary(result)
 #> 1 0.9520606 -0.8054074 0.3692224
 ```
 
-### Logistic regression
+### logistic regression
 
 ``` r
 library(fastcpd)
@@ -231,7 +231,7 @@ summary(result)
 #> 5  0.2419351  2.524173
 ```
 
-### Poisson regression
+### poisson regression
 
 ``` r
 library(fastcpd)
@@ -302,7 +302,7 @@ summary(result_two_epochs)
 #> 3 -1.34277129 -2.5426556 -0.8989812  0.5197285 -1.128259 -2.5035143
 ```
 
-### Penalized linear regression
+### penalized linear regression
 
 ``` r
 library(fastcpd)
@@ -402,7 +402,7 @@ summary(result)
 #> [50,]  .         .          .         .
 ```
 
-### Custom cost function: logistic regression
+### custom logistic regression
 
 ``` r
 library(fastcpd)
@@ -475,7 +475,7 @@ summary(result_custom_two_epochs)
 #> 200
 ```
 
-### Custom cost function: mean shift
+### custom cost function mean change
 
 ``` r
 library(fastcpd)
@@ -522,7 +522,7 @@ summary(mean_loss_result)
 #> 300 700
 ```
 
-### Custom cost function: multivariate mean shift
+### custom cost function multivariate mean change
 
 ``` r
 library(fastcpd)
@@ -571,7 +571,7 @@ summary(mean_loss_result)
 #> 300 700
 ```
 
-### Custom cost function: variance change
+### custom cost function variance change
 
 ``` r
 library(fastcpd)
@@ -584,8 +584,9 @@ data <- rbind.data.frame(
 )
 data_all_mu <- colMeans(data)
 var_loss <- function(data) {
+  n <- nrow(data)
   demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
-  nrow(data) * (1 + log(2 * pi) + log(demeaned_data_norm^2 / nrow(data))) / 2
+  n / 2 * (1 + log(2 * pi) + log(demeaned_data_norm^2 / n))
 }
 var_loss_result <- fastcpd(
   formula = ~ . - 1,
@@ -604,16 +605,22 @@ summary(var_loss_result)
 #> 300 699
 ```
 
-### Custom cost function: multivariate variance change
+### custom cost function multivariate variance change
 
 ``` r
 library(fastcpd)
 set.seed(1)
 p <- 3
 data <- rbind.data.frame(
-  mvtnorm::rmvnorm(300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))),
-  mvtnorm::rmvnorm(400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))),
-  mvtnorm::rmvnorm(300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p)))
+  mvtnorm::rmvnorm(
+    300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+  ),
+  mvtnorm::rmvnorm(
+    400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+  ),
+  mvtnorm::rmvnorm(
+    300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+  )
 )
 data_all_mu <- colMeans(data)
 var_loss <- function(data) {
@@ -647,7 +654,7 @@ summary(var_loss_result)
 #> 300 700
 ```
 
-### Custom cost function: mean shift and variance change
+### custom cost function mean or variance change
 
 ``` r
 library(fastcpd)
@@ -682,7 +689,7 @@ summary(meanvar_loss_result)
 #> 300 700 1000 1300 1700
 ```
 
-### Custom cost function: multivariate mean or variance change
+### custom cost function multivariate mean or variance change
 
 ``` r
 library(fastcpd)
@@ -727,7 +734,7 @@ summary(meanvar_loss_result)
 #> 300 696 1000 1300 1697
 ```
 
-### Custom cost function: Huber loss
+### custom cost function huber regression
 
 ``` r
 library(fastcpd)
