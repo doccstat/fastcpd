@@ -22,16 +22,28 @@ NULL
 #' Sequential Gradient Descent and Quasi-Newton's Method for Change-Point
 #' Analysis
 #'
-#' @param formula A symbolic description of the model to be fitted.
-#' @param data A data frame containing the data to be segmented.
-#' @param beta Initial cost value.
+#' @param formula A symbolic description of the model to be fitted. A response
+#'     variable is not necessary in the case of mean change or variance change.
+#'     Please refer to the examples for more details.
+#' @param data A data frame containing the data to be segmented. The data frame
+#'     should contain the response variable as the first column and the
+#'     covariates as the rest of the columns if the dataset is a regression
+#'     problem. The response is not necessary in the case of mean change or
+#'     variance change, in which case the formula will need to be adjusted
+#'     as well. Please refer to the examples for more details.
+#' @param beta Initial cost value. For the choice of `beta`, please refer to
+#'     the paper.
 #' @param segment_count Number of segments for initial guess.
-#' @param trim Trimming for the boundary change points.
+#' @param trim Trimming for the boundary change points or changes points that
+#'     are too close.
 #' @param momentum_coef Momentum coefficient to be applied to each update.
-#' @param k Function on number of epochs in SGD.
-#' @param family Family of the models. Can be "binomial", "poisson", "lasso" or
-#'     "gaussian". If not provided, the user must specify the cost function and
-#'     its gradient (and Hessian).
+#' @param k Function on number of epochs in SGD. If k is a function returning
+#'     values larger than 0, the algorithm will run for k more epochs. By
+#'     default k returns 0, meaning no multiple epochs will be performed.
+#' @param family Family of the models. Can be "binomial", "poisson", "lasso",
+#'     "gaussian" or "custom". If not provided, the user must specify the cost
+#'     function (and its gradient and Hessian) if the cost function does not
+#'     have explicit solution.
 #' @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
 #'     poisson.
 #' @param min_prob Minimum probability to avoid numerical issues. Only used for
@@ -40,9 +52,12 @@ NULL
 #'     poisson.
 #' @param winsorise_maxval Maximum value to be winsorised. Only used for
 #'     poisson.
-#' @param p Number of parameters to be estimated.
+#' @param p Number of parameters to be estimated. If not provided will be set
+#'     to be the number of columns in the data minus 1.
 #' @param cost Cost function to be used. If not specified, the default is
-#'     the negative log-likelihood for the corresponding family.
+#'     the negative log-likelihood for the corresponding family. The custom
+#'     cost function should only contain a `data` parameter (and a `theta`
+#'     parameter if there are no explicit solutions).
 #' @param cost_gradient Gradient for custom cost function.
 #' @param cost_hessian Hessian for custom cost function.
 #' @param cp_only Whether to return only the change points or with the cost
