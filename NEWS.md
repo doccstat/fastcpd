@@ -1,3 +1,7 @@
+# fastcpd 0.5.7
+
+*   Fix loss function for custom mean or variance change.
+
 # fastcpd 0.5.6
 
 *   Add stargazers in README.

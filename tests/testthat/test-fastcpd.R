@@ -368,9 +368,10 @@ testthat::test_that(
     data_all_cov <- colMeans(data_all_covs)
     mean_loss <- function(data) {
       n <- nrow(data)
+      demeaned_data <- sweep(data, 2, colMeans(data))
       n / 2 * (
         log(det(data_all_cov)) + p * log(2 * pi) +
-          sum(diag(solve(data_all_cov, crossprod(data - colMeans(data))))) / n
+          sum(diag(solve(data_all_cov, crossprod(demeaned_data)))) / n
       )
     }
     mean_loss_result <- fastcpd(
@@ -394,14 +395,14 @@ testthat::test_that(
       mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(50, p)),
       mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
     )
-    data_all_mu <- colMeans(data)
+    data_all_mean <- colMeans(data)
     var_loss <- function(data) {
       n <- nrow(data)
       data_cov <- 1
       if (n > 1) {
         data_cov <- var(data)
       }
-      demeaned_data <- sweep(data, 2, data_all_mu)
+      demeaned_data <- sweep(data, 2, data_all_mean)
       n / 2 * (
         log(data_cov) + log(2 * pi) +
           sum(demeaned_data^2 / c(data_cov)) / n
@@ -435,7 +436,7 @@ testthat::test_that(
         300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
       )
     )
-    data_all_mu <- colMeans(data)
+    data_all_mean <- colMeans(data)
     var_loss <- function(data) {
       n <- nrow(data)
       p <- ncol(data)
@@ -444,7 +445,7 @@ testthat::test_that(
       } else {
         data_cov <- cov(data)
       }
-      demeaned_data <- sweep(data, 2, data_all_mu)
+      demeaned_data <- sweep(data, 2, data_all_mean)
       n / 2 * (
         log(det(data_cov)) + p * log(2 * pi) +
           sum(diag(solve(data_cov, crossprod(demeaned_data)))) / n
@@ -474,18 +475,18 @@ testthat::test_that(
       mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
       mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
     )
-meanvar_loss <- function(data) {
-  n <- nrow(data)
-  data_cov <- 1
-  if (n > 1) {
-    data_cov <- var(data)
-  }
-  demeaned_data <- sweep(data, 2, colMeans(data))
-  n / 2 * (
-    log(data_cov) + log(2 * pi) +
-      sum(demeaned_data^2 / c(data_cov)) / n
-  )
-}
+    meanvar_loss <- function(data) {
+      n <- nrow(data)
+      data_cov <- 1
+      if (n > 1) {
+        data_cov <- var(data)
+      }
+      demeaned_data <- sweep(data, 2, colMeans(data))
+      n / 2 * (
+        log(data_cov) + log(2 * pi) +
+          sum(demeaned_data^2 / c(data_cov)) / n
+      )
+    }
     meanvar_loss_result <- fastcpd(
       formula = ~ . - 1,
       data = data,
