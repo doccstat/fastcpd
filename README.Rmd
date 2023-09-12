@@ -372,9 +372,10 @@ for (block_index in seq_len(block_count)) {
 data_all_cov <- colMeans(data_all_covs)
 mean_loss <- function(data) {
   n <- nrow(data)
-  sum(diag(
-    (data - colMeans(data)) %*% solve(data_all_cov, t(data - colMeans(data)))
-  )) / 2 + n / 2 * (log(det(data_all_cov)) + p * log(2 * pi))
+  n / 2 * (
+    log(det(data_all_cov)) + p * log(2 * pi) +
+      sum(diag(solve(data_all_cov, crossprod(data - colMeans(data))))) / n
+  )
 }
 mean_loss_result <- fastcpd(
   formula = ~ . - 1,
@@ -419,15 +420,24 @@ library(fastcpd)
 set.seed(1)
 p <- 3
 data <- rbind.data.frame(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(50, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
+  mvtnorm::rmvnorm(300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))),
+  mvtnorm::rmvnorm(400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))),
+  mvtnorm::rmvnorm(300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p)))
 )
 data_all_mu <- colMeans(data)
 var_loss <- function(data) {
-  demeaned_data_norm <- norm(sweep(data, 2, data_all_mu), type = "F")
-  nrow(data) / 2 *
-    (1 + p * log(2 * pi) + log(demeaned_data_norm^2 / nrow(data)))
+  n <- nrow(data)
+  p <- ncol(data)
+  if (n <= p) {
+    data_cov <- diag(p)
+  } else {
+    data_cov <- cov(data)
+  }
+  demeaned_data <- sweep(data, 2, data_all_mu)
+  n / 2 * (
+    log(det(data_cov)) + p * log(2 * pi) +
+      sum(diag(solve(data_cov, crossprod(demeaned_data)))) / n
+  )
 }
 var_loss_result <- fastcpd(
   formula = ~ . - 1,
@@ -490,10 +500,10 @@ meanvar_loss <- function(data) {
     data_cov <- cov(data)
   }
   demeaned_data <- sweep(data, 2, colMeans(data))
-  n / 2 * (log(det(data_cov)) + p * log(2 * pi)) +
-    sum(diag(
-      demeaned_data %*% solve(data_cov, t(demeaned_data))
-    )) / 2
+  n / 2 * (
+    log(det(data_cov)) + p * log(2 * pi) +
+      sum(diag(solve(data_cov, crossprod(demeaned_data)))) / n
+  )
 }
 meanvar_loss_result <- fastcpd(
   formula = ~ . - 1,
