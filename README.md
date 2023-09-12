@@ -588,15 +588,8 @@ data <- rbind.data.frame(
 data_all_mean <- colMeans(data)
 var_loss <- function(data) {
   n <- nrow(data)
-  data_cov <- 1
-  if (n > 1) {
-    data_cov <- var(data)
-  }
-  demeaned_data <- sweep(data, 2, data_all_mean)
-  n / 2 * (
-    log(data_cov) + log(2 * pi) +
-      sum(demeaned_data^2 / c(data_cov)) / n
-  )
+  data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
+  n / 2 * (log(data_cov) + log(2 * pi) + (n - 1) / n)
 }
 var_loss_result <- fastcpd(
   formula = ~ . - 1,
@@ -636,21 +629,18 @@ data_all_mean <- colMeans(data)
 var_loss <- function(data) {
   n <- nrow(data)
   p <- ncol(data)
-  if (n <= p) {
+  if (n < p) {
     data_cov <- diag(p)
   } else {
-    data_cov <- cov(data)
+    data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
   }
-  demeaned_data <- sweep(data, 2, data_all_mean)
-  n / 2 * (
-    log(det(data_cov)) + p * log(2 * pi) +
-      sum(diag(solve(data_cov, crossprod(demeaned_data)))) / n
-  )
+  n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
 }
 var_loss_result <- fastcpd(
   formula = ~ . - 1,
   data = data,
   beta = (p + 1) * log(nrow(data)) / 2,
+  trim = 0.1,
   p = p,
   cost = var_loss
 )
@@ -658,10 +648,10 @@ summary(var_loss_result)
 #> 
 #> Call:
 #> fastcpd(formula = ~. - 1, data = data, beta = (p + 1) * log(nrow(data))/2, 
-#>     p = p, cost = var_loss)
+#>     trim = 0.1, p = p, cost = var_loss)
 #> 
 #> Change points:
-#> 300 700
+#> 300 699
 ```
 
 ### custom cost function mean or variance change
@@ -684,11 +674,7 @@ meanvar_loss <- function(data) {
   if (n > 1) {
     data_cov <- var(data)
   }
-  demeaned_data <- sweep(data, 2, colMeans(data))
-  n / 2 * (
-    log(data_cov) + log(2 * pi) +
-      sum(demeaned_data^2 / c(data_cov)) / n
-  )
+  n / 2 * (log(data_cov) + log(2 * pi) + (n - 1) / n)
 }
 meanvar_loss_result <- fastcpd(
   formula = ~ . - 1,
@@ -712,7 +698,7 @@ summary(meanvar_loss_result)
 ``` r
 library(fastcpd)
 set.seed(1)
-p <- 4
+p <- 3
 data <- rbind.data.frame(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
@@ -729,16 +715,13 @@ meanvar_loss <- function(data) {
   } else {
     data_cov <- cov(data)
   }
-  demeaned_data <- sweep(data, 2, colMeans(data))
-  n / 2 * (
-    log(det(data_cov)) + p * log(2 * pi) +
-      sum(diag(solve(data_cov, crossprod(demeaned_data)))) / n
-  )
+  n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
 }
 meanvar_loss_result <- fastcpd(
   formula = ~ . - 1,
   data = data,
   beta = (2 * p + 1) * log(nrow(data)) / 2,
+  trim = 0.01,
   p = 2 * p,
   cost = meanvar_loss
 )
@@ -746,10 +729,10 @@ summary(meanvar_loss_result)
 #> 
 #> Call:
 #> fastcpd(formula = ~. - 1, data = data, beta = (2 * p + 1) * log(nrow(data))/2, 
-#>     p = 2 * p, cost = meanvar_loss)
+#>     trim = 0.01, p = 2 * p, cost = meanvar_loss)
 #> 
 #> Change points:
-#> 300 696 1000 1300 1697
+#> 300 700 1000 1300 1700
 ```
 
 ### custom cost function huber regression
