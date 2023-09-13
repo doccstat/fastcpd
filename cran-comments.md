@@ -1,3 +1,14 @@
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+* Adjusted the examples so that the run time is less than 5 seconds.
+* Removed C++17 requirement.
+* Removed `Remotes` field in `DESCRIPTION` file.
+
+NOTE: There might be an extra note about possibly misspelled words in
+  DESCRIPTION. This comes from the first name and last name of the authors.
+
 ## R CMD check results
 
 ❯ checking CRAN incoming feasibility ... [4s/35s] NOTE
@@ -5,16 +16,4 @@
 
   New submission
 
-  Unknown, possibly misspelled, fields in DESCRIPTION:
-    ‘Remotes’
-
-❯ checking compilation flags used ... NOTE
-  Compilation used the following non-portable flag(s):
-    ‘-march=nocona’
-
-❯ checking examples ... [51s/40s] NOTE
-  Examples with CPU (user + system) or elapsed time > 5s
-            user system elapsed
-  fastcpd 38.356 10.518  38.267
-
-0 errors ✔ | 0 warnings ✔ | 3 notes ✖
+0 errors ✔ | 0 warnings ✔ | 1 notes ✖
