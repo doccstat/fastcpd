@@ -429,24 +429,24 @@ testthat::test_that(
       )
     )
     data_all_mean <- colMeans(data)
-  var_loss <- function(data) {
-    n <- nrow(data)
-    p <- ncol(data)
-    if (n < p) {
-      data_cov <- diag(p)
-    } else {
-      data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
+    var_loss <- function(data) {
+      n <- nrow(data)
+      p <- ncol(data)
+      if (n < p) {
+        data_cov <- diag(p)
+      } else {
+        data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
+      }
+      n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
     }
-    n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
-  }
-  var_loss_result <- fastcpd(
-    formula = ~ . - 1,
-    data = data,
-    beta = (p + 1) * log(nrow(data)) / 2,
-    trim = 0.1,
-    p = p,
-    cost = var_loss
-  )
+    var_loss_result <- fastcpd(
+      formula = ~ . - 1,
+      data = data,
+      beta = (p + 1) * log(nrow(data)) / 2,
+      trim = 0.1,
+      p = p,
+      cost = var_loss
+    )
 
     testthat::expect_equal(var_loss_result@cp_set, c(300, 699))
   }

@@ -2,7 +2,7 @@ Type: Package
 Package: fastcpd
 Title: Fast Change Point Detection Based on Dynamic Programming with
     Pruning and Sequential Gradient Descent
-Version: 0.6.0
+Version: 0.6.1
 Authors@R: c(
     person("Xingchi", "Li", , "anthony.li@stat.tamu.edu", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0006-2493-0853")),
@@ -42,8 +42,6 @@ LinkingTo:
     Rcpp,
     RcppArmadillo,
     testthat
-Remotes:
-    github::kaneplusplus/bigmemory
 Config/testthat/edition: 3
 Encoding: UTF-8
 RoxygenNote: 7.2.3

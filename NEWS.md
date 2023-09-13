@@ -1,3 +1,7 @@
+# fastcpd 0.6.1
+
+*   Address CRAN comments.
+
 # fastcpd 0.6.0
 
 *   Submit for CRAN release.
