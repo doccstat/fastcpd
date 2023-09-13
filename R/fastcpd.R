@@ -73,6 +73,7 @@ NULL
 #' @return A class \code{fastcpd} object.
 #' @export
 #' @examples
+#' \donttest{
 #' ### linear regression
 #' library(fastcpd)
 #' set.seed(1)
@@ -506,6 +507,7 @@ NULL
 #'   cost_hessian = huber_loss_hessian
 #' )
 #' summary(huber_regression_result)
+#' }
 fastcpd <- function(
     formula = y ~ . - 1,
     data,

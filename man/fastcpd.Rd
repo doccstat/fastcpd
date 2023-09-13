@@ -109,6 +109,7 @@ Analysis'' arXiv preprint arXiv:2210.12235 (2022).
 }
 
 \examples{
+\donttest{
 ### linear regression
 library(fastcpd)
 set.seed(1)
@@ -542,4 +543,5 @@ huber_regression_result <- fastcpd(
   cost_hessian = huber_loss_hessian
 )
 summary(huber_regression_result)
+}
 }
