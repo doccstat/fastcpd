@@ -3,8 +3,9 @@
 
 # fastcpd
 
-<!-- [![CRAN status](https://www.r-pkg.org/badges/version/fastcpd)](https://cran.r-project.org/package=fastcpd) -->
-
+[![CRAN
+status](https://www.r-pkg.org/badges/version-last-release/fastcpd)](https://cran.r-project.org/package=fastcpd)
+[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/fastcpd)](https://cran.r-project.org/package=fastcpd)
 [![R-CMD-check](https://github.com/doccstat/fastcpd/workflows/R-CMD-check/badge.svg)](https://github.com/doccstat/fastcpd/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/doccstat/fastcpd/branch/main/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd?branch=main)
@@ -30,7 +31,7 @@ To learn more behind the algorithms:
 ## Installation
 
 ``` r
-# Install from CRAN, (not yet available)
+# Install from CRAN
 install.packages("fastcpd")
 ```
 
