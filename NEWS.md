@@ -1,3 +1,7 @@
+# fastcpd 0.6.3
+
+*   Add CRAN release badge.
+
 # fastcpd 0.6.2
 
 *   Address CRAN comments.
