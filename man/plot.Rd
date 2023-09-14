@@ -16,6 +16,9 @@
 
 \item{y}{Ignored.}
 }
+\value{
+No return value, called for plotting.
+}
 \description{
 Plot the data and the change points for a \code{fastcpd} object
 }

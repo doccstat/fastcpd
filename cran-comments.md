@@ -2,9 +2,10 @@
 
 This is a resubmission. In this version I have:
 
-* Adjusted the examples so that the run time is less than 5 seconds.
-* Removed C++17 requirement.
-* Removed `Remotes` field in `DESCRIPTION` file.
+* Reduced the length of the title to less than 65 characters.
+* Expanded all acronyms in the description text.
+* Added value fields to .Rd files / return fields to roxygen documentation
+  regarding exported methods `plot`, `print`, `show`, `summary`.
 
 NOTE: There might be an extra note about possibly misspelled words in
   DESCRIPTION. This comes from the first name and last name of the authors.

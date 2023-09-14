@@ -14,8 +14,9 @@
 #' @slot cost_values The cost values for each segment.
 #' @slot residuals The residuals for each segment.
 #' @slot thetas The estimated parameters for each segment.
-#' @slot cp_only A boolean indicating whether the model was fitted with only
-#'   change points or with change points and parameters.
+#' @slot cp_only A boolean indicating whether \link{fastcpd} was run to return
+#'     only the change points or the change points with the estimated parameters
+#'     and cost values for each segment.
 #' @export
 setClass(
   "fastcpd",
@@ -86,6 +87,7 @@ plot.fastcpd <- function(x, ...) {
 #' @param y Ignored.
 #' @param ... Ignored.
 #'
+#' @return No return value, called for plotting.
 #' @rdname plot
 #' @export
 setMethod("plot", signature(x = "fastcpd", y = "missing"), plot.fastcpd)
@@ -107,6 +109,8 @@ print.fastcpd <- function(x, ...) {
 #' @param x \code{fastcpd} object.
 #' @param ... Ignored.
 #'
+#' @return Return a (temporarily) invisible copy of the \code{fastcpd} object.
+#'     Called primarily for printing the change points in the model.
 #' @rdname print
 #' @export
 setMethod("print", "fastcpd", print.fastcpd)
@@ -127,6 +131,8 @@ show.fastcpd <- function(object) {
 #' Show the available methods for a \code{fastcpd} object
 #' @param object \code{fastcpd} object.
 #'
+#' @return No return value, called for showing a list of available methods
+#'     for a \code{fastcpd} object.
 #' @rdname show
 #' @export
 setMethod("show", "fastcpd", show.fastcpd)
@@ -165,6 +171,9 @@ summary.fastcpd <- function(object, ...) {
 #' @param object \code{fastcpd} object.
 #' @param ... Ignored.
 #'
+#' @return Return a (temporarily) invisible copy of the \code{fastcpd} object.
+#'     Called primarily for printing the summary of the model including the
+#'     call, the change points, the cost values and the estimated parameters.
 #' @rdname summary
 #' @export
 setMethod("summary", "fastcpd", summary.fastcpd)

@@ -29,7 +29,8 @@ select using \code{@}.
 
 \item{\code{thetas}}{The estimated parameters for each segment.}
 
-\item{\code{cp_only}}{A boolean indicating whether the model was fitted with only
-change points or with change points and parameters.}
+\item{\code{cp_only}}{A boolean indicating whether \link{fastcpd} was run to return
+only the change points or the change points with the estimated parameters
+and cost values for each segment.}
 }}
 
