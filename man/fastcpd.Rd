@@ -418,9 +418,9 @@ var_loss <- function(data) {
 var_loss_result <- fastcpd(
   formula = ~ . - 1,
   data = data,
-  beta = (p + 1) * log(nrow(data)) / 2,
+  beta = (p^2 + 1) * log(nrow(data)) / 2,
   trim = 0.1,
-  p = p,
+  p = p^2,
   cost = var_loss
 )
 summary(var_loss_result)
@@ -448,8 +448,8 @@ meanvar_loss <- function(data) {
 meanvar_loss_result <- fastcpd(
   formula = ~ . - 1,
   data = data,
-  beta = (2 * p + 1) * log(nrow(data)) / 2,
-  p = 2 * p,
+  beta = (p^2 + p + 1) * log(nrow(data)) / 2,
+  p = p^2 + p,
   cost = meanvar_loss
 )
 summary(meanvar_loss_result)
@@ -479,9 +479,9 @@ meanvar_loss <- function(data) {
 meanvar_loss_result <- fastcpd(
   formula = ~ . - 1,
   data = data,
-  beta = (2 * p + 1) * log(nrow(data)) / 2,
+  beta = (p^2 + p + 1) * log(nrow(data)) / 2,
   trim = 0.01,
-  p = 2 * p,
+  p = p^2 + p,
   cost = meanvar_loss
 )
 summary(meanvar_loss_result)

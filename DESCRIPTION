@@ -1,8 +1,7 @@
 Type: Package
 Package: fastcpd
-Title: Fast Change Point Detection Based on Dynamic Programming with
-    Pruning and Sequential Gradient Descent
-Version: 0.6.1
+Title: Fast Change Point Detection Via Sequential Gradient Descent
+Version: 0.6.2
 Authors@R: c(
     person("Xingchi", "Li", , "anthony.li@stat.tamu.edu", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0006-2493-0853")),
@@ -15,10 +14,10 @@ Description: Implements fast change point detection algorithm based on the
     <https://proceedings.mlr.press/v206/zhang23b.html>. The algorithm
     is based on dynamic programming with pruning and sequential gradient
     descent. It is able to detect change points a magnitude faster than
-    the vanilla PELT. The package includes examples with data type being
-    linear regression, logistic regression, Poisson regression, penalized
-    linear regression, and whole lot more examples with custom cost function
-    in case the user wants to use their own cost function.
+    the vanilla Pruned Exact Linear Time(PELT). The package includes examples
+    of linear regression, logistic regression, Poisson regression, penalized
+    linear regression data, and whole lot more examples with custom cost
+    function in case the user wants to use their own cost function.
 License: GPL (>= 3)
 URL: https://fastcpd.xingchi.li, https://github.com/doccstat/fastcpd
 BugReports: https://github.com/doccstat/fastcpd/issues

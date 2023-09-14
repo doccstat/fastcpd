@@ -1,3 +1,8 @@
+# fastcpd 0.6.2
+
+*   Address CRAN comments.
+*   Add more experiments.
+
 # fastcpd 0.6.1
 
 *   Address CRAN comments.

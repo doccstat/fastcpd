@@ -442,13 +442,13 @@ testthat::test_that(
     var_loss_result <- fastcpd(
       formula = ~ . - 1,
       data = data,
-      beta = (p + 1) * log(nrow(data)) / 2,
+      beta = (p^2 + 1) * log(nrow(data)) / 2,
       trim = 0.1,
-      p = p,
+      p = p^2,
       cost = var_loss
     )
 
-    testthat::expect_equal(var_loss_result@cp_set, c(300, 699))
+    testthat::expect_equal(var_loss_result@cp_set, c(300, 700))
   }
 )
 
@@ -475,8 +475,8 @@ testthat::test_that(
     meanvar_loss_result <- fastcpd(
       formula = ~ . - 1,
       data = data,
-      beta = (2 * p + 1) * log(nrow(data)) / 2,
-      p = 2 * p,
+      beta = (p^2 + p + 1) * log(nrow(data)) / 2,
+      p = p^2 + p,
       cost = meanvar_loss
     )
 
@@ -511,9 +511,9 @@ testthat::test_that(
     meanvar_loss_result <- fastcpd(
       formula = ~ . - 1,
       data = data,
-      beta = (2 * p + 1) * log(nrow(data)) / 2,
+      beta = (p^2 + p + 1) * log(nrow(data)) / 2,
       trim = 0.01,
-      p = 2 * p,
+      p = p^2 + p,
       cost = meanvar_loss
     )
 
@@ -647,6 +647,88 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "ar(1) model", {
+    set.seed(1)
+    n <- 1000
+    p <- 1
+    time_series <- rep(0, n + 1)
+    for (i in 1:600) {
+      time_series[i + 1] <- 0.6 * time_series[i] + rnorm(1)
+    }
+    for (i in 601:1000) {
+      time_series[i + 1] <- 0.3 * time_series[i] + rnorm(1)
+    }
+    ar1_loss <- function(data) {
+      n <- nrow(data)
+      optim_result <- optim(
+        par = 0,
+        fn = function(data, theta) {
+          n <- nrow(data)
+          unconditional_sum_of_squares <- (1 - theta^2) * data[1]^2 + sum(
+            (data[2:n] - theta * data[1:(n - 1)])^2
+          )
+          log(unconditional_sum_of_squares) - log(1 - theta^2) / n
+        },
+        method = "Brent",
+        data = data,
+        lower = -0.999,
+        upper = 0.999
+      )
+      n / 2 * (optim_result$value - log(n) + log(2 * pi) + 1)
+    }
+    result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(x = time_series[-1]),
+      beta = (2 * p + 1) * log(n) / 2,
+      p = 2 * p,
+      cost = ar1_loss
+    )
+
+    testthat::expect_equal(result@cp_set, 614)
+  }
+)
+
+testthat::test_that(
+  "var(1) model with p = 2", {
+    set.seed(1)
+    n <- 1000
+    p <- 2
+    theta_0 <- array(NA, dim = c(p, p, 2))
+    theta_0[, , 1] <- cbind(c(-0.3, 0.6), c(-0.4, 0.5))
+    theta_0[, , 2] <- cbind(c(-0.1, -0.2), c(0.1, 0.05))
+    x <- matrix(0, n + 1, p)
+    for (i in 1:600) {
+      x[i + 1, ] <- theta_0[, , 1] %*% x[i, ] + rnorm(p)
+    }
+    for (i in 601:1000) {
+      x[i + 1, ] <- theta_0[, , 2] %*% x[i, ] + rnorm(p)
+    }
+    y <- x[3:1001, ]
+    x <- x[2:1000, ]
+    multi_response_linear_loss <- function(data) {
+      x <- data[, (ncol(data) - p + 1):ncol(data)]
+      y <- data[, 1:(ncol(data) - p)]
+
+      if (nrow(data) <= p) {
+        x_t_x <- diag(p)
+      } else {
+        x_t_x <- crossprod(x)
+      }
+
+      norm(y - x %*% solve(x_t_x, t(x)) %*% y, type = "F")^2 / 2
+    }
+    result <- fastcpd(
+      formula = y ~ x - 1,
+      data = data.frame(y = y, x = x),
+      beta = (2 * p + 1) * log(n) / 2,
+      cost = multi_response_linear_loss
+    )
+
+    testthat::expect_equal(result@cp_set, 593)
+  }
+)
+
+testthat::test_that(
   "confidence interval experiment", {
     testthat::skip("This test is intended to be run manually.")
     set.seed(1)
@@ -761,14 +843,17 @@ testthat::test_that(
     kDimension <- 1  # nolint: Google Style Guide
     change_point_locations <- list()
     cps_cookie_bucket <- rep(list(rep(list(NULL), 20)), 500)
-    containing_change_point <- rep(FALSE, 500)
+    containing_change_point <- matrix(NA, 500, 5)
+
+    # 500 experiments and count the number of times change point will be inside
+    # the confidence interval to verify the logics of confidence interval.
     for (experiment_id in seq_len(500)) {
       data <- rbind(
         mvtnorm::rmvnorm(
-          121, mean = rep(0, kDimension), sigma = diag(100, kDimension)
+          130, mean = rep(0, kDimension), sigma = diag(100, kDimension)
         ),
         mvtnorm::rmvnorm(
-          121, mean = rep(50, kDimension), sigma = diag(100, kDimension)
+          130, mean = rep(50, kDimension), sigma = diag(100, kDimension)
         )
       )
       segment_count_guess <- 10
@@ -787,8 +872,10 @@ testthat::test_that(
       data_all_var <- mean(data_all_vars)
       mean_loss <- function(data) {
         n <- nrow(data)
-        (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
-          n / 2 * (log(data_all_var) + log(2 * pi))
+        n / 2 * (
+          log(data_all_var) + log(2 * pi) +
+            sum((data - colMeans(data))^2 / data_all_var) / n
+        )
       }
       mean_loss_result <- fastcpd(
         formula = ~ . - 1,
@@ -797,12 +884,19 @@ testthat::test_that(
         p = kDimension,
         cost = mean_loss
       )
+
+      # Store the change point locations for each experiment as a baseline for
+      # cookie bucket experiments.
       change_point_locations[[experiment_id]] <- mean_loss_result@cp_set
 
+      # Randomly assign 20 cookie buckets to each experiment.
       cookie_bucket_id_list <-
-        sample.int(n = 20, size = 121 + 121, replace = TRUE)
+        sample.int(n = 20, size = 130 + 130, replace = TRUE)
       all_data <- data
+
+      # Do the cookie bucket experiment for each cookie bucket.
       for (cookie_bucket_id in seq_len(20)) {
+        # Exclude the data from the cookie bucket.
         data <-
           all_data[cookie_bucket_id_list != cookie_bucket_id, , drop = FALSE]
         segment_count_guess <- 10
@@ -822,9 +916,13 @@ testthat::test_that(
         data_all_var <- mean(data_all_vars)
         mean_loss <- function(data) {
           n <- nrow(data)
-          (norm(data, type = "F")^2 - colSums(data)^2 / n) / 2 / data_all_var +
-            n / 2 * (log(data_all_var) + log(2 * pi))
+          n / 2 * (
+            log(data_all_var) + log(2 * pi) +
+              sum((data - colMeans(data))^2 / data_all_var) / n
+          )
         }
+
+        # Obtain the change points for the cookie bucket experiment.
         mean_loss_result <- fastcpd(
           formula = ~ . - 1,
           data = data.frame(data),
@@ -833,6 +931,7 @@ testthat::test_that(
           cost = mean_loss
         )
 
+        # Map the change points to the original index.
         for (cp in mean_loss_result@cp_set) {
           ordinal_mapped_cp <-
             which(cumsum(cookie_bucket_id_list != cookie_bucket_id) == cp)[1]
@@ -841,8 +940,14 @@ testthat::test_that(
         }
       }
 
+      # Concatenate the change points from all cookie bucket experiments.
       cp_for_eid <- Reduce("c", cps_cookie_bucket[[experiment_id]])
+
+      # Calculate the mean as the center of confidence interval.
       d_capital <- mean(cp_for_eid)
+
+      # Concatenate the change ponints from all cookie bucket experiments
+      # except the current one.
       d_j <- rep(list(NULL), 20)
       for (j in seq_len(20)) {
         for (cookie_bucket_id in seq_len(20)) {
@@ -855,22 +960,143 @@ testthat::test_that(
         }
       }
       d_j_bar <- sapply(d_j, mean)
+
+      # Calculate the jackknife cookie bucket change point.
       d_capital_j <- 20 * d_capital - 19 * d_j_bar
       d_bar <- mean(d_capital_j)
       sd_2 <- sum((d_capital_j - d_bar)^2) / 19
-      ci <- c(
-        d_capital - 2.093 * sqrt(sd_2) / sqrt(20),
-        d_capital + 2.093 * sqrt(sd_2) / sqrt(20)
-      )
 
-      if (
-        floor(ci[1]) <= 121 && ceiling(ci[2]) >= 121
-      ) {
-        containing_change_point[experiment_id] <- TRUE
-      }
+      # Following t-distribution with 19 degrees of freedom.
+      containing_change_point[experiment_id, ] <- c(
+        # 70% confidence interval.
+        ceiling(d_capital - 1.066 * sqrt(sd_2) / sqrt(20)) <= 130 &&
+          floor(d_capital + 1.066 * sqrt(sd_2) / sqrt(20)) >= 130,
+        # 80% confidence interval.
+        ceiling(d_capital - 1.328 * sqrt(sd_2) / sqrt(20)) <= 130 &&
+          floor(d_capital + 1.328 * sqrt(sd_2) / sqrt(20)) >= 130,
+        # 90% confidence interval.
+        ceiling(d_capital - 1.729 * sqrt(sd_2) / sqrt(20)) <= 130 &&
+          floor(d_capital + 1.729 * sqrt(sd_2) / sqrt(20)) >= 130,
+        # 95% confidence interval.
+        ceiling(d_capital - 2.093 * sqrt(sd_2) / sqrt(20)) <= 130 &&
+          floor(d_capital + 2.093 * sqrt(sd_2) / sqrt(20)) >= 130,
+        # 98% confidence interval.
+        ceiling(d_capital - 2.539 * sqrt(sd_2) / sqrt(20)) <= 130 &&
+          floor(d_capital + 2.539 * sqrt(sd_2) / sqrt(20)) >= 130
+      )
     }
 
-    testthat::expect_equal(sum(containing_change_point), 927)
+    testthat::expect_equal(
+      colSums(containing_change_point), c(433, 436, 442, 449, 460)
+    )
+  }
+)
+
+testthat::test_that(
+  "confidence interval experiment with one change point for linear model", {
+    testthat::skip("This test is intended to be run manually.")
+    set.seed(1)
+    kDimension <- 3  # nolint: Google Style Guide
+    change_point_locations <- list()
+    cps_cookie_bucket <- rep(list(rep(list(NULL), 20)), 500)
+    containing_change_point <- matrix(NA, 500, 5)
+
+    # 500 experiments and count the number of times change point will be inside
+    # the confidence interval to verify the logics of confidence interval.
+    for (experiment_id in seq_len(500)) {
+      x <- mvtnorm::rmvnorm(800, rep(0, p), diag(p))
+      theta_0 <- rbind(c(1, 1.2, -1), c(-1, 0, 0.5))
+      y <- c(
+        x[1:500, ] %*% theta_0[1, ] + rnorm(100, 0, 1),
+        x[501:800, ] %*% theta_0[2, ] + rnorm(100, 0, 1)
+      )
+      data <- data.frame(y = y, x = x)
+      result <- fastcpd(
+        formula = y ~ . - 1,
+        data = data,
+        family = "gaussian"
+      )
+
+      # Store the change point locations for each experiment as a baseline for
+      # cookie bucket experiments.
+      change_point_locations[[experiment_id]] <- result@cp_set
+
+      # Randomly assign 20 cookie buckets to each experiment.
+      cookie_bucket_id_list <-
+        sample.int(n = 20, size = 800, replace = TRUE)
+      all_data <- data
+
+      # Do the cookie bucket experiment for each cookie bucket.
+      for (cookie_bucket_id in seq_len(20)) {
+        # Exclude the data from the cookie bucket.
+        data <-
+          all_data[cookie_bucket_id_list != cookie_bucket_id, , drop = FALSE]
+
+        # Obtain the change points for the cookie bucket experiment.
+        result <- fastcpd(
+          formula = y ~ . - 1,
+          data = data,
+          family = "gaussian"
+        )
+
+        # Map the change points to the original index.
+        for (cp in result@cp_set) {
+          ordinal_mapped_cp <-
+            which(cumsum(cookie_bucket_id_list != cookie_bucket_id) == cp)[1]
+          cps_cookie_bucket[[experiment_id]][[cookie_bucket_id]] <-
+            ordinal_mapped_cp
+        }
+      }
+
+      # Concatenate the change points from all cookie bucket experiments.
+      cp_for_eid <- Reduce("c", cps_cookie_bucket[[experiment_id]])
+
+      # Calculate the mean as the center of confidence interval.
+      d_capital <- mean(cp_for_eid)
+
+      # Concatenate the change ponints from all cookie bucket experiments
+      # except the current one.
+      d_j <- rep(list(NULL), 20)
+      for (j in seq_len(20)) {
+        for (cookie_bucket_id in seq_len(20)) {
+          if (j != cookie_bucket_id) {
+            d_j[[j]] <- c(
+              d_j[[j]],
+              cps_cookie_bucket[[experiment_id]][[cookie_bucket_id]]
+            )
+          }
+        }
+      }
+      d_j_bar <- sapply(d_j, mean)
+
+      # Calculate the jackknife cookie bucket change point.
+      d_capital_j <- 20 * d_capital - 19 * d_j_bar
+      d_bar <- mean(d_capital_j)
+      sd_2 <- sum((d_capital_j - d_bar)^2) / 19
+
+      # Following t-distribution with 19 degrees of freedom.
+      containing_change_point[experiment_id, ] <- c(
+        # 70% confidence interval.
+        ceiling(d_capital + 1.066 * sqrt(sd_2) / sqrt(20)) >= 500 &&
+          floor(d_capital - 1.066 * sqrt(sd_2) / sqrt(20)) <= 500,
+        # 80% confidence interval.
+        ceiling(d_capital + 1.328 * sqrt(sd_2) / sqrt(20)) >= 500 &&
+          floor(d_capital - 1.328 * sqrt(sd_2) / sqrt(20)) <= 500,
+        # 90% confidence interval.
+        ceiling(d_capital + 1.729 * sqrt(sd_2) / sqrt(20)) >= 500 &&
+          floor(d_capital - 1.729 * sqrt(sd_2) / sqrt(20)) <= 500,
+        # 95% confidence interval.
+        ceiling(d_capital + 2.093 * sqrt(sd_2) / sqrt(20)) >= 500 &&
+          floor(d_capital - 2.093 * sqrt(sd_2) / sqrt(20)) <= 500,
+        # 98% confidence interval.
+        ceiling(d_capital + 2.539 * sqrt(sd_2) / sqrt(20)) >= 500 &&
+          floor(d_capital - 2.539 * sqrt(sd_2) / sqrt(20)) <= 500
+      )
+    }
+
+    testthat::expect_equal(
+      colSums(containing_change_point), c(371, 379, 390, 393, 399)
+    )
   }
 )
 
