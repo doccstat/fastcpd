@@ -86,6 +86,10 @@ arma::vec FastcpdParameters::get_segment_indices() {
   return segment_indices;
 }
 
+arma::mat FastcpdParameters::get_theta_hat() {
+  return theta_hat;
+}
+
 void FastcpdParameters::update_theta_hat(
   const unsigned int col, arma::colvec new_theta_hat
 ) {
@@ -102,6 +106,10 @@ void FastcpdParameters::create_theta_sum(
   theta_sum.col(col) = new_theta_sum;
 }
 
+arma::mat FastcpdParameters::get_theta_sum() {
+  return theta_sum;
+}
+
 void FastcpdParameters::update_theta_sum(
   const unsigned int col, arma::colvec new_theta_sum
 ) {
@@ -110,6 +118,10 @@ void FastcpdParameters::update_theta_sum(
 
 void FastcpdParameters::update_theta_sum(arma::colvec new_theta_sum) {
   theta_sum = arma::join_rows(theta_sum, new_theta_sum);
+}
+
+arma::cube FastcpdParameters::get_hessian() {
+  return hessian;
 }
 
 void FastcpdParameters::update_hessian(
@@ -163,6 +175,22 @@ void FastcpdParameters::update_beta() {
   if (family == "lasso" || family == "gaussian") {
     beta = beta * (1 + mean(act_num));
   }
+}
+
+arma::colvec FastcpdParameters::get_momentum() {
+  return momentum;
+}
+
+void FastcpdParameters::update_momentum(arma::colvec new_momentum) {
+  momentum = new_momentum;
+}
+
+arma::mat FastcpdParameters::get_segment_theta_hat() {
+  return segment_theta_hat;
+}
+
+arma::colvec FastcpdParameters::get_act_num() {
+  return act_num;
 }
 
 void FastcpdParameters::create_gradients() {
@@ -682,14 +710,14 @@ List fastcpd_impl(
       } else {
         List cost_update_result = cost_update(
           data.rows(0, t - 1),
-          fastcpd_parameters_class.theta_hat,
-          fastcpd_parameters_class.theta_sum,
-          fastcpd_parameters_class.hessian,
+          fastcpd_parameters_class.get_theta_hat(),
+          fastcpd_parameters_class.get_theta_sum(),
+          fastcpd_parameters_class.get_hessian(),
           tau,
           i,
           k,
           family,
-          fastcpd_parameters_class.momentum,
+          fastcpd_parameters_class.get_momentum(),
           momentum_coef,
           epsilon,
           min_prob,
@@ -708,10 +736,11 @@ List fastcpd_impl(
         fastcpd_parameters_class.update_hessian(
           i - 1, as<arma::mat>(cost_update_result[2])
         );
-        fastcpd_parameters_class.momentum =
-            as<arma::colvec>(cost_update_result[3]);
+        fastcpd_parameters_class.update_momentum(
+          as<arma::colvec>(cost_update_result[3])
+        );
         arma::colvec theta =
-            fastcpd_parameters_class.theta_sum.col(i - 1) / (t - tau);
+            fastcpd_parameters_class.get_theta_sum().col(i - 1) / (t - tau);
         if (family == "poisson" && t - tau >= p) {
           Environment desc_tools = Environment::namespace_env("DescTools");
           Function winsorize = desc_tools["Winsorize"];
@@ -904,13 +933,14 @@ List init_fastcpd_parameters(
   }
   return List::create(
     Named("segment_indices") = fastcpd_parameters_class.get_segment_indices(),
-    Named("segment_theta_hat") = fastcpd_parameters_class.segment_theta_hat,
+    Named("segment_theta_hat") =
+        fastcpd_parameters_class.get_segment_theta_hat(),
     Named("err_sd") = fastcpd_parameters_class.get_err_sd(),
-    Named("act_num") = fastcpd_parameters_class.act_num,
-    Named("theta_hat") = fastcpd_parameters_class.theta_hat,
-    Named("theta_sum") = fastcpd_parameters_class.theta_sum,
-    Named("hessian") = fastcpd_parameters_class.hessian,
-    Named("momentum") = fastcpd_parameters_class.momentum
+    Named("act_num") = fastcpd_parameters_class.get_act_num(),
+    Named("theta_hat") = fastcpd_parameters_class.get_theta_hat(),
+    Named("theta_sum") = fastcpd_parameters_class.get_theta_sum(),
+    Named("hessian") = fastcpd_parameters_class.get_hessian(),
+    Named("momentum") = fastcpd_parameters_class.get_momentum()
   );
 }
 
