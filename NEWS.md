@@ -1,6 +1,7 @@
 # fastcpd 0.6.4
 
 *   Check warning messages in tests.
+*   Further encapsulation of all FastcpdParameters members.
 
 # fastcpd 0.6.3
 
