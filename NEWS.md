@@ -1,3 +1,7 @@
+# fastcpd 0.6.4
+
+*   Check warning messages in tests.
+
 # fastcpd 0.6.3
 
 *   Add CRAN release badge.
