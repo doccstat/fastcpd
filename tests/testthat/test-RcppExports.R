@@ -293,14 +293,23 @@ testthat::test_that("logistic regression", {
     change_points_binomial_fastcpd_sanity
   )
 
-  # TODO(doccstat): Deal with the warnings.
-  change_points_binomial_fastcpd_vanilla <- suppressWarnings(fastcpd(
-    formula = y ~ . - 1,
-    data = data.frame(y = y, x = x),
-    family = "binomial",
-    segment_count = 5,
-    vanilla_percentage = 1
-  ))@cp_set
+  warning_messages <- testthat::capture_warnings(
+    change_points_binomial_fastcpd_vanilla <- fastcpd(
+      formula = y ~ . - 1,
+      data = data.frame(y = y, x = x),
+      family = "binomial",
+      segment_count = 5,
+      vanilla_percentage = 1
+    )@cp_set
+  )
+
+  testthat::expect_equal(
+    sort(warning_messages),
+    rep(c(
+      "fit_glm: algorithm did not converge",
+      "fit_glm: fitted probabilities numerically 0 or 1 occurred"
+    ), c(6, 3984))
+  )
 
   change_points_binomial_fastcpd_vanilla_sanity <- pelt_vanilla_binomial(
     cbind(x, y), (kDimension + 1) * log(kNumberOfDataPoints) / 2
@@ -605,14 +614,20 @@ testthat::test_that("poisson regression", {
   change_points_poisson_fastcpd_sanity <-
     segd_poisson(data, beta, trim = 0.03, B = 10, epsilon = 0.001, G = 10^10, L = -20, H = 20)$cp
 
-  # TODO(doccstat): Deal with the warnings.
-  change_points_poisson_fastcpd_vanilla <- suppressWarnings(fastcpd(
-    formula = y ~ . - 1,
-    data = data.frame(y = data[, d + 1], x = data[, 1:d]),
-    family = "poisson",
-    segment_count = 10,
-    vanilla_percentage = 1
-  ))@cp_set
+  warning_messages <- testthat::capture_warnings(
+    change_points_poisson_fastcpd_vanilla <- fastcpd(
+      formula = y ~ . - 1,
+      data = data.frame(y = data[, d + 1], x = data[, 1:d]),
+      family = "poisson",
+      segment_count = 10,
+      vanilla_percentage = 1
+    )@cp_set
+  )
+
+  testthat::expect_equal(
+    warning_messages, rep("fit_glm: fitted rates numerically 0 occurred", 1539)
+  )
+
   change_points_poisson_fastcpd_vanilla_sanity <-
     pelt_vanilla_poisson(data, beta)$cp
 
