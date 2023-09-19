@@ -1,3 +1,7 @@
+# fastcpd 0.6.5
+
+*   Add more experiments.
+
 # fastcpd 0.6.4
 
 *   Check warning messages in tests.
