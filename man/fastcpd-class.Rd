@@ -15,21 +15,23 @@ select using \code{@}.
 \section{Slots}{
 
 \describe{
-\item{\code{call}}{The call to \link{fastcpd}.}
+\item{\code{call}}{The call of the function `fastcpd`.}
 
-\item{\code{data}}{The data used.}
+\item{\code{data}}{The data passed to the `fastcpd` function.}
 
 \item{\code{family}}{The family of the model.}
 
-\item{\code{cp_set}}{The change points.}
+\item{\code{cp_set}}{The set of change points.}
 
-\item{\code{cost_values}}{The cost values for each segment.}
+\item{\code{cost_values}}{The cost function values for each segment.}
 
-\item{\code{residuals}}{The residuals for each segment.}
+\item{\code{residuals}}{The residuals for each segment. Used only for built-in
+families.}
 
-\item{\code{thetas}}{The estimated parameters for each segment.}
+\item{\code{thetas}}{The estimated parameters for each segment. Used only for
+built-in families.}
 
-\item{\code{cp_only}}{A boolean indicating whether \link{fastcpd} was run to return
+\item{\code{cp_only}}{A boolean indicating whether `fastcpd` was run to return
 only the change points or the change points with the estimated parameters
 and cost values for each segment.}
 }}

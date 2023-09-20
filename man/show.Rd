@@ -14,7 +14,7 @@
 }
 \value{
 No return value, called for showing a list of available methods
-    for a \code{fastcpd} object.
+  for a \code{fastcpd} object.
 }
 \description{
 Show the available methods for a \code{fastcpd} object

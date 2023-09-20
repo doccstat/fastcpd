@@ -187,30 +187,30 @@ cost_optim <- function(family, p, data_segment, cost, lambda, cv) {
 #' @param momentum_coef Momentum coefficient to be applied to each update.
 #' @param k Function on number of epochs in SGD.
 #' @param family Family of the models. Can be "binomial", "poisson", "lasso" or
-#'     "gaussian". If not provided, the user must specify the cost function and
-#'     its gradient (and Hessian).
+#'   "gaussian". If not provided, the user must specify the cost function and
+#'   its gradient (and Hessian).
 #' @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
-#'     poisson.
+#'   poisson.
 #' @param min_prob Minimum probability to avoid numerical issues. Only used for
-#'     poisson.
+#'   poisson.
 #' @param winsorise_minval Minimum value to be winsorised. Only used for
-#'     poisson.
+#'   poisson.
 #' @param winsorise_maxval Maximum value to be winsorised. Only used for
-#'     poisson.
+#'   poisson.
 #' @param p Number of parameters to be estimated.
 #' @param cost Cost function to be used. If not specified, the default is
-#'     the negative log-likelihood for the corresponding family.
+#'   the negative log-likelihood for the corresponding family.
 #' @param cost_gradient Gradient for custom cost function.
 #' @param cost_hessian Hessian for custom cost function.
 #' @param cp_only Whether to return only the change points or with the cost
-#'     values for each segment. If family is not provided or set to be
-#'     "custom", this parameter will be set to be true.
+#'   values for each segment. If family is not provided or set to be
+#'   "custom", this parameter will be set to be true.
 #' @param vanilla_percentage How many of the data should be processed through
-#'     vanilla PELT. Range should be between 0 and 1. If set to be 0, all data
-#'     will be processed through sequential gradient descnet. If set to be 1,
-#'     all data will be processed through vaniall PELT. If the cost function
-#'     have an explicit solution, i.e. does not depend on coefficients like
-#'     the mean change case, this parameter will be set to be 1.
+#'   vanilla PELT. Range should be between 0 and 1. If set to be 0, all data
+#'   will be processed through sequential gradient descnet. If set to be 1,
+#'   all data will be processed through vaniall PELT. If the cost function
+#'   have an explicit solution, i.e. does not depend on coefficients like
+#'   the mean change case, this parameter will be set to be 1.
 #' @keywords internal
 #'
 #' @noRd

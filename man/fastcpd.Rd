@@ -27,70 +27,164 @@ fastcpd(
 )
 }
 \arguments{
-\item{formula}{A symbolic description of the model to be fitted. A response
-variable is not necessary in the case of mean change or variance change.
-Please refer to the examples for more details.}
+\item{formula}{A formula object specifying the model to be fitted. The
+optional response variable should be on the left hand side of the formula
+while the covariates should be on the right hand side. The intercept term
+should be removed from the formula. The response variable is not
+necessary if the data considered is not of regression type. For example,
+a mean or variance change model does not necessarily have response
+variables. By default an intercept column will be added to the data
+similar to the \code{lm} function in \proglang{R}. Thus it is suggested
+that user should remove the intercept term from the formula by appending
+\code{- 1} to the formula. The default formula is suitable for regression
+data sets with one-dimensional response variable and the rest being
+covariates without intercept. The naming of variables used in the formula
+should be consistent with the column names in the data frame provided in
+\code{data}.}
 
-\item{data}{A data frame containing the data to be segmented. The data frame
-should contain the response variable as the first column and the
-covariates as the rest of the columns if the dataset is a regression
-problem. The response is not necessary in the case of mean change or
+\item{data}{A data frame containing the data to be segmented where each row
+denotes each data point. In one-dimensional response variable regression
+settings, the first column is the response variable while the rest are
+covariates. The response is not necessary in the case of mean change or
 variance change, in which case the formula will need to be adjusted
-as well. Please refer to the examples for more details.}
+accordingly.}
 
-\item{beta}{Initial cost value. For the choice of `beta`, please refer to
-the paper.}
+\item{beta}{Initial cost value specified in the algorithm in the paper.
+For the proper choice of a value, please refer to the paper. If not
+specified, BIC criterion is used to obtain a proper value, i.e.,
+\code{beta = (p + 1) * log(nrow(data)) / 2}.}
 
-\item{segment_count}{Number of segments for initial guess.}
+\item{segment_count}{Number of segments for initial guess. If not specified,
+the initial guess on the number of segments is 10.}
 
-\item{trim}{Trimming for the boundary change points or changes points that
-are too close.}
+\item{trim}{Trimming for the boundary change points so that a change point
+close to the boundary will not be counted as a change point. This
+parameter also specifies the minimum distance between two change points.
+If.   several change points have mutual distances smaller than
+\code{trim * nrow(data)}, those change points will be merged into one
+single change point. The value of this parameter should be between
+0 and 1.}
 
-\item{momentum_coef}{Momentum coefficient to be applied to each update.}
+\item{momentum_coef}{Momentum coefficient to be applied to each update. This
+parameter is used when the loss function is bad-shaped so that
+maintaining a momentum from previous update is desired. Default value is
+0, meaning the algorithm doesn't maintain a momentum by default.}
 
-\item{k}{Function on number of epochs in SGD. If k is a function returning
-values larger than 0, the algorithm will run for k more epochs. By
-default k returns 0, meaning no multiple epochs will be performed.}
+\item{k}{Function on number of epochs in SGD. \code{k} should be a function
+taking only a parameter \code{x} meaning the current number of data
+points considered since last segmentaion. The return value of the
+function should be an integer indicating how many epochs should be
+performed apart from the default update. By default the function returns
+0, meaning no multiple epochs will be used to update the parameters.
+Example usage:
 
-\item{family}{Family of the models. Can be "binomial", "poisson", "lasso",
-"gaussian" or "custom". If not provided, the user must specify the cost
-function (and its gradient and Hessian) if the cost function does not
-have explicit solution.}
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{  k = function(x) \{
+    if (x < n / segment_count / 4 * 1) 3
+    else if (x < n / segment_count / 4 * 2) 2
+    else if (x < n / segment_count / 4 * 3) 1
+    else 0
+  \}
+}\if{html}{\out{</div>}}
 
-\item{epsilon}{Epsilon to avoid numerical issues. Only used for binomial and
-poisson.}
+This function will perform 3 epochs for the first quarter of the data, 2
+epochs for the second quarter of the data, 1 epoch for the third quarter
+of the data and no multiple epochs for the last quarter of the data.
+Experiments show that performing multiple epochs will significantly
+affect the performance of the algorithm. This parameter is left for the
+users to tune the performance of the algorithm if the result is not
+ideal. Details are discussed in the paper.}
 
-\item{min_prob}{Minimum probability to avoid numerical issues. Only used for
-poisson.}
+\item{family}{Family of the model. Can be \code{"gaussian"},
+\code{"binomial"}, \code{"poisson"}, \code{"lasso"}, \code{"custom"} or
+\code{NULL}. For simplicity, user can also omit this parameter,
+indicating that they will be using their own cost functions. Omitting the
+parameter is the same as specifying the parameter to be \code{"custom"}
+or \code{NULL}, in which case, users must specify the cost function, with
+optional gradient and corresponding Hessian matrix functions.}
 
-\item{winsorise_minval}{Minimum value to be winsorised. Only used for
-poisson.}
+\item{epsilon}{Epsilon to avoid numerical issues. Only used for the Hessian
+computation in Logistic Regression and Poisson Regression.}
 
-\item{winsorise_maxval}{Maximum value to be winsorised. Only used for
-poisson.}
+\item{min_prob}{Minimum probability to avoid numerical issues. Only used
+for Poisson Regression.}
 
-\item{p}{Number of parameters to be estimated. If not provided will be set
-to be the number of columns in the data minus 1.}
+\item{winsorise_minval}{Minimum value for the parameter in Poisson Regression
+to be winsorised.}
 
-\item{cost}{Cost function to be used. If not specified, the default is
-the negative log-likelihood for the corresponding family. The custom
-cost function should only contain a `data` parameter (and a `theta`
-parameter if there are no explicit solutions).}
+\item{winsorise_maxval}{Maximum value for the parameter in Poisson Regression
+to be winsorised.}
 
-\item{cost_gradient}{Gradient for custom cost function.}
+\item{p}{Number of covariates in the model. If not specified, the number of
+covariates will be inferred from the data, i.e.,
+\code{p = ncol(data) - 1}.}
 
-\item{cost_hessian}{Hessian for custom cost function.}
+\item{cost}{Cost function to be used. This and the following two parameters
+should not be specified at the same time with \code{family}. If not
+specified, the default is the negative log-likelihood for the
+corresponding family. Custom cost functions can be provided in the
+following two formats:
+\itemize{
+\item \code{cost = function(data) \{...\}}
+\item \code{cost = function(data, theta) \{...\}}
+}
 
-\item{cp_only}{Whether to return only the change points or with the cost
-values for each segment. If family is not provided or set to be "custom",
-this parameter will be set to be true.}
+In both methods, users should implement the cost value calculation based
+on the data provided, where the data parameter can be considered as a
+segment of the original data frame in the form of a matrix. The first
+method is used when the cost function has an explicit solution, in which
+case the cost function value can be calculated directly from the data.
+The second method is used when the cost function does not have an
+explicit solution, in which case the cost function value can be
+calculated from the data and the estimated parameters. In the case of
+only one \code{data} argument is provided, \code{fastcpd} performs the
+vanilla PELT algorithm since no parameter updating is performed.}
+
+\item{cost_gradient}{Gradient function for the custom cost function.
+Example usage:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{  cost_gradient = function(data, theta) \{
+    ...
+    return(gradient)
+  \}
+}\if{html}{\out{</div>}}
+
+The gradient function should take two parameters, the first one being a
+segment of the data in the format of a matrix, the second one being the
+estimated parameters. The gradient function should return the gradient of
+the cost function with respect to the data and parameters.}
+
+\item{cost_hessian}{Hessian function for the custom cost function. Similar to
+the gradient function, the Hessian function should take two parameters,
+the first one being a segment of the data in the format of a matrix, the
+second one being the estimated parameters. The Hessian function should
+return the Hessian matrix of the cost function with respect to the data
+and parameters.}
+
+\item{cp_only}{If \code{TRUE}, only the change points are returned.
+Otherwise, the cost function values together with the estimated
+parameters for each segment are also returned. By default the value is
+set to be \code{FALSE} so that \code{plot} can be used to visualize the
+results for a built-in model. If \code{family} is not provided or
+specified as \code{NULL} or \code{"custom"}, \code{cp_only} is set to be
+\code{TRUE} by default. \code{cp_only} has some performance impact on the
+algorithm, since the cost values and estimated parameters for each
+segment need to be calculated and stored. If the users are only
+interested in the change points, setting \code{cp_only} to be \code{TRUE}
+will help with the computational cost.}
 
 \item{vanilla_percentage}{How many of the data should be processed through
-vanilla PELT. Range should be between 0 and 1. If set to be 0, all data
+vanilla PELT. Range should be between 0 and 1. The \code{fastcpd}
+algorithm is based on gradient descent and thus a starting estimate can
+be crucial. At the beginning of the algorithm, vanilla PELT can be
+performed to obtain a relatively accurate estimate of the parameters
+despite the small amount of the data being used. If set to be 0, all data
 will be processed through sequential gradient descnet. If set to be 1,
 all data will be processed through vaniall PELT. If the cost function
-have an explicit solution, i.e. does not depend on coefficients like
-the mean change case, this parameter will be set to be 1.}
+have an explicit solution, i.e. does not depend on coefficients like the
+mean change case, this parameter will be set to be 1. If the value is set
+to be between 0 and 1, the first \code{vanilla_percentage * nrow(data)}
+data points will be processed through vanilla PELT and the rest will be
+processed through sequential gradient descent.}
 }
 \value{
 A class \code{fastcpd} object.
