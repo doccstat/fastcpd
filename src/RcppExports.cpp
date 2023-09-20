@@ -191,8 +191,6 @@ BEGIN_RCPP
 END_RCPP
 }
 
-RcppExport SEXP run_testthat_tests(void *);
-
 static const R_CallMethodDef CallEntries[] = {
     {"_fastcpd_init_fastcpd_parameters", (DL_FUNC) &_fastcpd_init_fastcpd_parameters, 10},
     {"_fastcpd_update_fastcpd_parameters", (DL_FUNC) &_fastcpd_update_fastcpd_parameters, 17},
@@ -203,7 +201,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_fastcpd_cost_update", (DL_FUNC) &_fastcpd_cost_update, 17},
     {"_fastcpd_cost_optim", (DL_FUNC) &_fastcpd_cost_optim, 6},
     {"_fastcpd_fastcpd_impl", (DL_FUNC) &_fastcpd_fastcpd_impl, 17},
-    {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };
 

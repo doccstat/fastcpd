@@ -7,16 +7,18 @@
 #' with only change points or with change points and parameters, which you can
 #' select using \code{@}.
 #'
-#' @slot call The call to \link{fastcpd}.
-#' @slot data The data used.
+#' @slot call The call of the function `fastcpd`.
+#' @slot data The data passed to the `fastcpd` function.
 #' @slot family The family of the model.
-#' @slot cp_set The change points.
-#' @slot cost_values The cost values for each segment.
-#' @slot residuals The residuals for each segment.
-#' @slot thetas The estimated parameters for each segment.
-#' @slot cp_only A boolean indicating whether \link{fastcpd} was run to return
-#'     only the change points or the change points with the estimated parameters
-#'     and cost values for each segment.
+#' @slot cp_set The set of change points.
+#' @slot cost_values The cost function values for each segment.
+#' @slot residuals The residuals for each segment. Used only for built-in
+#'   families.
+#' @slot thetas The estimated parameters for each segment. Used only for
+#'   built-in families.
+#' @slot cp_only A boolean indicating whether `fastcpd` was run to return
+#'   only the change points or the change points with the estimated parameters
+#'   and cost values for each segment.
 #' @export
 setClass(
   "fastcpd",
@@ -110,7 +112,7 @@ print.fastcpd <- function(x, ...) {
 #' @param ... Ignored.
 #'
 #' @return Return a (temporarily) invisible copy of the \code{fastcpd} object.
-#'     Called primarily for printing the change points in the model.
+#'   Called primarily for printing the change points in the model.
 #' @rdname print
 #' @export
 setMethod("print", "fastcpd", print.fastcpd)
@@ -132,7 +134,7 @@ show.fastcpd <- function(object) {
 #' @param object \code{fastcpd} object.
 #'
 #' @return No return value, called for showing a list of available methods
-#'     for a \code{fastcpd} object.
+#'   for a \code{fastcpd} object.
 #' @rdname show
 #' @export
 setMethod("show", "fastcpd", show.fastcpd)
@@ -172,8 +174,8 @@ summary.fastcpd <- function(object, ...) {
 #' @param ... Ignored.
 #'
 #' @return Return a (temporarily) invisible copy of the \code{fastcpd} object.
-#'     Called primarily for printing the summary of the model including the
-#'     call, the change points, the cost values and the estimated parameters.
+#'   Called primarily for printing the summary of the model including the
+#'   call, the change points, the cost values and the estimated parameters.
 #' @rdname summary
 #' @export
 setMethod("summary", "fastcpd", summary.fastcpd)

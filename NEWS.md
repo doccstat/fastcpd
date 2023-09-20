@@ -1,3 +1,10 @@
+# fastcpd 0.7.0
+
+*   Remove C++ unit tests using catch and commented out the code since the new
+    version of development version of Rcpp is not yet available on CRAN.
+    Related pull request: https://github.com/RcppCore/Rcpp/pull/1274.
+*   Add more documentation for `fastcpd` method.
+
 # fastcpd 0.6.5
 
 *   Add more experiments.

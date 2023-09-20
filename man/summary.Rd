@@ -16,8 +16,8 @@
 }
 \value{
 Return a (temporarily) invisible copy of the \code{fastcpd} object.
-    Called primarily for printing the summary of the model including the
-    call, the change points, the cost values and the estimated parameters.
+  Called primarily for printing the summary of the model including the
+  call, the change points, the cost values and the estimated parameters.
 }
 \description{
 Show the summary of a \code{fastcpd} object

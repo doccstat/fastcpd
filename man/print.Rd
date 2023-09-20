@@ -16,7 +16,7 @@
 }
 \value{
 Return a (temporarily) invisible copy of the \code{fastcpd} object.
-    Called primarily for printing the change points in the model.
+  Called primarily for printing the change points in the model.
 }
 \description{
 Print the call and the change points for a \code{fastcpd} object

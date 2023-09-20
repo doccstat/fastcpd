@@ -752,8 +752,8 @@ List fastcpd_impl(
           theta = as<arma::colvec>(winsorize_result);
         }
         if (
-          family != "custom" && family != "lasso" && t - tau >= p ||
-          family == "lasso" && t - tau >= 3
+          (family != "custom" && family != "lasso" && t - tau >= p) ||
+          (family == "lasso" && t - tau >= 3)
         ) {
           List cost_result = cost(data_segment, theta, family, lambda);
           cval(i - 1) = as<double>(cost_result["value"]);
