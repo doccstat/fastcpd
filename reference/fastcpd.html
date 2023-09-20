@@ -16,7 +16,7 @@ Xianyang Zhang and Trisha Dawn."><!-- mathjax --><script src="https://cdnjs.clou
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,104 +85,188 @@ Xianyang Zhang and Trisha Dawn.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>formula</dt>
-<dd><p>A symbolic description of the model to be fitted. A response
-variable is not necessary in the case of mean change or variance change.
-Please refer to the examples for more details.</p></dd>
+<dd><p>A formula object specifying the model to be fitted. The
+optional response variable should be on the left hand side of the formula
+while the covariates should be on the right hand side. The intercept term
+should be removed from the formula. The response variable is not
+necessary if the data considered is not of regression type. For example,
+a mean or variance change model does not necessarily have response
+variables. By default an intercept column will be added to the data
+similar to the <code>lm</code> function in R. Thus it is suggested
+that user should remove the intercept term from the formula by appending
+<code>- 1</code> to the formula. The default formula is suitable for regression
+data sets with one-dimensional response variable and the rest being
+covariates without intercept. The naming of variables used in the formula
+should be consistent with the column names in the data frame provided in
+<code>data</code>.</p></dd>
 
 
 <dt>data</dt>
-<dd><p>A data frame containing the data to be segmented. The data frame
-should contain the response variable as the first column and the
-covariates as the rest of the columns if the dataset is a regression
-problem. The response is not necessary in the case of mean change or
+<dd><p>A data frame containing the data to be segmented where each row
+denotes each data point. In one-dimensional response variable regression
+settings, the first column is the response variable while the rest are
+covariates. The response is not necessary in the case of mean change or
 variance change, in which case the formula will need to be adjusted
-as well. Please refer to the examples for more details.</p></dd>
+accordingly.</p></dd>
 
 
 <dt>beta</dt>
-<dd><p>Initial cost value. For the choice of `beta`, please refer to
-the paper.</p></dd>
+<dd><p>Initial cost value specified in the algorithm in the paper.
+For the proper choice of a value, please refer to the paper. If not
+specified, BIC criterion is used to obtain a proper value, i.e.,
+<code>beta = (p + 1) * log(nrow(data)) / 2</code>.</p></dd>
 
 
 <dt>segment_count</dt>
-<dd><p>Number of segments for initial guess.</p></dd>
+<dd><p>Number of segments for initial guess. If not specified,
+the initial guess on the number of segments is 10.</p></dd>
 
 
 <dt>trim</dt>
-<dd><p>Trimming for the boundary change points or changes points that
-are too close.</p></dd>
+<dd><p>Trimming for the boundary change points so that a change point
+close to the boundary will not be counted as a change point. This
+parameter also specifies the minimum distance between two change points.
+If.   several change points have mutual distances smaller than
+<code>trim * nrow(data)</code>, those change points will be merged into one
+single change point. The value of this parameter should be between
+0 and 1.</p></dd>
 
 
 <dt>momentum_coef</dt>
-<dd><p>Momentum coefficient to be applied to each update.</p></dd>
+<dd><p>Momentum coefficient to be applied to each update. This
+parameter is used when the loss function is bad-shaped so that
+maintaining a momentum from previous update is desired. Default value is
+0, meaning the algorithm doesn't maintain a momentum by default.</p></dd>
 
 
 <dt>k</dt>
-<dd><p>Function on number of epochs in SGD. If k is a function returning
-values larger than 0, the algorithm will run for k more epochs. By
-default k returns 0, meaning no multiple epochs will be performed.</p></dd>
+<dd><p>Function on number of epochs in SGD. <code>k</code> should be a function
+taking only a parameter <code>x</code> meaning the current number of data
+points considered since last segmentaion. The return value of the
+function should be an integer indicating how many epochs should be
+performed apart from the default update. By default the function returns
+0, meaning no multiple epochs will be used to update the parameters.
+Example usage:</p>
+<p></p><div class="sourceCode r"><pre><code><span>  <span class="va">k</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">x</span> <span class="op">&lt;</span> <span class="va">n</span> <span class="op">/</span> <span class="va">segment_count</span> <span class="op">/</span> <span class="fl">4</span> <span class="op">*</span> <span class="fl">1</span><span class="op">)</span> <span class="fl">3</span></span>
+<span>    <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">x</span> <span class="op">&lt;</span> <span class="va">n</span> <span class="op">/</span> <span class="va">segment_count</span> <span class="op">/</span> <span class="fl">4</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span> <span class="fl">2</span></span>
+<span>    <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">x</span> <span class="op">&lt;</span> <span class="va">n</span> <span class="op">/</span> <span class="va">segment_count</span> <span class="op">/</span> <span class="fl">4</span> <span class="op">*</span> <span class="fl">3</span><span class="op">)</span> <span class="fl">1</span></span>
+<span>    <span class="kw">else</span> <span class="fl">0</span></span>
+<span>  <span class="op">}</span></span></code></pre><p></p></div>
+<p>This function will perform 3 epochs for the first quarter of the data, 2
+epochs for the second quarter of the data, 1 epoch for the third quarter
+of the data and no multiple epochs for the last quarter of the data.
+Experiments show that performing multiple epochs will significantly
+affect the performance of the algorithm. This parameter is left for the
+users to tune the performance of the algorithm if the result is not
+ideal. Details are discussed in the paper.</p></dd>
 
 
 <dt>family</dt>
-<dd><p>Family of the models. Can be "binomial", "poisson", "lasso",
-"gaussian" or "custom". If not provided, the user must specify the cost
-function (and its gradient and Hessian) if the cost function does not
-have explicit solution.</p></dd>
+<dd><p>Family of the model. Can be <code>"gaussian"</code>,
+<code>"binomial"</code>, <code>"poisson"</code>, <code>"lasso"</code>, <code>"custom"</code> or
+<code>NULL</code>. For simplicity, user can also omit this parameter,
+indicating that they will be using their own cost functions. Omitting the
+parameter is the same as specifying the parameter to be <code>"custom"</code>
+or <code>NULL</code>, in which case, users must specify the cost function, with
+optional gradient and corresponding Hessian matrix functions.</p></dd>
 
 
 <dt>epsilon</dt>
-<dd><p>Epsilon to avoid numerical issues. Only used for binomial and
-poisson.</p></dd>
+<dd><p>Epsilon to avoid numerical issues. Only used for the Hessian
+computation in Logistic Regression and Poisson Regression.</p></dd>
 
 
 <dt>min_prob</dt>
-<dd><p>Minimum probability to avoid numerical issues. Only used for
-poisson.</p></dd>
+<dd><p>Minimum probability to avoid numerical issues. Only used
+for Poisson Regression.</p></dd>
 
 
 <dt>winsorise_minval</dt>
-<dd><p>Minimum value to be winsorised. Only used for
-poisson.</p></dd>
+<dd><p>Minimum value for the parameter in Poisson Regression
+to be winsorised.</p></dd>
 
 
 <dt>winsorise_maxval</dt>
-<dd><p>Maximum value to be winsorised. Only used for
-poisson.</p></dd>
+<dd><p>Maximum value for the parameter in Poisson Regression
+to be winsorised.</p></dd>
 
 
 <dt>p</dt>
-<dd><p>Number of parameters to be estimated. If not provided will be set
-to be the number of columns in the data minus 1.</p></dd>
+<dd><p>Number of covariates in the model. If not specified, the number of
+covariates will be inferred from the data, i.e.,
+<code>p = ncol(data) - 1</code>.</p></dd>
 
 
 <dt>cost</dt>
-<dd><p>Cost function to be used. If not specified, the default is
-the negative log-likelihood for the corresponding family. The custom
-cost function should only contain a `data` parameter (and a `theta`
-parameter if there are no explicit solutions).</p></dd>
+<dd><p>Cost function to be used. This and the following two parameters
+should not be specified at the same time with <code>family</code>. If not
+specified, the default is the negative log-likelihood for the
+corresponding family. Custom cost functions can be provided in the
+following two formats:</p><ul><li><p><code>cost = function(data) {...}</code></p></li>
+<li><p><code>cost = function(data, theta) {...}</code></p></li>
+</ul><p>In both methods, users should implement the cost value calculation based
+on the data provided, where the data parameter can be considered as a
+segment of the original data frame in the form of a matrix. The first
+method is used when the cost function has an explicit solution, in which
+case the cost function value can be calculated directly from the data.
+The second method is used when the cost function does not have an
+explicit solution, in which case the cost function value can be
+calculated from the data and the estimated parameters. In the case of
+only one <code>data</code> argument is provided, <code>fastcpd</code> performs the
+vanilla PELT algorithm since no parameter updating is performed.</p></dd>
 
 
 <dt>cost_gradient</dt>
-<dd><p>Gradient for custom cost function.</p></dd>
+<dd><p>Gradient function for the custom cost function.
+Example usage:</p>
+<p></p><div class="sourceCode r"><pre><code><span>  <span class="va">cost_gradient</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">...</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">gradient</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span></code></pre><p></p></div>
+<p>The gradient function should take two parameters, the first one being a
+segment of the data in the format of a matrix, the second one being the
+estimated parameters. The gradient function should return the gradient of
+the cost function with respect to the data and parameters.</p></dd>
 
 
 <dt>cost_hessian</dt>
-<dd><p>Hessian for custom cost function.</p></dd>
+<dd><p>Hessian function for the custom cost function. Similar to
+the gradient function, the Hessian function should take two parameters,
+the first one being a segment of the data in the format of a matrix, the
+second one being the estimated parameters. The Hessian function should
+return the Hessian matrix of the cost function with respect to the data
+and parameters.</p></dd>
 
 
 <dt>cp_only</dt>
-<dd><p>Whether to return only the change points or with the cost
-values for each segment. If family is not provided or set to be "custom",
-this parameter will be set to be true.</p></dd>
+<dd><p>If <code>TRUE</code>, only the change points are returned.
+Otherwise, the cost function values together with the estimated
+parameters for each segment are also returned. By default the value is
+set to be <code>FALSE</code> so that <code>plot</code> can be used to visualize the
+results for a built-in model. If <code>family</code> is not provided or
+specified as <code>NULL</code> or <code>"custom"</code>, <code>cp_only</code> is set to be
+<code>TRUE</code> by default. <code>cp_only</code> has some performance impact on the
+algorithm, since the cost values and estimated parameters for each
+segment need to be calculated and stored. If the users are only
+interested in the change points, setting <code>cp_only</code> to be <code>TRUE</code>
+will help with the computational cost.</p></dd>
 
 
 <dt>vanilla_percentage</dt>
 <dd><p>How many of the data should be processed through
-vanilla PELT. Range should be between 0 and 1. If set to be 0, all data
+vanilla PELT. Range should be between 0 and 1. The <code>fastcpd</code>
+algorithm is based on gradient descent and thus a starting estimate can
+be crucial. At the beginning of the algorithm, vanilla PELT can be
+performed to obtain a relatively accurate estimate of the parameters
+despite the small amount of the data being used. If set to be 0, all data
 will be processed through sequential gradient descnet. If set to be 1,
 all data will be processed through vaniall PELT. If the cost function
-have an explicit solution, i.e. does not depend on coefficients like
-the mean change case, this parameter will be set to be 1.</p></dd>
+have an explicit solution, i.e. does not depend on coefficients like the
+mean change case, this parameter will be set to be 1. If the value is set
+to be between 0 and 1, the first <code>vanilla_percentage * nrow(data)</code>
+data points will be processed through vanilla PELT and the rest will be
+processed through sequential gradient descent.</p></dd>
 
 </dl></div>
     <div class="section level2">

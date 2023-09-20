@@ -20,7 +20,7 @@ select using @."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,11 +70,11 @@ select using <code>@</code>.</p>
     
 
 <dl><dt><code>call</code></dt>
-<dd><p>The call to <a href="fastcpd.html">fastcpd</a>.</p></dd>
+<dd><p>The call of the function `fastcpd`.</p></dd>
 
 
 <dt><code>data</code></dt>
-<dd><p>The data used.</p></dd>
+<dd><p>The data passed to the `fastcpd` function.</p></dd>
 
 
 <dt><code>family</code></dt>
@@ -82,23 +82,25 @@ select using <code>@</code>.</p>
 
 
 <dt><code>cp_set</code></dt>
-<dd><p>The change points.</p></dd>
+<dd><p>The set of change points.</p></dd>
 
 
 <dt><code>cost_values</code></dt>
-<dd><p>The cost values for each segment.</p></dd>
+<dd><p>The cost function values for each segment.</p></dd>
 
 
 <dt><code>residuals</code></dt>
-<dd><p>The residuals for each segment.</p></dd>
+<dd><p>The residuals for each segment. Used only for built-in
+families.</p></dd>
 
 
 <dt><code>thetas</code></dt>
-<dd><p>The estimated parameters for each segment.</p></dd>
+<dd><p>The estimated parameters for each segment. Used only for
+built-in families.</p></dd>
 
 
 <dt><code>cp_only</code></dt>
-<dd><p>A boolean indicating whether <a href="fastcpd.html">fastcpd</a> was run to return
+<dd><p>A boolean indicating whether `fastcpd` was run to return
 only the change points or the change points with the estimated parameters
 and cost values for each segment.</p></dd>
 
