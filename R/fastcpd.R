@@ -5,10 +5,13 @@
 #' Gradient Descent and Quasi-Newton's Method for Change-Point Analysis'' by
 #' Xianyang Zhang and Trisha Dawn.
 #'
-#' @section Citation:
-#' Zhang, Xianyang, and Trisha Dawn.
-#' ``Sequential Gradient Descent and Quasi-Newton's Method for Change-Point
-#' Analysis'' arXiv preprint arXiv:2210.12235 (2022).
+#' @section References:
+#'   Zhang X, Dawn T (2023). ``Sequential Gradient Descent and Quasi-Newton's
+#'   Method for Change-Point Analysis.'' In Ruiz, Francisco, Dy, Jennifer,
+#'   van de Meent, Jan-Willem (eds.), _Proceedings of The 26th International
+#'   Conference on Artificial Intelligence and Statistics_, volume 206 series
+#'   Proceedings of Machine Learning Research, 1129-1143.
+#'   <https://proceedings.mlr.press/v206/zhang23b.html>.
 #'
 #' @docType package
 #' @name fastcpd
