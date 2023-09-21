@@ -1,3 +1,7 @@
+# fastcpd 0.7.1
+
+*   Add package citation.
+
 # fastcpd 0.7.0
 
 *   Remove C++ unit tests using catch and commented out the code since the new
