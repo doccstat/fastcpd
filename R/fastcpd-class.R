@@ -41,6 +41,9 @@ plot.fastcpd <- function(x, ...) {
   # Plot the built in families only.
   stopifnot(x@family != "custom")
 
+  # TODO(doccstat): `ggplot2` is used here. Need to update the DESCRIPTION file
+  # or add dependency check so that default plot is used if `ggplot2` is not
+  # installed.
   y <- x@data[, 1]
   p <- ggplot2::ggplot() +
     ggplot2::geom_point(
