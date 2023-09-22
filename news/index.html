@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +44,21 @@
       <small>Source: <a href="https://github.com/doccstat/fastcpd/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.2" id="fastcpd-072">fastcpd 0.7.2<a class="anchor" aria-label="anchor" href="#fastcpd-072"></a></h2>
+<ul><li><p>Add suggested package checking in tests.</p></li>
+<li>
+<p>Try to solve the <em>amazing</em> clang-ASAN error on CRAN:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Error <span class="cf">in</span> <span class="fu">dyn.load</span>(file, <span class="at">DLLpath =</span> DLLpath, ...) <span class="sc">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  unable to load shared object <span class="st">'/data/gannet/ripley/R/test-clang/mvtnorm/libs/mvtnorm.so'</span><span class="sc">:</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="er">/</span>data<span class="sc">/</span>gannet<span class="sc">/</span>ripley<span class="sc">/</span>R<span class="sc">/</span>test<span class="sc">-</span>clang<span class="sc">/</span>mvtnorm<span class="sc">/</span>libs<span class="sc">/</span>mvtnorm.so<span class="sc">:</span> undefined symbol<span class="sc">:</span> _ZNK7Fortran7runtime10Terminator5CrashEPKcz</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>Calls<span class="sc">:</span> <span class="er">&lt;</span>Anonymous<span class="sc">&gt;</span> ... asNamespace <span class="ot">-&gt;</span> loadNamespace <span class="ot">-&gt;</span> library.dynam <span class="ot">-&gt;</span> dyn.load</span></code></pre></div>
+</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.1" id="fastcpd-071">fastcpd 0.7.1<a class="anchor" aria-label="anchor" href="#fastcpd-071"></a></h2>
+<ul><li>Add package citation.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.0" id="fastcpd-070">fastcpd 0.7.0<a class="anchor" aria-label="anchor" href="#fastcpd-070"></a></h2><p class="text-muted">CRAN release: 2023-09-21</p>
 <ul><li>Remove C++ unit tests using catch and commented out the code since the new version of development version of Rcpp is not yet available on CRAN. Related pull request: <a href="https://github.com/RcppCore/Rcpp/pull/1274" class="external-link uri">https://github.com/RcppCore/Rcpp/pull/1274</a>.</li>
