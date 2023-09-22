@@ -44,46 +44,48 @@ plot.fastcpd <- function(x, ...) {
   # TODO(doccstat): `ggplot2` is used here. Need to update the DESCRIPTION file
   # or add dependency check so that default plot is used if `ggplot2` is not
   # installed.
-  y <- x@data[, 1]
-  p <- ggplot2::ggplot() +
-    ggplot2::geom_point(
-      data = data.frame(x = seq_len(nrow(x@data)), y = y, label = "response"),
-      ggplot2::aes(x = x, y = y)
-    ) +
-    ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
-  if (!x@cp_only) {
-    p <- p + ggplot2::geom_point(
-      data = data.frame(
-        x = seq_len(nrow(x@data)),
-        y = x@residuals,
-        label = "residual"
-      ),
-      ggplot2::aes(x = x, y = y)
-    )
-    if (ncol(x@data) > 2) {
-      p <- p + ggplot2::facet_wrap("label", ncol = 1, scales = "free_y")
-    } else if (ncol(x@data) == 2) {
-      xend <- c(x@cp_set, nrow(x@data))
-      yend <- as.numeric(x@thetas)
+  if (requireNamespace("ggplot2", quietly = TRUE)) {
+    y <- x@data[, 1]
+    p <- ggplot2::ggplot() +
+      ggplot2::geom_point(
+        data = data.frame(x = seq_len(nrow(x@data)), y = y, label = "response"),
+        ggplot2::aes(x = x, y = y)
+      ) +
+      ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
+    if (!x@cp_only) {
       p <- p + ggplot2::geom_point(
         data = data.frame(
-          x = seq_len(nrow(x@data)), y = x@data[, 2], label = "covariate"
+          x = seq_len(nrow(x@data)),
+          y = x@residuals,
+          label = "residual"
         ),
         ggplot2::aes(x = x, y = y)
-      ) + ggplot2::geom_segment(
-        data = data.frame(
-          x = c(1, x@cp_set),
-          y = yend,
-          xend = xend,
-          yend = yend,
-          label = "coefficient"
-        ),
-        ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
-        col = "blue"
-      ) + ggplot2::facet_wrap("label", ncol = 2, scales = "free_y")
+      )
+      if (ncol(x@data) > 2) {
+        p <- p + ggplot2::facet_wrap("label", ncol = 1, scales = "free_y")
+      } else if (ncol(x@data) == 2) {
+        xend <- c(x@cp_set, nrow(x@data))
+        yend <- as.numeric(x@thetas)
+        p <- p + ggplot2::geom_point(
+          data = data.frame(
+            x = seq_len(nrow(x@data)), y = x@data[, 2], label = "covariate"
+          ),
+          ggplot2::aes(x = x, y = y)
+        ) + ggplot2::geom_segment(
+          data = data.frame(
+            x = c(1, x@cp_set),
+            y = yend,
+            xend = xend,
+            yend = yend,
+            label = "coefficient"
+          ),
+          ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+          col = "blue"
+        ) + ggplot2::facet_wrap("label", ncol = 2, scales = "free_y")
+      }
     }
+    print(p)
   }
-  print(p)
   invisible()
 }
 
