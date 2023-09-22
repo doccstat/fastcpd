@@ -1,5 +1,6 @@
 testthat::test_that(
   "example linear regression", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     p <- 3
     x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
@@ -33,6 +34,7 @@ testthat::test_that(
 
 testthat::test_that(
   "example linear regression with one-dimensional covariate", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     p <- 1
     x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
@@ -54,6 +56,7 @@ testthat::test_that(
 
 testthat::test_that(
   "linear regression with multi-dimensional responses", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     n <- 300
     p <- 3
@@ -112,6 +115,7 @@ testthat::test_that(
 
 testthat::test_that(
   "example poisson regression", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     p <- 3
     x <- mvtnorm::rmvnorm(1500, rep(0, p), diag(p))
@@ -152,6 +156,7 @@ testthat::test_that(
 
 testthat::test_that(
   "example penalized linear regression", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     n <- 1500
     p_true <- 6
@@ -303,6 +308,7 @@ testthat::test_that(
 
 testthat::test_that(
   "example custom cost function mean change", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     p <- 1
     data <- rbind(
@@ -345,6 +351,7 @@ testthat::test_that(
 
 testthat::test_that(
   "example custom cost function multivariate mean change", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     p <- 3
     data <- rbind(
@@ -388,6 +395,7 @@ testthat::test_that(
 
 testthat::test_that(
   "example custom cost function variance change", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     p <- 1
     data <- rbind.data.frame(
@@ -415,6 +423,7 @@ testthat::test_that(
 
 testthat::test_that(
   "example custom cost function multivariate variance change", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     p <- 3
     data <- rbind.data.frame(
@@ -454,6 +463,7 @@ testthat::test_that(
 
 testthat::test_that(
   "example custom cost function mean or variance change", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     p <- 1
     data <- rbind.data.frame(
@@ -488,6 +498,7 @@ testthat::test_that(
 
 testthat::test_that(
   "example custom cost function multivariate mean or variance change", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     p <- 3
     data <- rbind.data.frame(
@@ -525,6 +536,7 @@ testthat::test_that(
 
 testthat::test_that(
   "custom cost function varince change in mean or var change data", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     p <- 3
     data <- rbind.data.frame(
@@ -561,6 +573,7 @@ testthat::test_that(
 
 testthat::test_that(
   "example custom cost function huber regression", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     n <- 400 + 300 + 500
     p <- 5
@@ -622,6 +635,7 @@ testthat::test_that(
 
 testthat::test_that(
   "huber regression with 0.1 vanilla", {
+    testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     n <- 400 + 300 + 500
     p <- 5

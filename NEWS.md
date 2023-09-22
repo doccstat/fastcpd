@@ -1,3 +1,13 @@
+# fastcpd 0.7.2
+
+*   Add suggested package checking in tests.
+*   Try to solve the *amazing* clang-ASAN error on CRAN:
+
+        Error in dyn.load(file, DLLpath = DLLpath, ...) :
+          unable to load shared object '/data/gannet/ripley/R/test-clang/mvtnorm/libs/mvtnorm.so':
+          /data/gannet/ripley/R/test-clang/mvtnorm/libs/mvtnorm.so: undefined symbol: _ZNK7Fortran7runtime10Terminator5CrashEPKcz
+        Calls: <Anonymous> ... asNamespace -> loadNamespace -> library.dynam -> dyn.load
+
 # fastcpd 0.7.1
 
 *   Add package citation.
