@@ -1,3 +1,8 @@
+# fastcpd 0.7.3
+
+*   Allow multiple response variables in the `formula`.
+*   Add fastcpd logo to README.
+
 # fastcpd 0.7.2
 
 *   Add suggested package checking in tests.
