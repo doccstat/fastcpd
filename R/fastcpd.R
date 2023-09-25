@@ -630,7 +630,7 @@ fastcpd <- function(
   match_formula[[1L]] <- quote(stats::model.frame)
   match_formula <- eval(match_formula, parent.frame())
   mt <- attr(match_formula, "terms")
-  y <- stats::model.response(match_formula, "numeric")
+  y <- stats::model.response(match_formula, "any")
   x <- stats::model.matrix(mt, match_formula)
   data <- cbind(y, x)
 
