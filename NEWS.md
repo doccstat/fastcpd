@@ -1,3 +1,8 @@
+# fastcpd 0.7.4
+
+*   Update website UI.
+*   Update `fastcpd` documentation.
+
 # fastcpd 0.7.3
 
 *   Allow multiple response variables in the `formula`.
