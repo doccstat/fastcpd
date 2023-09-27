@@ -35,8 +35,17 @@ To learn more behind the algorithms:
 install.packages("fastcpd")
 ```
 
+<details close>
+<summary>
+Development version
+</summary>
+
 ``` r
-# Install the development version using either of the following commands:
+# Development version from r-universe with CRAN version as a fallback
+install.packages(
+  "fastcpd",
+  repos = c("https://doccstat.r-universe.dev", "https://cloud.r-project.org")
+)
 
 ## install.packages("pak")
 pak::pak("doccstat/fastcpd")
@@ -45,30 +54,31 @@ pak::pak("doccstat/fastcpd")
 devtools::install_github("doccstat/fastcpd")
 ```
 
-### FAQ
-
+</details>
 <details close>
 <summary>
-I countered problems related to gfortran on mac!
+With mamba or conda (available soon)
 </summary>
 
-The package should be able to install on mac without any problems if all
-the dependencies are installed. However, if you encountered problems
-related to gfortran, it might be because `RcppArmadillo` is not
-installed previously. Try this [stackoverflow
-solution](https://stackoverflow.com/a/72997915) if you have trouble
-installing `RcppArmadillo`.
+``` bash
+# conda-forge is a fork from CRAN and may not be up-to-date
+
+# Use mamba
+mamba install r-fastcpd
+# Use conda
+conda install -c conda-forge r-fastcpd
+```
 
 </details>
 
-### Dependency
+### FAQ
 
 <details close>
 <summary>
 Package dependencies
 </summary>
 
-`library(fastcpd)` depends on the following packages:
+`fastcpd` depends on the following packages:
 
 - [Rcpp](https://github.com/RcppCore/Rcpp), for C++ source code
   compilation.
@@ -99,6 +109,22 @@ pak::pkg_sysreqs("doccstat/fastcpd")
 ```
 
 </details>
+<details close>
+<summary>
+I countered problems related to gfortran on Mac OSX or Linux!
+</summary>
+
+The package should be able to install on Mac and any Linux distribution
+without any problems if all the dependencies are installed. However, if
+you encountered problems related to gfortran, it might be because
+`RcppArmadillo` is not installed previously. Try [Mac OSX stackoverflow
+solution](https://stackoverflow.com/a/72997915) or [Linux stackover
+solution](https://stackoverflow.com/a/15540919) if you have trouble
+installing `RcppArmadillo`.
+
+</details>
+<!-- TODO(doccstat): Add a cheatsheet like the `ggplot2` package. -->
+<!-- TODO(doccstat): Leave only one example. -->
 
 ## Examples
 
@@ -811,7 +837,8 @@ Encountered a bug or unintended behavior?
 
 1.  File a ticket at [GitHub
     Issues](https://github.com/doccstat/fastcpd/issues).
-2.  Contact the developers specified in [DESCRIPTION](/DESCRIPTION).
+2.  Contact the authors specified in
+    [DESCRIPTION](https://github.com/doccstat/fastcpd/blob/main/DESCRIPTION#L5-L10).
 
 ## Stargazers over time
 
