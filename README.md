@@ -220,6 +220,74 @@ summary(result)
 #> 1 0.9520606 -0.8054074 0.3692224
 ```
 
+### linear regression with noise variance not equal to 1
+
+``` r
+library(fastcpd)
+set.seed(1)
+p <- 4
+n <- 300
+cp <- c(100, 200)
+x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+theta_0 <- rbind(c(1, 3.2, -1, 0), c(-1, -0.5, 2.5, -2), c(0.8, -0.3, 1, 1))
+y <- c(
+  x[1:cp[1], ] %*% theta_0[1, ] + rnorm(cp[1], 0, sd = 3),
+  x[(cp[1] + 1):cp[2], ] %*% theta_0[2, ] + rnorm(cp[2] - cp[1], 0, sd = 3),
+  x[(cp[2] + 1):n, ] %*% theta_0[3, ] + rnorm(n - cp[2], 0, sd = 3)
+)
+
+# Compute the variance estimation for each block and then take the average.
+block_size <- 5
+variance_estimation <- rep(NA, n - block_size)
+for (i in 1:(n - block_size)) {
+  block_index <- seq_len(block_size) + i - 1
+  block_index_lagged <- seq_len(block_size) + i
+  y_block <- y[block_index]
+  x_block <- x[block_index, ]
+  y_block_lagged <- y[block_index_lagged]
+  x_block_lagged <- x[block_index_lagged, ]
+  x_t_x <- crossprod(x_block)
+  x_t_x_lagged <- crossprod(x_block_lagged)
+  block_slope <- solve(crossprod(x_block), crossprod(x_block, y_block))
+  block_lagged_slope <- solve(
+    crossprod(x_block_lagged), crossprod(x_block_lagged, y_block_lagged)
+  )
+  x_t_x_inv <- solve(x_t_x)
+  x_t_x_inv_lagged <- solve(x_t_x_lagged)
+  inv_product <- x_t_x_inv %*% x_t_x_inv_lagged
+  cross_term <-
+    inv_product %*% crossprod(x_block[-1, ], x_block_lagged[-block_size, ])
+  delta_numerator <- crossprod(block_slope - block_lagged_slope)
+  delta_denominator <-
+    sum(diag(x_t_x_inv + x_t_x_inv_lagged - 2 * cross_term))
+  variance_estimation[i] <- delta_numerator / delta_denominator
+}
+result <- fastcpd(
+  data = data.frame(y = y, x = x),
+  beta = (p + 1) * log(n) / 2 * mean(variance_estimation),
+  family = "gaussian",
+)
+summary(result)
+#> 
+#> Call:
+#> fastcpd(data = data.frame(y = y, x = x), beta = (p + 1) * log(n)/2 * 
+#>     mean(variance_estimation), family = "gaussian")
+#> 
+#> Change points:
+#> 100 201 
+#> 
+#> Cost values:
+#> 499.5254 328.5244 459.3819 
+#> 
+#> Parameters:
+#>    segment 1  segment 2  segment 3
+#> 1  0.7054739 -0.5373328 0.23439463
+#> 2  0.8005173 -0.8915565 0.87884516
+#> 3  3.6097492 -0.5539604 0.03698789
+#> 4 -1.3438206  2.2831450 1.01253653
+#> 5  0.1352143 -2.0567371 1.28948015
+```
+
 ### logistic regression
 
 ``` r

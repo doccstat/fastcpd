@@ -2,10 +2,35 @@ url: https://fastcpd.xingchi.li
 template:
   bootstrap: 5
   bslib:
-    base_font: {google: {family: "Source Sans Pro", wght: [400, 600], ital: [0, 1]}}
-    code_font: {google: "Source Code Pro"}
+    base_font:
+      { google: { family: "Source Sans Pro", wght: [400, 600], ital: [0, 1] } }
+    code_font: { google: "Source Code Pro" }
     font_scale: 1.2
     primary: "#447099"
+
+reference:
+  - title: Main function
+    desc: >
+      All implementation of fastcpd is unified into one single function
+      `fastcpd()`.
+    contents:
+      - fastcpd
+
+  - title: Main class
+    desc: >
+      The results of `fastcpd()` will be stored in the class `fastcpd` with
+      accompanied several utility functions.
+    contents:
+      - fastcpd-class
+
+  - title: Utility functions
+    desc: >
+      The following functions help with visualization and analyzation of the data.
+    contents:
+      - plot.fastcpd
+      - print.fastcpd
+      - show.fastcpd
+      - summary.fastcpd
 
 authors:
   Xingchi Li:
