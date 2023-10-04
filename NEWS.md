@@ -2,6 +2,7 @@
 
 *   Add variance estimation example in linear regression.
 *   Update reference page.
+*   Add validation for `family`.
 
 # fastcpd 0.7.4
 

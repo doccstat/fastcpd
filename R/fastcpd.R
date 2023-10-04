@@ -672,6 +672,14 @@ fastcpd <- function(
   x <- stats::model.matrix(mt, match_formula)
   data <- cbind(y, x)
 
+  if (!(is.null(family) || family %in% c("gaussian", "binomial", "poisson",
+                                         "lasso", "custom"))) {
+    error_message <- r"[
+The family should be one of "gaussian", "binomial", "poisson", "lasso", "custom"
+or `NULL` while the provided family is {family}.]"
+    stop(gsub("{family}", family, error_message, fixed = TRUE))
+  }
+
   if (is.null(family) || length(formals(cost)) == 1) {
     family <- "custom"
   }
