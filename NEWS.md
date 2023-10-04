@@ -1,3 +1,8 @@
+# fastcpd 0.7.5
+
+*   Add variance estimation example in linear regression.
+*   Update reference page.
+
 # fastcpd 0.7.4
 
 *   Update website UI.
