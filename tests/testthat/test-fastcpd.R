@@ -77,6 +77,8 @@ testthat::test_that(
       variance_estimation[i] <- delta_numerator / delta_denominator
     }
 
+    testthat::expect_equal(mean(variance_estimation), 10.472932)
+
     result <- fastcpd(
       data = data.frame(y = y, x = x),
       beta = (p + 1) * log(n) / 2 * mean(variance_estimation),
