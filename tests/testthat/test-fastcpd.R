@@ -1,4 +1,18 @@
 testthat::test_that(
+  "invalid family provided", {
+    testthat::expect_error(
+      fastcpd(
+        data = data.frame(y = 0, x = 0),
+        family = "bin0mial"
+      ),
+      r"[
+The family should be one of "gaussian", "binomial", "poisson", "lasso", "custom"
+or `NULL` while the provided family is bin0mial.]"
+    )
+  }
+)
+
+testthat::test_that(
   "example linear regression", {
     testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
