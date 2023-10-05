@@ -810,6 +810,40 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "ar(1) model with `forecast::Arima` calculation of ML", {
+    set.seed(1)
+    n <- 400
+    p <- 1
+    time_series <- rep(0, n + 1)
+    for (i in 1:200) {
+      time_series[i + 1] <- 0.6 * time_series[i] + rnorm(1)
+    }
+    for (i in 201:400) {
+      time_series[i + 1] <- 0.3 * time_series[i] + rnorm(1)
+    }
+    ar1_loss <- function(data) {
+      tryCatch(
+        expr = -forecast::Arima(
+          c(data), order = c(1, 0, 0), include.mean = FALSE, method = "ML"
+        )$loglik,
+        error = function(e) {
+          0
+        }
+      )
+    }
+    result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(x = time_series[-1]),
+      beta = (2 * p + 1) * log(n) / 2,
+      p = p,
+      cost = ar1_loss
+    )
+
+    testthat::expect_equal(result@cp_set, 178)
+  }
+)
+
+testthat::test_that(
   "var(1) model with p = 2", {
     set.seed(1)
     n <- 1000
