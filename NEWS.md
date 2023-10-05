@@ -4,6 +4,7 @@
 *   Update reference page.
 *   Add validation for `family`.
 *   Add user selection when `ggplot2` is not installed.
+*   Add AR(1) using `forecast` example in the tests.
 
 # fastcpd 0.7.4
 
