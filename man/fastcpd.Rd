@@ -204,6 +204,10 @@ Proceedings of Machine Learning Research, 1129-1143.
 
 \examples{
 \donttest{
+if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
+  "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+
 ### linear regression
 library(fastcpd)
 set.seed(1)
