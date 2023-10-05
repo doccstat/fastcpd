@@ -3,6 +3,7 @@
 *   Add variance estimation example in linear regression.
 *   Update reference page.
 *   Add validation for `family`.
+*   Add user selection when `ggplot2` is not installed.
 
 # fastcpd 0.7.4
 

@@ -28,11 +28,13 @@ Imports:
     Matrix,
     methods,
     Rcpp (>= 0.11.0),
-    stats
+    stats,
+    utils
 Suggests:
     abind,
     ggplot2,
     knitr,
+    mockery,
     mvtnorm,
     rmarkdown,
     testthat (>= 3.0.0),

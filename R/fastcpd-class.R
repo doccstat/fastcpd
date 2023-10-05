@@ -40,10 +40,24 @@ setClass(
 plot.fastcpd <- function(x, ...) {
   # Plot the built in families only.
   stopifnot(x@family != "custom")
-
-  # TODO(doccstat): `ggplot2` is used here. Need to update the DESCRIPTION file
-  # or add dependency check so that default plot is used if `ggplot2` is not
-  # installed.
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    user_selection <- utils::menu(
+      c("yes", "no"),
+      title = "ggplot2 is not installed. Do you want to install it?"
+    )
+    if (user_selection == 1) {
+      tryCatch(
+        expr = utils::install.packages(
+          "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
+        ),
+        error = function(e) {
+          stop("ggplot2 could not be installed.")
+        }
+      )
+    } else {
+      message("ggplot2 is not installed. No plot is made.")
+    }
+  }
   if (requireNamespace("ggplot2", quietly = TRUE)) {
     y <- x@data[, 1]
     p <- ggplot2::ggplot() +

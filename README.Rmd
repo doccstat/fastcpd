@@ -11,6 +11,11 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-"
 )
 options(cli.hyperlink = FALSE, eval = TRUE)
+
+if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
+  "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+#'
 ```
 
 # fastcpd <a href="https://fastcpd.xingchi.li"><img src="man/figures/logo.svg" align="right" height="138" /></a>
