@@ -697,7 +697,7 @@ or `NULL` while the provided family is {family}.]"
   }
 
   if (!is.null(cost) && length(formals(cost)) == 1) {
-    family == "vanilla"
+    family <- "vanilla"
     vanilla_percentage <- 1
   }
 
