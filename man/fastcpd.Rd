@@ -18,9 +18,9 @@ fastcpd(
   winsorise_minval = -20,
   winsorise_maxval = 20,
   p = NULL,
-  cost = negative_log_likelihood,
-  cost_gradient = cost_update_gradient,
-  cost_hessian = cost_update_hessian,
+  cost = NULL,
+  cost_gradient = NULL,
+  cost_hessian = NULL,
   cp_only = FALSE,
   vanilla_percentage = 0
 )
