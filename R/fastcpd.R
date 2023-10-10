@@ -659,9 +659,9 @@ fastcpd <- function(
     winsorise_minval = -20,
     winsorise_maxval = 20,
     p = NULL,
-    cost = negative_log_likelihood,
-    cost_gradient = cost_update_gradient,
-    cost_hessian = cost_update_hessian,
+    cost = NULL,
+    cost_gradient = NULL,
+    cost_hessian = NULL,
     cp_only = FALSE,
     vanilla_percentage = 0) {
   # The following code is adapted from the `lm` function from base R.
@@ -684,12 +684,21 @@ or `NULL` while the provided family is {family}.]"
     stop(gsub("{family}", family, error_message, fixed = TRUE))
   }
 
-  if (is.null(family) || length(formals(cost)) == 1) {
+  # If the family is not provided, or a custom cost function is provided, the
+  # family will be set to be "custom". No need to check the gradient or
+  # Hessian since providing a custom gradient or Hessian requires a custom
+  # cost function.
+  if (is.null(family) || !is.null(cost)) {
     family <- "custom"
   }
 
   if (family == "custom") {
     cp_only <- TRUE
+  }
+
+  if (!is.null(cost) && length(formals(cost)) == 1) {
+    family == "vanilla"
+    vanilla_percentage <- 1
   }
 
   if (is.null(p)) {
@@ -700,8 +709,14 @@ or `NULL` while the provided family is {family}.]"
     beta <- (p + 1) * log(nrow(data)) / 2
   }
 
-  if (length(formals(cost)) == 1) {
-    vanilla_percentage <- 1
+  if (is.null(cost)) {
+    cost <- negative_log_likelihood
+  }
+  if (is.null(cost_gradient)) {
+    cost_gradient <- cost_update_gradient
+  }
+  if (is.null(cost_hessian)) {
+    cost_hessian <- cost_update_hessian
   }
 
   if (family == "lasso") {

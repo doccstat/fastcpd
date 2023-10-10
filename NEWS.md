@@ -1,3 +1,7 @@
+# fastcpd 0.7.6
+
+*   Move default cost functions definition inside the `fastcpd` definition.
+
 # fastcpd 0.7.5
 
 *   Add variance estimation example in linear regression.
