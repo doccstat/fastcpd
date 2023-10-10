@@ -1,6 +1,7 @@
 # fastcpd 0.7.6
 
 *   Move default cost functions definition inside the `fastcpd` definition.
+*   Define constant unordered set to store the family sets.
 
 # fastcpd 0.7.5
 

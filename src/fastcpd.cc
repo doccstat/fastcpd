@@ -11,6 +11,16 @@ using ::Rcpp::NumericMatrix;
 using ::Rcpp::NumericVector;
 using ::Rcpp::S4;
 
+// TODO(doccstat): `std::unordered_set` is not literal type and thus `constexpr`
+// can not be used here. Blocked by `abseil` due to the non-header only issue.
+const std::unordered_set<std::string> CUSTOM_FAMILIES = {
+  "custom", "vanilla"
+};
+
+const std::unordered_set<std::string> FASTCPD_FAMILIES = {
+  "gaussian", "binomial", "poisson", "lasso",
+};
+
 namespace fastcpd {
 
 FastcpdParameters::FastcpdParameters(
@@ -227,7 +237,7 @@ void FastcpdParameters::create_gradients() {
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian.slice(0) = epsilon * arma::eye<arma::mat>(p, p) +
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1);
-  } else if (family == "custom") {
+  } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
     theta_hat.col(0) = segment_theta_hat.row(0).t();
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian.slice(0) = arma::zeros<arma::mat>(p, p);
@@ -263,7 +273,7 @@ void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
   } else if (family == "lasso" || family == "gaussian") {
     hessian_new =
         new_data.t() * new_data + epsilon * arma::eye<arma::mat>(p, p);
-  } else if (family == "custom") {
+  } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
     hessian_new = arma::zeros<arma::mat>(p, p);
   }
 
@@ -452,7 +462,7 @@ List cost_update(
   arma::mat hessian_i = hessian.slice(i - 1);
   arma::colvec gradient;
 
-  if (family == "custom") {
+  if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
     NumericMatrix cost_hessian_result = cost_hessian(
       data, theta_hat.col(i - 1)
     );
@@ -510,7 +520,7 @@ List cost_update(
 
   for (int kk = 1; kk <= as<int>(k(data.n_rows - tau)); kk++) {
     for (unsigned j = tau + 1; j <= data.n_rows; j++) {
-      if (family == "custom") {
+      if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
         NumericMatrix cost_hessian_result = cost_hessian(
           data.rows(tau, j - 1), theta_hat.col(i - 1)
         );
@@ -588,7 +598,7 @@ List cost_optim(
       Named("value") = cost(data_segment),
       Named("residuals") = R_NilValue
     );
-  } else if (family == "custom" && p == 1) {
+  } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end() && p == 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result = optim(
@@ -615,7 +625,7 @@ List cost_optim(
         (1 + exp(as<double>(optim_result["value"]))),
       Named("residuals") = R_NilValue
     );
-  } else if (family == "custom" && p > 1) {
+  } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end() && p > 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result = optim(
@@ -752,12 +762,15 @@ List fastcpd_impl(
           theta = as<arma::colvec>(winsorize_result);
         }
         if (
-          (family != "custom" && family != "lasso" && t - tau >= p) ||
+          (
+            FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end() &&
+            family != "lasso" && t - tau >= p
+          ) ||
           (family == "lasso" && t - tau >= 3)
         ) {
           List cost_result = cost(data_segment, theta, family, lambda);
           cval(i - 1) = as<double>(cost_result["value"]);
-        } else if (family == "custom") {
+        } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
           // if (warm_start && t - tau >= 50) {
           //   cost_result <- cost(data_segment, start = start[, tau + 1])
           //   start[, tau + 1] <- cost_result$par
@@ -1082,7 +1095,7 @@ List append_fastcpd_parameters(
     } else if (family == "lasso" || family == "gaussian") {
       hessian_new =
           new_data.t() * new_data + epsilon * arma::eye<arma::mat>(p, p);
-    } else if (family == "custom") {
+    } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
       hessian_new = arma::zeros<arma::mat>(p, p);
     }
 
