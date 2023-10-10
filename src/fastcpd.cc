@@ -589,10 +589,7 @@ List cost_optim(
     const double lambda,
     const bool cv
 ) {
-  Environment base = Environment::namespace_env("base");
-  Function formals = base["formals"],
-            length = base["length"];
-  if (as<unsigned int>(length(formals(cost))) == 1) {
+  if (family == "vanilla") {
     return List::create(
       Named("par") = R_NilValue,
       Named("value") = cost(data_segment),

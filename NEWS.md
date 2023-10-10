@@ -2,6 +2,9 @@
 
 *   Move default cost functions definition inside the `fastcpd` definition.
 *   Define constant unordered set to store the family sets.
+*   Avoid using `length(formals(cost))` to check the number of arguments of
+    `cost` function.
+*   Introduce an internal family "vanilla".
 
 # fastcpd 0.7.5
 
