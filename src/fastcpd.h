@@ -121,6 +121,23 @@ class FastcpdParameters {
   // `cost_hessian` is the Hessian of the cost function to be used.
   Nullable<Function> cost_hessian;
 
+  // Gradient of the cost function. If the cost function is provided in R, this
+  // will be a wrapper of the R function.
+  std::function<arma::colvec(
+      arma::mat data,
+      arma::colvec theta,
+      std::string family
+  )> cost_gradient_wrapper;
+
+  // Hessian of the cost function. If the cost function is provided in R, this
+  // will be a wrapper of the R function.
+  std::function<arma::mat(
+      arma::mat data,
+      arma::colvec theta,
+      std::string family,
+      double min_prob
+  )> cost_hessian_wrapper;
+
  private:
   // `data` is the data set to be segmented.
   arma::mat data;
@@ -188,23 +205,6 @@ class FastcpdParameters {
       bool cv,
       Nullable<arma::colvec> start
   )> cost_function_wrapper;
-
-  // Gradient of the cost function. If the cost function is provided in R, this
-  // will be a wrapper of the R function.
-  std::function<arma::colvec(
-      arma::mat data,
-      arma::colvec theta,
-      std::string family
-  )> cost_gradient_wrapper;
-
-  // Hessian of the cost function. If the cost function is provided in R, this
-  // will be a wrapper of the R function.
-  std::function<arma::mat(
-      arma::mat data,
-      arma::colvec theta,
-      std::string family,
-      double min_prob
-  )> cost_hessian_wrapper;
 
 //   Function* winsorize;
 //   void create_environment_functions();
@@ -322,38 +322,33 @@ arma::mat cost_update_hessian(
     double min_prob
 );
 
-//' Update the cost values for the segmentation.
-//' This function is not meant to be called directly by the user.
-//'
-//' @param data A data frame containing the data to be segmented.
-//' @param theta_hat Estimated theta from the previous iteration.
-//' @param theta_sum Sum of estimated theta from the previous iteration.
-//' @param hessian Hessian matrix from the previous iteration.
-//' @param tau Start of the current segment.
-//' @param i Index of the current data in the whole data set.
-//' @param k Number of epochs in SGD.
-//' @param family Family of the model.
-//' @param momentum Momentum from the previous iteration.
-//' @param momentum_coef Momentum coefficient to be applied to the current
-//'   momentum.
-//' @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
-//'   poisson.
-//' @param min_prob Minimum probability to avoid numerical issues. Only used for
-//'   poisson.
-//' @param winsorise_minval Minimum value to be winsorised. Only used for
-//'   poisson.
-//' @param winsorise_maxval Maximum value to be winsorised. Only used for
-//'   poisson.
-//' @param lambda Lambda for L1 regularization. Only used for lasso.
-//' @param cost_gradient Gradient for custom cost function.
-//' @param cost_hessian Hessian for custom cost function.
-//' @keywords internal
-//' @importFrom DescTools Winsorize
-//'
-//' @noRd
-//' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
-//'   \code{hessian}, and \code{momentum}.
-// [[Rcpp::export]]
+// Update the cost values for the segmentation.
+//
+// @param data A data frame containing the data to be segmented.
+// @param theta_hat Estimated theta from the previous iteration.
+// @param theta_sum Sum of estimated theta from the previous iteration.
+// @param hessian Hessian matrix from the previous iteration.
+// @param tau Start of the current segment.
+// @param i Index of the current data in the whole data set.
+// @param k Number of epochs in SGD.
+// @param family Family of the model.
+// @param momentum Momentum from the previous iteration.
+// @param momentum_coef Momentum coefficient to be applied to the current
+//   momentum.
+// @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
+//   poisson.
+// @param min_prob Minimum probability to avoid numerical issues. Only used for
+//   poisson.
+// @param winsorise_minval Minimum value to be winsorised. Only used for
+//   poisson.
+// @param winsorise_maxval Maximum value to be winsorised. Only used for
+//   poisson.
+// @param lambda Lambda for L1 regularization. Only used for lasso.
+// @param cost_gradient Gradient for custom cost function.
+// @param cost_hessian Hessian for custom cost function.
+//
+// @return A list containing new values of \code{theta_hat}, \code{theta_sum},
+//   \code{hessian}, and \code{momentum}.
 List cost_update(
     const arma::mat data,
     arma::mat theta_hat,
@@ -370,25 +365,30 @@ List cost_update(
     const double winsorise_minval,
     const double winsorise_maxval,
     const double lambda,
-    Function cost_gradient,
-    Function cost_hessian
+    std::function<arma::colvec(
+        arma::mat data,
+        arma::colvec theta,
+        std::string family
+    )> cost_gradient_wrapper,
+    std::function<arma::mat(
+        arma::mat data,
+        arma::colvec theta,
+        std::string family,
+        double min_prob
+    )> cost_hessian_wrapper
 );
 
-//' Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
-//' This function is not meant to be called directly by the user.
-//'
-//' @param family Family of the model.
-//' @param p Number of parameters.
-//' @param data_segment A data frame containing a segment of the data.
-//' @param cost Cost function.
-//' @param lambda Lambda for L1 regularization.
-//' @param cv Whether to perform cross-validation to find the best lambda.
-//' @keywords internal
-//'
-//' @noRd
-//' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
-//'   and \code{hessian}.
-// [[Rcpp::export]]
+// Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
+//
+// @param family Family of the model.
+// @param p Number of parameters.
+// @param data_segment A data frame containing a segment of the data.
+// @param cost Cost function.
+// @param lambda Lambda for L1 regularization.
+// @param cv Whether to perform cross-validation to find the best lambda.
+//
+// @return A list containing new values of \code{theta_hat}, \code{theta_sum},
+//   and \code{hessian}.
 List cost_optim(
     const std::string family,
     const int p,
@@ -433,6 +433,7 @@ List cost_optim(
 //'   have an explicit solution, i.e. does not depend on coefficients like
 //'   the mean change case, this parameter will be set to be 1.
 //' @keywords internal
+//' @importFrom DescTools Winsorize
 //'
 //' @noRd
 //' @return A list containing the change points and the cost values for each
