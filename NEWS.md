@@ -7,6 +7,7 @@
 
 *   Separate the use of internal C++ cost functions and user-defined R cost
     functions.
+*   Add Codecov Icicle plot in README.
 
 # fastcpd 0.7.6
 

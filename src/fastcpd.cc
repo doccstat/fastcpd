@@ -28,12 +28,12 @@ CostFunction::CostFunction(Rcpp::Function cost) : cost(cost) {}
 List CostFunction::operator()(
     arma::mat data,
     Nullable<arma::colvec> theta,
-    std::string family,
-    double lambda,
-    bool cv,
-    Nullable<arma::colvec> start
+    std::string family,  // UNUSED
+    double lambda,  // UNUSED
+    bool cv,  // UNUSED
+    Nullable<arma::colvec> start  // UNUSED
 ) {
-  return cost(data, theta, family, lambda, cv, start);
+  return theta.isNull()? cost(data) : cost(data, theta);
 }
 
 CostGradient::CostGradient(Rcpp::Function cost_gradient) :
@@ -42,9 +42,9 @@ CostGradient::CostGradient(Rcpp::Function cost_gradient) :
 arma::colvec CostGradient::operator()(
     arma::mat data,
     arma::colvec theta,
-    std::string family
+    std::string family  // UNUSED
 ) {
-  return as<arma::colvec>(cost_gradient(data, theta, family));
+  return as<arma::colvec>(cost_gradient(data, theta));
 }
 
 CostHessian::CostHessian(Rcpp::Function cost_hessian) :
@@ -53,10 +53,10 @@ CostHessian::CostHessian(Rcpp::Function cost_hessian) :
 arma::mat CostHessian::operator()(
     arma::mat data,
     arma::colvec theta,
-    std::string family,
-    double min_prob
+    std::string family,  // UNUSED
+    double min_prob  // UNUSED
 ) {
-  return as<arma::mat>(cost_hessian(data, theta, family, min_prob));
+  return as<arma::mat>(cost_hessian(data, theta));
 }
 
 FastcpdParameters::FastcpdParameters(
@@ -332,6 +332,9 @@ void FastcpdParameters::wrap_cost(Nullable<Function> cost) {
     cost_function_wrapper = costFunction;
   } else if (cost.isNull()) {
     Rcpp::stop("cost function must be specified for custom family");
+  } else {
+    // NOTEST
+    Rcpp::stop("Internal error, this branch should not be reached.");
   }
 }
 
@@ -340,9 +343,13 @@ void FastcpdParameters::wrap_cost_gradient(Nullable<Function> cost_gradient) {
   if (FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end()) {
     cost_gradient_wrapper = &cost_update_gradient;
   } else if (cost_gradient.isNotNull()) {
-    // `cost_gradient` can be `NULL` in the case of vanilla PELT.
     CostGradient costGradient(cost_gradient.get());
     cost_gradient_wrapper = costGradient;
+  } else if (cost_gradient.isNull()) {
+    // `cost_gradient` can be `NULL` in the case of vanilla PELT.
+  } else {
+    // NOTEST
+    Rcpp::stop("Internal error, this branch should not be reached.");
   }
 }
 
@@ -351,9 +358,13 @@ void FastcpdParameters::wrap_cost_hessian(Nullable<Function> cost_hessian) {
   if (FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end()) {
     cost_hessian_wrapper = &cost_update_hessian;
   } else if (cost_hessian.isNotNull()) {
-    // `cost_hessian` can be `NULL` in the case of vanilla PELT.
     CostHessian costHessian(cost_hessian.get());
     cost_hessian_wrapper = costHessian;
+  } else if (cost_hessian.isNull()) {
+    // `cost_hessian` can be `NULL` in the case of vanilla PELT.
+  } else {
+    // NOTEST
+    Rcpp::stop("Internal error, this branch should not be reached.");
   }
 }
 
@@ -756,8 +767,7 @@ List cost_optim(
         (1 + exp(as<double>(optim_result["value"]))),
       Named("residuals") = R_NilValue
     );
-  } else {
-    // p > 1
+  } else if (p > 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result = optim(
@@ -771,6 +781,9 @@ List cost_optim(
       Named("value") = optim_result["value"],
       Named("residuals") = R_NilValue
     );
+  } else {
+    // NOTEST
+    Rcpp::stop("Internal error, this branch should not be reached.");
   }
 }
 
@@ -849,7 +862,7 @@ List fastcpd_impl(
           );
         } else {
           cost_optim_result = negative_log_likelihood(
-             data_segment, R_NilValue, family, 0, true
+              data_segment, R_NilValue, family, 0, true
           );
         }
         cval(i - 1) = as<double>(cost_optim_result["value"]);
@@ -905,7 +918,6 @@ List fastcpd_impl(
           );
           theta = as<arma::colvec>(winsorize_result);
         }
-        Function cost_non_null = fastcpd_parameters_class.cost.get();
         if (
           (
             FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end() &&
@@ -913,7 +925,9 @@ List fastcpd_impl(
           ) ||
           (family == "lasso" && t - tau >= 3)
         ) {
-          List cost_result = cost_non_null(data_segment, theta, family, lambda);
+          List cost_result = negative_log_likelihood(
+            data_segment, Rcpp::wrap(theta), family, lambda
+          );
           cval(i - 1) = as<double>(cost_result["value"]);
         } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
           // if (warm_start && t - tau >= 50) {
@@ -921,8 +935,9 @@ List fastcpd_impl(
           //   start[, tau + 1] <- cost_result$par
           //   cval[i] <- cost_result$value
           // } else {
-            SEXP cost_result = cost_non_null(data_segment, theta);
-            cval(i - 1) = as<double>(cost_result);
+          Function cost_non_null = fastcpd_parameters_class.cost.get();
+          SEXP cost_result = cost_non_null(data_segment, theta);
+          cval(i - 1) = as<double>(cost_result);
           // }
         }
       }
