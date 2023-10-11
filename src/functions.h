@@ -1,10 +1,7 @@
-#ifndef FUNCTIONS_H
-#define FUNCTIONS_H
+#ifndef FUNCTIONS_H_
+#define FUNCTIONS_H_
 
-#include "RcppArmadillo.h"
-
-using ::Rcpp::List;
-using ::Rcpp::Nullable;
+#include "fastcpd_types.h"
 
 namespace fastcpd::functions {
 
@@ -22,12 +19,12 @@ namespace fastcpd::functions {
 // @return Negative log likelihood of the corresponding data with the given
 //   family.
 List negative_log_likelihood(
-    arma::mat data,
-    Nullable<arma::colvec> theta,
-    std::string family,
+    mat data,
+    Nullable<colvec> theta,
+    string family,
     double lambda,
     bool cv = false,
-    Nullable<arma::colvec> start = R_NilValue
+    Nullable<colvec> start = R_NilValue
 );
 
 // Function to calculate the gradient at the current data.
@@ -37,11 +34,7 @@ List negative_log_likelihood(
 // @param family Family of the model.
 //
 // @return Gradient at the current data.
-arma::colvec cost_update_gradient(
-    arma::mat data,
-    arma::colvec theta,
-    std::string family
-);
+colvec cost_update_gradient(mat data, colvec theta, string family);
 
 // Function to calculate the Hessian matrix at the current data.
 //
@@ -51,13 +44,13 @@ arma::colvec cost_update_gradient(
 // @param min_prob Minimum probability to avoid numerical issues.
 //
 // @return Hessian at the current data.
-arma::mat cost_update_hessian(
-    arma::mat data,
-    arma::colvec theta,
-    std::string family,
+mat cost_update_hessian(
+    mat data,
+    colvec theta,
+    string family,
     double min_prob
 );
 
 }  // namespace fastcpd::functions
 
-#endif  // FUNCTIONS_H
+#endif  // FUNCTIONS_H_

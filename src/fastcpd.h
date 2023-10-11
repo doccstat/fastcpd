@@ -1,11 +1,7 @@
-#ifndef FASTCPD_H
-#define FASTCPD_H
+#ifndef FASTCPD_H_
+#define FASTCPD_H_
 
-#include <RcppArmadillo.h>
-
-using ::Rcpp::Function;
-using ::Rcpp::List;
-using ::Rcpp::Nullable;
+#include "fastcpd_types.h"
 
 // Update the cost values for the segmentation.
 //
@@ -35,32 +31,25 @@ using ::Rcpp::Nullable;
 // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 //   \code{hessian}, and \code{momentum}.
 List cost_update(
-    const arma::mat data,
-    arma::mat theta_hat,
-    arma::mat theta_sum,
-    arma::cube hessian,
+    const mat data,
+    mat theta_hat,
+    mat theta_sum,
+    cube hessian,
     const int tau,
     const int i,
     Function k,
-    const std::string family,
-    arma::colvec momentum,
+    const string family,
+    colvec momentum,
     const double momentum_coef,
     const double epsilon,
     const double min_prob,
     const double winsorise_minval,
     const double winsorise_maxval,
     const double lambda,
-    std::function<arma::colvec(
-        arma::mat data,
-        arma::colvec theta,
-        std::string family
-    )> cost_gradient_wrapper,
-    std::function<arma::mat(
-        arma::mat data,
-        arma::colvec theta,
-        std::string family,
-        double min_prob
-    )> cost_hessian_wrapper
+    function<colvec(mat data, colvec theta, string family)>
+      cost_gradient_wrapper,
+    function<mat(mat data, colvec theta, string family, double min_prob)>
+      cost_hessian_wrapper
 );
 
 // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
@@ -75,9 +64,9 @@ List cost_update(
 // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 //   and \code{hessian}.
 List cost_optim(
-    const std::string family,
+    const string family,
     const int p,
-    const arma::mat data_segment,
+    const mat data_segment,
     Function cost,
     const double lambda,
     const bool cv
@@ -127,13 +116,13 @@ List cost_optim(
 //'   segment.
 // [[Rcpp::export]]
 List fastcpd_impl(
-    arma::mat data,
+    mat data,
     double beta,
     const int segment_count,
     const double trim,
     const double momentum_coef,
     Function k,
-    const std::string family,
+    const string family,
     const double epsilon,
     const double min_prob,
     const double winsorise_minval,
@@ -146,4 +135,4 @@ List fastcpd_impl(
     const double vanilla_percentage
 );
 
-#endif  // FASTCPD_H
+#endif  // FASTCPD_H_

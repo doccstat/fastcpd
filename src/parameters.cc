@@ -4,17 +4,13 @@
 #include "parameters.h"
 #include "wrappers.h"
 
-using ::Rcpp::as;
-using ::Rcpp::Environment;
-using ::Rcpp::NumericVector;
-
 namespace fastcpd::parameters {
 
 FastcpdParameters::FastcpdParameters(
-    arma::mat data,
+    mat data,
     const double beta,
     const int p,
-    const std::string family,
+    const string family,
     const int segment_count,
     const double winsorise_minval,
     const double winsorise_maxval,
@@ -28,14 +24,14 @@ FastcpdParameters::FastcpdParameters(
     winsorise_maxval(winsorise_maxval),
     epsilon(epsilon) {
   n = data.n_rows;
-  segment_indices = arma::vec(n);
-  segment_theta_hat = arma::mat(segment_count, p);
-  err_sd = arma::vec(segment_count);
-  act_num = arma::vec(segment_count);
-  theta_hat = arma::mat(p, 1);
-  theta_sum = arma::mat(p, 1);
-  hessian = arma::cube(p, p, 1);
-  momentum = arma::vec(p);
+  segment_indices = vec(n);
+  segment_theta_hat = mat(segment_count, p);
+  err_sd = vec(segment_count);
+  act_num = vec(segment_count);
+  theta_hat = mat(p, 1);
+  theta_sum = mat(p, 1);
+  hessian = cube(p, p, 1);
+  momentum = vec(p);
 
   // create_environment_functions();
 }
@@ -47,7 +43,7 @@ FastcpdParameters::FastcpdParameters(
 //   }
 // }
 
-arma::colvec FastcpdParameters::get_err_sd() {
+colvec FastcpdParameters::get_err_sd() {
   return err_sd;
 }
 
@@ -77,67 +73,67 @@ void FastcpdParameters::create_segment_indices() {
   }
 }
 
-arma::vec FastcpdParameters::get_segment_indices() {
+vec FastcpdParameters::get_segment_indices() {
   return segment_indices;
 }
 
-arma::mat FastcpdParameters::get_theta_hat() {
+mat FastcpdParameters::get_theta_hat() {
   return theta_hat;
 }
 
 void FastcpdParameters::update_theta_hat(
-  const unsigned int col, arma::colvec new_theta_hat
+  const unsigned int col, colvec new_theta_hat
 ) {
   theta_hat.col(col) = new_theta_hat;
 }
 
-void FastcpdParameters::update_theta_hat(arma::colvec new_theta_hat) {
+void FastcpdParameters::update_theta_hat(colvec new_theta_hat) {
   theta_hat = arma::join_rows(theta_hat, new_theta_hat);
 }
 
 void FastcpdParameters::create_theta_sum(
-  const unsigned int col, arma::colvec new_theta_sum
+  const unsigned int col, colvec new_theta_sum
 ) {
   theta_sum.col(col) = new_theta_sum;
 }
 
-arma::mat FastcpdParameters::get_theta_sum() {
+mat FastcpdParameters::get_theta_sum() {
   return theta_sum;
 }
 
 void FastcpdParameters::update_theta_sum(
-  const unsigned int col, arma::colvec new_theta_sum
+  const unsigned int col, colvec new_theta_sum
 ) {
   theta_sum.col(col) += new_theta_sum;
 }
 
-void FastcpdParameters::update_theta_sum(arma::colvec new_theta_sum) {
+void FastcpdParameters::update_theta_sum(colvec new_theta_sum) {
   theta_sum = arma::join_rows(theta_sum, new_theta_sum);
 }
 
-arma::cube FastcpdParameters::get_hessian() {
+cube FastcpdParameters::get_hessian() {
   return hessian;
 }
 
 void FastcpdParameters::update_hessian(
-  const unsigned int slice, arma::mat new_hessian
+  const unsigned int slice, mat new_hessian
 ) {
   hessian.slice(slice) = new_hessian;
 }
 
-void FastcpdParameters::update_hessian(arma::mat new_hessian) {
+void FastcpdParameters::update_hessian(mat new_hessian) {
   hessian = arma::join_slices(hessian, new_hessian);
 }
 
-void FastcpdParameters::update_theta_hat(arma::ucolvec pruned_left) {
+void FastcpdParameters::update_theta_hat(ucolvec pruned_left) {
   theta_hat = theta_hat.cols(pruned_left);
 }
 
-void FastcpdParameters::update_theta_sum(arma::ucolvec pruned_left) {
+void FastcpdParameters::update_theta_sum(ucolvec pruned_left) {
   theta_sum = theta_sum.cols(pruned_left);
 }
 
-void FastcpdParameters::update_hessian(arma::ucolvec pruned_left) {
+void FastcpdParameters::update_hessian(ucolvec pruned_left) {
   hessian = hessian.slices(pruned_left);
 }
 
@@ -145,16 +141,16 @@ void FastcpdParameters::create_segment_statistics() {
   for (
     int segment_index = 0; segment_index < segment_count; ++segment_index
   ) {
-    arma::ucolvec segment_indices_ =
+    ucolvec segment_indices_ =
         arma::find(segment_indices == segment_index + 1);
-    arma::mat data_segment = data.rows(segment_indices_);
-    arma::rowvec segment_theta;
+    mat data_segment = data.rows(segment_indices_);
+    rowvec segment_theta;
     if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
-      segment_theta = as<arma::rowvec>(
+      segment_theta = as<rowvec>(
         cost_optim(family, p, data_segment, cost.get(), 0, false)["par"]
       );
     } else {
-      segment_theta = as<arma::rowvec>(
+      segment_theta = as<rowvec>(
         fastcpd::functions::negative_log_likelihood(
           data_segment, R_NilValue, family, 0, false
         )["par"]
@@ -165,12 +161,11 @@ void FastcpdParameters::create_segment_statistics() {
     // estimated coefficients in the segment.
     segment_theta_hat.row(segment_index) = segment_theta;
     if (family == "lasso" || family == "gaussian") {
-      arma::colvec segment_residual = data_segment.col(0) -
+      colvec segment_residual = data_segment.col(0) -
         data_segment.cols(1, data_segment.n_cols - 1) * segment_theta.t();
-        double err_var =
-            arma::as_scalar(arma::mean(arma::pow(segment_residual, 2)));
+        double err_var = as_scalar(arma::mean(arma::pow(segment_residual, 2)));
         update_err_sd(segment_index, err_var);
-        act_num(segment_index) = arma::accu(arma::abs(segment_theta) > 0);
+        act_num(segment_index) = accu(arma::abs(segment_theta) > 0);
     }
   }
 }
@@ -181,19 +176,19 @@ void FastcpdParameters::update_beta() {
   }
 }
 
-arma::colvec FastcpdParameters::get_momentum() {
+colvec FastcpdParameters::get_momentum() {
   return momentum;
 }
 
-void FastcpdParameters::update_momentum(arma::colvec new_momentum) {
+void FastcpdParameters::update_momentum(colvec new_momentum) {
   momentum = new_momentum;
 }
 
-arma::mat FastcpdParameters::get_segment_theta_hat() {
+mat FastcpdParameters::get_segment_theta_hat() {
   return segment_theta_hat;
 }
 
-arma::colvec FastcpdParameters::get_act_num() {
+colvec FastcpdParameters::get_act_num() {
   return act_num;
 }
 
@@ -202,11 +197,11 @@ void FastcpdParameters::create_gradients() {
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     theta_hat.col(0) = segment_theta_hat.row(0).t();
     const double prob = 1 / (1 + exp(
-      -arma::as_scalar(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
+      -as_scalar(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
     ));
     hessian.slice(0) = (
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
-    ) * arma::as_scalar(prob * (1 - prob));
+    ) * as_scalar(prob * (1 - prob));
   } else if (family == "poisson") {
     Environment desc_tools = Environment::namespace_env("DescTools");
     Function winsorize = desc_tools["Winsorize"];
@@ -215,41 +210,39 @@ void FastcpdParameters::create_gradients() {
       Rcpp::_["minval"] = winsorise_minval,
       Rcpp::_["maxval"] = winsorise_maxval
     );
-    theta_hat.col(0) = arma::vec(
+    theta_hat.col(0) = vec(
       winsorize_result.begin(), winsorize_result.size(), false
     );
-    theta_sum.col(0) = arma::vec(
+    theta_sum.col(0) = vec(
       winsorize_result.begin(), winsorize_result.size(), false
     );
     hessian.slice(0) = (
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
-    ) * arma::as_scalar(
+    ) * as_scalar(
       exp(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
     );
   } else if (family == "lasso" || family == "gaussian") {
     theta_hat.col(0) = segment_theta_hat.row(0).t();
     theta_sum.col(0) = segment_theta_hat.row(0).t();
-    hessian.slice(0) = epsilon * arma::eye<arma::mat>(p, p) +
+    hessian.slice(0) = epsilon * eye<mat>(p, p) +
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1);
   } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
     theta_hat.col(0) = segment_theta_hat.row(0).t();
     theta_sum.col(0) = segment_theta_hat.row(0).t();
-    hessian.slice(0) = arma::zeros<arma::mat>(p, p);
+    hessian.slice(0) = zeros<mat>(p, p);
   }
 }
 
 void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
   // for tau = t-1
-  arma::rowvec new_data = data.row(t - 1).tail(data.n_cols - 1);
+  rowvec new_data = data.row(t - 1).tail(data.n_cols - 1);
   const int segment_index = segment_indices(t - 1);
-  arma::rowvec cum_coef_add = segment_theta_hat.row(segment_index - 1),
-                    coef_add = segment_theta_hat.row(segment_index - 1);
-  arma::mat hessian_new;
+  rowvec cum_coef_add = segment_theta_hat.row(segment_index - 1),
+             coef_add = segment_theta_hat.row(segment_index - 1);
+  mat hessian_new;
   if (family == "binomial") {
-    const double prob =
-        1 / (1 + exp(-arma::as_scalar(coef_add * new_data.t())));
-    hessian_new =
-        (new_data.t() * new_data) * arma::as_scalar(prob * (1 - prob));
+    const double prob = 1 / (1 + exp(-as_scalar(coef_add * new_data.t())));
+    hessian_new = (new_data.t() * new_data) * as_scalar(prob * (1 - prob));
   } else if (family == "poisson") {
     Environment desc_tools = Environment::namespace_env("DescTools");
     Function winsorize = desc_tools["Winsorize"];
@@ -258,17 +251,16 @@ void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
       Rcpp::_["minval"] = winsorise_minval,
       Rcpp::_["maxval"] = winsorise_maxval
     );
-    coef_add = as<arma::rowvec>(winsorize_result);
-    cum_coef_add = as<arma::rowvec>(winsorize_result);
+    coef_add = as<rowvec>(winsorize_result);
+    cum_coef_add = as<rowvec>(winsorize_result);
     hessian_new =
-        (new_data.t() * new_data) * arma::as_scalar(
+        (new_data.t() * new_data) * as_scalar(
           exp(coef_add * new_data.t())
         );
   } else if (family == "lasso" || family == "gaussian") {
-    hessian_new =
-        new_data.t() * new_data + epsilon * arma::eye<arma::mat>(p, p);
+    hessian_new = new_data.t() * new_data + epsilon * eye<mat>(p, p);
   } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
-    hessian_new = arma::zeros<arma::mat>(p, p);
+    hessian_new = zeros<mat>(p, p);
   }
 
   update_theta_hat(coef_add.t());
@@ -284,10 +276,10 @@ void FastcpdParameters::wrap_cost(Nullable<Function> cost) {
     fastcpd::wrappers::CostFunction costFunction(cost.get());
     cost_function_wrapper = costFunction;
   } else if (cost.isNull()) {
-    Rcpp::stop("cost function must be specified for custom family");
+    stop("cost function must be specified for custom family");
   } else {
     // NOTEST
-    Rcpp::stop("Internal error, this branch should not be reached.");
+    stop("Internal error, this branch should not be reached.");
   }
 }
 
@@ -302,7 +294,7 @@ void FastcpdParameters::wrap_cost_gradient(Nullable<Function> cost_gradient) {
     // `cost_gradient` can be `NULL` in the case of vanilla PELT.
   } else {
     // NOTEST
-    Rcpp::stop("Internal error, this branch should not be reached.");
+    stop("Internal error, this branch should not be reached.");
   }
 }
 
@@ -317,12 +309,12 @@ void FastcpdParameters::wrap_cost_hessian(Nullable<Function> cost_hessian) {
     // `cost_hessian` can be `NULL` in the case of vanilla PELT.
   } else {
     // NOTEST
-    Rcpp::stop("Internal error, this branch should not be reached.");
+    stop("Internal error, this branch should not be reached.");
   }
 }
 
 // List FastcpdParameters::cost_optim(
-//     const arma::mat data_segment,
+//     const mat data_segment,
 //     const double lambda,
 //     const bool cv
 // ) {
@@ -340,7 +332,7 @@ void FastcpdParameters::wrap_cost_hessian(Nullable<Function> cost_hessian) {
 //     List optim_result = optim(
 //       Named("par") = 0,
 //       Named("fn") = InternalFunction(
-//         +[](double theta, arma::mat data, Function cost) {
+//         +[](double theta, mat data, Function cost) {
 //           return cost(
 //             Named("data") = data,
 //             Named("theta") = log(theta / (1 - theta))
@@ -365,7 +357,7 @@ void FastcpdParameters::wrap_cost_hessian(Nullable<Function> cost_hessian) {
 //     Environment stats = Environment::namespace_env("stats");
 //     Function optim = stats["optim"];
 //     List optim_result = optim(
-//       Named("par") = arma::zeros<arma::vec>(p),
+//       Named("par") = zeros<vec>(p),
 //       Named("fn") = cost,
 //       Named("method") = "L-BFGS-B",
 //       Named("data") = data_segment

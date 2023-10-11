@@ -1,20 +1,14 @@
 #include "functions.h"
 
-using ::Rcpp::as;
-using ::Rcpp::Environment;
-using ::Rcpp::Function;
-using ::Rcpp::Named;
-using ::Rcpp::S4;
-
 namespace fastcpd::functions {
 
 List negative_log_likelihood(
-    arma::mat data,
-    Nullable<arma::colvec> theta,
-    std::string family,
+    mat data,
+    Nullable<colvec> theta,
+    string family,
     double lambda,
     bool cv,
-    Nullable<arma::colvec> start
+    Nullable<colvec> start
 ) {
   if (theta.isNull() && family == "lasso" && cv) {
     Environment glmnet = Environment::namespace_env("glmnet");
@@ -29,9 +23,9 @@ List negative_log_likelihood(
       Named("type") = "coefficients",
       Named("exact") = false
     );
-    arma::vec glmnet_i = as<arma::vec>(out_coef.slot("i"));
-    arma::vec glmnet_x = as<arma::vec>(out_coef.slot("x"));
-    arma::vec par = arma::zeros(data.n_cols - 1);
+    vec glmnet_i = as<vec>(out_coef.slot("i"));
+    vec glmnet_x = as<vec>(out_coef.slot("x"));
+    vec par = zeros(data.n_cols - 1);
     for (unsigned int i = 1; i < glmnet_i.n_elem; i++) {
       par(glmnet_i(i) - 1) = glmnet_x(i);
     }
@@ -47,66 +41,65 @@ List negative_log_likelihood(
       Named("family") = "gaussian", Named("lambda") = lambda
     );
     S4 out_par = out["beta"];
-    arma::vec par_i = as<arma::vec>(out_par.slot("i"));
-    arma::vec par_x = as<arma::vec>(out_par.slot("x"));
-    arma::vec par = arma::zeros(data.n_cols - 1);
+    vec par_i = as<vec>(out_par.slot("i"));
+    vec par_x = as<vec>(out_par.slot("x"));
+    vec par = zeros(data.n_cols - 1);
     for (unsigned int i = 0; i < par_i.n_elem; i++) {
       par(par_i(i)) = par_x(i);
     }
     double value = as<double>(deviance(out));
-    arma::vec fitted_values = as<arma::vec>(
+    vec fitted_values = as<vec>(
       predict_glmnet(out, data.cols(1, data.n_cols - 1), Named("s") = lambda)
     );
-    arma::vec residuals = data.col(0) - fitted_values;
+    vec residuals = data.col(0) - fitted_values;
     return List::create(Named("par") = par,
                   Named("value") = value / 2,
                   Named("residuals") = residuals);
   } else if (theta.isNull()) {
     // Estimate theta in binomial/poisson/gaussian family
-    arma::mat x = data.cols(1, data.n_cols - 1);
-    arma::vec y = data.col(0);
+    mat x = data.cols(1, data.n_cols - 1);
+    vec y = data.col(0);
     Environment fastglm = Environment::namespace_env("fastglm");
     Function fastglm_ = fastglm["fastglm"];
     List out;
     if (start.isNull()) {
       out = fastglm_(x, y, family);
     } else {
-      arma::colvec start_ = as<arma::colvec>(start);
+      colvec start_ = as<colvec>(start);
       out = fastglm_(x, y, family, Named("start") = start_);
     }
-    arma::vec par = as<arma::vec>(out["coefficients"]);
-    arma::vec residuals = as<arma::vec>(out["residuals"]);
+    vec par = as<vec>(out["coefficients"]);
+    vec residuals = as<vec>(out["residuals"]);
     double value = out["deviance"];
     return List::create(Named("par") = par,
                   Named("value") = value / 2,
                   Named("residuals") = residuals);
   } else if (family == "lasso" || family == "gaussian") {
-    arma::colvec theta_nonnull = as<arma::colvec>(theta);
+    colvec theta_nonnull = as<colvec>(theta);
     // Calculate negative log likelihood in gaussian family
-    arma::vec y = data.col(0);
-    arma::mat x = data.cols(1, data.n_cols - 1);
-    double penalty = lambda * arma::accu(arma::abs(theta_nonnull));
+    vec y = data.col(0);
+    mat x = data.cols(1, data.n_cols - 1);
+    double penalty = lambda * accu(arma::abs(theta_nonnull));
     return List::create(
-      Named("value") =
-          arma::accu(arma::pow(y - x * theta_nonnull, 2)) / 2 + penalty
+      Named("value") = accu(arma::pow(y - x * theta_nonnull, 2)) / 2 + penalty
     );
   } else if (family == "binomial") {
     // Calculate negative log likelihood in binomial family
-    arma::colvec theta_nonnull = as<arma::colvec>(theta);
-    arma::vec y = data.col(0);
-    arma::mat x = data.cols(1, data.n_cols - 1);
-    arma::colvec u = x * theta_nonnull;
+    colvec theta_nonnull = as<colvec>(theta);
+    vec y = data.col(0);
+    mat x = data.cols(1, data.n_cols - 1);
+    colvec u = x * theta_nonnull;
     return List::create(
-      Named("value") = arma::accu(-y % u + arma::log(1 + exp(u)))
+      Named("value") = accu(-y % u + arma::log(1 + exp(u)))
     );
   } else {
     // Calculate negative log likelihood in poisson family
-    arma::colvec theta_nonnull = as<arma::colvec>(theta);
-    arma::vec y = data.col(0);
-    arma::mat x = data.cols(1, data.n_cols - 1);
-    arma::colvec u = x * theta_nonnull;
+    colvec theta_nonnull = as<colvec>(theta);
+    vec y = data.col(0);
+    mat x = data.cols(1, data.n_cols - 1);
+    colvec u = x * theta_nonnull;
 
-    arma::colvec y_factorial(y.n_elem);
+    colvec y_factorial(y.n_elem);
     for (unsigned int i = 0; i < y.n_elem; i++) {
       double log_factorial = 0;
       for (int j = 1; j <= y(i); ++j) {
@@ -116,46 +109,46 @@ List negative_log_likelihood(
     }
 
     return List::create(
-      Named("value") = arma::accu(-y % u + exp(u) + y_factorial)
+      Named("value") = accu(-y % u + exp(u) + y_factorial)
     );
   }
 }
 
-arma::colvec cost_update_gradient(
-    arma::mat data,
-    arma::colvec theta,
-    std::string family
+colvec cost_update_gradient(
+    mat data,
+    colvec theta,
+    string family
 ) {
-  arma::rowvec new_data = data.row(data.n_rows - 1);
-  arma::rowvec x = new_data.tail(new_data.n_elem - 1);
+  rowvec new_data = data.row(data.n_rows - 1);
+  rowvec x = new_data.tail(new_data.n_elem - 1);
   double y = new_data(0);
-  arma::colvec gradient;
+  colvec gradient;
   if (family.compare("binomial") == 0) {
-    gradient = - (y - 1 / (1 + exp(-arma::as_scalar(x * theta)))) * x.t();
+    gradient = - (y - 1 / (1 + exp(-as_scalar(x * theta)))) * x.t();
   } else if (family.compare("poisson") == 0) {
-    gradient = - (y - exp(arma::as_scalar(x * theta))) * x.t();
+    gradient = - (y - exp(as_scalar(x * theta))) * x.t();
   } else {
     // `family` is either "lasso" or "gaussian".
-    gradient = - (y - arma::as_scalar(x * theta)) * x.t();
+    gradient = - (y - as_scalar(x * theta)) * x.t();
   }
   return gradient;
 }
 
-arma::mat cost_update_hessian(
-    arma::mat data,
-    arma::colvec theta,
-    std::string family,
+mat cost_update_hessian(
+    mat data,
+    colvec theta,
+    string family,
     double min_prob
 ) {
-  arma::rowvec new_data = data.row(data.n_rows - 1);
-  arma::rowvec x = new_data.tail(new_data.n_elem - 1);
-  arma::mat hessian;
+  rowvec new_data = data.row(data.n_rows - 1);
+  rowvec x = new_data.tail(new_data.n_elem - 1);
+  mat hessian;
   if (family.compare("binomial") == 0) {
-    double prob = 1 / (1 + exp(-arma::as_scalar(x * theta)));
-    hessian = (x.t() * x) * arma::as_scalar((1 - prob) * prob);
+    double prob = 1 / (1 + exp(-as_scalar(x * theta)));
+    hessian = (x.t() * x) * as_scalar((1 - prob) * prob);
   } else if (family.compare("poisson") == 0) {
-    double prob = exp(arma::as_scalar(x * theta));
-    hessian = (x.t() * x) * std::min(arma::as_scalar(prob), min_prob);
+    double prob = exp(as_scalar(x * theta));
+    hessian = (x.t() * x) * std::min(as_scalar(prob), min_prob);
   } else {
     // `family` is either "lasso" or "gaussian".
     hessian = x.t() * x;
