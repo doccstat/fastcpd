@@ -11,49 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// negative_log_likelihood
-List negative_log_likelihood(arma::mat data, Nullable<arma::colvec> theta, std::string family, double lambda, bool cv, Nullable<arma::colvec> start);
-RcppExport SEXP _fastcpd_negative_log_likelihood(SEXP dataSEXP, SEXP thetaSEXP, SEXP familySEXP, SEXP lambdaSEXP, SEXP cvSEXP, SEXP startSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< Nullable<arma::colvec> >::type theta(thetaSEXP);
-    Rcpp::traits::input_parameter< std::string >::type family(familySEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< bool >::type cv(cvSEXP);
-    Rcpp::traits::input_parameter< Nullable<arma::colvec> >::type start(startSEXP);
-    rcpp_result_gen = Rcpp::wrap(negative_log_likelihood(data, theta, family, lambda, cv, start));
-    return rcpp_result_gen;
-END_RCPP
-}
-// cost_update_gradient
-arma::colvec cost_update_gradient(arma::mat data, arma::colvec theta, std::string family);
-RcppExport SEXP _fastcpd_cost_update_gradient(SEXP dataSEXP, SEXP thetaSEXP, SEXP familySEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type theta(thetaSEXP);
-    Rcpp::traits::input_parameter< std::string >::type family(familySEXP);
-    rcpp_result_gen = Rcpp::wrap(cost_update_gradient(data, theta, family));
-    return rcpp_result_gen;
-END_RCPP
-}
-// cost_update_hessian
-arma::mat cost_update_hessian(arma::mat data, arma::colvec theta, std::string family, double min_prob);
-RcppExport SEXP _fastcpd_cost_update_hessian(SEXP dataSEXP, SEXP thetaSEXP, SEXP familySEXP, SEXP min_probSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type theta(thetaSEXP);
-    Rcpp::traits::input_parameter< std::string >::type family(familySEXP);
-    Rcpp::traits::input_parameter< double >::type min_prob(min_probSEXP);
-    rcpp_result_gen = Rcpp::wrap(cost_update_hessian(data, theta, family, min_prob));
-    return rcpp_result_gen;
-END_RCPP
-}
 // fastcpd_impl
 List fastcpd_impl(arma::mat data, double beta, const int segment_count, const double trim, const double momentum_coef, Function k, const std::string family, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const int p, Nullable<Function> cost, Nullable<Function> cost_gradient, Nullable<Function> cost_hessian, const bool cp_only, const double vanilla_percentage);
 RcppExport SEXP _fastcpd_fastcpd_impl(SEXP dataSEXP, SEXP betaSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP kSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP pSEXP, SEXP costSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP cp_onlySEXP, SEXP vanilla_percentageSEXP) {
@@ -83,9 +40,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_fastcpd_negative_log_likelihood", (DL_FUNC) &_fastcpd_negative_log_likelihood, 6},
-    {"_fastcpd_cost_update_gradient", (DL_FUNC) &_fastcpd_cost_update_gradient, 3},
-    {"_fastcpd_cost_update_hessian", (DL_FUNC) &_fastcpd_cost_update_hessian, 4},
     {"_fastcpd_fastcpd_impl", (DL_FUNC) &_fastcpd_fastcpd_impl, 17},
     {NULL, NULL, 0}
 };
