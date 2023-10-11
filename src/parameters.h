@@ -123,6 +123,8 @@ class FastcpdParameters {
   function<mat(mat data, colvec theta, string family, double min_prob)>
     cost_hessian_wrapper;
 
+  Nullable<Function> winsorize;
+
  private:
   // `data` is the data set to be segmented.
   mat data;
@@ -191,9 +193,7 @@ class FastcpdParameters {
       Nullable<colvec> start
   )> cost_function_wrapper;
 
-// TODO(doccstat): Nullable function.
-//   Function* winsorize;
-//   void create_environment_functions();
+  void create_environment_functions();
 };
 
 }  // namespace fastcpd::parameters

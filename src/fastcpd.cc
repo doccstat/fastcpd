@@ -320,9 +320,9 @@ List fastcpd_impl(
         colvec theta =
             fastcpd_parameters_class.get_theta_sum().col(i - 1) / (t - tau);
         if (family == "poisson" && t - tau >= p) {
-          Environment desc_tools = Environment::namespace_env("DescTools");
-          Function winsorize = desc_tools["Winsorize"];
-          NumericVector winsorize_result = winsorize(
+          Function winsorize_non_null =
+            fastcpd_parameters_class.winsorize.get();
+          NumericVector winsorize_result = winsorize_non_null(
             Rcpp::_["x"] = theta,
             Rcpp::_["minval"] = winsorise_minval,
             Rcpp::_["maxval"] = winsorise_maxval
