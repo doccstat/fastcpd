@@ -217,10 +217,10 @@ class CostFunction {
   List operator()(
       arma::mat data,
       Nullable<arma::colvec> theta,
-      std::string family,
-      double lambda,
-      bool cv,
-      Nullable<arma::colvec> start
+      std::string family,  // UNUSED
+      double lambda,  // UNUSED
+      bool cv,  // UNUSED
+      Nullable<arma::colvec> start  // UNUSED
   );
 
  private:
@@ -234,7 +234,7 @@ class CostGradient {
   arma::colvec operator()(
       arma::mat data,
       arma::colvec theta,
-      std::string family
+      std::string family  // UNUSED
   );
 
  private:
@@ -248,8 +248,8 @@ class CostHessian {
   arma::mat operator()(
       arma::mat data,
       arma::colvec theta,
-      std::string family,
-      double min_prob
+      std::string family,  // UNUSED
+      double min_prob  // UNUSED
   );
 
  private:
