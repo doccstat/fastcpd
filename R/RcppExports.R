@@ -52,59 +52,6 @@ cost_update_hessian <- function(data, theta, family, min_prob) {
     .Call(`_fastcpd_cost_update_hessian`, data, theta, family, min_prob)
 }
 
-#' Update the cost values for the segmentation.
-#' This function is not meant to be called directly by the user.
-#'
-#' @param data A data frame containing the data to be segmented.
-#' @param theta_hat Estimated theta from the previous iteration.
-#' @param theta_sum Sum of estimated theta from the previous iteration.
-#' @param hessian Hessian matrix from the previous iteration.
-#' @param tau Start of the current segment.
-#' @param i Index of the current data in the whole data set.
-#' @param k Number of epochs in SGD.
-#' @param family Family of the model.
-#' @param momentum Momentum from the previous iteration.
-#' @param momentum_coef Momentum coefficient to be applied to the current
-#'   momentum.
-#' @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
-#'   poisson.
-#' @param min_prob Minimum probability to avoid numerical issues. Only used for
-#'   poisson.
-#' @param winsorise_minval Minimum value to be winsorised. Only used for
-#'   poisson.
-#' @param winsorise_maxval Maximum value to be winsorised. Only used for
-#'   poisson.
-#' @param lambda Lambda for L1 regularization. Only used for lasso.
-#' @param cost_gradient Gradient for custom cost function.
-#' @param cost_hessian Hessian for custom cost function.
-#' @keywords internal
-#' @importFrom DescTools Winsorize
-#'
-#' @noRd
-#' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
-#'   \code{hessian}, and \code{momentum}.
-cost_update <- function(data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian) {
-    .Call(`_fastcpd_cost_update`, data, theta_hat, theta_sum, hessian, tau, i, k, family, momentum, momentum_coef, epsilon, min_prob, winsorise_minval, winsorise_maxval, lambda, cost_gradient, cost_hessian)
-}
-
-#' Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
-#' This function is not meant to be called directly by the user.
-#'
-#' @param family Family of the model.
-#' @param p Number of parameters.
-#' @param data_segment A data frame containing a segment of the data.
-#' @param cost Cost function.
-#' @param lambda Lambda for L1 regularization.
-#' @param cv Whether to perform cross-validation to find the best lambda.
-#' @keywords internal
-#'
-#' @noRd
-#' @return A list containing new values of \code{theta_hat}, \code{theta_sum},
-#'   and \code{hessian}.
-cost_optim <- function(family, p, data_segment, cost, lambda, cv) {
-    .Call(`_fastcpd_cost_optim`, family, p, data_segment, cost, lambda, cv)
-}
-
 #' Implementation of the fastcpd algorithm.
 #' This function is not meant to be called directly by the user.
 #'
@@ -140,6 +87,7 @@ cost_optim <- function(family, p, data_segment, cost, lambda, cv) {
 #'   have an explicit solution, i.e. does not depend on coefficients like
 #'   the mean change case, this parameter will be set to be 1.
 #' @keywords internal
+#' @importFrom DescTools Winsorize
 #'
 #' @noRd
 #' @return A list containing the change points and the cost values for each

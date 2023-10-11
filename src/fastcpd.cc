@@ -600,28 +600,34 @@ List cost_update(
     const double winsorise_minval,
     const double winsorise_maxval,
     const double lambda,
-    Function cost_gradient,
-    Function cost_hessian
+    std::function<arma::colvec(
+        arma::mat data,
+        arma::colvec theta,
+        std::string family
+    )> cost_gradient_wrapper,
+    std::function<arma::mat(
+        arma::mat data,
+        arma::colvec theta,
+        std::string family,
+        double min_prob
+    )> cost_hessian_wrapper
 ) {
   // Get the hessian
   arma::mat hessian_i = hessian.slice(i - 1);
   arma::colvec gradient;
 
   if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
-    NumericMatrix cost_hessian_result = cost_hessian(
-      data, theta_hat.col(i - 1)
+    arma::mat cost_hessian_result = cost_hessian_wrapper(
+      data, theta_hat.col(i - 1),
+      family,  // UNUSED
+      min_prob  // UNUSED
     );
-    NumericVector cost_gradient_result = cost_gradient(
-      data, theta_hat.col(i - 1)
+    arma::colvec cost_gradient_result = cost_gradient_wrapper(
+      data, theta_hat.col(i - 1),
+      family  // UNUSED
     );
-    hessian_i += arma::mat(
-      cost_hessian_result.begin(),
-      cost_hessian_result.nrow(),
-      cost_hessian_result.ncol()
-    );
-    gradient = arma::colvec(
-      cost_gradient_result.begin(), cost_gradient_result.size(), false
-    );
+    hessian_i += cost_hessian_result;
+    gradient = cost_gradient_result;
   } else {
     hessian_i += cost_update_hessian(
       data, theta_hat.col(i - 1), family, min_prob
@@ -666,20 +672,17 @@ List cost_update(
   for (int kk = 1; kk <= as<int>(k(data.n_rows - tau)); kk++) {
     for (unsigned j = tau + 1; j <= data.n_rows; j++) {
       if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
-        NumericMatrix cost_hessian_result = cost_hessian(
-          data.rows(tau, j - 1), theta_hat.col(i - 1)
+        arma::mat cost_hessian_result = cost_hessian_wrapper(
+          data.rows(tau, j - 1), theta_hat.col(i - 1),
+          family,  // UNUSED
+          min_prob  // UNUSED
         );
-        hessian_i += arma::mat(
-          cost_hessian_result.begin(),
-          cost_hessian_result.nrow(),
-          cost_hessian_result.ncol()
+        hessian_i += cost_hessian_result;
+        arma::colvec cost_gradient_result = cost_gradient_wrapper(
+          data.rows(tau, j - 1), theta_hat.col(i - 1),
+          family  // UNUSED
         );
-        NumericVector cost_gradient_result = cost_gradient(
-          data.rows(tau, j - 1), theta_hat.col(i - 1)
-        );
-        gradient = arma::colvec(
-          cost_gradient_result.begin(), cost_gradient_result.size(), false
-        );
+        gradient = cost_gradient_result;
       } else {
         hessian_i += cost_update_hessian(
           data.rows(tau, j - 1), theta_hat.col(i - 1), family, min_prob
@@ -891,8 +894,8 @@ List fastcpd_impl(
           winsorise_minval,
           winsorise_maxval,
           lambda,
-          fastcpd_parameters_class.cost_gradient.get(),
-          fastcpd_parameters_class.cost_hessian.get()
+          fastcpd_parameters_class.cost_gradient_wrapper,
+          fastcpd_parameters_class.cost_hessian_wrapper
         );
         fastcpd_parameters_class.update_theta_hat(
           i - 1, as<arma::colvec>(cost_update_result[0])
