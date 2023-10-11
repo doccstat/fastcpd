@@ -22,7 +22,6 @@ class FastcpdParameters {
     const int p,
     const std::string family,
     const int segment_count,
-    Function cost,
     const double winsorise_minval,
     const double winsorise_maxval,
     const double epsilon
@@ -104,6 +103,24 @@ class FastcpdParameters {
   // Append new values to \code{fastcpd_parameters}.
   void update_fastcpd_parameters(const unsigned int t);
 
+  void wrap_cost(Nullable<Function> cost);
+  void wrap_cost_gradient(Nullable<Function> cost_gradient);
+  void wrap_cost_hessian(Nullable<Function> cost_hessian);
+//   List cost_optim(
+//       const arma::mat data_segment,
+//       const double lambda,
+//       const bool cv
+//   );
+
+  // `cost` is the cost function to be used.
+  Nullable<Function> cost;
+
+  // `cost_gradient` is the gradient of the cost function to be used.
+  Nullable<Function> cost_gradient;
+
+  // `cost_hessian` is the Hessian of the cost function to be used.
+  Nullable<Function> cost_hessian;
+
  private:
   // `data` is the data set to be segmented.
   arma::mat data;
@@ -125,9 +142,6 @@ class FastcpdParameters {
 
   // `segment_count` is the number of segments for initial guess.
   const int segment_count;
-
-  // `cost` is the cost function to be used.
-  Function cost;
 
   // `winsorise_minval` is the minimum value to be winsorised. Only used for
   // poisson.
@@ -164,8 +178,82 @@ class FastcpdParameters {
   // Momentum will be used in the update step if `momentum_coef` is not 0.
   arma::colvec momentum;
 
+  // Cost function. If the cost function is provided in R, this will be a
+  // wrapper of the R function.
+  std::function<List(
+      arma::mat data,
+      Nullable<arma::colvec> theta,
+      std::string family,
+      double lambda,
+      bool cv,
+      Nullable<arma::colvec> start
+  )> cost_function_wrapper;
+
+  // Gradient of the cost function. If the cost function is provided in R, this
+  // will be a wrapper of the R function.
+  std::function<arma::colvec(
+      arma::mat data,
+      arma::colvec theta,
+      std::string family
+  )> cost_gradient_wrapper;
+
+  // Hessian of the cost function. If the cost function is provided in R, this
+  // will be a wrapper of the R function.
+  std::function<arma::mat(
+      arma::mat data,
+      arma::colvec theta,
+      std::string family,
+      double min_prob
+  )> cost_hessian_wrapper;
+
 //   Function* winsorize;
 //   void create_environment_functions();
+};
+
+class CostFunction {
+ public:
+  CostFunction(Rcpp::Function cost);
+
+  List operator()(
+      arma::mat data,
+      Nullable<arma::colvec> theta,
+      std::string family,
+      double lambda,
+      bool cv,
+      Nullable<arma::colvec> start
+  );
+
+ private:
+  Rcpp::Function cost;
+};
+
+class CostGradient {
+ public:
+  CostGradient(Rcpp::Function cost_gradient);
+
+  arma::colvec operator()(
+      arma::mat data,
+      arma::colvec theta,
+      std::string family
+  );
+
+ private:
+  Rcpp::Function cost_gradient;
+};
+
+class CostHessian {
+ public:
+  CostHessian(Rcpp::Function cost_hessian);
+
+  arma::mat operator()(
+      arma::mat data,
+      arma::colvec theta,
+      std::string family,
+      double min_prob
+  );
+
+ private:
+  Rcpp::Function cost_hessian;
 };
 
 }  // namespace fastcpd
@@ -363,9 +451,9 @@ List fastcpd_impl(
     const double winsorise_minval,
     const double winsorise_maxval,
     const int p,
-    Function cost,
-    Function cost_gradient,
-    Function cost_hessian,
+    Nullable<Function> cost,
+    Nullable<Function> cost_gradient,
+    Nullable<Function> cost_hessian,
     const bool cp_only,
     const double vanilla_percentage
 );

@@ -11,72 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// init_fastcpd_parameters
-List init_fastcpd_parameters(const arma::mat data, const int p, const std::string family, const int segment_count, Function cost, const double winsorise_minval, const double winsorise_maxval, const double epsilon, const double vanilla_percentage, double& beta);
-RcppExport SEXP _fastcpd_init_fastcpd_parameters(SEXP dataSEXP, SEXP pSEXP, SEXP familySEXP, SEXP segment_countSEXP, SEXP costSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP epsilonSEXP, SEXP vanilla_percentageSEXP, SEXP betaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< const std::string >::type family(familySEXP);
-    Rcpp::traits::input_parameter< const int >::type segment_count(segment_countSEXP);
-    Rcpp::traits::input_parameter< Function >::type cost(costSEXP);
-    Rcpp::traits::input_parameter< const double >::type winsorise_minval(winsorise_minvalSEXP);
-    Rcpp::traits::input_parameter< const double >::type winsorise_maxval(winsorise_maxvalSEXP);
-    Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
-    Rcpp::traits::input_parameter< const double >::type vanilla_percentage(vanilla_percentageSEXP);
-    Rcpp::traits::input_parameter< double& >::type beta(betaSEXP);
-    rcpp_result_gen = Rcpp::wrap(init_fastcpd_parameters(data, p, family, segment_count, cost, winsorise_minval, winsorise_maxval, epsilon, vanilla_percentage, beta));
-    return rcpp_result_gen;
-END_RCPP
-}
-// update_fastcpd_parameters
-List update_fastcpd_parameters(List fastcpd_parameters, arma::mat data, const int t, const int i, Function k, const int tau, const double lambda, const std::string family, Function cost_gradient, Function cost_hessian, arma::ucolvec r_t_set, const int p, const double momentum_coef, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const double epsilon);
-RcppExport SEXP _fastcpd_update_fastcpd_parameters(SEXP fastcpd_parametersSEXP, SEXP dataSEXP, SEXP tSEXP, SEXP iSEXP, SEXP kSEXP, SEXP tauSEXP, SEXP lambdaSEXP, SEXP familySEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP r_t_setSEXP, SEXP pSEXP, SEXP momentum_coefSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP epsilonSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type fastcpd_parameters(fastcpd_parametersSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const int >::type t(tSEXP);
-    Rcpp::traits::input_parameter< const int >::type i(iSEXP);
-    Rcpp::traits::input_parameter< Function >::type k(kSEXP);
-    Rcpp::traits::input_parameter< const int >::type tau(tauSEXP);
-    Rcpp::traits::input_parameter< const double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< const std::string >::type family(familySEXP);
-    Rcpp::traits::input_parameter< Function >::type cost_gradient(cost_gradientSEXP);
-    Rcpp::traits::input_parameter< Function >::type cost_hessian(cost_hessianSEXP);
-    Rcpp::traits::input_parameter< arma::ucolvec >::type r_t_set(r_t_setSEXP);
-    Rcpp::traits::input_parameter< const int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< const double >::type momentum_coef(momentum_coefSEXP);
-    Rcpp::traits::input_parameter< const double >::type min_prob(min_probSEXP);
-    Rcpp::traits::input_parameter< const double >::type winsorise_minval(winsorise_minvalSEXP);
-    Rcpp::traits::input_parameter< const double >::type winsorise_maxval(winsorise_maxvalSEXP);
-    Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
-    rcpp_result_gen = Rcpp::wrap(update_fastcpd_parameters(fastcpd_parameters, data, t, i, k, tau, lambda, family, cost_gradient, cost_hessian, r_t_set, p, momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon));
-    return rcpp_result_gen;
-END_RCPP
-}
-// append_fastcpd_parameters
-List append_fastcpd_parameters(List fastcpd_parameters, const double vanilla_percentage, const arma::mat data, const int t, const std::string family, const double winsorise_minval, const double winsorise_maxval, const int p, const double epsilon);
-RcppExport SEXP _fastcpd_append_fastcpd_parameters(SEXP fastcpd_parametersSEXP, SEXP vanilla_percentageSEXP, SEXP dataSEXP, SEXP tSEXP, SEXP familySEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP pSEXP, SEXP epsilonSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type fastcpd_parameters(fastcpd_parametersSEXP);
-    Rcpp::traits::input_parameter< const double >::type vanilla_percentage(vanilla_percentageSEXP);
-    Rcpp::traits::input_parameter< const arma::mat >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const int >::type t(tSEXP);
-    Rcpp::traits::input_parameter< const std::string >::type family(familySEXP);
-    Rcpp::traits::input_parameter< const double >::type winsorise_minval(winsorise_minvalSEXP);
-    Rcpp::traits::input_parameter< const double >::type winsorise_maxval(winsorise_maxvalSEXP);
-    Rcpp::traits::input_parameter< const int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
-    rcpp_result_gen = Rcpp::wrap(append_fastcpd_parameters(fastcpd_parameters, vanilla_percentage, data, t, family, winsorise_minval, winsorise_maxval, p, epsilon));
-    return rcpp_result_gen;
-END_RCPP
-}
 // negative_log_likelihood
 List negative_log_likelihood(arma::mat data, Nullable<arma::colvec> theta, std::string family, double lambda, bool cv, Nullable<arma::colvec> start);
 RcppExport SEXP _fastcpd_negative_log_likelihood(SEXP dataSEXP, SEXP thetaSEXP, SEXP familySEXP, SEXP lambdaSEXP, SEXP cvSEXP, SEXP startSEXP) {
@@ -164,7 +98,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // fastcpd_impl
-List fastcpd_impl(arma::mat data, double beta, const int segment_count, const double trim, const double momentum_coef, Function k, const std::string family, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const int p, Function cost, Function cost_gradient, Function cost_hessian, const bool cp_only, const double vanilla_percentage);
+List fastcpd_impl(arma::mat data, double beta, const int segment_count, const double trim, const double momentum_coef, Function k, const std::string family, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const int p, Nullable<Function> cost, Nullable<Function> cost_gradient, Nullable<Function> cost_hessian, const bool cp_only, const double vanilla_percentage);
 RcppExport SEXP _fastcpd_fastcpd_impl(SEXP dataSEXP, SEXP betaSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP kSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP pSEXP, SEXP costSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP cp_onlySEXP, SEXP vanilla_percentageSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -181,9 +115,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double >::type winsorise_minval(winsorise_minvalSEXP);
     Rcpp::traits::input_parameter< const double >::type winsorise_maxval(winsorise_maxvalSEXP);
     Rcpp::traits::input_parameter< const int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< Function >::type cost(costSEXP);
-    Rcpp::traits::input_parameter< Function >::type cost_gradient(cost_gradientSEXP);
-    Rcpp::traits::input_parameter< Function >::type cost_hessian(cost_hessianSEXP);
+    Rcpp::traits::input_parameter< Nullable<Function> >::type cost(costSEXP);
+    Rcpp::traits::input_parameter< Nullable<Function> >::type cost_gradient(cost_gradientSEXP);
+    Rcpp::traits::input_parameter< Nullable<Function> >::type cost_hessian(cost_hessianSEXP);
     Rcpp::traits::input_parameter< const bool >::type cp_only(cp_onlySEXP);
     Rcpp::traits::input_parameter< const double >::type vanilla_percentage(vanilla_percentageSEXP);
     rcpp_result_gen = Rcpp::wrap(fastcpd_impl(data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage));
@@ -192,9 +126,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_fastcpd_init_fastcpd_parameters", (DL_FUNC) &_fastcpd_init_fastcpd_parameters, 10},
-    {"_fastcpd_update_fastcpd_parameters", (DL_FUNC) &_fastcpd_update_fastcpd_parameters, 17},
-    {"_fastcpd_append_fastcpd_parameters", (DL_FUNC) &_fastcpd_append_fastcpd_parameters, 9},
     {"_fastcpd_negative_log_likelihood", (DL_FUNC) &_fastcpd_negative_log_likelihood, 6},
     {"_fastcpd_cost_update_gradient", (DL_FUNC) &_fastcpd_cost_update_gradient, 3},
     {"_fastcpd_cost_update_hessian", (DL_FUNC) &_fastcpd_cost_update_hessian, 4},

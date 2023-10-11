@@ -23,13 +23,48 @@ const std::unordered_set<std::string> FASTCPD_FAMILIES = {
 
 namespace fastcpd {
 
+CostFunction::CostFunction(Rcpp::Function cost) : cost(cost) {}
+
+List CostFunction::operator()(
+    arma::mat data,
+    Nullable<arma::colvec> theta,
+    std::string family,
+    double lambda,
+    bool cv,
+    Nullable<arma::colvec> start
+) {
+  return cost(data, theta, family, lambda, cv, start);
+}
+
+CostGradient::CostGradient(Rcpp::Function cost_gradient) :
+    cost_gradient(cost_gradient) {}
+
+arma::colvec CostGradient::operator()(
+    arma::mat data,
+    arma::colvec theta,
+    std::string family
+) {
+  return as<arma::colvec>(cost_gradient(data, theta, family));
+}
+
+CostHessian::CostHessian(Rcpp::Function cost_hessian) :
+    cost_hessian(cost_hessian) {}
+
+arma::mat CostHessian::operator()(
+    arma::mat data,
+    arma::colvec theta,
+    std::string family,
+    double min_prob
+) {
+  return as<arma::mat>(cost_hessian(data, theta, family, min_prob));
+}
+
 FastcpdParameters::FastcpdParameters(
     arma::mat data,
     const double beta,
     const int p,
     const std::string family,
     const int segment_count,
-    Function cost,
     const double winsorise_minval,
     const double winsorise_maxval,
     const double epsilon
@@ -38,7 +73,6 @@ FastcpdParameters::FastcpdParameters(
     p(p),
     family(family),
     segment_count(segment_count),
-    cost(cost),
     winsorise_minval(winsorise_minval),
     winsorise_maxval(winsorise_maxval),
     epsilon(epsilon) {
@@ -163,9 +197,16 @@ void FastcpdParameters::create_segment_statistics() {
     arma::ucolvec segment_indices_ =
         arma::find(segment_indices == segment_index + 1);
     arma::mat data_segment = data.rows(segment_indices_);
-    arma::rowvec segment_theta = as<arma::rowvec>(
-      cost_optim(family, p, data_segment, cost, 0, false)["par"]
-    );
+    arma::rowvec segment_theta;
+    if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
+      segment_theta = as<arma::rowvec>(
+        cost_optim(family, p, data_segment, cost.get(), 0, false)["par"]
+      );
+    } else {
+      segment_theta = as<arma::rowvec>(negative_log_likelihood(
+        data_segment, R_NilValue, family, 0, false
+      )["par"]);
+    }
 
     // Initialize the estimated coefficients for each segment to be the
     // estimated coefficients in the segment.
@@ -281,6 +322,99 @@ void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
   update_theta_sum(cum_coef_add.t());
   update_hessian(hessian_new);
 }
+
+void FastcpdParameters::wrap_cost(Nullable<Function> cost) {
+  this->cost = cost;
+  if (FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end()) {
+    cost_function_wrapper = &negative_log_likelihood;
+  } else if (cost.isNotNull()) {
+    CostFunction costFunction(cost.get());
+    cost_function_wrapper = costFunction;
+  } else if (cost.isNull()) {
+    Rcpp::stop("cost function must be specified for custom family");
+  }
+}
+
+void FastcpdParameters::wrap_cost_gradient(Nullable<Function> cost_gradient) {
+  this->cost_gradient = cost_gradient;
+  if (FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end()) {
+    cost_gradient_wrapper = &cost_update_gradient;
+  } else if (cost_gradient.isNotNull()) {
+    // `cost_gradient` can be `NULL` in the case of vanilla PELT.
+    CostGradient costGradient(cost_gradient.get());
+    cost_gradient_wrapper = costGradient;
+  }
+}
+
+void FastcpdParameters::wrap_cost_hessian(Nullable<Function> cost_hessian) {
+  this->cost_hessian = cost_hessian;
+  if (FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end()) {
+    cost_hessian_wrapper = &cost_update_hessian;
+  } else if (cost_hessian.isNotNull()) {
+    // `cost_hessian` can be `NULL` in the case of vanilla PELT.
+    CostHessian costHessian(cost_hessian.get());
+    cost_hessian_wrapper = costHessian;
+  }
+}
+
+// List FastcpdParameters::cost_optim(
+//     const arma::mat data_segment,
+//     const double lambda,
+//     const bool cv
+// ) {
+//   if (family == "vanilla") {
+//     return List::create(
+//       Named("par") = R_NilValue,
+//       Named("value") = cost_function_wrapper(
+//         data_segment, R_NilValue, family, lambda, cv, R_NilValue
+//       ),
+//       Named("residuals") = R_NilValue
+//     );
+//   } else if (family == "custom" && p == 1) {
+//     Environment stats = Environment::namespace_env("stats");
+//     Function optim = stats["optim"];
+//     List optim_result = optim(
+//       Named("par") = 0,
+//       Named("fn") = InternalFunction(
+//         +[](double theta, arma::mat data, Function cost) {
+//           return cost(
+//             Named("data") = data,
+//             Named("theta") = log(theta / (1 - theta))
+//           );
+//         }
+//       ),
+//       Named("method") = "Brent",
+//       Named("lower") = 0,
+//       Named("upper") = 1,
+//       Named("data") = data_segment,
+//       Named("cost") = cost
+//     );
+//     return List::create(
+//       Named("par") = log(
+//         as<double>(optim_result["par"]) / (1 - as<double>(optim_result["par"]))
+//       ),
+//       Named("value") = exp(as<double>(optim_result["value"])) /
+//         (1 + exp(as<double>(optim_result["value"]))),
+//       Named("residuals") = R_NilValue
+//     );
+//   } else if (family == "custom" && p > 1) {
+//     Environment stats = Environment::namespace_env("stats");
+//     Function optim = stats["optim"];
+//     List optim_result = optim(
+//       Named("par") = arma::zeros<arma::vec>(p),
+//       Named("fn") = cost,
+//       Named("method") = "L-BFGS-B",
+//       Named("data") = data_segment
+//     );
+//     return List::create(
+//       Named("par") = optim_result["par"],
+//       Named("value") = optim_result["value"],
+//       Named("residuals") = R_NilValue
+//     );
+//   } else {
+//     return cost(data_segment, R_NilValue, family, lambda, cv);
+//   }
+// }
 
 }  // namespace fastcpd
 
@@ -595,7 +729,7 @@ List cost_optim(
       Named("value") = cost(data_segment),
       Named("residuals") = R_NilValue
     );
-  } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end() && p == 1) {
+  } else if (p == 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result = optim(
@@ -622,7 +756,8 @@ List cost_optim(
         (1 + exp(as<double>(optim_result["value"]))),
       Named("residuals") = R_NilValue
     );
-  } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end() && p > 1) {
+  } else {
+    // p > 1
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result = optim(
@@ -636,8 +771,6 @@ List cost_optim(
       Named("value") = optim_result["value"],
       Named("residuals") = R_NilValue
     );
-  } else {
-    return cost(data_segment, R_NilValue, family, lambda, cv);
   }
 }
 
@@ -654,9 +787,9 @@ List fastcpd_impl(
     const double winsorise_minval,
     const double winsorise_maxval,
     const int p,
-    Function cost,
-    Function cost_gradient,
-    Function cost_hessian,
+    Nullable<Function> cost,
+    Nullable<Function> cost_gradient,
+    Nullable<Function> cost_hessian,
     const bool cp_only,
     const double vanilla_percentage
 ) {
@@ -676,9 +809,14 @@ List fastcpd_impl(
   f_t(0) = -beta;
 
   fastcpd::FastcpdParameters fastcpd_parameters_class(
-    data, beta, p, family, segment_count, cost, winsorise_minval,
-    winsorise_maxval, epsilon
+    data, beta, p, family, segment_count,
+    winsorise_minval, winsorise_maxval, epsilon
   );
+
+  fastcpd_parameters_class.wrap_cost(cost);
+  fastcpd_parameters_class.wrap_cost_gradient(cost_gradient);
+  fastcpd_parameters_class.wrap_cost_hessian(cost_hessian);
+
   if (vanilla_percentage != 1) {
     fastcpd_parameters_class.create_segment_indices();
     fastcpd_parameters_class.create_segment_statistics();
@@ -703,8 +841,17 @@ List fastcpd_impl(
       }
       arma::mat data_segment = data.rows(tau, t - 1);
       if (vanilla_percentage == 1 || t <= vanilla_percentage * n) {
-        List cost_optim_result =
-            cost_optim(family, p, data_segment, cost, 0, true);
+        List cost_optim_result;
+        if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
+          cost_optim_result = cost_optim(
+            family, p, data_segment,
+            fastcpd_parameters_class.cost.get(), 0, true
+          );
+        } else {
+          cost_optim_result = negative_log_likelihood(
+             data_segment, R_NilValue, family, 0, true
+          );
+        }
         cval(i - 1) = as<double>(cost_optim_result["value"]);
         if (vanilla_percentage < 1 && t <= vanilla_percentage * n) {
           fastcpd_parameters_class.update_theta_hat(
@@ -731,8 +878,8 @@ List fastcpd_impl(
           winsorise_minval,
           winsorise_maxval,
           lambda,
-          cost_gradient,
-          cost_hessian
+          fastcpd_parameters_class.cost_gradient.get(),
+          fastcpd_parameters_class.cost_hessian.get()
         );
         fastcpd_parameters_class.update_theta_hat(
           i - 1, as<arma::colvec>(cost_update_result[0])
@@ -758,6 +905,7 @@ List fastcpd_impl(
           );
           theta = as<arma::colvec>(winsorize_result);
         }
+        Function cost_non_null = fastcpd_parameters_class.cost.get();
         if (
           (
             FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end() &&
@@ -765,7 +913,7 @@ List fastcpd_impl(
           ) ||
           (family == "lasso" && t - tau >= 3)
         ) {
-          List cost_result = cost(data_segment, theta, family, lambda);
+          List cost_result = cost_non_null(data_segment, theta, family, lambda);
           cval(i - 1) = as<double>(cost_result["value"]);
         } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
           // if (warm_start && t - tau >= 50) {
@@ -773,7 +921,7 @@ List fastcpd_impl(
           //   start[, tau + 1] <- cost_result$par
           //   cval[i] <- cost_result$value
           // } else {
-            SEXP cost_result = cost(data_segment, theta);
+            SEXP cost_result = cost_non_null(data_segment, theta);
             cval(i - 1) = as<double>(cost_result);
           // }
         }
@@ -875,8 +1023,17 @@ List fastcpd_impl(
     arma::ucolvec segment_data_index =
         arma::conv_to<arma::ucolvec>::from(std::move(segment_data_index_));
     arma::mat data_segment = data.rows(segment_data_index);
-    List cost_optim_result =
-        cost_optim(family, p, data_segment, cost, lambda, false);
+    List cost_optim_result;
+    if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
+      cost_optim_result = cost_optim(
+        family, p, data_segment,
+        fastcpd_parameters_class.cost.get(), lambda, false
+      );
+    } else {
+      cost_optim_result = negative_log_likelihood(
+        data_segment, R_NilValue, family, lambda, false
+      );
+    }
     arma::colvec cost_optim_par = as<arma::colvec>(cost_optim_result["par"]);
     double cost_optim_value = as<double>(cost_optim_result["value"]);
     arma::colvec cost_optim_residual =
@@ -894,215 +1051,4 @@ List fastcpd_impl(
     Named("residual") = residual,
     Named("thetas") = thetas
   );
-}
-
-// -----------------------------------------------------------------------------
-// Legacy code for LASSO
-// -----------------------------------------------------------------------------
-
-
-//' Initialize \code{fastcpd_parameters}.
-//' This function is not meant to be called directly by the user.
-//'
-//' @param data A data frame containing the data to be segmented.
-//' @param p Number of parameters.
-//' @param family Family of the model.
-//' @param segment_count Number of segments.
-//' @param cost Cost function.
-//' @param winsorise_minval Minimum value to be winsorised.
-//' @param winsorise_maxval Maximum value to be winsorised.
-//' @param epsilon Epsilon to avoid numerical issues.
-//' @param vanilla_percentage Percentage of vanilla gradient descent.
-//' @param beta Beta for the momentum.
-//' @keywords internal
-//'
-//' @noRd
-//' @return A list containing new values of \code{fastcpd_parameters}.
-// [[Rcpp::export]]
-List init_fastcpd_parameters(
-    const arma::mat data,
-    const int p,
-    const std::string family,
-    const int segment_count,
-    Function cost,
-    const double winsorise_minval,
-    const double winsorise_maxval,
-    const double epsilon,
-    const double vanilla_percentage,
-    double& beta
-) {
-  fastcpd::FastcpdParameters fastcpd_parameters_class(
-    data, beta, p, family, segment_count, cost, winsorise_minval,
-    winsorise_maxval, epsilon
-  );
-  if (vanilla_percentage != 1) {
-    fastcpd_parameters_class.create_segment_indices();
-    fastcpd_parameters_class.create_segment_statistics();
-    fastcpd_parameters_class.update_beta();
-    fastcpd_parameters_class.create_gradients();
-  }
-  return List::create(
-    Named("segment_indices") = fastcpd_parameters_class.get_segment_indices(),
-    Named("segment_theta_hat") =
-        fastcpd_parameters_class.get_segment_theta_hat(),
-    Named("err_sd") = fastcpd_parameters_class.get_err_sd(),
-    Named("act_num") = fastcpd_parameters_class.get_act_num(),
-    Named("theta_hat") = fastcpd_parameters_class.get_theta_hat(),
-    Named("theta_sum") = fastcpd_parameters_class.get_theta_sum(),
-    Named("hessian") = fastcpd_parameters_class.get_hessian(),
-    Named("momentum") = fastcpd_parameters_class.get_momentum()
-  );
-}
-
-//' Update the parameters related to fastcpd.
-//' This function is not meant to be called directly by the user.
-//'
-//' @param fastcpd_parameters A list containing the parameters related to
-//'   fastcpd.
-//' @param data A data frame containing the data to be segmented.
-//' @param t Current iteration.
-//' @param i Index of the current data in the whole data set.
-//' @param k Number of epochs in SGD.
-//' @param tau Start of the current segment.
-//' @param lambda Lambda for L1 regularization.
-//' @param family Family of the model.
-//' @param cost_gradient Gradient for custom cost function.
-//' @param cost_hessian Hessian for custom cost function.
-//' @param r_t_set Set of r_t values for the current iteration.
-//' @param p Number of parameters.
-//' @param momentum_coef Momentum coefficient to be applied to the current
-//'   momentum.
-//' @param min_prob Minimum probability to avoid numerical issues.
-//' @param winsorise_minval Minimum value to be winsorised.
-//' @param winsorise_maxval Maximum value to be winsorised.
-//' @param epsilon Epsilon to avoid numerical issues.
-//' @keywords internal
-//'
-//' @noRd
-//' @return A list containing new values of \code{fastcpd_parameters}.
-// [[Rcpp::export]]
-List update_fastcpd_parameters(
-    List fastcpd_parameters,
-    arma::mat data,
-    const int t,
-    const int i,
-    Function k,
-    const int tau,
-    const double lambda,
-    const std::string family,
-    Function cost_gradient,
-    Function cost_hessian,
-    arma::ucolvec r_t_set,
-    const int p,
-    const double momentum_coef,
-    const double min_prob,
-    const double winsorise_minval,
-    const double winsorise_maxval,
-    const double epsilon
-) {
-  List cost_update_result = cost_update(
-    data.rows(0, t - 1),
-    as<arma::mat>(fastcpd_parameters["theta_hat"]),
-    as<arma::mat>(fastcpd_parameters["theta_sum"]),
-    as<arma::cube>(fastcpd_parameters["hessian"]),
-    tau,
-    i,
-    k,
-    family,
-    as<arma::colvec>(fastcpd_parameters["momentum"]),
-    momentum_coef,
-    epsilon,
-    min_prob,
-    winsorise_minval,
-    winsorise_maxval,
-    lambda,
-    cost_gradient,
-    cost_hessian
-  );
-  arma::mat theta_hat = fastcpd_parameters["theta_hat"],
-            theta_sum = fastcpd_parameters["theta_sum"];
-  arma::cube hessian = fastcpd_parameters["hessian"];
-  theta_hat.col(i - 1) = as<arma::colvec>(cost_update_result[0]);
-  theta_sum.col(i - 1) = as<arma::colvec>(cost_update_result[1]);
-  hessian.slice(i - 1) = as<arma::mat>(cost_update_result[2]);
-  fastcpd_parameters["theta_hat"] = theta_hat;
-  fastcpd_parameters["theta_sum"] = theta_sum;
-  fastcpd_parameters["hessian"] = hessian;
-  fastcpd_parameters["momentum"] = cost_update_result[3];
-  return fastcpd_parameters;
-}
-
-//' Append new values to \code{fastcpd_parameters}.
-//' This function is not meant to be called directly by the user.
-//'
-//' @param fastcpd_parameters A list containing the parameters related to
-//'   fastcpd.
-//' @param vanilla_percentage Percentage of vanilla gradient descent.
-//' @param data A data frame containing the data to be segmented.
-//' @param t Current iteration.
-//' @param family Family of the model.
-//' @param winsorise_minval Minimum value to be winsorised.
-//' @param winsorise_maxval Maximum value to be winsorised.
-//' @param p Number of parameters.
-//' @param epsilon Epsilon to avoid numerical issues.
-//' @keywords internal
-//'
-//' @noRd
-//' @return A list containing new values of \code{fastcpd_parameters}.
-// [[Rcpp::export]]
-List append_fastcpd_parameters(
-    List fastcpd_parameters,
-    const double vanilla_percentage,
-    const arma::mat data,
-    const int t,
-    const std::string family,
-    const double winsorise_minval,
-    const double winsorise_maxval,
-    const int p,
-    const double epsilon
-) {
-  if (vanilla_percentage != 1) {
-    // for tau = t-1
-    arma::rowvec new_data = data.row(t - 1).tail(data.n_cols - 1);
-    arma::vec segment_indices = fastcpd_parameters["segment_indices"];
-    const int segment_index = segment_indices(t - 1);
-    arma::mat segment_theta_hat = fastcpd_parameters["segment_theta_hat"];
-    arma::rowvec cum_coef_add = segment_theta_hat.row(segment_index - 1),
-                     coef_add = segment_theta_hat.row(segment_index - 1);
-    arma::mat hessian_new;
-    if (family == "binomial") {
-      const double prob =
-          1 / (1 + exp(-arma::as_scalar(coef_add * new_data.t())));
-      hessian_new =
-          (new_data.t() * new_data) * arma::as_scalar(prob * (1 - prob));
-    } else if (family == "poisson") {
-      Environment desc_tools = Environment::namespace_env("DescTools");
-      Function winsorize = desc_tools["Winsorize"];
-      NumericVector winsorize_result = winsorize(
-        Rcpp::_["x"] = coef_add,
-        Rcpp::_["minval"] = winsorise_minval,
-        Rcpp::_["maxval"] = winsorise_maxval
-      );
-      coef_add = as<arma::rowvec>(winsorize_result);
-      cum_coef_add = as<arma::rowvec>(winsorize_result);
-      hessian_new =
-          (new_data.t() * new_data) * arma::as_scalar(
-            exp(coef_add * new_data.t())
-          );
-    } else if (family == "lasso" || family == "gaussian") {
-      hessian_new =
-          new_data.t() * new_data + epsilon * arma::eye<arma::mat>(p, p);
-    } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
-      hessian_new = arma::zeros<arma::mat>(p, p);
-    }
-
-    arma::mat theta_hat = fastcpd_parameters["theta_hat"],
-              theta_sum = fastcpd_parameters["theta_sum"];
-    arma::cube hessian = fastcpd_parameters["hessian"];
-    fastcpd_parameters["theta_hat"] = arma::join_rows(theta_hat, coef_add.t());
-    fastcpd_parameters["theta_sum"] =
-        arma::join_rows(theta_sum, cum_coef_add.t());
-    fastcpd_parameters["hessian"] = arma::join_slices(hessian, hessian_new);
-  }
-  return fastcpd_parameters;
 }

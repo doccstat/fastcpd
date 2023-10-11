@@ -1,3 +1,13 @@
+# fastcpd 0.8.0
+
+*   Deal with the following TODO:
+
+        Due to the excessive calls to `glmnet` between R and C++,
+        it is better to use the R implementation of `fastcpd` for lasso.
+
+*   Separate the use of internal C++ cost functions and user-defined R cost
+    functions.
+
 # fastcpd 0.7.6
 
 *   Move default cost functions definition inside the `fastcpd` definition.
