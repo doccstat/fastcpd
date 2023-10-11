@@ -33,15 +33,17 @@ FastcpdParameters::FastcpdParameters(
   hessian = cube(p, p, 1);
   momentum = vec(p);
 
-  // create_environment_functions();
+  create_environment_functions();
 }
 
-// void FastcpdParameters::create_environment_functions() {
-//   if (family == "poisson") {
-//     Environment desc_tools = Environment::namespace_env("DescTools");
-//     *winsorize = desc_tools["Winsorize"];
-//   }
-// }
+void FastcpdParameters::create_environment_functions() {
+  if (family == "poisson") {
+    Environment desc_tools = Environment::namespace_env("DescTools");
+    winsorize = as<Nullable<Function>>(desc_tools["Winsorize"]);
+  } else {
+    // TODO(doccstat): Store other environment functions.
+  }
+}
 
 colvec FastcpdParameters::get_err_sd() {
   return err_sd;
@@ -203,9 +205,8 @@ void FastcpdParameters::create_gradients() {
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
     ) * as_scalar(prob * (1 - prob));
   } else if (family == "poisson") {
-    Environment desc_tools = Environment::namespace_env("DescTools");
-    Function winsorize = desc_tools["Winsorize"];
-    NumericVector winsorize_result = winsorize(
+    Function winsorize_non_null = winsorize.get();
+    NumericVector winsorize_result = winsorize_non_null(
       Rcpp::_["x"] = segment_theta_hat.row(0).t(),
       Rcpp::_["minval"] = winsorise_minval,
       Rcpp::_["maxval"] = winsorise_maxval
@@ -244,9 +245,8 @@ void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
     const double prob = 1 / (1 + exp(-as_scalar(coef_add * new_data.t())));
     hessian_new = (new_data.t() * new_data) * as_scalar(prob * (1 - prob));
   } else if (family == "poisson") {
-    Environment desc_tools = Environment::namespace_env("DescTools");
-    Function winsorize = desc_tools["Winsorize"];
-    NumericVector winsorize_result = winsorize(
+    Function winsorize_non_null = winsorize.get();
+    NumericVector winsorize_result = winsorize_non_null(
       Rcpp::_["x"] = coef_add,
       Rcpp::_["minval"] = winsorise_minval,
       Rcpp::_["maxval"] = winsorise_maxval
