@@ -709,6 +709,21 @@ or `NULL` while the provided family is {family}.]"
     beta <- (p + 1) * log(nrow(data)) / 2
   }
 
+  # `cost_function_wrapper` requires data. `theta` is required for a general
+  # custom family and is optional (not needed) for vanilla PELT. The rest of the
+  # parameters are discarded.
+  # cost_function_wrapper <- function(data, theta = NULL, ...) {
+  #   cost(data, theta, ...)
+  # }
+
+  # cost_gradient_wrapper <- function(data, theta, ...) {
+  #   cost_gradient(data, theta, ...)
+  # }
+
+  # cost_hessian_wrapper <- function(data, theta, ...) {
+  #   cost_hessian(data, theta, ...)
+  # }
+
   if (is.null(cost)) {
     cost <- negative_log_likelihood
   }
@@ -718,22 +733,11 @@ or `NULL` while the provided family is {family}.]"
   if (is.null(cost_hessian)) {
     cost_hessian <- cost_update_hessian
   }
-
-  if (family == "lasso") {
-    # TODO(doccstat): Due to the excessive calls to `glmnet` between R and C++,
-    # it is better to use the R implementation of `fastcpd` for lasso.
-    result <- fastcpd_impl_r(
-      data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
-      min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
-      cost_hessian, cp_only, vanilla_percentage
-    )
-  } else {
-    result <- fastcpd_impl(
-      data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
-      min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
-      cost_hessian, cp_only, vanilla_percentage
-    )
-  }
+  result <- fastcpd_impl(
+    data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
+    min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
+    cost_hessian, cp_only, vanilla_percentage
+  )
 
   result$thetas <- data.frame(result$thetas)
   if (ncol(result$thetas) > 0) {
@@ -758,151 +762,5 @@ or `NULL` while the provided family is {family}.]"
     residuals = c(result$residual),
     thetas = result$thetas,
     cp_only = cp_only
-  )
-}
-
-fastcpd_impl_r <- function(
-    data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
-    min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
-    cost_hessian, cp_only, vanilla_percentage) {
-  # Set up the initial values.
-  n <- nrow(data)
-  lambda <- 0
-
-  # After t = 1, the r_t_set R_t contains 0 and 1.
-  r_t_set <- c(0, 1)
-  # C(0)=NULL, C(1)={0}
-  cp_set <- append(list(NULL), rep(list(0), n))
-  # Objective function: F(0) = -beta
-  f_t <- c(-beta, rep(0, n))
-
-  fastcpd_parameters <- init_fastcpd_parameters(
-    data, p, family, segment_count, cost, winsorise_minval, winsorise_maxval,
-    epsilon, vanilla_percentage, beta
-  )
-
-  for (t in 2:n) {
-    r_t_count <- length(r_t_set)
-
-    # number of cost values is the same as number of elemnts in R_t
-    cval <- rep(0, r_t_count)
-
-    # for tau in R_t\{t-1}
-    for (i in 1:(r_t_count - 1)) {
-      tau <- r_t_set[i]
-      if (family == "lasso") {
-        # Mean of `err_sd` only works if error sd is unchanged.
-        lambda <- mean(fastcpd_parameters$err_sd) * sqrt(2 * log(p) / (t - tau))
-      }
-
-      data_segment <- data[(tau + 1):t, , drop = FALSE]
-      if (vanilla_percentage == 1 || t <= vanilla_percentage * n) {
-        cost_optim_result <- cost_optim(family, p, data_segment, cost, 0, TRUE)
-        cval[i] <- cost_optim_result$value
-        if (vanilla_percentage < 1 && t == vanilla_percentage * n) {
-          fastcpd_parameters$theta_hat[, i] <- cost_optim_result$par
-          fastcpd_parameters$theta_sum[, i] <-
-            fastcpd_parameters$theta_sum[, i] + cost_optim_result$par
-        }
-      } else {
-        fastcpd_parameters <- update_fastcpd_parameters(
-          fastcpd_parameters, data, t, i, k, tau, lambda, family,
-          cost_gradient, cost_hessian, r_t_set, p,
-          momentum_coef, min_prob, winsorise_minval, winsorise_maxval, epsilon
-        )
-
-        theta <- fastcpd_parameters$theta_sum[, i] / (t - tau)
-        if (family == "poisson" && t - tau >= p) {
-          theta <- DescTools::Winsorize(
-            x = theta, minval = winsorise_minval, maxval = winsorise_maxval
-          )
-        }
-
-        if (
-          (family %in% c("gaussian", "binomial", "poisson") && t - tau >= p) ||
-            (family == "lasso" && t - tau >= 3)
-        ) {
-          cval[i] <- cost(data_segment, theta, family, lambda)$value
-        } else if (family == "custom") {
-          # if (warm_start && t - tau >= 50) {
-          #   cost_result <- cost(data_segment, start = start[, tau + 1])
-          #   start[, tau + 1] <- cost_result$par
-          #   cval[i] <- cost_result$value
-          # } else {
-          cval[i] <- cost(data_segment, theta)
-          # }
-        }
-      }
-    }
-    fastcpd_parameters <- append_fastcpd_parameters(
-      fastcpd_parameters, vanilla_percentage, data, t, family,
-      winsorise_minval, winsorise_maxval, p, epsilon
-    )
-
-    # Step 3
-    cval[r_t_count] <- 0
-    # `beta` adjustment seems to work but there might be better choices.
-    obj <- cval + f_t[r_t_set + 1] + beta
-    min_obj <- min(obj)
-    tau_star <- r_t_set[which(obj == min_obj)[1]]
-
-    # Step 4
-    cp_set[[t + 1]] <- c(cp_set[[tau_star + 1]], tau_star)
-
-    # Step 5
-    pruned_left <- (cval + f_t[r_t_set + 1]) <= min_obj
-    r_t_set <- c(r_t_set[pruned_left], t)
-
-    if (vanilla_percentage != 1) {
-      fastcpd_parameters$theta_hat <-
-        fastcpd_parameters$theta_hat[, pruned_left, drop = FALSE]
-      fastcpd_parameters$theta_sum <-
-        fastcpd_parameters$theta_sum[, pruned_left, drop = FALSE]
-      fastcpd_parameters$hessian <-
-        fastcpd_parameters$hessian[, , pruned_left, drop = FALSE]
-    }
-
-    # Objective function F(t).
-    f_t[t + 1] <- min_obj
-  }
-
-  # Remove change-points close to the boundaries
-  cp_set <- cp_set[[n + 1]]
-  cp_set <- cp_set[(cp_set >= trim * n) & (cp_set <= (1 - trim) * n)]
-  cp_set <- sort(unique(c(0, cp_set)))
-
-  cp_set_too_close <- which((diff(cp_set) < trim * n) == TRUE)
-  if (length(cp_set_too_close) > 0) {
-    cp_set <- floor(
-      (cp_set[-(cp_set_too_close + 1)] + cp_set[-cp_set_too_close]) / 2
-    )
-  }
-  cp_set <- cp_set[cp_set > 0]
-
-  residual <- numeric(0)
-  if (cp_only) {
-    cost_values <- numeric(0)
-    thetas <- matrix(NA, nrow = 0, ncol = 0)
-  } else {
-    cp_loc <- unique(c(0, cp_set, n))
-    cost_values <- rep(0, length(cp_loc) - 1)
-    thetas <- matrix(NA, nrow = p, ncol = length(cp_loc) - 1)
-    for (i in 1:(length(cp_loc) - 1)) {
-      data_segment <- data[(cp_loc[i] + 1):cp_loc[i + 1], , drop = FALSE]
-      cost_result <- cost_optim(family, p, data_segment, cost, lambda, FALSE)
-      residual <- c(residual, cost_result$residuals)
-      cost_values[i] <- cost_result$value
-      thetas[, i] <- cost_result$par
-    }
-  }
-  thetas <- data.frame(thetas)
-  if (ncol(thetas) > 0) {
-    names(thetas) <- paste0("segment ", seq_len(ncol(thetas)))
-  }
-  list(
-    cp_set = cp_set,
-    cost_values = cost_values,
-    residual = residual,
-    thetas = thetas
   )
 }
