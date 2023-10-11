@@ -1,59 +1,56 @@
-#ifndef WRAPPERS_H
-#define WRAPPERS_H
+#ifndef WRAPPERS_H_
+#define WRAPPERS_H_
 
-#include "RcppArmadillo.h"
-
-using ::Rcpp::List;
-using ::Rcpp::Nullable;
+#include "fastcpd_types.h"
 
 namespace fastcpd::wrappers {
 
 class CostFunction {
  public:
-  CostFunction(Rcpp::Function cost);
+  CostFunction(Function cost);
 
   List operator()(
-      arma::mat data,
-      Nullable<arma::colvec> theta,
-      std::string family,  // UNUSED
+      mat data,
+      Nullable<colvec> theta,
+      string family,  // UNUSED
       double lambda,  // UNUSED
       bool cv,  // UNUSED
-      Nullable<arma::colvec> start  // UNUSED
+      Nullable<colvec> start  // UNUSED
   );
 
  private:
-  Rcpp::Function cost;
+  Function cost;
 };
 
 class CostGradient {
  public:
-  CostGradient(Rcpp::Function cost_gradient);
+  CostGradient(Function cost_gradient);
 
-  arma::colvec operator()(
-      arma::mat data,
-      arma::colvec theta,
-      std::string family  // UNUSED
+  colvec operator()(
+      mat data,
+      colvec theta,
+      string family  // UNUSED
   );
 
  private:
-  Rcpp::Function cost_gradient;
+  Function cost_gradient;
 };
 
 class CostHessian {
  public:
-  CostHessian(Rcpp::Function cost_hessian);
+  CostHessian(Function cost_hessian);
 
-  arma::mat operator()(
-      arma::mat data,
-      arma::colvec theta,
-      std::string family,  // UNUSED
+  mat operator()(
+      mat data,
+      colvec theta,
+      string family,  // UNUSED
       double min_prob  // UNUSED
   );
 
  private:
-  Rcpp::Function cost_hessian;
+  Function cost_hessian;
 };
 
 }  // namespace fastcpd::wrappers
 
-#endif  // WRAPPERS_H
+#endif  // WRAPPERS_H_

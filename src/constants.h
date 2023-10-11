@@ -1,17 +1,17 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef CONSTANTS_H_
+#define CONSTANTS_H_
 
 #include <string>
 #include <unordered_set>
 
-// TODO(doccstat): `std::unordered_set` is not literal type and thus `constexpr`
+using ::std::string;
+using ::std::unordered_set;
+
+// TODO(doccstat): `unordered_set` is not literal type and thus `constexpr`
 // can not be used here. Blocked by `abseil` due to the non-header only issue.
-const std::unordered_set<std::string> CUSTOM_FAMILIES = {
-  "custom", "vanilla"
-};
+const unordered_set<string> CUSTOM_FAMILIES = {"custom", "vanilla"};
 
-const std::unordered_set<std::string> FASTCPD_FAMILIES = {
-  "gaussian", "binomial", "poisson", "lasso",
-};
+const unordered_set<string> FASTCPD_FAMILIES =
+  {"gaussian", "binomial", "poisson", "lasso"};
 
-#endif  // CONSTANTS_H
+#endif  // CONSTANTS_H_

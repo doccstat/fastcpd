@@ -4,75 +4,60 @@
 #include "parameters.h"
 #include "wrappers.h"
 
-using ::Rcpp::as;
-using ::Rcpp::Environment;
-using ::Rcpp::Function;
-using ::Rcpp::InternalFunction;
-using ::Rcpp::List;
-using ::Rcpp::Named;
-using ::Rcpp::Nullable;
-using ::Rcpp::NumericVector;
+using ::fastcpd::functions::cost_update_gradient;
+using ::fastcpd::functions::cost_update_hessian;
+using ::fastcpd::functions::negative_log_likelihood;
 
 List cost_update(
-    const arma::mat data,
-    arma::mat theta_hat,
-    arma::mat theta_sum,
-    arma::cube hessian,
+    const mat data,
+    mat theta_hat,
+    mat theta_sum,
+    cube hessian,
     const int tau,
     const int i,
     Function k,
-    const std::string family,
-    arma::colvec momentum,
+    const string family,
+    colvec momentum,
     const double momentum_coef,
     const double epsilon,
     const double min_prob,
     const double winsorise_minval,
     const double winsorise_maxval,
     const double lambda,
-    std::function<arma::colvec(
-        arma::mat data,
-        arma::colvec theta,
-        std::string family
-    )> cost_gradient_wrapper,
-    std::function<arma::mat(
-        arma::mat data,
-        arma::colvec theta,
-        std::string family,
-        double min_prob
-    )> cost_hessian_wrapper
+    function<colvec(mat data, colvec theta, string family)>
+      cost_gradient_wrapper,
+    function<mat(mat data, colvec theta, string family, double min_prob)>
+      cost_hessian_wrapper
 ) {
   // Get the hessian
-  arma::mat hessian_i = hessian.slice(i - 1);
-  arma::colvec gradient;
+  mat hessian_i = hessian.slice(i - 1);
+  colvec gradient;
 
   if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
-    arma::mat cost_hessian_result = cost_hessian_wrapper(
+    mat cost_hessian_result = cost_hessian_wrapper(
       data, theta_hat.col(i - 1),
       family,  // UNUSED
       min_prob  // UNUSED
     );
-    arma::colvec cost_gradient_result = cost_gradient_wrapper(
+    colvec cost_gradient_result = cost_gradient_wrapper(
       data, theta_hat.col(i - 1),
       family  // UNUSED
     );
     hessian_i += cost_hessian_result;
     gradient = cost_gradient_result;
   } else {
-    hessian_i += fastcpd::functions::cost_update_hessian(
-      data, theta_hat.col(i - 1), family, min_prob
-    );
-    gradient = fastcpd::functions::cost_update_gradient(
-      data, theta_hat.col(i - 1), family
-    );
+    hessian_i +=
+      cost_update_hessian(data, theta_hat.col(i - 1), family, min_prob);
+    gradient = cost_update_gradient(data, theta_hat.col(i - 1), family);
   }
 
   // Add epsilon to the diagonal for PSD hessian
-  arma::mat hessian_psd = hessian_i + epsilon * arma::eye<arma::mat>(
+  mat hessian_psd = hessian_i + epsilon * eye<mat>(
     theta_hat.n_rows, theta_hat.n_rows
   );
 
   // Calculate momentum step
-  arma::vec momentum_step = arma::solve(hessian_psd, gradient);
+  vec momentum_step = solve(hessian_psd, gradient);
   momentum = momentum_coef * momentum - momentum_step;
 
   // Update theta_hat with momentum
@@ -87,46 +72,42 @@ List cost_update(
       Rcpp::_["minval"] = winsorise_minval,
       Rcpp::_["maxval"] = winsorise_maxval
     );
-    theta_hat.col(i - 1) = arma::vec(
-      winsorize_result.begin(), winsorize_result.size(), false
-    );
+    theta_hat.col(i - 1) =
+      vec(winsorize_result.begin(), winsorize_result.size(), false);
   } else if (family == "lasso" || family == "gaussian") {
     // Update theta_hat with L1 penalty
-    double hessian_norm = arma::norm(hessian_i, "fro");
-    arma::vec normd = arma::abs(theta_hat.col(i - 1)) - lambda / hessian_norm;
+    double hessian_norm = norm(hessian_i, "fro");
+    vec normd = arma::abs(theta_hat.col(i - 1)) - lambda / hessian_norm;
     theta_hat.col(i - 1) =
-        arma::sign(theta_hat.col(i - 1)) % arma::max(
-          normd, arma::zeros<arma::colvec>(normd.n_elem)
-        );
+        sign(theta_hat.col(i - 1)) % max(normd, zeros<colvec>(normd.n_elem));
   }
 
   for (int kk = 1; kk <= as<int>(k(data.n_rows - tau)); kk++) {
     for (unsigned j = tau + 1; j <= data.n_rows; j++) {
       if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
-        arma::mat cost_hessian_result = cost_hessian_wrapper(
+        mat cost_hessian_result = cost_hessian_wrapper(
           data.rows(tau, j - 1), theta_hat.col(i - 1),
           family,  // UNUSED
           min_prob  // UNUSED
         );
         hessian_i += cost_hessian_result;
-        arma::colvec cost_gradient_result = cost_gradient_wrapper(
+        colvec cost_gradient_result = cost_gradient_wrapper(
           data.rows(tau, j - 1), theta_hat.col(i - 1),
           family  // UNUSED
         );
         gradient = cost_gradient_result;
       } else {
-        hessian_i += fastcpd::functions::cost_update_hessian(
+        hessian_i += cost_update_hessian(
           data.rows(tau, j - 1), theta_hat.col(i - 1), family, min_prob
         );
-        gradient = fastcpd::functions::cost_update_gradient(
+        gradient = cost_update_gradient(
           data.rows(tau, j - 1), theta_hat.col(i - 1), family
         );
       }
 
-      hessian_psd = hessian_i + epsilon * arma::eye<arma::mat>(
-            theta_hat.n_rows, theta_hat.n_rows
-          );
-      momentum_step = arma::solve(hessian_psd, gradient);
+      hessian_psd =
+        hessian_i + epsilon * eye<mat>(theta_hat.n_rows, theta_hat.n_rows);
+      momentum_step = solve(hessian_psd, gradient);
       momentum = momentum_coef * momentum - momentum_step;
       theta_hat.col(i - 1) += momentum;
 
@@ -140,15 +121,12 @@ List cost_update(
           Rcpp::_["maxval"] = winsorise_maxval
         );
         theta_hat.col(i - 1) =
-            arma::vec(winsorize_result.begin(), winsorize_result.size(), false);
+            vec(winsorize_result.begin(), winsorize_result.size(), false);
       } else if (family == "lasso" || family == "gaussian") {
-        double hessian_norm = arma::norm(hessian_i, "fro");
-        arma::vec normd = arma::abs(
-          theta_hat.col(i - 1)
-        ) - lambda / hessian_norm;
-        theta_hat.col(i - 1) = arma::sign(theta_hat.col(i - 1)) % arma::max(
-          normd, arma::zeros<arma::colvec>(normd.n_elem)
-        );
+        double hessian_norm = norm(hessian_i, "fro");
+        vec normd = arma::abs(theta_hat.col(i - 1)) - lambda / hessian_norm;
+        theta_hat.col(i - 1) =
+          sign(theta_hat.col(i - 1)) % max(normd, zeros<colvec>(normd.n_elem));
       }
     }
   }
@@ -161,9 +139,9 @@ List cost_update(
 }
 
 List cost_optim(
-    const std::string family,
+    const string family,
     const int p,
-    const arma::mat data_segment,
+    const mat data_segment,
     Function cost,
     const double lambda,
     const bool cv
@@ -180,7 +158,7 @@ List cost_optim(
     List optim_result = optim(
       Named("par") = 0,
       Named("fn") = InternalFunction(
-        +[](double theta, arma::mat data, Function cost) {
+        +[](double theta, mat data, Function cost) {
           return cost(
             Named("data") = data,
             Named("theta") = log(theta / (1 - theta))
@@ -205,7 +183,7 @@ List cost_optim(
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result = optim(
-      Named("par") = arma::zeros<arma::vec>(p),
+      Named("par") = zeros<vec>(p),
       Named("fn") = cost,
       Named("method") = "L-BFGS-B",
       Named("data") = data_segment
@@ -217,18 +195,18 @@ List cost_optim(
     );
   } else {
     // NOTEST
-    Rcpp::stop("Internal error, this branch should not be reached.");
+    stop("Internal error, this branch should not be reached.");
   }
 }
 
 List fastcpd_impl(
-    arma::mat data,
+    mat data,
     double beta,
     const int segment_count,
     const double trim,
     const double momentum_coef,
     Function k,
-    const std::string family,
+    const string family,
     const double epsilon,
     const double min_prob,
     const double winsorise_minval,
@@ -245,14 +223,14 @@ List fastcpd_impl(
   double lambda = 0;
 
   // After t = 1, the r_t_set R_t contains 0 and 1.
-  arma::ucolvec r_t_set = {0, 1};
+  ucolvec r_t_set = {0, 1};
   // C(0) = NULL, C(1) = {0}.
-  std::vector<arma::colvec> cp_sets = {arma::zeros<arma::vec>(0)};
-  arma::linspace(1, n, n).for_each([&](int i) {
-    cp_sets.push_back(arma::zeros<arma::vec>(1));
+  std::vector<colvec> cp_sets = {zeros<vec>(0)};
+  linspace(1, n, n).for_each([&](int i) {
+    cp_sets.push_back(zeros<vec>(1));
   });
   // Objective function: F(0) = -beta.
-  arma::colvec f_t = arma::zeros<arma::vec>(n + 1);
+  colvec f_t = zeros<vec>(n + 1);
   f_t(0) = -beta;
 
   fastcpd::parameters::FastcpdParameters fastcpd_parameters_class(
@@ -275,7 +253,7 @@ List fastcpd_impl(
     unsigned int r_t_count = r_t_set.n_elem;
 
     // Number of cost values is the same as the number of elements in R_t.
-    arma::colvec cval = arma::zeros<arma::vec>(r_t_count);
+    colvec cval = zeros<vec>(r_t_count);
 
     // For tau in R_t \ {t-1}.
     for (unsigned int i = 1; i < r_t_count; i++) {
@@ -286,7 +264,7 @@ List fastcpd_impl(
           fastcpd_parameters_class.get_err_sd()
         ) * sqrt(2 * log(p) / (t - tau));
       }
-      arma::mat data_segment = data.rows(tau, t - 1);
+      mat data_segment = data.rows(tau, t - 1);
       if (vanilla_percentage == 1 || t <= vanilla_percentage * n) {
         List cost_optim_result;
         if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
@@ -295,17 +273,16 @@ List fastcpd_impl(
             fastcpd_parameters_class.cost.get(), 0, true
           );
         } else {
-          cost_optim_result = fastcpd::functions::negative_log_likelihood(
-              data_segment, R_NilValue, family, 0, true
-          );
+          cost_optim_result =
+            negative_log_likelihood(data_segment, R_NilValue, family, 0, true);
         }
         cval(i - 1) = as<double>(cost_optim_result["value"]);
         if (vanilla_percentage < 1 && t <= vanilla_percentage * n) {
           fastcpd_parameters_class.update_theta_hat(
-            i - 1, as<arma::colvec>(cost_optim_result["par"])
+            i - 1, as<colvec>(cost_optim_result["par"])
           );
           fastcpd_parameters_class.update_theta_sum(
-            i - 1, as<arma::colvec>(cost_optim_result["par"])
+            i - 1, as<colvec>(cost_optim_result["par"])
           );
         }
       } else {
@@ -329,18 +306,18 @@ List fastcpd_impl(
           fastcpd_parameters_class.cost_hessian_wrapper
         );
         fastcpd_parameters_class.update_theta_hat(
-          i - 1, as<arma::colvec>(cost_update_result[0])
+          i - 1, as<colvec>(cost_update_result[0])
         );
         fastcpd_parameters_class.create_theta_sum(
-          i - 1, as<arma::colvec>(cost_update_result[1])
+          i - 1, as<colvec>(cost_update_result[1])
         );
         fastcpd_parameters_class.update_hessian(
-          i - 1, as<arma::mat>(cost_update_result[2])
+          i - 1, as<mat>(cost_update_result[2])
         );
         fastcpd_parameters_class.update_momentum(
-          as<arma::colvec>(cost_update_result[3])
+          as<colvec>(cost_update_result[3])
         );
-        arma::colvec theta =
+        colvec theta =
             fastcpd_parameters_class.get_theta_sum().col(i - 1) / (t - tau);
         if (family == "poisson" && t - tau >= p) {
           Environment desc_tools = Environment::namespace_env("DescTools");
@@ -350,7 +327,7 @@ List fastcpd_impl(
             Rcpp::_["minval"] = winsorise_minval,
             Rcpp::_["maxval"] = winsorise_maxval
           );
-          theta = as<arma::colvec>(winsorize_result);
+          theta = as<colvec>(winsorize_result);
         }
         if (
           (
@@ -359,7 +336,7 @@ List fastcpd_impl(
           ) ||
           (family == "lasso" && t - tau >= 3)
         ) {
-          List cost_result = fastcpd::functions::negative_log_likelihood(
+          List cost_result = negative_log_likelihood(
             data_segment, Rcpp::wrap(theta), family, lambda
           );
           cval(i - 1) = as<double>(cost_result["value"]);
@@ -385,18 +362,16 @@ List fastcpd_impl(
     cval(r_t_count - 1) = 0;
 
     // `beta` adjustment seems to work but there might be better choices.
-    arma::colvec obj = cval + f_t.rows(r_t_set) + beta;
-    double min_obj = arma::min(obj);
-    double tau_star = r_t_set(arma::index_min(obj));
+    colvec obj = cval + f_t.rows(r_t_set) + beta;
+    double min_obj = min(obj);
+    double tau_star = r_t_set(index_min(obj));
 
     // Step 4
-    cp_sets[t] = arma::join_cols(cp_sets[tau_star], arma::colvec{tau_star});
+    cp_sets[t] = join_cols(cp_sets[tau_star], colvec{tau_star});
 
     // Step 5
-    arma::ucolvec pruned_left =
-        arma::find(cval + f_t.rows(r_t_set) <= min_obj);
-    arma::ucolvec pruned_r_t_set =
-        arma::zeros<arma::ucolvec>(pruned_left.n_elem + 1);
+    ucolvec pruned_left = arma::find(cval + f_t.rows(r_t_set) <= min_obj);
+    ucolvec pruned_r_t_set = zeros<ucolvec>(pruned_left.n_elem + 1);
     pruned_r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
     pruned_r_t_set(pruned_left.n_elem) = t;
     r_t_set = std::move(pruned_r_t_set);
@@ -412,31 +387,31 @@ List fastcpd_impl(
   }
 
   // Remove change points close to the boundaries.
-  arma::colvec cp_set = cp_sets[n];
+  colvec cp_set = cp_sets[n];
   cp_set = cp_set(arma::find(cp_set >= trim * n));
   cp_set = cp_set(arma::find(cp_set <= (1 - trim) * n));
-  arma::colvec cp_set_ = arma::zeros<arma::vec>(cp_set.n_elem + 1);
+  colvec cp_set_ = zeros<vec>(cp_set.n_elem + 1);
   if (cp_set.n_elem) {
     cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
   }
   cp_set = arma::sort(arma::unique(std::move(cp_set_)));
 
   // Remove change points close to each other.
-  arma::ucolvec cp_set_too_close = arma::find(arma::diff(cp_set) <= trim * n);
+  ucolvec cp_set_too_close = arma::find(arma::diff(cp_set) <= trim * n);
   if (cp_set_too_close.n_elem > 0) {
     int rest_element_count = cp_set.n_elem - cp_set_too_close.n_elem;
-    arma::colvec cp_set_rest_left = arma::zeros<arma::vec>(rest_element_count),
-                cp_set_rest_right = arma::zeros<arma::vec>(rest_element_count);
+    colvec cp_set_rest_left = zeros<vec>(rest_element_count),
+          cp_set_rest_right = zeros<vec>(rest_element_count);
     for (unsigned int i = 0, i_left = 0, i_right = 0; i < cp_set.n_elem; i++) {
       if (
-        arma::ucolvec left_find = arma::find(cp_set_too_close == i);
+        ucolvec left_find = arma::find(cp_set_too_close == i);
         left_find.n_elem == 0
       ) {
         cp_set_rest_left(i_left) = cp_set(i);
         i_left++;
       }
       if (
-        arma::ucolvec right_find = arma::find(cp_set_too_close == i - 1);
+        ucolvec right_find = arma::find(cp_set_too_close == i - 1);
         right_find.n_elem == 0
       ) {
         cp_set_rest_right(i_right) = cp_set(i);
@@ -456,22 +431,22 @@ List fastcpd_impl(
     );
   }
 
-  arma::colvec cp_loc_ = arma::zeros<arma::colvec>(cp_set.n_elem + 2);
+  colvec cp_loc_ = zeros<colvec>(cp_set.n_elem + 2);
   if (cp_set.n_elem) {
     cp_loc_.rows(1, cp_loc_.n_elem - 2) = cp_set;
   }
   cp_loc_(cp_loc_.n_elem - 1) = n;
-  arma::colvec cp_loc = arma::unique(std::move(cp_loc_));
-  arma::colvec cost_values = arma::zeros<arma::vec>(cp_loc.n_elem - 1);
-  arma::mat thetas = arma::zeros<arma::mat>(p, cp_loc.n_elem - 1);
-  arma::colvec residual = arma::zeros<arma::colvec>(n);
+  colvec cp_loc = arma::unique(std::move(cp_loc_));
+  colvec cost_values = zeros<vec>(cp_loc.n_elem - 1);
+  mat thetas = zeros<mat>(p, cp_loc.n_elem - 1);
+  colvec residual = zeros<colvec>(n);
   unsigned int residual_next_start = 0;
   for (unsigned int i = 0; i < cp_loc.n_elem - 1; i++) {
-    arma::colvec segment_data_index_ =
-        arma::linspace(cp_loc(i), cp_loc(i + 1) - 1, cp_loc(i + 1) - cp_loc(i));
-    arma::ucolvec segment_data_index =
-        arma::conv_to<arma::ucolvec>::from(std::move(segment_data_index_));
-    arma::mat data_segment = data.rows(segment_data_index);
+    colvec segment_data_index_ =
+        linspace(cp_loc(i), cp_loc(i + 1) - 1, cp_loc(i + 1) - cp_loc(i));
+    ucolvec segment_data_index =
+        arma::conv_to<ucolvec>::from(std::move(segment_data_index_));
+    mat data_segment = data.rows(segment_data_index);
     List cost_optim_result;
     if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
       cost_optim_result = cost_optim(
@@ -479,14 +454,13 @@ List fastcpd_impl(
         fastcpd_parameters_class.cost.get(), lambda, false
       );
     } else {
-      cost_optim_result = fastcpd::functions::negative_log_likelihood(
+      cost_optim_result = negative_log_likelihood(
         data_segment, R_NilValue, family, lambda, false
       );
     }
-    arma::colvec cost_optim_par = as<arma::colvec>(cost_optim_result["par"]);
+    colvec cost_optim_par = as<colvec>(cost_optim_result["par"]);
     double cost_optim_value = as<double>(cost_optim_result["value"]);
-    arma::colvec cost_optim_residual =
-        as<arma::colvec>(cost_optim_result["residuals"]);
+    colvec cost_optim_residual = as<colvec>(cost_optim_result["residuals"]);
     thetas.col(i) = cost_optim_par;
     cost_values(i) = cost_optim_value;
     residual.rows(

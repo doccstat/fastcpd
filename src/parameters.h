@@ -1,28 +1,24 @@
-#ifndef PARAMETERS_H
-#define PARAMETERS_H
+#ifndef PARAMETERS_H_
+#define PARAMETERS_H_
 
-#include <RcppArmadillo.h>
-
-using ::Rcpp::Function;
-using ::Rcpp::List;
-using ::Rcpp::Nullable;
+#include "fastcpd_types.h"
 
 namespace fastcpd::parameters {
 
 class FastcpdParameters {
  public:
   FastcpdParameters(
-    arma::mat data,
+    mat data,
     const double beta,
     const int p,
-    const std::string family,
+    const string family,
     const int segment_count,
     const double winsorise_minval,
     const double winsorise_maxval,
     const double epsilon
   );
   // Return `err_sd`.
-  arma::colvec get_err_sd();
+  colvec get_err_sd();
 
   // Update `err_sd` for a specific segment.
   void update_err_sd(const unsigned int segment_index, const double err_var);
@@ -32,46 +28,46 @@ class FastcpdParameters {
   void create_segment_indices();
 
   // Return the indices of the segments.
-  arma::colvec get_segment_indices();
+  colvec get_segment_indices();
 
   // Get the value of \code{theta_hat}.
-  arma::mat get_theta_hat();
+  mat get_theta_hat();
 
   // Update \code{theta_hat} for a specific column.
-  void update_theta_hat(const unsigned int col, arma::colvec new_theta_hat);
+  void update_theta_hat(const unsigned int col, colvec new_theta_hat);
 
   // Append a new column to \code{theta_hat}.
-  void update_theta_hat(arma::colvec new_theta_hat);
+  void update_theta_hat(colvec new_theta_hat);
 
   // Prune the columns of \code{theta_hat}.
-  void update_theta_hat(arma::ucolvec pruned_left);
+  void update_theta_hat(ucolvec pruned_left);
 
   // Get the value of \code{theta_sum}.
-  arma::mat get_theta_sum();
+  mat get_theta_sum();
 
   // Set \code{theta_sum} for a specific column.
-  void create_theta_sum(const unsigned int col, arma::colvec new_theta_sum);
+  void create_theta_sum(const unsigned int col, colvec new_theta_sum);
 
   // Update \code{theta_sum} for a specific column by adding to that column.
-  void update_theta_sum(const unsigned int col, arma::colvec new_theta_sum);
+  void update_theta_sum(const unsigned int col, colvec new_theta_sum);
 
   // Append a new column to \code{theta_sum}.
-  void update_theta_sum(arma::colvec new_theta_sum);
+  void update_theta_sum(colvec new_theta_sum);
 
   // Prune the columns of \code{theta_sum}.
-  void update_theta_sum(arma::ucolvec pruned_left);
+  void update_theta_sum(ucolvec pruned_left);
 
   // Get the value of \code{hessian}.
-  arma::cube get_hessian();
+  cube get_hessian();
 
   // Update \code{hessian} for a specific slice.
-  void update_hessian(const unsigned int slice, arma::mat new_hessian);
+  void update_hessian(const unsigned int slice, mat new_hessian);
 
   // Append a new slice to \code{hessian}.
-  void update_hessian(arma::mat new_hessian);
+  void update_hessian(mat new_hessian);
 
   // Prune the slices of \code{hessian}.
-  void update_hessian(arma::ucolvec pruned_left);
+  void update_hessian(ucolvec pruned_left);
 
   // Initialize theta_hat_t_t to be the estimate in the segment.
   void create_segment_statistics();
@@ -81,16 +77,16 @@ class FastcpdParameters {
   void update_beta();
 
   // Get the value of \code{momentum}.
-  arma::colvec get_momentum();
+  colvec get_momentum();
 
   // Update \code{momentum}.
-  void update_momentum(arma::colvec new_momentum);
+  void update_momentum(colvec new_momentum);
 
   // Get the value of \code{segment_theta_hat}.
-  arma::mat get_segment_theta_hat();
+  mat get_segment_theta_hat();
 
   // Get the value of \code{act_num}.
-  arma::colvec get_act_num();
+  colvec get_act_num();
 
   // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   void create_gradients();
@@ -101,8 +97,10 @@ class FastcpdParameters {
   void wrap_cost(Nullable<Function> cost);
   void wrap_cost_gradient(Nullable<Function> cost_gradient);
   void wrap_cost_hessian(Nullable<Function> cost_hessian);
+
+// TODO(doccstat): define a `cost_optim` inside the class.
 //   List cost_optim(
-//       const arma::mat data_segment,
+//       const mat data_segment,
 //       const double lambda,
 //       const bool cv
 //   );
@@ -118,30 +116,22 @@ class FastcpdParameters {
 
   // Gradient of the cost function. If the cost function is provided in R, this
   // will be a wrapper of the R function.
-  std::function<arma::colvec(
-      arma::mat data,
-      arma::colvec theta,
-      std::string family
-  )> cost_gradient_wrapper;
+  function<colvec(mat data, colvec theta, string family)> cost_gradient_wrapper;
 
   // Hessian of the cost function. If the cost function is provided in R, this
   // will be a wrapper of the R function.
-  std::function<arma::mat(
-      arma::mat data,
-      arma::colvec theta,
-      std::string family,
-      double min_prob
-  )> cost_hessian_wrapper;
+  function<mat(mat data, colvec theta, string family, double min_prob)>
+    cost_hessian_wrapper;
 
  private:
   // `data` is the data set to be segmented.
-  arma::mat data;
+  mat data;
 
   // `beta` is the initial cost value.
   double beta;
 
   // `error_sd` is used in Gaussian family only.
-  arma::colvec err_sd;
+  colvec err_sd;
 
   // `n` is the number of data points.
   int n;
@@ -150,7 +140,7 @@ class FastcpdParameters {
   const int p;
 
   // `family` is the family of the model.
-  const std::string family;
+  const string family;
 
   // `segment_count` is the number of segments for initial guess.
   const int segment_count;
@@ -168,43 +158,44 @@ class FastcpdParameters {
   const double epsilon;
 
   // `segment_indices` is the indices of the segments.
-  arma::colvec segment_indices;
+  colvec segment_indices;
 
   // `theta_hat` stores the estimated coefficients up to the current data point.
-  arma::mat theta_hat;
+  mat theta_hat;
 
   // `theta_sum` stores the sum of estimated coefficients up to the current data
   // point.
-  arma::mat theta_sum;
+  mat theta_sum;
 
   // `hessian` stores the Hessian matrix up to the current data point.
-  arma::cube hessian;
+  cube hessian;
 
   // Create a matrix to store the estimated coefficients in each segment,
   // where each row represents estimated coefficients for a segment.
-  arma::mat segment_theta_hat;
+  mat segment_theta_hat;
 
   // `act_num` is used in Lasso and Gaussian families only.
-  arma::colvec act_num;
+  colvec act_num;
 
   // Momentum will be used in the update step if `momentum_coef` is not 0.
-  arma::colvec momentum;
+  colvec momentum;
 
   // Cost function. If the cost function is provided in R, this will be a
   // wrapper of the R function.
-  std::function<List(
-      arma::mat data,
-      Nullable<arma::colvec> theta,
-      std::string family,
+  function<List(
+      mat data,
+      Nullable<colvec> theta,
+      string family,
       double lambda,
       bool cv,
-      Nullable<arma::colvec> start
+      Nullable<colvec> start
   )> cost_function_wrapper;
 
+// TODO(doccstat): Nullable function.
 //   Function* winsorize;
 //   void create_environment_functions();
 };
 
 }  // namespace fastcpd::parameters
 
-#endif  // PARAMETERS_H
+#endif  // PARAMETERS_H_
