@@ -658,7 +658,7 @@ fastcpd <- function(
     min_prob = 10^10,
     winsorise_minval = -20,
     winsorise_maxval = 20,
-    p = NULL,
+    p = ncol(data) - 1,
     cost = NULL,
     cost_gradient = NULL,
     cost_hessian = NULL,
@@ -701,38 +701,10 @@ or `NULL` while the provided family is {family}.]"
     vanilla_percentage <- 1
   }
 
-  if (is.null(p)) {
-    p <- ncol(data) - 1
-  }
-
   if (is.null(beta)) {
     beta <- (p + 1) * log(nrow(data)) / 2
   }
 
-  # `cost_function_wrapper` requires data. `theta` is required for a general
-  # custom family and is optional (not needed) for vanilla PELT. The rest of the
-  # parameters are discarded.
-  # cost_function_wrapper <- function(data, theta = NULL, ...) {
-  #   cost(data, theta, ...)
-  # }
-
-  # cost_gradient_wrapper <- function(data, theta, ...) {
-  #   cost_gradient(data, theta, ...)
-  # }
-
-  # cost_hessian_wrapper <- function(data, theta, ...) {
-  #   cost_hessian(data, theta, ...)
-  # }
-
-  if (is.null(cost)) {
-    cost <- negative_log_likelihood
-  }
-  if (is.null(cost_gradient)) {
-    cost_gradient <- cost_update_gradient
-  }
-  if (is.null(cost_hessian)) {
-    cost_hessian <- cost_update_hessian
-  }
   result <- fastcpd_impl(
     data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
     min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,

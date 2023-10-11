@@ -17,7 +17,7 @@ fastcpd(
   min_prob = 10^10,
   winsorise_minval = -20,
   winsorise_maxval = 20,
-  p = NULL,
+  p = ncol(data) - 1,
   cost = NULL,
   cost_gradient = NULL,
   cost_hessian = NULL,
