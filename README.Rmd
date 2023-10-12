@@ -202,36 +202,9 @@ y <- c(
   x[(cp[2] + 1):n, ] %*% theta_0[3, ] + rnorm(n - cp[2], 0, sd = 3)
 )
 
-# Compute the variance estimation for each block and then take the average.
-block_size <- 5
-variance_estimation <- rep(NA, n - block_size)
-for (i in 1:(n - block_size)) {
-  block_index <- seq_len(block_size) + i - 1
-  block_index_lagged <- seq_len(block_size) + i
-  y_block <- y[block_index]
-  x_block <- x[block_index, ]
-  y_block_lagged <- y[block_index_lagged]
-  x_block_lagged <- x[block_index_lagged, ]
-  x_t_x <- crossprod(x_block)
-  x_t_x_lagged <- crossprod(x_block_lagged)
-  block_slope <- solve(crossprod(x_block), crossprod(x_block, y_block))
-  block_lagged_slope <- solve(
-    crossprod(x_block_lagged), crossprod(x_block_lagged, y_block_lagged)
-  )
-  x_t_x_inv <- solve(x_t_x)
-  x_t_x_inv_lagged <- solve(x_t_x_lagged)
-  inv_product <- x_t_x_inv %*% x_t_x_inv_lagged
-  cross_term <-
-    inv_product %*% crossprod(x_block[-1, ], x_block_lagged[-block_size, ])
-  delta_numerator <- crossprod(block_slope - block_lagged_slope)
-  delta_denominator <-
-    sum(diag(x_t_x_inv + x_t_x_inv_lagged - 2 * cross_term))
-  variance_estimation[i] <- delta_numerator / delta_denominator
-}
 result <- fastcpd(
   data = data.frame(y = y, x = x),
-  beta = (p + 1) * log(n) / 2 * mean(variance_estimation),
-  family = "gaussian",
+  family = "gaussian"
 )
 summary(result)
 ```

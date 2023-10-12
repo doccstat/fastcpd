@@ -100,6 +100,15 @@ testthat::test_that(
     )
 
     testthat::expect_equal(result@cp_set, c(100, 201))
+
+    result_internal_variance <- fastcpd(
+      data = data.frame(y = y, x = x),
+      family = "gaussian",
+    )
+
+    testthat::expect_equal(
+      result_internal_variance@cp_set, c(100, 201)
+    )
   }
 )
 
