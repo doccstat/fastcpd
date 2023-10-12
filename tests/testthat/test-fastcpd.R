@@ -6,8 +6,8 @@ testthat::test_that(
         family = "bin0mial"
       ),
       r"[
-The family should be one of "gaussian", "binomial", "poisson", "lasso", "custom"
-or `NULL` while the provided family is bin0mial.]"
+The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
+"custom" or `NULL` while the provided family is bin0mial.]"
     )
   }
 )
@@ -773,6 +773,54 @@ testthat::test_that(
     )
 
     testthat::expect_equal(huber_regression_result@cp_set, c(401, 726))
+  }
+)
+
+testthat::test_that(
+  "example ar(1) model", {
+    set.seed(1)
+    n <- 1000
+    p <- 1
+    x <- rep(0, n + 1)
+    for (i in 1:600) {
+      x[i + 1] <- 0.6 * x[i] + rnorm(1)
+    }
+    for (i in 601:1000) {
+      x[i + 1] <- 0.3 * x[i] + rnorm(1)
+    }
+
+    result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(x = x),
+      p = 1,
+      family = "ar"
+    )
+
+    testthat::expect_equal(result@cp_set, 609)
+  }
+)
+
+testthat::test_that(
+  "example ar(3) model with innovation standard deviation 3", {
+    set.seed(1)
+    n <- 1000
+    p <- 1
+    x <- rep(0, n + 3)
+    for (i in 1:600) {
+      x[i + 3] <- 0.6 * x[i + 2] - 0.2 * x[i + 1] + 0.1 * x[i] + rnorm(1, 0, 3)
+    }
+    for (i in 601:1000) {
+      x[i + 1] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
+    }
+
+    result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(x = x),
+      p = 3,
+      family = "ar"
+    )
+
+    testthat::expect_equal(result@cp_set, 615)
   }
 )
 

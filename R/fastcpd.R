@@ -145,6 +145,48 @@
 #' plot(result)
 #' summary(result)
 #'
+#' ### ar(1) model
+#' library(fastcpd)
+#' set.seed(1)
+#' n <- 1000
+#' p <- 1
+#' x <- rep(0, n + 1)
+#' for (i in 1:600) {
+#'   x[i + 1] <- 0.6 * x[i] + rnorm(1)
+#' }
+#' for (i in 601:1000) {
+#'   x[i + 1] <- 0.3 * x[i] + rnorm(1)
+#' }
+#' result <- fastcpd(
+#'   formula = ~ . - 1,
+#'   data = data.frame(x = x),
+#'   p = 1,
+#'   family = "ar"
+#' )
+#' summary(result)
+#' plot(result)
+#'
+#' ### ar(3) model with innovation standard deviation 3
+#' library(fastcpd)
+#' set.seed(1)
+#' n <- 1000
+#' p <- 1
+#' x <- rep(0, n + 3)
+#' for (i in 1:600) {
+#'   x[i + 3] <- 0.6 * x[i + 2] - 0.2 * x[i + 1] + 0.1 * x[i] + rnorm(1, 0, 3)
+#' }
+#' for (i in 601:1000) {
+#'   x[i + 1] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
+#' }
+#' result <- fastcpd(
+#'   formula = ~ . - 1,
+#'   data = data.frame(x = x),
+#'   p = 3,
+#'   family = "ar"
+#' )
+#' summary(result)
+#' plot(result)
+#'
 #' ### custom logistic regression
 #' library(fastcpd)
 #' set.seed(1)
@@ -619,24 +661,25 @@
 #' @importFrom methods show
 #' @useDynLib fastcpd, .registration = TRUE
 fastcpd <- function(
-    formula = y ~ . - 1,
-    data,
-    beta = NULL,
-    segment_count = 10,
-    trim = 0.025,
-    momentum_coef = 0,
-    k = function(x) 0,
-    family = NULL,
-    epsilon = 1e-10,
-    min_prob = 10^10,
-    winsorise_minval = -20,
-    winsorise_maxval = 20,
-    p = ncol(data) - 1,
-    cost = NULL,
-    cost_gradient = NULL,
-    cost_hessian = NULL,
-    cp_only = FALSE,
-    vanilla_percentage = 0) {
+  formula = y ~ . - 1,
+  data,
+  beta = NULL,
+  segment_count = 10,
+  trim = 0.025,
+  momentum_coef = 0,
+  k = function(x) 0,
+  family = NULL,
+  epsilon = 1e-10,
+  min_prob = 10^10,
+  winsorise_minval = -20,
+  winsorise_maxval = 20,
+  p = ncol(data) - 1,
+  cost = NULL,
+  cost_gradient = NULL,
+  cost_hessian = NULL,
+  cp_only = FALSE,
+  vanilla_percentage = 0
+) {
   # The following code is adapted from the `lm` function from base R.
   match_formula <- match.call(expand.dots = FALSE)
   matched_formula <- match(c("formula", "data"), names(match_formula), 0L)
@@ -649,12 +692,21 @@ fastcpd <- function(
   x <- stats::model.matrix(mt, match_formula)
   data <- cbind(y, x)
 
-  allowed_family <- c("gaussian", "binomial", "poisson", "lasso", "custom")
+  # Vanilla is not a `fastcpd` family and can not be set manually by the user.
+  # `vanilla` is used to distinguish the cost function parameters in the
+  # implementation.
+  allowed_family <- c(
+    "gaussian", "binomial", "poisson", "lasso", "custom", "ar"
+  )
 
+  fastcpd_family <- NULL
+  fastcpd_data <- NULL
+
+  # If `family` is provided and not in the allowed family list, throw an error.
   if (!(is.null(family) || family %in% allowed_family)) {
     error_message <- r"[
-The family should be one of "gaussian", "binomial", "poisson", "lasso", "custom"
-or `NULL` while the provided family is {family}.]"
+The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
+"custom" or `NULL` while the provided family is {family}.]"
     stop(gsub("{family}", family, error_message, fixed = TRUE))
   }
 
@@ -666,22 +718,56 @@ or `NULL` while the provided family is {family}.]"
     family <- "custom"
   }
 
+  # If a family is set to be `"custom"`, no plot or residuals can be provided.
   if (family == "custom") {
     cp_only <- TRUE
   }
 
+  # If a cost function provided has an explicit solution, i.e. does not depend
+  # on the parameters, e.g., mean change, then the `family` is set to be
+  # `"vanilla"` and the percentage of vanilla PELT is set to be 1.
   if (!is.null(cost) && length(formals(cost)) == 1) {
-    family <- "vanilla"
+    family <- "custom"
+    fastcpd_family <- "vanilla"
     vanilla_percentage <- 1
   }
 
+  if (family == "ar") {
+    # Check the validity of the parameters for AR(p) model.
+    if (ncol(data) != 1) {
+      stop("The data should be a univariate time series.")
+    }
+    if (p == 0) {
+      stop("Please specify the order of the AR model as the parameter `p`.")
+    }
+    fastcpd_family <- "gaussian"
+    cp_only <- TRUE
+    y <- data[p + seq_len(nrow(data) - p), 1]
+    x <- matrix(NA, nrow(data) - p, p)
+    for (p_i in seq_len(p)) {
+      x[, p_i] <- data[(p - p_i) + seq_len(nrow(data) - p), 1]
+    }
+    fastcpd_data <- cbind(y, x)
+  }
+
+  if (is.null(fastcpd_family)) {
+    fastcpd_family <- family
+  }
+
+  if (is.null(fastcpd_data)) {
+    fastcpd_data <- data
+  }
+
+  # Use the `beta` value obtained from BIC. For linear regression models,
+  # an estimate of the variance is needed in the cost function. The variance
+  # estimation is only for "gaussian" family with no `beta` provided.
   if (is.null(beta)) {
-    beta <- (p + 1) * log(nrow(data)) / 2
+    beta <- (p + 1) * log(nrow(fastcpd_data)) / 2
 
     # Only estimate the variance for Gaussian family when `beta` is null.
-    if (family == "gaussian") {
+    if (fastcpd_family == "gaussian") {
       # Estimate the variance for each block and then take the average.
-      n <- nrow(data)
+      n <- nrow(fastcpd_data)
       block_size <- 5
       variance_estimation <- rep(NA, n - block_size)
       for (i in 1:(n - block_size)) {
@@ -720,10 +806,16 @@ or `NULL` while the provided family is {family}.]"
   }
 
   result <- fastcpd_impl(
-    data, beta, segment_count, trim, momentum_coef, k, family, epsilon,
-    min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient,
-    cost_hessian, cp_only, vanilla_percentage
+    fastcpd_data, beta, segment_count, trim, momentum_coef, k, fastcpd_family,
+    epsilon, min_prob, winsorise_minval, winsorise_maxval, p,
+    cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage
   )
+
+  cp_set <- c(result$cp_set)
+
+  if (family == "ar") {
+    cp_set <- cp_set + p
+  }
 
   result$thetas <- data.frame(result$thetas)
   if (ncol(result$thetas) > 0) {
@@ -743,7 +835,7 @@ or `NULL` while the provided family is {family}.]"
     call = match.call(),
     data = data.frame(data),
     family = family,
-    cp_set = c(result$cp_set),
+    cp_set = cp_set,
     cost_values = c(result$cost_values),
     residuals = c(result$residual),
     thetas = result$thetas,

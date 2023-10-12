@@ -1,3 +1,7 @@
+# fastcpd 0.8.1
+
+*   Add new "ar" family for autoregressive models.
+
 # fastcpd 0.8.0
 
 *   Deal with the following TODO:

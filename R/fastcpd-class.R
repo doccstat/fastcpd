@@ -61,11 +61,18 @@ plot.fastcpd <- function(x, ...) {
   if (requireNamespace("ggplot2", quietly = TRUE)) {
     y <- x@data[, 1]
     p <- ggplot2::ggplot() +
-      ggplot2::geom_point(
+      ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
+    if (x@family == "ar") {
+      p <- p + ggplot2::geom_line(
+        data = data.frame(x = seq_len(nrow(x@data)), y = x@data[, 1]),
+        ggplot2::aes(x = x, y = y)
+      )
+    } else {
+      p <- p + ggplot2::geom_point(
         data = data.frame(x = seq_len(nrow(x@data)), y = y, label = "response"),
         ggplot2::aes(x = x, y = y)
-      ) +
-      ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
+      )
+    }
     if (!x@cp_only) {
       p <- p + ggplot2::geom_point(
         data = data.frame(
