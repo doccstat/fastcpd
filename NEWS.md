@@ -9,6 +9,7 @@
     functions.
 *   Add Codecov Icicle plot in README.
 *   Remove `cost_optim` and `cost_update` from `RcppExports.R`.
+*   Estimate the variance in the "gaussian" family dynamically.
 
 # fastcpd 0.7.6
 
