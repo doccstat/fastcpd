@@ -1,6 +1,7 @@
 # fastcpd 0.8.1
 
 *   Add new "ar" family for autoregressive models.
+*   Add new "var" family for vector autoregressive models.
 
 # fastcpd 0.8.0
 

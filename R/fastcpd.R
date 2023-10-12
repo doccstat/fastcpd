@@ -696,7 +696,7 @@ fastcpd <- function(
   # `vanilla` is used to distinguish the cost function parameters in the
   # implementation.
   allowed_family <- c(
-    "gaussian", "binomial", "poisson", "lasso", "custom", "ar"
+    "gaussian", "binomial", "poisson", "lasso", "custom", "ar", "var"
   )
 
   fastcpd_family <- NULL
@@ -706,7 +706,7 @@ fastcpd <- function(
   if (!(is.null(family) || family %in% allowed_family)) {
     error_message <- r"[
 The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
-"custom" or `NULL` while the provided family is {family}.]"
+"var", "custom" or `NULL` while the provided family is {family}.]"
     stop(gsub("{family}", family, error_message, fixed = TRUE))
   }
 
@@ -742,12 +742,38 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
     }
     fastcpd_family <- "gaussian"
     cp_only <- TRUE
-    y <- data[p + seq_len(nrow(data) - p), 1]
+    y <- data[p + seq_len(nrow(data) - p), ]
     x <- matrix(NA, nrow(data) - p, p)
     for (p_i in seq_len(p)) {
-      x[, p_i] <- data[(p - p_i) + seq_len(nrow(data) - p), 1]
+      x[, p_i] <- data[(p - p_i) + seq_len(nrow(data) - p), ]
     }
     fastcpd_data <- cbind(y, x)
+  }
+
+  if (family == "var") {
+    fastcpd_family <- "vanilla"
+    vanilla_percentage <- 1
+    cp_only <- TRUE
+    y <- data[p + seq_len(nrow(data) - p), ]
+    x <- matrix(NA, nrow(data) - p, p * ncol(data))
+    for (p_i in seq_len(p)) {
+      x[, (p_i - 1) * ncol(data) + seq_len(ncol(data))] <-
+        data[(p - p_i) + seq_len(nrow(data) - p), ]
+    }
+    fastcpd_data <- cbind(y, x)
+    cost <- function(data) {
+      x <- data[, (ncol(data) - p + 1):ncol(data)]
+      y <- data[, 1:(ncol(data) - p)]
+
+      if (nrow(data) <= p + 1) {
+        x_t_x <- diag(p)
+      } else {
+        x_t_x <- crossprod(x)
+      }
+
+      # TODO(doccstat): Verify the correctness of the cost function for VAR(p).
+      norm(y - x %*% solve(x_t_x, t(x)) %*% y, type = "F")^2 / 2
+    }
   }
 
   if (is.null(fastcpd_family)) {
@@ -765,6 +791,7 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
     beta <- (p + 1) * log(nrow(fastcpd_data)) / 2
 
     # Only estimate the variance for Gaussian family when `beta` is null.
+    # TODO(doccstat): Variance estimation for VAR(p).
     if (fastcpd_family == "gaussian") {
       # Estimate the variance for each block and then take the average.
       n <- nrow(fastcpd_data)
@@ -813,7 +840,7 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
 
   cp_set <- c(result$cp_set)
 
-  if (family == "ar") {
+  if (family %in% c("ar", "var")) {
     cp_set <- cp_set + p
   }
 
