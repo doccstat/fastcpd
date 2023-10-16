@@ -47,3 +47,4 @@ inst/doc
 vignettes/*.aux
 .vscode/
 docs
+pkgdown/favicon/
