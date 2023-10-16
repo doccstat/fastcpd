@@ -841,6 +841,25 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "ar(1) model using `fastcpd_ts`", {
+    set.seed(1)
+    n <- 1000
+    p <- 1
+    x <- rep(0, n + 1)
+    for (i in 1:600) {
+      x[i + 1] <- 0.6 * x[i] + rnorm(1)
+    }
+    for (i in 601:1000) {
+      x[i + 1] <- 0.3 * x[i] + rnorm(1)
+    }
+
+    result <- fastcpd_ts(x, "ar", 1)
+
+    testthat::expect_equal(result@cp_set, 609)
+  }
+)
+
+testthat::test_that(
   "example ar(3) model with innovation standard deviation 3", {
     set.seed(1)
     n <- 1000
