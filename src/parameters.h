@@ -27,9 +27,6 @@ class FastcpdParameters {
   // specified in the `segment_count` parameter.
   void create_segment_indices();
 
-  // Return the indices of the segments.
-  colvec get_segment_indices();
-
   // Get the value of \code{theta_hat}.
   mat get_theta_hat();
 
@@ -81,12 +78,6 @@ class FastcpdParameters {
 
   // Update \code{momentum}.
   void update_momentum(colvec new_momentum);
-
-  // Get the value of \code{segment_theta_hat}.
-  mat get_segment_theta_hat();
-
-  // Get the value of \code{act_num}.
-  colvec get_act_num();
 
   // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   void create_gradients();
