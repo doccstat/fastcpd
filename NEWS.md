@@ -1,3 +1,7 @@
+# fastcpd 0.8.3
+
+*   Add `fastcpd.ts` / `fastcpd_ts` for time series data.
+
 # fastcpd 0.8.2
 
 *   Add cheatsheets WIP.
