@@ -12,9 +12,11 @@ reference:
   - title: Main function
     desc: >
       All implementation of fastcpd is unified into one single function
-      `fastcpd()`.
+      `fastcpd()`. For time series data, `fastcpd.ts()` and `fastcpd_ts()` are
+      provided for easier analysis.
     contents:
       - fastcpd
+      - fastcpd.ts
 
   - title: Main class
     desc: >
