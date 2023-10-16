@@ -123,7 +123,12 @@ solution](https://stackoverflow.com/a/15540919) if you have trouble
 installing `RcppArmadillo`.
 
 </details>
-<!-- TODO(doccstat): Add a cheatsheet like the `ggplot2` package. -->
+
+## Cheatsheet (WIP)
+
+[![fastcpd
+cheatsheet](man/figures/cheatsheets.png)](https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf)
+
 <!-- TODO(doccstat): Leave only one example. -->
 
 ## Examples
@@ -133,7 +138,7 @@ installing `RcppArmadillo`.
 <!-- This example section is a direct copy from `fastcpd` documentation -->
 <details open>
 <summary>
-Example usage
+Click to fold
 </summary>
 
 ### linear regression

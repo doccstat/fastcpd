@@ -1,3 +1,7 @@
+# fastcpd 0.8.2
+
+*   Add cheatsheets WIP.
+
 # fastcpd 0.8.1
 
 *   Add new "ar" family for autoregressive models.
