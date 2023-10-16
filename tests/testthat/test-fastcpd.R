@@ -272,6 +272,46 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "penalized linear regression with smaller sample size", {
+    testthat::skip_if_not_installed("mvtnorm")
+    set.seed(1)
+    n <- 1500
+    p_true <- 6
+    p <- 50
+    x <- mvtnorm::rmvnorm(480, rep(0, p), diag(p))
+    theta_0 <- rbind(
+      runif(p_true, -5, -2),
+      runif(p_true, -3, 3),
+      runif(p_true, 2, 5),
+      runif(p_true, -5, 5)
+    )
+    theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+    y <- c(
+      x[1:80, ] %*% theta_0[1, ] + rnorm(80, 0, 1),
+      x[81:200, ] %*% theta_0[2, ] + rnorm(120, 0, 1),
+      x[201:320, ] %*% theta_0[3, ] + rnorm(120, 0, 1),
+      x[321:480, ] %*% theta_0[4, ] + rnorm(160, 0, 1)
+    )
+    result <- fastcpd(
+      formula = y ~ . - 1,
+      data = data.frame(y = y, x = x),
+      family = "lasso"
+    )
+
+    testthat::expect_equal(result@cp_set, c(101, 239, 335))
+
+    result_multiple_epochs <- fastcpd(
+      formula = y ~ . - 1,
+      data = data.frame(y = y, x = x),
+      family = "lasso",
+      k = function(x) if (x < 20) 1 else 0
+    )
+
+    testthat::expect_equal(result_multiple_epochs@cp_set, c(90, 235, 335))
+  }
+)
+
+testthat::test_that(
   "example custom logistic regression", {
     set.seed(1)
     p <- 5
