@@ -75,10 +75,6 @@ void FastcpdParameters::create_segment_indices() {
   }
 }
 
-vec FastcpdParameters::get_segment_indices() {
-  return segment_indices;
-}
-
 mat FastcpdParameters::get_theta_hat() {
   return theta_hat;
 }
@@ -184,14 +180,6 @@ colvec FastcpdParameters::get_momentum() {
 
 void FastcpdParameters::update_momentum(colvec new_momentum) {
   momentum = new_momentum;
-}
-
-mat FastcpdParameters::get_segment_theta_hat() {
-  return segment_theta_hat;
-}
-
-colvec FastcpdParameters::get_act_num() {
-  return act_num;
 }
 
 void FastcpdParameters::create_gradients() {

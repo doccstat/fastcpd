@@ -265,27 +265,7 @@ List fastcpd_impl(
         ) * sqrt(2 * log(p) / (t - tau));
       }
       mat data_segment = data.rows(tau, t - 1);
-      if (vanilla_percentage == 1 || t <= vanilla_percentage * n) {
-        List cost_optim_result;
-        if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
-          cost_optim_result = cost_optim(
-            family, p, data_segment,
-            fastcpd_parameters_class.cost.get(), 0, true
-          );
-        } else {
-          cost_optim_result =
-            negative_log_likelihood(data_segment, R_NilValue, family, 0, true);
-        }
-        cval(i - 1) = as<double>(cost_optim_result["value"]);
-        if (vanilla_percentage < 1 && t <= vanilla_percentage * n) {
-          fastcpd_parameters_class.update_theta_hat(
-            i - 1, as<colvec>(cost_optim_result["par"])
-          );
-          fastcpd_parameters_class.update_theta_sum(
-            i - 1, as<colvec>(cost_optim_result["par"])
-          );
-        }
-      } else {
+      if (t > vanilla_percentage * n) {
         List cost_update_result = cost_update(
           data.rows(0, t - 1),
           fastcpd_parameters_class.get_theta_hat(),
@@ -350,6 +330,26 @@ List fastcpd_impl(
           SEXP cost_result = cost_non_null(data_segment, theta);
           cval(i - 1) = as<double>(cost_result);
           // }
+        }
+      } else {
+        List cost_optim_result;
+        if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
+          cost_optim_result = cost_optim(
+            family, p, data_segment,
+            fastcpd_parameters_class.cost.get(), 0, true
+          );
+        } else {
+          cost_optim_result =
+            negative_log_likelihood(data_segment, R_NilValue, family, 0, true);
+        }
+        cval(i - 1) = as<double>(cost_optim_result["value"]);
+        if (vanilla_percentage < 1 && t <= vanilla_percentage * n) {
+          fastcpd_parameters_class.update_theta_hat(
+            i - 1, as<colvec>(cost_optim_result["par"])
+          );
+          fastcpd_parameters_class.update_theta_sum(
+            i - 1, as<colvec>(cost_optim_result["par"])
+          );
         }
       }
     }

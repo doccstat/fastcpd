@@ -13,6 +13,17 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
 )
 
 testthat::test_that(
+  "custom family but no cost function provided", {
+    testthat::expect_error(
+      fastcpd(
+        data = data.frame(y = 0, x = 0)
+      ),
+      "cost function must be specified for custom family"
+    )
+  }
+)
+
+testthat::test_that(
   "example linear regression", {
     testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
