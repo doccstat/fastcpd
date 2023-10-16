@@ -1,6 +1,7 @@
 # fastcpd 0.8.2
 
 *   Add cheatsheets WIP.
+*   Add smaller examples test for penalized linear regression.
 
 # fastcpd 0.8.1
 
