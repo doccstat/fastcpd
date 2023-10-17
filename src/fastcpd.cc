@@ -146,8 +146,9 @@ List cost_optim(
     const double lambda,
     const bool cv
 ) {
+  List cost_optim_result;
   if (family == "vanilla") {
-    return List::create(
+    cost_optim_result = List::create(
       Named("par") = R_NilValue,
       Named("value") = cost(data_segment),
       Named("residuals") = R_NilValue
@@ -171,7 +172,7 @@ List cost_optim(
       Named("data") = data_segment,
       Named("cost") = cost
     );
-    return List::create(
+    cost_optim_result = List::create(
       Named("par") = log(
         as<double>(optim_result["par"]) / (1 - as<double>(optim_result["par"]))
       ),
@@ -188,15 +189,15 @@ List cost_optim(
       Named("method") = "L-BFGS-B",
       Named("data") = data_segment
     );
-    return List::create(
+    cost_optim_result = List::create(
       Named("par") = optim_result["par"],
       Named("value") = optim_result["value"],
       Named("residuals") = R_NilValue
     );
   } else {
-    // NOTEST
-    stop("Internal error, this branch should not be reached.");
+    // This branch should not be reached.
   }
+  return cost_optim_result;
 }
 
 List fastcpd_impl(
