@@ -238,10 +238,8 @@ and parameters.</p></dd>
 Otherwise, the cost function values together with the estimated
 parameters for each segment are also returned. By default the value is
 set to be <code>FALSE</code> so that <code>plot</code> can be used to visualize the
-results for a built-in model. If <code>family</code> is not provided or
-specified as <code>NULL</code> or <code>"custom"</code>, <code>cp_only</code> is set to be
-<code>TRUE</code> by default. <code>cp_only</code> has some performance impact on the
-algorithm, since the cost values and estimated parameters for each
+results for a built-in model. <code>cp_only</code> has some performance impact
+on the algorithm, since the cost values and estimated parameters for each
 segment need to be calculated and stored. If the users are only
 interested in the change points, setting <code>cp_only</code> to be <code>TRUE</code>
 will help with the computational cost.</p></dd>
@@ -616,6 +614,13 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 609 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 304.2952 228.4288 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   segment 1 segment 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.5648258 0.2227463</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fastcpd-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -645,6 +650,15 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 615 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2753.547 2022.597 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     segment 1   segment 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.57616905  0.13006290</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.21476408 -0.03084403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.07938272 -0.04544551</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fastcpd-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -717,6 +731,14 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 200 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    segment 1  segment 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.6235240  2.0066479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -1.6767614  1.6278889</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -1.7973433  4.6422022</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.4842969 -0.1521062</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  2.0797875  2.4047092</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### custom cost function mean change</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span></span>
@@ -1024,6 +1046,14 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 401 726 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     segment 1   segment 2    segment 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.52615415  2.77991463  8.744706508</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -1.02443443  5.06390528  9.506534878</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.09220421  0.01647923 -0.008908851</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.01326592 -0.08103008 -0.047909865</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.02526703  0.01329142  0.025171681</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
