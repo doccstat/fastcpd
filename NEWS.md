@@ -4,6 +4,8 @@
 *   Fix pre segmengation bug for `lasso`.
 *   Fix bug related to `vanilla_percentage` parameter for `lasso`.
 *   Add tests with invalid family for `fastcpd.ts`.
+*   Remove the `cp_only = TRUE` default when the family is "custom".
+*   Improved plotting for "ar" and "var" families.
 
 # fastcpd 0.8.2
 
