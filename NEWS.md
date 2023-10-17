@@ -3,6 +3,7 @@
 *   Add `fastcpd.ts` / `fastcpd_ts` for time series data.
 *   Fix pre segmengation bug for `lasso`.
 *   Fix bug related to `vanilla_percentage` parameter for `lasso`.
+*   Add tests with invalid family for `fastcpd.ts`.
 
 # fastcpd 0.8.2
 
