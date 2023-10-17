@@ -24,6 +24,21 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "invalid family provided for time series data", {
+    testthat::expect_error(
+      fastcpd.ts(
+        data = seq_len(10),
+        family = "at",
+        order = 1
+      ),
+      r"[
+The family should be one of "ar" or "var"
+while the provided family is at.]"
+    )
+  }
+)
+
+testthat::test_that(
   "example linear regression", {
     testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
