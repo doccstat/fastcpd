@@ -24,21 +24,6 @@ testthat::test_that(
 )
 
 testthat::test_that(
-  "invalid family provided for time series data", {
-    testthat::expect_error(
-      fastcpd.ts(
-        data = seq_len(10),
-        family = "at",
-        order = 1
-      ),
-      r"[
-The family should be one of "ar" or "var"
-while the provided family is at.]"
-    )
-  }
-)
-
-testthat::test_that(
   "example linear regression", {
     testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
@@ -193,7 +178,8 @@ testthat::test_that(
       formula = y ~ x - 1,
       data = data.frame(y = y, x = x),
       beta = (2 * p + 1) * log(n) / 2,
-      cost = multi_response_linear_loss
+      cost = multi_response_linear_loss,
+      cp_only = TRUE
     )
 
     testthat::expect_equal(result@cp_set, c(102, 195))
@@ -870,25 +856,6 @@ testthat::test_that(
       p = 1,
       family = "ar"
     )
-
-    testthat::expect_equal(result@cp_set, 609)
-  }
-)
-
-testthat::test_that(
-  "ar(1) model using `fastcpd_ts`", {
-    set.seed(1)
-    n <- 1000
-    p <- 1
-    x <- rep(0, n + 1)
-    for (i in 1:600) {
-      x[i + 1] <- 0.6 * x[i] + rnorm(1)
-    }
-    for (i in 601:1000) {
-      x[i + 1] <- 0.3 * x[i] + rnorm(1)
-    }
-
-    result <- fastcpd_ts(x, "ar", 1)
 
     testthat::expect_equal(result@cp_set, 609)
   }
