@@ -24,6 +24,19 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "invalid order for ar family", {
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "ar",
+      ),
+      "Please specify the order of the AR model as the parameter `p`."
+    )
+  }
+)
+
+testthat::test_that(
   "example linear regression", {
     testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)

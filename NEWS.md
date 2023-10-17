@@ -7,6 +7,7 @@
 *   Remove the `cp_only = TRUE` default when the family is "custom".
 *   Improved plotting for "ar" and "var" families.
 *   Add test coverage for `cp_only = TRUE` and `fastcpd_ts`.
+*   Increase test coverage.
 
 # fastcpd 0.8.2
 

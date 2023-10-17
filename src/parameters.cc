@@ -266,8 +266,7 @@ void FastcpdParameters::wrap_cost(Nullable<Function> cost) {
   } else if (cost.isNull()) {
     stop("cost function must be specified for custom family");
   } else {
-    // NOTEST
-    stop("Internal error, this branch should not be reached.");
+    // This branch should not be reached.
   }
 }
 
@@ -281,8 +280,7 @@ void FastcpdParameters::wrap_cost_gradient(Nullable<Function> cost_gradient) {
   } else if (cost_gradient.isNull()) {
     // `cost_gradient` can be `NULL` in the case of vanilla PELT.
   } else {
-    // NOTEST
-    stop("Internal error, this branch should not be reached.");
+    // This branch should not be reached.
   }
 }
 
@@ -296,8 +294,7 @@ void FastcpdParameters::wrap_cost_hessian(Nullable<Function> cost_hessian) {
   } else if (cost_hessian.isNull()) {
     // `cost_hessian` can be `NULL` in the case of vanilla PELT.
   } else {
-    // NOTEST
-    stop("Internal error, this branch should not be reached.");
+    // This branch should not be reached.
   }
 }
 
