@@ -1,6 +1,7 @@
 # fastcpd 0.8.3
 
 *   Add `fastcpd.ts` / `fastcpd_ts` for time series data.
+*   Fix pre segmengation bug for `lasso`.
 
 # fastcpd 0.8.2
 
