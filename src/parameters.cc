@@ -150,7 +150,7 @@ void FastcpdParameters::create_segment_statistics() {
     } else {
       segment_theta = as<rowvec>(
         fastcpd::functions::negative_log_likelihood(
-          data_segment, R_NilValue, family, 0, false
+          data_segment, R_NilValue, family, 0, true
         )["par"]
       );
     }
