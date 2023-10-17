@@ -62,37 +62,36 @@ plot.fastcpd <- function(x, ...) {
     y <- x@data[, 1]
     p <- ggplot2::ggplot() +
       ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
-    if (x@family == "ar") {
-      p <- p + ggplot2::geom_line(
-        data = data.frame(x = seq_len(nrow(x@data)), y = x@data[, 1]),
-        ggplot2::aes(x = x, y = y)
-      )
-    } else {
-      p <- p + ggplot2::geom_point(
-        data = data.frame(x = seq_len(nrow(x@data)), y = y, label = "response"),
-        ggplot2::aes(x = x, y = y)
-      )
-    }
-    if (!x@cp_only) {
+
+    line_or_point <-
+      if (x@family == "ar") ggplot2::geom_line else ggplot2::geom_point
+    p <- p + line_or_point(
+      data = data.frame(x = seq_len(nrow(x@data)), y = y, label = "response"),
+      ggplot2::aes(x = x, y = y)
+    )
+
+    if (!(x@family %in% c("custom", "var") || x@cp_only)) {
       p <- p + ggplot2::geom_point(
         data = data.frame(
           x = seq_len(nrow(x@data)),
           y = x@residuals,
           label = "residual"
         ),
-        ggplot2::aes(x = x, y = y)
+        ggplot2::aes(x = x, y = y),
+        na.rm = TRUE
       )
-      if (ncol(x@data) > 2) {
-        p <- p + ggplot2::facet_wrap("label", ncol = 1, scales = "free_y")
-      } else if (ncol(x@data) == 2) {
+      if (ncol(x@data) == 2 || (x@family == "ar" && nrow(x@thetas) == 1)) {
         xend <- c(x@cp_set, nrow(x@data))
         yend <- as.numeric(x@thetas)
         p <- p + ggplot2::geom_point(
           data = data.frame(
-            x = seq_len(nrow(x@data)), y = x@data[, 2], label = "covariate"
+            x = seq_len(nrow(x@data)),
+            y = x@data[, ncol(x@data)],
+            label = "covariate"
           ),
           ggplot2::aes(x = x, y = y)
-        ) + ggplot2::geom_segment(
+        )
+        p <- p + ggplot2::geom_segment(
           data = data.frame(
             x = c(1, x@cp_set),
             y = yend,
@@ -102,8 +101,9 @@ plot.fastcpd <- function(x, ...) {
           ),
           ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
           col = "blue"
-        ) + ggplot2::facet_wrap("label", ncol = 2, scales = "free_y")
+        )
       }
+      p <- p + ggplot2::facet_wrap("label", nrow = 2, scales = "free_y")
     }
     print(p)
   }

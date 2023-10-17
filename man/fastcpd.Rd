@@ -163,10 +163,8 @@ and parameters.}
 Otherwise, the cost function values together with the estimated
 parameters for each segment are also returned. By default the value is
 set to be \code{FALSE} so that \code{plot} can be used to visualize the
-results for a built-in model. If \code{family} is not provided or
-specified as \code{NULL} or \code{"custom"}, \code{cp_only} is set to be
-\code{TRUE} by default. \code{cp_only} has some performance impact on the
-algorithm, since the cost values and estimated parameters for each
+results for a built-in model. \code{cp_only} has some performance impact
+on the algorithm, since the cost values and estimated parameters for each
 segment need to be calculated and stored. If the users are only
 interested in the change points, setting \code{cp_only} to be \code{TRUE}
 will help with the computational cost.}

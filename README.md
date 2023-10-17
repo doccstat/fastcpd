@@ -500,7 +500,14 @@ summary(result)
 #>     p = 1)
 #> 
 #> Change points:
-#> 609
+#> 609 
+#> 
+#> Cost values:
+#> 304.2952 228.4288 
+#> 
+#> Parameters:
+#>   segment 1 segment 2
+#> 1 0.5648258 0.2227463
 plot(result)
 ```
 
@@ -533,7 +540,16 @@ summary(result)
 #>     p = 3)
 #> 
 #> Change points:
-#> 615
+#> 615 
+#> 
+#> Cost values:
+#> 2753.547 2022.597 
+#> 
+#> Parameters:
+#>     segment 1   segment 2
+#> 1  0.57616905  0.13006290
+#> 2 -0.21476408 -0.03084403
+#> 3  0.07938272 -0.04544551
 plot(result)
 ```
 
@@ -609,7 +625,15 @@ summary(result_custom_two_epochs)
 #>     cost_hessian = logistic_loss_hessian)
 #> 
 #> Change points:
-#> 200
+#> 200 
+#> 
+#> Parameters:
+#>    segment 1  segment 2
+#> 1 -0.6235240  2.0066479
+#> 2 -1.6767614  1.6278889
+#> 3 -1.7973433  4.6422022
+#> 4 -0.4842969 -0.1521062
+#> 5  2.0797875  2.4047092
 ```
 
 ### custom cost function mean change
@@ -937,7 +961,15 @@ summary(huber_regression_result)
 #>     cost = huber_loss, cost_gradient = huber_loss_gradient, cost_hessian = huber_loss_hessian)
 #> 
 #> Change points:
-#> 401 726
+#> 401 726 
+#> 
+#> Parameters:
+#>     segment 1   segment 2    segment 3
+#> 1 -0.52615415  2.77991463  8.744706508
+#> 2 -1.02443443  5.06390528  9.506534878
+#> 3 -0.09220421  0.01647923 -0.008908851
+#> 4 -0.01326592 -0.08103008 -0.047909865
+#> 5  0.02526703  0.01329142  0.025171681
 ```
 
 </details>

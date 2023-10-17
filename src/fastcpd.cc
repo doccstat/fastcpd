@@ -458,15 +458,22 @@ List fastcpd_impl(
         data_segment, R_NilValue, family, lambda, false
       );
     }
-    colvec cost_optim_par = as<colvec>(cost_optim_result["par"]);
-    double cost_optim_value = as<double>(cost_optim_result["value"]);
-    colvec cost_optim_residual = as<colvec>(cost_optim_result["residuals"]);
-    thetas.col(i) = cost_optim_par;
-    cost_values(i) = cost_optim_value;
-    residual.rows(
-      residual_next_start, residual_next_start + cost_optim_residual.n_elem - 1
-    ) = cost_optim_residual;
-    residual_next_start += cost_optim_residual.n_elem;
+    cost_values(i) = as<double>(cost_optim_result["value"]);
+
+    // Parameters are not involved for PELT.
+    if (family != "vanilla") {
+      thetas.col(i) = as<colvec>(cost_optim_result["par"]);
+    }
+
+    // Residual is only calculated for built-in families.
+    if (FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end()) {
+      colvec cost_optim_residual = as<colvec>(cost_optim_result["residuals"]);
+      residual.rows(
+        residual_next_start,
+        residual_next_start + cost_optim_residual.n_elem - 1
+      ) = cost_optim_residual;
+      residual_next_start += cost_optim_residual.n_elem;
+    }
   }
   return List::create(
     Named("cp_set") = cp_set,

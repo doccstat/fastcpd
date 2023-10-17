@@ -633,10 +633,8 @@
 #'   Otherwise, the cost function values together with the estimated
 #'   parameters for each segment are also returned. By default the value is
 #'   set to be \code{FALSE} so that `plot` can be used to visualize the
-#'   results for a built-in model. If \code{family} is not provided or
-#'   specified as \code{NULL} or \code{"custom"}, \code{cp_only} is set to be
-#'   \code{TRUE} by default. \code{cp_only} has some performance impact on the
-#'   algorithm, since the cost values and estimated parameters for each
+#'   results for a built-in model. \code{cp_only} has some performance impact
+#'   on the algorithm, since the cost values and estimated parameters for each
 #'   segment need to be calculated and stored. If the users are only
 #'   interested in the change points, setting \code{cp_only} to be \code{TRUE}
 #'   will help with the computational cost.
@@ -718,11 +716,6 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
     family <- "custom"
   }
 
-  # If a family is set to be `"custom"`, no plot or residuals can be provided.
-  if (family == "custom") {
-    cp_only <- TRUE
-  }
-
   # If a cost function provided has an explicit solution, i.e. does not depend
   # on the parameters, e.g., mean change, then the `family` is set to be
   # `"vanilla"` and the percentage of vanilla PELT is set to be 1.
@@ -741,7 +734,6 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
       stop("Please specify the order of the AR model as the parameter `p`.")
     }
     fastcpd_family <- "gaussian"
-    cp_only <- TRUE
     y <- data[p + seq_len(nrow(data) - p), ]
     x <- matrix(NA, nrow(data) - p, p)
     for (p_i in seq_len(p)) {
@@ -753,7 +745,6 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
   if (family == "var") {
     fastcpd_family <- "vanilla"
     vanilla_percentage <- 1
-    cp_only <- TRUE
     y <- data[p + seq_len(nrow(data) - p), ]
     x <- matrix(NA, nrow(data) - p, p * ncol(data))
     for (p_i in seq_len(p)) {
@@ -844,9 +835,11 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
     cp_set <- cp_set + p
   }
 
-  result$thetas <- data.frame(result$thetas)
-  if (ncol(result$thetas) > 0) {
-    names(result$thetas) <- paste0("segment ", seq_len(ncol(result$thetas)))
+  if (fastcpd_family == "vanilla") {
+    thetas <- data.frame(matrix(NA, 0, 0))
+  } else {
+    thetas <- data.frame(result$thetas)
+    names(thetas) <- paste0("segment ", seq_len(ncol(thetas)))
   }
 
   if (is.null(result$cost_values)) {
@@ -857,6 +850,12 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
     result$residual <- numeric(0)
   }
 
+  residuals <- c(result$residual)
+
+  if (family == "ar") {
+    residuals <- c(rep(NA, p), residuals)
+  }
+
   methods::new(
     Class = "fastcpd",
     call = match.call(),
@@ -864,8 +863,8 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
     family = family,
     cp_set = cp_set,
     cost_values = c(result$cost_values),
-    residuals = c(result$residual),
-    thetas = result$thetas,
+    residuals = residuals,
+    thetas = thetas,
     cp_only = cp_only
   )
 }
