@@ -40,16 +40,10 @@ setClass(
 plot.fastcpd <- function(x, ...) {
   # Plot the built in families only.
   stopifnot(x@family != "custom")
-  if (!requireNamespace("ggplot2", quietly = TRUE)) {
-    user_selection <- utils::menu(
-      c("yes", "no"),
-      title = "ggplot2 is not installed. Do you want to install it?"
-    )
-    if (user_selection == 1) {
+  if (!require_namespace("ggplot2")) {
+    if (utils_menu() == 1) {
       tryCatch(
-        expr = utils::install.packages(
-          "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
-        ),
+        expr = install_packages("ggplot2"),
         error = function(e) {
           stop("ggplot2 could not be installed.")
         }
@@ -58,7 +52,7 @@ plot.fastcpd <- function(x, ...) {
       message("ggplot2 is not installed. No plot is made.")
     }
   }
-  if (requireNamespace("ggplot2", quietly = TRUE)) {
+  if (require_namespace("ggplot2")) {
     y <- x@data[, 1]
     p <- ggplot2::ggplot() +
       ggplot2::geom_vline(xintercept = x@cp_set, color = "red")

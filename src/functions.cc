@@ -11,11 +11,12 @@ List negative_log_likelihood(
     Nullable<colvec> start
 ) {
   if (theta.isNull() && family == "lasso" && cv) {
-    if (data.n_rows < 5) {
-      return List::create(
-        Named("par") = zeros(data.n_cols - 1), Named("value") = 0
-      );
-    }
+    // It seems that the check below is unnecessary.
+    // if (data.n_rows < 5) {
+    //   return List::create(
+    //     Named("par") = zeros(data.n_cols - 1), Named("value") = 0
+    //   );
+    // }
     Environment glmnet = Environment::namespace_env("glmnet"),
                  stats = Environment::namespace_env("stats");
     Function cv_glmnet = glmnet["cv.glmnet"],
