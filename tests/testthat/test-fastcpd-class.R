@@ -1,9 +1,5 @@
 testthat::test_that(
-  "ggplot2 is not installed selection 2", {
-    # TODO(doccstat): I can not find a way to cover the `if` branch in
-    # `plot.fastcpd` when `ggplot2` is not installed. `stub` from `mockery`
-    # does not work.
-    testthat::skip("This test is intended to be run manually.")
+  "ggplot2 is not installed mock", {
     match_call <- ""
     class(match_call) <- "language"
     thetas <- data.frame(matrix(c(1, 2), 1, 2))
@@ -21,18 +17,40 @@ testthat::test_that(
       cp_only = FALSE
     )
 
-    mockery::stub(plot, "utils::menu", function(...) 2)
-    mockery::stub(plot, "base::requireNamespace", function(...) FALSE)
-
     testthat::expect_message(
-      plot(class_instance),
+      mockthat::with_mock(
+        `require_namespace` = function(...) FALSE,
+        `utils_menu` = function(...) 2,
+        plot(class_instance)
+      ),
       "ggplot2 is not installed. No plot is made.\n"
+    )
+
+    testthat::expect_no_error(
+      mockthat::with_mock(
+        `require_namespace` = function(...) FALSE,
+        `utils_menu` = function(...) 1,
+        `install_packages` = function(...) TRUE,
+        plot(class_instance)
+      )
+    )
+
+    testthat::expect_error(
+      mockthat::with_mock(
+        `require_namespace` = function(...) FALSE,
+        `utils_menu` = function(...) 1,
+        `install_packages` = function(...) {
+          stop("ggplot2 could not be installed.")
+        },
+        plot(class_instance)
+      ),
+      "ggplot2 could not be installed."
     )
   }
 )
 
 testthat::test_that(
-  "ggplot2 is not installed selection 1", {
+  "utility functions output test", {
     match_call <- ""
     class(match_call) <- "language"
     thetas <- data.frame(matrix(c(1, 2), 1, 2))
@@ -50,9 +68,6 @@ testthat::test_that(
       cp_only = FALSE
     )
 
-    # TODO(doccstat): I can not find a way to cover the `if` branch in
-    # `plot.fastcpd` when `ggplot2` is not installed. `menu` with selection 1
-    # should be mocked here.
     testthat::expect_no_error(plot(class_instance))
 
     testthat::expect_equal(
