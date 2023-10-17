@@ -319,6 +319,15 @@ testthat::test_that(
     )
 
     testthat::expect_equal(result_multiple_epochs@cp_set, c(80, 200, 320))
+
+    result_vanilla_percentage <- fastcpd(
+      formula = y ~ . - 1,
+      data = data.frame(y = y, x = x),
+      family = "lasso",
+      vanilla_percentage = 0.2
+    )
+
+    testthat::expect_equal(result_vanilla_percentage@cp_set, c(79, 201, 321))
   }
 )
 

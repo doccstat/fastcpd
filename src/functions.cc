@@ -11,12 +11,21 @@ List negative_log_likelihood(
     Nullable<colvec> start
 ) {
   if (theta.isNull() && family == "lasso" && cv) {
-    Environment glmnet = Environment::namespace_env("glmnet");
+    if (data.n_rows < 5) {
+      return List::create(
+        Named("par") = zeros(data.n_cols - 1), Named("value") = 0
+      );
+    }
+    Environment glmnet = Environment::namespace_env("glmnet"),
+                 stats = Environment::namespace_env("stats");
     Function cv_glmnet = glmnet["cv.glmnet"],
-        predict_glmnet = glmnet["predict.glmnet"];
+        predict_glmnet = glmnet["predict.glmnet"],
+              deviance = stats["deviance"];
     List out = cv_glmnet(
       data.cols(1, data.n_cols - 1), data.col(0), Named("family") = "gaussian"
     );
+    colvec index_vec = as<colvec>(out["index"]),
+              values = as<colvec>(deviance(out["glmnet.fit"]));
     S4 out_coef = predict_glmnet(
       out["glmnet.fit"],
       Named("s") = out["lambda.1se"],
@@ -29,8 +38,9 @@ List negative_log_likelihood(
     for (unsigned int i = 1; i < glmnet_i.n_elem; i++) {
       par(glmnet_i(i) - 1) = glmnet_x(i);
     }
-    return List::create(Named("par") = par,
-                  Named("value") = R_NilValue);
+    return List::create(
+      Named("par") = par, Named("value") = values(index_vec(1) - 1)
+    );
   } else if (theta.isNull() && family == "lasso" && !cv) {
     Environment stats = Environment::namespace_env("stats"),
                glmnet = Environment::namespace_env("glmnet");

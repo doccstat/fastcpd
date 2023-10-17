@@ -336,11 +336,11 @@ List fastcpd_impl(
         if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
           cost_optim_result = cost_optim(
             family, p, data_segment,
-            fastcpd_parameters_class.cost.get(), 0, true
+            fastcpd_parameters_class.cost.get(), lambda, false
           );
         } else {
           cost_optim_result =
-            negative_log_likelihood(data_segment, R_NilValue, family, 0, true);
+            negative_log_likelihood(data_segment, R_NilValue, family, lambda);
         }
         cval(i - 1) = as<double>(cost_optim_result["value"]);
         if (vanilla_percentage < 1 && t <= vanilla_percentage * n) {
