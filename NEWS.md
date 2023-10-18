@@ -2,6 +2,7 @@
 
 *   Add cheatsheets.
 *   Refactor code and utilize the `cost_function_wrapper`.
+*   Optimize warm start.
 
 # fastcpd 0.8.3
 
@@ -27,7 +28,7 @@
 
 # fastcpd 0.8.0
 
-*   Deal with the following TODO:
+*   Deal with the following:
 
         Due to the excessive calls to `glmnet` between R and C++,
         it is better to use the R implementation of `fastcpd` for lasso.

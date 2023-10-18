@@ -138,6 +138,8 @@ void FastcpdParameters::update_hessian(ucolvec pruned_left) {
   hessian = hessian.slices(pruned_left);
 }
 
+// TODO(doccstat): Use `segment_theta` as warm start.
+
 void FastcpdParameters::create_segment_statistics() {
   for (
     int segment_index = 0; segment_index < segment_count; ++segment_index

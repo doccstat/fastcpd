@@ -26,11 +26,13 @@ List fastcpd_impl(
     Nullable<Function> cost_gradient,
     Nullable<Function> cost_hessian,
     const bool cp_only,
-    const double vanilla_percentage
+    const double vanilla_percentage,
+    const bool warm_start
 ) {
   // Set up the initial values.
   const int n = data.n_rows;
   double lambda = 0;
+  mat start = zeros<mat>(p, n);
 
   // After t = 1, the r_t_set R_t contains 0 and 1.
   ucolvec r_t_set = {0, 1};
@@ -119,27 +121,19 @@ List fastcpd_impl(
           );
           theta = as<colvec>(winsorize_result);
         }
-        if (
-          (
-            array_contains(FASTCPD_FAMILIES, family) &&
-            family != "lasso" && t - tau >= p
-          ) ||
-          (family == "lasso" && t - tau >= 3)
-        ) {
-          List cost_result = negative_log_likelihood(
-            data_segment, Rcpp::wrap(theta), family, lambda
-          );
-          cval(i - 1) = as<double>(cost_result["value"]);
-        } else if (array_contains(CUSTOM_FAMILIES, family)) {
-          // if (warm_start && t - tau >= 50) {
-          //   cost_result <- cost(data_segment, start = start[, tau + 1])
-          //   start[, tau + 1] <- cost_result$par
-          //   cval[i] <- cost_result$value
-          // } else {
+        if (array_contains(CUSTOM_FAMILIES, family)) {
           Function cost_non_null = fastcpd_parameters_class.cost.get();
           SEXP cost_result = cost_non_null(data_segment, theta);
           cval(i - 1) = as<double>(cost_result);
-          // }
+        } else if (
+          family != "lasso" && t - tau >= p || family == "lasso" && t - tau >= 3
+        ) {
+          List cost_result = negative_log_likelihood(
+            data_segment, Rcpp::wrap(theta), family, lambda, false, R_NilValue
+          );
+          cval(i - 1) = as<double>(cost_result["value"]);
+        } else {
+          // t - tau < p or for lasso t - tau < 3
         }
       } else {
         List cost_optim_result;
@@ -149,8 +143,17 @@ List fastcpd_impl(
             fastcpd_parameters_class.cost.get(), lambda, false
           );
         } else {
-          cost_optim_result =
-            negative_log_likelihood(data_segment, R_NilValue, family, lambda);
+          if (warm_start && t - tau >= 50) {
+            cost_optim_result = negative_log_likelihood(
+              data_segment, R_NilValue, family,
+              lambda, false, Rcpp::wrap(start.col(tau))
+            );
+            start.col(tau) = as<colvec>(cost_optim_result["par"]);
+          } else {
+            cost_optim_result = negative_log_likelihood(
+              data_segment, R_NilValue, family, lambda, false, R_NilValue
+            );
+          }
         }
         cval(i - 1) = as<double>(cost_optim_result["value"]);
         if (vanilla_percentage < 1 && t <= vanilla_percentage * n) {

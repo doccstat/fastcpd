@@ -651,6 +651,10 @@
 #'   to be between 0 and 1, the first \code{vanilla_percentage * nrow(data)}
 #'   data points will be processed through vanilla PELT and the rest will be
 #'   processed through sequential gradient descent.
+#' @param warm_start If \code{TRUE}, the algorithm will use the estimated
+#'   parameters from the previous segment as the initial value for the
+#'   current segment. This parameter is only used for family \code{"gaussian"},
+#'   \code{"binomial"} and \code{"poisson"}.
 #'
 #' @return A class \code{fastcpd} object.
 #'
@@ -676,7 +680,8 @@ fastcpd <- function(
   cost_gradient = NULL,
   cost_hessian = NULL,
   cp_only = FALSE,
-  vanilla_percentage = 0
+  vanilla_percentage = 0,
+  warm_start = FALSE
 ) {
   # The following code is adapted from the `lm` function from base R.
   match_formula <- match.call(expand.dots = FALSE)
@@ -826,7 +831,7 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
   result <- fastcpd_impl(
     fastcpd_data, beta, segment_count, trim, momentum_coef, k, fastcpd_family,
     epsilon, min_prob, winsorise_minval, winsorise_maxval, p,
-    cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage
+    cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start
   )
 
   cp_set <- c(result$cp_set)

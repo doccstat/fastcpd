@@ -219,6 +219,26 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "logistic regression with warm start", {
+    set.seed(1)
+    x <- matrix(rnorm(1500, 0, 1), ncol = 5)
+    theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
+    y <- c(
+      rbinom(125, 1, 1 / (1 + exp(-x[1:125, ] %*% theta[1, ]))),
+      rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] %*% theta[2, ])))
+    )
+    result <- suppressWarnings(fastcpd(
+      formula = y ~ . - 1,
+      data = data.frame(y = y, x = x),
+      family = "binomial",
+      warm_start = TRUE
+    ))
+
+    testthat::expect_equal(result@cp_set, 126)
+  }
+)
+
+testthat::test_that(
   "example poisson regression", {
     testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
