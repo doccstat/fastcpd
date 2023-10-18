@@ -124,7 +124,7 @@ installing `RcppArmadillo`.
 
 </details>
 
-## Cheatsheet (WIP)
+## Cheatsheet
 
 [![fastcpd
 cheatsheet](man/figures/cheatsheets.png)](https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf)
