@@ -1,5 +1,6 @@
 testthat::test_that(
   "ggplot2 is not installed mock", {
+    testthat::skip_if_not_installed("mockthat")
     match_call <- ""
     class(match_call) <- "language"
     thetas <- data.frame(matrix(c(1, 2), 1, 2))

@@ -4,14 +4,18 @@
 #include <algorithm>
 #include <array>
 
-using ::std::array;
-
+#if defined(__cplusplus) && __cplusplus >= 201703L
 template<typename C, typename T>
-bool array_contains(C&& c, T e) {
-    return std::find(std::begin(c), std::end(c), e) != std::end(c);
+bool contain(C&& c, T e) {
+  return std::find(std::begin(c), std::end(c), e) != std::end(c);
 };
+#else
+bool contain(std::array, std::string) {
+  return std::find(std::begin(c), std::end(c), e) != std::end(c);
+};
+#endif
 
-constexpr array CUSTOM_FAMILIES = {"custom", "vanilla"};
-constexpr array FASTCPD_FAMILIES = {"gaussian", "binomial", "poisson", "lasso"};
+constexpr std::array CUSTOM_FAMILIES = {"custom", "vanilla"};
+constexpr std::array FASTCPD_FAMILIES = {"gaussian", "binomial", "poisson", "lasso"};
 
 #endif  // CONSTANTS_H_

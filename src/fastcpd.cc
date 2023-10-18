@@ -121,7 +121,7 @@ List fastcpd_impl(
           );
           theta = as<colvec>(winsorize_result);
         }
-        if (array_contains(CUSTOM_FAMILIES, family)) {
+        if (contain(CUSTOM_FAMILIES, family)) {
           Function cost_non_null = fastcpd_parameters_class.cost.get();
           SEXP cost_result = cost_non_null(data_segment, theta);
           cval(i - 1) = as<double>(cost_result);
@@ -137,13 +137,13 @@ List fastcpd_impl(
         }
       } else {
         List cost_optim_result;
-        if (array_contains(CUSTOM_FAMILIES, family)) {
+        if (contain(CUSTOM_FAMILIES, family)) {
           cost_optim_result = cost_optim(
             family, p, data_segment,
             fastcpd_parameters_class.cost.get(), lambda, false
           );
         } else {
-          if (warm_start && t - tau >= 50) {
+          if (warm_start && t - tau >= 5 * p) {
             cost_optim_result = negative_log_likelihood(
               data_segment, R_NilValue, family,
               lambda, false, Rcpp::wrap(start.col(tau))
@@ -261,7 +261,7 @@ List fastcpd_impl(
         arma::conv_to<ucolvec>::from(std::move(segment_data_index_));
     mat data_segment = data.rows(segment_data_index);
     List cost_optim_result;
-    if (array_contains(CUSTOM_FAMILIES, family)) {
+    if (contain(CUSTOM_FAMILIES, family)) {
       cost_optim_result = cost_optim(
         family, p, data_segment,
         fastcpd_parameters_class.cost.get(), lambda, false
@@ -279,7 +279,7 @@ List fastcpd_impl(
     }
 
     // Residual is only calculated for built-in families.
-    if (array_contains(FASTCPD_FAMILIES, family)) {
+    if (contain(FASTCPD_FAMILIES, family)) {
       colvec cost_optim_residual = as<colvec>(cost_optim_result["residuals"]);
       residual.rows(
         residual_next_start,
