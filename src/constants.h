@@ -1,17 +1,17 @@
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 
-#include <string>
-#include <unordered_set>
+#include <algorithm>
+#include <array>
 
-using ::std::string;
-using ::std::unordered_set;
+using ::std::array;
 
-// TODO(doccstat): `unordered_set` is not literal type and thus `constexpr`
-// can not be used here. Blocked by `abseil` due to the non-header only issue.
-const unordered_set<string> CUSTOM_FAMILIES = {"custom", "vanilla"};
+template<typename C, typename T>
+bool array_contains(C&& c, T e) {
+    return std::find(std::begin(c), std::end(c), e) != std::end(c);
+};
 
-const unordered_set<string> FASTCPD_FAMILIES =
-  {"gaussian", "binomial", "poisson", "lasso"};
+constexpr array CUSTOM_FAMILIES = {"custom", "vanilla"};
+constexpr array FASTCPD_FAMILIES = {"gaussian", "binomial", "poisson", "lasso"};
 
 #endif  // CONSTANTS_H_

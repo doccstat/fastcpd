@@ -121,7 +121,7 @@ List fastcpd_impl(
         }
         if (
           (
-            FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end() &&
+            array_contains(FASTCPD_FAMILIES, family) &&
             family != "lasso" && t - tau >= p
           ) ||
           (family == "lasso" && t - tau >= 3)
@@ -130,7 +130,7 @@ List fastcpd_impl(
             data_segment, Rcpp::wrap(theta), family, lambda
           );
           cval(i - 1) = as<double>(cost_result["value"]);
-        } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
+        } else if (array_contains(CUSTOM_FAMILIES, family)) {
           // if (warm_start && t - tau >= 50) {
           //   cost_result <- cost(data_segment, start = start[, tau + 1])
           //   start[, tau + 1] <- cost_result$par
@@ -143,7 +143,7 @@ List fastcpd_impl(
         }
       } else {
         List cost_optim_result;
-        if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
+        if (array_contains(CUSTOM_FAMILIES, family)) {
           cost_optim_result = cost_optim(
             family, p, data_segment,
             fastcpd_parameters_class.cost.get(), lambda, false
@@ -258,7 +258,7 @@ List fastcpd_impl(
         arma::conv_to<ucolvec>::from(std::move(segment_data_index_));
     mat data_segment = data.rows(segment_data_index);
     List cost_optim_result;
-    if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
+    if (array_contains(CUSTOM_FAMILIES, family)) {
       cost_optim_result = cost_optim(
         family, p, data_segment,
         fastcpd_parameters_class.cost.get(), lambda, false
@@ -276,7 +276,7 @@ List fastcpd_impl(
     }
 
     // Residual is only calculated for built-in families.
-    if (FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end()) {
+    if (array_contains(FASTCPD_FAMILIES, family)) {
       colvec cost_optim_residual = as<colvec>(cost_optim_result["residuals"]);
       residual.rows(
         residual_next_start,
