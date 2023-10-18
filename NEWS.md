@@ -1,3 +1,7 @@
+# fastcpd 0.9.0
+
+*   Submit for CRAN update.
+
 # fastcpd 0.8.4
 
 *   Add cheatsheets.
