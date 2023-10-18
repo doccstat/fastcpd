@@ -72,7 +72,8 @@ parameters and returns a <code>fastcpd</code> object.</p>
 <span>  cost_gradient <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cost_hessian <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cp_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  vanilla_percentage <span class="op">=</span> <span class="fl">0</span></span>
+<span>  vanilla_percentage <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  warm_start <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -259,6 +260,13 @@ mean change case, this parameter will be set to be 1. If the value is set
 to be between 0 and 1, the first <code>vanilla_percentage * nrow(data)</code>
 data points will be processed through vanilla PELT and the rest will be
 processed through sequential gradient descent.</p></dd>
+
+
+<dt>warm_start</dt>
+<dd><p>If <code>TRUE</code>, the algorithm will use the estimated
+parameters from the previous segment as the initial value for the
+current segment. This parameter is only used for family <code>"gaussian"</code>,
+<code>"binomial"</code> and <code>"poisson"</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
