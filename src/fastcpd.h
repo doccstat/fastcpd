@@ -37,7 +37,7 @@
 //'   all data will be processed through vaniall PELT. If the cost function
 //'   have an explicit solution, i.e. does not depend on coefficients like
 //'   the mean change case, this parameter will be set to be 1.
-//' @keywords internal
+//' @param warm_start Whether to use warm start for the initial guess.
 //' @importFrom DescTools Winsorize
 //' @importFrom glmnet glmnet cv.glmnet predict.glmnet
 //' @importFrom fastglm fastglm
@@ -63,7 +63,8 @@ List fastcpd_impl(
     Nullable<Function> cost_gradient,
     Nullable<Function> cost_hessian,
     const bool cp_only,
-    const double vanilla_percentage
+    const double vanilla_percentage,
+    const bool warm_start
 );
 
 #endif  // FASTCPD_H_

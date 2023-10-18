@@ -22,7 +22,8 @@ fastcpd(
   cost_gradient = NULL,
   cost_hessian = NULL,
   cp_only = FALSE,
-  vanilla_percentage = 0
+  vanilla_percentage = 0,
+  warm_start = FALSE
 )
 }
 \arguments{
@@ -182,6 +183,11 @@ mean change case, this parameter will be set to be 1. If the value is set
 to be between 0 and 1, the first \code{vanilla_percentage * nrow(data)}
 data points will be processed through vanilla PELT and the rest will be
 processed through sequential gradient descent.}
+
+\item{warm_start}{If \code{TRUE}, the algorithm will use the estimated
+parameters from the previous segment as the initial value for the
+current segment. This parameter is only used for family \code{"gaussian"},
+\code{"binomial"} and \code{"poisson"}.}
 }
 \value{
 A class \code{fastcpd} object.

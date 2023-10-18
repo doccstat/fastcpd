@@ -35,7 +35,7 @@
 #'   all data will be processed through vaniall PELT. If the cost function
 #'   have an explicit solution, i.e. does not depend on coefficients like
 #'   the mean change case, this parameter will be set to be 1.
-#' @keywords internal
+#' @param warm_start Whether to use warm start for the initial guess.
 #' @importFrom DescTools Winsorize
 #' @importFrom glmnet glmnet cv.glmnet predict.glmnet
 #' @importFrom fastglm fastglm
@@ -43,7 +43,7 @@
 #' @noRd
 #' @return A list containing the change points and the cost values for each
 #'   segment.
-fastcpd_impl <- function(data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage) {
-    .Call(`_fastcpd_fastcpd_impl`, data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage)
+fastcpd_impl <- function(data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start) {
+    .Call(`_fastcpd_fastcpd_impl`, data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start)
 }
 
