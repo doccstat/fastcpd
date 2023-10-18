@@ -231,10 +231,11 @@ testthat::test_that(
       formula = y ~ . - 1,
       data = data.frame(y = y, x = x),
       family = "binomial",
+      vanilla_percentage = 1,
       warm_start = TRUE
     ))
 
-    testthat::expect_equal(result@cp_set, 126)
+    testthat::expect_equal(result@cp_set, 121)
   }
 )
 
