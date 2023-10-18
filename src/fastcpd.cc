@@ -143,7 +143,7 @@ List fastcpd_impl(
             fastcpd_parameters_class.cost.get(), lambda, false
           );
         } else {
-          if (warm_start && t - tau >= 5 * p) {
+          if (warm_start && t - tau >= 10 * p) {
             cost_optim_result = negative_log_likelihood(
               data_segment, R_NilValue, family,
               lambda, false, Rcpp::wrap(start.col(tau))
