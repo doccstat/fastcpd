@@ -1015,6 +1015,7 @@ testthat::test_that(
 
 testthat::test_that(
   "ar(1) model with `forecast::Arima` calculation of ML", {
+    testthat::skip_if_not_installed("forecast")
     set.seed(1)
     n <- 400
     p <- 1

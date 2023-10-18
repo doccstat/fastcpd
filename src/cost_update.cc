@@ -32,7 +32,7 @@ List cost_update(
   mat hessian_i = hessian.slice(i - 1);
   colvec gradient;
 
-  if (array_contains(CUSTOM_FAMILIES, family)) {
+  if (contain(CUSTOM_FAMILIES, family)) {
     mat cost_hessian_result = cost_hessian_wrapper(
       data, theta_hat.col(i - 1),
       family,  // UNUSED
@@ -83,7 +83,7 @@ List cost_update(
 
   for (int kk = 1; kk <= as<int>(k(data.n_rows - tau)); kk++) {
     for (unsigned j = tau + 1; j <= data.n_rows; j++) {
-      if (array_contains(CUSTOM_FAMILIES, family)) {
+      if (contain(CUSTOM_FAMILIES, family)) {
         mat cost_hessian_result = cost_hessian_wrapper(
           data.rows(tau, j - 1), theta_hat.col(i - 1),
           family,  // UNUSED
