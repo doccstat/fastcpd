@@ -146,7 +146,7 @@ void FastcpdParameters::create_segment_statistics() {
         arma::find(segment_indices == segment_index + 1);
     mat data_segment = data.rows(segment_indices_);
     rowvec segment_theta;
-    if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
+    if (array_contains(CUSTOM_FAMILIES, family)) {
       segment_theta = as<rowvec>(
         cost_optim(family, p, data_segment, cost.get(), 0, false)["par"]
       );
@@ -218,7 +218,7 @@ void FastcpdParameters::create_gradients() {
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian.slice(0) = epsilon * eye<mat>(p, p) +
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1);
-  } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
+  } else if (array_contains(CUSTOM_FAMILIES, family)) {
     theta_hat.col(0) = segment_theta_hat.row(0).t();
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian.slice(0) = zeros<mat>(p, p);
@@ -250,7 +250,7 @@ void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
         );
   } else if (family == "lasso" || family == "gaussian") {
     hessian_new = new_data.t() * new_data + epsilon * eye<mat>(p, p);
-  } else if (CUSTOM_FAMILIES.find(family) != CUSTOM_FAMILIES.end()) {
+  } else if (array_contains(CUSTOM_FAMILIES, family)) {
     hessian_new = zeros<mat>(p, p);
   }
 
@@ -261,7 +261,7 @@ void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
 
 void FastcpdParameters::wrap_cost(Nullable<Function> cost) {
   this->cost = cost;
-  if (FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end()) {
+  if (array_contains(FASTCPD_FAMILIES, family)) {
     cost_function_wrapper = &fastcpd::functions::negative_log_likelihood;
   } else if (cost.isNotNull()) {
     fastcpd::wrappers::CostFunction costFunction(cost.get());
@@ -275,7 +275,7 @@ void FastcpdParameters::wrap_cost(Nullable<Function> cost) {
 
 void FastcpdParameters::wrap_cost_gradient(Nullable<Function> cost_gradient) {
   this->cost_gradient = cost_gradient;
-  if (FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end()) {
+  if (array_contains(FASTCPD_FAMILIES, family)) {
     cost_gradient_wrapper = &fastcpd::functions::cost_update_gradient;
   } else if (cost_gradient.isNotNull()) {
     fastcpd::wrappers::CostGradient costGradient(cost_gradient.get());
@@ -289,7 +289,7 @@ void FastcpdParameters::wrap_cost_gradient(Nullable<Function> cost_gradient) {
 
 void FastcpdParameters::wrap_cost_hessian(Nullable<Function> cost_hessian) {
   this->cost_hessian = cost_hessian;
-  if (FASTCPD_FAMILIES.find(family) != FASTCPD_FAMILIES.end()) {
+  if (array_contains(FASTCPD_FAMILIES, family)) {
     cost_hessian_wrapper = &fastcpd::functions::cost_update_hessian;
   } else if (cost_hessian.isNotNull()) {
     fastcpd::wrappers::CostHessian costHessian(cost_hessian.get());
