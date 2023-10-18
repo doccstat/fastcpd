@@ -1,6 +1,7 @@
 # fastcpd 0.8.4
 
 *   Add cheatsheets.
+*   Refactor code and utilize the `cost_function_wrapper`.
 
 # fastcpd 0.8.3
 

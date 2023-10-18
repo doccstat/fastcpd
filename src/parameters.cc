@@ -1,8 +1,11 @@
 #include "constants.h"
+#include "cost_update.h"
 #include "fastcpd.h"
 #include "functions.h"
 #include "parameters.h"
 #include "wrappers.h"
+
+using ::fastcpd::cost_update::cost_optim;
 
 namespace fastcpd::parameters {
 
@@ -149,8 +152,8 @@ void FastcpdParameters::create_segment_statistics() {
       );
     } else {
       segment_theta = as<rowvec>(
-        fastcpd::functions::negative_log_likelihood(
-          data_segment, R_NilValue, family, 0, true
+        cost_function_wrapper(
+          data_segment, R_NilValue, family, 0, true, R_NilValue
         )["par"]
       );
     }
