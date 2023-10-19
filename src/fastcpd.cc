@@ -126,7 +126,8 @@ List fastcpd_impl(
           SEXP cost_result = cost_non_null(data_segment, theta);
           cval(i - 1) = as<double>(cost_result);
         } else if (
-          family != "lasso" && t - tau >= p || family == "lasso" && t - tau >= 3
+          (family != "lasso" && t - tau >= p) ||
+          (family == "lasso" && t - tau >= 3)
         ) {
           List cost_result = negative_log_likelihood(
             data_segment, Rcpp::wrap(theta), family, lambda, false, R_NilValue
