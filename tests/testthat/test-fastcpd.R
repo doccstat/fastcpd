@@ -1032,9 +1032,7 @@ testthat::test_that(
         expr = -forecast::Arima(
           c(data), order = c(1, 0, 0), include.mean = FALSE, method = "ML"
         )$loglik,
-        error = function(e) {
-          0
-        }
+        error = function(e) 0
       )
     }
     result <- fastcpd(
@@ -1046,6 +1044,58 @@ testthat::test_that(
     )
 
     testthat::expect_equal(result@cp_set, 178)
+  }
+)
+
+testthat::test_that(
+  "ma(4) model with `forecast::Arima` calculation of ML", {
+    testthat::skip_if_not_installed("forecast")
+    set.seed(1)
+    n <- 400
+    p <- 4
+    time_series <- rep(0, n)
+
+    lambda1 <- c(1, 3 / 2, 2i, -2i)
+    param1 <- 1
+    for (lam in lambda1) {
+      param1 <- convolve(param1, c(1, -lam), type = "open")
+    }
+    ma_coef1 <- Re(param1[-1] / param1[1])
+
+    testthat::expect_equal(ma_coef1, c(-5 / 3, 11 / 12, -5 / 12, 1 / 6))
+
+    time_series[1:200] <-
+      arima.sim(n = 200, model = list(ma = ma_coef1, sd = 0.1))
+
+    lambda2 <- c(3, 1, -3i / 2, 3i / 2)
+    param2 <- 1
+    for (lam in lambda2) {
+      param2 <- convolve(param2, c(1, -lam), type = "open")
+    }
+    ma_coef2 <- Re(param2[-1] / param2[1])
+
+    testthat::expect_equal(ma_coef2, c(-4 / 3, 7 / 9, -16 / 27, 4 / 27))
+
+    time_series[201:400] <-
+      arima.sim(n = 200, model = list(ma = ma_coef2, sd = 0.3))
+
+    ma4_loss <- function(data) {
+      tryCatch(
+        expr = -forecast::Arima(
+          c(data), order = c(0, 0, 4), include.mean = FALSE, method = "ML"
+        )$loglik,
+        error = function(e) 0
+      )
+    }
+    result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(x = time_series[-1]),
+      beta = (2 * p + 1) * log(n) / 2,
+      p = p,
+      cost = ma4_loss
+    )
+
+    testthat::expect_equal(result@cp_set, 199)
   }
 )
 
