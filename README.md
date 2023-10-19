@@ -24,9 +24,9 @@ user specified cost function apart from the built-in cost functions.
 
 To learn more behind the algorithms:
 
-- [Sequential Gradient Descent and Quasi-Newton’s Method for
-  Change-Point
-  Analysis](https://proceedings.mlr.press/v206/zhang23b.html)
+  - [Sequential Gradient Descent and Quasi-Newton’s Method for
+    Change-Point
+    Analysis](https://proceedings.mlr.press/v206/zhang23b.html)
 
 ## Installation
 
@@ -36,9 +36,8 @@ install.packages("fastcpd")
 ```
 
 <details close>
-<summary>
-Development version
-</summary>
+
+<summary>Development version</summary>
 
 ``` r
 # Development version from r-universe with CRAN version as a fallback
@@ -55,10 +54,10 @@ devtools::install_github("doccstat/fastcpd")
 ```
 
 </details>
+
 <details close>
-<summary>
-With mamba or conda (available soon)
-</summary>
+
+<summary>With mamba or conda (available soon)</summary>
 
 ``` bash
 # conda-forge is a fork from CRAN and may not be up-to-date
@@ -74,23 +73,22 @@ conda install -c conda-forge r-fastcpd
 ### FAQ
 
 <details close>
-<summary>
-Package dependencies
-</summary>
+
+<summary>Package dependencies</summary>
 
 `fastcpd` depends on the following packages:
 
-- [Rcpp](https://github.com/RcppCore/Rcpp), for C++ source code
-  compilation.
-- [RcppArmadillo](https://github.com/RcppCore/RcppArmadillo), for fast
-  linear algebra.
-- [fastglm](https://github.com/jaredhuling/fastglm), for fast
-  generalized linear models.
-- [DescTools](https://github.com/AndriSignorell/DescTools), for
-  Winsorizing Poisson data.
-- [glmnet](https://glmnet.stanford.edu/), for penalized regression.
-- [ggplot2](https://github.com/tidyverse/ggplot2), for data
-  visualization.
+  - [Rcpp](https://github.com/RcppCore/Rcpp), for C++ source code
+    compilation.
+  - [RcppArmadillo](https://github.com/RcppCore/RcppArmadillo), for fast
+    linear algebra.
+  - [fastglm](https://github.com/jaredhuling/fastglm), for fast
+    generalized linear models.
+  - [DescTools](https://github.com/AndriSignorell/DescTools), for
+    Winsorizing Poisson data.
+  - [glmnet](https://glmnet.stanford.edu/), for penalized regression.
+  - [ggplot2](https://github.com/tidyverse/ggplot2), for data
+    visualization.
 
 If you’re compiling from source, you can run the following command to
 see the complete set of system packages needed on your machine.
@@ -109,10 +107,11 @@ pak::pkg_sysreqs("doccstat/fastcpd")
 ```
 
 </details>
+
 <details close>
-<summary>
-I countered problems related to gfortran on Mac OSX or Linux!
-</summary>
+
+<summary>I countered problems related to gfortran on Mac OSX or
+Linux\!</summary>
 
 The package should be able to install on Mac and any Linux distribution
 without any problems if all the dependencies are installed. However, if
@@ -136,10 +135,10 @@ cheatsheet](man/figures/cheatsheets.png)](https://github.com/doccstat/fastcpd/bl
 [Documentation](https://fastcpd.xingchi.li/reference/fastcpd.html)
 
 <!-- This example section is a direct copy from `fastcpd` documentation -->
+
 <details open>
-<summary>
-Click to fold
-</summary>
+
+<summary>Click to fold</summary>
 
 ### linear regression
 
@@ -490,14 +489,14 @@ for (i in 601:1000) {
 result <- fastcpd(
   formula = ~ . - 1,
   data = data.frame(x = x),
-  p = 1,
+  order = 1,
   family = "ar"
 )
 summary(result)
 #> 
 #> Call:
 #> fastcpd(formula = ~. - 1, data = data.frame(x = x), family = "ar", 
-#>     p = 1)
+#>     order = 1)
 #> 
 #> Change points:
 #> 609 
@@ -530,14 +529,14 @@ for (i in 601:1000) {
 result <- fastcpd(
   formula = ~ . - 1,
   data = data.frame(x = x),
-  p = 3,
+  order = 3,
   family = "ar"
 )
 summary(result)
 #> 
 #> Call:
 #> fastcpd(formula = ~. - 1, data = data.frame(x = x), family = "ar", 
-#>     p = 3)
+#>     order = 3)
 #> 
 #> Change points:
 #> 615 
