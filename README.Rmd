@@ -313,12 +313,7 @@ for (i in 1:600) {
 for (i in 601:1000) {
   x[i + 1] <- 0.3 * x[i] + rnorm(1)
 }
-result <- fastcpd(
-  formula = ~ . - 1,
-  data = data.frame(x = x),
-  order = 1,
-  family = "ar"
-)
+result <- fastcpd_ts(x, "ar", 1)
 summary(result)
 plot(result)
 ```
@@ -337,12 +332,7 @@ for (i in 1:600) {
 for (i in 601:1000) {
   x[i + 1] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
 }
-result <- fastcpd(
-  formula = ~ . - 1,
-  data = data.frame(x = x),
-  order = 3,
-  family = "ar"
-)
+result <- fastcpd.ts(x, "ar", 3)
 summary(result)
 plot(result)
 ```
