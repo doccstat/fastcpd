@@ -18,6 +18,7 @@ fastcpd(
   winsorise_minval = -20,
   winsorise_maxval = 20,
   p = ncol(data) - 1,
+  order = c(0, 0, 0),
   cost = NULL,
   cost_gradient = NULL,
   cost_hessian = NULL,
@@ -116,7 +117,10 @@ to be winsorised.}
 
 \item{p}{Number of covariates in the model. If not specified, the number of
 covariates will be inferred from the data, i.e.,
-\code{p = ncol(data) - 1}.}
+\code{p = ncol(data) - 1}. This parameter is superseded by \code{order} in the
+case of time series models: "ar", "var", "arima".}
+
+\item{order}{Order of the AR(p), VAR(p) or ARIMA(p, d, q) model.}
 
 \item{cost}{Cost function to be used. This and the following two parameters
 should not be specified at the same time with \code{family}. If not
@@ -363,7 +367,7 @@ for (i in 601:1000) {
 result <- fastcpd(
   formula = ~ . - 1,
   data = data.frame(x = x),
-  p = 1,
+  order = 1,
   family = "ar"
 )
 summary(result)
@@ -384,7 +388,7 @@ for (i in 601:1000) {
 result <- fastcpd(
   formula = ~ . - 1,
   data = data.frame(x = x),
-  p = 3,
+  order = 3,
   family = "ar"
 )
 summary(result)

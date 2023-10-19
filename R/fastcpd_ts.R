@@ -8,7 +8,14 @@
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param family A character string specifying the family of the time series.
 #'   The value should be one of \code{"ar"} or \code{"var"}.
-#' @param order A positive integer specifying the order of the time series.
+#' @param order A vector of length 3 or a positive integer specifying the order
+#'   of the time series. The convention of a vector of length 3 follows the
+#'   ARIMA model. If a single positive integer is provided, for "ar" and "var"
+#'   family, the model is specified as AR(p) or VAR(p) respectively and for
+#'   "arima" model, the model is specified as MA(q). If a vector of length 3 is
+#'   provided, the model is specified as ARIMA(p, d, q). AR(p) model can also
+#'   be specified as ARIMA(p, 0, 0). "ar" family uses linear regression to fit
+#'   the time series while "arima" family uses `forecast::Arima`.
 #' @param ... Other arguments passed to \code{\link{fastcpd}}.
 #'
 #' @return A class \code{fastcpd} object.
@@ -18,20 +25,26 @@
 fastcpd.ts <- function(  # nolint: Conventional R function style
   data,
   family = NULL,
-  order = NULL,
+  order = c(0, 0, 0),
   ...
 ) {
-  allowed_family <- c("ar", "var")
+  family <- tolower(family)
 
-  stopifnot("The family should be one of \"ar\" or \"var\"" = !is.null(family))
-  stopifnot("Order of the time series should be specified" = !is.null(order))
-  stopifnot(
-    "`order` should be a positive integer" = order > 0 && order == floor(order)
-  )
+  allowed_family <- c("ar", "var", "arima")
+
+  if (is.null(family)) {
+    stop(r"[The family should be one of "ar", "var" or "arima".]")
+  }
+  if (all(order == 0)) {
+    stop(r"[The order should be specified as a vector of length 3.]")
+  }
+  if (any(order < 0) || any(order != floor(order))) {
+    stop(r"[The order should be non-negative integers.]")
+  }
 
   if (!(family %in% allowed_family)) {
     error_message <- r"[
-The family should be one of "ar" or "var"
+The family should be one of "ar", "var" or "arima",
 while the provided family is {family}.]"
     stop(gsub("{family}", family, error_message, fixed = TRUE))
   }
@@ -40,7 +53,7 @@ while the provided family is {family}.]"
     formula = ~ . - 1,
     data = data.frame(x = data),
     family = family,
-    p = order,
+    order = order,
     ...
   )
 }
