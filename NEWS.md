@@ -1,3 +1,7 @@
+# fastcpd 0.9.1
+
+*   Wrap `&&` around `||` by parentheses.
+
 # fastcpd 0.9.0
 
 *   Submit for CRAN update.
