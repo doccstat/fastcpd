@@ -1,6 +1,7 @@
 # fastcpd 0.9.1
 
 *   Wrap `&&` around `||` by parentheses.
+*   Add ma(4) example using custom cost function.
 
 # fastcpd 0.9.0
 
