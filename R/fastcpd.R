@@ -160,7 +160,7 @@
 #' result <- fastcpd(
 #'   formula = ~ . - 1,
 #'   data = data.frame(x = x),
-#'   p = 1,
+#'   order = 1,
 #'   family = "ar"
 #' )
 #' summary(result)
@@ -181,7 +181,7 @@
 #' result <- fastcpd(
 #'   formula = ~ . - 1,
 #'   data = data.frame(x = x),
-#'   p = 3,
+#'   order = 3,
 #'   family = "ar"
 #' )
 #' summary(result)
@@ -591,7 +591,9 @@
 #'   to be winsorised.
 #' @param p Number of covariates in the model. If not specified, the number of
 #'   covariates will be inferred from the data, i.e.,
-#'   \code{p = ncol(data) - 1}.
+#'   \code{p = ncol(data) - 1}. This parameter is superseded by `order` in the
+#'   case of time series models: "ar", "var", "arima".
+#' @param order Order of the AR(p), VAR(p) or ARIMA(p, d, q) model.
 #' @param cost Cost function to be used. This and the following two parameters
 #'   should not be specified at the same time with \code{family}. If not
 #'   specified, the default is the negative log-likelihood for the
@@ -676,6 +678,7 @@ fastcpd <- function(
   winsorise_minval = -20,
   winsorise_maxval = 20,
   p = ncol(data) - 1,
+  order = c(0, 0, 0),
   cost = NULL,
   cost_gradient = NULL,
   cost_hessian = NULL,
@@ -683,6 +686,10 @@ fastcpd <- function(
   vanilla_percentage = 0,
   warm_start = FALSE
 ) {
+  if (!is.null(family)) {
+    family <- tolower(family)
+  }
+
   # The following code is adapted from the `lm` function from base R.
   match_formula <- match.call(expand.dots = FALSE)
   matched_formula <- match(c("formula", "data"), names(match_formula), 0L)
@@ -699,7 +706,7 @@ fastcpd <- function(
   # `vanilla` is used to distinguish the cost function parameters in the
   # implementation.
   allowed_family <- c(
-    "gaussian", "binomial", "poisson", "lasso", "custom", "ar", "var"
+    "gaussian", "binomial", "poisson", "lasso", "custom", "ar", "var", "arima"
   )
 
   fastcpd_family <- NULL
@@ -709,7 +716,7 @@ fastcpd <- function(
   if (!(is.null(family) || family %in% allowed_family)) {
     error_message <- r"[
 The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
-"var", "custom" or `NULL` while the provided family is {family}.]"
+"var", "arima", "custom" or `NULL` while the provided family is {family}.]"
     stop(gsub("{family}", family, error_message, fixed = TRUE))
   }
 
@@ -721,6 +728,8 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
     family <- "custom"
   }
 
+  # TODO(doccstat): Replace "vanilla" with `vanilla_percentage == 1`.
+
   # If a cost function provided has an explicit solution, i.e. does not depend
   # on the parameters, e.g., mean change, then the `family` is set to be
   # `"vanilla"` and the percentage of vanilla PELT is set to be 1.
@@ -730,14 +739,19 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
     vanilla_percentage <- 1
   }
 
+  # Pre-process the data for the time series models.
   if (family == "ar") {
     # Check the validity of the parameters for AR(p) model.
     if (ncol(data) != 1) {
       stop("The data should be a univariate time series.")
     }
-    if (p == 0) {
-      stop("Please specify the order of the AR model as the parameter `p`.")
+    if (length(order) == 1 && !(order > 0 && order == floor(order))) {
+      stop("Please specify a positive integer as the `order` of the AR model.")
     }
+    if (length(order) != 1) {
+      stop("Please specify a positive integer as the `order` of the AR model.")
+    }
+    p <- order
     fastcpd_family <- "gaussian"
     y <- data[p + seq_len(nrow(data) - p), ]
     x <- matrix(NA, nrow(data) - p, p)
@@ -745,9 +759,10 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
       x[, p_i] <- data[(p - p_i) + seq_len(nrow(data) - p), ]
     }
     fastcpd_data <- cbind(y, x)
-  }
-
-  if (family == "var") {
+  } else if (family == "var") {
+    if (!(length(order) == 1 && order > 0 && order == floor(order))) {
+      stop("Please specify a positive integer as the `order` of the VAR model.")
+    }
     fastcpd_family <- "vanilla"
     vanilla_percentage <- 1
     y <- data[p + seq_len(nrow(data) - p), ]
@@ -770,6 +785,27 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
       # TODO(doccstat): Verify the correctness of the cost function for VAR(p).
       norm(y - x %*% solve(x_t_x, t(x)) %*% y, type = "F")^2 / 2
     }
+  } else if (family == "arima") {
+    if (length(order) != 3) {
+      stop(r"[The order should be specified as a vector of length 3.]")
+    }
+    fastcpd_family <- "vanilla"
+    vanilla_percentage <- 1
+    if (all(order == 0)) {
+      stop(r"[The order should be specified as a vector of length 3.]")
+    }
+    if (any(order < 0) || any(order != floor(order))) {
+      stop(r"[The order should be non-negative integers.]")
+    }
+    cost <- function(data) {
+      tryCatch(
+        expr = -forecast::Arima(
+          c(data), order = order, method = "ML"
+        )$loglik,
+        error = function(e) 0
+      )
+    }
+    p <- sum(order[-2])
   }
 
   if (is.null(fastcpd_family)) {

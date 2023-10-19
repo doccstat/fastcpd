@@ -7,7 +7,7 @@ testthat::test_that(
       ),
       r"[
 The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
-"var", "custom" or `NULL` while the provided family is bin0mial.]"
+"var", "arima", "custom" or `NULL` while the provided family is bin0mial.]"
     )
   }
 )
@@ -31,7 +31,7 @@ testthat::test_that(
         data = data.frame(x = 0),
         family = "ar",
       ),
-      "Please specify the order of the AR model as the parameter `p`."
+      "Please specify a positive integer as the `order` of the AR model."
     )
   }
 )
@@ -887,7 +887,7 @@ testthat::test_that(
     result <- fastcpd(
       formula = ~ . - 1,
       data = data.frame(x = x),
-      p = 1,
+      order = 1,
       family = "ar"
     )
 
@@ -911,7 +911,7 @@ testthat::test_that(
     result <- fastcpd(
       formula = ~ . - 1,
       data = data.frame(x = x),
-      p = 3,
+      order = 3,
       family = "ar"
     )
 
@@ -964,11 +964,11 @@ testthat::test_that(
       formula = ~ . - 1,
       data = data.frame(x = x),
       beta = (2 * 4 + 1) * log(n) / 2,
-      p = 2,
+      order = 2,
       family = "var"
     )
 
-    testthat::expect_equal(result_var@cp_set, 611)
+    testthat::expect_equal(result_var@cp_set, 609)
   }
 )
 
@@ -1079,23 +1079,15 @@ testthat::test_that(
     time_series[201:400] <-
       arima.sim(n = 200, model = list(ma = ma_coef2, sd = 0.3))
 
-    ma4_loss <- function(data) {
-      tryCatch(
-        expr = -forecast::Arima(
-          c(data), order = c(0, 0, 4), include.mean = FALSE, method = "ML"
-        )$loglik,
-        error = function(e) 0
-      )
-    }
     result <- fastcpd(
       formula = ~ . - 1,
-      data = data.frame(x = time_series[-1]),
+      data = data.frame(x = time_series),
       beta = (2 * p + 1) * log(n) / 2,
-      p = p,
-      cost = ma4_loss
+      order = c(0, 0, 4),
+      family = "arima"
     )
 
-    testthat::expect_equal(result@cp_set, 199)
+    testthat::expect_equal(result@cp_set, 200)
   }
 )
 

@@ -2,6 +2,7 @@
 
 *   Wrap `&&` around `||` by parentheses.
 *   Add ma(4) example using custom cost function.
+*   Add full support for AR(p), MA(q) and ARIMA(p, d, q) models.
 
 # fastcpd 0.9.0
 

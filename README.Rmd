@@ -316,7 +316,7 @@ for (i in 601:1000) {
 result <- fastcpd(
   formula = ~ . - 1,
   data = data.frame(x = x),
-  p = 1,
+  order = 1,
   family = "ar"
 )
 summary(result)
@@ -340,7 +340,7 @@ for (i in 601:1000) {
 result <- fastcpd(
   formula = ~ . - 1,
   data = data.frame(x = x),
-  p = 3,
+  order = 3,
   family = "ar"
 )
 summary(result)

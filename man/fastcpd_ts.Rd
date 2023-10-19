@@ -5,9 +5,9 @@
 \alias{fastcpd_ts}
 \title{Find change points efficiently in time series data}
 \usage{
-fastcpd.ts(data, family = NULL, order = NULL, ...)
+fastcpd.ts(data, family = NULL, order = c(0, 0, 0), ...)
 
-fastcpd_ts(data, family = NULL, order = NULL, ...)
+fastcpd_ts(data, family = NULL, order = c(0, 0, 0), ...)
 }
 \arguments{
 \item{data}{A numeric vector, a matrix, a data frame or a time series object.}
@@ -15,7 +15,14 @@ fastcpd_ts(data, family = NULL, order = NULL, ...)
 \item{family}{A character string specifying the family of the time series.
 The value should be one of \code{"ar"} or \code{"var"}.}
 
-\item{order}{A positive integer specifying the order of the time series.}
+\item{order}{A vector of length 3 or a positive integer specifying the order
+of the time series. The convention of a vector of length 3 follows the
+ARIMA model. If a single positive integer is provided, for "ar" and "var"
+family, the model is specified as AR(p) or VAR(p) respectively and for
+"arima" model, the model is specified as MA(q). If a vector of length 3 is
+provided, the model is specified as ARIMA(p, d, q). AR(p) model can also
+be specified as ARIMA(p, 0, 0). "ar" family uses linear regression to fit
+the time series while "arima" family uses `forecast::Arima`.}
 
 \item{...}{Other arguments passed to \code{\link{fastcpd}}.}
 }
