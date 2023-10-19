@@ -16,7 +16,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,9 +60,9 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fastcpd.ts</span><span class="op">(</span><span class="va">data</span>, family <span class="op">=</span> <span class="cn">NULL</span>, order <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fastcpd.ts</span><span class="op">(</span><span class="va">data</span>, family <span class="op">=</span> <span class="cn">NULL</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">fastcpd_ts</span><span class="op">(</span><span class="va">data</span>, family <span class="op">=</span> <span class="cn">NULL</span>, order <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">fastcpd_ts</span><span class="op">(</span><span class="va">data</span>, family <span class="op">=</span> <span class="cn">NULL</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -77,7 +77,14 @@ The value should be one of <code>"ar"</code> or <code>"var"</code>.</p></dd>
 
 
 <dt>order</dt>
-<dd><p>A positive integer specifying the order of the time series.</p></dd>
+<dd><p>A vector of length 3 or a positive integer specifying the order
+of the time series. The convention of a vector of length 3 follows the
+ARIMA model. If a single positive integer is provided, for "ar" and "var"
+family, the model is specified as AR(p) or VAR(p) respectively and for
+"arima" model, the model is specified as MA(q). If a vector of length 3 is
+provided, the model is specified as ARIMA(p, d, q). AR(p) model can also
+be specified as ARIMA(p, 0, 0). "ar" family uses linear regression to fit
+the time series while "arima" family uses `forecast::Arima`.</p></dd>
 
 
 <dt>...</dt>
