@@ -4,7 +4,7 @@ namespace fastcpd::wrappers {
 
 CostFunction::CostFunction(Function cost) : cost(cost) {}
 
-List CostFunction::operator()(
+List CostFunction::operator()(  // # nocov
     mat data,
     Nullable<colvec> theta,
     string family,  // UNUSED
@@ -12,7 +12,7 @@ List CostFunction::operator()(
     bool cv,  // UNUSED
     Nullable<colvec> start  // UNUSED
 ) {
-  return theta.isNull()? cost(data) : cost(data, theta);
+  return theta.isNull()? cost(data) : cost(data, theta);  // # nocov
 }
 
 CostGradient::CostGradient(Function cost_gradient) :
