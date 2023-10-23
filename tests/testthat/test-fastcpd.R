@@ -1,4 +1,44 @@
 testthat::test_that(
+  "fastcpd.ts/fastcpd_ts", {
+    testthat::expect_error(
+      fastcpd.ts(),
+      r"[The family should be one of "ar", "var", "arima" or "garch".]"
+    )
+
+    testthat::expect_error(
+      fastcpd.ts(family = "at"),
+      r"[
+The family should be one of "ar", "var", "arima" or "garch",
+while the provided family is at.]"
+    )
+
+    testthat::expect_error(
+      fastcpd_ts(family = "ar", order = c(0)),
+      r"[The order should be specified as a vector of length 3.]"
+    )
+
+    testthat::expect_error(
+      fastcpd.ts(family = "ar", order = c(-1, 0, 0)),
+      r"[The order should be non-negative integers.]"
+    )
+
+    testthat::expect_error(
+      fastcpd_ts(family = "arima", order = 1.1),
+      r"[The order should be non-negative integers.]"
+    )
+
+    testthat::expect_error(
+      fastcpd_ts(
+        data = matrix(NA, 1, 2),
+        family = "ar",
+        order = 1
+      ),
+      "The data should be a univariate time series."
+    )
+  }
+)
+
+testthat::test_that(
   "invalid family provided", {
     testthat::expect_error(
       fastcpd(
@@ -37,42 +77,64 @@ testthat::test_that(
 )
 
 testthat::test_that(
-  "invalid family provided for time series data", {
-    testthat::expect_error(
-      fastcpd.ts(
-        data = seq_len(10),
-        family = "at",
-        order = 1
-      ),
-      r"[
-The family should be one of "ar", "var", "arima" or "garch",
-while the provided family is at.]"
-    )
-  }
-)
-
-testthat::test_that(
-  "invalid data provided for ar(1) model", {
-    testthat::expect_error(
-      fastcpd_ts(
-        data = matrix(NA, 1, 2),
-        family = "ar",
-        order = 1
-      ),
-      "The data should be a univariate time series."
-    )
-  }
-)
-
-testthat::test_that(
   "invalid order for ar family", {
     testthat::expect_error(
       fastcpd(
         formula = ~ x - 1,
         data = data.frame(x = 0),
-        family = "ar",
+        family = "ar"
       ),
       "Please specify a positive integer as the `order` of the AR model."
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "ar",
+        order = -0.1
+      ),
+      "Please specify a positive integer as the `order` of the AR model."
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "var",
+        order = -0.1
+      ),
+      "Please specify a positive integer as the `order` of the VAR model."
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "arima",
+        order = c(1, 0)
+      ),
+      r"[The order should be specified as a vector of length 3.]"
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "arima",
+        order = c(0, 0, 0)
+      ),
+      r"[The order should be specified as a vector of length 3.]"
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "arima",
+        order = c(-0.1, 0, 0)
+      ),
+      r"[The order should be non-negative integers.]"
     )
   }
 )

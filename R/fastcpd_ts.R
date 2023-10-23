@@ -29,26 +29,26 @@ fastcpd.ts <- function(  # nolint: Conventional R function style
   order = c(0, 0, 0),
   ...
 ) {
-  family <- tolower(family)
-
   allowed_family <- c("ar", "var", "arima", "garch")
 
   # TODO(doccstat): Verify the documentation of `fastcpd` and `fastcpd_ts`.
   if (is.null(family)) {
-    stop(r"[The family should be one of "ar", "var","arima" or "garch".]")
+    stop(r"[The family should be one of "ar", "var", "arima" or "garch".]")
   }
-  if (all(order == 0)) {
-    stop(r"[The order should be specified as a vector of length 3.]")
-  }
-  if (any(order < 0) || any(order != floor(order))) {
-    stop(r"[The order should be non-negative integers.]")
-  }
+  family <- tolower(family)
 
   if (!(family %in% allowed_family)) {
     error_message <- r"[
 The family should be one of "ar", "var", "arima" or "garch",
 while the provided family is {family}.]"
     stop(gsub("{family}", family, error_message, fixed = TRUE))
+  }
+
+  if (all(order == 0)) {
+    stop(r"[The order should be specified as a vector of length 3.]")
+  }
+  if (any(order < 0) || any(order != floor(order))) {
+    stop(r"[The order should be non-negative integers.]")
   }
 
   fastcpd(
