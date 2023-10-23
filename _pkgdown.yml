@@ -1,4 +1,12 @@
 url: https://fastcpd.xingchi.li
+
+navbar:
+  components:
+    home: ~
+    intro:
+      text: Gallery
+      href: articles/gallery.html
+
 template:
   bootstrap: 5
   bslib:

@@ -3,11 +3,12 @@
 #' @description `fastcpd_ts` is a wrapper function for `fastcpd` to find
 #'   change points in time series data. The function is similar to `fastcpd`
 #'   except that the data is a time series data and the family is one of
-#'   \code{"ar"} or \code{"var"}.
+#'   \code{"ar"}, \code{"var"}, \code{"arima"} or \code{"garch"}.
 #'
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param family A character string specifying the family of the time series.
-#'   The value should be one of \code{"ar"} or \code{"var"}.
+#'   The value should be one of \code{"ar"}, \code{"var"}, \code{"arima"} or
+#'   \code{"garch"}.
 #' @param order A vector of length 3 or a positive integer specifying the order
 #'   of the time series. The convention of a vector of length 3 follows the
 #'   ARIMA model. If a single positive integer is provided, for "ar" and "var"
@@ -30,10 +31,11 @@ fastcpd.ts <- function(  # nolint: Conventional R function style
 ) {
   family <- tolower(family)
 
-  allowed_family <- c("ar", "var", "arima")
+  allowed_family <- c("ar", "var", "arima", "garch")
 
+  # TODO(doccstat): Verify the documentation of `fastcpd` and `fastcpd_ts`.
   if (is.null(family)) {
-    stop(r"[The family should be one of "ar", "var" or "arima".]")
+    stop(r"[The family should be one of "ar", "var","arima" or "garch".]")
   }
   if (all(order == 0)) {
     stop(r"[The order should be specified as a vector of length 3.]")
@@ -44,7 +46,7 @@ fastcpd.ts <- function(  # nolint: Conventional R function style
 
   if (!(family %in% allowed_family)) {
     error_message <- r"[
-The family should be one of "ar", "var" or "arima",
+The family should be one of "ar", "var", "arima" or "garch",
 while the provided family is {family}.]"
     stop(gsub("{family}", family, error_message, fixed = TRUE))
   }

@@ -1,3 +1,10 @@
+# fastcpd 0.9.2
+
+*   Add gallery to vignettes.
+*   Remove cheatsheets pdf from the package.
+*   Use `forecast` package for ARIMA model.
+*   Use `fGarch` package for GARCH model.
+
 # fastcpd 0.9.1
 
 *   Wrap `&&` around `||` by parentheses.

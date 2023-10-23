@@ -10,3 +10,4 @@
 ^pkgdown$
 ^.lintr$
 ^\.covrignore$
+^man/figures/cheatsheets\.pdf$

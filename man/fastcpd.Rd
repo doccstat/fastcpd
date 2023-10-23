@@ -24,7 +24,8 @@ fastcpd(
   cost_hessian = NULL,
   cp_only = FALSE,
   vanilla_percentage = 0,
-  warm_start = FALSE
+  warm_start = FALSE,
+  ...
 )
 }
 \arguments{
@@ -192,6 +193,10 @@ processed through sequential gradient descent.}
 parameters from the previous segment as the initial value for the
 current segment. This parameter is only used for family \code{"gaussian"},
 \code{"binomial"} and \code{"poisson"}.}
+
+\item{...}{Parameters specifically used for time series models. As of the
+current implementation, only \code{include.mean} will not be ignored and used
+in the ARIMA or GARCH model.}
 }
 \value{
 A class \code{fastcpd} object.
@@ -200,6 +205,11 @@ A class \code{fastcpd} object.
 \code{fastcpd} takes in formulas, data, families and extra
 parameters and returns a \code{fastcpd} object.
 }
+\section{Gallery}{
+
+\url{https://fastcpd.xingchi.li/articles/gallery.html}
+}
+
 \section{References}{
 
 Zhang X, Dawn T (2023). ``Sequential Gradient Descent and Quasi-Newton's

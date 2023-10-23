@@ -78,6 +78,7 @@ List fastcpd_impl(
       }
       mat data_segment = data.rows(tau, t - 1);
       if (t > vanilla_percentage * n) {
+        // fastcpd
         List cost_update_result = cost_update(
           data.rows(0, t - 1),
           fastcpd_parameters_class.get_theta_hat(),
@@ -137,6 +138,7 @@ List fastcpd_impl(
           // t - tau < p or for lasso t - tau < 3
         }
       } else {
+        // vanilla PELT
         List cost_optim_result;
         if (contain(CUSTOM_FAMILIES, family)) {
           cost_optim_result = cost_optim(
@@ -157,6 +159,9 @@ List fastcpd_impl(
           }
         }
         cval(i - 1) = as<double>(cost_optim_result["value"]);
+
+        // If `vanilla_percentage` is not 1, then we need to keep track of
+        // thetas for later `fastcpd` steps.
         if (vanilla_percentage < 1 && t <= vanilla_percentage * n) {
           fastcpd_parameters_class.update_theta_hat(
             i - 1, as<colvec>(cost_optim_result["par"])
