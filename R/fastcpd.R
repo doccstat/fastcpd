@@ -497,6 +497,8 @@
 #' }
 #'
 #' @md
+#' @section Gallery:
+#'   <https://fastcpd.xingchi.li/articles/gallery.html>
 #' @section References:
 #'   Zhang X, Dawn T (2023). ``Sequential Gradient Descent and Quasi-Newton's
 #'   Method for Change-Point Analysis.'' In Ruiz, Francisco, Dy, Jennifer,
@@ -647,6 +649,9 @@
 #'   parameters from the previous segment as the initial value for the
 #'   current segment. This parameter is only used for family \code{"gaussian"},
 #'   \code{"binomial"} and \code{"poisson"}.
+#' @param ... Parameters specifically used for time series models. As of the
+#'   current implementation, only `include.mean` will not be ignored and used
+#'   in the ARIMA or GARCH model.
 #'
 #' @return A class \code{fastcpd} object.
 #'
@@ -674,7 +679,8 @@ fastcpd <- function(
   cost_hessian = NULL,
   cp_only = FALSE,
   vanilla_percentage = 0,
-  warm_start = FALSE
+  warm_start = FALSE,
+  ...
 ) {
   if (!is.null(family)) {
     family <- tolower(family)
@@ -696,7 +702,8 @@ fastcpd <- function(
   # `vanilla` is used to distinguish the cost function parameters in the
   # implementation.
   allowed_family <- c(
-    "gaussian", "binomial", "poisson", "lasso", "custom", "ar", "var", "arima"
+    "gaussian", "binomial", "poisson", "lasso", "custom",
+    "ar", "var", "arima", "garch"
   )
 
   fastcpd_family <- NULL
@@ -705,8 +712,9 @@ fastcpd <- function(
   # If `family` is provided and not in the allowed family list, throw an error.
   if (!(is.null(family) || family %in% allowed_family)) {
     error_message <- r"[
-The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
-"var", "arima", "custom" or `NULL` while the provided family is {family}.]"
+The family should be one of
+"gaussian", "binomial", "poisson", "lasso", "ar", "var", "arima", "garch",
+"custom" or `NULL`, while the provided family is {family}.]"
     stop(gsub("{family}", family, error_message, fixed = TRUE))
   }
 
@@ -787,15 +795,45 @@ The family should be one of "gaussian", "binomial", "poisson", "lasso", "ar",
     if (any(order < 0) || any(order != floor(order))) {
       stop(r"[The order should be non-negative integers.]")
     }
+
+    # By default in time series models, `include.mean` is set to be `TRUE`.
+    include_mean <- TRUE
+    if (methods::hasArg("include.mean")) {
+      include_mean <- eval.parent(match.call()[["include.mean"]])
+    }
     cost <- function(data) {
       tryCatch(
         expr = -forecast::Arima(
-          c(data), order = order, method = "ML"
+          c(data), order = order, method = "ML", include.mean = include_mean
         )$loglik,
         error = function(e) 0
       )
     }
     p <- sum(order[-2])
+  } else if (family == "garch") {
+    # TODO(doccstat): Add parameter check.
+    fastcpd_family <- "vanilla"
+    vanilla_percentage <- 1
+
+    # By default in time series models, `include.mean` is set to be `TRUE`.
+    include_mean <- TRUE
+    if (methods::hasArg("include.mean")) {
+      include_mean <- eval.parent(match.call()[["include.mean"]])
+    }
+    garch_formula <-
+      stats::as.formula(paste0("~ garch(", order[1], ",", order[2], ")"))
+    cost <- function(data) {
+      tryCatch(
+        expr = fGarch::garchFit(
+          formula = garch_formula,
+          data = data,
+          include.mean = include_mean,
+          trace = FALSE
+        )@fit$value,
+        error = function(e) 0
+      )
+    }
+    p <- 1 + sum(order)
   }
 
   if (is.null(fastcpd_family)) {
