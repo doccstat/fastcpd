@@ -11,13 +11,14 @@ Authors@R: c(
 Description: Implements fast change point detection algorithm based on the
     paper "Sequential Gradient Descent and Quasi-Newton's Method for
     Change-Point Analysis" by Xianyang Zhang, Trisha Dawn
-    <https://proceedings.mlr.press/v206/zhang23b.html>. The algorithm
-    is based on dynamic programming with pruning and sequential gradient
+    <https://proceedings.mlr.press/v206/zhang23b.html>. The algorithm is
+    based on dynamic programming with pruning and sequential gradient
     descent. It is able to detect change points a magnitude faster than
-    the vanilla Pruned Exact Linear Time(PELT). The package includes examples
-    of linear regression, logistic regression, Poisson regression, penalized
-    linear regression data, and whole lot more examples with custom cost
-    function in case the user wants to use their own cost function.
+    the vanilla Pruned Exact Linear Time(PELT). The package includes
+    examples of linear regression, logistic regression, Poisson
+    regression, penalized linear regression data, and whole lot more
+    examples with custom cost function in case the user wants to use their
+    own cost function.
 License: GPL (>= 3)
 URL: https://fastcpd.xingchi.li, https://github.com/doccstat/fastcpd
 BugReports: https://github.com/doccstat/fastcpd/issues
@@ -45,6 +46,8 @@ LinkingTo:
     Rcpp,
     RcppArmadillo,
     testthat
+VignetteBuilder:
+    knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
 RoxygenNote: 7.2.3
