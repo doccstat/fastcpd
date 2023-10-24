@@ -67,6 +67,7 @@ List cost_update(
 //   and \code{hessian}.
 List cost_optim(
     const string family,
+    const double vanilla_percentage,
     const int p,
     const mat data_segment,
     Function cost,

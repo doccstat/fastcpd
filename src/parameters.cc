@@ -14,6 +14,7 @@ FastcpdParameters::FastcpdParameters(
     const double beta,
     const int p,
     const string family,
+    const double vanilla_percentage,
     const int segment_count,
     const double winsorise_minval,
     const double winsorise_maxval,
@@ -22,6 +23,7 @@ FastcpdParameters::FastcpdParameters(
     beta(beta),
     p(p),
     family(family),
+    vanilla_percentage(vanilla_percentage),
     segment_count(segment_count),
     winsorise_minval(winsorise_minval),
     winsorise_maxval(winsorise_maxval),
@@ -149,9 +151,9 @@ void FastcpdParameters::create_segment_statistics() {
     mat data_segment = data.rows(segment_indices_);
     rowvec segment_theta;
     if (contain(CUSTOM_FAMILIES, family)) {
-      segment_theta = as<rowvec>(
-        cost_optim(family, p, data_segment, cost.get(), 0, false)["par"]
-      );
+      segment_theta = as<rowvec>(cost_optim(
+        family, vanilla_percentage, p, data_segment, cost.get(), 0, false
+      )["par"]);
     } else {
       segment_theta = as<rowvec>(
         cost_function_wrapper(
@@ -271,7 +273,9 @@ void FastcpdParameters::wrap_cost(Nullable<Function> cost) {
   } else if (cost.isNull()) {
     stop("cost function must be specified for custom family");
   } else {
-    // This branch should not be reached.
+    // # nocov start
+    stop("This branch should not be reached at parameters.cc: 276.");
+    // # nocov end
   }
 }
 
@@ -285,7 +289,9 @@ void FastcpdParameters::wrap_cost_gradient(Nullable<Function> cost_gradient) {
   } else if (cost_gradient.isNull()) {
     // `cost_gradient` can be `NULL` in the case of vanilla PELT.
   } else {
-    // This branch should not be reached.
+    // # nocov start
+    stop("This branch should not be reached at parameters.cc: 290.");
+    // # nocov end
   }
 }
 
@@ -299,7 +305,9 @@ void FastcpdParameters::wrap_cost_hessian(Nullable<Function> cost_hessian) {
   } else if (cost_hessian.isNull()) {
     // `cost_hessian` can be `NULL` in the case of vanilla PELT.
   } else {
-    // This branch should not be reached.
+    // # nocov start
+    stop("This branch should not be reached at parameters.cc: 304.");
+    // # nocov end
   }
 }
 

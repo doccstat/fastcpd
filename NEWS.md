@@ -1,3 +1,8 @@
+# fastcpd 0.9.3
+
+*   Deprecate "vanilla" family by `vanilla_percentage` parameter.
+*   Add check utility functions.
+
 # fastcpd 0.9.2
 
 *   Add gallery to vignettes.

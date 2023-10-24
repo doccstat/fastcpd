@@ -2,29 +2,31 @@ testthat::test_that(
   "fastcpd.ts/fastcpd_ts", {
     testthat::expect_error(
       fastcpd.ts(),
-      r"[The family should be one of "ar", "var", "arima" or "garch".]"
+      r"[The family should be one of "ar", "var", "ma", "arima", "garch".]"
     )
 
     testthat::expect_error(
       fastcpd.ts(family = "at"),
-      r"[
-The family should be one of "ar", "var", "arima" or "garch",
-while the provided family is at.]"
+      r"[The family should be one of "ar", "var", "ma", "arima", "garch".
+The provided family is "at".]"
     )
 
     testthat::expect_error(
       fastcpd_ts(family = "ar", order = c(0)),
-      r"[The order should be specified as a vector of length 3.]"
+      "The order should be a positive integer for AR family."
     )
 
     testthat::expect_error(
       fastcpd.ts(family = "ar", order = c(-1, 0, 0)),
-      r"[The order should be non-negative integers.]"
+      paste0(
+        "The first element of the order should be a positive integer ",
+        "for AR family."
+      )
     )
 
     testthat::expect_error(
       fastcpd_ts(family = "arima", order = 1.1),
-      r"[The order should be non-negative integers.]"
+      "The order should be specified as a vector of length 3 for ARIMA family."
     )
 
     testthat::expect_error(
@@ -33,7 +35,7 @@ while the provided family is at.]"
         family = "ar",
         order = 1
       ),
-      "The data should be a univariate time series."
+      "Data should be a univariate time series."
     )
   }
 )
@@ -45,10 +47,11 @@ testthat::test_that(
         data = data.frame(y = 0, x = 0),
         family = "bin0mial"
       ),
-      r"[
-The family should be one of
-"gaussian", "binomial", "poisson", "lasso", "ar", "var", "arima", "garch",
-"custom" or `NULL`, while the provided family is bin0mial.]"
+      paste0(
+        "The family should be one of \"gaussian\", \"binomial\", ",
+        "\"poisson\", \"lasso\", \"ar\", \"var\", \"ma\", \"arima\", ",
+        "\"garch\", \"custom\".\nThe provided family is \"bin0mial\"."
+      )
     )
   }
 )
@@ -59,7 +62,7 @@ testthat::test_that(
       fastcpd(
         data = data.frame(y = 0, x = 0)
       ),
-      "cost function must be specified for custom family"
+      "Please specify the cost function."
     )
   }
 )
@@ -84,7 +87,10 @@ testthat::test_that(
         data = data.frame(x = 0),
         family = "ar"
       ),
-      "Please specify a positive integer as the `order` of the AR model."
+      paste0(
+        "The first element of the order should be a positive integer ",
+        "for AR family."
+      )
     )
 
     testthat::expect_error(
@@ -94,7 +100,7 @@ testthat::test_that(
         family = "ar",
         order = -0.1
       ),
-      "Please specify a positive integer as the `order` of the AR model."
+      "The order should be a positive integer for AR family."
     )
 
     testthat::expect_error(
@@ -104,7 +110,7 @@ testthat::test_that(
         family = "var",
         order = -0.1
       ),
-      "Please specify a positive integer as the `order` of the VAR model."
+      "The order should be a positive integer for VAR family."
     )
 
     testthat::expect_error(
@@ -114,7 +120,7 @@ testthat::test_that(
         family = "arima",
         order = c(1, 0)
       ),
-      r"[The order should be specified as a vector of length 3.]"
+      "The order should be specified as a vector of length 3."
     )
 
     testthat::expect_error(
@@ -124,7 +130,7 @@ testthat::test_that(
         family = "arima",
         order = c(0, 0, 0)
       ),
-      r"[The order should be specified as a vector of length 3.]"
+      "The order should have at least one non-zero element for ARIMA family."
     )
 
     testthat::expect_error(
@@ -134,7 +140,7 @@ testthat::test_that(
         family = "arima",
         order = c(-0.1, 0, 0)
       ),
-      r"[The order should be non-negative integers.]"
+      "The order should be positive integers for ARIMA family."
     )
   }
 )

@@ -18,13 +18,13 @@ testthat::test_that(
       cp_only = FALSE
     )
 
-    testthat::expect_message(
+    testthat::expect_error(
       mockthat::with_mock(
         `require_namespace` = function(...) FALSE,
         `utils_menu` = function(...) 2,
         plot(class_instance)
       ),
-      "ggplot2 is not installed. No plot is made.\n"
+      "ggplot2 is not installed. No plot is made."
     )
 
     testthat::expect_no_error(
