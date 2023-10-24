@@ -139,6 +139,7 @@ List cost_update(
 
 List cost_optim(
     const string family,
+    const double vanilla_percentage,
     const int p,
     const mat data_segment,
     Function cost,
@@ -146,7 +147,7 @@ List cost_optim(
     const bool cv
 ) {
   List cost_optim_result;
-  if (family == "vanilla") {
+  if (vanilla_percentage == 1) {
     cost_optim_result = List::create(
       Named("par") = R_NilValue,
       Named("value") = cost(data_segment),
@@ -194,7 +195,9 @@ List cost_optim(
       Named("residuals") = R_NilValue
     );
   } else {
-    // This branch should not be reached.
+    // # nocov start
+    stop("This branch should not be reached at cost_update.cc: 198.");
+    // # nocov end
   }
   return cost_optim_result;
 }

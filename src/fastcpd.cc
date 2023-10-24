@@ -46,7 +46,7 @@ List fastcpd_impl(
   f_t(0) = -beta;
 
   fastcpd::parameters::FastcpdParameters fastcpd_parameters_class(
-    data, beta, p, family, segment_count,
+    data, beta, p, family, vanilla_percentage, segment_count,
     winsorise_minval, winsorise_maxval, epsilon
   );
 
@@ -142,7 +142,7 @@ List fastcpd_impl(
         List cost_optim_result;
         if (contain(CUSTOM_FAMILIES, family)) {
           cost_optim_result = cost_optim(
-            family, p, data_segment,
+            family, vanilla_percentage, p, data_segment,
             fastcpd_parameters_class.cost.get(), lambda, false
           );
         } else {
@@ -269,7 +269,7 @@ List fastcpd_impl(
     List cost_optim_result;
     if (contain(CUSTOM_FAMILIES, family)) {
       cost_optim_result = cost_optim(
-        family, p, data_segment,
+        family, vanilla_percentage, p, data_segment,
         fastcpd_parameters_class.cost.get(), lambda, false
       );
     } else {
@@ -280,7 +280,7 @@ List fastcpd_impl(
     cost_values(i) = as<double>(cost_optim_result["value"]);
 
     // Parameters are not involved for PELT.
-    if (family != "vanilla") {
+    if (vanilla_percentage < 1) {
       thetas.col(i) = as<colvec>(cost_optim_result["par"]);
     }
 

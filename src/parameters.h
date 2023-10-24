@@ -12,6 +12,7 @@ class FastcpdParameters {
     const double beta,
     const int p,
     const string family,
+    const double vanilla_percentage,
     const int segment_count,
     const double winsorise_minval,
     const double winsorise_maxval,
@@ -134,6 +135,8 @@ class FastcpdParameters {
 
   // `family` is the family of the model.
   const string family;
+
+  const double vanilla_percentage;
 
   // `segment_count` is the number of segments for initial guess.
   const int segment_count;

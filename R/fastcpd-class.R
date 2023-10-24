@@ -39,7 +39,9 @@ setClass(
 #' @export
 plot.fastcpd <- function(x, ...) {
   # Plot the built in families only.
-  stopifnot(x@family != "custom")
+  stopifnot(
+    "Built-in plot only works for built-in families." = x@family != "custom"
+  )
   if (!require_namespace("ggplot2")) {
     if (utils_menu() == 1) {
       tryCatch(
@@ -49,7 +51,7 @@ plot.fastcpd <- function(x, ...) {
         }
       )
     } else {
-      message("ggplot2 is not installed. No plot is made.")
+      stop("ggplot2 is not installed. No plot is made.")
     }
   }
   if (require_namespace("ggplot2")) {

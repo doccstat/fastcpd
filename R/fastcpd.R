@@ -659,7 +659,7 @@
 #' @importFrom Rcpp evalCpp
 #' @importFrom methods show
 #' @useDynLib fastcpd, .registration = TRUE
-fastcpd <- function(
+fastcpd <- function(  # nolint: cyclomatic complexity
   formula = y ~ . - 1,
   data,
   beta = NULL,
@@ -682,9 +682,22 @@ fastcpd <- function(
   warm_start = FALSE,
   ...
 ) {
-  if (!is.null(family)) {
-    family <- tolower(family)
-  }
+  family <- ifelse(is.null(family), "custom", tolower(family))
+
+  # Vanilla is not a `fastcpd` family and can not be set manually by the user.
+  # `vanilla` is used to distinguish the cost function parameters in the
+  # implementation.
+  stopifnot(
+    check_family(
+      family,
+      c(
+        "gaussian", "binomial", "poisson", "lasso",
+        "ar", "var", "ma", "arima", "garch", "custom"
+      )
+    )
+  )
+
+  stopifnot(check_cost(cost, cost_gradient, cost_hessian, family))
 
   # The following code is adapted from the `lm` function from base R.
   match_formula <- match.call(expand.dots = FALSE)
@@ -698,57 +711,24 @@ fastcpd <- function(
   x <- stats::model.matrix(mt, match_formula)
   data <- cbind(y, x)
 
-  # Vanilla is not a `fastcpd` family and can not be set manually by the user.
-  # `vanilla` is used to distinguish the cost function parameters in the
-  # implementation.
-  allowed_family <- c(
-    "gaussian", "binomial", "poisson", "lasso", "custom",
-    "ar", "var", "arima", "garch"
-  )
-
   fastcpd_family <- NULL
   fastcpd_data <- NULL
 
-  # If `family` is provided and not in the allowed family list, throw an error.
-  if (!(is.null(family) || family %in% allowed_family)) {
-    error_message <- r"[
-The family should be one of
-"gaussian", "binomial", "poisson", "lasso", "ar", "var", "arima", "garch",
-"custom" or `NULL`, while the provided family is {family}.]"
-    stop(gsub("{family}", family, error_message, fixed = TRUE))
-  }
-
-  # If the family is not provided, or a custom cost function is provided, the
-  # family will be set to be "custom". No need to check the gradient or
-  # Hessian since providing a custom gradient or Hessian requires a custom
-  # cost function.
-  if (is.null(family) || !is.null(cost)) {
-    family <- "custom"
-  }
-
-  # TODO(doccstat): Replace "vanilla" with `vanilla_percentage == 1`.
-
   # If a cost function provided has an explicit solution, i.e. does not depend
-  # on the parameters, e.g., mean change, then the `family` is set to be
-  # `"vanilla"` and the percentage of vanilla PELT is set to be 1.
+  # on the parameters, e.g., mean change, then the percentage of vanilla PELT
+  # is set to be 1.
   if (!is.null(cost) && length(formals(cost)) == 1) {
     family <- "custom"
-    fastcpd_family <- "vanilla"
     vanilla_percentage <- 1
   }
 
   # Pre-process the data for the time series models.
   if (family == "ar") {
     # Check the validity of the parameters for AR(p) model.
-    if (ncol(data) != 1) {
-      stop("The data should be a univariate time series.")
-    }
-    if (length(order) == 1 && !(order > 0 && order == floor(order))) {
-      stop("Please specify a positive integer as the `order` of the AR model.")
-    }
-    if (length(order) != 1) {
-      stop("Please specify a positive integer as the `order` of the AR model.")
-    }
+    stopifnot("Data should be a univariate time series." = ncol(data) == 1)
+    stopifnot(check_ar_order(order))
+
+    # Preprocess the data for AR(p) model to be used in linear regression.
     p <- order
     fastcpd_family <- "gaussian"
     y <- data[p + seq_len(nrow(data) - p), ]
@@ -758,10 +738,10 @@ The family should be one of
     }
     fastcpd_data <- cbind(y, x)
   } else if (family == "var") {
-    if (!(length(order) == 1 && order > 0 && order == floor(order))) {
-      stop("Please specify a positive integer as the `order` of the VAR model.")
-    }
-    fastcpd_family <- "vanilla"
+    stopifnot(check_var_order(order))
+    fastcpd_family <- "custom"
+
+    # Preprocess the data for VAR(p) model to be used in linear regression.
     vanilla_percentage <- 1
     y <- data[p + seq_len(nrow(data) - p), ]
     x <- matrix(NA, nrow(data) - p, p * ncol(data))
@@ -783,18 +763,35 @@ The family should be one of
       # TODO(doccstat): Verify the correctness of the cost function for VAR(p).
       norm(y - x %*% solve(x_t_x, t(x)) %*% y, type = "F")^2 / 2
     }
-  } else if (family == "arima") {
-    if (length(order) != 3) {
-      stop(r"[The order should be specified as a vector of length 3.]")
-    }
-    fastcpd_family <- "vanilla"
+  } else if (family == "ma") {
+    stopifnot("Data should be a univariate time series." = ncol(data) == 1)
+    stopifnot(check_ma_order(order))
+    fastcpd_family <- "custom"
     vanilla_percentage <- 1
-    if (all(order == 0)) {
-      stop(r"[The order should be specified as a vector of length 3.]")
+
+    if (length(order) == 1) {
+      order <- c(0, 0, order)
     }
-    if (any(order < 0) || any(order != floor(order))) {
-      stop(r"[The order should be non-negative integers.]")
+
+    # By default in time series models, `include.mean` is set to be `TRUE`.
+    include_mean <- TRUE
+    if (methods::hasArg("include.mean")) {
+      include_mean <- eval.parent(match.call()[["include.mean"]])
     }
+    cost <- function(data) {
+      tryCatch(
+        expr = -forecast::Arima(
+          c(data), order = order, method = "ML", include.mean = include_mean
+        )$loglik,
+        error = function(e) 0
+      )
+    }
+    p <- sum(order)
+  } else if (family == "arima") {
+    stopifnot("Data should be a univariate time series." = ncol(data) == 1)
+    stopifnot(check_arima_order(order))
+    fastcpd_family <- "custom"
+    vanilla_percentage <- 1
 
     # By default in time series models, `include.mean` is set to be `TRUE`.
     include_mean <- TRUE
@@ -811,8 +808,9 @@ The family should be one of
     }
     p <- sum(order[-2])
   } else if (family == "garch") {
-    # TODO(doccstat): Add parameter check.
-    fastcpd_family <- "vanilla"
+    stopifnot("Data should be a univariate time series." = ncol(data) == 1)
+    stopifnot(check_garch_order(order))
+    fastcpd_family <- "custom"
     vanilla_percentage <- 1
 
     # By default in time series models, `include.mean` is set to be `TRUE`.
@@ -904,7 +902,7 @@ The family should be one of
     cp_set <- cp_set + p
   }
 
-  if (fastcpd_family == "vanilla") {
+  if (vanilla_percentage == 1) {
     thetas <- data.frame(matrix(NA, 0, 0))
   } else {
     thetas <- data.frame(result$thetas)
