@@ -3,6 +3,7 @@
 *   Deprecate "vanilla" family by `vanilla_percentage` parameter.
 *   Add check utility functions.
 *   Add MA(4) example.
+*   Fix the bug when `beta` is updated but the old `beta` is still in use.
 
 # fastcpd 0.9.2
 
