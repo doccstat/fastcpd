@@ -435,6 +435,16 @@ testthat::test_that(
     )
 
     testthat::expect_equal(result@cp_set, 200)
+
+    result_ma <- fastcpd.ts(
+      time_series,
+      "ma",
+      4,
+      include.mean = FALSE,
+      trim = 0
+    )
+
+    testthat::expect_equal(result_ma@cp_set, 200)
   }
 )
 

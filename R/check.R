@@ -16,7 +16,6 @@ check_family <- function(family, allowed_families) {
 check_order <- function(order, family) {
   if (is.null(order)) {
     stop("Please refer to the documentation for the order of the model.")
-    return(FALSE)
   }
   switch(family,
     ar = check_ar_order(order),

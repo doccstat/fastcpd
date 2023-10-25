@@ -267,15 +267,9 @@ void FastcpdParameters::wrap_cost(Nullable<Function> cost) {
   this->cost = cost;
   if (contain(FASTCPD_FAMILIES, family)) {
     cost_function_wrapper = &fastcpd::functions::negative_log_likelihood;
-  } else if (cost.isNotNull()) {
+  } else {
     fastcpd::wrappers::CostFunction costFunction(cost.get());
     cost_function_wrapper = costFunction;
-  } else if (cost.isNull()) {
-    stop("cost function must be specified for custom family");
-  } else {
-    // # nocov start
-    stop("This branch should not be reached at parameters.cc: 276.");
-    // # nocov end
   }
 }
 
