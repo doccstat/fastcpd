@@ -181,7 +181,7 @@ List fastcpd_impl(
     cval(r_t_count - 1) = 0;
 
     // `beta` adjustment seems to work but there might be better choices.
-    colvec obj = cval + f_t.rows(r_t_set) + beta;
+    colvec obj = cval + f_t.rows(r_t_set) + fastcpd_parameters_class.get_beta();
     double min_obj = min(obj);
     double tau_star = r_t_set(index_min(obj));
 

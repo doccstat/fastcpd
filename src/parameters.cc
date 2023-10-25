@@ -176,9 +176,13 @@ void FastcpdParameters::create_segment_statistics() {
 }
 
 void FastcpdParameters::update_beta() {
-  if (family == "lasso" || family == "gaussian") {
+  if (family == "lasso") {
     beta = beta * (1 + mean(act_num));
   }
+}
+
+double FastcpdParameters::get_beta() {
+  return beta;
 }
 
 colvec FastcpdParameters::get_momentum() {

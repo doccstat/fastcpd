@@ -239,7 +239,7 @@ testthat::test_that(
     testthat::expect_equal(result@cp_set, c(300, 700, 1000))
     testthat::expect_equal(
       unname(sqrt(colSums((t(theta_0[, 1:6]) - result@thetas[1:6, ])^2))),
-      c(0.5801021, 0.5439067, 0.4677495, 0.4898553),
+      c(0.6156176, 0.5728400, 0.4978282, 0.5112985),
       tolerance = 1e-7,
       ignore_attr = TRUE
     )
@@ -273,7 +273,7 @@ testthat::test_that(
       family = "lasso"
     )
 
-    testthat::expect_equal(result@cp_set, c(79, 201, 325))
+    testthat::expect_equal(result@cp_set, c(79, 202, 325))
 
     result_multiple_epochs <- fastcpd(
       formula = y ~ . - 1,
@@ -291,7 +291,7 @@ testthat::test_that(
       vanilla_percentage = 0.2
     )
 
-    testthat::expect_equal(result_vanilla_percentage@cp_set, c(79, 201, 321))
+    testthat::expect_equal(result_vanilla_percentage@cp_set, c(80, 202, 321))
   }
 )
 

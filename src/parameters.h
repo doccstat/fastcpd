@@ -74,6 +74,8 @@ class FastcpdParameters {
   // but there might be better choices.
   void update_beta();
 
+  double get_beta();
+
   // Get the value of \code{momentum}.
   colvec get_momentum();
 
