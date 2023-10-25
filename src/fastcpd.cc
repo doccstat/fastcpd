@@ -57,7 +57,6 @@ List fastcpd_impl(
   if (vanilla_percentage != 1) {
     fastcpd_parameters_class.create_segment_indices();
     fastcpd_parameters_class.create_segment_statistics();
-    fastcpd_parameters_class.update_beta();
     fastcpd_parameters_class.create_gradients();
   }
 

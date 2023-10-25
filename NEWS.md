@@ -4,6 +4,8 @@
 *   Add check utility functions.
 *   Add MA(4) example.
 *   Fix the bug when `beta` is updated but the old `beta` is still in use.
+*   Remove tests estimating the variance in the "gaussian" family dynamically.
+*   Merge `beta` updating into `get_segment_statistics`.
 
 # fastcpd 0.9.2
 

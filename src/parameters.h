@@ -70,10 +70,6 @@ class FastcpdParameters {
   // Initialize theta_hat_t_t to be the estimate in the segment.
   void create_segment_statistics();
 
-  // Adjust `beta` for Lasso and Gaussian families. This seems to be working
-  // but there might be better choices.
-  void update_beta();
-
   double get_beta();
 
   // Get the value of \code{momentum}.
