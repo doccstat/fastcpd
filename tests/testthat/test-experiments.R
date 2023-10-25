@@ -633,7 +633,6 @@ segd_binomial <- function(data, beta, B = 10, trim = 0.025) {
 }
 
 testthat::test_that("logistic regression", {
-  testthat::skip("This test is intended to be run manually.")
   # This is the same example with `fastcpd` documentation. Please keep it in
   # sync if the documentation ever changes.
   set.seed(1)
@@ -686,6 +685,8 @@ testthat::test_that("logistic regression", {
     change_points_binomial_fastcpd,
     change_points_binomial_fastcpd_sanity
   )
+
+  testthat::skip("This test is intended to be run manually.")
 
   warning_messages <- testthat::capture_warnings(
     change_points_binomial_fastcpd_vanilla <- fastcpd::fastcpd(
@@ -971,7 +972,6 @@ data_gen_poisson <- function(n, d, true.coef, true.cp.loc, Sigma) {
 }
 
 testthat::test_that("poisson regression", {
-  testthat::skip("This test is intended to be run manually.")
   set.seed(1)
   n <- 1500
   d <- 5
@@ -1005,8 +1005,21 @@ testthat::test_that("poisson regression", {
     family = "poisson",
     segment_count = 10
   )@cp_set
+
   change_points_poisson_fastcpd_sanity <-
     segd_poisson(data, beta, trim = 0.03, B = 10, epsilon = 0.001, G = 10^10, L = -20, H = 20)$cp
+
+  testthat::expect_equal(
+    change_points_poisson_fastcpd,
+    c(380, 751, 1136, 1251)
+  )
+
+  testthat::expect_equal(
+    change_points_poisson_fastcpd,
+    change_points_poisson_fastcpd_sanity
+  )
+
+  testthat::skip("This test is intended to be run manually.")
 
   warning_messages <- testthat::capture_warnings(
     change_points_poisson_fastcpd_vanilla <- fastcpd::fastcpd(
@@ -1024,16 +1037,6 @@ testthat::test_that("poisson regression", {
 
   change_points_poisson_fastcpd_vanilla_sanity <-
     pelt_vanilla_poisson(data, beta)$cp
-
-  testthat::expect_equal(
-    change_points_poisson_fastcpd,
-    c(380, 751, 1136, 1251)
-  )
-
-  testthat::expect_equal(
-    change_points_poisson_fastcpd,
-    change_points_poisson_fastcpd_sanity
-  )
 
   testthat::expect_equal(
     change_points_poisson_fastcpd_vanilla,
@@ -1340,7 +1343,6 @@ data_gen_lasso <- function(n, d, true.coef, true.cp.loc, Sigma, evar) {
 }
 
 testthat::test_that("penalized linear regression", {
-  testthat::skip("This test is intended to be run manually.")
   set.seed(1)
   n <- 1000
   s <- 3
@@ -1358,37 +1360,39 @@ testthat::test_that("penalized linear regression", {
   change_points_lasso_fastcpd <- fastcpd::fastcpd(
     formula = y ~ . - 1,
     data = data.frame(y = data[, d + 1], x = data[, 1:d]),
-    family = "lasso"
+    family = "lasso",
+    epsilon = 1e-5,
+    beta = beta
   )@cp_set
 
   change_points_lasso_fastcpd_sanity <- segd_lasso(data, beta, B = 10, trim = 0.025)$cp
 
-  # TODO(doccstat): Deal with the bugs.
-  # change_points_lasso_fastcpd_vanilla <- fastcpd::fastcpd(
-  #   formula = y ~ . - 1,
-  #   data = data.frame(y = data[, d + 1], x = data[, 1:d]),
-  #   family = "lasso",
-  #   vanilla_percentage = 1
-  # )@cp_set
-
-  change_points_lasso_fastcpd_vanilla_sanity <- pelt_vanilla_lasso(data, beta, cost = cost_lasso)$cp
-
-
+  # TODO(doccstat): Check why the results are different.
   testthat::expect_equal(
     change_points_lasso_fastcpd,
-    c(315, 798)
+    c(100, 300, 376, 458, 522, 800, 901, 965)
   )
 
-  # TODO(doccstat): Check why the results are different.
   testthat::expect_equal(
     change_points_lasso_fastcpd_sanity,
     c(100, 300, 520, 800, 901)
   )
 
-  # testthat::expect_equal(
-  #   change_points_lasso_fastcpd_vanilla,
-  #   c(374, 752, 1133)
-  # )
+  testthat::skip("This test is intended to be run manually.")
+
+  change_points_lasso_fastcpd_vanilla <- fastcpd::fastcpd(
+    formula = y ~ . - 1,
+    data = data.frame(y = data[, d + 1], x = data[, 1:d]),
+    family = "lasso",
+    vanilla_percentage = 1
+  )@cp_set
+
+  change_points_lasso_fastcpd_vanilla_sanity <- pelt_vanilla_lasso(data, beta, cost = cost_lasso)$cp
+
+  testthat::expect_equal(
+    change_points_lasso_fastcpd_vanilla,
+    c(374, 752, 1133)
+  )
 
   testthat::expect_equal(
     c(0, 103, 299, 510, 800, 900),
