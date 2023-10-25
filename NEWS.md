@@ -2,6 +2,7 @@
 
 *   Deprecate "vanilla" family by `vanilla_percentage` parameter.
 *   Add check utility functions.
+*   Add MA(4) example.
 
 # fastcpd 0.9.2
 
