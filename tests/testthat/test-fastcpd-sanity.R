@@ -996,7 +996,7 @@ testthat::test_that("penalized linear regression", {
   )
 
   testthat::expect_equal(
-    c(0, 103, 299, 510, 800, 900),
+    c(0, change_points_lasso_fastcpd_vanilla),
     change_points_lasso_fastcpd_vanilla_sanity
   )
 })
