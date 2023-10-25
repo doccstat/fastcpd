@@ -173,9 +173,6 @@ void FastcpdParameters::create_segment_statistics() {
         act_num(segment_index) = accu(arma::abs(segment_theta) > 0);
     }
   }
-}
-
-void FastcpdParameters::update_beta() {
   if (family == "lasso") {
     beta = beta * (1 + mean(act_num));
   }
