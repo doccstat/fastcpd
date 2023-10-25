@@ -315,6 +315,29 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "ar(1) model with `forecast::Arima` calculation of ML", {
+    testthat::skip_if_not_installed("forecast")
+    set.seed(1)
+    n <- 400
+    p <- 1
+    time_series <- rep(0, n + 1)
+    for (i in 1:200) {
+      time_series[i + 1] <- 0.6 * time_series[i] + rnorm(1)
+    }
+    for (i in 201:400) {
+      time_series[i + 1] <- 0.3 * time_series[i] + rnorm(1)
+    }
+
+    result_ts <- fastcpd.ts(
+      time_series[-1], "arima", c(1, 0, 0),
+      include.mean = FALSE, beta = 3 * log(n) / 2
+    )
+    testthat::expect_equal(result_ts@cp_set, 178)
+  }
+)
+
+
+testthat::test_that(
   "ar(1) model using custom cost function", {
     set.seed(1)
     n <- 1000

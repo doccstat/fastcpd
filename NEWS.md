@@ -1,6 +1,7 @@
 # fastcpd 0.9.4
 
 *   Fix sanity check.
+*   Add small AR(1) data in gallery.
 
 # fastcpd 0.9.3
 
