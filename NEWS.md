@@ -1,3 +1,7 @@
+# fastcpd 0.9.4
+
+*   Fix sanity check.
+
 # fastcpd 0.9.3
 
 *   Deprecate "vanilla" family by `vanilla_percentage` parameter.
