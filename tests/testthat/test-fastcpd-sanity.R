@@ -977,8 +977,6 @@ testthat::test_that("penalized linear regression", {
     change_points_lasso_fastcpd_sanity
   )
 
-  testthat::skip("TODO(doccstat): Fix `change_points_lasso_fastcpd_vanilla`.")
-
   change_points_lasso_fastcpd_vanilla <- fastcpd::fastcpd(
     formula = y ~ . - 1,
     data = data.frame(y = data[, d + 1], x = data[, 1:d]),

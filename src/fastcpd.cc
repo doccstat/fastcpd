@@ -54,9 +54,12 @@ List fastcpd_impl(
   fastcpd_parameters_class.wrap_cost_gradient(cost_gradient);
   fastcpd_parameters_class.wrap_cost_hessian(cost_hessian);
 
-  if (vanilla_percentage != 1) {
+  if (contain(FASTCPD_FAMILIES, family) || vanilla_percentage < 1) {
     fastcpd_parameters_class.create_segment_indices();
     fastcpd_parameters_class.create_segment_statistics();
+  }
+
+  if (vanilla_percentage < 1) {
     fastcpd_parameters_class.create_gradients();
   }
 
