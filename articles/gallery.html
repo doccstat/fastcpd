@@ -530,7 +530,17 @@
 <span>  trim <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span><span class="va">result</span><span class="op">@</span><span class="va">cp_set</span>, <span class="fl">200</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span><span class="va">result</span><span class="op">@</span><span class="va">cp_set</span>, <span class="fl">200</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">result_ma</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_ts.html">fastcpd.ts</a></span><span class="op">(</span></span>
+<span>  <span class="va">time_series</span>,</span>
+<span>  <span class="st">"ma"</span>,</span>
+<span>  <span class="fl">4</span>,</span>
+<span>  include.mean <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  trim <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span><span class="va">result_ma</span><span class="op">@</span><span class="va">cp_set</span>, <span class="fl">200</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
