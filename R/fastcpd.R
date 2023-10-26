@@ -743,19 +743,20 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
     # Preprocess the data for VAR(p) model to be used in linear regression.
     vanilla_percentage <- 1
-    y <- data[p + seq_len(nrow(data) - p), ]
-    x <- matrix(NA, nrow(data) - p, p * ncol(data))
-    for (p_i in seq_len(p)) {
+    y <- data[order + seq_len(nrow(data) - order), ]
+    x <- matrix(NA, nrow(data) - order, order * ncol(data))
+    for (p_i in seq_len(order)) {
       x[, (p_i - 1) * ncol(data) + seq_len(ncol(data))] <-
-        data[(p - p_i) + seq_len(nrow(data) - p), ]
+        data[(order - p_i) + seq_len(nrow(data) - order), ]
     }
     fastcpd_data <- cbind(y, x)
+    lm_x_col <- order * ncol(data)
     cost <- function(data) {
-      x <- data[, (ncol(data) - p + 1):ncol(data)]
-      y <- data[, 1:(ncol(data) - p)]
+      x <- data[, (ncol(data) - lm_x_col + 1):ncol(data)]
+      y <- data[, 1:(ncol(data) - lm_x_col)]
 
-      if (nrow(data) <= p + 1) {
-        x_t_x <- diag(p)
+      if (nrow(data) <= lm_x_col + 1) {
+        x_t_x <- diag(lm_x_col)
       } else {
         x_t_x <- crossprod(x)
       }
@@ -763,6 +764,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       # TODO(doccstat): Verify the correctness of the cost function for VAR(p).
       norm(y - x %*% solve(x_t_x, t(x)) %*% y, type = "F")^2 / 2
     }
+    p <- order^2 * ncol(data)
   } else if (family == "ma") {
     stopifnot("Data should be a univariate time series." = ncol(data) == 1)
     stopifnot(check_ma_order(order))
@@ -898,8 +900,8 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   cp_set <- c(result$cp_set)
 
-  if (family %in% c("ar", "var")) {
-    cp_set <- cp_set + p
+  if (family %in% c("ar", "var") && length(order) == 1) {
+    cp_set <- cp_set + order
   }
 
   if (vanilla_percentage == 1) {
