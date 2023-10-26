@@ -2,6 +2,7 @@
 
 *   Fix sanity check.
 *   Add small AR(1) data in gallery.
+*   Fix VAR(p) model bug.
 
 # fastcpd 0.9.3
 
