@@ -210,7 +210,7 @@ Click to fold
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
 <span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
 <span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"gaussian"</span></span>
+<span>  family <span class="op">=</span> <span class="st">"lm"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-linear_regression-1.png"><!-- --></p>
@@ -219,7 +219,7 @@ Click to fold
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x), </span></span>
-<span><span class="co">#&gt;     family = "gaussian")</span></span>
+<span><span class="co">#&gt;     family = "lm")</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
 <span><span class="co">#&gt; 98 202 </span></span>
@@ -250,7 +250,7 @@ Click to fold
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
 <span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
 <span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"gaussian"</span></span>
+<span>  family <span class="op">=</span> <span class="st">"lm"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-linear_regression_with_one_dimensional_covariate-1.png"><!-- --></p>
@@ -259,7 +259,7 @@ Click to fold
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x), </span></span>
-<span><span class="co">#&gt;     family = "gaussian")</span></span>
+<span><span class="co">#&gt;     family = "lm")</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
 <span><span class="co">#&gt; 100 194 </span></span>
@@ -290,12 +290,12 @@ Click to fold
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"gaussian"</span></span>
+<span>  family <span class="op">=</span> <span class="st">"lm"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(data = data.frame(y = y, x = x), family = "gaussian")</span></span>
+<span><span class="co">#&gt; fastcpd(data = data.frame(y = y, x = x), family = "lm")</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
 <span><span class="co">#&gt; 100 201 </span></span>
