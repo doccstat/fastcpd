@@ -57,9 +57,10 @@ for (i in 1:200) {
 for (i in 201:400) {
   time_series[i + 1] <- 0.3 * time_series[i] + rnorm(1)
 }
-result_ts <- fastcpd.ts(
+result <- fastcpd.ts(
   time_series[-1], "arima", c(1, 0, 0),
   include.mean = FALSE, beta = 3 * log(n) / 2
 )
+summary(result)
 }
 }

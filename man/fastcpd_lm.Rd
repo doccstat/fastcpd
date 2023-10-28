@@ -38,5 +38,6 @@ y <- c(
   x[(cp[1] + 1):cp[2], ] \%*\% theta_0[2, ] + rnorm(cp[2] - cp[1], 0, sd = 3),
   x[(cp[2] + 1):n, ] \%*\% theta_0[3, ] + rnorm(n - cp[2], 0, sd = 3)
 )
-result_internal_variance <- fastcpd.lm(cbind(y, x))
+result <- fastcpd.lm(cbind(y, x))
+summary(result)
 }

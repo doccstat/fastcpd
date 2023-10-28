@@ -1,3 +1,63 @@
+#' @title Find change points efficiently in logistic regression models
+#'
+#' @description \code{"fastcpd_binomial"} and \code{"fastcpd.binomial"} are
+#'   wrapper functions of \code{\link{fastcpd}} to find change points in
+#'   logistic regression models. The function is similar to \code{"fastcpd"}
+#'   except that the data is by default a matrix or data frame with the response
+#'   variable as the first column and thus a formula is not required here.
+#'
+#' @example man/examples/fastcpd_binomial.R
+#'
+#' @md
+#'
+#' @param data A matrix or a data frame with the response variable as the first
+#'   column.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_binomial
+#' @export
+fastcpd.binomial <- function(data, ...) {  # nolint: Conventional R function style
+  fastcpd(
+    data = data.frame(y = data[, 1], x = data[, -1]), family = "binomial", ...
+  )
+}
+
+#' @rdname fastcpd_binomial
+#' @export
+fastcpd_binomial <- fastcpd.binomial
+
+#' @title Find change points efficiently in linear regression models
+#'
+#' @description \code{"fastcpd_lm"} and \code{"fastcpd.lm"} are wrapper
+#'   functions of \code{\link{fastcpd}} to find change points in linear
+#'   regression models. The function is similar to \code{"fastcpd"} except that
+#'   the data is by default a matrix or data frame with the response variable
+#'   as the first column and thus a formula is not required here.
+#'
+#' @example man/examples/fastcpd_lm.R
+#'
+#' @md
+#'
+#' @param data A matrix or a data frame with the response variable as the first
+#'   column.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_lm
+#' @export
+fastcpd.lm <- function(data, ...) {  # nolint: Conventional R function style
+  fastcpd(data = data.frame(y = data[, 1], x = data[, -1]), family = "lm", ...)
+}
+
+#' @rdname fastcpd_lm
+#' @export
+fastcpd_lm <- fastcpd.lm
+
 #' @title Find change points efficiently in time series data
 #'
 #' @description `fastcpd_ts` is a wrapper function for `fastcpd` to find
@@ -46,6 +106,7 @@ fastcpd.ts <- function(  # nolint: Conventional R function style
     family <- tolower(family)
   }
 
+  # TODO(doccstat): Split into different families.
   stopifnot(check_family(family, c("ar", "var", "ma", "arima", "garch")))
   stopifnot(check_order(order, family))
 
@@ -62,32 +123,3 @@ fastcpd.ts <- function(  # nolint: Conventional R function style
 #' @rdname fastcpd_ts
 #' @export
 fastcpd_ts <- fastcpd.ts
-
-#' @title Find change points efficiently in linear regression models
-#'
-#' @description \code{"fastcpd_lm"} and \code{"fastcpd.lm"} are wrapper
-#'   functions of \code{\link{fastcpd}} to find change points in linear
-#'   regression models. The function is similar to \code{"fastcpd"} except that
-#'   the data is by default a matrix or data frame with the response variable
-#'   as the first column and thus a formula is not required here.
-#'
-#' @example man/examples/fastcpd_lm.R
-#'
-#' @md
-#'
-#' @param data A matrix or a data frame with the response variable as the first
-#'   column.
-#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
-#'   \code{segment_count}.
-#'
-#' @return A class \code{fastcpd} object.
-#'
-#' @rdname fastcpd_lm
-#' @export
-fastcpd.lm <- function(data, ...) {  # nolint: Conventional R function style
-  fastcpd(data = data.frame(y = data[, 1], x = data[, -1]), family = "lm", ...)
-}
-
-#' @rdname fastcpd_lm
-#' @export
-fastcpd_lm <- fastcpd.lm
