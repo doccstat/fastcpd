@@ -115,7 +115,6 @@ check_garch_order <- function(order) {
   }
 }
 
-
 check_cost <- function(cost, cost_gradient, cost_hessian, family) {  # nolint
   error_message <- c("Please", "")
   if (

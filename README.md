@@ -157,7 +157,7 @@ y <- c(
 result <- fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
-  family = "gaussian"
+  family = "lm"
 )
 plot(result)
 ```
@@ -169,7 +169,7 @@ summary(result)
 #> 
 #> Call:
 #> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x), 
-#>     family = "gaussian")
+#>     family = "lm")
 #> 
 #> Change points:
 #> 98 202 
@@ -200,7 +200,7 @@ y <- c(
 result <- fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
-  family = "gaussian"
+  family = "lm"
 )
 plot(result)
 ```
@@ -212,7 +212,7 @@ summary(result)
 #> 
 #> Call:
 #> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x), 
-#>     family = "gaussian")
+#>     family = "lm")
 #> 
 #> Change points:
 #> 100 194 
@@ -243,12 +243,12 @@ y <- c(
 
 result <- fastcpd(
   data = data.frame(y = y, x = x),
-  family = "gaussian"
+  family = "lm"
 )
 summary(result)
 #> 
 #> Call:
-#> fastcpd(data = data.frame(y = y, x = x), family = "gaussian")
+#> fastcpd(data = data.frame(y = y, x = x), family = "lm")
 #> 
 #> Change points:
 #> 100 201 

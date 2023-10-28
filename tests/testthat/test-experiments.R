@@ -284,7 +284,7 @@ testthat::test_that(
       result <- fastcpd::fastcpd(
         formula = y ~ . - 1,
         data = data,
-        family = "gaussian"
+        family = "lm"
       )
 
       # Store the change point locations for each experiment as a baseline for
@@ -306,7 +306,7 @@ testthat::test_that(
         result <- fastcpd::fastcpd(
           formula = y ~ . - 1,
           data = data,
-          family = "gaussian"
+          family = "lm"
         )
 
         # Map the change points to the original index.

@@ -48,9 +48,9 @@ testthat::test_that(
         family = "bin0mial"
       ),
       paste0(
-        "The family should be one of \"gaussian\", \"binomial\", ",
-        "\"poisson\", \"lasso\", \"ar\", \"var\", \"ma\", \"arima\", ",
-        "\"garch\", \"custom\".\nThe provided family is \"bin0mial\"."
+        "The family should be one of \"lm\", \"binomial\", \"poisson\", ",
+        "\"lasso\", \"ar\", \"var\", \"ma\", \"arima\", \"garch\", \"custom\".",
+        "\nThe provided family is \"bin0mial\"."
       )
     )
   }
@@ -72,7 +72,7 @@ testthat::test_that(
     result <- fastcpd(
       formula = y ~ . - 1,
       data = data.frame(y = seq_len(100), x = seq_len(100)),
-      family = "gaussian"
+      family = "lm"
     )
 
     testthat::expect_length(result@cp_set, 0)

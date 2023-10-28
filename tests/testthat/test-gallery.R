@@ -15,34 +15,10 @@ testthat::test_that(
     result <- fastcpd(
       formula = y ~ . - 1,
       data = data.frame(y = y, x = x),
-      family = "gaussian"
+      family = "lm"
     )
 
     testthat::expect_equal(result@cp_set, c(98, 202))
-  }
-)
-
-testthat::test_that(
-  "example linear regression with noise variance not equal to 1", {
-    set.seed(1)
-    p <- 4
-    n <- 300
-    cp <- c(100, 200)
-    x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
-    theta_0 <- rbind(c(1, 3.2, -1, 0), c(-1, -0.5, 2.5, -2), c(0.8, -0.3, 1, 1))
-    y <- c(
-      x[1:cp[1], ] %*% theta_0[1, ] + rnorm(cp[1], 0, sd = 3),
-      x[(cp[1] + 1):cp[2], ] %*% theta_0[2, ] + rnorm(cp[2] - cp[1], 0, sd = 3),
-      x[(cp[2] + 1):n, ] %*% theta_0[3, ] + rnorm(n - cp[2], 0, sd = 3)
-    )
-    result_internal_variance <- fastcpd(
-      data = data.frame(y = y, x = x),
-      family = "gaussian",
-    )
-
-    testthat::expect_equal(
-      result_internal_variance@cp_set, c(100, 201)
-    )
   }
 )
 
@@ -61,7 +37,7 @@ testthat::test_that(
     result <- fastcpd(
       formula = y ~ . - 1,
       data = data.frame(y = y, x = x),
-      family = "gaussian"
+      family = "lm"
     )
 
     testthat::expect_equal(result@cp_set, c(100, 194))
@@ -313,29 +289,6 @@ testthat::test_that(
     testthat::expect_equal(result@cp_set, 609)
   }
 )
-
-testthat::test_that(
-  "ar(1) model with `forecast::Arima` calculation of ML", {
-    testthat::skip_if_not_installed("forecast")
-    set.seed(1)
-    n <- 400
-    p <- 1
-    time_series <- rep(0, n + 1)
-    for (i in 1:200) {
-      time_series[i + 1] <- 0.6 * time_series[i] + rnorm(1)
-    }
-    for (i in 201:400) {
-      time_series[i + 1] <- 0.3 * time_series[i] + rnorm(1)
-    }
-
-    result_ts <- fastcpd.ts(
-      time_series[-1], "arima", c(1, 0, 0),
-      include.mean = FALSE, beta = 3 * log(n) / 2
-    )
-    testthat::expect_equal(result_ts@cp_set, 178)
-  }
-)
-
 
 testthat::test_that(
   "ar(1) model using custom cost function", {

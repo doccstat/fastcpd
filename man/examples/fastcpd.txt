@@ -1,153 +1,9 @@
----
-output: github_document
----
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-"
-)
-options(cli.hyperlink = FALSE, eval = TRUE)
-
+\donttest{
 if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
   "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
 )
-#'
-```
-
-# fastcpd <a href="https://fastcpd.xingchi.li"><img src="man/figures/logo.svg" align="right" height="138" /></a>
-
-[![CRAN status](https://www.r-pkg.org/badges/version-last-release/fastcpd)](https://cran.r-project.org/package=fastcpd)
-[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/fastcpd)](https://cran.r-project.org/package=fastcpd)
-[![R-CMD-check](https://github.com/doccstat/fastcpd/workflows/R-CMD-check/badge.svg)](https://github.com/doccstat/fastcpd/actions)
-[![Codecov test coverage](https://codecov.io/gh/doccstat/fastcpd/branch/main/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd?branch=main)
-[![Last Commit](https://img.shields.io/github/last-commit/doccstat/fastcpd)](https://github.com/doccstat/fastcpd)
-[![r-universe](https://doccstat.r-universe.dev/badges/fastcpd)](https://doccstat.r-universe.dev)
-[![CodeFactor](https://www.codefactor.io/repository/github/doccstat/fastcpd/badge)](https://www.codefactor.io/repository/github/doccstat/fastcpd)
-
-## Overview
-
-The fastcpd (**fast** **c**hange **p**oint **d**etection) is a fast
-implmentation of change point detection methods in R. The __fastcpd__ package is
-designed to find change points in a fast manner. It is easy to install and
-extensible to all kinds of change point problems with a user specified cost
-function apart from the built-in cost functions.
-
-To learn more behind the algorithms:
-
-* [Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis](https://proceedings.mlr.press/v206/zhang23b.html)
-
-## Installation
-
-```{r eval = FALSE}
-# Install from CRAN
-install.packages("fastcpd")
-```
-
-<details close>
-
-<summary>Development version</summary>
-
-```{r eval = FALSE}
-# Development version from r-universe with CRAN version as a fallback
-install.packages(
-  "fastcpd",
-  repos = c("https://doccstat.r-universe.dev", "https://cloud.r-project.org")
-)
-
-## install.packages("pak")
-pak::pak("doccstat/fastcpd")
-
-## install.packages("devtools")
-devtools::install_github("doccstat/fastcpd")
-```
-
-</details>
-
-<details close>
-
-<summary>With mamba or conda (available soon)</summary>
-
-``` bash
-# conda-forge is a fork from CRAN and may not be up-to-date
-
-# Use mamba
-mamba install r-fastcpd
-# Use conda
-conda install -c conda-forge r-fastcpd
-```
-
-</details>
-
-### FAQ
-
-<details close>
-
-<summary>Package dependencies</summary>
-
-`fastcpd` depends on the following packages:
-
-*   [Rcpp](https://github.com/RcppCore/Rcpp), for C++ source code compilation.
-*   [RcppArmadillo](https://github.com/RcppCore/RcppArmadillo), for fast linear
-    algebra.
-*   [fastglm](https://github.com/jaredhuling/fastglm), for fast generalized
-    linear models.
-*   [DescTools](https://github.com/AndriSignorell/DescTools), for Winsorizing
-    Poisson data.
-*   [glmnet](https://glmnet.stanford.edu/), for penalized regression.
-*   [ggplot2](https://github.com/tidyverse/ggplot2), for data visualization.
-
-If you're compiling from source, you can run the following command to see the
-complete set of system packages needed on your machine.
-
-```{r eval = FALSE}
-pak::pkg_sysreqs("doccstat/fastcpd")
-#> ── Install scripts ───────────────────────────────────────────── Ubuntu 20.04
-#> apt-get -y update
-#> apt-get -y install libcurl4-openssl-dev libssl-dev zlib1g-dev make
-#>
-#> ── Packages and their system dependencies ───────────────────────────────────
-#> curl       – libcurl4-openssl-dev, libssl-dev
-#> data.table – zlib1g-dev
-#> fs         – make
-#> openssl    – libssl-dev
-```
-
-</details>
-
-<details close>
-
-<summary>I countered problems related to gfortran on Mac OSX or Linux!</summary>
-
-The package should be able to install on Mac and any Linux distribution without any problems if all the
-dependencies are installed. However, if you encountered problems related to
-gfortran, it might be because `RcppArmadillo` is not installed previously. Try [Mac OSX stackoverflow solution](https://stackoverflow.com/a/72997915) or [Linux stackover solution](https://stackoverflow.com/a/15540919) if you have
-trouble installing `RcppArmadillo`.
-
-</details>
-
-## Cheatsheet
-
-[![fastcpd cheatsheet](man/figures/cheatsheets.png)](https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf)
-
-<!-- TODO(doccstat): Leave only one example. -->
-
-## Examples
-
-[Documentation](https://fastcpd.xingchi.li/reference/fastcpd.html)
-
-<!-- This example section is a direct copy from `fastcpd` documentation -->
-
-<details open>
-
-<summary>Click to fold</summary>
 
 ### linear regression
-
-```{r linear_regression}
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -165,11 +21,8 @@ result <- fastcpd(
 )
 plot(result)
 summary(result)
-```
 
 ### linear regression with one-dimensional covariate
-
-```{r linear_regression_with_one_dimensional_covariate}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -187,11 +40,8 @@ result <- fastcpd(
 )
 plot(result)
 summary(result)
-```
 
 ### linear regression with noise variance not equal to 1
-
-```{r}
 library(fastcpd)
 set.seed(1)
 p <- 4
@@ -210,11 +60,8 @@ result <- fastcpd(
   family = "lm"
 )
 summary(result)
-```
 
 ### logistic regression
-
-```{r logistic_regression}
 library(fastcpd)
 set.seed(1)
 x <- matrix(rnorm(1500, 0, 1), ncol = 5)
@@ -229,11 +76,8 @@ result <- suppressWarnings(fastcpd(
   family = "binomial"
 ))
 summary(result)
-```
 
 ### poisson regression
-
-```{r poisson_regression}
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -266,11 +110,8 @@ result_two_epochs <- fastcpd(
   epsilon = 1e-4
 )
 summary(result_two_epochs)
-```
 
 ### penalized linear regression
-
-```{r penalized_linear_regression}
 library(fastcpd)
 set.seed(1)
 n <- 1500
@@ -297,11 +138,8 @@ result <- fastcpd(
 )
 plot(result)
 summary(result)
-```
 
 ### ar(1) model
-
-```{r ar1_model}
 library(fastcpd)
 set.seed(1)
 n <- 1000
@@ -316,11 +154,8 @@ for (i in 601:1000) {
 result <- fastcpd_ts(x, "ar", 1)
 summary(result)
 plot(result)
-```
 
 ### ar(3) model with innovation standard deviation 3
-
-```{r ar3_model_with_innovation_standard_deviation_3}
 library(fastcpd)
 set.seed(1)
 n <- 1000
@@ -335,11 +170,8 @@ for (i in 601:1000) {
 result <- fastcpd.ts(x, "ar", 3)
 summary(result)
 plot(result)
-```
 
 ### custom logistic regression
-
-```{r custom_logistic_regression}
 library(fastcpd)
 set.seed(1)
 p <- 5
@@ -398,11 +230,8 @@ result_custom_two_epochs <- fastcpd(
   cost_hessian = logistic_loss_hessian
 )
 summary(result_custom_two_epochs)
-```
 
 ### custom cost function mean change
-
-```{r custom_cost_function_mean_change}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -440,11 +269,8 @@ mean_loss_result <- fastcpd(
   cost = mean_loss
 )
 summary(mean_loss_result)
-```
 
 ### custom cost function multivariate mean change
-
-```{r custom_cost_function_multivariate_mean_change}
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -483,11 +309,8 @@ mean_loss_result <- fastcpd(
   cost = mean_loss
 )
 summary(mean_loss_result)
-```
 
 ### custom cost function variance change
-
-```{r custom_cost_function_variance_change}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -510,11 +333,8 @@ var_loss_result <- fastcpd(
   cost = var_loss
 )
 summary(var_loss_result)
-```
 
 ### custom cost function multivariate variance change
-
-```{r custom_cost_function_multivariate_variance_change}
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -549,11 +369,8 @@ var_loss_result <- fastcpd(
   cost = var_loss
 )
 summary(var_loss_result)
-```
 
 ### custom cost function mean or variance change
-
-```{r custom_cost_function_mean_or_variance_change}
 library(fastcpd)
 set.seed(1)
 p <- 1
@@ -581,11 +398,8 @@ meanvar_loss_result <- fastcpd(
   cost = meanvar_loss
 )
 summary(meanvar_loss_result)
-```
 
 ### custom cost function multivariate mean or variance change
-
-```{r custom_cost_function_multivariate_mean_or_variance_change}
 library(fastcpd)
 set.seed(1)
 p <- 3
@@ -616,11 +430,8 @@ meanvar_loss_result <- fastcpd(
   cost = meanvar_loss
 )
 summary(meanvar_loss_result)
-```
 
 ### custom cost function huber regression
-
-```{r custom_cost_function_huber_regression}
 library(fastcpd)
 set.seed(1)
 n <- 400 + 300 + 500
@@ -677,21 +488,4 @@ huber_regression_result <- fastcpd(
   cost_hessian = huber_loss_hessian
 )
 summary(huber_regression_result)
-```
-
-</details>
-
-## Contact us
-
-Encountered a bug or unintended behavior?
-
-1.  File a ticket at
-    [GitHub Issues](https://github.com/doccstat/fastcpd/issues).
-2.  Contact the authors specified in
-    [DESCRIPTION](https://github.com/doccstat/fastcpd/blob/main/DESCRIPTION#L5-L10).
-
-## Stargazers over time
-[![Stargazers over time](https://starchart.cc/doccstat/fastcpd.svg)](https://starchart.cc/doccstat/fastcpd)
-
-## Codecov Icicle
-[![Codecov Icicle](https://codecov.io/gh/doccstat/fastcpd/graphs/icicle.svg)](https://app.codecov.io/gh/doccstat/fastcpd?branch=main)
+}
