@@ -1,7 +1,8 @@
 # fastcpd 0.9.5
 
-*   Add wrapper functions of linear regression family:
-    `fastcpd.lm` / `fastcpd_lm`.
+*   Add wrapper functions of
+    linear regression family: `fastcpd.lm` / `fastcpd_lm`,
+    logistic regression family: `fastcpd.binomial` / `fastcpd_binomial`.
 *   Replace `"gaussian"` family with `"lm"`.
 
 # fastcpd 0.9.4
