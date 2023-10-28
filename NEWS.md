@@ -1,3 +1,9 @@
+# fastcpd 0.9.5
+
+*   Add wrapper functions of linear regression family:
+    `fastcpd.lm` / `fastcpd_lm`.
+*   Replace `"gaussian"` family with `"lm"`.
+
 # fastcpd 0.9.4
 
 *   Fix sanity check.

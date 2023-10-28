@@ -3,498 +3,7 @@
 #' @description \code{fastcpd} takes in formulas, data, families and extra
 #' parameters and returns a \code{fastcpd} object.
 #'
-#' @examples
-#' \donttest{
-#' if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
-#'   "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
-#' )
-#'
-#' ### linear regression
-#' library(fastcpd)
-#' set.seed(1)
-#' p <- 3
-#' x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
-#' theta_0 <- rbind(c(1, 1.2, -1), c(-1, 0, 0.5), c(0.5, -0.3, 0.2))
-#' y <- c(
-#'   x[1:100, ] %*% theta_0[1, ] + rnorm(100, 0, 1),
-#'   x[101:200, ] %*% theta_0[2, ] + rnorm(100, 0, 1),
-#'   x[201:300, ] %*% theta_0[3, ] + rnorm(100, 0, 1)
-#' )
-#' result <- fastcpd(
-#'   formula = y ~ . - 1,
-#'   data = data.frame(y = y, x = x),
-#'   family = "gaussian"
-#' )
-#' plot(result)
-#' summary(result)
-#'
-#' ### linear regression with one-dimensional covariate
-#' library(fastcpd)
-#' set.seed(1)
-#' p <- 1
-#' x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
-#' theta_0 <- matrix(c(1, -1, 0.5))
-#' y <- c(
-#'   x[1:100, ] * theta_0[1, ] + rnorm(100, 0, 1),
-#'   x[101:200, ] * theta_0[2, ] + rnorm(100, 0, 1),
-#'   x[201:300, ] * theta_0[3, ] + rnorm(100, 0, 1)
-#' )
-#' result <- fastcpd(
-#'   formula = y ~ . - 1,
-#'   data = data.frame(y = y, x = x),
-#'   family = "gaussian"
-#' )
-#' plot(result)
-#' summary(result)
-#'
-#' ### linear regression with noise variance not equal to 1
-#' library(fastcpd)
-#' set.seed(1)
-#' p <- 4
-#' n <- 300
-#' cp <- c(100, 200)
-#' x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
-#' theta_0 <- rbind(c(1, 3.2, -1, 0), c(-1, -0.5, 2.5, -2), c(0.8, -0.3, 1, 1))
-#' y <- c(
-#'   x[1:cp[1], ] %*% theta_0[1, ] + rnorm(cp[1], 0, sd = 3),
-#'   x[(cp[1] + 1):cp[2], ] %*% theta_0[2, ] + rnorm(cp[2] - cp[1], 0, sd = 3),
-#'   x[(cp[2] + 1):n, ] %*% theta_0[3, ] + rnorm(n - cp[2], 0, sd = 3)
-#' )
-#'
-#' result <- fastcpd(
-#'   data = data.frame(y = y, x = x),
-#'   family = "gaussian"
-#' )
-#' summary(result)
-#'
-#' ### logistic regression
-#' library(fastcpd)
-#' set.seed(1)
-#' x <- matrix(rnorm(1500, 0, 1), ncol = 5)
-#' theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
-#' y <- c(
-#'   rbinom(125, 1, 1 / (1 + exp(-x[1:125, ] %*% theta[1, ]))),
-#'   rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] %*% theta[2, ])))
-#' )
-#' result <- suppressWarnings(fastcpd(
-#'   formula = y ~ . - 1,
-#'   data = data.frame(y = y, x = x),
-#'   family = "binomial"
-#' ))
-#' summary(result)
-#'
-#' ### poisson regression
-#' library(fastcpd)
-#' set.seed(1)
-#' p <- 3
-#' x <- mvtnorm::rmvnorm(1500, rep(0, p), diag(p))
-#' delta <- rnorm(p)
-#' theta_0 <- c(1, 1.2, -1)
-#' y <- c(
-#'   rpois(300, exp(x[1:300, ] %*% theta_0)),
-#'   rpois(400, exp(x[301:700, ] %*% (theta_0 + delta))),
-#'   rpois(300, exp(x[701:1000, ] %*% theta_0)),
-#'   rpois(100, exp(x[1001:1100, ] %*% (theta_0 - delta))),
-#'   rpois(200, exp(x[1101:1300, ] %*% theta_0)),
-#'   rpois(200, exp(x[1301:1500, ] %*% (theta_0 + delta)))
-#' )
-#' result <- fastcpd(
-#'   formula = y ~ . - 1,
-#'   data = data.frame(y = y, x = x),
-#'   beta = (p + 1) * log(1500) / 2,
-#'   k = function(x) 0,
-#'   family = "poisson",
-#'   epsilon = 1e-5
-#' )
-#' summary(result)
-#' result_two_epochs <- fastcpd(
-#'   formula = y ~ . - 1,
-#'   data = data.frame(y = y, x = x),
-#'   beta = (p + 1) * log(1500) / 2,
-#'   k = function(x) 1,
-#'   family = "poisson",
-#'   epsilon = 1e-4
-#' )
-#' summary(result_two_epochs)
-#'
-#' ### penalized linear regression
-#' library(fastcpd)
-#' set.seed(1)
-#' n <- 1500
-#' p_true <- 6
-#' p <- 50
-#' x <- mvtnorm::rmvnorm(1500, rep(0, p), diag(p))
-#' theta_0 <- rbind(
-#'   runif(p_true, -5, -2),
-#'   runif(p_true, -3, 3),
-#'   runif(p_true, 2, 5),
-#'   runif(p_true, -5, 5)
-#' )
-#' theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
-#' y <- c(
-#'   x[1:300, ] %*% theta_0[1, ] + rnorm(300, 0, 1),
-#'   x[301:700, ] %*% theta_0[2, ] + rnorm(400, 0, 1),
-#'   x[701:1000, ] %*% theta_0[3, ] + rnorm(300, 0, 1),
-#'   x[1001:1500, ] %*% theta_0[4, ] + rnorm(500, 0, 1)
-#' )
-#' result <- fastcpd(
-#'   formula = y ~ . - 1,
-#'   data = data.frame(y = y, x = x),
-#'   family = "lasso"
-#' )
-#' plot(result)
-#' summary(result)
-#'
-#' ### ar(1) model
-#' library(fastcpd)
-#' set.seed(1)
-#' n <- 1000
-#' p <- 1
-#' x <- rep(0, n + 1)
-#' for (i in 1:600) {
-#'   x[i + 1] <- 0.6 * x[i] + rnorm(1)
-#' }
-#' for (i in 601:1000) {
-#'   x[i + 1] <- 0.3 * x[i] + rnorm(1)
-#' }
-#' result <- fastcpd_ts(x, "ar", 1)
-#' summary(result)
-#' plot(result)
-#'
-#' ### ar(3) model with innovation standard deviation 3
-#' library(fastcpd)
-#' set.seed(1)
-#' n <- 1000
-#' p <- 1
-#' x <- rep(0, n + 3)
-#' for (i in 1:600) {
-#'   x[i + 3] <- 0.6 * x[i + 2] - 0.2 * x[i + 1] + 0.1 * x[i] + rnorm(1, 0, 3)
-#' }
-#' for (i in 601:1000) {
-#'   x[i + 1] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
-#' }
-#' result <- fastcpd.ts(x, "ar", 3)
-#' summary(result)
-#' plot(result)
-#'
-#' ### custom logistic regression
-#' library(fastcpd)
-#' set.seed(1)
-#' p <- 5
-#' x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
-#' theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
-#' y <- c(
-#'   rbinom(200, 1, 1 / (1 + exp(-x[1:200, ] %*% theta[1, ]))),
-#'   rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] %*% theta[2, ])))
-#' )
-#' data <- data.frame(y = y, x = x)
-#' result_builtin <- suppressWarnings(fastcpd(
-#'   formula = y ~ . - 1,
-#'   data = data,
-#'   family = "binomial"
-#' ))
-#' logistic_loss <- function(data, theta) {
-#'   x <- data[, -1]
-#'   y <- data[, 1]
-#'   u <- x %*% theta
-#'   nll <- -y * u + log(1 + exp(u))
-#'   nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
-#'   sum(nll)
-#' }
-#' logistic_loss_gradient <- function(data, theta) {
-#'   x <- data[nrow(data), -1]
-#'   y <- data[nrow(data), 1]
-#'   c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
-#' }
-#' logistic_loss_hessian <- function(data, theta) {
-#'   x <- data[nrow(data), -1]
-#'   prob <- 1 / (1 + exp(-x %*% theta))
-#'   (x %o% x) * c((1 - prob) * prob)
-#' }
-#' result_custom <- fastcpd(
-#'   formula = y ~ . - 1,
-#'   data = data,
-#'   epsilon = 1e-5,
-#'   cost = logistic_loss,
-#'   cost_gradient = logistic_loss_gradient,
-#'   cost_hessian = logistic_loss_hessian
-#' )
-#' cat(
-#'   "Change points detected by built-in logistic regression model: ",
-#'   result_builtin@cp_set, "\n",
-#'   "Change points detected by custom logistic regression model: ",
-#'   result_custom@cp_set, "\n",
-#'   sep = ""
-#' )
-#' result_custom_two_epochs <- fastcpd(
-#'   formula = y ~ . - 1,
-#'   data = data,
-#'   k = function(x) 1,
-#'   epsilon = 1e-5,
-#'   cost = logistic_loss,
-#'   cost_gradient = logistic_loss_gradient,
-#'   cost_hessian = logistic_loss_hessian
-#' )
-#' summary(result_custom_two_epochs)
-#'
-#' ### custom cost function mean change
-#' library(fastcpd)
-#' set.seed(1)
-#' p <- 1
-#' data <- rbind(
-#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
-#'   mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
-#'   mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
-#' )
-#' segment_count_guess <- 10
-#' block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
-#' block_count <- floor(nrow(data) / block_size)
-#' data_all_vars <- rep(0, block_count)
-#' for (block_index in seq_len(block_count)) {
-#'   block_start <- (block_index - 1) * block_size + 1
-#'   block_end <- if (block_index < block_count) {
-#'     block_index * block_size
-#'   } else {
-#'     nrow(data)
-#'   }
-#'   data_all_vars[block_index] <- var(data[block_start:block_end, ])
-#' }
-#' data_all_var <- mean(data_all_vars)
-#' mean_loss <- function(data) {
-#'   n <- nrow(data)
-#'   n / 2 * (
-#'     log(data_all_var) + log(2 * pi) +
-#'       sum((data - colMeans(data))^2 / data_all_var) / n
-#'   )
-#' }
-#' mean_loss_result <- fastcpd(
-#'   formula = ~ . - 1,
-#'   data = data.frame(data),
-#'   beta = (p + 1) * log(nrow(data)) / 2,
-#'   p = p,
-#'   cost = mean_loss
-#' )
-#' summary(mean_loss_result)
-#'
-#' ### custom cost function multivariate mean change
-#' library(fastcpd)
-#' set.seed(1)
-#' p <- 3
-#' data <- rbind(
-#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
-#'   mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
-#'   mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
-#' )
-#' segment_count_guess <- 5
-#' block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
-#' block_count <- floor(nrow(data) / block_size)
-#' data_all_covs <- array(NA, dim = c(block_count, p, p))
-#' for (block_index in seq_len(block_count)) {
-#'   block_start <- (block_index - 1) * block_size + 1
-#'   block_end <- if (block_index < block_count) {
-#'     block_index * block_size
-#'   } else {
-#'     nrow(data)
-#'   }
-#'   data_all_covs[block_index, , ] <- cov(data[block_start:block_end, ])
-#' }
-#' data_all_cov <- colMeans(data_all_covs)
-#' mean_loss <- function(data) {
-#'   n <- nrow(data)
-#'   demeaned_data <- sweep(data, 2, colMeans(data))
-#'   n / 2 * (
-#'     log(det(data_all_cov)) + p * log(2 * pi) +
-#'       sum(diag(solve(data_all_cov, crossprod(demeaned_data)))) / n
-#'   )
-#' }
-#' mean_loss_result <- fastcpd(
-#'   formula = ~ . - 1,
-#'   data = data.frame(data),
-#'   beta = (p + 1) * log(nrow(data)) / 2,
-#'   p = p,
-#'   cost = mean_loss
-#' )
-#' summary(mean_loss_result)
-#'
-#' ### custom cost function variance change
-#' library(fastcpd)
-#' set.seed(1)
-#' p <- 1
-#' data <- rbind.data.frame(
-#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-#'   mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(50, p)),
-#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
-#' )
-#' data_all_mean <- colMeans(data)
-#' var_loss <- function(data) {
-#'   n <- nrow(data)
-#'   data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
-#'   n / 2 * (log(data_cov) + log(2 * pi) + (n - 1) / n)
-#' }
-#' var_loss_result <- fastcpd(
-#'   formula = ~ . - 1,
-#'   data = data,
-#'   beta = (p + 1) * log(nrow(data)) / 2,
-#'   p = p,
-#'   cost = var_loss
-#' )
-#' summary(var_loss_result)
-#'
-#' ### custom cost function multivariate variance change
-#' library(fastcpd)
-#' set.seed(1)
-#' p <- 3
-#' data <- rbind.data.frame(
-#'   mvtnorm::rmvnorm(
-#'     300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-#'   ),
-#'   mvtnorm::rmvnorm(
-#'     400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-#'   ),
-#'   mvtnorm::rmvnorm(
-#'     300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-#'   )
-#' )
-#' data_all_mean <- colMeans(data)
-#' var_loss <- function(data) {
-#'   n <- nrow(data)
-#'   p <- ncol(data)
-#'   if (n < p) {
-#'     data_cov <- diag(p)
-#'   } else {
-#'     data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
-#'   }
-#'   n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
-#' }
-#' var_loss_result <- fastcpd(
-#'   formula = ~ . - 1,
-#'   data = data,
-#'   beta = (p^2 + 1) * log(nrow(data)) / 2,
-#'   trim = 0.1,
-#'   p = p^2,
-#'   cost = var_loss
-#' )
-#' summary(var_loss_result)
-#'
-#' ### custom cost function mean or variance change
-#' library(fastcpd)
-#' set.seed(1)
-#' p <- 1
-#' data <- rbind.data.frame(
-#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-#'   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(50, p)),
-#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-#'   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-#'   mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
-#' )
-#' meanvar_loss <- function(data) {
-#'   n <- nrow(data)
-#'   data_cov <- 1
-#'   if (n > 1) {
-#'     data_cov <- var(data)
-#'   }
-#'   n / 2 * (log(data_cov) + log(2 * pi) + (n - 1) / n)
-#' }
-#' meanvar_loss_result <- fastcpd(
-#'   formula = ~ . - 1,
-#'   data = data,
-#'   beta = (p^2 + p + 1) * log(nrow(data)) / 2,
-#'   p = p^2 + p,
-#'   cost = meanvar_loss
-#' )
-#' summary(meanvar_loss_result)
-#'
-#' ### custom cost function multivariate mean or variance change
-#' library(fastcpd)
-#' set.seed(1)
-#' p <- 3
-#' data <- rbind.data.frame(
-#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-#'   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(50, p)),
-#'   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-#'   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-#'   mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
-#' )
-#' meanvar_loss <- function(data) {
-#'   n <- nrow(data)
-#'   p <- ncol(data)
-#'   if (n <= p) {
-#'     data_cov <- diag(p)
-#'   } else {
-#'     data_cov <- cov(data)
-#'   }
-#'   n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
-#' }
-#' meanvar_loss_result <- fastcpd(
-#'   formula = ~ . - 1,
-#'   data = data,
-#'   beta = (p^2 + p + 1) * log(nrow(data)) / 2,
-#'   trim = 0.01,
-#'   p = p^2 + p,
-#'   cost = meanvar_loss
-#' )
-#' summary(meanvar_loss_result)
-#'
-#' ### custom cost function huber regression
-#' library(fastcpd)
-#' set.seed(1)
-#' n <- 400 + 300 + 500
-#' p <- 5
-#' x <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(p))
-#' theta <- rbind(
-#'   mvtnorm::rmvnorm(1, mean = rep(0, p - 3), sigma = diag(p - 3)),
-#'   mvtnorm::rmvnorm(1, mean = rep(5, p - 3), sigma = diag(p - 3)),
-#'   mvtnorm::rmvnorm(1, mean = rep(9, p - 3), sigma = diag(p - 3))
-#' )
-#' theta <- cbind(theta, matrix(0, 3, 3))
-#' theta <- theta[rep(seq_len(3), c(400, 300, 500)), ]
-#' y_true <- rowSums(x * theta)
-#' factor <- c(
-#'   2 * stats::rbinom(400, size = 1, prob = 0.95) - 1,
-#'   2 * stats::rbinom(300, size = 1, prob = 0.95) - 1,
-#'   2 * stats::rbinom(500, size = 1, prob = 0.95) - 1
-#' )
-#' y <- factor * y_true + stats::rnorm(n)
-#' data <- cbind.data.frame(y, x)
-#' huber_threshold <- 1
-#' huber_loss <- function(data, theta) {
-#'   residual <- data[, 1] - data[, -1, drop = FALSE] %*% theta
-#'   indicator <- abs(residual) <= huber_threshold
-#'   sum(
-#'     residual^2 / 2 * indicator +
-#'       huber_threshold * (
-#'         abs(residual) - huber_threshold / 2
-#'       ) * (1 - indicator)
-#'   )
-#' }
-#' huber_loss_gradient <- function(data, theta) {
-#'   residual <- c(data[nrow(data), 1] - data[nrow(data), -1] %*% theta)
-#'   if (abs(residual) <= huber_threshold) {
-#'     -residual * data[nrow(data), -1]
-#'   } else {
-#'     -huber_threshold * sign(residual) * data[nrow(data), -1]
-#'   }
-#' }
-#' huber_loss_hessian <- function(data, theta) {
-#'   residual <- c(data[nrow(data), 1] - data[nrow(data), -1] %*% theta)
-#'   if (abs(residual) <= huber_threshold) {
-#'     outer(data[nrow(data), -1], data[nrow(data), -1])
-#'   } else {
-#'     0.01 * diag(length(theta))
-#'   }
-#' }
-#' huber_regression_result <- fastcpd(
-#'   formula = y ~ . - 1,
-#'   data = data,
-#'   beta = (p + 1) * log(n) / 2,
-#'   cost = huber_loss,
-#'   cost_gradient = huber_loss_gradient,
-#'   cost_hessian = huber_loss_hessian
-#' )
-#' summary(huber_regression_result)
-#' }
+#' @example man/examples/fastcpd.txt
 #'
 #' @md
 #' @section Gallery:
@@ -566,8 +75,9 @@
 #'   affect the performance of the algorithm. This parameter is left for the
 #'   users to tune the performance of the algorithm if the result is not
 #'   ideal. Details are discussed in the paper.
-#' @param family Family of the model. Can be \code{"gaussian"},
-#'   \code{"binomial"}, \code{"poisson"}, \code{"lasso"}, \code{"custom"} or
+#' @param family Family of the model. Can be \code{"lm"}, \code{"binomial"},
+#'   \code{"poisson"}, \code{"lasso"}, \code{"custom"}, \code{"ar"},
+#'   \code{"var"}, \code{"ma"}, \code{"arima"}, \code{"garch"} or
 #'   \code{NULL}. For simplicity, user can also omit this parameter,
 #'   indicating that they will be using their own cost functions. Omitting the
 #'   parameter is the same as specifying the parameter to be \code{"custom"}
@@ -647,8 +157,7 @@
 #'   processed through sequential gradient descent.
 #' @param warm_start If \code{TRUE}, the algorithm will use the estimated
 #'   parameters from the previous segment as the initial value for the
-#'   current segment. This parameter is only used for family \code{"gaussian"},
-#'   \code{"binomial"} and \code{"poisson"}.
+#'   current segment. This parameter is only used for \code{"glm"} families.
 #' @param ... Parameters specifically used for time series models. As of the
 #'   current implementation, only `include.mean` will not be ignored and used
 #'   in the ARIMA or GARCH model.
@@ -656,8 +165,11 @@
 #' @return A class \code{fastcpd} object.
 #'
 #' @export
-#' @importFrom Rcpp evalCpp
+#' @importFrom DescTools Winsorize
+#' @importFrom fastglm fastglm
+#' @importFrom glmnet glmnet cv.glmnet predict.glmnet
 #' @importFrom methods show
+#' @importFrom Rcpp evalCpp
 #' @useDynLib fastcpd, .registration = TRUE
 fastcpd <- function(  # nolint: cyclomatic complexity
   formula = y ~ . - 1,
@@ -691,7 +203,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     check_family(
       family,
       c(
-        "gaussian", "binomial", "poisson", "lasso",
+        "lm", "binomial", "poisson", "lasso",
         "ar", "var", "ma", "arima", "garch", "custom"
       )
     )
@@ -836,6 +348,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     p <- 1 + sum(order)
   }
 
+  if (family == "lm") {
+    fastcpd_family <- "gaussian"
+  }
+
   if (is.null(fastcpd_family)) {
     fastcpd_family <- family
   }
@@ -844,15 +360,16 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     fastcpd_data <- data
   }
 
-  # Use the `beta` value obtained from BIC. For linear regression models,
-  # an estimate of the variance is needed in the cost function. The variance
-  # estimation is only for "gaussian" family with no `beta` provided.
   if (is.null(beta)) {
+    # Use the `beta` value obtained from BIC.
     beta <- (p + 1) * log(nrow(fastcpd_data)) / 2
 
-    # Only estimate the variance for Gaussian family when `beta` is null.
     # TODO(doccstat): Variance estimation for VAR(p).
-    if (fastcpd_family == "gaussian") {
+    # For linear regression models, an estimate of the variance is needed in the
+    # cost function. The variance estimation is only for "lm" family with no
+    # `beta` provided. Only estimate the variance for Gaussian family when
+    # `beta` is null.
+    if (family == "lm" || fastcpd_family == "gaussian") {
       # Estimate the variance for each block and then take the average.
       n <- nrow(fastcpd_data)
       block_size <- 5

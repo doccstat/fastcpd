@@ -20,10 +20,10 @@ reference:
   - title: Main function
     desc: >
       All implementation of fastcpd is unified into one single function
-      `fastcpd()`. For time series data, `fastcpd.ts()` and `fastcpd_ts()` are
-      provided for easier analysis.
+      `fastcpd()`. Simplified functions are provided for each family.
     contents:
       - fastcpd
+      - fastcpd.lm
       - fastcpd.ts
 
   - title: Main class

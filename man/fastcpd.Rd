@@ -96,8 +96,9 @@ affect the performance of the algorithm. This parameter is left for the
 users to tune the performance of the algorithm if the result is not
 ideal. Details are discussed in the paper.}
 
-\item{family}{Family of the model. Can be \code{"gaussian"},
-\code{"binomial"}, \code{"poisson"}, \code{"lasso"}, \code{"custom"} or
+\item{family}{Family of the model. Can be \code{"lm"}, \code{"binomial"},
+\code{"poisson"}, \code{"lasso"}, \code{"custom"}, \code{"ar"},
+\code{"var"}, \code{"ma"}, \code{"arima"}, \code{"garch"} or
 \code{NULL}. For simplicity, user can also omit this parameter,
 indicating that they will be using their own cost functions. Omitting the
 parameter is the same as specifying the parameter to be \code{"custom"}
@@ -191,8 +192,7 @@ processed through sequential gradient descent.}
 
 \item{warm_start}{If \code{TRUE}, the algorithm will use the estimated
 parameters from the previous segment as the initial value for the
-current segment. This parameter is only used for family \code{"gaussian"},
-\code{"binomial"} and \code{"poisson"}.}
+current segment. This parameter is only used for \code{"glm"} families.}
 
 \item{...}{Parameters specifically used for time series models. As of the
 current implementation, only \code{include.mean} will not be ignored and used
@@ -240,7 +240,7 @@ y <- c(
 result <- fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
-  family = "gaussian"
+  family = "lm"
 )
 plot(result)
 summary(result)
@@ -259,7 +259,7 @@ y <- c(
 result <- fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
-  family = "gaussian"
+  family = "lm"
 )
 plot(result)
 summary(result)
@@ -280,7 +280,7 @@ y <- c(
 
 result <- fastcpd(
   data = data.frame(y = y, x = x),
-  family = "gaussian"
+  family = "lm"
 )
 summary(result)
 
@@ -712,5 +712,4 @@ huber_regression_result <- fastcpd(
 )
 summary(huber_regression_result)
 }
-
 }
