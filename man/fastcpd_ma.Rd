@@ -42,6 +42,6 @@ time_series[1:200] <- arima.sim(
 time_series[201:400] <- arima.sim(
   n = 200, model = list(ma = c(-4 / 3, 7 / 9, -16 / 27, 4 / 27), sd = 0.3)
 )
-result <- fastcpd.ma(time_series, 4, include.mean = FALSE, trim = 0)
+result <- suppressMessages(fastcpd.ma(time_series, 4, include.mean = FALSE))
 }
 }
