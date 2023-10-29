@@ -125,6 +125,42 @@ fastcpd.lm <- function(data, ...) {  # nolint: Conventional R function style
 #' @export
 fastcpd_lm <- fastcpd.lm
 
+#' @title Find change points efficiently in MA(q) models
+#'
+#' @description \code{fastcpd_ma} and \code{fastcpd.ma} are
+#'   wrapper functions of \code{\link{fastcpd}} to find change points in
+#'   MA(q) models. The function is similar to \code{\link{fastcpd}}
+#'   except that the data is by default a one-column matrix or univariate vector
+#'   and thus a formula is not required here.
+#'
+#' @example tests/testthat/examples/fastcpd_ma.txt
+#'
+#' @md
+#'
+#' @param data A numeric vector, a matrix, a data frame or a time series object.
+#' @param order A positive integer or a vector of length three with the first
+#'   two elements being zeros specifying the order of the MA model.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}. One special argument can be passed here is
+#'   \code{include.mean}, which is a logical value indicating whether the
+#'   mean should be included in the model. The default value is \code{TRUE}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_ma
+#' @export
+fastcpd.ma <- function(  # nolint: Conventional R function style
+  data,
+  order = 0,
+  ...
+) {
+  fastcpd.ts(c(data), "ma", order, ...)
+}
+
+#' @rdname fastcpd_ma
+#' @export
+fastcpd_ma <- fastcpd.ma
+
 #' @title Find change points efficiently in linear regression models
 #'
 #' @description \code{"fastcpd_mean"} and \code{"fastcpd.mean"} are wrapper

@@ -27,6 +27,7 @@ reference:
       - fastcpd.garch
       - fastcpd.lasso
       - fastcpd.lm
+      - fastcpd.ma
       - fastcpd.mean
       - fastcpd.poisson
       - fastcpd.ts

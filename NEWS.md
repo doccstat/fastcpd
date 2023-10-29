@@ -6,7 +6,8 @@
     logistic regression family: `fastcpd.binomial` / `fastcpd_binomial`,
     poisson regression family: `fastcpd.poisson` / `fastcpd_poisson`,
     penalized linear regression family: `fastcpd.lasso` / `fastcpd_lasso`,
-    mean change: `fastcpd.mean` / `fastcpd_mean`.
+    MA(q) model: `fastcpd.ma` / `fastcpd_ma`,
+    mean change: `fastcpd.mean` / `fastcpd_mean`,
 *   Replace `"gaussian"` family with `"lm"`.
 *   Add progress bar.
 *   Fix design matrix from formula bug.
