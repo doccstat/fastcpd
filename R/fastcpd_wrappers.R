@@ -6,7 +6,7 @@
 #'   except that the data is by default a matrix or data frame with the response
 #'   variable as the first column and thus a formula is not required here.
 #'
-#' @example man/examples/fastcpd_binomial.R
+#' @example tests/testthat/examples/fastcpd_binomial.R
 #'
 #' @md
 #'
@@ -29,6 +29,37 @@ fastcpd.binomial <- function(data, ...) {  # nolint: Conventional R function sty
 #' @export
 fastcpd_binomial <- fastcpd.binomial
 
+#' @title Find change points efficiently in penalized linear regression models
+#'
+#' @description \code{"fastcpd_lasso"} and \code{"fastcpd.lasso"} are wrapper
+#'   functions of \code{\link{fastcpd}} to find change points in penalized
+#'   linear regression models. The function is similar to \code{"fastcpd"}
+#'   except that the data is by default a matrix or data frame with the response
+#'   variable as the first column and thus a formula is not required here.
+#'
+#' @example tests/testthat/examples/fastcpd_lasso.R
+#'
+#' @md
+#'
+#' @param data A matrix or a data frame with the response variable as the first
+#'   column.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_lasso
+#' @export
+fastcpd.lasso <- function(data, ...) {  # nolint: Conventional R function style
+  fastcpd(
+    data = data.frame(y = data[, 1], x = data[, -1]), family = "lasso", ...
+  )
+}
+
+#' @rdname fastcpd_lasso
+#' @export
+fastcpd_lasso <- fastcpd.lasso
+
 #' @title Find change points efficiently in linear regression models
 #'
 #' @description \code{"fastcpd_lm"} and \code{"fastcpd.lm"} are wrapper
@@ -37,7 +68,7 @@ fastcpd_binomial <- fastcpd.binomial
 #'   the data is by default a matrix or data frame with the response variable
 #'   as the first column and thus a formula is not required here.
 #'
-#' @example man/examples/fastcpd_lm.R
+#' @example tests/testthat/examples/fastcpd_lm.R
 #'
 #' @md
 #'
@@ -66,7 +97,7 @@ fastcpd_lm <- fastcpd.lm
 #'   data frame or a vector with each row / element as an observation and thus a
 #'   formula is not required here.
 #'
-#' @example man/examples/fastcpd_mean.txt
+#' @example tests/testthat/examples/fastcpd_mean.txt
 #'
 #' @md
 #'
@@ -97,7 +128,7 @@ fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
     } else {
       nrow(data)
     }
-    data_all_covs[block_index, , ] <- cov(data[block_start:block_end, ])
+    data_all_covs[block_index, , ] <- stats::cov(data[block_start:block_end, ])
   }
   data_all_cov <- colMeans(data_all_covs)
   fastcpd(
@@ -127,7 +158,7 @@ fastcpd_mean <- fastcpd.mean
 #'   except that the data is a time series data and the family is one of
 #'   \code{"ar"}, \code{"var"}, \code{"arima"} or \code{"garch"}.
 #'
-#' @example man/examples/fastcpd_ts.txt
+#' @example tests/testthat/examples/fastcpd_ts.txt
 #'
 #' @md
 #'
