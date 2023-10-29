@@ -151,6 +151,40 @@ fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
 #' @export
 fastcpd_mean <- fastcpd.mean
 
+#' @title Find change points efficiently in Poisson regression models
+#'
+#' @description \code{"fastcpd_poisson"} and \code{"fastcpd.poisson"} are
+#'   wrapper functions of \code{\link{fastcpd}} to find change points in
+#'   Poisson regression models. The function is similar to \code{"fastcpd"}
+#'   except that the data is by default a matrix or data frame with the response
+#'   variable as the first column and thus a formula is not required here.
+#'
+#' @example tests/testthat/examples/fastcpd_poisson.R
+#'
+#' @md
+#'
+#' @param data A matrix or a data frame with the response variable as the first
+#'   column.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_poisson
+#' @export
+fastcpd.poisson <- function(  # nolint: Conventional R function style
+  data,
+  ...
+) {
+  fastcpd(
+    data = data.frame(y = data[, 1], x = data[, -1]), family = "poisson", ...
+  )
+}
+
+#' @rdname fastcpd_poisson
+#' @export
+fastcpd_poisson <- fastcpd.poisson
+
 #' @title Find change points efficiently in time series data
 #'
 #' @description `fastcpd_ts` is a wrapper function for `fastcpd` to find
