@@ -133,8 +133,6 @@ trouble installing `RcppArmadillo`.
 
 [![fastcpd cheatsheet](man/figures/cheatsheets.png)](https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf)
 
-<!-- TODO(doccstat): Leave only one example. -->
-
 ## Examples
 
 [Documentation](https://fastcpd.xingchi.li/reference/fastcpd.html)
