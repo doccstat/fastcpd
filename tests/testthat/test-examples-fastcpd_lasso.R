@@ -1,7 +1,13 @@
 testthat::test_that(
-  "examples/fastcpd_lasso.R", {
+  "examples/fastcpd_lasso.txt", {
     testthat::skip_if_not_installed("mvtnorm")
-    source("examples/fastcpd_lasso.R")
+
+    examples_garch <- readLines("examples/fastcpd_lasso.txt")
+    source(textConnection(paste(
+      examples_garch[seq_len(length(examples_garch) - 2) + 1],
+      collapse = "\n"
+    )))
+
     testthat::expect_equal(result@cp_set, c(80, 200, 320))
   }
 )

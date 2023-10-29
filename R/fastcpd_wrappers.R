@@ -109,7 +109,7 @@ fastcpd_garch <- fastcpd.garch
 #'   except that the data is by default a matrix or data frame with the response
 #'   variable as the first column and thus a formula is not required here.
 #'
-#' @example tests/testthat/examples/fastcpd_lasso.R
+#' @example tests/testthat/examples/fastcpd_lasso.txt
 #'
 #' @md
 #'
@@ -218,7 +218,9 @@ fastcpd_ma <- fastcpd.ma
 #' @rdname fastcpd_mean
 #' @export
 fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
-  data <- matrix(data)
+  if (is.null(dim(data)) && length(dim(data)) == 1) {
+    data <- matrix(data, ncol = 1)
+  }
   p <- ncol(data)
   segment_count <- 10
   if (methods::hasArg("segment_count")) {
@@ -234,7 +236,8 @@ fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
     } else {
       nrow(data)
     }
-    data_all_covs[block_index, , ] <- stats::cov(data[block_start:block_end, ])
+    data_all_covs[block_index, , ] <-
+      stats::cov(data[block_start:block_end, , drop = FALSE])
   }
   data_all_cov <- colMeans(data_all_covs)
   fastcpd(
