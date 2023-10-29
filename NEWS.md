@@ -6,6 +6,8 @@
     penalized linear regression family: `fastcpd.lasso` / `fastcpd_lasso`,
     mean change: `fastcpd.mean` / `fastcpd_mean`.
 *   Replace `"gaussian"` family with `"lm"`.
+*   Add progress bar.
+*   Fix design matrix from formula bug.
 
 # fastcpd 0.9.4
 

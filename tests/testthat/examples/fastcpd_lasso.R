@@ -16,5 +16,5 @@ y <- c(
   x[201:320, ] %*% theta_0[3, ] + rnorm(120, 0, 1),
   x[321:n, ] %*% theta_0[4, ] + rnorm(160, 0, 1)
 )
-result <- fastcpd.lasso(cbind(y, x), k = function(x) if (x < 20) 1 else 0)
+result <- fastcpd.lasso(cbind(y, x), k = function(x) if (x < 30) 1 else 0)
 summary(result)

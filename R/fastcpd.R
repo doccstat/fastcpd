@@ -218,10 +218,8 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   match_formula$drop.unused.levels <- TRUE
   match_formula[[1L]] <- quote(stats::model.frame)
   match_formula <- eval(match_formula, parent.frame())
-  mt <- attr(match_formula, "terms")
   y <- stats::model.response(match_formula, "any")
-  x <- stats::model.matrix(mt, match_formula)
-  data <- cbind(y, x)
+  data <- cbind(y, stats::model.matrix(formula, data = data))
 
   fastcpd_family <- NULL
   fastcpd_data <- NULL
@@ -378,11 +376,11 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         block_index <- seq_len(block_size) + i - 1
         block_index_lagged <- seq_len(block_size) + i
 
-        y_block <- y[block_index]
-        x_block <- x[block_index, , drop = FALSE]
+        y_block <- fastcpd_data[block_index, 1]
+        x_block <- fastcpd_data[block_index, -1, drop = FALSE]
 
-        y_block_lagged <- y[block_index_lagged]
-        x_block_lagged <- x[block_index_lagged, , drop = FALSE]
+        y_block_lagged <- fastcpd_data[block_index_lagged, 1]
+        x_block_lagged <- fastcpd_data[block_index_lagged, -1, drop = FALSE]
 
         x_t_x <- crossprod(x_block)
         x_t_x_lagged <- crossprod(x_block_lagged)

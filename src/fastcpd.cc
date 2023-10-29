@@ -3,6 +3,7 @@
 #include "fastcpd.h"
 #include "functions.h"
 #include "parameters.h"
+#include "RProgress.h"
 #include "wrappers.h"
 
 using ::fastcpd::cost_update::cost_optim;
@@ -45,6 +46,9 @@ List fastcpd_impl(
   colvec f_t = zeros<vec>(n + 1);
   f_t(0) = -beta;
 
+  RProgress::RProgress rProgress("[:bar] :current/:total in :elapsed", n);
+  rProgress.tick(0);
+
   fastcpd::parameters::FastcpdParameters fastcpd_parameters_class(
     data, beta, p, family, vanilla_percentage, segment_count,
     winsorise_minval, winsorise_maxval, epsilon
@@ -62,6 +66,8 @@ List fastcpd_impl(
   if (vanilla_percentage < 1) {
     fastcpd_parameters_class.create_gradients();
   }
+
+  rProgress.tick();
 
   for (int t = 2; t <= n; t++) {
     unsigned int r_t_count = r_t_set.n_elem;
@@ -205,6 +211,8 @@ List fastcpd_impl(
 
     // Objective function F(t).
     f_t(t) = min_obj;
+
+    rProgress.tick();
   }
 
   // Remove change points close to the boundaries.
