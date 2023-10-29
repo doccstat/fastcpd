@@ -182,9 +182,7 @@ fastcpd_ma <- fastcpd.ma
 #' @rdname fastcpd_mean
 #' @export
 fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
-  if (length(dim(data)) == 1) {
-    data <- matrix(data, ncol = 1)
-  }
+  data <- matrix(data)
   p <- ncol(data)
   segment_count <- 10
   if (methods::hasArg("segment_count")) {
