@@ -41,6 +41,6 @@ y <- c(
   rpois(200, exp(x[1101:1300, ] \%*\% theta_0)),
   rpois(200, exp(x[1301:n, ] \%*\% (theta_0 + delta)))
 )
-result <- fastcpd.poisson(cbind(y, x), epsilon = 1e-5)
+result <- fastcpd.poisson(cbind(y, x), epsilon = 1e-5, k = function(x) 1)
 summary(result)
 }
