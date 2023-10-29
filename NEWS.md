@@ -3,6 +3,7 @@
 *   Add wrapper functions of
     linear regression family: `fastcpd.lm` / `fastcpd_lm`,
     logistic regression family: `fastcpd.binomial` / `fastcpd_binomial`,
+    poisson regression family: `fastcpd.poisson` / `fastcpd_poisson`,
     penalized linear regression family: `fastcpd.lasso` / `fastcpd_lasso`,
     mean change: `fastcpd.mean` / `fastcpd_mean`.
 *   Replace `"gaussian"` family with `"lm"`.

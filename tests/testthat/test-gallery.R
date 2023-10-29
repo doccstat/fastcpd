@@ -107,66 +107,6 @@ testthat::test_that(
 )
 
 testthat::test_that(
-  "example poisson regression", {
-    testthat::skip_if_not_installed("mvtnorm")
-    set.seed(1)
-    p <- 3
-    x <- mvtnorm::rmvnorm(1500, rep(0, p), diag(p))
-    delta <- rnorm(p)
-    theta_0 <- c(1, 1.2, -1)
-    y <- c(
-      rpois(300, exp(x[1:300, ] %*% theta_0)),
-      rpois(400, exp(x[301:700, ] %*% (theta_0 + delta))),
-      rpois(300, exp(x[701:1000, ] %*% theta_0)),
-      rpois(100, exp(x[1001:1100, ] %*% (theta_0 - delta))),
-      rpois(200, exp(x[1101:1300, ] %*% theta_0)),
-      rpois(200, exp(x[1301:1500, ] %*% (theta_0 + delta)))
-    )
-    result <- fastcpd(
-      formula = y ~ . - 1,
-      data = data.frame(y = y, x = x),
-      beta = (p + 1) * log(1500) / 2,
-      k = function(x) 0,
-      family = "poisson",
-      epsilon = 1e-5
-    )
-
-    testthat::expect_equal(result@cp_set, c(329, 728, 1021, 1107, 1325))
-  }
-)
-
-testthat::test_that(
-  "example poisson regression multiple epochs", {
-    testthat::skip_if_not_installed("mvtnorm")
-    set.seed(1)
-    p <- 3
-    x <- mvtnorm::rmvnorm(1500, rep(0, p), diag(p))
-    delta <- rnorm(p)
-    theta_0 <- c(1, 1.2, -1)
-    y <- c(
-      rpois(300, exp(x[1:300, ] %*% theta_0)),
-      rpois(400, exp(x[301:700, ] %*% (theta_0 + delta))),
-      rpois(300, exp(x[701:1000, ] %*% theta_0)),
-      rpois(100, exp(x[1001:1100, ] %*% (theta_0 - delta))),
-      rpois(200, exp(x[1101:1300, ] %*% theta_0)),
-      rpois(200, exp(x[1301:1500, ] %*% (theta_0 + delta)))
-    )
-    result_two_epochs <- fastcpd(
-      formula = y ~ . - 1,
-      data = data.frame(y = y, x = x),
-      beta = (p + 1) * log(1500) / 2,
-      k = function(x) 1,
-      family = "poisson",
-      epsilon = 1e-4
-    )
-
-    testthat::expect_equal(
-      result_two_epochs@cp_set, c(328, 716, 1020, 1102, 1323)
-    )
-  }
-)
-
-testthat::test_that(
   "penalized linear regression with smaller sample size", {
     testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)

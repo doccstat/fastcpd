@@ -17,7 +17,7 @@ template:
     primary: "#447099"
 
 reference:
-  - title: Main function
+  - title: Main functions
     desc: >
       All implementation of fastcpd is unified into one single function
       `fastcpd()`. Simplified functions are provided for each family.
@@ -27,6 +27,7 @@ reference:
       - fastcpd.lasso
       - fastcpd.lm
       - fastcpd.mean
+      - fastcpd.poisson
       - fastcpd.ts
 
   - title: Main class
