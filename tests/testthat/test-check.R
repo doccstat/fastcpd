@@ -41,6 +41,42 @@ The provided family is "at".]"
 )
 
 testthat::test_that(
+  "order should be specified as a vector of length 1 or 3", {
+    testthat::expect_error(
+      fastcpd.ts(seq_len(5), "ar", rep(2, 2)),
+      paste0(
+        "The order should be specified as a vector of length 1 or 3 ",
+        "for AR family."
+      )
+    )
+  }
+)
+
+testthat::test_that(
+  "second and third elements of the order should be 0", {
+    testthat::expect_error(
+      fastcpd.ts(seq_len(5), "ar", c(1, 1, 0)),
+      paste0(
+        "The second and third elements of the order should be 0 ",
+        "for AR family."
+      )
+    )
+  }
+)
+
+testthat::test_that(
+  "order should be specified as a single integer", {
+    testthat::expect_error(
+      fastcpd.ts(seq_len(5), "var", c(1, 1)),
+      paste0(
+        "The order should be specified as a single integer ",
+        "for VAR family."
+      )
+    )
+  }
+)
+
+testthat::test_that(
   "invalid family provided", {
     testthat::expect_error(
       fastcpd(
