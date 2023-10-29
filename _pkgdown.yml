@@ -23,7 +23,10 @@ reference:
       `fastcpd()`. Simplified functions are provided for each family.
     contents:
       - fastcpd
+      - fastcpd.binomial
+      - fastcpd.lasso
       - fastcpd.lm
+      - fastcpd.mean
       - fastcpd.ts
 
   - title: Main class
