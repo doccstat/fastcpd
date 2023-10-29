@@ -381,31 +381,6 @@ result_ma <- fastcpd.ts(
 testthat::expect_equal(result_ma@cp_set, 200)
 ```
 
-# GARCH(p, q)
-
-## garch(1, 1)
-
-```{r}
-set.seed(1)
-n <- 400
-p <- 1
-sigma_2 <- rep(1, n + 1)
-x <- rep(0, n + 1)
-for (i in seq_len(200)) {
-  sigma_2[i + 1] <- 20 + 0.5 * x[i]^2 + 0.1 * sigma_2[i]
-  x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
-}
-for (i in 201:400) {
-  sigma_2[i + 1] <- 1 + 0.1 * x[i]^2 + 0.5 * sigma_2[i]
-  x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
-}
-
-result_ts <- suppressWarnings(
-  fastcpd.ts(x[-1], "garch", c(1, 1), include.mean = FALSE, trim = 0)
-)
-testthat::expect_equal(result_ts@cp_set, 206)
-```
-
 # custom family
 
 ## logistic regression

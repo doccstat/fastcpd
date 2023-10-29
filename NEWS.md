@@ -1,6 +1,7 @@
 # fastcpd 0.9.5
 
 *   Add wrapper functions of
+    GARCH(p, q) family: `fastcpd.garch` / `fastcpd_garch`,
     linear regression family: `fastcpd.lm` / `fastcpd_lm`,
     logistic regression family: `fastcpd.binomial` / `fastcpd_binomial`,
     poisson regression family: `fastcpd.poisson` / `fastcpd_poisson`,

@@ -365,31 +365,6 @@ testthat::test_that(
 )
 
 testthat::test_that(
-  "garch(1, 1) model using fGarch package", {
-    testthat::skip_if_not_installed("fGarch")
-    set.seed(1)
-    n <- 400
-    p <- 1
-    sigma_2 <- rep(1, n + 1)
-    x <- rep(0, n + 1)
-    for (i in seq_len(200)) {
-      sigma_2[i + 1] <- 20 + 0.5 * x[i]^2 + 0.1 * sigma_2[i]
-      x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
-    }
-    for (i in 201:400) {
-      sigma_2[i + 1] <- 1 + 0.1 * x[i]^2 + 0.5 * sigma_2[i]
-      x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
-    }
-
-    # TODO(doccstat): Verify the warning messages as well.
-    result_ts <- suppressWarnings(
-      fastcpd.ts(x[-1], "garch", c(1, 1), include.mean = FALSE, trim = 0)
-    )
-    testthat::expect_equal(result_ts@cp_set, 206)
-  }
-)
-
-testthat::test_that(
   "example custom logistic regression", {
     set.seed(1)
     p <- 5
