@@ -3,7 +3,7 @@
 #' @description \code{fastcpd} takes in formulas, data, families and extra
 #' parameters and returns a \code{fastcpd} object.
 #'
-#' @example man/examples/fastcpd.txt
+#' @example tests/testthat/examples/fastcpd.txt
 #'
 #' @md
 #' @section Gallery:

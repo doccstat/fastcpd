@@ -177,43 +177,7 @@ testthat::expect_equal(
 )
 ```
 
-# penalized linear regression
-
-```{r}
-set.seed(1)
-n <- 1500
-p_true <- 6
-p <- 50
-x <- mvtnorm::rmvnorm(1500, rep(0, p), diag(p))
-theta_0 <- rbind(
-  runif(p_true, -5, -2),
-  runif(p_true, -3, 3),
-  runif(p_true, 2, 5),
-  runif(p_true, -5, 5)
-)
-theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
-y <- c(
-  x[1:300, ] %*% theta_0[1, ] + rnorm(300, 0, 1),
-  x[301:700, ] %*% theta_0[2, ] + rnorm(400, 0, 1),
-  x[701:1000, ] %*% theta_0[3, ] + rnorm(300, 0, 1),
-  x[1001:1500, ] %*% theta_0[4, ] + rnorm(500, 0, 1)
-)
-result <- fastcpd(
-  formula = y ~ . - 1,
-  data = data.frame(y = y, x = x),
-  family = "lasso"
-)
-
-testthat::expect_equal(result@cp_set, c(300, 700, 1000))
-testthat::expect_equal(
-  unname(sqrt(colSums((t(theta_0[, 1:6]) - result@thetas[1:6, ])^2))),
-  c(0.5801021, 0.5439067, 0.4677495, 0.4898553),
-  tolerance = 1e-7,
-  ignore_attr = TRUE
-)
-```
-
-## smaller sample size / multiple epochs / starting with vanilla
+# penalized linear regression / multiple epochs / starting with vanilla
 
 ```{r}
 set.seed(1)
@@ -615,91 +579,6 @@ result_custom <- fastcpd(
 
 testthat::expect_equal(result_builtin@cp_set, 198)
 testthat::expect_equal(result_custom@cp_set, 200)
-```
-
-## mean change (one-dimensional)
-
-```{r}
-set.seed(1)
-p <- 1
-data <- rbind(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
-  mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
-  mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
-)
-segment_count_guess <- 10
-block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
-block_count <- floor(nrow(data) / block_size)
-data_all_vars <- rep(0, block_count)
-for (block_index in seq_len(block_count)) {
-  block_start <- (block_index - 1) * block_size + 1
-  block_end <- if (block_index < block_count) {
-    block_index * block_size
-  } else {
-    nrow(data)
-  }
-  data_all_vars[block_index] <- var(data[block_start:block_end, ])
-}
-data_all_var <- mean(data_all_vars)
-mean_loss <- function(data) {
-  n <- nrow(data)
-  n / 2 * (
-    log(data_all_var) + log(2 * pi) +
-      sum((data - colMeans(data))^2 / data_all_var) / n
-  )
-}
-mean_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data.frame(data),
-  beta = (p + 1) * log(nrow(data)) / 2,
-  p = p,
-  cost = mean_loss
-)
-
-testthat::expect_equal(mean_loss_result@cp_set, c(300, 700))
-```
-
-## mean change
-
-```{r}
-set.seed(1)
-p <- 3
-data <- rbind(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
-  mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
-  mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
-)
-segment_count_guess <- 5
-block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
-block_count <- floor(nrow(data) / block_size)
-data_all_covs <- array(NA, dim = c(block_count, p, p))
-for (block_index in seq_len(block_count)) {
-  block_start <- (block_index - 1) * block_size + 1
-  block_end <- if (block_index < block_count) {
-    block_index * block_size
-  } else {
-    nrow(data)
-  }
-  data_all_covs[block_index, , ] <- cov(data[block_start:block_end, ])
-}
-data_all_cov <- colMeans(data_all_covs)
-mean_loss <- function(data) {
-  n <- nrow(data)
-  demeaned_data <- sweep(data, 2, colMeans(data))
-  n / 2 * (
-    log(det(data_all_cov)) + p * log(2 * pi) +
-      sum(diag(solve(data_all_cov, crossprod(demeaned_data)))) / n
-  )
-}
-mean_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data.frame(data),
-  beta = (p + 1) * log(nrow(data)) / 2,
-  p = p,
-  cost = mean_loss
-)
-
-testthat::expect_equal(mean_loss_result@cp_set, c(300, 700))
 ```
 
 ## variance change (one-dimensional)
