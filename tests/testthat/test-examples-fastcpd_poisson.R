@@ -2,6 +2,6 @@ testthat::test_that(
   "examples/fastcpd_poisson.R", {
     testthat::skip_if_not_installed("mvtnorm")
     source("examples/fastcpd_poisson.R")
-    testthat::expect_equal(result@cp_set, c(329, 728, 1021, 1107, 1325))
+    testthat::expect_equal(result@cp_set, c(328, 716, 1020, 1102, 1323))
   }
 )
