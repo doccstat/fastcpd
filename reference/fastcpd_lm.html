@@ -109,7 +109,25 @@ column.</p></dd>
 <span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">cp</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">cp</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">cp</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="va">cp</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">cp</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">n</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="va">cp</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result_internal_variance</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.lm</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.lm</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(data = data.frame(y = data[, 1], x = data[, -1]), family = "lm")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 100 201 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 499.5254 328.5244 459.3819 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    segment 1  segment 2  segment 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.7054739 -0.5373328 0.23439463</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.8005173 -0.8915565 0.87884516</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3.6097492 -0.5539604 0.03698789</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -1.3438206  2.2831450 1.01253653</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.1352143 -2.0567371 1.28948015</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
