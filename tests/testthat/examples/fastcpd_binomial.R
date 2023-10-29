@@ -1,0 +1,13 @@
+set.seed(1)
+x <- matrix(rnorm(1500, 0, 1), ncol = 5)
+theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
+y <- c(
+  rbinom(125, 1, 1 / (1 + exp(-x[1:125, ] %*% theta[1, ]))),
+  rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] %*% theta[2, ])))
+)
+result <- suppressWarnings(fastcpd(
+  formula = y ~ . - 1,
+  data = data.frame(y = y, x = x),
+  family = "binomial"
+))
+summary(result)

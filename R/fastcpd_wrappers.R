@@ -58,6 +58,68 @@ fastcpd.lm <- function(data, ...) {  # nolint: Conventional R function style
 #' @export
 fastcpd_lm <- fastcpd.lm
 
+#' @title Find change points efficiently in linear regression models
+#'
+#' @description \code{"fastcpd_mean"} and \code{"fastcpd.mean"} are wrapper
+#'   functions of \code{\link{fastcpd}} to find the mean change. The function is
+#'   similar to \code{"fastcpd"} except that the data is by default a matrix or
+#'   data frame or a vector with each row / element as an observation and thus a
+#'   formula is not required here.
+#'
+#' @example man/examples/fastcpd_mean.txt
+#'
+#' @md
+#'
+#' @param data A matrix, a data frame or a vector.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_mean
+#' @export
+fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
+  if (length(dim(data)) == 1) {
+    data <- matrix(data, ncol = 1)
+  }
+  p <- ncol(data)
+  segment_count <- 10
+  if (methods::hasArg("segment_count")) {
+    segment_count <- eval.parent(match.call()[["segment_count"]])
+  }
+  block_size <- max(floor(sqrt(nrow(data)) / (segment_count + 1)), 2)
+  block_count <- floor(nrow(data) / block_size)
+  data_all_covs <- array(NA, dim = c(block_count, p, p))
+  for (block_index in seq_len(block_count)) {
+    block_start <- (block_index - 1) * block_size + 1
+    block_end <- if (block_index < block_count) {
+      block_index * block_size
+    } else {
+      nrow(data)
+    }
+    data_all_covs[block_index, , ] <- cov(data[block_start:block_end, ])
+  }
+  data_all_cov <- colMeans(data_all_covs)
+  fastcpd(
+    formula = ~ . - 1,
+    data = data.frame(x = data),
+    cost = function(data) {
+      n <- nrow(data)
+      demeaned_data <- sweep(data, 2, colMeans(data))
+      n / 2 * (
+        log(det(data_all_cov)) + p * log(2 * pi) +
+          sum(diag(solve(data_all_cov, crossprod(demeaned_data)))) / n
+      )
+    },
+    beta = (p + 1) * log(nrow(data)) / 2,
+    ...
+  )
+}
+
+#' @rdname fastcpd_mean
+#' @export
+fastcpd_mean <- fastcpd.mean
+
 #' @title Find change points efficiently in time series data
 #'
 #' @description `fastcpd_ts` is a wrapper function for `fastcpd` to find
