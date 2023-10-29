@@ -29,6 +29,42 @@ fastcpd.binomial <- function(data, ...) {  # nolint: Conventional R function sty
 #' @export
 fastcpd_binomial <- fastcpd.binomial
 
+#' @title Find change points efficiently in GARCH(p, q) models
+#'
+#' @description \code{"fastcpd_garch"} and \code{"fastcpd.garch"} are
+#'   wrapper functions of \code{\link{fastcpd}} to find change points in
+#'   GARCH(p, q) models. The function is similar to \code{"fastcpd"}
+#'   except that the data is by default a one-column matrix or univariate vector
+#'   and thus a formula is not required here.
+#'
+#' @example tests/testthat/examples/fastcpd_garch.txt
+#'
+#' @md
+#'
+#' @param data A numeric vector, a matrix, a data frame or a time series object.
+#' @param order A positive integer vector of length two specifying the order of
+#'   the GARCH model.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}. One special argument can be passed here is
+#'   \code{include.mean}, which is a logical value indicating whether the
+#'   mean should be included in the model. The default value is \code{TRUE}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_garch
+#' @export
+fastcpd.garch <- function(  # nolint: Conventional R function style
+  data,
+  order = c(0, 0),
+  ...
+) {
+  fastcpd.ts(c(data), "garch", order, ...)
+}
+
+#' @rdname fastcpd_garch
+#' @export
+fastcpd_garch <- fastcpd.garch
+
 #' @title Find change points efficiently in penalized linear regression models
 #'
 #' @description \code{"fastcpd_lasso"} and \code{"fastcpd.lasso"} are wrapper
