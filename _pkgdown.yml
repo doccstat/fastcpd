@@ -45,6 +45,7 @@ reference:
     contents:
       - fastcpd.mean
       - fastcpd.variance
+      - fastcpd.meanvariance
 
   - subtitle: Regression data
     desc: >

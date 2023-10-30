@@ -260,6 +260,64 @@ fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
 #' @export
 fastcpd_mean <- fastcpd.mean
 
+#' @title Find change points efficiently in variance change models
+#'
+#' @description \code{fastcpd_meanvariance}, \code{fastcpd.meanvariance},
+#'   \code{fastcpd_mv}, \code{fastcpd.mv} are wrapper
+#'   functions of \code{\link{fastcpd}} to find the meanvariance change. The
+#'   function is similar to \code{\link{fastcpd}} except that the data is by
+#'   default a matrix or data frame or a vector with each row / element as an
+#'   observation and thus a formula is not required here.
+#'
+#' @example tests/testthat/examples/fastcpd_meanvariance.txt
+#'
+#' @md
+#'
+#' @param data A matrix, a data frame or a vector.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_meanvariance
+#' @export
+fastcpd.meanvariance <- function(  # nolint: Conventional R function style
+  data,
+  ...
+) {
+  if (is.null(dim(data)) && length(dim(data)) == 1) {
+    data <- matrix(data, ncol = 1)
+  }
+  fastcpd(
+    formula = ~ . - 1,
+    data = data.frame(x = data),
+    cost = function(data) {
+      n <- nrow(data)
+      p <- ncol(data)
+      if (n <= p) {
+        data_cov <- diag(p)
+      } else {
+        data_cov <- cov(data)
+      }
+      n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
+    },
+    beta = (ncol(data)^2 + ncol(data) + 1) * log(nrow(data)) / 2,
+    ...
+  )
+}
+
+#' @rdname fastcpd_meanvariance
+#' @export
+fastcpd_meanvariance <- fastcpd.meanvariance
+
+#' @rdname fastcpd_meanvariance
+#' @export
+fastcpd.mv <- fastcpd.meanvariance  # nolint: Conventional R function style
+
+#' @rdname fastcpd_meanvariance
+#' @export
+fastcpd_mv <- fastcpd.meanvariance
+
 #' @title Find change points efficiently in Poisson regression models
 #'
 #' @description \code{"fastcpd_poisson"} and \code{"fastcpd.poisson"} are

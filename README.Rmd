@@ -133,15 +133,34 @@ trouble installing `RcppArmadillo`.
 
 [![fastcpd cheatsheet](man/figures/cheatsheets.png)](https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf)
 
-## Examples
+## Usage
 
-[Documentation](https://fastcpd.xingchi.li/reference/fastcpd.html)
+It is hard to demonstrate all the features of `fastcpd` in a single example due
+to the flexibility of the package. For more examples, please refer to the
+[function reference](https://fastcpd.xingchi.li/reference/index.html).
+
+```{r ar3}
+set.seed(1)
+n <- 1000
+x <- rep(0, n + 3)
+for (i in 1:600) {
+  x[i + 3] <- 0.6 * x[i + 2] - 0.2 * x[i + 1] + 0.1 * x[i] + rnorm(1, 0, 3)
+}
+for (i in 601:1000) {
+  x[i + 1] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
+}
+result <- fastcpd::fastcpd.ar(x[3 + seq_len(n)], 3)
+summary(result)
+plot(result)
+```
+
+## Examples
 
 <!-- This example section is a direct copy from `fastcpd` documentation -->
 
-<details open>
+<details close>
 
-<summary>Click to fold</summary>
+<summary>Click to open</summary>
 
 ### linear regression
 
