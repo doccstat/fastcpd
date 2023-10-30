@@ -104,6 +104,43 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "check_cost", {
+    testthat::expect_error(
+      fastcpd(
+        data = data.frame(y = 0, x = 0),
+        family = "lm",
+        cost = function(data) NULL
+      ),
+      "Please do not specify the cost function for built-in models."
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        data = data.frame(y = 0, x = 0),
+        cost = function(data, theta) NULL,
+        cost_gradient = function(data, theta) NULL
+      ),
+      paste0(
+        "Please specify the Hessian function ",
+        "if the gradient function is available."
+      )
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        data = data.frame(y = 0, x = 0),
+        cost = function(data, theta) NULL,
+        cost_hessian = function(data, theta) NULL
+      ),
+      paste0(
+        "Please specify the gradient function ",
+        "if the Hessian function is available."
+      )
+    )
+  }
+)
+
+testthat::test_that(
   "linear regression without change points", {
     result <- fastcpd(
       formula = y ~ . - 1,
@@ -140,6 +177,15 @@ testthat::test_that(
     )
 
     testthat::expect_error(
+      fastcpd.ts(
+        data = seq_len(5),
+        family = "ar",
+        order = NULL
+      ),
+      "Please refer to the documentation for the order of the model."
+    )
+
+    testthat::expect_error(
       fastcpd(
         formula = ~ x - 1,
         data = data.frame(x = 0),
@@ -163,6 +209,52 @@ testthat::test_that(
       fastcpd(
         formula = ~ x - 1,
         data = data.frame(x = 0),
+        family = "ma",
+        order = c(1, 0)
+      ),
+      paste0(
+        "The order should be specified as a vector of length 1 or 3 ",
+        "for MA family."
+      )
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "ma",
+        order = 0
+      ),
+      "The order should be a positive integer for MA family."
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "ma",
+        order = c(0, 0, -1)
+      ),
+      paste0(
+        "The third element of the order should be a positive integer ",
+        "for MA family."
+      )
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "ma",
+        order = c(1, 0, 1)
+      ),
+      "The first and second elements of the order should be 0 for MA family."
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
         family = "arima",
         order = c(0, 0, 0)
       ),
@@ -177,6 +269,36 @@ testthat::test_that(
         order = c(-0.1, 0, 0)
       ),
       "The order should be positive integers for ARIMA family."
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "garch",
+        order = 1
+      ),
+      "The order should be specified as a vector of length 2 for GARCH family."
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "garch",
+        order = c(0.1, 0.1)
+      ),
+      "The order should be positive integers for GARCH family."
+    )
+
+    testthat::expect_error(
+      fastcpd(
+        formula = ~ x - 1,
+        data = data.frame(x = 0),
+        family = "garch",
+        order = c(0, 0)
+      ),
+      "The order should have at least one non-zero element for GARCH family."
     )
   }
 )
