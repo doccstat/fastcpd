@@ -9,6 +9,7 @@
     penalized linear regression family: `fastcpd.lasso` / `fastcpd_lasso`,
     MA(q) model: `fastcpd.ma` / `fastcpd_ma`,
     mean change: `fastcpd.mean` / `fastcpd_mean`,
+    variance change: `fastcpd.variance` / `fastcpd_variance`.
 *   Replace `"gaussian"` family with `"lm"`.
 *   Add progress bar.
 *   Fix design matrix from formula bug.

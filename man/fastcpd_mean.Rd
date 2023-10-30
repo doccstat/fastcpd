@@ -3,7 +3,7 @@
 \name{fastcpd.mean}
 \alias{fastcpd.mean}
 \alias{fastcpd_mean}
-\title{Find change points efficiently in linear regression models}
+\title{Find change points efficiently in mean change models}
 \usage{
 fastcpd.mean(data, ...)
 

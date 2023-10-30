@@ -17,21 +17,43 @@ template:
     primary: "#447099"
 
 reference:
-  - title: Main functions
+  - title: Main function
     desc: >
       All implementation of fastcpd is unified into one single function
-      `fastcpd()`. Simplified functions are provided for each family.
+      `fastcpd()`.
     contents:
       - fastcpd
+
+  - title: Wrapper functions
+    desc: >
+      Simplified functions are provided for each family.
+
+  - subtitle: Time series
+    desc: >
+      `fastcpd.ts()` and `fastcpd_ts()` are the main functions for time series
+      data.
+    contents:
       - fastcpd.ar
-      - fastcpd.binomial
       - fastcpd.garch
+      - fastcpd.ma
+      - fastcpd.ts
+
+  - subtitle: Unlabeled data
+    desc: >
+      Used for data without response variables, for example, mean change and
+      variance change.
+    contents:
+      - fastcpd.mean
+      - fastcpd.variance
+
+  - subtitle: Regression data
+    desc: >
+      Detect change points in the coefficients of regression-type data.
+    contents:
+      - fastcpd.binomial
       - fastcpd.lasso
       - fastcpd.lm
-      - fastcpd.ma
-      - fastcpd.mean
       - fastcpd.poisson
-      - fastcpd.ts
 
   - title: Main class
     desc: >

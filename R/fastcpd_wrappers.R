@@ -197,7 +197,7 @@ fastcpd.ma <- function(  # nolint: Conventional R function style
 #' @export
 fastcpd_ma <- fastcpd.ma
 
-#' @title Find change points efficiently in linear regression models
+#' @title Find change points efficiently in mean change models
 #'
 #' @description \code{"fastcpd_mean"} and \code{"fastcpd.mean"} are wrapper
 #'   functions of \code{\link{fastcpd}} to find the mean change. The function is
@@ -359,3 +359,53 @@ fastcpd.ts <- function(  # nolint: Conventional R function style
 #' @rdname fastcpd_ts
 #' @export
 fastcpd_ts <- fastcpd.ts
+
+#' @title Find change points efficiently in variance change models
+#'
+#' @description \code{fastcpd_variance} and \code{fastcpd.variance} are wrapper
+#'   functions of \code{\link{fastcpd}} to find the variance change. The
+#'   function is similar to \code{\link{fastcpd}} except that the data is by
+#'   default a matrix or data frame or a vector with each row / element as an
+#'   observation and thus a formula is not required here.
+#'
+#' @example tests/testthat/examples/fastcpd_variance.txt
+#'
+#' @md
+#'
+#' @param data A matrix, a data frame or a vector.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_variance
+#' @export
+fastcpd.variance <- function(  # nolint: Conventional R function style
+  data,
+  ...
+) {
+  if (is.null(dim(data)) && length(dim(data)) == 1) {
+    data <- matrix(data, ncol = 1)
+  }
+  data_all_mean <- colMeans(data)
+  fastcpd(
+    formula = ~ . - 1,
+    data = data.frame(x = data),
+    cost = function(data) {
+      n <- nrow(data)
+      p <- ncol(data)
+      if (n < p) {
+        data_cov <- diag(p)
+      } else {
+        data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
+      }
+      n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
+    },
+    beta = (ncol(data)^2 + 1) * log(nrow(data)) / 2,
+    ...
+  )
+}
+
+#' @rdname fastcpd_variance
+#' @export
+fastcpd_variance <- fastcpd.variance
