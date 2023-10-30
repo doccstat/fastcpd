@@ -27,6 +27,22 @@ List negative_log_likelihood(
     Nullable<colvec> start = R_NilValue
 );
 
+List negative_log_likelihood_wo_theta(
+    mat data,
+    string family,
+    double lambda,
+    bool cv,
+    Nullable<colvec> start
+);
+
+double negative_log_likelihood_wo_cv(
+    mat data,
+    colvec theta,
+    string family,
+    double lambda,
+    Nullable<colvec> start
+);
+
 // Function to calculate the gradient at the current data.
 //
 // @param data A data frame containing the data to be segmented.

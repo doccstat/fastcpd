@@ -10,9 +10,27 @@ List negative_log_likelihood(
     bool cv,
     Nullable<colvec> start
 ) {
-  if (theta.isNull() && family == "lasso" && cv) {
+  if (theta.isNull()) {
+    return negative_log_likelihood_wo_theta(data, family, lambda, cv, start);
+  } else {
+    return List::create(
+      Named("value") = negative_log_likelihood_wo_cv(
+        data, as<colvec>(theta), family, lambda, start
+      )
+    );
+  }
+}
+
+List negative_log_likelihood_wo_theta(
+    mat data,
+    string family,
+    double lambda,
+    bool cv,
+    Nullable<colvec> start
+) {
+  if (family == "lasso" && cv) {
     Environment glmnet = Environment::namespace_env("glmnet"),
-                 stats = Environment::namespace_env("stats");
+                stats = Environment::namespace_env("stats");
     Function cv_glmnet = glmnet["cv.glmnet"],
         predict_glmnet = glmnet["predict.glmnet"],
               deviance = stats["deviance"];
@@ -36,11 +54,11 @@ List negative_log_likelihood(
     return List::create(
       Named("par") = par, Named("value") = values(index_vec(1) - 1)
     );
-  } else if (theta.isNull() && family == "lasso" && !cv) {
+  } else if (family == "lasso" && !cv) {
     Environment stats = Environment::namespace_env("stats"),
-               glmnet = Environment::namespace_env("glmnet");
+              glmnet = Environment::namespace_env("glmnet");
     Function deviance = stats["deviance"], glmnet_ = glmnet["glmnet"],
-       predict_glmnet = glmnet["predict.glmnet"];
+      predict_glmnet = glmnet["predict.glmnet"];
     List out = glmnet_(
       data.cols(1, data.n_cols - 1), data.col(0),
       Named("family") = "gaussian", Named("lambda") = lambda
@@ -60,7 +78,7 @@ List negative_log_likelihood(
     return List::create(Named("par") = par,
                   Named("value") = value / 2,
                   Named("residuals") = residuals);
-  } else if (theta.isNull()) {
+  } else {
     // Estimate theta in binomial/poisson/gaussian family
     mat x = data.cols(1, data.n_cols - 1);
     vec y = data.col(0);
@@ -79,30 +97,29 @@ List negative_log_likelihood(
     return List::create(Named("par") = par,
                   Named("value") = value / 2,
                   Named("residuals") = residuals);
-  } else if (family == "lasso" || family == "gaussian") {
-    colvec theta_nonnull = as<colvec>(theta);
+  }
+}
+
+double negative_log_likelihood_wo_cv(
+    mat data,
+    colvec theta,
+    string family,
+    double lambda,
+    Nullable<colvec> start
+) {
+  vec y = data.col(0);
+  mat x = data.cols(1, data.n_cols - 1);
+  if (family == "lasso" || family == "gaussian") {
     // Calculate negative log likelihood in gaussian family
-    vec y = data.col(0);
-    mat x = data.cols(1, data.n_cols - 1);
-    double penalty = lambda * accu(arma::abs(theta_nonnull));
-    return List::create(
-      Named("value") = accu(arma::pow(y - x * theta_nonnull, 2)) / 2 + penalty
-    );
+    double penalty = lambda * accu(arma::abs(theta));
+    return accu(arma::pow(y - x * theta, 2)) / 2 + penalty;
   } else if (family == "binomial") {
     // Calculate negative log likelihood in binomial family
-    colvec theta_nonnull = as<colvec>(theta);
-    vec y = data.col(0);
-    mat x = data.cols(1, data.n_cols - 1);
-    colvec u = x * theta_nonnull;
-    return List::create(
-      Named("value") = accu(-y % u + arma::log(1 + exp(u)))
-    );
+    colvec u = x * theta;
+    return accu(-y % u + arma::log(1 + exp(u)));
   } else {
     // Calculate negative log likelihood in poisson family
-    colvec theta_nonnull = as<colvec>(theta);
-    vec y = data.col(0);
-    mat x = data.cols(1, data.n_cols - 1);
-    colvec u = x * theta_nonnull;
+    colvec u = x * theta;
 
     colvec y_factorial(y.n_elem);
     for (unsigned int i = 0; i < y.n_elem; i++) {
@@ -113,9 +130,7 @@ List negative_log_likelihood(
       y_factorial(i) = log_factorial;
     }
 
-    return List::create(
-      Named("value") = accu(-y % u + exp(u) + y_factorial)
-    );
+    return accu(-y % u + exp(u) + y_factorial);
   }
 }
 
