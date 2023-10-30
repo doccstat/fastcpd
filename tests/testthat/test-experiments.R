@@ -1,4 +1,169 @@
 testthat::test_that(
+  "examples/fastcpd_mean.txt test coverage", {
+    set.seed(1)
+    data <- c(rnorm(300, 0, 100), rnorm(400, 100, 100), rnorm(300, 0, 100))
+    result_mean <- fastcpd.mean(data)
+    testthat::expect_equal(result_mean@cp_set, c(294, 702))
+  }
+)
+
+testthat::test_that(
+  "examples/fastcpd_variance.txt test coverage", {
+    set.seed(1)
+    data <- c(rnorm(300, 0, 1), rnorm(400, 0, 100), rnorm(300, 0, 1))
+    result_variance <- fastcpd.variance(data)
+    testthat::expect_equal(result_variance@cp_set, c(300, 700))
+  }
+)
+
+testthat::test_that(
+  "examples/fastcpd_meanvariance.txt test coverage", {
+    set.seed(1)
+    data <- c(
+      rnorm(300, 0, 1), rnorm(400, 10, 1), rnorm(300, 0, 50),
+      rnorm(300, 0, 1), rnorm(400, 10, 1), rnorm(300, 10, 50)
+    )
+    result_meanvariance <- fastcpd.meanvariance(data)
+    testthat::expect_equal(
+      result_meanvariance@cp_set, c(300, 700, 1000, 1300, 1700)
+    )
+  }
+)
+
+testthat::test_that(
+  "example linear regression with one-dimensional covariate", {
+    testthat::skip("This test is intended to be run manually.")
+    testthat::skip_if_not_installed("mvtnorm")
+    set.seed(1)
+    p <- 1
+    x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
+    theta_0 <- matrix(c(1, -1, 0.5))
+    y <- c(
+      x[1:100, ] * theta_0[1, ] + rnorm(100, 0, 1),
+      x[101:200, ] * theta_0[2, ] + rnorm(100, 0, 1),
+      x[201:300, ] * theta_0[3, ] + rnorm(100, 0, 1)
+    )
+    result <- fastcpd(
+      formula = y ~ . - 1,
+      data = data.frame(y = y, x = x),
+      family = "lm"
+    )
+
+    testthat::expect_equal(result@cp_set, c(100, 194))
+  }
+)
+
+testthat::test_that(
+  "example custom logistic regression", {
+    testthat::skip("This test is intended to be run manually.")
+    set.seed(1)
+    p <- 5
+    x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
+    theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
+    y <- c(
+      rbinom(200, 1, 1 / (1 + exp(-x[1:200, ] %*% theta[1, ]))),
+      rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] %*% theta[2, ])))
+    )
+    data <- data.frame(y = y, x = x)
+    logistic_loss <- function(data, theta) {
+      x <- data[, -1]
+      y <- data[, 1]
+      u <- x %*% theta
+      nll <- -y * u + log(1 + exp(u))
+      nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
+      sum(nll)
+    }
+    logistic_loss_gradient <- function(data, theta) {
+      x <- data[nrow(data), -1]
+      y <- data[nrow(data), 1]
+      c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
+    }
+    logistic_loss_hessian <- function(data, theta) {
+      x <- data[nrow(data), -1]
+      prob <- 1 / (1 + exp(-x %*% theta))
+      (x %o% x) * c((1 - prob) * prob)
+    }
+    result_custom <- fastcpd(
+      formula = y ~ . - 1,
+      data = data,
+      epsilon = 1e-5,
+      cost = logistic_loss,
+      cost_gradient = logistic_loss_gradient,
+      cost_hessian = logistic_loss_hessian
+    )
+
+    result_custom_two_epochs <- fastcpd(
+      formula = y ~ . - 1,
+      data = data,
+      k = function(x) 1,
+      epsilon = 1e-5,
+      cost = logistic_loss,
+      cost_gradient = logistic_loss_gradient,
+      cost_hessian = logistic_loss_hessian
+    )
+
+    warning_messages <- testthat::capture_warnings(
+      result_builtin <- fastcpd(
+        formula = y ~ . - 1,
+        data = data,
+        family = "binomial"
+      )
+    )
+    testthat::expect_equal(
+      warning_messages,
+      rep("fit_glm: fitted probabilities numerically 0 or 1 occurred", 3)
+    )
+
+    testthat::expect_equal(result_builtin@cp_set, 200)
+    testthat::expect_equal(result_custom@cp_set, 201)
+    testthat::expect_equal(result_custom_two_epochs@cp_set, 200)
+  }
+)
+
+testthat::test_that(
+  "ar(1) model using custom cost function", {
+    testthat::skip("This test is intended to be run manually.")
+    set.seed(1)
+    n <- 1000
+    p <- 1
+    time_series <- rep(0, n + 1)
+    for (i in 1:600) {
+      time_series[i + 1] <- 0.6 * time_series[i] + rnorm(1)
+    }
+    for (i in 601:1000) {
+      time_series[i + 1] <- 0.3 * time_series[i] + rnorm(1)
+    }
+    ar1_loss <- function(data) {
+      n <- nrow(data)
+      optim_result <- optim(
+        par = 0,
+        fn = function(data, theta) {
+          n <- nrow(data)
+          unconditional_sum_of_squares <- (1 - theta^2) * data[1]^2 + sum(
+            (data[2:n] - theta * data[1:(n - 1)])^2
+          )
+          log(unconditional_sum_of_squares) - log(1 - theta^2) / n
+        },
+        method = "Brent",
+        data = data,
+        lower = -0.999,
+        upper = 0.999
+      )
+      n / 2 * (optim_result$value - log(n) + log(2 * pi) + 1)
+    }
+    result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(x = time_series[-1]),
+      beta = (2 * p + 1) * log(n) / 2,
+      p = 2 * p,
+      cost = ar1_loss
+    )
+
+    testthat::expect_equal(result@cp_set, 614)
+  }
+)
+
+testthat::test_that(
   "confidence interval experiment", {
     testthat::skip("This test is intended to be run manually.")
     set.seed(1)

@@ -1,0 +1,111 @@
+---
+title: "Advanced usages"
+output: rmarkdown::html_vignette
+description: |
+  Introduction and examples to the parameters of the `fastcpd` function.
+vignette: >
+  %\VignetteIndexEntry{Advanced usages}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(fastcpd)
+```
+
+```{r lasso_setup}
+set.seed(1)
+n <- 1500
+p_true <- 6
+p <- 50
+x <- mvtnorm::rmvnorm(480, rep(0, p), diag(p))
+theta_0 <- rbind(
+  runif(p_true, -5, -2),
+  runif(p_true, -3, 3),
+  runif(p_true, 2, 5),
+  runif(p_true, -5, 5)
+)
+theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+y <- c(
+  x[1:80, ] %*% theta_0[1, ] + rnorm(80, 0, 1),
+  x[81:200, ] %*% theta_0[2, ] + rnorm(120, 0, 1),
+  x[201:320, ] %*% theta_0[3, ] + rnorm(120, 0, 1),
+  x[321:480, ] %*% theta_0[4, ] + rnorm(160, 0, 1)
+)
+```
+
+```{r lasso}
+result <- fastcpd(
+  formula = y ~ . - 1,
+  data = data.frame(y = y, x = x),
+  family = "lasso"
+)
+summary(result)
+```
+
+# Multiple epochs
+
+```{r lasso_multiple_epochs_setup, include = FALSE}
+set.seed(1)
+n <- 1500
+p_true <- 6
+p <- 50
+x <- mvtnorm::rmvnorm(480, rep(0, p), diag(p))
+theta_0 <- rbind(
+  runif(p_true, -5, -2),
+  runif(p_true, -3, 3),
+  runif(p_true, 2, 5),
+  runif(p_true, -5, 5)
+)
+theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+y <- c(
+  x[1:80, ] %*% theta_0[1, ] + rnorm(80, 0, 1),
+  x[81:200, ] %*% theta_0[2, ] + rnorm(120, 0, 1),
+  x[201:320, ] %*% theta_0[3, ] + rnorm(120, 0, 1),
+  x[321:480, ] %*% theta_0[4, ] + rnorm(160, 0, 1)
+)
+```
+
+```{r lasso_multiple_epochs}
+result_multiple_epochs <- fastcpd(
+  formula = y ~ . - 1,
+  data = data.frame(y = y, x = x),
+  family = "lasso",
+  k = function(x) if (x < 20) 1 else 0
+)
+summary(result_multiple_epochs)
+```
+
+# Vanilla percentage
+
+```{r lasso_vanilla_percentage_setup, include = FALSE}
+set.seed(1)
+n <- 1500
+p_true <- 6
+p <- 50
+x <- mvtnorm::rmvnorm(480, rep(0, p), diag(p))
+theta_0 <- rbind(
+  runif(p_true, -5, -2),
+  runif(p_true, -3, 3),
+  runif(p_true, 2, 5),
+  runif(p_true, -5, 5)
+)
+theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+y <- c(
+  x[1:80, ] %*% theta_0[1, ] + rnorm(80, 0, 1),
+  x[81:200, ] %*% theta_0[2, ] + rnorm(120, 0, 1),
+  x[201:320, ] %*% theta_0[3, ] + rnorm(120, 0, 1),
+  x[321:480, ] %*% theta_0[4, ] + rnorm(160, 0, 1)
+)
+```
+
+```{r lasso_vanilla_percentage}
+result_vanilla_percentage <- fastcpd(
+  formula = y ~ . - 1,
+  data = data.frame(y = y, x = x),
+  family = "lasso",
+  vanilla_percentage = 0.2
+)
+summary(result_vanilla_percentage)
+```

@@ -218,7 +218,7 @@ fastcpd_ma <- fastcpd.ma
 #' @rdname fastcpd_mean
 #' @export
 fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
-  if (is.null(dim(data)) && length(dim(data)) == 1) {
+  if (is.null(dim(data)) || length(dim(data)) == 1) {
     data <- matrix(data, ncol = 1)
   }
   p <- ncol(data)
@@ -285,7 +285,7 @@ fastcpd.meanvariance <- function(  # nolint: Conventional R function style
   data,
   ...
 ) {
-  if (is.null(dim(data)) && length(dim(data)) == 1) {
+  if (is.null(dim(data)) || length(dim(data)) == 1) {
     data <- matrix(data, ncol = 1)
   }
   fastcpd(
@@ -297,7 +297,7 @@ fastcpd.meanvariance <- function(  # nolint: Conventional R function style
       if (n <= p) {
         data_cov <- diag(p)
       } else {
-        data_cov <- cov(data)
+        data_cov <- stats::cov(data)
       }
       n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
     },
@@ -442,7 +442,7 @@ fastcpd.variance <- function(  # nolint: Conventional R function style
   data,
   ...
 ) {
-  if (is.null(dim(data)) && length(dim(data)) == 1) {
+  if (is.null(dim(data)) || length(dim(data)) == 1) {
     data <- matrix(data, ncol = 1)
   }
   data_all_mean <- colMeans(data)
