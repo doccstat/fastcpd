@@ -1,12 +1,5 @@
 url: https://fastcpd.xingchi.li
 
-navbar:
-  components:
-    home: ~
-    intro:
-      text: Gallery
-      href: articles/gallery.html
-
 template:
   bootstrap: 5
   bslib:
@@ -71,6 +64,17 @@ reference:
       - print.fastcpd
       - show.fastcpd
       - summary.fastcpd
+
+articles:
+- title: Advanced usages
+  navbar: ~
+  contents:
+  - advanced-usages
+
+- title: Gallery
+  navbar: Gallery
+  contents:
+  - gallery
 
 authors:
   Xingchi Li:
