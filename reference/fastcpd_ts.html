@@ -135,8 +135,8 @@ mean should be included in the model. The default value is <code>TRUE</code>.</p
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = ~. - 1, data = data.frame(x = data), beta = ..2, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     family = family, order = order, include.mean = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.ts(data = time_series[-1], family = "arima", order = c(1, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     0, 0), include.mean = FALSE, beta = 3 * log(n)/2)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 178 </span>

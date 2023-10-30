@@ -110,19 +110,10 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = ~. - 1, data = data.frame(x = data), beta = (ncol(data)^2 + </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     1) * log(nrow(data))/2, cost = function(data) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     n &lt;- nrow(data)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     p &lt;- ncol(data)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     if (n &lt; p) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         data_cov &lt;- diag(p)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     else {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         data_cov &lt;- crossprod(sweep(data, 2, data_all_mean))/(n - </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     n/2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1)/n)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> })</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.variance(data = rbind(mvtnorm::rmvnorm(300, rep(0, p), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     crossprod(matrix(runif(p^2) * 2 - 1, p))), mvtnorm::rmvnorm(400, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))), mvtnorm::rmvnorm(300, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p)))))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 300 700 </span>
