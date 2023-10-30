@@ -150,8 +150,7 @@ result <- fastcpd::fastcpd.ar(x[3 + seq_len(n)], 3)
 summary(result)
 #> 
 #> Call:
-#> fastcpd(formula = ~. - 1, data = data.frame(x = data), family = family, 
-#>     order = order)
+#> fastcpd::fastcpd.ar(data = x[3 + seq_len(n)], order = 3)
 #> 
 #> Change points:
 #> 612 
@@ -526,8 +525,7 @@ result <- fastcpd_ts(x, "ar", 1)
 summary(result)
 #> 
 #> Call:
-#> fastcpd(formula = ~. - 1, data = data.frame(x = data), family = family, 
-#>     order = order)
+#> fastcpd_ts(data = x, family = "ar", order = 1)
 #> 
 #> Change points:
 #> 609 
@@ -561,8 +559,7 @@ result <- fastcpd.ts(x, "ar", 3)
 summary(result)
 #> 
 #> Call:
-#> fastcpd(formula = ~. - 1, data = data.frame(x = data), family = family, 
-#>     order = order)
+#> fastcpd.ts(data = x, family = "ar", order = 3)
 #> 
 #> Change points:
 #> 615 
