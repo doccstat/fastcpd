@@ -1,6 +1,6 @@
 #include "constants.h"
 #include "cost_update.h"
-#include "fastcpd.h"
+#include "fastcpd_impl.h"
 #include "functions.h"
 #include "parameters.h"
 #include "RProgress.h"

@@ -1,4 +1,3 @@
-#include "fastcpd.h"
 #include "functions.h"
 #include "testthat.h"
 
