@@ -7,6 +7,9 @@
     <loc>https://fastcpd.xingchi.li/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://fastcpd.xingchi.li/articles/advanced-usages.html</loc>
+  </url>
+  <url>
     <loc>https://fastcpd.xingchi.li/articles/gallery.html</loc>
   </url>
   <url>
@@ -49,10 +52,16 @@
     <loc>https://fastcpd.xingchi.li/reference/fastcpd_mean.html</loc>
   </url>
   <url>
+    <loc>https://fastcpd.xingchi.li/reference/fastcpd_meanvariance.html</loc>
+  </url>
+  <url>
     <loc>https://fastcpd.xingchi.li/reference/fastcpd_poisson.html</loc>
   </url>
   <url>
     <loc>https://fastcpd.xingchi.li/reference/fastcpd_ts.html</loc>
+  </url>
+  <url>
+    <loc>https://fastcpd.xingchi.li/reference/fastcpd_variance.html</loc>
   </url>
   <url>
     <loc>https://fastcpd.xingchi.li/reference/index.html</loc>
