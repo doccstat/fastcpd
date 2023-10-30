@@ -16,28 +16,7 @@ library(fastcpd)
 
 <!-- Please make sure this file is in sync with "tests/testthat/test-gallery.R" -->
 
-# linear regression
-
-```{r}
-set.seed(1)
-p <- 3
-x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
-theta_0 <- rbind(c(1, 1.2, -1), c(-1, 0, 0.5), c(0.5, -0.3, 0.2))
-y <- c(
-  x[1:100, ] %*% theta_0[1, ] + rnorm(100, 0, 1),
-  x[101:200, ] %*% theta_0[2, ] + rnorm(100, 0, 1),
-  x[201:300, ] %*% theta_0[3, ] + rnorm(100, 0, 1)
-)
-result <- fastcpd(
-  formula = y ~ . - 1,
-  data = data.frame(y = y, x = x),
-  family = "lm"
-)
-
-testthat::expect_equal(result@cp_set, c(98, 202))
-```
-
-## one-dimensional covariate
+# linear regression with one-dimensional covariate
 
 ```{r}
 set.seed(1)
@@ -340,77 +319,6 @@ result_custom <- fastcpd(
 
 testthat::expect_equal(result_builtin@cp_set, 198)
 testthat::expect_equal(result_custom@cp_set, 200)
-```
-
-## mean / variance change (one-dimensional)
-
-```{r}
-set.seed(1)
-p <- 1
-data <- rbind.data.frame(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(50, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
-)
-meanvar_loss <- function(data) {
-  n <- nrow(data)
-  data_cov <- 1
-  if (n > 1) {
-    data_cov <- var(data)
-  }
-  n / 2 * (log(data_cov) + log(2 * pi) + (n - 1) / n)
-}
-meanvar_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data,
-  beta = (p^2 + p + 1) * log(nrow(data)) / 2,
-  p = p^2 + p,
-  cost = meanvar_loss
-)
-
-testthat::expect_equal(
-  meanvar_loss_result@cp_set, c(300, 700, 1000, 1300, 1700)
-)
-```
-
-## mean / variance change
-
-```{r}
-set.seed(1)
-p <- 3
-data <- rbind.data.frame(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(50, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
-)
-meanvar_loss <- function(data) {
-  n <- nrow(data)
-  p <- ncol(data)
-  if (n <= p) {
-    data_cov <- diag(p)
-  } else {
-    data_cov <- cov(data)
-  }
-  n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
-}
-meanvar_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data,
-  beta = (p^2 + p + 1) * log(nrow(data)) / 2,
-  trim = 0.01,
-  p = p^2 + p,
-  cost = meanvar_loss
-)
-
-testthat::expect_equal(
-  meanvar_loss_result@cp_set, c(300, 700, 1000, 1300, 1700)
-)
 ```
 
 ## variance change in mean & variance change

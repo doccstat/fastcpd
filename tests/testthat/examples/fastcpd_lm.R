@@ -1,13 +1,12 @@
 set.seed(1)
-p <- 4
 n <- 300
-cp <- c(100, 200)
+p <- 4
 x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
 theta_0 <- rbind(c(1, 3.2, -1, 0), c(-1, -0.5, 2.5, -2), c(0.8, 0, 1, 2))
 y <- c(
-  x[1:cp[1], ] %*% theta_0[1, ] + rnorm(cp[1], 0, sd = 3),
-  x[(cp[1] + 1):cp[2], ] %*% theta_0[2, ] + rnorm(cp[2] - cp[1], 0, sd = 3),
-  x[(cp[2] + 1):n, ] %*% theta_0[3, ] + rnorm(n - cp[2], 0, sd = 3)
+  x[1:100, ] %*% theta_0[1, ] + rnorm(100, 0, 3),
+  x[101:200, ] %*% theta_0[2, ] + rnorm(100, 0, 3),
+  x[201:300, ] %*% theta_0[3, ] + rnorm(100, 0, 3)
 )
 result <- fastcpd.lm(cbind(y, x))
 summary(result)
