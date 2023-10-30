@@ -1,6 +1,5 @@
 #include "constants.h"
 #include "cost_update.h"
-#include "fastcpd.h"
 #include "functions.h"
 #include "parameters.h"
 #include "wrappers.h"

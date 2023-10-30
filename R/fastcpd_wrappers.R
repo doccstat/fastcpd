@@ -27,7 +27,9 @@ fastcpd.ar <- function(  # nolint: Conventional R function style
   order = 0,
   ...
 ) {
-  fastcpd.ts(c(data), "ar", order, ...)
+  result <- fastcpd.ts(c(data), "ar", order, ...)
+  result@call <- match.call()
+  result
 }
 
 #' @rdname fastcpd_ar
@@ -56,9 +58,11 @@ fastcpd_ar <- fastcpd.ar
 #' @rdname fastcpd_binomial
 #' @export
 fastcpd.binomial <- function(data, ...) {  # nolint: Conventional R function style
-  fastcpd(
+  result <- fastcpd(
     data = data.frame(y = data[, 1], x = data[, -1]), family = "binomial", ...
   )
+  result@call <- match.call()
+  result
 }
 
 #' @rdname fastcpd_binomial
@@ -94,7 +98,9 @@ fastcpd.garch <- function(  # nolint: Conventional R function style
   order = c(0, 0),
   ...
 ) {
-  fastcpd.ts(c(data), "garch", order, ...)
+  result <- fastcpd.ts(c(data), "garch", order, ...)
+  result@call <- match.call()
+  result
 }
 
 #' @rdname fastcpd_garch
@@ -123,9 +129,11 @@ fastcpd_garch <- fastcpd.garch
 #' @rdname fastcpd_lasso
 #' @export
 fastcpd.lasso <- function(data, ...) {  # nolint: Conventional R function style
-  fastcpd(
+  result <- fastcpd(
     data = data.frame(y = data[, 1], x = data[, -1]), family = "lasso", ...
   )
+  result@call <- match.call()
+  result
 }
 
 #' @rdname fastcpd_lasso
@@ -154,7 +162,11 @@ fastcpd_lasso <- fastcpd.lasso
 #' @rdname fastcpd_lm
 #' @export
 fastcpd.lm <- function(data, ...) {  # nolint: Conventional R function style
-  fastcpd(data = data.frame(y = data[, 1], x = data[, -1]), family = "lm", ...)
+  result <- fastcpd(
+    data = data.frame(y = data[, 1], x = data[, -1]), family = "lm", ...
+  )
+  result@call <- match.call()
+  result
 }
 
 #' @rdname fastcpd_lm
@@ -190,7 +202,9 @@ fastcpd.ma <- function(  # nolint: Conventional R function style
   order = 0,
   ...
 ) {
-  fastcpd.ts(c(data), "ma", order, ...)
+  result <- fastcpd.ts(c(data), "ma", order, ...)
+  result@call <- match.call()
+  result
 }
 
 #' @rdname fastcpd_ma
@@ -240,7 +254,7 @@ fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
       stats::cov(data[block_start:block_end, , drop = FALSE])
   }
   data_all_cov <- colMeans(data_all_covs)
-  fastcpd(
+  result <- fastcpd(
     formula = ~ . - 1,
     data = data.frame(x = data),
     cost = function(data) {
@@ -254,6 +268,8 @@ fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
     beta = (p + 1) * log(nrow(data)) / 2,
     ...
   )
+  result@call <- match.call()
+  result
 }
 
 #' @rdname fastcpd_mean
@@ -288,7 +304,7 @@ fastcpd.meanvariance <- function(  # nolint: Conventional R function style
   if (is.null(dim(data)) || length(dim(data)) == 1) {
     data <- matrix(data, ncol = 1)
   }
-  fastcpd(
+  result <- fastcpd(
     formula = ~ . - 1,
     data = data.frame(x = data),
     cost = function(data) {
@@ -304,6 +320,8 @@ fastcpd.meanvariance <- function(  # nolint: Conventional R function style
     beta = (ncol(data)^2 + ncol(data) + 1) * log(nrow(data)) / 2,
     ...
   )
+  result@call <- match.call()
+  result
 }
 
 #' @rdname fastcpd_meanvariance
@@ -343,9 +361,11 @@ fastcpd.poisson <- function(  # nolint: Conventional R function style
   data,
   ...
 ) {
-  fastcpd(
+  result <- fastcpd(
     data = data.frame(y = data[, 1], x = data[, -1]), family = "poisson", ...
   )
+  result@call <- match.call()
+  result
 }
 
 #' @rdname fastcpd_poisson
@@ -405,13 +425,15 @@ fastcpd.ts <- function(  # nolint: Conventional R function style
   stopifnot(check_order(order, family))
 
   # TODO(doccstat): Deal with different data types.
-  fastcpd(
+  result <- fastcpd(
     formula = ~ . - 1,
     data = data.frame(x = data),
     family = family,
     order = order,
     ...
   )
+  result@call <- match.call()
+  result
 }
 
 #' @rdname fastcpd_ts
@@ -446,7 +468,7 @@ fastcpd.variance <- function(  # nolint: Conventional R function style
     data <- matrix(data, ncol = 1)
   }
   data_all_mean <- colMeans(data)
-  fastcpd(
+  result <- fastcpd(
     formula = ~ . - 1,
     data = data.frame(x = data),
     cost = function(data) {
@@ -462,6 +484,8 @@ fastcpd.variance <- function(  # nolint: Conventional R function style
     beta = (ncol(data)^2 + 1) * log(nrow(data)) / 2,
     ...
   )
+  result@call <- match.call()
+  result
 }
 
 #' @rdname fastcpd_variance
