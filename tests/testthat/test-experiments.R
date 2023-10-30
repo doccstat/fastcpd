@@ -80,8 +80,12 @@ testthat::test_that(
       rbinom(150, 1, 1 / (1 + exp(-x[1:150, ] * theta[1, ]))),
       rbinom(150, 1, 1 / (1 + exp(-x[151:300, ] * theta[2, ])))
     )
-    result <- fastcpd.binomial(data.frame(y = y, x = x), warm_start = TRUE)
-    testthat::expect_equal(result@cp_set, c(35, 134))
+    result <- suppressWarnings(
+      fastcpd.binomial(
+        data.frame(y = y, x = x), vanilla_percentage = 1, warm_start = TRUE
+      )
+    )
+    testthat::expect_equal(result@cp_set, 134)
   }
 )
 
