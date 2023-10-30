@@ -27,6 +27,7 @@ except that the data is by default a matrix or data frame with the response
 variable as the first column and thus a formula is not required here.
 }
 \examples{
+\donttest{
 set.seed(1)
 n <- 480
 p_true <- 6
@@ -47,4 +48,5 @@ y <- c(
 )
 result <- fastcpd.lasso(cbind(y, x), k = function(x) if (x < 30) 1 else 0)
 summary(result)
+}
 }

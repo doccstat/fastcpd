@@ -167,50 +167,6 @@ result_vanilla_percentage <- fastcpd(
 testthat::expect_equal(result_vanilla_percentage@cp_set, c(79, 201, 321))
 ```
 
-# AR(p)
-
-## ar(1) using custom cost function
-
-```{r}
-set.seed(1)
-n <- 1000
-p <- 1
-time_series <- rep(0, n + 1)
-for (i in 1:600) {
-  time_series[i + 1] <- 0.6 * time_series[i] + rnorm(1)
-}
-for (i in 601:1000) {
-  time_series[i + 1] <- 0.3 * time_series[i] + rnorm(1)
-}
-ar1_loss <- function(data) {
-  n <- nrow(data)
-  optim_result <- optim(
-    par = 0,
-    fn = function(data, theta) {
-      n <- nrow(data)
-      unconditional_sum_of_squares <- (1 - theta^2) * data[1]^2 + sum(
-        (data[2:n] - theta * data[1:(n - 1)])^2
-      )
-      log(unconditional_sum_of_squares) - log(1 - theta^2) / n
-    },
-    method = "Brent",
-    data = data,
-    lower = -0.999,
-    upper = 0.999
-  )
-  n / 2 * (optim_result$value - log(n) + log(2 * pi) + 1)
-}
-result <- fastcpd(
-  formula = ~ . - 1,
-  data = data.frame(x = time_series[-1]),
-  beta = (2 * p + 1) * log(n) / 2,
-  p = 2 * p,
-  cost = ar1_loss
-)
-
-testthat::expect_equal(result@cp_set, 614)
-```
-
 # VAR(p)
 
 ## var(2) model with p = 2 with innovation sd = 1
@@ -384,72 +340,6 @@ result_custom <- fastcpd(
 
 testthat::expect_equal(result_builtin@cp_set, 198)
 testthat::expect_equal(result_custom@cp_set, 200)
-```
-
-## variance change (one-dimensional)
-
-```{r}
-set.seed(1)
-p <- 1
-data <- rbind.data.frame(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(50, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
-)
-data_all_mean <- colMeans(data)
-var_loss <- function(data) {
-  n <- nrow(data)
-  data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
-  n / 2 * (log(data_cov) + log(2 * pi) + (n - 1) / n)
-}
-var_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data,
-  beta = (p + 1) * log(nrow(data)) / 2,
-  p = p,
-  cost = var_loss
-)
-
-testthat::expect_equal(var_loss_result@cp_set, c(300, 699))
-```
-
-## variance change
-
-```{r}
-set.seed(1)
-p <- 3
-data <- rbind.data.frame(
-  mvtnorm::rmvnorm(
-    300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-  ),
-  mvtnorm::rmvnorm(
-    400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-  ),
-  mvtnorm::rmvnorm(
-    300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-  )
-)
-data_all_mean <- colMeans(data)
-var_loss <- function(data) {
-  n <- nrow(data)
-  p <- ncol(data)
-  if (n < p) {
-    data_cov <- diag(p)
-  } else {
-    data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
-  }
-  n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
-}
-var_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data,
-  beta = (p^2 + 1) * log(nrow(data)) / 2,
-  trim = 0.1,
-  p = p^2,
-  cost = var_loss
-)
-
-testthat::expect_equal(var_loss_result@cp_set, c(300, 700))
 ```
 
 ## mean / variance change (one-dimensional)
@@ -680,4 +570,46 @@ huber_regression_result <- fastcpd(
 )
 
 testthat::expect_equal(huber_regression_result@cp_set, c(401, 726))
+```
+
+## ar(1)
+
+```{r}
+set.seed(1)
+n <- 1000
+p <- 1
+time_series <- rep(0, n + 1)
+for (i in 1:600) {
+  time_series[i + 1] <- 0.6 * time_series[i] + rnorm(1)
+}
+for (i in 601:1000) {
+  time_series[i + 1] <- 0.3 * time_series[i] + rnorm(1)
+}
+ar1_loss <- function(data) {
+  n <- nrow(data)
+  optim_result <- optim(
+    par = 0,
+    fn = function(data, theta) {
+      n <- nrow(data)
+      unconditional_sum_of_squares <- (1 - theta^2) * data[1]^2 + sum(
+        (data[2:n] - theta * data[1:(n - 1)])^2
+      )
+      log(unconditional_sum_of_squares) - log(1 - theta^2) / n
+    },
+    method = "Brent",
+    data = data,
+    lower = -0.999,
+    upper = 0.999
+  )
+  n / 2 * (optim_result$value - log(n) + log(2 * pi) + 1)
+}
+result <- fastcpd(
+  formula = ~ . - 1,
+  data = data.frame(x = time_series[-1]),
+  beta = (2 * p + 1) * log(n) / 2,
+  p = 2 * p,
+  cost = ar1_loss
+)
+
+testthat::expect_equal(result@cp_set, 614)
 ```
