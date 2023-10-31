@@ -49,5 +49,6 @@ result <- suppressWarnings(
   fastcpd.garch(x[-1], c(1, 1), include.mean = FALSE, trim = 0)
 )
 summary(result)
+plot(result)
 }
 }

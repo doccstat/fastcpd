@@ -62,5 +62,6 @@ result <- fastcpd.ts(
   include.mean = FALSE, beta = 3 * log(n) / 2
 )
 summary(result)
+plot(result)
 }
 }
