@@ -1,15 +1,19 @@
 \donttest{
 set.seed(1)
-n <- 400
-x <- rep(0, n + 1)
-for (i in 1:200) {
-  x[i + 1] <- 0.6 * x[i] + rnorm(1)
+n <- 1000
+x <- rep(0, n + 3)
+for (i in 1:600) {
+  x[i + 3] <- 0.6 * x[i + 2] - 0.2 * x[i + 1] + 0.1 * x[i] + rnorm(1, 0, 3)
 }
-for (i in 201:n) {
-  x[i + 1] <- 0.3 * x[i] + rnorm(1)
+for (i in 601:1000) {
+  x[i + 3] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
 }
 result <- fastcpd.arima(
-  x[-1], c(1, 0, 0), include.mean = FALSE, beta = 3 * log(n) / 2
+  x[3 + seq_len(n)],
+  c(3, 0, 0),
+  include.mean = FALSE,
+  trim = 0,
+  beta = (3 + 1 + 1) * log(n) / 2 * 5
 )
 summary(result)
 plot(result)

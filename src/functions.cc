@@ -78,8 +78,9 @@ List negative_log_likelihood_wo_theta(
     return List::create(Named("par") = par,
                   Named("value") = value / 2,
                   Named("residuals") = residuals);
-  } else {
-    // Estimate theta in binomial/poisson/gaussian family
+  } else if (
+    family == "binomial" || family == "poisson" || family == "gaussian"
+  ) {
     mat x = data.cols(1, data.n_cols - 1);
     vec y = data.col(0);
     Environment fastglm = Environment::namespace_env("fastglm");
@@ -97,6 +98,10 @@ List negative_log_likelihood_wo_theta(
     return List::create(Named("par") = par,
                   Named("value") = value / 2,
                   Named("residuals") = residuals);
+  } else {
+    // # nocov start
+    stop("This branch should not be reached at functions.cc: 103.");
+    // # nocov end
   }
 }
 

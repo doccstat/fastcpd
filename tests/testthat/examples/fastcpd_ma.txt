@@ -1,16 +1,18 @@
 \donttest{
 set.seed(1)
 n <- 400
-p <- 4
-time_series <- rep(0, n)
-time_series[1:200] <- arima.sim(
-  n = 200, model = list(ma = c(-5 / 3, 11 / 12, -5 / 12, 1 / 6), sd = 0.1)
-)
-time_series[201:400] <- arima.sim(
-  n = 200, model = list(ma = c(-4 / 3, 7 / 9, -16 / 27, 4 / 27), sd = 0.3)
-)
+w <- rnorm(n + 4, 0, 0.1)
+x <- rep(NA, n)
+for (i in 1:200) {
+  x[i] <- w[i + 4] - 5 / 3 * w[i + 3] + 11 / 12 * w[i + 2] - 5 / 12 * w[i + 1] +
+    1 / 6 * w[i]
+}
+for (i in 201:n) {
+  x[i] <- w[i + 4] - 4 / 3 * w[i + 3] + 7 / 9 * w[i + 2] - 16 / 27 * w[i + 1] +
+    4 / 27 * w[i]
+}
 result <- suppressMessages(
-  fastcpd.ma(time_series, 4, include.mean = FALSE, trim = 0)
+  fastcpd.ma(x, 4, include.mean = FALSE, trim = 0)
 )
 summary(result)
 plot(result)
