@@ -9,3 +9,4 @@ for (i in 601:1000) {
 }
 result <- fastcpd.ar(x[3 + seq_len(n)], 3)
 summary(result)
+plot(result)

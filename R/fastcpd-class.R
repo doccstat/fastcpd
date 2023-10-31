@@ -59,8 +59,12 @@ plot.fastcpd <- function(x, ...) {
     p <- ggplot2::ggplot() +
       ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
 
-    line_or_point <-
-      if (x@family == "ar") ggplot2::geom_line else ggplot2::geom_point
+    # Draw lines for time series data and points for other data.
+    if (x@family %in% c("ar", "ma", "arima", "garch")) {
+      line_or_point <- ggplot2::geom_line
+    } else {
+      line_or_point <- ggplot2::geom_point
+    }
     p <- p + line_or_point(
       data = data.frame(x = seq_len(nrow(x@data)), y = y, label = "response"),
       ggplot2::aes(x = x, y = y)
