@@ -451,6 +451,19 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         include.mean = include_mean
       )$residuals
     }
+  } else if (family == "garch") {
+    residuals <- rep(NA, nrow(data))
+    segments <- c(0, cp_set, nrow(data))
+    for (segments_i in seq_len(length(segments) - 1)) {
+      segments_start <- segments[segments_i] + 1
+      segments_end <- segments[segments_i + 1]
+      residuals[segments_start:segments_end] <- fGarch::garchFit(
+        formula = garch_formula,
+        data = data[segments_start:segments_end, 1],
+        include.mean = include_mean,
+        trace = FALSE
+      )@residuals
+    }
   }
 
   methods::new(
