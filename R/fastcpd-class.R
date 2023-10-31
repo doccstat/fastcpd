@@ -66,7 +66,7 @@ plot.fastcpd <- function(x, ...) {
       ggplot2::aes(x = x, y = y)
     )
 
-    if (!(x@family %in% c("custom", "var") || x@cp_only)) {
+    if (x@family != "var" && !x@cp_only) {
       p <- p + ggplot2::geom_point(
         data = data.frame(
           x = seq_len(nrow(x@data)),

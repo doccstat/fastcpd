@@ -7,3 +7,4 @@ y <- c(
 )
 result <- suppressWarnings(fastcpd.binomial(cbind(y, x)))
 summary(result)
+plot(result)

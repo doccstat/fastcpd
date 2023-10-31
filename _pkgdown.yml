@@ -27,6 +27,7 @@ reference:
       data.
     contents:
       - fastcpd.ar
+      - fastcpd.arima
       - fastcpd.garch
       - fastcpd.ma
       - fastcpd.ts

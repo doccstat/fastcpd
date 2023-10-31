@@ -48,5 +48,6 @@ y <- c(
 )
 result <- fastcpd.lasso(cbind(y, x), k = function(x) if (x < 30) 1 else 0)
 summary(result)
+plot(result)
 }
 }

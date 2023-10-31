@@ -36,6 +36,44 @@ fastcpd.ar <- function(  # nolint: Conventional R function style
 #' @export
 fastcpd_ar <- fastcpd.ar
 
+#' @title Find change points efficiently in ARIMA(p, d, q) models
+#'
+#' @description \code{fastcpd_arima} and \code{fastcpd.arima} are
+#'   wrapper functions of \code{\link{fastcpd}} to find change points in
+#'   ARIMA(p, d, q) models. The function is similar to \code{\link{fastcpd}}
+#'   except that the data is by default a one-column matrix or univariate vector
+#'   and thus a formula is not required here.
+#'
+#' @example tests/testthat/examples/fastcpd_arima.txt
+#'
+#' @md
+#'
+#' @param data A numeric vector, a matrix, a data frame or a time series object.
+#' @param order A vector of length three specifying the order of the ARIMA
+#'   model.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}. One special argument can be passed here is
+#'   \code{include.mean}, which is a logical value indicating whether the
+#'   mean should be included in the model. The default value is \code{TRUE}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_arima
+#' @export
+fastcpd.arima <- function(  # nolint: Conventional R function style
+  data,
+  order = 0,
+  ...
+) {
+  result <- fastcpd.ts(c(data), "arima", order, ...)
+  result@call <- match.call()
+  result
+}
+
+#' @rdname fastcpd_arima
+#' @export
+fastcpd_arima <- fastcpd.arima
+
 #' @title Find change points efficiently in logistic regression models
 #'
 #' @description \code{"fastcpd_binomial"} and \code{"fastcpd.binomial"} are
