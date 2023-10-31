@@ -10,3 +10,4 @@ y <- c(
 )
 result <- fastcpd.lm(cbind(y, x))
 summary(result)
+plot(result)

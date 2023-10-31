@@ -438,6 +438,19 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   if (family == "ar") {
     residuals <- c(rep(NA, p), residuals)
+  } else if (family == "ma" || family == "arima") {
+    residuals <- rep(NA, nrow(data))
+    segments <- c(0, cp_set, nrow(data))
+    for (segments_i in seq_len(length(segments) - 1)) {
+      segments_start <- segments[segments_i] + 1
+      segments_end <- segments[segments_i + 1]
+      residuals[segments_start:segments_end] <- forecast::Arima(
+        c(data[segments_start:segments_end, 1]),
+        order = order,
+        method = "ML",
+        include.mean = include_mean
+      )$residuals
+    }
   }
 
   methods::new(
