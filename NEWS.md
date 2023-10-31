@@ -2,6 +2,7 @@
 
 *   Add wrapper functions of
     AR(p) family: `fastcpd.ar` / `fastcpd_ar`,
+    ARIMA(p, d, q) family: `fastcpd.arima` / `fastcpd_arima`,
     GARCH(p, q) family: `fastcpd.garch` / `fastcpd_garch`,
     linear regression family: `fastcpd.lm` / `fastcpd_lm`,
     logistic regression family: `fastcpd.binomial` / `fastcpd_binomial`,
