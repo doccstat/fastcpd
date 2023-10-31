@@ -223,6 +223,127 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "ARIMA(3, 0, 0)", {
+    testthat::skip("This test is intended to be run manually.")
+    set.seed(1)
+    n <- 1000
+    x <- rep(0, n + 3)
+    for (i in 1:600) {
+      x[i + 3] <- 0.6 * x[i + 2] - 0.2 * x[i + 1] + 0.1 * x[i] + rnorm(1, 0, 3)
+    }
+    for (i in 601:1000) {
+      x[i + 3] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
+    }
+    result <- fastcpd.arima(
+      x[3 + seq_len(n)],
+      c(3, 0, 0),
+      include.mean = FALSE,
+      trim = 0,
+      beta = (3 + 1 + 1) * log(n) / 2 * 5
+    )
+
+    testthat::expect_equal(result@cp_set, c(609, 613))
+  }
+)
+
+testthat::test_that(
+  "ARIMA(3, 0, 0)", {
+    testthat::skip("This test is intended to be run manually.")
+    set.seed(5)
+    n <- 1500
+    x <- rep(0, n + 3)
+    for (i in 1:1000) {
+      x[i + 3] <- 0.6 * x[i + 2] - 0.2 * x[i + 1] + 0.1 * x[i] + rnorm(1, 0, 5)
+    }
+    for (i in 1001:n) {
+      x[i + 3] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 5)
+    }
+    result <- fastcpd.arima(
+      x[3 + seq_len(n)],
+      c(3, 0, 0),
+      include.mean = FALSE,
+      trim = 0,
+      beta = (3 + 1 + 1) * log(n) / 2 * 5
+    )
+
+    testthat::expect_equal(result@cp_set, c(1003, 1007, 1011))
+  }
+)
+
+testthat::test_that(
+  "ARIMA(2, 0, 0)", {
+    testthat::skip("This test is intended to be run manually.")
+    set.seed(4)
+    n <- 1000
+    x <- rep(0, n + 2)
+    for (i in 1:500) {
+      x[i + 2] <- - 0.2 * x[i + 1] + 0.5 * x[i] + rnorm(1, 0, 4)
+    }
+    for (i in 501:n) {
+      x[i + 2] <- 0.4 * x[i + 1] - 0.2 * x[i] + rnorm(1, 0, 4)
+    }
+    result <- fastcpd.arima(
+      x[2 + seq_len(n)],
+      c(2, 0, 0),
+      include.mean = FALSE,
+      trim = 0,
+      beta = (2 + 1 + 1) * log(n) / 2 * 4
+    )
+
+    testthat::expect_equal(result@cp_set, c(532, 535))
+  }
+)
+
+testthat::test_that(
+  "ARIMA(2, 0, 0)", {
+    testthat::skip("This test is intended to be run manually.")
+    set.seed(4)
+    n <- 1000
+    x <- rep(0, n + 2)
+    for (i in 1:500) {
+      x[i + 2] <- - 0.2 * x[i + 1] + 0.5 * x[i] + rnorm(1, 0, 1)
+    }
+    for (i in 501:n) {
+      x[i + 2] <- 0.4 * x[i + 1] - 0.2 * x[i] + rnorm(1, 0, 1)
+    }
+    result <- fastcpd.arima(
+      x[2 + seq_len(n)],
+      c(2, 0, 0),
+      include.mean = FALSE,
+      trim = 0,
+      beta = (2 + 1 + 1) * log(n) / 2 * 4
+    )
+
+    testthat::expect_equal(result@cp_set, c(532, 535))
+  }
+)
+
+testthat::test_that(
+  "ARIMA(1, 0, 0)", {
+    testthat::skip("This test is intended to be run manually.")
+    set.seed(4)
+    n <- 600
+    x <- rep(0, n + 1)
+    for (i in 1:300) {
+      x[i + 1] <- 0.8 * x[i] + rnorm(1, 0, 1)
+    }
+    for (i in 301:n) {
+      x[i + 1] <- 0.1 * x[i] + rnorm(1, 0, 1)
+    }
+    result <- fastcpd.arima(
+      x[1 + seq_len(n)],
+      c(1, 0, 0),
+      include.mean = FALSE,
+      trim = 0,
+      beta = (1 + 1 + 1) * log(n) / 2 * 3
+    )
+
+    testthat::expect_equal(result@cp_set, 301)
+  }
+)
+
+
+testthat::test_that(
   "confidence interval experiment", {
     testthat::skip("This test is intended to be run manually.")
     set.seed(1)

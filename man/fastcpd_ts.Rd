@@ -48,18 +48,21 @@ except that the data is a time series data and the family is one of
 \examples{
 \donttest{
 set.seed(1)
-n <- 400
-p <- 1
-time_series <- rep(0, n + 1)
-for (i in 1:200) {
-  time_series[i + 1] <- 0.6 * time_series[i] + rnorm(1)
+n <- 600
+x <- rep(0, n + 1)
+for (i in 1:300) {
+  x[i + 1] <- 0.8 * x[i] + rnorm(1, 0, 2)
 }
-for (i in 201:400) {
-  time_series[i + 1] <- 0.3 * time_series[i] + rnorm(1)
+for (i in 301:n) {
+  x[i + 1] <- 0.1 * x[i] + rnorm(1, 0, 2)
 }
 result <- fastcpd.ts(
-  time_series[-1], "arima", c(1, 0, 0),
-  include.mean = FALSE, beta = 3 * log(n) / 2
+  x[1 + seq_len(n)],
+  "ar",
+  c(1, 0, 0),
+  include.mean = FALSE,
+  trim = 0,
+  beta = (1 + 1 + 1) * log(n) / 2 * 3
 )
 summary(result)
 plot(result)

@@ -238,15 +238,19 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     stopifnot("Data should be a univariate time series." = ncol(data) == 1)
     stopifnot(check_ar_order(order))
 
-    # Preprocess the data for AR(p) model to be used in linear regression.
-    p <- order
-    fastcpd_family <- "gaussian"
-    y <- data[p + seq_len(nrow(data) - p), ]
-    x <- matrix(NA, nrow(data) - p, p)
-    for (p_i in seq_len(p)) {
-      x[, p_i] <- data[(p - p_i) + seq_len(nrow(data) - p), ]
+    if (length(order) == 3) {
+      family <- "arima"
+    } else {
+      # Preprocess the data for AR(p) model to be used in linear regression.
+      p <- order
+      fastcpd_family <- "gaussian"
+      y <- data[p + seq_len(nrow(data) - p), ]
+      x <- matrix(NA, nrow(data) - p, p)
+      for (p_i in seq_len(p)) {
+        x[, p_i] <- data[(p - p_i) + seq_len(nrow(data) - p), ]
+      }
+      fastcpd_data <- cbind(y, x)
     }
-    fastcpd_data <- cbind(y, x)
   } else if (family == "var") {
     stopifnot(check_var_order(order))
     fastcpd_family <- "custom"
@@ -299,7 +303,8 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       )
     }
     p <- sum(order)
-  } else if (family == "arima") {
+  }
+  if (family == "arima") {
     stopifnot("Data should be a univariate time series." = ncol(data) == 1)
     stopifnot(check_arima_order(order))
     fastcpd_family <- "custom"
