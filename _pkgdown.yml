@@ -50,13 +50,6 @@ reference:
       - fastcpd.lm
       - fastcpd.poisson
 
-  - title: Main class
-    desc: >
-      The results of `fastcpd()` will be stored in the class `fastcpd` with
-      accompanied several utility functions.
-    contents:
-      - fastcpd-class
-
   - title: Utility functions
     desc: >
       The following functions help with visualization and analyzation of the data.
@@ -65,6 +58,21 @@ reference:
       - print.fastcpd
       - show.fastcpd
       - summary.fastcpd
+
+  - title: Data
+    desc: >
+      fastcpd comes with a selection of built-in datasets that are used in
+      examples to illustrate various change point detection challenges.
+    contents:
+    - bitcoin
+    - well_log
+
+  - title: Main class
+    desc: >
+      The results of `fastcpd()` will be stored in the class `fastcpd` with
+      accompanied several utility functions.
+    contents:
+      - fastcpd-class
 
 articles:
 - title: Advanced usages
