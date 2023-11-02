@@ -25,6 +25,9 @@
     <loc>https://fastcpd.xingchi.li/news/index.html</loc>
   </url>
   <url>
+    <loc>https://fastcpd.xingchi.li/reference/bitcoin.html</loc>
+  </url>
+  <url>
     <loc>https://fastcpd.xingchi.li/reference/fastcpd-class.html</loc>
   </url>
   <url>
@@ -80,5 +83,8 @@
   </url>
   <url>
     <loc>https://fastcpd.xingchi.li/reference/summary.html</loc>
+  </url>
+  <url>
+    <loc>https://fastcpd.xingchi.li/reference/well_log.html</loc>
   </url>
 </urlset>
