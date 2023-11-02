@@ -1,6 +1,7 @@
 # fastcpd 0.9.6
 
 *   Add `bitcoin` and `well_log` data.
+*   Add residual calculation for mean family.
 
 # fastcpd 0.9.5
 
