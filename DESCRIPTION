@@ -22,6 +22,8 @@ Description: Implements fast change point detection algorithm based on the
 License: GPL (>= 3)
 URL: https://fastcpd.xingchi.li, https://github.com/doccstat/fastcpd
 BugReports: https://github.com/doccstat/fastcpd/issues
+Depends:
+    R (>= 2.10)
 Imports:
     DescTools,
     fastglm,
@@ -52,4 +54,5 @@ VignetteBuilder:
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 Encoding: UTF-8
+LazyData: true
 RoxygenNote: 7.2.3

@@ -1,0 +1,5 @@
+bitcoin_json <- rjson::fromJSON(file = "data-raw/bitcoin.json")
+bitcoin <- data.frame(do.call(Map, c(f = rbind, bitcoin_json$`market-price`)))
+bitcoin$x <- as.POSIXct(bitcoin$x / 1000, origin = "1969-12-31", tz = "UTC")
+bitcoin <- xts::xts(bitcoin$y, bitcoin$x)
+usethis::use_data(bitcoin, overwrite = TRUE)
