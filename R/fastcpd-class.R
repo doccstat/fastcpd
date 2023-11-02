@@ -42,6 +42,9 @@ plot.fastcpd <- function(x, ...) {
   stopifnot(
     "Built-in plot only works for built-in families." = x@family != "custom"
   )
+  if (x@family == "mean" && ncol(x@data) > 1) {
+    stop("Can not plot mean change points with p > 1.")
+  }
   if (!require_namespace("ggplot2")) {
     if (utils_menu() == 1) {
       tryCatch(
