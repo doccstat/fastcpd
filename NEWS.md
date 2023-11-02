@@ -1,3 +1,7 @@
+# fastcpd 0.9.6
+
+*   Add `bitcoin` and `well_log` data.
+
 # fastcpd 0.9.5
 
 *   Add wrapper functions of
