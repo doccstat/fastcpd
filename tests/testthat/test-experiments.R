@@ -213,8 +213,8 @@ testthat::test_that(
     result <- fastcpd(
       formula = ~ . - 1,
       data = data.frame(x = time_series[-1]),
-      beta = (2 * p + 1) * log(n) / 2,
-      p = 2 * p,
+      beta = (1 + 1 + 1) * log(n) / 2,
+      p = 1 + 1,
       cost = ar1_loss
     )
 
