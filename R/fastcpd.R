@@ -203,7 +203,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     check_family(
       family,
       c(
-        "lm", "binomial", "poisson", "lasso",
+        "lm", "binomial", "poisson", "lasso", "mean",
         "ar", "var", "ma", "arima", "garch", "custom"
       )
     )
@@ -230,6 +230,34 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   if (!is.null(cost) && length(formals(cost)) == 1) {
     family <- "custom"
     vanilla_percentage <- 1
+  }
+
+  if (family == "mean") {
+    fastcpd_family <- "custom"
+    vanilla_percentage <- 1
+    p <- ncol(data)
+    block_size <- max(floor(sqrt(nrow(data)) / (segment_count + 1)), 2)
+    block_count <- floor(nrow(data) / block_size)
+    data_all_covs <- array(NA, dim = c(block_count, p, p))
+    for (block_index in seq_len(block_count)) {
+      block_start <- (block_index - 1) * block_size + 1
+      block_end <- if (block_index < block_count) {
+        block_index * block_size
+      } else {
+        nrow(data)
+      }
+      data_all_covs[block_index, , ] <-
+        stats::cov(data[block_start:block_end, , drop = FALSE])
+    }
+    data_all_cov <- colMeans(data_all_covs)
+    cost <- function(data) {
+      n <- nrow(data)
+      demeaned_data <- sweep(data, 2, colMeans(data))
+      n / 2 * (
+        log(det(data_all_cov)) + p * log(2 * pi) +
+          sum(diag(solve(data_all_cov, crossprod(demeaned_data)))) / n
+      )
+    }
   }
 
   # Pre-process the data for the time series models.
@@ -440,6 +468,17 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   }
 
   residuals <- c(result$residual)
+
+  if (family == "mean" && p == 1) {
+    segments <- c(0, cp_set, nrow(data))
+    for (segments_i in seq_len(length(segments) - 1)) {
+      segments_start <- segments[segments_i] + 1
+      segments_end <- segments[segments_i + 1]
+      segment_index <- segments_start:segments_end
+      residuals[segment_index] <-
+        data[segment_index, 1] - mean(data[segment_index, 1])
+    }
+  }
 
   if (!cp_only) {
     if (family == "ar") {
