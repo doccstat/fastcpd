@@ -2,6 +2,9 @@
 
 *   Add `bitcoin` and `well_log` data.
 *   Add residual calculation for mean family.
+*   Add plots for bitcoin data.
+*   Fix residual calculation for time series data when the seegments are
+    too small.
 
 # fastcpd 0.9.5
 
