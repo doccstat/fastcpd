@@ -3,4 +3,5 @@ result <- fastcpd.mean(
   well_log, beta = (1 + 1) * log(length(well_log)) / 2 * 5,  trim = 0.01
 )
 summary(result)
+plot(result)
 }

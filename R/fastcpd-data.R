@@ -15,7 +15,7 @@
 #'
 #' This is the well-known well-log dataset used in many changepoint papers
 #' obtained from Alan Turing Institute GitHub repository and licensed under
-#' the MIT license.
+#' the MIT license. Outliers with value less or equal to 1e5 are removed.
 #'
 #' @format A Time-Series of length 3989.
 #' @source <https://github.com/alan-turing-institute/TCPD>
