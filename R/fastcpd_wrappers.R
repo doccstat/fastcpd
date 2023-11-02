@@ -278,6 +278,10 @@ fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
   if (methods::hasArg("segment_count")) {
     segment_count <- eval.parent(match.call()[["segment_count"]])
   }
+  beta <- (p + 1) * log(nrow(data)) / 2
+  if (methods::hasArg("beta")) {
+    beta <- eval.parent(match.call()[["beta"]])
+  }
   block_size <- max(floor(sqrt(nrow(data)) / (segment_count + 1)), 2)
   block_count <- floor(nrow(data) / block_size)
   data_all_covs <- array(NA, dim = c(block_count, p, p))
@@ -303,7 +307,7 @@ fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
           sum(diag(solve(data_all_cov, crossprod(demeaned_data)))) / n
       )
     },
-    beta = (p + 1) * log(nrow(data)) / 2,
+    beta = beta,
     ...
   )
   result@call <- match.call()
