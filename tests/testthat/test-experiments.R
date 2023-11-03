@@ -90,6 +90,16 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "variance estimation test coverage", {
+    set.seed(1)
+    testthat::expect_message(
+      try(fastcpd.ar(c(0, 0, 0, 0, 0, 0), 2), silent = TRUE),
+      "Variance estimation failed for block 1."
+    )
+  }
+)
+
+testthat::test_that(
   "example linear regression with one-dimensional covariate", {
     testthat::skip("This test is intended to be run manually.")
     testthat::skip_if_not_installed("mvtnorm")

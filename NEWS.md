@@ -5,6 +5,7 @@
 *   Add plots for bitcoin data.
 *   Fix residual calculation for time series data when the seegments are
     too small.
+*   Handle variance estimation errors.
 
 # fastcpd 0.9.5
 
