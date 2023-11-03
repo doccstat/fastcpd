@@ -146,7 +146,8 @@ testthat::test_that(
       c(3, 0, 0),
       include.mean = FALSE,
       trim = 0,
-      beta = (3 + 1 + 1) * log(n) / 2 * 5
+      beta = (3 + 1 + 1) * log(n) / 2 * 5,
+      cp_only = TRUE
     )
 
     testthat::expect_equal(result@cp_set, c(609, 613))
@@ -169,7 +170,8 @@ testthat::test_that(
       c(3, 0, 0),
       include.mean = FALSE,
       trim = 0,
-      beta = (3 + 1 + 1) * log(n) / 2 * 5
+      beta = (3 + 1 + 1) * log(n) / 2 * 5,
+      cp_only = TRUE
     )
 
     testthat::expect_equal(result@cp_set, c(1003, 1007, 1011))
@@ -192,7 +194,8 @@ testthat::test_that(
       c(2, 0, 0),
       include.mean = FALSE,
       trim = 0,
-      beta = (2 + 1 + 1) * log(n) / 2 * 4
+      beta = (2 + 1 + 1) * log(n) / 2 * 4,
+      cp_only = TRUE
     )
 
     testthat::expect_equal(result@cp_set, c(532, 535))
@@ -215,7 +218,8 @@ testthat::test_that(
       c(2, 0, 0),
       include.mean = FALSE,
       trim = 0,
-      beta = (2 + 1 + 1) * log(n) / 2 * 4
+      beta = (2 + 1 + 1) * log(n) / 2 * 4,
+      cp_only = TRUE
     )
 
     testthat::expect_equal(result@cp_set, c(532, 535))
@@ -238,7 +242,8 @@ testthat::test_that(
       c(1, 0, 0),
       include.mean = FALSE,
       trim = 0,
-      beta = (1 + 1 + 1) * log(n) / 2 * 3
+      beta = (1 + 1 + 1) * log(n) / 2 * 3,
+      cp_only = TRUE
     )
 
     testthat::expect_equal(result@cp_set, 301)
