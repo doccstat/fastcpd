@@ -5,11 +5,10 @@
 \alias{bitcoin}
 \title{Bitcoin Market Price (USD)}
 \format{
-An xts object with 1354 observations and 1 variable on
-2019-01-02 / 2023-10-28 containing:
+A data frame with 1354 rows and 2 variables:
 \describe{
-  \item{Data}{double [1354, 1]}
-  \item{Index}{POSIXct,POSIXt [1354] (TZ: "UTC")}
+  \item{date}{POSIXct,POSIXt (TZ: "UTC") from 2019-01-02 to 2023-10-28}
+  \item{price}{The average USD market price across major bitcoin exchanges}
 }
 }
 \source{
