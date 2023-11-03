@@ -37,7 +37,7 @@ setClass(
 #' @method plot fastcpd
 #' @rdname plot
 #' @export
-plot.fastcpd <- function(x, ...) {
+plot.fastcpd <- function(x, ...) {  # nolint: cyclomatic complexity
   # Plot the built in families only.
   stopifnot(
     "Built-in plot only works for built-in families." = x@family != "custom"

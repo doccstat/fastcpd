@@ -310,28 +310,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   } else if (family == "ma") {
     stopifnot("Data should be a univariate time series." = ncol(data) == 1)
     stopifnot(check_ma_order(order))
-    fastcpd_family <- "custom"
-    vanilla_percentage <- 1
-
-    if (length(order) == 1) {
-      order <- c(0, 0, order)
-    }
-
-    # By default in time series models, `include.mean` is set to be `TRUE`.
-    include_mean <- TRUE
-    if (methods::hasArg("include.mean")) {
-      include_mean <- eval.parent(match.call()[["include.mean"]])
-    }
-    cost <- function(data) {
-      tryCatch(
-        expr = -forecast::Arima(
-          c(data), order = order, method = "ML", include.mean = include_mean
-        )$loglik,
-        error = function(e) 0
-      )
-    }
-    p <- sum(order)
+    family <- "arima"
+    order <- c(rep(0, 3 - length(order)), order)
   }
+
   if (family == "arima") {
     stopifnot("Data should be a univariate time series." = ncol(data) == 1)
     stopifnot(check_arima_order(order))
