@@ -1,8 +1,8 @@
 testthat::test_that(
   "examples/fastcpd_variance.txt", {
-    examples_mean <- readLines("examples/fastcpd_variance.txt")
+    examples_variance <- readLines("examples/fastcpd_variance.txt")
     source(textConnection(paste(
-      examples_mean[seq_len(length(examples_mean) - 2) + 1],
+      examples_variance[seq_len(length(examples_variance) - 2) + 1],
       collapse = "\n"
     )))
 

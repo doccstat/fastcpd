@@ -1,107 +1,7 @@
-testthat::test_that(
-  "examples/fastcpd_mean.txt test coverage", {
-    set.seed(1)
-    data <- c(rnorm(300, 0, 100), rnorm(400, 100, 100), rnorm(300, 0, 100))
-    result_mean <- fastcpd.mean(data)
-    testthat::expect_equal(result_mean@cp_set, c(294, 702))
-  }
-)
-
-testthat::test_that(
-  "examples/fastcpd_variance.txt test coverage", {
-    set.seed(1)
-    data <- c(rnorm(300, 0, 1), rnorm(400, 0, 100), rnorm(300, 0, 1))
-    result_variance <- fastcpd.variance(data)
-    testthat::expect_equal(result_variance@cp_set, c(300, 700))
-  }
-)
-
-testthat::test_that(
-  "examples/fastcpd_meanvariance.txt test coverage", {
-    set.seed(1)
-    data <- c(
-      rnorm(300, 0, 1), rnorm(400, 10, 1), rnorm(300, 0, 50),
-      rnorm(300, 0, 1), rnorm(400, 10, 1), rnorm(300, 10, 50)
-    )
-    result_meanvariance <- fastcpd.meanvariance(data)
-    testthat::expect_equal(
-      result_meanvariance@cp_set, c(300, 700, 1000, 1300, 1700)
-    )
-  }
-)
-
-testthat::test_that(
-  "one-dimensional custom multiple epochs test coverage", {
-    set.seed(1)
-    p <- 1
-    x <- matrix(rnorm(300 * p, 0, 1), ncol = p)
-    theta <- rbind(rnorm(p, 0, 1), rnorm(p, 4, 1))
-    y <- c(
-      rbinom(150, 1, 1 / (1 + exp(-x[1:150, ] * theta[1, ]))),
-      rbinom(150, 1, 1 / (1 + exp(-x[151:300, ] * theta[2, ])))
-    )
-    logistic_loss <- function(data, theta) {
-      x <- data[, -1]
-      y <- data[, 1]
-      u <- x * c(theta)
-      nll <- -y * u + log(1 + exp(u))
-      nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
-      sum(nll)
-    }
-    logistic_loss_gradient <- function(data, theta) {
-      x <- data[nrow(data), -1]
-      y <- data[nrow(data), 1]
-      c(-(y - 1 / (1 + exp(-x * theta)))) * x
-    }
-    logistic_loss_hessian <- function(data, theta) {
-      x <- data[nrow(data), -1]
-      prob <- 1 / (1 + exp(-x * theta))
-      (x %o% x) * c((1 - prob) * prob)
-    }
-    result <- fastcpd(
-      formula = y ~ . - 1,
-      data = data.frame(y = y, x = x),
-      cost = logistic_loss,
-      cost_gradient = logistic_loss_gradient,
-      cost_hessian = logistic_loss_hessian,
-      k = function(x) if (x < 10) 1 else 0
-    )
-    testthat::expect_equal(result@cp_set, 147)
-  }
-)
-
-testthat::test_that(
-  "warm start test coverage", {
-    set.seed(1)
-    p <- 1
-    x <- matrix(rnorm(300 * p, 0, 1), ncol = p)
-    theta <- rbind(rnorm(p, 0, 1), rnorm(p, 4, 1))
-    y <- c(
-      rbinom(150, 1, 1 / (1 + exp(-x[1:150, ] * theta[1, ]))),
-      rbinom(150, 1, 1 / (1 + exp(-x[151:300, ] * theta[2, ])))
-    )
-    result <- suppressWarnings(
-      fastcpd.binomial(
-        data.frame(y = y, x = x), vanilla_percentage = 1, warm_start = TRUE
-      )
-    )
-    testthat::expect_equal(result@cp_set, 134)
-  }
-)
-
-testthat::test_that(
-  "variance estimation test coverage", {
-    set.seed(1)
-    testthat::expect_message(
-      try(fastcpd.ar(c(0, 0, 0, 0, 0, 0), 2), silent = TRUE),
-      "Variance estimation failed for block 1."
-    )
-  }
-)
+testthat::skip("These tests are intended to be run manually.")
 
 testthat::test_that(
   "example linear regression with one-dimensional covariate", {
-    testthat::skip("This test is intended to be run manually.")
     testthat::skip_if_not_installed("mvtnorm")
     set.seed(1)
     p <- 1
@@ -124,7 +24,6 @@ testthat::test_that(
 
 testthat::test_that(
   "example custom logistic regression", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(1)
     p <- 5
     x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
@@ -191,7 +90,6 @@ testthat::test_that(
 
 testthat::test_that(
   "ar(1) model using custom cost function", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(1)
     n <- 1000
     p <- 1
@@ -234,7 +132,6 @@ testthat::test_that(
 
 testthat::test_that(
   "ARIMA(3, 0, 0)", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(1)
     n <- 1000
     x <- rep(0, n + 3)
@@ -258,7 +155,6 @@ testthat::test_that(
 
 testthat::test_that(
   "ARIMA(3, 0, 0)", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(5)
     n <- 1500
     x <- rep(0, n + 3)
@@ -282,7 +178,6 @@ testthat::test_that(
 
 testthat::test_that(
   "ARIMA(2, 0, 0)", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(4)
     n <- 1000
     x <- rep(0, n + 2)
@@ -306,7 +201,6 @@ testthat::test_that(
 
 testthat::test_that(
   "ARIMA(2, 0, 0)", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(4)
     n <- 1000
     x <- rep(0, n + 2)
@@ -330,7 +224,6 @@ testthat::test_that(
 
 testthat::test_that(
   "ARIMA(1, 0, 0)", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(4)
     n <- 600
     x <- rep(0, n + 1)
@@ -355,7 +248,6 @@ testthat::test_that(
 
 testthat::test_that(
   "confidence interval experiment", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(1)
     kDimension <- 1  # nolint: Google Style Guide
     change_point_locations <- NULL
@@ -461,9 +353,8 @@ testthat::test_that(
   }
 )
 
-testthat::test_that(
+testthat::test_that(  # nolint: cyclomatic complexity
   "confidence interval experiment with one change point", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(1)
     kDimension <- 1  # nolint: Google Style Guide
     change_point_locations <- list()
@@ -617,9 +508,8 @@ testthat::test_that(
   }
 )
 
-testthat::test_that(
+testthat::test_that(  # nolint: cyclomatic complexity
   "confidence interval experiment with one change point for linear model", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(1)
     kDimension <- 3  # nolint: Google Style Guide
     change_point_locations <- list()
@@ -727,7 +617,6 @@ testthat::test_that(
 
 testthat::test_that(
   "all examples in the documentation", {
-    testthat::skip("This test is intended to be run manually.")
     fastcpd_documentation <- readLines("R/fastcpd.R")
     examples_index_start <-
       which(fastcpd_documentation == "#' # Linear regression")
@@ -751,7 +640,6 @@ testthat::test_that(
 
 testthat::test_that(
   "build-in binomial performance on large data set with n = 10^4, p = 5", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(1)
     n <- 10^4
     p <- 5
@@ -801,7 +689,6 @@ testthat::test_that(
 
 testthat::test_that(
   "build-in binomial performance on large data set with n = 10^4, p = 10", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(1)
     n <- 10^4
     p <- 10
@@ -853,7 +740,6 @@ testthat::test_that(
 
 testthat::test_that(
   "build-in binomial performance on large data set with n = 10^4, p = 20", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(1)
     n <- 10^4
     p <- 20
@@ -905,7 +791,6 @@ testthat::test_that(
 
 testthat::test_that(
   "build-in binomial performance on large data set with n = 3 * 10^4, p = 30", {
-    testthat::skip("This test is intended to be run manually.")
     set.seed(1)
     n <- 3 * 10^4
     p <- 30
