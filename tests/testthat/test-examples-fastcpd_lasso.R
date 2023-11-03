@@ -2,9 +2,9 @@ testthat::test_that(
   "examples/fastcpd_lasso.txt", {
     testthat::skip_if_not_installed("mvtnorm")
 
-    examples_garch <- readLines("examples/fastcpd_lasso.txt")
+    examples_lasso <- readLines("examples/fastcpd_lasso.txt")
     source(textConnection(paste(
-      examples_garch[seq_len(length(examples_garch) - 2) + 1],
+      examples_lasso[seq_len(length(examples_lasso) - 2) + 1],
       collapse = "\n"
     )))
 

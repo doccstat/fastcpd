@@ -2,9 +2,9 @@ testthat::test_that(
   "examples/fastcpd_arima.txt", {
     testthat::skip_if_not_installed("forecast")
 
-    examples_ts <- readLines("examples/fastcpd_arima.txt")
+    examples_arima <- readLines("examples/fastcpd_arima.txt")
     source(textConnection(paste(
-      examples_ts[seq_len(length(examples_ts) - 2) + 1],
+      examples_arima[seq_len(length(examples_arima) - 2) + 1],
       collapse = "\n"
     )))
 

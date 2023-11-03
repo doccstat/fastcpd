@@ -1,8 +1,8 @@
 testthat::test_that(
   "examples/well_log.txt", {
-    examples_ts <- readLines("examples/well_log.txt")
+    examples_well_log <- readLines("examples/well_log.txt")
     source(textConnection(paste(
-      examples_ts[seq_len(length(examples_ts) - 2) + 1],
+      examples_well_log[seq_len(length(examples_well_log) - 2) + 1],
       collapse = "\n"
     )))
 

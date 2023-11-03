@@ -9,7 +9,7 @@
 #'   \item{Index}{POSIXct,POSIXt [1354] (TZ: "UTC")}
 #' }
 #' @source <https://www.blockchain.com/explorer/charts/market-price>
-#' @example tests/testthat/examples/bitcoin.R
+#' @example tests/testthat/examples/bitcoin.txt
 "bitcoin"
 
 #' Well-log Dataset from Numerical Bayesian Methods Applied to Signal Processing
