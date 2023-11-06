@@ -28,7 +28,9 @@ List fastcpd_impl(
     Nullable<Function> cost_hessian,
     const bool cp_only,
     const double vanilla_percentage,
-    const bool warm_start
+    const bool warm_start,
+    colvec lower,
+    colvec upper
 ) {
   // Set up the initial values.
   const int n = data.n_rows;
@@ -51,7 +53,7 @@ List fastcpd_impl(
 
   fastcpd::parameters::FastcpdParameters fastcpd_parameters_class(
     data, beta, p, family, vanilla_percentage, segment_count,
-    winsorise_minval, winsorise_maxval, epsilon
+    winsorise_minval, winsorise_maxval, epsilon, lower, upper
   );
 
   fastcpd_parameters_class.wrap_cost(cost);
@@ -104,7 +106,9 @@ List fastcpd_impl(
           winsorise_maxval,
           lambda,
           fastcpd_parameters_class.cost_gradient_wrapper,
-          fastcpd_parameters_class.cost_hessian_wrapper
+          fastcpd_parameters_class.cost_hessian_wrapper,
+          lower,
+          upper
         );
         fastcpd_parameters_class.update_theta_hat(
           i - 1, as<colvec>(cost_update_result[0])
@@ -151,7 +155,8 @@ List fastcpd_impl(
         if (contain(CUSTOM_FAMILIES, family)) {
           cost_optim_result = cost_optim(
             family, vanilla_percentage, p, data_segment,
-            fastcpd_parameters_class.cost.get(), lambda, false
+            fastcpd_parameters_class.cost.get(), lambda, false,
+            lower, upper
           );
         } else {
           if (warm_start && t - tau >= 10 * p) {
@@ -280,7 +285,7 @@ List fastcpd_impl(
     if (contain(CUSTOM_FAMILIES, family)) {
       cost_optim_result = cost_optim(
         family, vanilla_percentage, p, data_segment,
-        fastcpd_parameters_class.cost.get(), lambda, false
+        fastcpd_parameters_class.cost.get(), lambda, false, lower, upper
       );
     } else {
       cost_optim_result = negative_log_likelihood(

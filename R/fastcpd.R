@@ -161,6 +161,10 @@
 #' @param ... Parameters specifically used for time series models. As of the
 #'   current implementation, only `include.mean` will not be ignored and used
 #'   in the ARIMA or GARCH model.
+#' @param lower Lower bound for the parameters. If not specified, the lower
+#'   bound will be set to be \code{-Inf} for all parameters.
+#' @param upper Upper bound for the parameters. If not specified, the upper
+#'   bound will be set to be \code{Inf} for all parameters.
 #'
 #' @return A class \code{fastcpd} object.
 #'
@@ -192,6 +196,8 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   cp_only = FALSE,
   vanilla_percentage = 0,
   warm_start = FALSE,
+  lower = NULL,
+  upper = NULL,
   ...
 ) {
   family <- ifelse(is.null(family), "custom", tolower(family))
@@ -432,10 +438,19 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     }
   }
 
+  if (is.null(lower)) {
+    lower <- rep(-Inf, p)
+  }
+
+  if (is.null(upper)) {
+    upper <- rep(Inf, p)
+  }
+
   result <- fastcpd_impl(
     fastcpd_data, beta, segment_count, trim, momentum_coef, k, fastcpd_family,
     epsilon, min_prob, winsorise_minval, winsorise_maxval, p,
-    cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start
+    cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
+    lower, upper
   )
 
   cp_set <- c(result$cp_set)
