@@ -12,7 +12,7 @@ parameters and returns a fastcpd object."><meta property="og:image" content="htt
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,6 +84,8 @@ parameters and returns a <code>fastcpd</code> object.</p>
 <span>  cp_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  vanilla_percentage <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  warm_start <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  lower <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  upper <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -283,6 +285,16 @@ processed through sequential gradient descent.</p></dd>
 <dd><p>If <code>TRUE</code>, the algorithm will use the estimated
 parameters from the previous segment as the initial value for the
 current segment. This parameter is only used for <code>"glm"</code> families.</p></dd>
+
+
+<dt>lower</dt>
+<dd><p>Lower bound for the parameters. If not specified, the lower
+bound will be set to be <code>-Inf</code> for all parameters.</p></dd>
+
+
+<dt>upper</dt>
+<dd><p>Upper bound for the parameters. If not specified, the upper
+bound will be set to be <code>Inf</code> for all parameters.</p></dd>
 
 
 <dt>...</dt>
