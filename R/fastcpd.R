@@ -448,7 +448,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     thetas <- data.frame(matrix(NA, 0, 0))
   } else {
     thetas <- data.frame(result$thetas)
-    names(thetas) <- paste0("segment ", seq_len(ncol(thetas)))
+    if (ncol(thetas) > 0) {
+      names(thetas) <- paste0("segment ", seq_len(ncol(thetas)))
+    }
   }
 
   if (is.null(result$cost_values)) {
