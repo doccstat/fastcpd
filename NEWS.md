@@ -1,3 +1,8 @@
+# fastcpd 0.9.7
+
+*   Add `lower` and `upper` parameters to denote the lower and upper bounds of
+    the parameters.
+
 # fastcpd 0.9.6
 
 *   Add `bitcoin` and `well_log` data.

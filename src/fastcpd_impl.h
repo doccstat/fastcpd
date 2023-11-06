@@ -37,6 +37,8 @@
 //   have an explicit solution, i.e. does not depend on coefficients like
 //   the mean change case, this parameter will be set to be 1.
 // @param warm_start Whether to use warm start for the initial guess.
+// @param lower A vector containing the lower bounds for the parameters.
+// @param upper A vector containing the upper bounds for the parameters.
 //
 // @return A list containing the change points and the cost values for each
 //   segment.
@@ -59,7 +61,9 @@ List fastcpd_impl(
     Nullable<Function> cost_hessian,
     const bool cp_only,
     const double vanilla_percentage,
-    const bool warm_start
+    const bool warm_start,
+    colvec lower,
+    colvec upper
 );
 
 #endif  // FASTCPD_H_

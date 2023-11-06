@@ -1,5 +1,94 @@
 testthat::skip("These tests are intended to be run manually.")
 
+testthat::test_that(  # nolint: cyclomatic complexity
+  "arma(1, 1)", {
+    set.seed(1)
+    n <- 600
+    w <- rnorm(n + 1, 0, 1)
+    x <- rep(0, n + 1)
+    for (i in 1:300) {
+      x[i + 1] <- 0.8 * x[i] + w[i + 1] + 0.1 * w[i]
+    }
+    for (i in 301:n) {
+      x[i + 1] <- 0.1 * x[i] + w[i + 1] + 0.5 * w[i]
+    }
+    qmle <- function(data, theta) {
+      variance_term <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        variance_term[i] <-
+          data[i] - theta[1] * data[i - 1] - theta[2] * variance_term[i - 1]
+      }
+      (nrow(data) - 1) * log(2 * pi) / 2 + (nrow(data) - 1) * log(theta[3]) +
+        sum(variance_term^2) / (2 * theta[3])
+    }
+    qmle_gradient <- function(data, theta) {
+      variance_term <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        variance_term[i] <-
+          data[i] - theta[1] * data[i - 1] - theta[2] * variance_term[i - 1]
+      }
+      phi_coefficient <- rep(0, nrow(data))
+      psi_coefficient <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        phi_coefficient[i] <- -data[i - 1] - theta[2] * phi_coefficient[i - 1]
+        psi_coefficient[i] <-
+          -variance_term[i - 1] - theta[2] * psi_coefficient[i - 1]
+      }
+      c(
+        sum(phi_coefficient * variance_term) / theta[3],
+        sum(psi_coefficient * variance_term) / theta[3],
+        (nrow(data) - 1) / theta[3] - sum(variance_term^2) / (2 * theta[3]^2)
+      )
+    }
+    qmle_hessian <- function(data, theta) {
+      variance_term <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        variance_term[i] <-
+          data[i] - theta[1] * data[i - 1] - theta[2] * variance_term[i - 1]
+      }
+      phi_coefficient <- rep(0, nrow(data))
+      psi_coefficient <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        phi_coefficient[i] <- -data[i - 1] - theta[2] * phi_coefficient[i - 1]
+        psi_coefficient[i] <-
+          -variance_term[i - 1] - theta[2] * psi_coefficient[i - 1]
+      }
+      hessian <- matrix(0, nrow = 3, ncol = 3)
+      hessian[1, 1] <- sum(phi_coefficient^2) / theta[3]
+      phi_psi_coefficient <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        phi_psi_coefficient[i] <-
+          -phi_coefficient[i - 1] - theta[2] * phi_psi_coefficient[i - 1]
+      }
+      hessian[1, 2] <- hessian[2, 1] <- sum(
+        phi_psi_coefficient * variance_term + phi_coefficient * psi_coefficient
+      ) / theta[3]
+      hessian[1, 3] <- hessian[3, 1] <-
+        -sum(phi_coefficient * variance_term) / theta[3]^2
+      hessian[2, 2] <- sum(psi_coefficient^2) / theta[3]
+      hessian[2, 3] <- hessian[3, 2] <-
+        -sum(psi_coefficient * variance_term) / theta[3]^2
+      hessian[3, 3] <-
+        sum(variance_term^2) / theta[3]^3 - (nrow(data) - 1) / theta[3]^2
+      hessian
+    }
+    result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(x = x[1 + seq_len(n)]),
+      trim = 0,
+      p = 3,
+      beta = (3 + 1) * log(n) / 2 * 2,
+      cost = qmle,
+      cost_gradient = qmle_gradient,
+      cost_hessian = qmle_hessian,
+      cp_only = TRUE,
+      lower = c(-1, -1, 1e-10),
+      upper = c(1, 1, Inf)
+    )
+    testthat::expect_equal(result@cp_set, c(2, 407))
+  }
+)
+
 testthat::test_that(
   "example linear regression with one-dimensional covariate", {
     testthat::skip_if_not_installed("mvtnorm")

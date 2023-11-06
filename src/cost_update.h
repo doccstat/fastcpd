@@ -29,6 +29,8 @@ namespace fastcpd::cost_update {
 // @param lambda Lambda for L1 regularization. Only used for lasso.
 // @param cost_gradient Gradient for custom cost function.
 // @param cost_hessian Hessian for custom cost function.
+// @param lower A vector containing the lower bounds for the parameters.
+// @param upper A vector containing the upper bounds for the parameters.
 //
 // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 //   \code{hessian}, and \code{momentum}.
@@ -51,7 +53,9 @@ List cost_update(
     function<colvec(mat data, colvec theta, string family)>
       cost_gradient_wrapper,
     function<mat(mat data, colvec theta, string family, double min_prob)>
-      cost_hessian_wrapper
+      cost_hessian_wrapper,
+    colvec lower,
+    colvec upper
 );
 
 // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
@@ -62,6 +66,8 @@ List cost_update(
 // @param cost Cost function.
 // @param lambda Lambda for L1 regularization.
 // @param cv Whether to perform cross-validation to find the best lambda.
+// @param lower A vector containing the lower bounds for the parameters.
+// @param upper A vector containing the upper bounds for the parameters.
 //
 // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 //   and \code{hessian}.
@@ -72,7 +78,9 @@ List cost_optim(
     const mat data_segment,
     Function cost,
     const double lambda,
-    const bool cv
+    const bool cv,
+    const colvec lower,
+    const colvec upper
 );
 
 }  // namespace fastcpd::cost_update

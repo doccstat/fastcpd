@@ -16,7 +16,9 @@ class FastcpdParameters {
     const int segment_count,
     const double winsorise_minval,
     const double winsorise_maxval,
-    const double epsilon
+    const double epsilon,
+    const colvec lower,
+    const colvec upper
   );
   // Return `err_sd`.
   colvec get_err_sd();
@@ -173,6 +175,10 @@ class FastcpdParameters {
 
   // Momentum will be used in the update step if `momentum_coef` is not 0.
   colvec momentum;
+
+  const colvec lower;
+
+  const colvec upper;
 
   // Cost function. If the cost function is provided in R, this will be a
   // wrapper of the R function.

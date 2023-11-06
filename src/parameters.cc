@@ -17,7 +17,9 @@ FastcpdParameters::FastcpdParameters(
     const int segment_count,
     const double winsorise_minval,
     const double winsorise_maxval,
-    const double epsilon
+    const double epsilon,
+    const colvec lower,
+    const colvec upper
 ) : data(data),
     beta(beta),
     p(p),
@@ -26,7 +28,9 @@ FastcpdParameters::FastcpdParameters(
     segment_count(segment_count),
     winsorise_minval(winsorise_minval),
     winsorise_maxval(winsorise_maxval),
-    epsilon(epsilon) {
+    epsilon(epsilon),
+    lower(lower),
+    upper(upper) {
   n = data.n_rows;
   segment_indices = vec(n);
   segment_theta_hat = mat(segment_count, p);
@@ -151,7 +155,8 @@ void FastcpdParameters::create_segment_statistics() {
     rowvec segment_theta;
     if (contain(CUSTOM_FAMILIES, family)) {
       segment_theta = as<rowvec>(cost_optim(
-        family, vanilla_percentage, p, data_segment, cost.get(), 0, false
+        family, vanilla_percentage, p, data_segment, cost.get(), 0, false,
+        lower, upper
       )["par"]);
     } else {
       segment_theta = as<rowvec>(

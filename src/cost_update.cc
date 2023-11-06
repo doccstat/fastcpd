@@ -26,7 +26,9 @@ List cost_update(
     function<colvec(mat data, colvec theta, string family)>
       cost_gradient_wrapper,
     function<mat(mat data, colvec theta, string family, double min_prob)>
-      cost_hessian_wrapper
+      cost_hessian_wrapper,
+    colvec lower,
+    colvec upper
 ) {
   // Get the hessian
   mat hessian_i = hessian.slice(i - 1);
@@ -61,6 +63,9 @@ List cost_update(
 
   // Update theta_hat with momentum
   theta_hat.col(i - 1) += momentum;
+
+  theta_hat.col(i - 1) = min(theta_hat.col(i - 1), upper);
+  theta_hat.col(i - 1) = max(theta_hat.col(i - 1), lower);
 
   // Winsorize if family is Poisson
   if (family == "poisson") {
@@ -144,7 +149,9 @@ List cost_optim(
     const mat data_segment,
     Function cost,
     const double lambda,
-    const bool cv
+    const bool cv,
+    const colvec lower,
+    const colvec upper
 ) {
   List cost_optim_result;
   if (vanilla_percentage == 1) {
@@ -187,7 +194,9 @@ List cost_optim(
       Named("par") = zeros<vec>(p),
       Named("fn") = cost,
       Named("method") = "L-BFGS-B",
-      Named("data") = data_segment
+      Named("data") = data_segment,
+      Named("lower") = lower,
+      Named("upper") = upper
     );
     cost_optim_result = List::create(
       Named("par") = optim_result["par"],
