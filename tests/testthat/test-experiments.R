@@ -2,6 +2,184 @@ testthat::skip("These tests are intended to be run manually.")
 
 testthat::test_that(  # nolint: cyclomatic complexity
   "arma(1, 1)", {
+    qmle <- function(data, theta) {
+      variance_term <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        variance_term[i] <-
+          data[i] - theta[1] * data[i - 1] - theta[2] * variance_term[i - 1]
+      }
+      (log(2 * pi) + log(theta[3])) * (nrow(data) - 1) / 2 +
+        sum(variance_term^2) / (2 * theta[3])
+    }
+    qmle_gradient <- function(data, theta) {
+      if (nrow(data) == 1) {
+        return(c(1, 1, 1))
+      }
+      variance_term <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        variance_term[i] <-
+          data[i] - theta[1] * data[i - 1] - theta[2] * variance_term[i - 1]
+      }
+      phi_coefficient <- rep(0, nrow(data))
+      psi_coefficient <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        phi_coefficient[i] <- -data[i - 1] - theta[2] * phi_coefficient[i - 1]
+        psi_coefficient[i] <-
+          -variance_term[i - 1] - theta[2] * psi_coefficient[i - 1]
+      }
+      c(
+        phi_coefficient[nrow(data)] * variance_term[nrow(data)] / theta[3],
+        psi_coefficient[nrow(data)] * variance_term[nrow(data)] / theta[3],
+        1 / 2 / theta[3] - variance_term[nrow(data)]^2 / (2 * theta[3]^2)
+      )
+    }
+    qmle_gradient_sum <- function(data, theta) {
+      if (nrow(data) == 1) {
+        return(c(1, 1, 1))
+      }
+      variance_term <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        variance_term[i] <-
+          data[i] - theta[1] * data[i - 1] - theta[2] * variance_term[i - 1]
+      }
+      phi_coefficient <- rep(0, nrow(data))
+      psi_coefficient <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        phi_coefficient[i] <- -data[i - 1] - theta[2] * phi_coefficient[i - 1]
+        psi_coefficient[i] <-
+          -variance_term[i - 1] - theta[2] * psi_coefficient[i - 1]
+      }
+      c(
+        sum(phi_coefficient * variance_term) / theta[3],
+        sum(psi_coefficient * variance_term) / theta[3],
+        (nrow(data) - 1) / 2 / theta[3] - sum(variance_term^2) / 2 / theta[3]^2
+      )
+    }
+    qmle_hessian <- function(data, theta) {
+      if (nrow(data) == 1) {
+        return(diag(3))
+      }
+      variance_term <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        variance_term[i] <-
+          data[i] - theta[1] * data[i - 1] - theta[2] * variance_term[i - 1]
+      }
+      phi_coefficient <- rep(0, nrow(data))
+      psi_coefficient <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        phi_coefficient[i] <- -data[i - 1] - theta[2] * phi_coefficient[i - 1]
+        psi_coefficient[i] <-
+          -variance_term[i - 1] - theta[2] * psi_coefficient[i - 1]
+      }
+      phi_psi_coefficient <- rep(0, nrow(data))
+      psi_psi_coefficient <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        phi_psi_coefficient[i] <-
+          -phi_coefficient[i - 1] - theta[2] * phi_psi_coefficient[i - 1]
+        psi_psi_coefficient[i] <-
+          -psi_coefficient[i - 1] - theta[2] * psi_psi_coefficient[i - 1] -
+          psi_coefficient[i - 1]
+      }
+      hessian <- matrix(0, nrow = 3, ncol = 3)
+      hessian[1, 1] <- phi_coefficient[nrow(data)]^2 / theta[3]
+      hessian[1, 2] <- hessian[2, 1] <- (
+        phi_psi_coefficient[nrow(data)] * variance_term[nrow(data)] +
+          phi_coefficient[nrow(data)] * psi_coefficient[nrow(data)]
+      ) / theta[3]
+      hessian[1, 3] <- hessian[3, 1] <-
+        -phi_coefficient[nrow(data)] * variance_term[nrow(data)] / theta[3]^2
+      hessian[2, 2] <- (
+        psi_psi_coefficient[nrow(data)] * variance_term[nrow(data)] +
+          psi_coefficient[nrow(data)]^2
+      ) / theta[3]
+      hessian[2, 3] <- hessian[3, 2] <-
+        -psi_coefficient[nrow(data)] * variance_term[nrow(data)] / theta[3]^2
+      hessian[3, 3] <-
+        variance_term[nrow(data)]^2 / theta[3]^3 - 1 / 2 / theta[3]^2
+      hessian
+    }
+    qmle_hessian_sum <- function(data, theta) {
+      if (nrow(data) == 1) {
+        return(diag(3))
+      }
+      variance_term <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        variance_term[i] <-
+          data[i] - theta[1] * data[i - 1] - theta[2] * variance_term[i - 1]
+      }
+      phi_coefficient <- rep(0, nrow(data))
+      psi_coefficient <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        phi_coefficient[i] <- -data[i - 1] - theta[2] * phi_coefficient[i - 1]
+        psi_coefficient[i] <-
+          -variance_term[i - 1] - theta[2] * psi_coefficient[i - 1]
+      }
+      phi_psi_coefficient <- rep(0, nrow(data))
+      psi_psi_coefficient <- rep(0, nrow(data))
+      for (i in 2:nrow(data)) {
+        phi_psi_coefficient[i] <-
+          -phi_coefficient[i - 1] - theta[2] * phi_psi_coefficient[i - 1]
+        psi_psi_coefficient[i] <-
+          -psi_coefficient[i - 1] - theta[2] * psi_psi_coefficient[i - 1] -
+          psi_coefficient[i - 1]
+      }
+      hessian <- matrix(0, nrow = 3, ncol = 3)
+      hessian[1, 1] <- sum(phi_coefficient^2) / theta[3]
+      hessian[1, 2] <- hessian[2, 1] <- sum(
+        phi_psi_coefficient * variance_term + phi_coefficient * psi_coefficient
+      ) / theta[3]
+      hessian[1, 3] <- hessian[3, 1] <-
+        -sum(phi_coefficient * variance_term) / theta[3]^2
+      hessian[2, 2] <- sum(
+        psi_psi_coefficient * variance_term + psi_coefficient^2
+      ) / theta[3]
+      hessian[2, 3] <- hessian[3, 2] <-
+        -sum(psi_coefficient * variance_term) / theta[3]^2
+      hessian[3, 3] <-
+        sum(variance_term^2) / theta[3]^3 - (nrow(data) - 1) / 2 / theta[3]^2
+      hessian
+    }
+
+    set.seed(1)
+    diffs <- matrix(NA, 100, 3)
+    for (experiment_id in seq_len(100)) {
+      x <- arima.sim(list(ar = 0.8, ma = 0.1), n = 1000)
+      result_arima <-
+        forecast::Arima(x, order = c(1, 0, 1), include.mean = FALSE)
+
+      # nolint start: sanity check
+      # a <- optim(
+      #   par = c(0, 0, 1),
+      #   fn = qmle,
+      #   lower = c(-1, -1, 1e-10),
+      #   upper = c(1, 1, Inf),
+      #   data = data,
+      #   method = "L-BFGS-B",
+      #   gr = qmle_gradient_sum
+      # )
+      # nolint end
+
+      theta_gradient <- c(0, 0, 1)
+      data <- matrix(x)
+      for (i in 2:nrow(data)) {
+        gradient <- qmle_gradient(data[1:i, , drop = FALSE], theta_gradient)
+        theta_gradient <- theta_gradient - 0.01 * gradient
+        theta_gradient <-
+          pmin(pmax(theta_gradient, c(-1, -1, 1e-10)), c(1, 1, Inf))
+      }
+      diffs[experiment_id, ] <-
+        theta_gradient - c(result_arima$coef, result_arima$sigma2)
+    }
+    testthat::expect_equal(
+      colMeans(diffs),
+      c(-0.0475569393, 0.0274229581, 0.0238775482),
+      tolerance = 1e-9
+    )
+  }
+)
+
+testthat::test_that(  # nolint: cyclomatic complexity
+  "arma(1, 1)", {
     set.seed(1)
     n <- 600
     w <- rnorm(n + 1, 0, 1)
@@ -18,10 +196,13 @@ testthat::test_that(  # nolint: cyclomatic complexity
         variance_term[i] <-
           data[i] - theta[1] * data[i - 1] - theta[2] * variance_term[i - 1]
       }
-      (nrow(data) - 1) * log(2 * pi) / 2 + (nrow(data) - 1) * log(theta[3]) +
+      (log(2 * pi) + log(theta[3])) * (nrow(data) - 1) / 2 +
         sum(variance_term^2) / (2 * theta[3])
     }
     qmle_gradient <- function(data, theta) {
+      if (nrow(data) == 1) {
+        return(c(1, 1, 1))
+      }
       variance_term <- rep(0, nrow(data))
       for (i in 2:nrow(data)) {
         variance_term[i] <-
@@ -35,42 +216,56 @@ testthat::test_that(  # nolint: cyclomatic complexity
           -variance_term[i - 1] - theta[2] * psi_coefficient[i - 1]
       }
       c(
-        sum(phi_coefficient * variance_term) / theta[3],
-        sum(psi_coefficient * variance_term) / theta[3],
-        (nrow(data) - 1) / theta[3] - sum(variance_term^2) / (2 * theta[3]^2)
+        phi_coefficient[nrow(data)] * variance_term[nrow(data)] / theta[3],
+        psi_coefficient[nrow(data)] * variance_term[nrow(data)] / theta[3],
+        1 / 2 / theta[3] - variance_term[nrow(data)]^2 / (2 * theta[3]^2)
       )
     }
     qmle_hessian <- function(data, theta) {
-      variance_term <- rep(0, nrow(data))
-      for (i in 2:nrow(data)) {
-        variance_term[i] <-
-          data[i] - theta[1] * data[i - 1] - theta[2] * variance_term[i - 1]
-      }
-      phi_coefficient <- rep(0, nrow(data))
-      psi_coefficient <- rep(0, nrow(data))
-      for (i in 2:nrow(data)) {
-        phi_coefficient[i] <- -data[i - 1] - theta[2] * phi_coefficient[i - 1]
-        psi_coefficient[i] <-
-          -variance_term[i - 1] - theta[2] * psi_coefficient[i - 1]
-      }
-      hessian <- matrix(0, nrow = 3, ncol = 3)
-      hessian[1, 1] <- sum(phi_coefficient^2) / theta[3]
-      phi_psi_coefficient <- rep(0, nrow(data))
-      for (i in 2:nrow(data)) {
-        phi_psi_coefficient[i] <-
-          -phi_coefficient[i - 1] - theta[2] * phi_psi_coefficient[i - 1]
-      }
-      hessian[1, 2] <- hessian[2, 1] <- sum(
-        phi_psi_coefficient * variance_term + phi_coefficient * psi_coefficient
-      ) / theta[3]
-      hessian[1, 3] <- hessian[3, 1] <-
-        -sum(phi_coefficient * variance_term) / theta[3]^2
-      hessian[2, 2] <- sum(psi_coefficient^2) / theta[3]
-      hessian[2, 3] <- hessian[3, 2] <-
-        -sum(psi_coefficient * variance_term) / theta[3]^2
-      hessian[3, 3] <-
-        sum(variance_term^2) / theta[3]^3 - (nrow(data) - 1) / theta[3]^2
-      hessian
+      # nolint start: Hessian calculation
+      # if (nrow(data) == 1) {
+      #   return(diag(3))
+      # }
+      # variance_term <- rep(0, nrow(data))
+      # for (i in 2:nrow(data)) {
+      #   variance_term[i] <-
+      #     data[i] - theta[1] * data[i - 1] - theta[2] * variance_term[i - 1]
+      # }
+      # phi_coefficient <- rep(0, nrow(data))
+      # psi_coefficient <- rep(0, nrow(data))
+      # for (i in 2:nrow(data)) {
+      #   phi_coefficient[i] <- -data[i - 1] - theta[2] * phi_coefficient[i - 1]
+      #   psi_coefficient[i] <-
+      #     -variance_term[i - 1] - theta[2] * psi_coefficient[i - 1]
+      # }
+      # phi_psi_coefficient <- rep(0, nrow(data))
+      # psi_psi_coefficient <- rep(0, nrow(data))
+      # for (i in 2:nrow(data)) {
+      #   phi_psi_coefficient[i] <-
+      #     -phi_coefficient[i - 1] - theta[2] * phi_psi_coefficient[i - 1]
+      #   psi_psi_coefficient[i] <-
+      #     -psi_coefficient[i - 1] - theta[2] * psi_psi_coefficient[i - 1] -
+      #     psi_coefficient[i - 1]
+      # }
+      # hessian <- matrix(0, nrow = 3, ncol = 3)
+      # hessian[1, 1] <- phi_coefficient[nrow(data)]^2 / theta[3]
+      # hessian[1, 2] <- hessian[2, 1] <- (
+      #   phi_psi_coefficient[nrow(data)] * variance_term[nrow(data)] +
+      #     phi_coefficient[nrow(data)] * psi_coefficient[nrow(data)]
+      # ) / theta[3]
+      # hessian[1, 3] <- hessian[3, 1] <-
+      #   -phi_coefficient[nrow(data)] * variance_term[nrow(data)] / theta[3]^2
+      # hessian[2, 2] <- (
+      #   psi_psi_coefficient[nrow(data)] * variance_term[nrow(data)] +
+      #     psi_coefficient[nrow(data)]^2
+      # ) / theta[3]
+      # hessian[2, 3] <- hessian[3, 2] <-
+      #   -psi_coefficient[nrow(data)] * variance_term[nrow(data)] / theta[3]^2
+      # hessian[3, 3] <-
+      #   variance_term[nrow(data)]^2 / theta[3]^3 - 1 / 2 / theta[3]^2
+      # hessian
+      # nolint end
+      diag(100, 3)
     }
     result <- fastcpd(
       formula = ~ . - 1,
@@ -85,7 +280,7 @@ testthat::test_that(  # nolint: cyclomatic complexity
       lower = c(-1, -1, 1e-10),
       upper = c(1, 1, Inf)
     )
-    testthat::expect_equal(result@cp_set, c(2, 407))
+    testthat::expect_equal(result@cp_set, 300)
   }
 )
 
