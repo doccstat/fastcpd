@@ -115,6 +115,9 @@ List cost_update(
       momentum = momentum_coef * momentum - momentum_step;
       theta_hat.col(i - 1) += momentum;
 
+      theta_hat.col(i - 1) = min(theta_hat.col(i - 1), upper);
+      theta_hat.col(i - 1) = max(theta_hat.col(i - 1), lower);
+
       // Winsorize if family is Poisson
       if (family == "poisson") {
         Environment desc_tools = Environment::namespace_env("DescTools");
