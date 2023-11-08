@@ -1,6 +1,6 @@
 testthat::test_that(
-  "examples/bitcoin.txt", {
-    examples_bitcoin <- readLines("examples/bitcoin.txt")
+  "examples/data-bitcoin.txt", {
+    examples_bitcoin <- readLines("examples/data-bitcoin.txt")
     source(textConnection(paste(
       examples_bitcoin[seq_len(length(examples_bitcoin) - 2) + 1],
       collapse = "\n"

@@ -8,7 +8,7 @@
 #'   \item{price}{The average USD market price across major bitcoin exchanges}
 #' }
 #' @source <https://www.blockchain.com/explorer/charts/market-price>
-#' @example tests/testthat/examples/bitcoin.txt
+#' @example tests/testthat/examples/data-bitcoin.txt
 "bitcoin"
 
 #' Transcription Profiling of 57 Human Bladder Carcinoma Samples
@@ -22,7 +22,7 @@
 #' }
 #' @source <https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-TABM-147>
 #' @source <https://github.com/cran/ecp/tree/master/data>
-#' @example tests/testthat/examples/transcriptome.R
+#' @example tests/testthat/examples/data-transcriptome.R
 "transcriptome"
 
 #' Occupancy Detection Data Set
@@ -53,5 +53,5 @@
 #'
 #' @format A Time-Series of length 3989.
 #' @source <https://github.com/alan-turing-institute/TCPD>
-#' @example tests/testthat/examples/well_log.txt
+#' @example tests/testthat/examples/data-well_log.txt
 "well_log"

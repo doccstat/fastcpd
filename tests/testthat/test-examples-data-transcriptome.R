@@ -1,6 +1,6 @@
 testthat::test_that(
-  "examples/transcriptome.R", {
-    source("examples/transcriptome.R")
+  "examples/data-transcriptome.R", {
+    source("examples/data-transcriptome.R")
     testthat::expect_equal(
       result@cp_set,
       c(
