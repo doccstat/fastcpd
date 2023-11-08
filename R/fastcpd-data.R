@@ -11,6 +11,20 @@
 #' @example tests/testthat/examples/bitcoin.txt
 "bitcoin"
 
+#' Transcription Profiling of 57 Human Bladder Carcinoma Samples
+#'
+#' Transcriptome analysis of 57 bladder carcinomas on Affymetrix HG-U95A and
+#' HG-U95Av2 microarrays
+#'
+#' @format A data frame with 2215 rows and 43 variables:
+#' \describe{
+#'   \item{columns}{Corresponding to the 43 individuals}
+#' }
+#' @source <https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-TABM-147>
+#' @source <https://github.com/cran/ecp/tree/master/data>
+#' @example tests/testthat/examples/transcriptome.R
+"transcriptome"
+
 #' Well-log Dataset from Numerical Bayesian Methods Applied to Signal Processing
 #'
 #' This is the well-known well-log dataset used in many changepoint papers
