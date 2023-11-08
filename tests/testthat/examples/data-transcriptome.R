@@ -1,3 +1,3 @@
-result <- fastcpd.mean(transcriptome[, 8], trim = 0.005)
+result <- fastcpd.mean(transcriptome$"10", trim = 0.005)
 summary(result)
 plot(result)
