@@ -65,6 +65,8 @@ reference:
       examples to illustrate various change point detection challenges.
     contents:
     - bitcoin
+    - occupancy
+    - transcriptome
     - well_log
 
   - title: Main class
