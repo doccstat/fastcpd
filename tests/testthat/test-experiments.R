@@ -163,7 +163,7 @@ testthat::test_that(  # nolint: cyclomatic complexity
       for (i in 2:nrow(data)) {
         gradient <- qmle_gradient(data[1:i, , drop = FALSE], theta_estimate)
         # hessian <-
-        #   hessian + qmle_hessian(data[i, , drop = FALSE], theta_estimate)
+        #   hessian + qmle_hessian(data[1:i, , drop = FALSE], theta_estimate)  # nolint
         hessian <- diag(100, 3)
         theta_estimate <- theta_estimate - solve(
           hessian + 1e-10 * diag(3), gradient
