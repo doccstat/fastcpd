@@ -77,8 +77,7 @@ testthat::test_that(  # nolint: cyclomatic complexity
         phi_psi_coefficient[i] <-
           -phi_coefficient[i - 1] - theta[2] * phi_psi_coefficient[i - 1]
         psi_psi_coefficient[i] <-
-          -psi_coefficient[i] - theta[2] * psi_psi_coefficient[i - 1] -
-          psi_coefficient[i - 1]
+          -2 * psi_coefficient[i - 1] - theta[2] * psi_psi_coefficient[i - 1]
       }
       hessian <- matrix(0, nrow = 3, ncol = 3)
       hessian[1, 1] <- phi_coefficient[nrow(data)]^2 / theta[3]
@@ -120,8 +119,7 @@ testthat::test_that(  # nolint: cyclomatic complexity
         phi_psi_coefficient[i] <-
           -phi_coefficient[i - 1] - theta[2] * phi_psi_coefficient[i - 1]
         psi_psi_coefficient[i] <-
-          -psi_coefficient[i] - theta[2] * psi_psi_coefficient[i - 1] -
-          psi_coefficient[i - 1]
+          -2 * psi_coefficient[i - 1] - theta[2] * psi_psi_coefficient[i - 1]
       }
       hessian <- matrix(0, nrow = 3, ncol = 3)
       hessian[1, 1] <- sum(phi_coefficient^2) / theta[3]
