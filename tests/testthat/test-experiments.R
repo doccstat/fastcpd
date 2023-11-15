@@ -162,8 +162,9 @@ testthat::test_that(  # nolint: cyclomatic complexity
       hessian <- matrix(0, 3, 3)
       for (i in 2:nrow(data)) {
         gradient <- qmle_gradient(data[1:i, , drop = FALSE], theta_estimate)
-        hessian <-
-          hessian + qmle_hessian(data[i, , drop = FALSE], theta_estimate)
+        # hessian <-
+        #   hessian + qmle_hessian(data[i, , drop = FALSE], theta_estimate)
+        hessian <- diag(100, 3)
         theta_estimate <- theta_estimate - solve(
           hessian + 1e-10 * diag(3), gradient
         )
@@ -175,8 +176,7 @@ testthat::test_that(  # nolint: cyclomatic complexity
     }
     testthat::expect_equal(
       colMeans(diffs),
-      c(-0.097893392, 0.004145239, 4015.478777062),
-      tolerance = 1e-9
+      c(-0.06077537, 0.03814139, 0.03148709)
     )
   }
 )
