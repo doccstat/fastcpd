@@ -65,7 +65,7 @@ Transcriptome analysis of 57 bladder carcinomas on Affymetrix HG-U95A and
 HG-U95Av2 microarrays
 }
 \examples{
-result <- fastcpd.mean(transcriptome[, 8], trim = 0.005)
+result <- fastcpd.mean(transcriptome$"10", trim = 0.005)
 summary(result)
 plot(result)
 }
