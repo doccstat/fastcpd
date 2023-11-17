@@ -54,7 +54,7 @@ List fastcpd_impl(
 
   fastcpd::parameters::FastcpdParameters fastcpd_parameters_class(
     data, beta, p, family, vanilla_percentage, segment_count,
-    winsorise_minval, winsorise_maxval, epsilon, lower, upper
+    winsorise_minval, winsorise_maxval, epsilon, min_prob, lower, upper
   );
 
   fastcpd_parameters_class.wrap_cost(cost);

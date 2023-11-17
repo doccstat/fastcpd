@@ -5,6 +5,7 @@
 #include "wrappers.h"
 
 using ::fastcpd::cost_update::cost_optim;
+using ::fastcpd::functions::cost_update_hessian;
 
 namespace fastcpd::parameters {
 
@@ -18,6 +19,7 @@ FastcpdParameters::FastcpdParameters(
     const double winsorise_minval,
     const double winsorise_maxval,
     const double epsilon,
+    const double min_prob,
     const colvec lower,
     const colvec upper
 ) : data(data),
@@ -29,6 +31,7 @@ FastcpdParameters::FastcpdParameters(
     winsorise_minval(winsorise_minval),
     winsorise_maxval(winsorise_maxval),
     epsilon(epsilon),
+    min_prob(min_prob),
     lower(lower),
     upper(upper) {
   n = data.n_rows;
@@ -259,6 +262,10 @@ void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
         );
   } else if (family == "lasso" || family == "gaussian") {
     hessian_new = new_data.t() * new_data + epsilon * eye<mat>(p, p);
+  } else if (family == "arma") {
+    hessian_new = cost_update_hessian(
+      data.rows(0, t - 1), coef_add.t(), family, min_prob
+    );
   } else if (!contain(FASTCPD_FAMILIES, family)) {
     hessian_new = zeros<mat>(p, p);
   }

@@ -85,8 +85,8 @@ testthat::test_that(
       ),
       paste0(
         "The family should be one of \"lm\", \"binomial\", \"poisson\", ",
-        "\"lasso\", \"mean\", \"ar\", \"var\", \"ma\", \"arima\", \"garch\", ",
-        "\"custom\".\nThe provided family is \"bin0mial\"."
+        "\"lasso\", \"mean\", \"arma\", \"ar\", \"var\", \"ma\", \"arima\", ",
+        "\"garch\", \"custom\".\nThe provided family is \"bin0mial\"."
       )
     )
   }

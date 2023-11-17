@@ -212,7 +212,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     check_family(
       family,
       c(
-        "lm", "binomial", "poisson", "lasso", "mean",
+        "lm", "binomial", "poisson", "lasso", "mean", "arma",
         "ar", "var", "ma", "arima", "garch", "custom"
       )
     )

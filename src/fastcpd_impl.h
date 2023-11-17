@@ -11,9 +11,9 @@
 // @param trim Trimming for the boundary change points.
 // @param momentum_coef Momentum coefficient to be applied to each update.
 // @param k Function on number of epochs in SGD.
-// @param family Family of the models. Can be "binomial", "poisson", "lasso" or
-//   "gaussian". If not provided, the user must specify the cost function and
-//   its gradient (and Hessian).
+// @param family Family of the models. Can be "binomial", "poisson", "lasso",
+//   "lm" or "arma". If not provided, the user must specify the cost function
+//   and its gradient (and Hessian).
 // @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
 //   poisson.
 // @param min_prob Minimum probability to avoid numerical issues. Only used for
