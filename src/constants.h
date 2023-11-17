@@ -2,10 +2,10 @@
 #define CONSTANTS_H_
 
 #include <algorithm>
+#include <array>
 
 #if defined(__cplusplus) && __cplusplus >= 201703L
 
-#include <array>
 template<typename C, typename T>
 bool contain(C&& c, T e) {
   return std::find(std::begin(c), std::end(c), e) != std::end(c);
