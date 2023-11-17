@@ -43,7 +43,7 @@ List cost_update(
   mat hessian_i = hessian.slice(i - 1);
   colvec gradient;
 
-  if (contain(CUSTOM_FAMILIES, family)) {
+  if (!contain(FASTCPD_FAMILIES, family)) {
     mat cost_hessian_result = cost_hessian_wrapper(
       data, theta_hat.col(i - 1),
       family,  // UNUSED
@@ -82,14 +82,15 @@ List cost_update(
     ) {
       line_search_costs[line_search_index] = cost_function_wrapper(
         data,
-        Rcpp::wrap(
-          theta_hat.col(i - 1) + line_search[line_search_index] * momentum
-        ),
+        Rcpp::wrap(max(min(
+          theta_hat.col(i - 1) + line_search[line_search_index] * momentum,
+          upper
+        ), lower)),
         family,
         lambda,
         false,
         R_NilValue
-      )["value"];
+      )[0];
     }
   }
   best_learning_rate = line_search[line_search_costs.index_min()];
@@ -121,7 +122,7 @@ List cost_update(
 
   for (int kk = 1; kk <= as<int>(k(data.n_rows - tau)); kk++) {
     for (unsigned j = tau + 1; j <= data.n_rows; j++) {
-      if (contain(CUSTOM_FAMILIES, family)) {
+      if (!contain(FASTCPD_FAMILIES, family)) {
         mat cost_hessian_result = cost_hessian_wrapper(
           data.rows(tau, j - 1), theta_hat.col(i - 1),
           family,  // UNUSED
