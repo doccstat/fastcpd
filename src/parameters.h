@@ -17,6 +17,7 @@ class FastcpdParameters {
     const double winsorise_minval,
     const double winsorise_maxval,
     const double epsilon,
+    const double min_prob,
     const colvec lower,
     const colvec upper
   );
@@ -163,6 +164,8 @@ class FastcpdParameters {
   // `epsilon` is the epsilon to avoid numerical issues. Only used for binomial
   // and poisson.
   const double epsilon;
+
+  const double min_prob;
 
   // `segment_indices` is the indices of the segments.
   colvec segment_indices;

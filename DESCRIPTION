@@ -41,6 +41,7 @@ Suggests:
     knitr,
     mockthat,
     mvtnorm,
+    numDeriv,
     rmarkdown,
     testthat (>= 3.0.0),
     xml2

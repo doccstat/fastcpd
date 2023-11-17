@@ -90,7 +90,7 @@ List cost_update(
         lambda,
         false,
         R_NilValue
-      )[0];
+      )["value"];
     }
   }
   best_learning_rate = line_search[line_search_costs.index_min()];

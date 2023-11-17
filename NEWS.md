@@ -3,6 +3,7 @@
 *   Add `lower` and `upper` parameters to denote the lower and upper bounds of
     the parameters.
 *   Add line search.
+*   Add hardcoded ARMA(3, 2).
 
 # fastcpd 0.9.6
 

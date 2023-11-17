@@ -1,3 +1,36 @@
+testthat::test_that(  # nolint: cyclomatic complexity
+  "ARIMA(3, 0, 2) fast c++", {
+    set.seed(1)
+    n <- 600
+    w <- rnorm(n + 2, 0, 1)
+    x <- rep(0, n + 3)
+    for (i in 1:300) {
+      x[i + 3] <- 0.1 * x[i + 2] - 0.2 * x[i + 1] + 0.6 * x[i] +
+        w[i + 2] + 0.1 * w[i + 1] + 0.5 * w[i]
+    }
+    for (i in 301:n) {
+      x[i + 3] <- 0.3 * x[i + 2] + 0.5 * x[i + 1] + 0.1 * x[i] +
+        w[i + 2] + 0.6 * w[i + 1] + 0.1 * w[i]
+    }
+    testthat::capture_warnings(
+      result <- fastcpd(
+        formula = ~ . - 1,
+        data = data.frame(x = x[3 + seq_len(n)]),
+        segment_count = 3,
+        trim = 0.01,
+        p = 3 + 2 + 1,
+        beta = (3 + 2 + 1 + 1) * log(n) / 2,
+        family = "arma",
+        cp_only = TRUE,
+        lower = c(rep(-1, 3 + 2), 1e-10),
+        upper = c(rep(1, 3 + 2), Inf),
+        line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
+      )
+    )
+    testthat::expect_equal(result@cp_set, c(302, 418))
+  }
+)
+
 testthat::skip("These tests are intended to be run manually.")
 
 testthat::test_that(  # nolint: cyclomatic complexity
@@ -250,6 +283,32 @@ testthat::test_that(  # nolint: cyclomatic complexity
       hessian
     }
 
+    # fastcpd arma 1 1
+    set.seed(1)
+    n <- 600
+    w <- rnorm(n + 1, 0, 1)
+    x <- rep(0, n + 1)
+    for (i in 1:300) {
+      x[i + 1] <- 0.1 * x[i] + w[i + 1] + 0.1 * w[i]
+    }
+    for (i in 301:n) {
+      x[i + 1] <- 0.3 * x[i] + w[i + 1] + 0.4 * w[i]
+    }
+    result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(x = x[1 + seq_len(n)]),
+      trim = 0,
+      p = 1 + 1 + 1,
+      beta = (1 + 1 + 1 + 1) * log(n) / 2,
+      cost = qmle,
+      cost_gradient = qmle_gradient,
+      cost_hessian = qmle_hessian,
+      cp_only = TRUE,
+      lower = c(rep(-1, 1 + 1), 1e-10),
+      upper = c(rep(1, 1 + 1), Inf),
+      line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
+    )
+
     # fastcpd arma 3 2
     set.seed(1)
     n <- 600
@@ -281,7 +340,7 @@ testthat::test_that(  # nolint: cyclomatic complexity
       cp_only = TRUE,
       lower = c(rep(-1, 3 + 2), 1e-10),
       upper = c(rep(1, 3 + 2), Inf),
-      epsilon = 1e-5
+      line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
     )
     testthat::expect_equal(result@cp_set, c(4, 22, 290))
 
@@ -294,7 +353,19 @@ testthat::test_that(  # nolint: cyclomatic complexity
       qmle_hessian_sum(matrix(x[3 + seq_len(n)]), theta_estimate, 3, 2)
     )
 
-    # optim(rep(0.1, 3 + 2 + 1), fn = function(data, theta) { qmle(data, theta, 3, 2) }, data = data, method = "L-BFGS-B", lower = c(rep(-1, 3 + 2), 1e-10), upper = c(rep(1, 3 + 2), Inf), gr = function(data, theta) { qmle_gradient_sum(data, theta, 3, 2) })
+    optim(
+      rep(0.1, 3 + 2 + 1),
+      fn = function(data, theta) {
+        qmle(data, theta, 3, 2)
+      },
+      data = data,
+      method = "L-BFGS-B",
+      lower = c(rep(-1, 3 + 2), 1e-10),
+      upper = c(rep(1, 3 + 2), Inf),
+      gr = function(data, theta) {
+        qmle_gradient_sum(data, theta, 3, 2)
+      }
+    )
 
     # convergence check
     x <- arima.sim(list(ar = c(0.1, -0.2, 0.6), ma = c(0.1, 0.5)), n = n + 3)
@@ -306,7 +377,8 @@ testthat::test_that(  # nolint: cyclomatic complexity
     epochs_num <- 0
     while (abs(curr_qmle - prev_qmle) > 1e-5) {
       prev_qmle <- curr_qmle
-      hessian <- Matrix::nearPD(qmle_hessian_sum(data, theta_estimate, 3, 2))$mat
+      hessian <-
+        Matrix::nearPD(qmle_hessian_sum(data, theta_estimate, 3, 2))$mat
       step <- solve(
         hessian, qmle_gradient_sum(data, theta_estimate, 3, 2)
       )
@@ -315,9 +387,9 @@ testthat::test_that(  # nolint: cyclomatic complexity
       lr <- lr_choices[which.min(
         sapply(lr_choices, function(lr) {
           qmle(data, pmin(
-        pmax(theta_estimate - lr * step, c(rep(-1, 3 + 2), 1e-10)),
-        c(rep(1, 3 + 2), Inf)
-      ), 3, 2)
+            pmax(theta_estimate - lr * step, c(rep(-1, 3 + 2), 1e-10)),
+            c(rep(1, 3 + 2), Inf)
+          ), 3, 2)
         })
       )]
       theta_estimate <- pmin(
@@ -329,39 +401,6 @@ testthat::test_that(  # nolint: cyclomatic complexity
       qmle_path <- c(qmle_path, curr_qmle)
       epochs_num <- epochs_num + 1
     }
-  }
-)
-
-testthat::test_that(  # nolint: cyclomatic complexity
-  "arma(1, 1) experiment", {
-    set.seed(1)
-    diffs <- matrix(NA, 100, 3)
-    for (experiment_id in seq_len(100)) {
-      x <- arima.sim(list(ar = 0.8, ma = 0.1), n = 300)
-      result_arima <-
-        forecast::Arima(x, order = c(1, 0, 1), include.mean = FALSE)
-
-      theta_estimate <- c(0, 0, 1)
-      data <- matrix(x)
-      hessian <- matrix(0, 3, 3)
-      for (i in 2:nrow(data)) {
-        gradient <- qmle_gradient(data[1:i, , drop = FALSE], theta_estimate)
-        hessian <-
-          hessian + qmle_hessian(data[1:i, , drop = FALSE], theta_estimate)  # nolint
-        # hessian <- diag(100, 3)
-        theta_estimate <- theta_estimate - solve(
-          hessian + 1e-10 * diag(3), gradient
-        )
-        theta_estimate <-
-          pmin(pmax(theta_estimate, c(-1, -1, 1e-5)), c(1, 1, 1e5))
-      }
-      diffs[experiment_id, ] <-
-        theta_estimate - c(result_arima$coef, result_arima$sigma2)
-    }
-    testthat::expect_equal(
-      colMeans(diffs),
-      c(-0.06077537, 0.03814139, 0.03148709)
-    )
   }
 )
 
