@@ -106,6 +106,17 @@ class FastcpdParameters {
   // `cost_hessian` is the Hessian of the cost function to be used.
   Nullable<Function> cost_hessian;
 
+  // Cost function. If the cost function is provided in R, this will be a
+  // wrapper of the R function.
+  function<List(
+      mat data,
+      Nullable<colvec> theta,
+      string family,
+      double lambda,
+      bool cv,
+      Nullable<colvec> start
+  )> cost_function_wrapper;
+
   // Gradient of the cost function. If the cost function is provided in R, this
   // will be a wrapper of the R function.
   function<colvec(mat data, colvec theta, string family)> cost_gradient_wrapper;
@@ -179,17 +190,6 @@ class FastcpdParameters {
   const colvec lower;
 
   const colvec upper;
-
-  // Cost function. If the cost function is provided in R, this will be a
-  // wrapper of the R function.
-  function<List(
-      mat data,
-      Nullable<colvec> theta,
-      string family,
-      double lambda,
-      bool cv,
-      Nullable<colvec> start
-  )> cost_function_wrapper;
 
   void create_environment_functions();
 };

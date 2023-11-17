@@ -2,6 +2,7 @@
 
 *   Add `lower` and `upper` parameters to denote the lower and upper bounds of
     the parameters.
+*   Add line search.
 
 # fastcpd 0.9.6
 

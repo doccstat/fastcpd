@@ -30,7 +30,8 @@ List fastcpd_impl(
     const double vanilla_percentage,
     const bool warm_start,
     colvec lower,
-    colvec upper
+    colvec upper,
+    colvec line_search
 ) {
   // Set up the initial values.
   const int n = data.n_rows;
@@ -105,10 +106,12 @@ List fastcpd_impl(
           winsorise_minval,
           winsorise_maxval,
           lambda,
+          fastcpd_parameters_class.cost_function_wrapper,
           fastcpd_parameters_class.cost_gradient_wrapper,
           fastcpd_parameters_class.cost_hessian_wrapper,
           lower,
-          upper
+          upper,
+          line_search
         );
         fastcpd_parameters_class.update_theta_hat(
           i - 1, as<colvec>(cost_update_result[0])

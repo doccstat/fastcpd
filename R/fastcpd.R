@@ -165,6 +165,8 @@
 #'   bound will be set to be \code{-Inf} for all parameters.
 #' @param upper Upper bound for the parameters. If not specified, the upper
 #'   bound will be set to be \code{Inf} for all parameters.
+#' @param line_search If a vector of numeric values are provided, line search
+#'   will be performed to find the optimal step size for each update.
 #'
 #' @return A class \code{fastcpd} object.
 #'
@@ -198,6 +200,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   warm_start = FALSE,
   lower = NULL,
   upper = NULL,
+  line_search = c(1),
   ...
 ) {
   family <- ifelse(is.null(family), "custom", tolower(family))
@@ -450,7 +453,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     fastcpd_data, beta, segment_count, trim, momentum_coef, k, fastcpd_family,
     epsilon, min_prob, winsorise_minval, winsorise_maxval, p,
     cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
-    lower, upper
+    lower, upper, line_search
   )
 
   cp_set <- c(result$cp_set)

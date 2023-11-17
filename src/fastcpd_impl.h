@@ -39,6 +39,7 @@
 // @param warm_start Whether to use warm start for the initial guess.
 // @param lower A vector containing the lower bounds for the parameters.
 // @param upper A vector containing the upper bounds for the parameters.
+// @param line_search A vector containing the line search coefficients.
 //
 // @return A list containing the change points and the cost values for each
 //   segment.
@@ -63,7 +64,8 @@ List fastcpd_impl(
     const double vanilla_percentage,
     const bool warm_start,
     colvec lower,
-    colvec upper
+    colvec upper,
+    colvec line_search
 );
 
 #endif  // FASTCPD_H_
