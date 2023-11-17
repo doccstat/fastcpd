@@ -153,7 +153,7 @@ void FastcpdParameters::create_segment_statistics() {
         arma::find(segment_indices == segment_index + 1);
     mat data_segment = data.rows(segment_indices_);
     rowvec segment_theta;
-    if (contain(CUSTOM_FAMILIES, family)) {
+    if (!contain(FASTCPD_FAMILIES, family)) {
       segment_theta = as<rowvec>(cost_optim(
         family, vanilla_percentage, p, data_segment, cost.get(), 0, false,
         lower, upper
@@ -227,7 +227,7 @@ void FastcpdParameters::create_gradients() {
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian.slice(0) = epsilon * eye<mat>(p, p) +
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1);
-  } else if (contain(CUSTOM_FAMILIES, family)) {
+  } else if (!contain(FASTCPD_FAMILIES, family)) {
     theta_hat.col(0) = segment_theta_hat.row(0).t();
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian.slice(0) = zeros<mat>(p, p);
@@ -259,7 +259,7 @@ void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
         );
   } else if (family == "lasso" || family == "gaussian") {
     hessian_new = new_data.t() * new_data + epsilon * eye<mat>(p, p);
-  } else if (contain(CUSTOM_FAMILIES, family)) {
+  } else if (!contain(FASTCPD_FAMILIES, family)) {
     hessian_new = zeros<mat>(p, p);
   }
 

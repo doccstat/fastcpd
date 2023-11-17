@@ -137,7 +137,7 @@ List fastcpd_impl(
           );
           theta = as<colvec>(winsorize_result);
         }
-        if (contain(CUSTOM_FAMILIES, family)) {
+        if (!contain(FASTCPD_FAMILIES, family)) {
           Function cost_non_null = fastcpd_parameters_class.cost.get();
           SEXP cost_result = cost_non_null(data_segment, theta);
           cval(i - 1) = as<double>(cost_result);
@@ -155,7 +155,7 @@ List fastcpd_impl(
       } else {
         // vanilla PELT
         List cost_optim_result;
-        if (contain(CUSTOM_FAMILIES, family)) {
+        if (!contain(FASTCPD_FAMILIES, family)) {
           cost_optim_result = cost_optim(
             family, vanilla_percentage, p, data_segment,
             fastcpd_parameters_class.cost.get(), lambda, false,
@@ -285,7 +285,7 @@ List fastcpd_impl(
         arma::conv_to<ucolvec>::from(std::move(segment_data_index_));
     mat data_segment = data.rows(segment_data_index);
     List cost_optim_result;
-    if (contain(CUSTOM_FAMILIES, family)) {
+    if (!contain(FASTCPD_FAMILIES, family)) {
       cost_optim_result = cost_optim(
         family, vanilla_percentage, p, data_segment,
         fastcpd_parameters_class.cost.get(), lambda, false, lower, upper
