@@ -31,6 +31,7 @@ namespace fastcpd::cost_update {
 // @param cost_hessian Hessian for custom cost function.
 // @param lower A vector containing the lower bounds for the parameters.
 // @param upper A vector containing the upper bounds for the parameters.
+// @param line_search A vector containing the line search coefficients.
 //
 // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
 //   \code{hessian}, and \code{momentum}.
@@ -50,12 +51,21 @@ List cost_update(
     const double winsorise_minval,
     const double winsorise_maxval,
     const double lambda,
+    function<List(
+        mat data,
+        Nullable<colvec> theta,
+        string family,
+        double lambda,
+        bool cv,
+        Nullable<colvec> start
+    )> cost_function_wrapper,
     function<colvec(mat data, colvec theta, string family)>
       cost_gradient_wrapper,
     function<mat(mat data, colvec theta, string family, double min_prob)>
       cost_hessian_wrapper,
     colvec lower,
-    colvec upper
+    colvec upper,
+    colvec line_search
 );
 
 // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.

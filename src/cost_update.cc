@@ -23,12 +23,21 @@ List cost_update(
     const double winsorise_minval,
     const double winsorise_maxval,
     const double lambda,
+    function<List(
+        mat data,
+        Nullable<colvec> theta,
+        string family,
+        double lambda,
+        bool cv,
+        Nullable<colvec> start
+    )> cost_function_wrapper,
     function<colvec(mat data, colvec theta, string family)>
       cost_gradient_wrapper,
     function<mat(mat data, colvec theta, string family, double min_prob)>
       cost_hessian_wrapper,
     colvec lower,
-    colvec upper
+    colvec upper,
+    colvec line_search
 ) {
   // Get the hessian
   mat hessian_i = hessian.slice(i - 1);
@@ -61,8 +70,32 @@ List cost_update(
   vec momentum_step = solve(hessian_psd, gradient);
   momentum = momentum_coef * momentum - momentum_step;
 
+  double best_learning_rate = 1;
+  colvec line_search_costs = zeros<colvec>(line_search.n_elem);
+
+  // Line search
+  if (line_search.n_elem > 1 || line_search[0] != 1) {
+    for (
+      unsigned int line_search_index = 0;
+      line_search_index < line_search.n_elem;
+      line_search_index++
+    ) {
+      line_search_costs[line_search_index] = cost_function_wrapper(
+        data,
+        Rcpp::wrap(
+          theta_hat.col(i - 1) + line_search[line_search_index] * momentum
+        ),
+        family,
+        lambda,
+        false,
+        R_NilValue
+      )["value"];
+    }
+  }
+  best_learning_rate = line_search[line_search_costs.index_min()];
+
   // Update theta_hat with momentum
-  theta_hat.col(i - 1) += momentum;
+  theta_hat.col(i - 1) += best_learning_rate * momentum;
 
   theta_hat.col(i - 1) = min(theta_hat.col(i - 1), upper);
   theta_hat.col(i - 1) = max(theta_hat.col(i - 1), lower);
