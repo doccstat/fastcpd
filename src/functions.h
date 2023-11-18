@@ -15,6 +15,7 @@ namespace fastcpd::functions {
 // @param lambda Lambda for L1 regularization. Only used for lasso.
 // @param cv Whether to perform cross-validation to find the best lambda.
 // @param start Starting point for the optimization for warm start.
+// @param order Order of the time series models.
 //
 // @return Negative log likelihood of the corresponding data with the given
 //   family.
@@ -24,7 +25,8 @@ List negative_log_likelihood(
     string family,
     double lambda,
     bool cv = false,
-    Nullable<colvec> start = R_NilValue
+    Nullable<colvec> start = R_NilValue,
+    const colvec order = colvec(1)
 );
 
 List negative_log_likelihood_wo_theta(
@@ -32,7 +34,8 @@ List negative_log_likelihood_wo_theta(
     string family,
     double lambda,
     bool cv,
-    Nullable<colvec> start
+    Nullable<colvec> start,
+    const colvec order
 );
 
 double negative_log_likelihood_wo_cv(
@@ -40,7 +43,8 @@ double negative_log_likelihood_wo_cv(
     colvec theta,
     string family,
     double lambda,
-    Nullable<colvec> start
+    Nullable<colvec> start,
+    const colvec order
 );
 
 // Function to calculate the gradient at the current data.
@@ -48,9 +52,15 @@ double negative_log_likelihood_wo_cv(
 // @param data A data frame containing the data to be segmented.
 // @param theta Estimated theta from the previous iteration.
 // @param family Family of the model.
+// @param order Order of the time series models.
 //
 // @return Gradient at the current data.
-colvec cost_update_gradient(mat data, colvec theta, string family);
+colvec cost_update_gradient(
+    mat data,
+    colvec theta,
+    string family,
+    const colvec order
+);
 
 // Function to calculate the Hessian matrix at the current data.
 //
@@ -58,13 +68,15 @@ colvec cost_update_gradient(mat data, colvec theta, string family);
 // @param theta Estimated theta from the previous iteration.
 // @param family Family of the model.
 // @param min_prob Minimum probability to avoid numerical issues.
+// @param order Order of the time series models.
 //
 // @return Hessian at the current data.
 mat cost_update_hessian(
     mat data,
     colvec theta,
     string family,
-    double min_prob
+    double min_prob,
+    const colvec order
 );
 
 }  // namespace fastcpd::functions

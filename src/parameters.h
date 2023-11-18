@@ -32,9 +32,6 @@ class FastcpdParameters {
   // specified in the `segment_count` parameter.
   void create_segment_indices();
 
-  // Get the value of \code{theta_hat}.
-  mat get_theta_hat();
-
   // Update \code{theta_hat} for a specific column.
   void update_theta_hat(const unsigned int col, colvec new_theta_hat);
 
@@ -59,9 +56,6 @@ class FastcpdParameters {
   // Prune the columns of \code{theta_sum}.
   void update_theta_sum(ucolvec pruned_left);
 
-  // Get the value of \code{hessian}.
-  cube get_hessian();
-
   // Update \code{hessian} for a specific slice.
   void update_hessian(const unsigned int slice, mat new_hessian);
 
@@ -75,9 +69,6 @@ class FastcpdParameters {
   void create_segment_statistics();
 
   double get_beta();
-
-  // Get the value of \code{momentum}.
-  colvec get_momentum();
 
   // Update \code{momentum}.
   void update_momentum(colvec new_momentum);
@@ -129,6 +120,7 @@ class FastcpdParameters {
   // @param lower A vector containing the lower bounds for the parameters.
   // @param upper A vector containing the upper bounds for the parameters.
   // @param line_search A vector containing the line search coefficients.
+  // @param order Order of the time series models.
   //
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   \code{hessian}, and \code{momentum}.
@@ -154,15 +146,19 @@ class FastcpdParameters {
         string family,
         double lambda,
         bool cv,
-        Nullable<colvec> start
+        Nullable<colvec> start,
+        const colvec order
     )> cost_function_wrapper,
-    function<colvec(mat data, colvec theta, string family)>
-      cost_gradient_wrapper,
-    function<mat(mat data, colvec theta, string family, double min_prob)>
-      cost_hessian_wrapper,
+    function<colvec(
+      mat data, colvec theta, string family, const colvec order
+    )> cost_gradient_wrapper,
+    function<mat(
+      mat data, colvec theta, string family, double min_prob, const colvec order
+    )> cost_hessian_wrapper,
     colvec lower,
     colvec upper,
-    colvec line_search
+    colvec line_search,
+    const colvec order
   );
 
 // TODO(doccstat): define a `cost_optim` inside the class.
@@ -189,16 +185,24 @@ class FastcpdParameters {
       string family,
       double lambda,
       bool cv,
-      Nullable<colvec> start
+      Nullable<colvec> start,
+      const colvec order
   )> cost_function_wrapper;
 
   // Gradient of the cost function. If the cost function is provided in R, this
   // will be a wrapper of the R function.
-  function<colvec(mat data, colvec theta, string family)> cost_gradient_wrapper;
+  function<colvec(
+      mat data,
+      colvec theta,
+      string family,
+      const colvec order
+  )> cost_gradient_wrapper;
 
   // Hessian of the cost function. If the cost function is provided in R, this
   // will be a wrapper of the R function.
-  function<mat(mat data, colvec theta, string family, double min_prob)>
+  function<mat(
+    mat data, colvec theta, string family, double min_prob, const colvec order
+  )>
     cost_hessian_wrapper;
 
   Nullable<Function> winsorize;

@@ -2,9 +2,6 @@
 #include "cost_update.h"
 #include "functions.h"
 
-using ::fastcpd::functions::cost_update_gradient;
-using ::fastcpd::functions::cost_update_hessian;
-
 namespace fastcpd::cost_update {
 
 List cost_optim(
