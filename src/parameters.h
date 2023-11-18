@@ -11,6 +11,7 @@ class FastcpdParameters {
     mat data,
     const double beta,
     const int p,
+    const colvec order,
     const string family,
     const double vanilla_percentage,
     const int segment_count,
@@ -91,6 +92,79 @@ class FastcpdParameters {
   void wrap_cost_gradient(Nullable<Function> cost_gradient);
   void wrap_cost_hessian(Nullable<Function> cost_hessian);
 
+  void cost_update(
+      const unsigned int t,
+      const unsigned int tau,
+      const unsigned int i,
+      Function k,
+      const double momentum_coef,
+      const double lambda,
+      const colvec line_search
+  );
+
+  // Update the cost values for the segmentation.
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param theta_hat Estimated theta from the previous iteration.
+  // @param theta_sum Sum of estimated theta from the previous iteration.
+  // @param hessian Hessian matrix from the previous iteration.
+  // @param tau Start of the current segment.
+  // @param i Index of the current data in the whole data set.
+  // @param k Number of epochs in SGD.
+  // @param family Family of the model.
+  // @param momentum Momentum from the previous iteration.
+  // @param momentum_coef Momentum coefficient to be applied to the current
+  //   momentum.
+  // @param epsilon Epsilon to avoid numerical issues. Only used for binomial
+  //   and poisson.
+  // @param min_prob Minimum probability to avoid numerical issues.
+  //   Only used for poisson.
+  // @param winsorise_minval Minimum value to be winsorised. Only used for
+  //   poisson.
+  // @param winsorise_maxval Maximum value to be winsorised. Only used for
+  //   poisson.
+  // @param lambda Lambda for L1 regularization. Only used for lasso.
+  // @param cost_gradient Gradient for custom cost function.
+  // @param cost_hessian Hessian for custom cost function.
+  // @param lower A vector containing the lower bounds for the parameters.
+  // @param upper A vector containing the upper bounds for the parameters.
+  // @param line_search A vector containing the line search coefficients.
+  //
+  // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
+  //   \code{hessian}, and \code{momentum}.
+  static List cost_update_step(
+    const mat data,
+    mat theta_hat,
+    mat theta_sum,
+    cube hessian,
+    const int tau,
+    const int i,
+    Function k,
+    const string family,
+    colvec momentum,
+    const double momentum_coef,
+    const double epsilon,
+    const double min_prob,
+    const double winsorise_minval,
+    const double winsorise_maxval,
+    const double lambda,
+    function<List(
+        mat data,
+        Nullable<colvec> theta,
+        string family,
+        double lambda,
+        bool cv,
+        Nullable<colvec> start
+    )> cost_function_wrapper,
+    function<colvec(mat data, colvec theta, string family)>
+      cost_gradient_wrapper,
+    function<mat(mat data, colvec theta, string family, double min_prob)>
+      cost_hessian_wrapper,
+    colvec lower,
+    colvec upper,
+    colvec line_search
+  );
+
 // TODO(doccstat): define a `cost_optim` inside the class.
 //   List cost_optim(
 //       const mat data_segment,
@@ -144,6 +218,8 @@ class FastcpdParameters {
 
   // `p` is the number of parameters to be estimated.
   const int p;
+
+  const colvec order;
 
   // `family` is the family of the model.
   const string family;

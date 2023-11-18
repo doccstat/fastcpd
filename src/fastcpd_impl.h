@@ -23,6 +23,7 @@
 // @param winsorise_maxval Maximum value to be winsorised. Only used for
 //   poisson.
 // @param p Number of parameters to be estimated.
+// @param order Order for time series models.
 // @param cost Cost function to be used. If not specified, the default is
 //   the negative log-likelihood for the corresponding family.
 // @param cost_gradient Gradient for custom cost function.
@@ -57,6 +58,7 @@ List fastcpd_impl(
     const double winsorise_minval,
     const double winsorise_maxval,
     const int p,
+    const colvec order,
     Nullable<Function> cost,
     Nullable<Function> cost_gradient,
     Nullable<Function> cost_hessian,

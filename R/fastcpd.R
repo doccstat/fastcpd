@@ -451,7 +451,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   result <- fastcpd_impl(
     fastcpd_data, beta, segment_count, trim, momentum_coef, k, fastcpd_family,
-    epsilon, min_prob, winsorise_minval, winsorise_maxval, p,
+    epsilon, min_prob, winsorise_minval, winsorise_maxval, p, order,
     cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
     lower, upper, line_search
   )

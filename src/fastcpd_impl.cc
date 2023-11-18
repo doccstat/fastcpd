@@ -7,7 +7,6 @@
 #include "wrappers.h"
 
 using ::fastcpd::cost_update::cost_optim;
-using ::fastcpd::cost_update::cost_update;
 using ::fastcpd::functions::negative_log_likelihood;
 
 List fastcpd_impl(
@@ -23,6 +22,7 @@ List fastcpd_impl(
     const double winsorise_minval,
     const double winsorise_maxval,
     const int p,
+    const colvec order,
     Nullable<Function> cost,
     Nullable<Function> cost_gradient,
     Nullable<Function> cost_hessian,
@@ -53,7 +53,7 @@ List fastcpd_impl(
   rProgress.tick(0);
 
   fastcpd::parameters::FastcpdParameters fastcpd_parameters_class(
-    data, beta, p, family, vanilla_percentage, segment_count,
+    data, beta, p, order, family, vanilla_percentage, segment_count,
     winsorise_minval, winsorise_maxval, epsilon, min_prob, lower, upper
   );
 
@@ -90,40 +90,8 @@ List fastcpd_impl(
       mat data_segment = data.rows(tau, t - 1);
       if (t > vanilla_percentage * n) {
         // fastcpd
-        List cost_update_result = cost_update(
-          data.rows(0, t - 1),
-          fastcpd_parameters_class.get_theta_hat(),
-          fastcpd_parameters_class.get_theta_sum(),
-          fastcpd_parameters_class.get_hessian(),
-          tau,
-          i,
-          k,
-          family,
-          fastcpd_parameters_class.get_momentum(),
-          momentum_coef,
-          epsilon,
-          min_prob,
-          winsorise_minval,
-          winsorise_maxval,
-          lambda,
-          fastcpd_parameters_class.cost_function_wrapper,
-          fastcpd_parameters_class.cost_gradient_wrapper,
-          fastcpd_parameters_class.cost_hessian_wrapper,
-          lower,
-          upper,
-          line_search
-        );
-        fastcpd_parameters_class.update_theta_hat(
-          i - 1, as<colvec>(cost_update_result[0])
-        );
-        fastcpd_parameters_class.create_theta_sum(
-          i - 1, as<colvec>(cost_update_result[1])
-        );
-        fastcpd_parameters_class.update_hessian(
-          i - 1, as<mat>(cost_update_result[2])
-        );
-        fastcpd_parameters_class.update_momentum(
-          as<colvec>(cost_update_result[3])
+        fastcpd_parameters_class.cost_update(
+          t, tau, i, k, momentum_coef, lambda, line_search
         );
         colvec theta =
             fastcpd_parameters_class.get_theta_sum().col(i - 1) / (t - tau);
