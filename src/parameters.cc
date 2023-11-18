@@ -88,10 +88,6 @@ void FastcpdParameters::create_segment_indices() {
   }
 }
 
-mat FastcpdParameters::get_theta_hat() {
-  return theta_hat;
-}
-
 void FastcpdParameters::update_theta_hat(
   const unsigned int col, colvec new_theta_hat
 ) {
@@ -120,10 +116,6 @@ void FastcpdParameters::update_theta_sum(
 
 void FastcpdParameters::update_theta_sum(colvec new_theta_sum) {
   theta_sum = arma::join_rows(theta_sum, new_theta_sum);
-}
-
-cube FastcpdParameters::get_hessian() {
-  return hessian;
 }
 
 void FastcpdParameters::update_hessian(
@@ -166,7 +158,7 @@ void FastcpdParameters::create_segment_statistics() {
     } else {
       segment_theta = as<rowvec>(
         cost_function_wrapper(
-          data_segment, R_NilValue, family, 0, true, R_NilValue
+          data_segment, R_NilValue, family, 0, true, R_NilValue, order
         )["par"]
       );
     }
@@ -189,10 +181,6 @@ void FastcpdParameters::create_segment_statistics() {
 
 double FastcpdParameters::get_beta() {
   return beta;
-}
-
-colvec FastcpdParameters::get_momentum() {
-  return momentum;
 }
 
 void FastcpdParameters::update_momentum(colvec new_momentum) {
@@ -266,7 +254,7 @@ void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
     hessian_new = new_data.t() * new_data + epsilon * eye<mat>(p, p);
   } else if (family == "arma") {
     hessian_new = cost_update_hessian(
-      data.rows(0, t - 1), coef_add.t(), family, min_prob
+      data.rows(0, t - 1), coef_add.t(), family, min_prob, order
     );
   } else if (!contain(FASTCPD_FAMILIES, family)) {
     hessian_new = zeros<mat>(p, p);
@@ -349,7 +337,8 @@ void FastcpdParameters::cost_update(
     cost_hessian_wrapper,
     lower,
     upper,
-    line_search
+    line_search,
+    order
   );
   update_theta_hat(i - 1, as<colvec>(cost_update_result[0]));
   create_theta_sum(i - 1, as<colvec>(cost_update_result[1]));
@@ -379,15 +368,19 @@ List FastcpdParameters::cost_update_step(
         string family,
         double lambda,
         bool cv,
-        Nullable<colvec> start
+        Nullable<colvec> start,
+        const colvec order
     )> cost_function_wrapper,
-    function<colvec(mat data, colvec theta, string family)>
-      cost_gradient_wrapper,
-    function<mat(mat data, colvec theta, string family, double min_prob)>
-      cost_hessian_wrapper,
+    function<colvec(
+      mat data, colvec theta, string family, const colvec order
+    )> cost_gradient_wrapper,
+    function<mat(
+      mat data, colvec theta, string family, double min_prob, const colvec order
+    )> cost_hessian_wrapper,
     colvec lower,
     colvec upper,
-    colvec line_search
+    colvec line_search,
+    const colvec order
 ) {
   // Get the hessian
   mat hessian_i = hessian.slice(i - 1);
@@ -397,19 +390,21 @@ List FastcpdParameters::cost_update_step(
     mat cost_hessian_result = cost_hessian_wrapper(
       data, theta_hat.col(i - 1),
       family,  // UNUSED
-      min_prob  // UNUSED
+      min_prob,  // UNUSED
+      order  // UNUSED
     );
     colvec cost_gradient_result = cost_gradient_wrapper(
       data, theta_hat.col(i - 1),
-      family  // UNUSED
+      family,  // UNUSED
+      order  // UNUSED
     );
     hessian_i += cost_hessian_result;
     gradient = cost_gradient_result;
   } else {
     hessian_i +=
-      cost_update_hessian(data, theta_hat.col(i - 1), family, min_prob);
+      cost_update_hessian(data, theta_hat.col(i - 1), family, min_prob, order);
     gradient = fastcpd::functions::cost_update_gradient(
-      data, theta_hat.col(i - 1), family
+      data, theta_hat.col(i - 1), family, order
     );
   }
 
@@ -433,15 +428,10 @@ List FastcpdParameters::cost_update_step(
       line_search_index++
     ) {
       line_search_costs[line_search_index] = cost_function_wrapper(
-        data,
-        Rcpp::wrap(max(min(
+        data, Rcpp::wrap(max(min(
           theta_hat.col(i - 1) + line_search[line_search_index] * momentum,
           upper
-        ), lower)),
-        family,
-        lambda,
-        false,
-        R_NilValue
+        ), lower)), family, lambda, false, R_NilValue, order
       )["value"];
     }
   }
@@ -478,20 +468,22 @@ List FastcpdParameters::cost_update_step(
         mat cost_hessian_result = cost_hessian_wrapper(
           data.rows(tau, j - 1), theta_hat.col(i - 1),
           family,  // UNUSED
-          min_prob  // UNUSED
+          min_prob,  // UNUSED
+          order  // UNUSED
         );
         hessian_i += cost_hessian_result;
         colvec cost_gradient_result = cost_gradient_wrapper(
           data.rows(tau, j - 1), theta_hat.col(i - 1),
-          family  // UNUSED
+          family,  // UNUSED
+          order  // UNUSED
         );
         gradient = cost_gradient_result;
       } else {
         hessian_i += cost_update_hessian(
-          data.rows(tau, j - 1), theta_hat.col(i - 1), family, min_prob
+          data.rows(tau, j - 1), theta_hat.col(i - 1), family, min_prob, order
         );
         gradient = fastcpd::functions::cost_update_gradient(
-          data.rows(tau, j - 1), theta_hat.col(i - 1), family
+          data.rows(tau, j - 1), theta_hat.col(i - 1), family, order
         );
       }
 

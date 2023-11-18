@@ -8,14 +8,17 @@ List negative_log_likelihood(
     string family,
     double lambda,
     bool cv,
-    Nullable<colvec> start
+    Nullable<colvec> start,
+    const colvec order
 ) {
   if (theta.isNull()) {
-    return negative_log_likelihood_wo_theta(data, family, lambda, cv, start);
+    return negative_log_likelihood_wo_theta(
+      data, family, lambda, cv, start, order
+    );
   } else {
     return List::create(
       Named("value") = negative_log_likelihood_wo_cv(
-        data, as<colvec>(theta), family, lambda, start
+        data, as<colvec>(theta), family, lambda, start, order
       )
     );
   }
@@ -26,7 +29,8 @@ List negative_log_likelihood_wo_theta(
     string family,
     double lambda,
     bool cv,
-    Nullable<colvec> start
+    Nullable<colvec> start,
+    const colvec order
 ) {
   if (family == "lasso" && cv) {
     Environment glmnet = Environment::namespace_env("glmnet"),
@@ -127,7 +131,8 @@ double negative_log_likelihood_wo_cv(
     colvec theta,
     string family,
     double lambda,
-    Nullable<colvec> start
+    Nullable<colvec> start,
+    const colvec order
 ) {
   vec y = data.col(0);
   if (family == "lasso" || family == "gaussian") {
@@ -179,7 +184,8 @@ double negative_log_likelihood_wo_cv(
 colvec cost_update_gradient(
     mat data,
     colvec theta,
-    string family
+    string family,
+    const colvec order
 ) {
   rowvec new_data = data.row(data.n_rows - 1);
   rowvec x = new_data.tail(new_data.n_elem - 1);
@@ -238,7 +244,8 @@ mat cost_update_hessian(
     mat data,
     colvec theta,
     string family,
-    double min_prob
+    double min_prob,
+    const colvec order
 ) {
   rowvec new_data = data.row(data.n_rows - 1);
   rowvec x = new_data.tail(new_data.n_elem - 1);

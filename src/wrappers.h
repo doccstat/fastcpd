@@ -15,7 +15,8 @@ class CostFunction {
       string family,  // UNUSED
       double lambda,  // UNUSED
       bool cv,  // UNUSED
-      Nullable<colvec> start  // UNUSED
+      Nullable<colvec> start,  // UNUSED
+      const colvec order  // UNUSED
   );
 
  private:
@@ -29,7 +30,8 @@ class CostGradient {
   colvec operator()(
       mat data,
       colvec theta,
-      string family  // UNUSED
+      string family,  // UNUSED
+      const colvec order  // UNUSED
   );
 
  private:
@@ -44,7 +46,8 @@ class CostHessian {
       mat data,
       colvec theta,
       string family,  // UNUSED
-      double min_prob  // UNUSED
+      double min_prob,  // UNUSED,
+      const colvec order  // UNUSED
   );
 
  private:

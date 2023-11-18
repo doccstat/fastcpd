@@ -114,7 +114,8 @@ List fastcpd_impl(
           (family == "lasso" && t - tau >= 3)
         ) {
           List cost_result = negative_log_likelihood(
-            data_segment, Rcpp::wrap(theta), family, lambda, false, R_NilValue
+            data_segment, Rcpp::wrap(theta), family,
+            lambda, false, R_NilValue, order
           );
           cval(i - 1) = as<double>(cost_result["value"]);
         } else {
@@ -133,12 +134,13 @@ List fastcpd_impl(
           if (warm_start && t - tau >= 10 * p) {
             cost_optim_result = negative_log_likelihood(
               data_segment, R_NilValue, family,
-              lambda, false, Rcpp::wrap(start.col(tau))
+              lambda, false, Rcpp::wrap(start.col(tau)), order
             );
             start.col(tau) = as<colvec>(cost_optim_result["par"]);
           } else {
             cost_optim_result = negative_log_likelihood(
-              data_segment, R_NilValue, family, lambda, false, R_NilValue
+              data_segment, R_NilValue, family,
+              lambda, false, R_NilValue, order
             );
           }
         }
@@ -260,7 +262,7 @@ List fastcpd_impl(
       );
     } else {
       cost_optim_result = negative_log_likelihood(
-        data_segment, R_NilValue, family, lambda, false
+        data_segment, R_NilValue, family, lambda, false, R_NilValue, order
       );
     }
     cost_values(i) = as<double>(cost_optim_result["value"]);

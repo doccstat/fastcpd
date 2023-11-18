@@ -10,8 +10,9 @@ using ::fastcpd::functions::cost_update_hessian;
 context("negative_log_likelihood_wo_theta Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     colvec data(time_series_arma_3_2.data(), time_series_arma_3_2.size());
+    const colvec order = {3, 0, 2};
     List out = negative_log_likelihood_wo_theta(
-      data, "arma", 0, false, R_NilValue
+      data, "arma", 0, false, R_NilValue, order
     );
     colvec par = out["par"];
     double value = out["value"];
@@ -75,8 +76,10 @@ context("negative_log_likelihood_wo_cv Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     colvec data(time_series_arma_3_2.data(), time_series_arma_3_2.size()),
            theta = 0.1 * ones<colvec>(6);
-    double value =
-      negative_log_likelihood_wo_cv(data, theta, "arma", 0.0, R_NilValue);
+    const colvec order = {3, 0, 2};
+    double value = negative_log_likelihood_wo_cv(
+      data, theta, "arma", 0.0, R_NilValue, order
+    );
     expect_true(abs(value -  1363.288) < 0.001);
   }
 }
@@ -85,7 +88,8 @@ context("cost_update_gradient Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     colvec theta = 0.1 * ones<colvec>(6),
            data(time_series_arma_3_2.data(), time_series_arma_3_2.size());
-    colvec gradient = cost_update_gradient(data, theta, "arma"),
+    const colvec order = {3, 0, 2};
+    colvec gradient = cost_update_gradient(data, theta, "arma", order),
            expected_gradient =
       {4.401258, 6.600128, -7.591818, 4.151778, 7.503752, -2.806806};
     expect_true(norm(gradient - expected_gradient, "fro") < 1e-6);
@@ -97,8 +101,9 @@ context("cost_update_hessian Unit Test") {
     colvec theta = {-0.5, 0.3};
     mat data = {{1, 1, 0.2}};
     std::string family = "binomial";
-    double min_prob = 0.0;
-    mat hessian = cost_update_hessian(data, theta, family, min_prob);
+    double min_prob = 1e10;
+    const colvec order = {3, 0, 2};
+    mat hessian = cost_update_hessian(data, theta, family, min_prob, order);
     mat expected_hessian =
         {{0.238'28, 0.047'656}, {0.047'656, 0.009'531'2}};
     expect_true(norm(hessian - expected_hessian, "fro") < 0.000'001);
@@ -109,7 +114,8 @@ context("cost_update_hessian Unit Test") {
     mat data = {{4, 1, 0.2}};
     std::string family = "poisson";
     double min_prob = 1e10;
-    mat hessian = cost_update_hessian(data, theta, family, min_prob);
+    const colvec order = {3, 0, 2};
+    mat hessian = cost_update_hessian(data, theta, family, min_prob, order);
     mat expected_hessian =
         {{0.644'036'4, 0.128'807}, {0.128'807, 0.025'761'6}};
     expect_true(norm(hessian - expected_hessian, "fro") < 0.000'001);
@@ -118,7 +124,9 @@ context("cost_update_hessian Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     colvec theta = 0.1 * ones<colvec>(6);
     colvec data(time_series_arma_3_2.data(), time_series_arma_3_2.size());
-    mat hessian = cost_update_hessian(data, theta, "arma", 0.0);
+    const double min_prob = 1e10;
+    const colvec order = {3, 0, 2};
+    mat hessian = cost_update_hessian(data, theta, "arma", min_prob, order);
     mat expected_hessian = {
       { 12.406525,  18.60483, -21.40027,   4.743794,  28.98263, -44.01258},
       { 18.604831,  27.89981, -32.09185,  25.380851,  27.48253, -66.00128},
