@@ -104,7 +104,7 @@ List negative_log_likelihood_wo_theta(
     Environment stats = Environment::namespace_env("stats");
     Function arima = stats["arima"];
     List out = arima(
-      data.col(0),
+      Named("x") = data.col(0),
       Named("order") = Rcpp::IntegerVector::create(3, 0, 2),
       Named("include.mean") = false
     );
@@ -280,8 +280,8 @@ mat cost_update_hessian(
         -reversed_variance_term.rows(data.n_rows - i, data.n_rows - i + 1).t() -
         reversed_theta.rows(1, 2).t() * psi_coefficient.rows(i - 2, i - 1);
     }
-    mat reversed_phi_coefficient = arma::reverse(phi_coefficient, 0),
-        reversed_psi_coefficient = arma::reverse(psi_coefficient, 0);
+    mat reversed_coef_phi = arma::reverse(phi_coefficient, 0),
+        reversed_coef_psi = arma::reverse(psi_coefficient, 0);
     cube phi_psi_coefficient = zeros(2, 3, data.n_rows),
          psi_psi_coefficient = zeros(2, 2, data.n_rows);
     for (unsigned int i = 2; i < data.n_rows; i++) {
@@ -292,17 +292,15 @@ mat cost_update_hessian(
           phi_psi_coefficient.slice(i - j) * theta(2 + j);
       }
       phi_psi_coefficient.slice(i) =
-        -reversed_phi_coefficient.rows(data.n_rows - i, data.n_rows - i + 1) -
+        -reversed_coef_phi.rows(data.n_rows - i, data.n_rows - i + 1) -
           phi_psi_coefficient_part;
       for (unsigned int j = 1; j <= 2; j++) {
         psi_psi_coefficient_part +=
           psi_psi_coefficient.slice(i - j) * theta(2 + j);
       }
       psi_psi_coefficient.slice(i) =
-        -reversed_psi_coefficient.rows(data.n_rows - i, data.n_rows - i + 1) -
-        reversed_psi_coefficient.rows(
-          data.n_rows - i, data.n_rows - i + 1
-        ).t() -
+        -reversed_coef_psi.rows(data.n_rows - i, data.n_rows - i + 1) -
+        reversed_coef_psi.rows(data.n_rows - i, data.n_rows - i + 1).t() -
         psi_psi_coefficient_part;
     }
     hessian = zeros(3 + 2 + 1, 3 + 2 + 1);
