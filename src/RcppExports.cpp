@@ -13,8 +13,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // fastcpd_impl
-List fastcpd_impl(mat data, double beta, const int segment_count, const double trim, const double momentum_coef, Function k, const string family, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const int p, Nullable<Function> cost, Nullable<Function> cost_gradient, Nullable<Function> cost_hessian, const bool cp_only, const double vanilla_percentage, const bool warm_start, colvec lower, colvec upper, colvec line_search);
-RcppExport SEXP _fastcpd_fastcpd_impl(SEXP dataSEXP, SEXP betaSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP kSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP pSEXP, SEXP costSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP cp_onlySEXP, SEXP vanilla_percentageSEXP, SEXP warm_startSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP line_searchSEXP) {
+List fastcpd_impl(mat data, double beta, const int segment_count, const double trim, const double momentum_coef, Function k, const string family, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const int p, const colvec order, Nullable<Function> cost, Nullable<Function> cost_gradient, Nullable<Function> cost_hessian, const bool cp_only, const double vanilla_percentage, const bool warm_start, colvec lower, colvec upper, colvec line_search);
+RcppExport SEXP _fastcpd_fastcpd_impl(SEXP dataSEXP, SEXP betaSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP kSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP pSEXP, SEXP orderSEXP, SEXP costSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP cp_onlySEXP, SEXP vanilla_percentageSEXP, SEXP warm_startSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP line_searchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -30,6 +30,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double >::type winsorise_minval(winsorise_minvalSEXP);
     Rcpp::traits::input_parameter< const double >::type winsorise_maxval(winsorise_maxvalSEXP);
     Rcpp::traits::input_parameter< const int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< const colvec >::type order(orderSEXP);
     Rcpp::traits::input_parameter< Nullable<Function> >::type cost(costSEXP);
     Rcpp::traits::input_parameter< Nullable<Function> >::type cost_gradient(cost_gradientSEXP);
     Rcpp::traits::input_parameter< Nullable<Function> >::type cost_hessian(cost_hessianSEXP);
@@ -39,7 +40,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< colvec >::type lower(lowerSEXP);
     Rcpp::traits::input_parameter< colvec >::type upper(upperSEXP);
     Rcpp::traits::input_parameter< colvec >::type line_search(line_searchSEXP);
-    rcpp_result_gen = Rcpp::wrap(fastcpd_impl(data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper, line_search));
+    rcpp_result_gen = Rcpp::wrap(fastcpd_impl(data, beta, segment_count, trim, momentum_coef, k, family, epsilon, min_prob, winsorise_minval, winsorise_maxval, p, order, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper, line_search));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -47,7 +48,7 @@ END_RCPP
 RcppExport SEXP run_testthat_tests(void *);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_fastcpd_fastcpd_impl", (DL_FUNC) &_fastcpd_fastcpd_impl, 21},
+    {"_fastcpd_fastcpd_impl", (DL_FUNC) &_fastcpd_fastcpd_impl, 22},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };
