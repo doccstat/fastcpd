@@ -21,6 +21,7 @@ testthat::test_that(  # nolint: cyclomatic complexity
         p = 3 + 2 + 1,
         beta = (3 + 2 + 1 + 1) * log(n) / 2,
         family = "arma",
+        order = c(3, 2),
         cp_only = TRUE,
         lower = c(rep(-1, 3 + 2), 1e-10),
         upper = c(rep(1, 3 + 2), Inf),
