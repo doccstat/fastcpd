@@ -1,7 +1,5 @@
-\donttest{
 result <- fastcpd.mean(
   well_log, beta = (1 + 1) * log(length(well_log)) / 2 * 2,  trim = 0.002
 )
 summary(result)
 plot(result)
-}
