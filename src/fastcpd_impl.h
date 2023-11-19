@@ -41,6 +41,7 @@
 // @param lower A vector containing the lower bounds for the parameters.
 // @param upper A vector containing the upper bounds for the parameters.
 // @param line_search A vector containing the line search coefficients.
+// @param mean_data_cov Covariance matrix of the data, only used in mean change.
 //
 // @return A list containing the change points and the cost values for each
 //   segment.
@@ -67,7 +68,8 @@ List fastcpd_impl(
     const bool warm_start,
     colvec lower,
     colvec upper,
-    colvec line_search
+    colvec line_search,
+    const mat mean_data_cov
 );
 
 #endif  // FASTCPD_H_

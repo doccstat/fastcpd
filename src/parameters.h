@@ -20,7 +20,8 @@ class FastcpdParameters {
     const double epsilon,
     const double min_prob,
     const colvec lower,
-    const colvec upper
+    const colvec upper,
+    const mat mean_data_cov
   );
   // Return `err_sd`.
   colvec get_err_sd();
@@ -147,7 +148,8 @@ class FastcpdParameters {
         double lambda,
         bool cv,
         Nullable<colvec> start,
-        const colvec order
+        const colvec order,
+        const mat mean_data_cov
     )> cost_function_wrapper,
     function<colvec(
       mat data, colvec theta, string family, const colvec order
@@ -158,7 +160,8 @@ class FastcpdParameters {
     colvec lower,
     colvec upper,
     colvec line_search,
-    const colvec order
+    const colvec order,
+    const mat mean_data_cov
   );
 
 // TODO(doccstat): define a `cost_optim` inside the class.
@@ -186,7 +189,8 @@ class FastcpdParameters {
       double lambda,
       bool cv,
       Nullable<colvec> start,
-      const colvec order
+      const colvec order,
+      const mat mean_data_cov
   )> cost_function_wrapper;
 
   // Gradient of the cost function. If the cost function is provided in R, this
@@ -273,6 +277,8 @@ class FastcpdParameters {
   const colvec lower;
 
   const colvec upper;
+
+  const mat mean_data_cov;
 
   void create_environment_functions();
 };

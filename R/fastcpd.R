@@ -242,7 +242,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   }
 
   if (family == "mean") {
-    fastcpd_family <- "custom"
     vanilla_percentage <- 1
     p <- ncol(data)
     block_size <- max(floor(sqrt(nrow(data)) / (segment_count + 1)), 2)
@@ -258,15 +257,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       data_all_covs[block_index, , ] <-
         stats::cov(data[block_start:block_end, , drop = FALSE])
     }
-    data_all_cov <- colMeans(data_all_covs)
-    cost <- function(data) {
-      n <- nrow(data)
-      demeaned_data <- sweep(data, 2, colMeans(data))
-      n / 2 * (
-        log(det(data_all_cov)) + p * log(2 * pi) +
-          sum(diag(solve(data_all_cov, crossprod(demeaned_data)))) / n
-      )
-    }
+    mean_data_cov <- colMeans(data_all_covs)
+  } else {
+    mean_data_cov <- diag(1)
   }
 
   # Pre-process the data for the time series models.
@@ -453,7 +446,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     fastcpd_data, beta, segment_count, trim, momentum_coef, k, fastcpd_family,
     epsilon, min_prob, winsorise_minval, winsorise_maxval, p, order,
     cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
-    lower, upper, line_search
+    lower, upper, line_search, mean_data_cov
   )
 
   cp_set <- c(result$cp_set)

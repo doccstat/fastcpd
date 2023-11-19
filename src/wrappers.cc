@@ -11,7 +11,8 @@ List CostFunction::operator()(  // # nocov
     double lambda,  // UNUSED
     bool cv,  // UNUSED
     Nullable<colvec> start,  // UNUSED
-    const colvec order  // UNUSED
+    const colvec order,  // UNUSED
+    const mat mean_data_cov  // UNUSED
 ) {
   return theta.isNull()? cost(data) : cost(data, theta);  // # nocov
 }

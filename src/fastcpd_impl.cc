@@ -31,7 +31,8 @@ List fastcpd_impl(
     const bool warm_start,
     colvec lower,
     colvec upper,
-    colvec line_search
+    colvec line_search,
+    const mat mean_data_cov
 ) {
   // Set up the initial values.
   const int n = data.n_rows;
@@ -54,7 +55,8 @@ List fastcpd_impl(
 
   fastcpd::parameters::FastcpdParameters fastcpd_parameters_class(
     data, beta, p, order, family, vanilla_percentage, segment_count,
-    winsorise_minval, winsorise_maxval, epsilon, min_prob, lower, upper
+    winsorise_minval, winsorise_maxval, epsilon, min_prob, lower, upper,
+    mean_data_cov
   );
 
   fastcpd_parameters_class.wrap_cost(cost);
@@ -115,7 +117,7 @@ List fastcpd_impl(
         ) {
           List cost_result = negative_log_likelihood(
             data_segment, Rcpp::wrap(theta), family,
-            lambda, false, R_NilValue, order
+            lambda, false, R_NilValue, order, mean_data_cov
           );
           cval(i - 1) = as<double>(cost_result["value"]);
         } else {
@@ -133,14 +135,14 @@ List fastcpd_impl(
         } else {
           if (warm_start && t - tau >= 10 * p) {
             cost_optim_result = negative_log_likelihood(
-              data_segment, R_NilValue, family,
-              lambda, false, Rcpp::wrap(start.col(tau)), order
+              data_segment, R_NilValue, family, lambda,
+              false, Rcpp::wrap(start.col(tau)), order, mean_data_cov
             );
             start.col(tau) = as<colvec>(cost_optim_result["par"]);
           } else {
             cost_optim_result = negative_log_likelihood(
               data_segment, R_NilValue, family,
-              lambda, false, R_NilValue, order
+              lambda, false, R_NilValue, order, mean_data_cov
             );
           }
         }
@@ -246,13 +248,20 @@ List fastcpd_impl(
   colvec cp_loc = arma::unique(std::move(cp_loc_));
   colvec cost_values = zeros<vec>(cp_loc.n_elem - 1);
   mat thetas = zeros<mat>(p, cp_loc.n_elem - 1);
-  colvec residual = zeros<colvec>(n);
+  mat residual;
+  if (family == "mean") {
+    residual = zeros<mat>(data.n_rows, data.n_cols);
+  } else {
+    residual = zeros<mat>(data.n_rows, 1);
+  }
   unsigned int residual_next_start = 0;
+
   for (unsigned int i = 0; i < cp_loc.n_elem - 1; i++) {
     colvec segment_data_index_ =
         linspace(cp_loc(i), cp_loc(i + 1) - 1, cp_loc(i + 1) - cp_loc(i));
     ucolvec segment_data_index =
         arma::conv_to<ucolvec>::from(std::move(segment_data_index_));
+
     mat data_segment = data.rows(segment_data_index);
     List cost_optim_result;
     if (!contain(FASTCPD_FAMILIES, family)) {
@@ -262,9 +271,11 @@ List fastcpd_impl(
       );
     } else {
       cost_optim_result = negative_log_likelihood(
-        data_segment, R_NilValue, family, lambda, false, R_NilValue, order
+        data_segment, R_NilValue, family, lambda,
+        false, R_NilValue, order, mean_data_cov
       );
     }
+
     cost_values(i) = as<double>(cost_optim_result["value"]);
 
     // Parameters are not involved for PELT.
@@ -274,12 +285,12 @@ List fastcpd_impl(
 
     // Residual is only calculated for built-in families.
     if (contain(FASTCPD_FAMILIES, family)) {
-      colvec cost_optim_residual = as<colvec>(cost_optim_result["residuals"]);
+      mat cost_optim_residual = as<mat>(cost_optim_result["residuals"]);
       residual.rows(
         residual_next_start,
-        residual_next_start + cost_optim_residual.n_elem - 1
+        residual_next_start + cost_optim_residual.n_rows - 1
       ) = cost_optim_residual;
-      residual_next_start += cost_optim_residual.n_elem;
+      residual_next_start += cost_optim_residual.n_rows;
     }
   }
   return List::create(

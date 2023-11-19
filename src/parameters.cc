@@ -22,7 +22,8 @@ FastcpdParameters::FastcpdParameters(
     const double epsilon,
     const double min_prob,
     const colvec lower,
-    const colvec upper
+    const colvec upper,
+    const mat mean_data_cov
 ) : data(data),
     beta(beta),
     p(p),
@@ -35,7 +36,8 @@ FastcpdParameters::FastcpdParameters(
     epsilon(epsilon),
     min_prob(min_prob),
     lower(lower),
-    upper(upper) {
+    upper(upper),
+    mean_data_cov(mean_data_cov) {
   n = data.n_rows;
   segment_indices = vec(n);
   segment_theta_hat = mat(segment_count, p);
@@ -158,7 +160,8 @@ void FastcpdParameters::create_segment_statistics() {
     } else {
       segment_theta = as<rowvec>(
         cost_function_wrapper(
-          data_segment, R_NilValue, family, 0, true, R_NilValue, order
+          data_segment, R_NilValue, family, 0,
+          true, R_NilValue, order, mean_data_cov
         )["par"]
       );
     }
@@ -338,7 +341,8 @@ void FastcpdParameters::cost_update(
     lower,
     upper,
     line_search,
-    order
+    order,
+    mean_data_cov
   );
   update_theta_hat(i - 1, as<colvec>(cost_update_result[0]));
   create_theta_sum(i - 1, as<colvec>(cost_update_result[1]));
@@ -369,7 +373,8 @@ List FastcpdParameters::cost_update_step(
         double lambda,
         bool cv,
         Nullable<colvec> start,
-        const colvec order
+        const colvec order,
+        const mat mean_data_cov
     )> cost_function_wrapper,
     function<colvec(
       mat data, colvec theta, string family, const colvec order
@@ -380,7 +385,8 @@ List FastcpdParameters::cost_update_step(
     colvec lower,
     colvec upper,
     colvec line_search,
-    const colvec order
+    const colvec order,
+    const mat mean_data_cov
 ) {
   // Get the hessian
   mat hessian_i = hessian.slice(i - 1);
@@ -431,7 +437,7 @@ List FastcpdParameters::cost_update_step(
         data, Rcpp::wrap(max(min(
           theta_hat.col(i - 1) + line_search[line_search_index] * momentum,
           upper
-        ), lower)), family, lambda, false, R_NilValue, order
+        ), lower)), family, lambda, false, R_NilValue, order, mean_data_cov
       )["value"];
     }
   }
