@@ -1,6 +1,5 @@
 #include "constants.h"
 #include "cost_update.h"
-#include "functions.h"
 
 namespace fastcpd::cost_update {
 

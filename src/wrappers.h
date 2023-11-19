@@ -12,12 +12,9 @@ class CostFunction {
   List operator()(
       mat data,
       Nullable<colvec> theta,
-      string family,  // UNUSED
       double lambda,  // UNUSED
       bool cv,  // UNUSED
-      Nullable<colvec> start,  // UNUSED
-      const colvec order,  // UNUSED
-      const mat mean_data_cov  // UNUSED
+      Nullable<colvec> start  // UNUSED
   );
 
  private:
@@ -28,12 +25,7 @@ class CostGradient {
  public:
   CostGradient(Function cost_gradient);
 
-  colvec operator()(
-      mat data,
-      colvec theta,
-      string family,  // UNUSED
-      const colvec order  // UNUSED
-  );
+  colvec operator()(mat data, colvec theta);
 
  private:
   Function cost_gradient;
@@ -43,13 +35,7 @@ class CostHessian {
  public:
   CostHessian(Function cost_hessian);
 
-  mat operator()(
-      mat data,
-      colvec theta,
-      string family,  // UNUSED
-      double min_prob,  // UNUSED,
-      const colvec order  // UNUSED
-  );
+  mat operator()(mat data, colvec theta);
 
  private:
   Function cost_hessian;

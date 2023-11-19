@@ -125,7 +125,7 @@ class FastcpdParameters {
   //
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   \code{hessian}, and \code{momentum}.
-  static List cost_update_step(
+  List cost_update_step(
     const mat data,
     mat theta_hat,
     mat theta_sum,
@@ -144,19 +144,12 @@ class FastcpdParameters {
     function<List(
         mat data,
         Nullable<colvec> theta,
-        string family,
         double lambda,
         bool cv,
-        Nullable<colvec> start,
-        const colvec order,
-        const mat mean_data_cov
+        Nullable<colvec> start
     )> cost_function_wrapper,
-    function<colvec(
-      mat data, colvec theta, string family, const colvec order
-    )> cost_gradient_wrapper,
-    function<mat(
-      mat data, colvec theta, string family, double min_prob, const colvec order
-    )> cost_hessian_wrapper,
+    function<colvec(mat data, colvec theta)> cost_gradient_wrapper,
+    function<mat(mat data, colvec theta)> cost_hessian_wrapper,
     colvec lower,
     colvec upper,
     colvec line_search,
@@ -185,31 +178,79 @@ class FastcpdParameters {
   function<List(
       mat data,
       Nullable<colvec> theta,
-      string family,
       double lambda,
       bool cv,
-      Nullable<colvec> start,
-      const colvec order,
-      const mat mean_data_cov
+      Nullable<colvec> start
   )> cost_function_wrapper;
 
   // Gradient of the cost function. If the cost function is provided in R, this
   // will be a wrapper of the R function.
-  function<colvec(
-      mat data,
-      colvec theta,
-      string family,
-      const colvec order
-  )> cost_gradient_wrapper;
+  function<colvec(mat data, colvec theta)> cost_gradient_wrapper;
 
   // Hessian of the cost function. If the cost function is provided in R, this
   // will be a wrapper of the R function.
-  function<mat(
-    mat data, colvec theta, string family, double min_prob, const colvec order
-  )>
-    cost_hessian_wrapper;
+  function<mat(mat data, colvec theta)> cost_hessian_wrapper;
 
   Nullable<Function> winsorize;
+
+  // Solve logistic/poisson regression using Gradient Descent Extension to the
+  // multivariate case
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param theta Estimate of the parameters. If null, the function will
+  //   estimate the parameters.
+  // @param family Family of the model.
+  // @param lambda Lambda for L1 regularization. Only used for lasso.
+  // @param cv Whether to perform cross-validation to find the best lambda.
+  // @param start Starting point for the optimization for warm start.
+  // @param order Order of the time series models.
+  // @param mean_data_cov Covariance matrix of the data,
+  //   only used in mean change.
+  //
+  // @return Negative log likelihood of the corresponding data with the given
+  //   family.
+  List negative_log_likelihood(
+      mat data,
+      Nullable<colvec> theta,
+      double lambda,
+      bool cv = false,
+      Nullable<colvec> start = R_NilValue
+  );
+
+  List negative_log_likelihood_wo_theta(
+      mat data,
+      double lambda,
+      bool cv,
+      Nullable<colvec> start
+  );
+
+  double negative_log_likelihood_wo_cv(
+      mat data,
+      colvec theta,
+      double lambda,
+      Nullable<colvec> start
+  );
+
+  // Function to calculate the gradient at the current data.
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param theta Estimated theta from the previous iteration.
+  // @param family Family of the model.
+  // @param order Order of the time series models.
+  //
+  // @return Gradient at the current data.
+  colvec cost_update_gradient(mat data, colvec theta);
+
+  // Function to calculate the Hessian matrix at the current data.
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param theta Estimated theta from the previous iteration.
+  // @param family Family of the model.
+  // @param min_prob Minimum probability to avoid numerical issues.
+  // @param order Order of the time series models.
+  //
+  // @return Hessian at the current data.
+  mat cost_update_hessian(mat data, colvec theta);
 
  private:
   // `data` is the data set to be segmented.

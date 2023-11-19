@@ -7,12 +7,9 @@ CostFunction::CostFunction(Function cost) : cost(cost) {}
 List CostFunction::operator()(  // # nocov
     mat data,
     Nullable<colvec> theta,
-    string family,  // UNUSED
     double lambda,  // UNUSED
     bool cv,  // UNUSED
-    Nullable<colvec> start,  // UNUSED
-    const colvec order,  // UNUSED
-    const mat mean_data_cov  // UNUSED
+    Nullable<colvec> start  // UNUSED
 ) {
   return theta.isNull()? cost(data) : cost(data, theta);  // # nocov
 }
@@ -20,25 +17,14 @@ List CostFunction::operator()(  // # nocov
 CostGradient::CostGradient(Function cost_gradient) :
     cost_gradient(cost_gradient) {}
 
-colvec CostGradient::operator()(
-    mat data,
-    colvec theta,
-    string family,  // UNUSED
-    const colvec order  // UNUSED
-) {
+colvec CostGradient::operator()(mat data, colvec theta) {
   return as<colvec>(cost_gradient(data, theta));
 }
 
 CostHessian::CostHessian(Function cost_hessian) :
     cost_hessian(cost_hessian) {}
 
-mat CostHessian::operator()(
-    mat data,
-    colvec theta,
-    string family,  // UNUSED
-    double min_prob,  // UNUSED
-    const colvec order  // UNUSED
-) {
+mat CostHessian::operator()(mat data, colvec theta) {
   return as<mat>(cost_hessian(data, theta));
 }
 
