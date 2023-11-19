@@ -26,7 +26,6 @@ default a matrix or data frame or a vector with each row / element as an
 observation and thus a formula is not required here.
 }
 \examples{
-\donttest{
 set.seed(1)
 p <- 3
 result <- fastcpd.variance(
@@ -37,5 +36,4 @@ result <- fastcpd.variance(
   )
 )
 summary(result)
-}
 }

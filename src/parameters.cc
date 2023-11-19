@@ -46,6 +46,10 @@ FastcpdParameters::FastcpdParameters(
   hessian = cube(p, p, 1);
   momentum = vec(p);
 
+  if (family == "variance") {
+    variance_data_mean = mean(data, 0);
+  }
+
   create_environment_functions();
 }
 
@@ -635,11 +639,25 @@ List FastcpdParameters::negative_log_likelihood_wo_theta(
     return List::create(
       Named("par") = par,
       Named("value") = data.n_rows / 2.0 * (
-        log(2.0 * M_PI) * data.n_cols + arma::log_det_sympd(mean_data_cov) +
+        log(2.0 * M_PI) * data.n_cols + log_det_sympd(mean_data_cov) +
           arma::trace(
             solve(mean_data_cov, residuals.t() * residuals)
           ) / data.n_rows
       ),
+      Named("residuals") = residuals
+    );
+  } else if (family == "variance") {
+    mat residuals = data.each_row() - variance_data_mean;
+    mat par = residuals.t() * residuals / (data.n_rows - 1);
+    double value =
+      data.n_cols * (log(2.0 * M_PI) + (data.n_rows - 1) / data.n_rows);
+    if (data.n_rows >= data.n_cols) {
+      value += log_det_sympd(par);
+    }
+    value *= data.n_rows / 2.0;
+    return List::create(
+      Named("par") = par,
+      Named("value") = value,
       Named("residuals") = residuals
     );
   } else {

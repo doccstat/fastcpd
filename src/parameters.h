@@ -320,6 +320,7 @@ class FastcpdParameters {
   const colvec upper;
 
   const mat mean_data_cov;
+  rowvec variance_data_mean;
 
   void create_environment_functions();
 };

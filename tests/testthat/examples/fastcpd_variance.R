@@ -1,4 +1,3 @@
-\donttest{
 set.seed(1)
 p <- 3
 result <- fastcpd.variance(
@@ -9,4 +8,3 @@ result <- fastcpd.variance(
   )
 )
 summary(result)
-}
