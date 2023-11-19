@@ -1,5 +1,5 @@
-#ifndef FASTCPD_H_
-#define FASTCPD_H_
+#ifndef FASTCPD_IMPL_H_
+#define FASTCPD_IMPL_H_
 
 #include "fastcpd_types.h"
 
@@ -72,4 +72,4 @@ List fastcpd_impl(
     const mat mean_data_cov
 );
 
-#endif  // FASTCPD_H_
+#endif  // FASTCPD_IMPL_H_

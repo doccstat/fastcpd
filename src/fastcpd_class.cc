@@ -1,13 +1,9 @@
-#include "constants.h"
-#include "cost_update.h"
-#include "parameters.h"
-#include "wrappers.h"
+#include "fastcpd_classes.h"
+#include "fastcpd_constants.h"
 
-using ::fastcpd::cost_update::cost_optim;
+namespace fastcpd::classes {
 
-namespace fastcpd::parameters {
-
-FastcpdParameters::FastcpdParameters(
+Fastcpd::Fastcpd(
     mat data,
     const double beta,
     const int p,
@@ -53,7 +49,7 @@ FastcpdParameters::FastcpdParameters(
   create_environment_functions();
 }
 
-void FastcpdParameters::create_environment_functions() {
+void Fastcpd::create_environment_functions() {
   if (family == "poisson") {
     Environment desc_tools = Environment::namespace_env("DescTools");
     winsorize = as<Nullable<Function>>(desc_tools["Winsorize"]);
@@ -62,17 +58,17 @@ void FastcpdParameters::create_environment_functions() {
   }
 }
 
-colvec FastcpdParameters::get_err_sd() {
+colvec Fastcpd::get_err_sd() {
   return err_sd;
 }
 
-void FastcpdParameters::update_err_sd(
+void Fastcpd::update_err_sd(
   const unsigned int segment_index, const double err_var
 ) {
   err_sd(segment_index) = sqrt(err_var);
 }
 
-void FastcpdParameters::create_segment_indices() {
+void Fastcpd::create_segment_indices() {
   const unsigned int segment_length = floor(n / segment_count);
   const int segment_remainder = n % segment_count;
   for (
@@ -92,61 +88,61 @@ void FastcpdParameters::create_segment_indices() {
   }
 }
 
-void FastcpdParameters::update_theta_hat(
+void Fastcpd::update_theta_hat(
   const unsigned int col, colvec new_theta_hat
 ) {
   theta_hat.col(col) = new_theta_hat;
 }
 
-void FastcpdParameters::update_theta_hat(colvec new_theta_hat) {
+void Fastcpd::update_theta_hat(colvec new_theta_hat) {
   theta_hat = arma::join_rows(theta_hat, new_theta_hat);
 }
 
-void FastcpdParameters::create_theta_sum(
+void Fastcpd::create_theta_sum(
   const unsigned int col, colvec new_theta_sum
 ) {
   theta_sum.col(col) = new_theta_sum;
 }
 
-mat FastcpdParameters::get_theta_sum() {
+mat Fastcpd::get_theta_sum() {
   return theta_sum;
 }
 
-void FastcpdParameters::update_theta_sum(
+void Fastcpd::update_theta_sum(
   const unsigned int col, colvec new_theta_sum
 ) {
   theta_sum.col(col) += new_theta_sum;
 }
 
-void FastcpdParameters::update_theta_sum(colvec new_theta_sum) {
+void Fastcpd::update_theta_sum(colvec new_theta_sum) {
   theta_sum = arma::join_rows(theta_sum, new_theta_sum);
 }
 
-void FastcpdParameters::update_hessian(
+void Fastcpd::update_hessian(
   const unsigned int slice, mat new_hessian
 ) {
   hessian.slice(slice) = new_hessian;
 }
 
-void FastcpdParameters::update_hessian(mat new_hessian) {
+void Fastcpd::update_hessian(mat new_hessian) {
   hessian = arma::join_slices(hessian, new_hessian);
 }
 
-void FastcpdParameters::update_theta_hat(ucolvec pruned_left) {
+void Fastcpd::update_theta_hat(ucolvec pruned_left) {
   theta_hat = theta_hat.cols(pruned_left);
 }
 
-void FastcpdParameters::update_theta_sum(ucolvec pruned_left) {
+void Fastcpd::update_theta_sum(ucolvec pruned_left) {
   theta_sum = theta_sum.cols(pruned_left);
 }
 
-void FastcpdParameters::update_hessian(ucolvec pruned_left) {
+void Fastcpd::update_hessian(ucolvec pruned_left) {
   hessian = hessian.slices(pruned_left);
 }
 
 // TODO(doccstat): Use `segment_theta` as warm start.
 
-void FastcpdParameters::create_segment_statistics() {
+void Fastcpd::create_segment_statistics() {
   for (
     int segment_index = 0; segment_index < segment_count; ++segment_index
   ) {
@@ -156,8 +152,7 @@ void FastcpdParameters::create_segment_statistics() {
     rowvec segment_theta;
     if (!contain(FASTCPD_FAMILIES, family)) {
       segment_theta = as<rowvec>(cost_optim(
-        family, vanilla_percentage, p, data_segment, cost.get(), 0, false,
-        lower, upper
+        data_segment, 0, false
       )["par"]);
     } else {
       segment_theta = as<rowvec>(
@@ -183,15 +178,15 @@ void FastcpdParameters::create_segment_statistics() {
   }
 }
 
-double FastcpdParameters::get_beta() {
+double Fastcpd::get_beta() {
   return beta;
 }
 
-void FastcpdParameters::update_momentum(colvec new_momentum) {
+void Fastcpd::update_momentum(colvec new_momentum) {
   momentum = new_momentum;
 }
 
-void FastcpdParameters::create_gradients() {
+void Fastcpd::create_gradients() {
   if (family == "binomial") {
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     theta_hat.col(0) = segment_theta_hat.row(0).t();
@@ -231,7 +226,7 @@ void FastcpdParameters::create_gradients() {
   }
 }
 
-void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
+void Fastcpd::update_fastcpd_parameters(const unsigned int t) {
   // for tau = t-1
   rowvec new_data = data.row(t - 1).tail(data.n_cols - 1);
   const int segment_index = segment_indices(t - 1);
@@ -267,11 +262,11 @@ void FastcpdParameters::update_fastcpd_parameters(const unsigned int t) {
   update_hessian(hessian_new);
 }
 
-void FastcpdParameters::wrap_cost(Nullable<Function> cost) {
+void Fastcpd::wrap_cost(Nullable<Function> cost) {
   this->cost = cost;
   if (contain(FASTCPD_FAMILIES, family)) {
     cost_function_wrapper = std::bind(
-      &FastcpdParameters::negative_log_likelihood,
+      &Fastcpd::negative_log_likelihood,
       this,
       std::placeholders::_1,
       std::placeholders::_2,
@@ -280,54 +275,54 @@ void FastcpdParameters::wrap_cost(Nullable<Function> cost) {
       std::placeholders::_5
     );
   } else {
-    fastcpd::wrappers::CostFunction costFunction(cost.get());
+    fastcpd::classes::CostFunction costFunction(cost.get());
     cost_function_wrapper = costFunction;
   }
 }
 
-void FastcpdParameters::wrap_cost_gradient(Nullable<Function> cost_gradient) {
+void Fastcpd::wrap_cost_gradient(Nullable<Function> cost_gradient) {
   this->cost_gradient = cost_gradient;
   if (contain(FASTCPD_FAMILIES, family)) {
     cost_gradient_wrapper = std::bind(
-      &FastcpdParameters::cost_update_gradient,
+      &Fastcpd::cost_update_gradient,
       this,
       std::placeholders::_1,
       std::placeholders::_2
     );
   } else if (cost_gradient.isNotNull()) {
-    fastcpd::wrappers::CostGradient costGradient(cost_gradient.get());
+    fastcpd::classes::CostGradient costGradient(cost_gradient.get());
     cost_gradient_wrapper = costGradient;
   } else if (cost_gradient.isNull()) {
     // `cost_gradient` can be `NULL` in the case of vanilla PELT.
   } else {
     // # nocov start
-    stop("This branch should not be reached at parameters.cc: 290.");
+    stop("This branch should not be reached at classes.cc: 290.");
     // # nocov end
   }
 }
 
-void FastcpdParameters::wrap_cost_hessian(Nullable<Function> cost_hessian) {
+void Fastcpd::wrap_cost_hessian(Nullable<Function> cost_hessian) {
   this->cost_hessian = cost_hessian;
   if (contain(FASTCPD_FAMILIES, family)) {
     cost_hessian_wrapper = std::bind(
-      &FastcpdParameters::cost_update_hessian,
+      &Fastcpd::cost_update_hessian,
       this,
       std::placeholders::_1,
       std::placeholders::_2
     );
   } else if (cost_hessian.isNotNull()) {
-    fastcpd::wrappers::CostHessian costHessian(cost_hessian.get());
+    fastcpd::classes::CostHessian costHessian(cost_hessian.get());
     cost_hessian_wrapper = costHessian;
   } else if (cost_hessian.isNull()) {
     // `cost_hessian` can be `NULL` in the case of vanilla PELT.
   } else {
     // # nocov start
-    stop("This branch should not be reached at parameters.cc: 304.");
+    stop("This branch should not be reached at classes.cc: 304.");
     // # nocov end
   }
 }
 
-void FastcpdParameters::cost_update(
+void Fastcpd::cost_update(
   const unsigned int t,
   const unsigned int tau,
   const unsigned int i,
@@ -367,7 +362,7 @@ void FastcpdParameters::cost_update(
   update_momentum(as<colvec>(cost_update_result[3]));
 }
 
-List FastcpdParameters::cost_update_step(
+List Fastcpd::cost_update_step(
     const mat data,
     mat theta_hat,
     mat theta_sum,
@@ -524,7 +519,7 @@ List FastcpdParameters::cost_update_step(
   );
 }
 
-List FastcpdParameters::negative_log_likelihood(
+List Fastcpd::negative_log_likelihood(
     mat data,
     Nullable<colvec> theta,
     double lambda,
@@ -541,7 +536,7 @@ List FastcpdParameters::negative_log_likelihood(
   }
 }
 
-List FastcpdParameters::negative_log_likelihood_wo_theta(
+List Fastcpd::negative_log_likelihood_wo_theta(
     mat data,
     double lambda,
     bool cv,
@@ -667,7 +662,7 @@ List FastcpdParameters::negative_log_likelihood_wo_theta(
   }
 }
 
-double FastcpdParameters::negative_log_likelihood_wo_cv(
+double Fastcpd::negative_log_likelihood_wo_cv(
     mat data,
     colvec theta,
     double lambda,
@@ -722,7 +717,7 @@ double FastcpdParameters::negative_log_likelihood_wo_cv(
   }
 }
 
-colvec FastcpdParameters::cost_update_gradient(mat data, colvec theta) {
+colvec Fastcpd::cost_update_gradient(mat data, colvec theta) {
   rowvec new_data = data.row(data.n_rows - 1);
   rowvec x = new_data.tail(new_data.n_elem - 1);
   double y = new_data(0);
@@ -781,7 +776,7 @@ colvec FastcpdParameters::cost_update_gradient(mat data, colvec theta) {
   return gradient;
 }
 
-mat FastcpdParameters::cost_update_hessian(mat data, colvec theta) {
+mat Fastcpd::cost_update_hessian(mat data, colvec theta) {
   rowvec new_data = data.row(data.n_rows - 1);
   rowvec x = new_data.tail(new_data.n_elem - 1);
   mat hessian;
@@ -885,63 +880,68 @@ mat FastcpdParameters::cost_update_hessian(mat data, colvec theta) {
   return hessian;
 }
 
-// List FastcpdParameters::cost_optim(
-//     const mat data_segment,
-//     const double lambda,
-//     const bool cv
-// ) {
-//   if (family == "vanilla") {
-//     return List::create(
-//       Named("par") = R_NilValue,
-//       Named("value") = cost_function_wrapper(
-//         data_segment, R_NilValue, family, lambda, cv, R_NilValue
-//       ),
-//       Named("residuals") = R_NilValue
-//     );
-//   } else if (family == "custom" && p == 1) {
-//     Environment stats = Environment::namespace_env("stats");
-//     Function optim = stats["optim"];
-//     List optim_result = optim(
-//       Named("par") = 0,
-//       Named("fn") = InternalFunction(
-//         +[](double theta, mat data, Function cost) {
-//           return cost(
-//             Named("data") = data,
-//             Named("theta") = log(theta / (1 - theta))
-//           );
-//         }
-//       ),
-//       Named("method") = "Brent",
-//       Named("lower") = 0,
-//       Named("upper") = 1,
-//       Named("data") = data_segment,
-//       Named("cost") = cost
-//     );
-//     return List::create(
-//       Named("par") = log(
-//         as<double>(optim_result["par"]) / (1 - as<double>(optim_result["par"]))
-//       ),
-//       Named("value") = exp(as<double>(optim_result["value"])) /
-//         (1 + exp(as<double>(optim_result["value"]))),
-//       Named("residuals") = R_NilValue
-//     );
-//   } else if (family == "custom" && p > 1) {
-//     Environment stats = Environment::namespace_env("stats");
-//     Function optim = stats["optim"];
-//     List optim_result = optim(
-//       Named("par") = zeros<vec>(p),
-//       Named("fn") = cost,
-//       Named("method") = "L-BFGS-B",
-//       Named("data") = data_segment
-//     );
-//     return List::create(
-//       Named("par") = optim_result["par"],
-//       Named("value") = optim_result["value"],
-//       Named("residuals") = R_NilValue
-//     );
-//   } else {
-//     return cost(data_segment, R_NilValue, family, lambda, cv);
-//   }
-// }
+List Fastcpd::cost_optim(
+    const mat data_segment,
+    const double lambda,
+    const bool cv
+) {
+  Function cost_ = cost.get();
+  List cost_optim_result;
+  if (vanilla_percentage == 1) {
+    cost_optim_result = List::create(
+      Named("par") = R_NilValue,
+      Named("value") = cost_(data_segment),
+      Named("residuals") = R_NilValue
+    );
+  } else if (p == 1) {
+    Environment stats = Environment::namespace_env("stats");
+    Function optim = stats["optim"];
+    List optim_result = optim(
+      Named("par") = 0,
+      Named("fn") = InternalFunction(
+        +[](double theta, mat data, Function cost_) {
+          return cost_(
+            Named("data") = data,
+            Named("theta") = log(theta / (1 - theta))
+          );
+        }
+      ),
+      Named("method") = "Brent",
+      Named("lower") = 0,
+      Named("upper") = 1,
+      Named("data") = data_segment,
+      Named("cost") = cost_
+    );
+    cost_optim_result = List::create(
+      Named("par") = log(
+        as<double>(optim_result["par"]) / (1 - as<double>(optim_result["par"]))
+      ),
+      Named("value") = exp(as<double>(optim_result["value"])) /
+        (1 + exp(as<double>(optim_result["value"]))),
+      Named("residuals") = R_NilValue
+    );
+  } else if (p > 1) {
+    Environment stats = Environment::namespace_env("stats");
+    Function optim = stats["optim"];
+    List optim_result = optim(
+      Named("par") = zeros<vec>(p),
+      Named("fn") = cost_,
+      Named("method") = "L-BFGS-B",
+      Named("data") = data_segment,
+      Named("lower") = lower,
+      Named("upper") = upper
+    );
+    cost_optim_result = List::create(
+      Named("par") = optim_result["par"],
+      Named("value") = optim_result["value"],
+      Named("residuals") = R_NilValue
+    );
+  } else {
+    // # nocov start
+    stop("This branch should not be reached at classes.cc: 945.");
+    // # nocov end
+  }
+  return cost_optim_result;
+}
 
-}  // namespace fastcpd::parameters
+}  // namespace fastcpd::classes
