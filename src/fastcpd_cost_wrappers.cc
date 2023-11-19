@@ -1,6 +1,6 @@
-#include "wrappers.h"
+#include "fastcpd_classes.h"
 
-namespace fastcpd::wrappers {
+namespace fastcpd::classes {
 
 CostFunction::CostFunction(Function cost) : cost(cost) {}
 
@@ -28,4 +28,4 @@ mat CostHessian::operator()(mat data, colvec theta) {
   return as<mat>(cost_hessian(data, theta));
 }
 
-}  // namespace fastcpd::wrappers
+}  // namespace fastcpd::classes

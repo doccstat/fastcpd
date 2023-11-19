@@ -1,13 +1,13 @@
-#ifndef PARAMETERS_H_
-#define PARAMETERS_H_
+#ifndef FASTCPD_CLASSES_H_
+#define FASTCPD_CLASSES_H_
 
 #include "fastcpd_types.h"
 
-namespace fastcpd::parameters {
+namespace fastcpd::classes {
 
-class FastcpdParameters {
+class Fastcpd {
  public:
-  FastcpdParameters(
+  Fastcpd(
     mat data,
     const double beta,
     const int p,
@@ -157,13 +157,6 @@ class FastcpdParameters {
     const mat mean_data_cov
   );
 
-// TODO(doccstat): define a `cost_optim` inside the class.
-//   List cost_optim(
-//       const mat data_segment,
-//       const double lambda,
-//       const bool cv
-//   );
-
   // `cost` is the cost function to be used.
   Nullable<Function> cost;
 
@@ -252,6 +245,25 @@ class FastcpdParameters {
   // @return Hessian at the current data.
   mat cost_update_hessian(mat data, colvec theta);
 
+  // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
+  //
+  // @param family Family of the model.
+  // @param p Number of parameters.
+  // @param data_segment A data frame containing a segment of the data.
+  // @param cost Cost function.
+  // @param lambda Lambda for L1 regularization.
+  // @param cv Whether to perform cross-validation to find the best lambda.
+  // @param lower A vector containing the lower bounds for the parameters.
+  // @param upper A vector containing the upper bounds for the parameters.
+  //
+  // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
+  //   and \code{hessian}.
+  List cost_optim(
+      const mat data_segment,
+      const double lambda,
+      const bool cv
+  );
+
  private:
   // `data` is the data set to be segmented.
   mat data;
@@ -325,6 +337,42 @@ class FastcpdParameters {
   void create_environment_functions();
 };
 
+class CostFunction {
+ public:
+  CostFunction(Function cost);
+
+  List operator()(
+      mat data,
+      Nullable<colvec> theta,
+      double lambda,  // UNUSED
+      bool cv,  // UNUSED
+      Nullable<colvec> start  // UNUSED
+  );
+
+ private:
+  Function cost;
+};
+
+class CostGradient {
+ public:
+  CostGradient(Function cost_gradient);
+
+  colvec operator()(mat data, colvec theta);
+
+ private:
+  Function cost_gradient;
+};
+
+class CostHessian {
+ public:
+  CostHessian(Function cost_hessian);
+
+  mat operator()(mat data, colvec theta);
+
+ private:
+  Function cost_hessian;
+};
+
 }  // namespace fastcpd::parameters
 
-#endif  // PARAMETERS_H_
+#endif  // FASTCPD_CLASSES_H_

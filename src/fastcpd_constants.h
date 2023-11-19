@@ -1,5 +1,5 @@
-#ifndef CONSTANTS_H_
-#define CONSTANTS_H_
+#ifndef FASTCPD_CONSTANTS_H_
+#define FASTCPD_CONSTANTS_H_
 
 #include <algorithm>
 #include <array>
@@ -121,4 +121,4 @@ constexpr std::array<double, 200> kARMA32RESIDUALS = {
   -0.842645368,  1.100285732, -2.022265133, -0.499831533, -0.348419523
 };
 
-#endif  // CONSTANTS_H_
+#endif  // FASTCPD_CONSTANTS_H_
