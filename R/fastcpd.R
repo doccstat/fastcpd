@@ -212,8 +212,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     check_family(
       family,
       c(
-        "lm", "binomial", "poisson", "lasso", "mean", "variance", "arma",
-        "ar", "var", "ma", "arima", "garch", "custom"
+        "lm", "binomial", "poisson", "lasso", "mean", "variance",
+        "meanvariance", "mv",
+        "arma", "ar", "var", "ma", "arima", "garch", "custom"
       )
     )
   )
@@ -265,6 +266,11 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   if (family == "variance") {
     vanilla_percentage <- 1
     p <- ncol(data)^2
+  }
+
+  if (family == "meanvariance" || family == "mv") {
+    vanilla_percentage <- 1
+    p <- ncol(data) + ncol(data)^2
   }
 
   # Pre-process the data for the time series models.

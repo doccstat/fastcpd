@@ -1,4 +1,3 @@
-\donttest{
 set.seed(1)
 p <- 3
 result <- fastcpd.mv(
@@ -12,4 +11,3 @@ result <- fastcpd.mv(
   )
 )
 summary(result)
-}

@@ -655,6 +655,29 @@ List Fastcpd::negative_log_likelihood_wo_theta(
       Named("value") = value,
       Named("residuals") = residuals
     );
+  } else if (family == "meanvariance" || family == "mv") {
+    mat covariance = arma::cov(data);
+
+    double value =
+      data.n_cols * (log(2.0 * M_PI) + (data.n_rows - 1) / data.n_rows);
+    if (data.n_rows >= data.n_cols) {
+      value += log_det_sympd(
+        covariance + epsilon * eye<mat>(data.n_cols, data.n_cols)
+      );
+    }
+    value *= data.n_rows / 2.0;
+
+    colvec par = zeros(data.n_cols * data.n_cols + data.n_cols);
+    par.rows(0, data.n_cols - 1) = mean(data, 0).t();
+    par.rows(data.n_cols, par.n_rows - 1) =
+      covariance.reshape(data.n_cols * data.n_cols, 1);
+    mat residuals = data.each_row() - par.rows(0, data.n_cols - 1).t();
+
+    return List::create(
+      Named("par") = par,
+      Named("value") = value,
+      Named("residuals") = residuals
+    );
   } else {
     // # nocov start
     stop("This branch should not be reached at functions.cc: 103.");
