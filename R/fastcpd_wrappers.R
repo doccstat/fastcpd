@@ -456,7 +456,7 @@ fastcpd_ts <- fastcpd.ts
 #'   default a matrix or data frame or a vector with each row / element as an
 #'   observation and thus a formula is not required here.
 #'
-#' @example tests/testthat/examples/fastcpd_variance.txt
+#' @example tests/testthat/examples/fastcpd_variance.R
 #'
 #' @md
 #'
@@ -475,21 +475,8 @@ fastcpd.variance <- function(  # nolint: Conventional R function style
   if (is.null(dim(data)) || length(dim(data)) == 1) {
     data <- matrix(data, ncol = 1)
   }
-  data_all_mean <- colMeans(data)
   result <- fastcpd(
-    formula = ~ . - 1,
-    data = data.frame(x = data),
-    cost = function(data) {
-      n <- nrow(data)
-      p <- ncol(data)
-      if (n < p) {
-        data_cov <- diag(p)
-      } else {
-        data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
-      }
-      n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
-    },
-    beta = (ncol(data)^2 + 1) * log(nrow(data)) / 2,
+    formula = ~ . - 1, data = data.frame(x = data), family = "variance",
     ...
   )
   result@call <- match.call()

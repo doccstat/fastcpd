@@ -9,6 +9,7 @@ using ::arma::eye;
 using ::arma::index_min;
 using ::arma::join_cols;
 using ::arma::linspace;
+using ::arma::log_det_sympd;
 using ::arma::max;
 using ::arma::min;
 using ::arma::norm;

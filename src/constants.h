@@ -11,7 +11,7 @@ bool contain(C&& c, T e) {
   return std::find(std::begin(c), std::end(c), e) != std::end(c);
 };
 constexpr std::array FASTCPD_FAMILIES =
-  {"gaussian", "binomial", "poisson", "lasso", "arma", "mean"};
+  {"gaussian", "binomial", "poisson", "lasso", "arma", "mean", "variance"};
 
 #else
 
