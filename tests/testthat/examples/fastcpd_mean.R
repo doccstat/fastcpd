@@ -1,4 +1,3 @@
-\donttest{
 set.seed(1)
 p <- 3
 data <- rbind(
@@ -8,4 +7,3 @@ data <- rbind(
 )
 result <- fastcpd.mean(data, segment_count = 5)
 summary(result)
-}

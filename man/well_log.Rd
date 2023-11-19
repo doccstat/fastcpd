@@ -19,12 +19,10 @@ obtained from Alan Turing Institute GitHub repository and licensed under
 the MIT license. Outliers with value less or equal to 1e5 are removed.
 }
 \examples{
-\donttest{
 result <- fastcpd.mean(
   well_log, beta = (1 + 1) * log(length(well_log)) / 2 * 2,  trim = 0.002
 )
 summary(result)
 plot(result)
-}
 }
 \keyword{datasets}

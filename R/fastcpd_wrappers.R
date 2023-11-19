@@ -257,7 +257,7 @@ fastcpd_ma <- fastcpd.ma
 #'   data frame or a vector with each row / element as an observation and thus a
 #'   formula is not required here.
 #'
-#' @example tests/testthat/examples/fastcpd_mean.txt
+#' @example tests/testthat/examples/fastcpd_mean.R
 #'
 #' @md
 #'

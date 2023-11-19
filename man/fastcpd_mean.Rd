@@ -26,7 +26,6 @@ data frame or a vector with each row / element as an observation and thus a
 formula is not required here.
 }
 \examples{
-\donttest{
 set.seed(1)
 p <- 3
 data <- rbind(
@@ -36,5 +35,4 @@ data <- rbind(
 )
 result <- fastcpd.mean(data, segment_count = 5)
 summary(result)
-}
 }
