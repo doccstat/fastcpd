@@ -241,7 +241,10 @@ List fastcpd_impl(
   colvec cost_values = zeros<vec>(cp_loc.n_elem - 1);
   mat thetas = zeros<mat>(p, cp_loc.n_elem - 1);
   mat residual;
-  if (family == "mean" || family == "variance") {
+  if (
+    family == "mean" || family == "variance" ||
+    family == "meanvariance" || family == "mv"
+  ) {
     residual = zeros<mat>(data.n_rows, data.n_cols);
   } else {
     residual = zeros<mat>(data.n_rows, 1);

@@ -293,7 +293,7 @@ fastcpd_mean <- fastcpd.mean
 #'   default a matrix or data frame or a vector with each row / element as an
 #'   observation and thus a formula is not required here.
 #'
-#' @example tests/testthat/examples/fastcpd_meanvariance.txt
+#' @example tests/testthat/examples/fastcpd_meanvariance.R
 #'
 #' @md
 #'
@@ -313,20 +313,7 @@ fastcpd.meanvariance <- function(  # nolint: Conventional R function style
     data <- matrix(data, ncol = 1)
   }
   result <- fastcpd(
-    formula = ~ . - 1,
-    data = data.frame(x = data),
-    cost = function(data) {
-      n <- nrow(data)
-      p <- ncol(data)
-      if (n <= p) {
-        data_cov <- diag(p)
-      } else {
-        data_cov <- stats::cov(data)
-      }
-      n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
-    },
-    beta = (ncol(data)^2 + ncol(data) + 1) * log(nrow(data)) / 2,
-    ...
+    formula = ~ . - 1, data = data.frame(x = data), family = "meanvariance", ...
   )
   result@call <- match.call()
   result
@@ -428,7 +415,6 @@ fastcpd.ts <- function(  # nolint: Conventional R function style
     family <- tolower(family)
   }
 
-  # TODO(doccstat): Split into different families.
   stopifnot(check_family(family, c("ar", "var", "ma", "arima", "garch")))
   stopifnot(check_order(order, family))
 
@@ -476,8 +462,7 @@ fastcpd.variance <- function(  # nolint: Conventional R function style
     data <- matrix(data, ncol = 1)
   }
   result <- fastcpd(
-    formula = ~ . - 1, data = data.frame(x = data), family = "variance",
-    ...
+    formula = ~ . - 1, data = data.frame(x = data), family = "variance", ...
   )
   result@call <- match.call()
   result
