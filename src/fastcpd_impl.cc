@@ -1,13 +1,11 @@
 #include "constants.h"
 #include "cost_update.h"
 #include "fastcpd_impl.h"
-#include "functions.h"
 #include "parameters.h"
 #include "RProgress.h"
 #include "wrappers.h"
 
 using ::fastcpd::cost_update::cost_optim;
-using ::fastcpd::functions::negative_log_likelihood;
 
 List fastcpd_impl(
     mat data,
@@ -115,9 +113,8 @@ List fastcpd_impl(
           (family != "lasso" && t - tau >= p) ||
           (family == "lasso" && t - tau >= 3)
         ) {
-          List cost_result = negative_log_likelihood(
-            data_segment, Rcpp::wrap(theta), family,
-            lambda, false, R_NilValue, order, mean_data_cov
+          List cost_result = fastcpd_parameters_class.negative_log_likelihood(
+            data_segment, Rcpp::wrap(theta), lambda, false, R_NilValue
           );
           cval(i - 1) = as<double>(cost_result["value"]);
         } else {
@@ -134,15 +131,16 @@ List fastcpd_impl(
           );
         } else {
           if (warm_start && t - tau >= 10 * p) {
-            cost_optim_result = negative_log_likelihood(
-              data_segment, R_NilValue, family, lambda,
-              false, Rcpp::wrap(start.col(tau)), order, mean_data_cov
+            cost_optim_result =
+              fastcpd_parameters_class.negative_log_likelihood(
+                data_segment, R_NilValue, lambda,
+                false, Rcpp::wrap(start.col(tau))
             );
             start.col(tau) = as<colvec>(cost_optim_result["par"]);
           } else {
-            cost_optim_result = negative_log_likelihood(
-              data_segment, R_NilValue, family,
-              lambda, false, R_NilValue, order, mean_data_cov
+            cost_optim_result =
+              fastcpd_parameters_class.negative_log_likelihood(
+                data_segment, R_NilValue, lambda, false, R_NilValue
             );
           }
         }
@@ -270,9 +268,8 @@ List fastcpd_impl(
         fastcpd_parameters_class.cost.get(), lambda, false, lower, upper
       );
     } else {
-      cost_optim_result = negative_log_likelihood(
-        data_segment, R_NilValue, family, lambda,
-        false, R_NilValue, order, mean_data_cov
+      cost_optim_result = fastcpd_parameters_class.negative_log_likelihood(
+        data_segment, R_NilValue, lambda, false, R_NilValue
       );
     }
 
