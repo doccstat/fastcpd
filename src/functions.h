@@ -16,6 +16,7 @@ namespace fastcpd::functions {
 // @param cv Whether to perform cross-validation to find the best lambda.
 // @param start Starting point for the optimization for warm start.
 // @param order Order of the time series models.
+// @param mean_data_cov Covariance matrix of the data, only used in mean change.
 //
 // @return Negative log likelihood of the corresponding data with the given
 //   family.
@@ -26,7 +27,8 @@ List negative_log_likelihood(
     double lambda,
     bool cv = false,
     Nullable<colvec> start = R_NilValue,
-    const colvec order = colvec(1)
+    const colvec order = colvec(1),
+    const mat mean_data_cov = eye(1, 1)
 );
 
 List negative_log_likelihood_wo_theta(
@@ -35,7 +37,8 @@ List negative_log_likelihood_wo_theta(
     double lambda,
     bool cv,
     Nullable<colvec> start,
-    const colvec order
+    const colvec order,
+    const mat mean_data_cov
 );
 
 double negative_log_likelihood_wo_cv(

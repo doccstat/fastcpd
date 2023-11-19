@@ -12,7 +12,7 @@ context("negative_log_likelihood_wo_theta Unit Test") {
     colvec data(time_series_arma_3_2.data(), time_series_arma_3_2.size());
     const colvec order = {3, 2};
     List out = negative_log_likelihood_wo_theta(
-      data, "arma", 0, false, R_NilValue, order
+      data, "arma", 0, false, R_NilValue, order, eye(1, 1)
     );
     colvec par = out["par"];
     double value = out["value"];

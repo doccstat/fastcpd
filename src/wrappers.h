@@ -16,7 +16,8 @@ class CostFunction {
       double lambda,  // UNUSED
       bool cv,  // UNUSED
       Nullable<colvec> start,  // UNUSED
-      const colvec order  // UNUSED
+      const colvec order,  // UNUSED
+      const mat mean_data_cov  // UNUSED
   );
 
  private:

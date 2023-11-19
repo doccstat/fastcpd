@@ -9,11 +9,12 @@ List negative_log_likelihood(
     double lambda,
     bool cv,
     Nullable<colvec> start,
-    const colvec order
+    const colvec order,
+    const mat mean_data_cov
 ) {
   if (theta.isNull()) {
     return negative_log_likelihood_wo_theta(
-      data, family, lambda, cv, start, order
+      data, family, lambda, cv, start, order, mean_data_cov
     );
   } else {
     return List::create(
@@ -30,7 +31,8 @@ List negative_log_likelihood_wo_theta(
     double lambda,
     bool cv,
     Nullable<colvec> start,
-    const colvec order
+    const colvec order,
+    const mat mean_data_cov
 ) {
   if (family == "lasso" && cv) {
     Environment glmnet = Environment::namespace_env("glmnet"),
@@ -118,6 +120,19 @@ List negative_log_likelihood_wo_theta(
     return List::create(Named("par") = par,
                   Named("value") = -as<double>(out["loglik"]),
                   Named("residuals") = as<vec>(out["residuals"]));
+  } else if (family == "mean") {
+    rowvec par = mean(data, 0);
+    mat residuals = data.each_row() - par;
+    return List::create(
+      Named("par") = par,
+      Named("value") = data.n_rows / 2.0 * (
+        log(2.0 * M_PI) * data.n_cols + arma::log_det_sympd(mean_data_cov) +
+          arma::trace(
+            solve(mean_data_cov, residuals.t() * residuals)
+          ) / data.n_rows
+      ),
+      Named("residuals") = residuals
+    );
   } else {
     // # nocov start
     stop("This branch should not be reached at functions.cc: 103.");
@@ -356,4 +371,4 @@ mat cost_update_hessian(
   return hessian;
 }
 
-}
+}  // namespace fastcpd::functions
