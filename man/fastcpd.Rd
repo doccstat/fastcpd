@@ -197,18 +197,20 @@ processed through sequential gradient descent.}
 parameters from the previous segment as the initial value for the
 current segment. This parameter is only used for \code{"glm"} families.}
 
-\item{lower}{Lower bound for the parameters. If not specified, the lower
-bound will be set to be \code{-Inf} for all parameters.}
+\item{lower}{Lower bound for the parameters. Used to specify the
+domain of the parameter after each gradient descent step. If not specified,
+the lower bound will be set to be \code{-Inf} for all parameters.}
 
-\item{upper}{Upper bound for the parameters. If not specified, the upper
-bound will be set to be \code{Inf} for all parameters.}
+\item{upper}{Upper bound for the parameters. Used to specify the
+domain of the parameter after each gradient descent step. If not specified,
+the upper bound will be set to be \code{Inf} for all parameters.}
 
-\item{line_search}{If a vector of numeric values are provided, line search
-will be performed to find the optimal step size for each update.}
+\item{line_search}{If a vector of numeric values are provided, line
+search will be performed to find the optimal step size for each update.}
 
-\item{...}{Parameters specifically used for time series models. As of the
-current implementation, only \code{include.mean} will not be ignored and used
-in the ARIMA or GARCH model.}
+\item{...}{Parameters specifically used for time series models. As of
+the current implementation, only \code{include.mean} will not be ignored
+and used in the ARIMA or GARCH model.}
 }
 \value{
 A class \code{fastcpd} object.

@@ -1,34 +1,32 @@
 testthat::test_that(  # nolint: cyclomatic complexity
   "ARIMA(3, 0, 2) fast c++", {
     set.seed(1)
-    n <- 600
+    n <- 400
     w <- rnorm(n + 2, 0, 1)
     x <- rep(0, n + 3)
-    for (i in 1:300) {
-      x[i + 3] <- 0.1 * x[i + 2] - 0.2 * x[i + 1] + 0.6 * x[i] +
+    for (i in 1:150) {
+      x[i + 3] <- 0.1 * x[i + 2] - 0.3 * x[i + 1] + 0.5 * x[i] +
         w[i + 2] + 0.1 * w[i + 1] + 0.5 * w[i]
     }
-    for (i in 301:n) {
-      x[i + 3] <- 0.3 * x[i + 2] + 0.5 * x[i + 1] + 0.1 * x[i] +
-        w[i + 2] + 0.6 * w[i + 1] + 0.1 * w[i]
+    for (i in 151:n) {
+      x[i + 3] <- -0.3 * x[i + 2] + 0.5 * x[i + 1] + 0.1 * x[i] +
+        w[i + 2] - 0.6 * w[i + 1] - 0.1 * w[i]
     }
-    testthat::capture_warnings(
-      result <- fastcpd(
-        formula = ~ . - 1,
-        data = data.frame(x = x[3 + seq_len(n)]),
-        segment_count = 3,
-        trim = 0.01,
-        p = 3 + 2 + 1,
-        beta = (3 + 2 + 1 + 1) * log(n) / 2,
-        family = "arma",
-        order = c(3, 2),
-        cp_only = TRUE,
-        lower = c(rep(-1, 3 + 2), 1e-10),
-        upper = c(rep(1, 3 + 2), Inf),
-        line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
-      )
+    result <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(x = x[3 + seq_len(n)]),
+      segment_count = 3,
+      trim = 0.01,
+      p = 3 + 2 + 1,
+      beta = (3 + 2 + 1 + 1) * log(n) / 2,
+      family = "arma",
+      order = c(3, 2),
+      cp_only = TRUE,
+      lower = c(rep(-1, 3 + 2), 1e-10),
+      upper = c(rep(1, 3 + 2), Inf),
+      line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
     )
-    testthat::expect_equal(result@cp_set, c(302, 418))
+    testthat::expect_equal(result@cp_set, 163)
   }
 )
 

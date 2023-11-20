@@ -15,9 +15,9 @@ select using \code{@}.
 \section{Slots}{
 
 \describe{
-\item{\code{call}}{The call of the function `fastcpd`.}
+\item{\code{call}}{The call of the function.}
 
-\item{\code{data}}{The data passed to the `fastcpd` function.}
+\item{\code{data}}{The data passed to the function.}
 
 \item{\code{family}}{The family of the model.}
 
@@ -25,8 +25,8 @@ select using \code{@}.
 
 \item{\code{cost_values}}{The cost function values for each segment.}
 
-\item{\code{residuals}}{The residuals for each segment. Used only for built-in
-families.}
+\item{\code{residuals}}{The residuals of the model with change points.
+Used only for built-in families.}
 
 \item{\code{thetas}}{The estimated parameters for each segment. Used only for
 built-in families.}

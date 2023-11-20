@@ -189,8 +189,8 @@ List fastcpd_impl(
 
   // Remove change points close to the boundaries.
   colvec cp_set = cp_sets[n];
-  cp_set = cp_set(arma::find(cp_set >= trim * n));
-  cp_set = cp_set(arma::find(cp_set <= (1 - trim) * n));
+  cp_set = cp_set(arma::find(cp_set > trim * n));
+  cp_set = cp_set(arma::find(cp_set < (1 - trim) * n));
   colvec cp_set_ = zeros<vec>(cp_set.n_elem + 1);
   if (cp_set.n_elem) {
     cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
