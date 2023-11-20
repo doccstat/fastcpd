@@ -7,13 +7,13 @@
 #' with only change points or with change points and parameters, which you can
 #' select using \code{@}.
 #'
-#' @slot call The call of the function `fastcpd`.
-#' @slot data The data passed to the `fastcpd` function.
+#' @slot call The call of the function.
+#' @slot data The data passed to the function.
 #' @slot family The family of the model.
 #' @slot cp_set The set of change points.
 #' @slot cost_values The cost function values for each segment.
-#' @slot residuals The residuals for each segment. Used only for built-in
-#'   families.
+#' @slot residuals The residuals of the model with change points.
+#'   Used only for built-in families.
 #' @slot thetas The estimated parameters for each segment. Used only for
 #'   built-in families.
 #' @slot cp_only A boolean indicating whether `fastcpd` was run to return
