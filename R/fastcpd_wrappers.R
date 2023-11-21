@@ -74,6 +74,42 @@ fastcpd.arima <- function(  # nolint: Conventional R function style
 #' @export
 fastcpd_arima <- fastcpd.arima
 
+#' @title Find change points efficiently in ARMA(p, q) models
+#'
+#' @description \code{fastcpd_arma} and \code{fastcpd.arma} are
+#'   wrapper functions of \code{\link{fastcpd}} to find change points in
+#'   ARMA(p, q) models. The function is similar to \code{\link{fastcpd}}
+#'   except that the data is by default a one-column matrix or univariate vector
+#'   and thus a formula is not required here.
+#'
+#' @example tests/testthat/examples/fastcpd_arma.txt
+#'
+#' @md
+#'
+#' @param data A numeric vector, a matrix, a data frame or a time series object.
+#' @param order A vector of length two specifying the order of the ARMA
+#'   model.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_arma
+#' @export
+fastcpd.arma <- function(  # nolint: Conventional R function style
+  data,
+  order = 0,
+  ...
+) {
+  result <- fastcpd.ts(c(data), "arma", order, ...)
+  result@call <- match.call()
+  result
+}
+
+#' @rdname fastcpd_arma
+#' @export
+fastcpd_arma <- fastcpd.arma
+
 #' @title Find change points efficiently in logistic regression models
 #'
 #' @description \code{"fastcpd_binomial"} and \code{"fastcpd.binomial"} are
@@ -415,7 +451,9 @@ fastcpd.ts <- function(  # nolint: Conventional R function style
     family <- tolower(family)
   }
 
-  stopifnot(check_family(family, c("ar", "var", "ma", "arima", "garch")))
+  stopifnot(
+    check_family(family, c("ar", "var", "ma", "arima", "arma", "garch"))
+  )
   stopifnot(check_order(order, family))
 
   # TODO(doccstat): Deal with different data types.

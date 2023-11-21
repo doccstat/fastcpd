@@ -63,7 +63,7 @@ plot.fastcpd <- function(x, ...) {  # nolint: cyclomatic complexity
       ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
 
     # Draw lines for time series data and points for other data.
-    if (x@family %in% c("ar", "ma", "arima", "garch")) {
+    if (x@family %in% c("ar", "ma", "arma", "arima", "garch")) {
       line_or_point <- ggplot2::geom_line
     } else {
       line_or_point <- ggplot2::geom_point
