@@ -41,12 +41,14 @@ Suggests:
     abind,
     ggplot2,
     knitr,
+    lubridate,
     mockthat,
     mvtnorm,
     numDeriv,
     rmarkdown,
     testthat (>= 3.0.0),
-    xml2
+    xml2,
+    zoo
 LinkingTo:
     progress,
     Rcpp,

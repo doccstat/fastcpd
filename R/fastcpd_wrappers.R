@@ -98,7 +98,7 @@ fastcpd_arima <- fastcpd.arima
 #' @export
 fastcpd.arma <- function(  # nolint: Conventional R function style
   data,
-  order = 0,
+  order = c(0, 0),
   ...
 ) {
   result <- fastcpd.ts(c(data), "arma", order, ...)
