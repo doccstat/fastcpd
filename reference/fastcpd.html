@@ -289,24 +289,26 @@ current segment. This parameter is only used for <code>"glm"</code> families.</p
 
 
 <dt>lower</dt>
-<dd><p>Lower bound for the parameters. If not specified, the lower
-bound will be set to be <code>-Inf</code> for all parameters.</p></dd>
+<dd><p>Lower bound for the parameters. Used to specify the
+domain of the parameter after each gradient descent step. If not specified,
+the lower bound will be set to be <code>-Inf</code> for all parameters.</p></dd>
 
 
 <dt>upper</dt>
-<dd><p>Upper bound for the parameters. If not specified, the upper
-bound will be set to be <code>Inf</code> for all parameters.</p></dd>
+<dd><p>Upper bound for the parameters. Used to specify the
+domain of the parameter after each gradient descent step. If not specified,
+the upper bound will be set to be <code>Inf</code> for all parameters.</p></dd>
 
 
 <dt>line_search</dt>
-<dd><p>If a vector of numeric values are provided, line search
-will be performed to find the optimal step size for each update.</p></dd>
+<dd><p>If a vector of numeric values are provided, line
+search will be performed to find the optimal step size for each update.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Parameters specifically used for time series models. As of the
-current implementation, only <code>include.mean</code> will not be ignored and used
-in the ARIMA or GARCH model.</p></dd>
+<dd><p>Parameters specifically used for time series models. As of
+the current implementation, only <code>include.mean</code> will not be ignored
+and used in the ARIMA or GARCH model.</p></dd>
 
 </dl></div>
     <div class="section level2">
