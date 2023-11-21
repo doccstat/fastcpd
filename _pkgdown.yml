@@ -68,6 +68,7 @@ reference:
     - bitcoin
     - occupancy
     - transcriptome
+    - uk_seatbelts
     - well_log
 
   - title: Main class

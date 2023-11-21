@@ -352,7 +352,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         error = function(e) 0
       )
     }
-    p <- sum(order[-2])
+    p <- sum(order[-2]) + 1 + include_mean
   } else if (family == "garch") {
     stopifnot("Data should be a univariate time series." = ncol(data) == 1)
     stopifnot(check_garch_order(order))
