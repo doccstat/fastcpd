@@ -329,6 +329,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     order <- c(rep(0, 3 - length(order)), order)
   }
 
+  if (family == "arma") {
+    p <- sum(order) + 1
+  }
+
   if (family == "arima") {
     stopifnot("Data should be a univariate time series." = ncol(data) == 1)
     stopifnot(check_arima_order(order))

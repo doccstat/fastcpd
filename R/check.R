@@ -22,6 +22,7 @@ check_order <- function(order, family) {
     var = check_var_order(order),
     ma = check_ma_order(order),
     arima = check_arima_order(order),
+    arma = check_arima_order(c(order[1], 0, order[2])),
     garch = check_garch_order(order)
   )
 }

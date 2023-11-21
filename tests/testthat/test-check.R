@@ -2,13 +2,19 @@ testthat::test_that(
   "fastcpd.ts/fastcpd_ts", {
     testthat::expect_error(
       fastcpd.ts(),
-      r"[The family should be one of "ar", "var", "ma", "arima", "garch".]"
+      paste0(
+        "The family should be one of \"ar\", \"var\", \"ma\", \"arima\", ",
+        "\"arma\", \"garch\"."
+      )
     )
 
     testthat::expect_error(
       fastcpd.ts(family = "at"),
-      r"[The family should be one of "ar", "var", "ma", "arima", "garch".
-The provided family is "at".]"
+      paste0(
+        "The family should be one of \"ar\", \"var\", \"ma\", \"arima\", ",
+        "\"arma\", \"garch\".\n",
+        "The provided family is \"at\"."
+      )
     )
 
     testthat::expect_error(
