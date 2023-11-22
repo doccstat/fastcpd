@@ -265,8 +265,8 @@ void Fastcpd::update_fastcpd_parameters(const unsigned int t) {
 void Fastcpd::wrap_cost(Nullable<Function> cost) {
   this->cost = cost;
   if (contain(FASTCPD_FAMILIES, family)) {
-    cost_function_wrapper = std::bind(
-      &Fastcpd::negative_log_likelihood,
+    cost_function_wrapper = std::bind(  // # nocov start
+      &Fastcpd::negative_log_likelihood,  // # nocov end
       this,
       std::placeholders::_1,
       std::placeholders::_2,
@@ -283,8 +283,8 @@ void Fastcpd::wrap_cost(Nullable<Function> cost) {
 void Fastcpd::wrap_cost_gradient(Nullable<Function> cost_gradient) {
   this->cost_gradient = cost_gradient;
   if (contain(FASTCPD_FAMILIES, family)) {
-    cost_gradient_wrapper = std::bind(
-      &Fastcpd::cost_update_gradient,
+    cost_gradient_wrapper = std::bind(  // # nocov start
+      &Fastcpd::cost_update_gradient,  // # nocov end
       this,
       std::placeholders::_1,
       std::placeholders::_2
@@ -304,8 +304,8 @@ void Fastcpd::wrap_cost_gradient(Nullable<Function> cost_gradient) {
 void Fastcpd::wrap_cost_hessian(Nullable<Function> cost_hessian) {
   this->cost_hessian = cost_hessian;
   if (contain(FASTCPD_FAMILIES, family)) {
-    cost_hessian_wrapper = std::bind(
-      &Fastcpd::cost_update_hessian,
+    cost_hessian_wrapper = std::bind(  // # nocov start
+      &Fastcpd::cost_update_hessian,  // # nocov end
       this,
       std::placeholders::_1,
       std::placeholders::_2
