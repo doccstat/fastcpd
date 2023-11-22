@@ -32,9 +32,9 @@ result_ar <- fastcpd.ar(
 summary(result_ar)
 plot(result_ar)
 
-result_lm <- fastcpd.lm(
+result_lm <- suppressMessages(fastcpd.lm(
   diff(uk_seatbelts[, c("drivers", "kms", "PetrolPrice", "law")], lag = 12)
-)
+))
 cp_dates <- as.Date("1969-01-01", format = "\%Y-\%m-\%d")
 cp_dates <- cp_dates + lubridate::period(month = 1 + result_lm@cp_set + 12)
 cp_dates <- zoo::as.yearmon(cp_dates)
