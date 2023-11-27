@@ -308,34 +308,11 @@ void Fastcpd::cost_update(
   const unsigned int tau,
   const unsigned int i,
   Function k,
-  const double momentum_coef,
   const double lambda,
   const colvec line_search
 ) {
-  List cost_update_result = cost_update_step(
-    data.rows(0, t - 1),
-    theta_hat,
-    theta_sum,
-    hessian,
-    tau,
-    i,
-    k,
-    family,
-    momentum,
-    momentum_coef,
-    epsilon,
-    min_prob,
-    winsorise_minval,
-    winsorise_maxval,
-    lambda,
-    cost_function_wrapper,
-    cost_gradient_wrapper,
-    cost_hessian_wrapper,
-    lower,
-    upper,
-    line_search,
-    order,
-    mean_data_cov
+  List cost_update_result = cost_update_steps(
+    data.rows(0, t - 1), tau, i, k, momentum, lambda, line_search
   );
   update_theta_hat(i - 1, as<colvec>(cost_update_result[0]));
   create_theta_sum(i - 1, as<colvec>(cost_update_result[1]));
@@ -343,61 +320,64 @@ void Fastcpd::cost_update(
   update_momentum(as<colvec>(cost_update_result[3]));
 }
 
-List Fastcpd::cost_update_step(
+List Fastcpd::cost_update_steps(
     const mat data,
-    mat theta_hat,
-    mat theta_sum,
-    cube hessian,
     const int tau,
     const int i,
     Function k,
-    const string family,
     colvec momentum,
-    const double momentum_coef,
-    const double epsilon,
-    const double min_prob,
-    const double winsorise_minval,
-    const double winsorise_maxval,
     const double lambda,
-    function<List(
-        mat data,
-        Nullable<colvec> theta,
-        double lambda,
-        bool cv,
-        Nullable<colvec> start
-    )> cost_function_wrapper,
-    function<colvec(mat data, colvec theta)> cost_gradient_wrapper,
-    function<mat(mat data, colvec theta)> cost_hessian_wrapper,
-    colvec lower,
-    colvec upper,
-    colvec line_search,
-    const colvec order,
-    const mat mean_data_cov
+    colvec line_search
 ) {
-  // Get the hessian
+  cost_update_step(data, i, 0, data.n_rows - 1, lambda, line_search);
+
+  for (int kk = 1; kk <= as<int>(k(data.n_rows - tau)); kk++) {
+    for (unsigned j = tau + 1; j <= data.n_rows; j++) {
+      cost_update_step(data, i, tau, j - 1, lambda, line_search);
+    }
+  }
+
+  theta_sum.col(i - 1) += theta_hat.col(i - 1);
+  return List::create(
+    theta_hat.col(i - 1), theta_sum.col(i - 1), hessian.slice(i - 1), momentum
+  );
+}
+
+void Fastcpd::cost_update_step(
+  const mat data,
+  const int i,
+  const int data_start,
+  const int data_end,
+  const double lambda,
+  const colvec line_search
+) {
   mat hessian_i = hessian.slice(i - 1);
   colvec gradient;
 
   if (!contain(FASTCPD_FAMILIES, family)) {
-    mat cost_hessian_result = cost_hessian_wrapper(data, theta_hat.col(i - 1));
-    colvec cost_gradient_result = cost_gradient_wrapper(
-      data, theta_hat.col(i - 1)
+    mat cost_hessian_result = cost_hessian_wrapper(
+      data.rows(data_start, data_end), theta_hat.col(i - 1)
     );
     hessian_i += cost_hessian_result;
+    colvec cost_gradient_result = cost_gradient_wrapper(
+      data.rows(data_start, data_end), theta_hat.col(i - 1)
+    );
     gradient = cost_gradient_result;
   } else {
-    hessian_i += cost_update_hessian(data, theta_hat.col(i - 1));
-    gradient = cost_update_gradient(data, theta_hat.col(i - 1));
+    hessian_i += cost_update_hessian(
+      data.rows(data_start, data_end), theta_hat.col(i - 1)
+    );
+    gradient = cost_update_gradient(
+      data.rows(data_start, data_end), theta_hat.col(i - 1)
+    );
   }
 
   // Add epsilon to the diagonal for PSD hessian
-  mat hessian_psd = hessian_i + epsilon * eye<mat>(
-    theta_hat.n_rows, theta_hat.n_rows
-  );
+  mat hessian_psd =
+    hessian_i + epsilon * eye<mat>(theta_hat.n_rows, theta_hat.n_rows);
 
   // Calculate momentum step
-  vec momentum_step = solve(hessian_psd, gradient);
-  momentum = momentum_coef * momentum - momentum_step;
+  momentum = momentum_coef * momentum - solve(hessian_psd, gradient);
 
   double best_learning_rate = 1;
   colvec line_search_costs = zeros<colvec>(line_search.n_elem);
@@ -435,57 +415,10 @@ List Fastcpd::cost_update_step(
     double hessian_norm = norm(hessian_i, "fro");
     vec normd = arma::abs(theta_hat.col(i - 1)) - lambda / hessian_norm;
     theta_hat.col(i - 1) =
-        sign(theta_hat.col(i - 1)) % max(normd, zeros<colvec>(normd.n_elem));
+      sign(theta_hat.col(i - 1)) % max(normd, zeros<colvec>(normd.n_elem));
   }
 
-  for (int kk = 1; kk <= as<int>(k(data.n_rows - tau)); kk++) {
-    for (unsigned j = tau + 1; j <= data.n_rows; j++) {
-      if (!contain(FASTCPD_FAMILIES, family)) {
-        mat cost_hessian_result = cost_hessian_wrapper(
-          data.rows(tau, j - 1), theta_hat.col(i - 1)
-        );
-        hessian_i += cost_hessian_result;
-        colvec cost_gradient_result = cost_gradient_wrapper(
-          data.rows(tau, j - 1), theta_hat.col(i - 1)
-        );
-        gradient = cost_gradient_result;
-      } else {
-        hessian_i += cost_update_hessian(
-          data.rows(tau, j - 1), theta_hat.col(i - 1)
-        );
-        gradient = cost_update_gradient(
-          data.rows(tau, j - 1), theta_hat.col(i - 1)
-        );
-      }
-
-      hessian_psd =
-        hessian_i + epsilon * eye<mat>(theta_hat.n_rows, theta_hat.n_rows);
-      momentum_step = solve(hessian_psd, gradient);
-      momentum = momentum_coef * momentum - momentum_step;
-      theta_hat.col(i - 1) += momentum;
-
-      theta_hat.col(i - 1) = min(theta_hat.col(i - 1), upper);
-      theta_hat.col(i - 1) = max(theta_hat.col(i - 1), lower);
-
-      // Winsorize if family is Poisson
-      if (family == "poisson") {
-        theta_hat.col(i - 1) = clamp(
-          theta_hat.col(i - 1), winsorise_minval, winsorise_maxval
-        );
-      } else if (family == "lasso" || family == "gaussian") {
-        double hessian_norm = norm(hessian_i, "fro");
-        vec normd = arma::abs(theta_hat.col(i - 1)) - lambda / hessian_norm;
-        theta_hat.col(i - 1) =
-          sign(theta_hat.col(i - 1)) % max(normd, zeros<colvec>(normd.n_elem));
-      }
-    }
-  }
-
-  theta_sum.col(i - 1) += theta_hat.col(i - 1);
   hessian.slice(i - 1) = std::move(hessian_i);
-  return List::create(
-    theta_hat.col(i - 1), theta_sum.col(i - 1), hessian.slice(i - 1), momentum
-  );
 }
 
 List Fastcpd::negative_log_likelihood(
