@@ -231,10 +231,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   match_formula[[1L]] <- quote(stats::model.frame)
   match_formula <- eval(match_formula, parent.frame())
   y <- stats::model.response(match_formula, "any")
-  data <- cbind(y, stats::model.matrix(formula, data = data))
+  data_ <- cbind(y, stats::model.matrix(formula, data = data))
 
   fastcpd_family <- NULL
-  fastcpd_data <- NULL
 
   # If a cost function provided has an explicit solution, i.e. does not depend
   # on the parameters, e.g., mean change, then the percentage of vanilla PELT
@@ -246,19 +245,19 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   if (family == "mean") {
     vanilla_percentage <- 1
-    p <- ncol(data)
-    block_size <- max(floor(sqrt(nrow(data)) / (segment_count + 1)), 2)
-    block_count <- floor(nrow(data) / block_size)
+    p <- ncol(data_)
+    block_size <- max(floor(sqrt(nrow(data_)) / (segment_count + 1)), 2)
+    block_count <- floor(nrow(data_) / block_size)
     data_all_covs <- array(NA, dim = c(block_count, p, p))
     for (block_index in seq_len(block_count)) {
       block_start <- (block_index - 1) * block_size + 1
       block_end <- if (block_index < block_count) {
         block_index * block_size
       } else {
-        nrow(data)
+        nrow(data_)
       }
       data_all_covs[block_index, , ] <-
-        stats::cov(data[block_start:block_end, , drop = FALSE])
+        stats::cov(data_[block_start:block_end, , drop = FALSE])
     }
     mean_data_cov <- colMeans(data_all_covs)
   } else {
@@ -267,18 +266,18 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   if (family == "variance") {
     vanilla_percentage <- 1
-    p <- ncol(data)^2
+    p <- ncol(data_)^2
   }
 
   if (family == "meanvariance" || family == "mv") {
     vanilla_percentage <- 1
-    p <- ncol(data) + ncol(data)^2
+    p <- ncol(data_) + ncol(data_)^2
   }
 
   # Pre-process the data for the time series models.
   if (family == "ar") {
     # Check the validity of the parameters for AR(p) model.
-    stopifnot("Data should be a univariate time series." = ncol(data) == 1)
+    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
     stopifnot(check_ar_order(order))
 
     if (length(order) == 3) {
@@ -287,12 +286,12 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       # Preprocess the data for AR(p) model to be used in linear regression.
       p <- order
       fastcpd_family <- "gaussian"
-      y <- data[p + seq_len(nrow(data) - p), ]
-      x <- matrix(NA, nrow(data) - p, p)
+      y <- data_[p + seq_len(nrow(data_) - p), ]
+      x <- matrix(NA, nrow(data_) - p, p)
       for (p_i in seq_len(p)) {
-        x[, p_i] <- data[(p - p_i) + seq_len(nrow(data) - p), ]
+        x[, p_i] <- data_[(p - p_i) + seq_len(nrow(data_) - p), ]
       }
-      fastcpd_data <- cbind(y, x)
+      data_ <- cbind(y, x)
     }
   } else if (family == "var") {
     stopifnot(check_var_order(order))
@@ -300,13 +299,13 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
     # Preprocess the data for VAR(p) model to be used in linear regression.
     vanilla_percentage <- 1
-    y <- data[order + seq_len(nrow(data) - order), ]
-    x <- matrix(NA, nrow(data) - order, order * ncol(data))
+    y <- data_[order + seq_len(nrow(data_) - order), ]
+    x <- matrix(NA, nrow(data_) - order, order * ncol(data_))
     for (p_i in seq_len(order)) {
-      x[, (p_i - 1) * ncol(data) + seq_len(ncol(data))] <-
-        data[(order - p_i) + seq_len(nrow(data) - order), ]
+      x[, (p_i - 1) * ncol(data_) + seq_len(ncol(data_))] <-
+        data_[(order - p_i) + seq_len(nrow(data_) - order), ]
     }
-    fastcpd_data <- cbind(y, x)
+    data_ <- cbind(y, x)
     lm_x_col <- order * ncol(data)
     cost <- function(data) {
       x <- data[, (ncol(data) - lm_x_col + 1):ncol(data)]
@@ -321,9 +320,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       # TODO(doccstat): Verify the correctness of the cost function for VAR(p).
       norm(y - x %*% solve(x_t_x, t(x)) %*% y, type = "F")^2 / 2
     }
-    p <- order^2 * ncol(data)
+    p <- order^2 * ncol(data_)
   } else if (family == "ma") {
-    stopifnot("Data should be a univariate time series." = ncol(data) == 1)
+    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
     stopifnot(check_ma_order(order))
     family <- "arima"
     order <- c(rep(0, 3 - length(order)), order)
@@ -334,7 +333,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   }
 
   if (family == "arima") {
-    stopifnot("Data should be a univariate time series." = ncol(data) == 1)
+    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
     stopifnot(check_arima_order(order))
     fastcpd_family <- "custom"
     vanilla_percentage <- 1
@@ -354,7 +353,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     }
     p <- sum(order[-2]) + 1 + include_mean
   } else if (family == "garch") {
-    stopifnot("Data should be a univariate time series." = ncol(data) == 1)
+    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
     stopifnot(check_garch_order(order))
     fastcpd_family <- "custom"
     vanilla_percentage <- 1
@@ -388,13 +387,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     fastcpd_family <- family
   }
 
-  if (is.null(fastcpd_data)) {
-    fastcpd_data <- data
-  }
-
   if (is.null(beta)) {
     # Use the `beta` value obtained from BIC.
-    beta <- (p + 1) * log(nrow(fastcpd_data)) / 2
+    beta <- (p + 1) * log(nrow(data_)) / 2
 
     # TODO(doccstat): Variance estimation for VAR(p).
     # For linear regression models, an estimate of the variance is needed in the
@@ -403,18 +398,18 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     # `beta` is null.
     if (family == "lm" || fastcpd_family == "gaussian") {
       # Estimate the variance for each block and then take the average.
-      n <- nrow(fastcpd_data)
+      n <- nrow(data_)
       block_size <- p + 1
       variance_estimation <- rep(NA, n - block_size)
       for (i in seq_len(n - block_size)) {
         block_index <- seq_len(block_size) + i - 1
         block_index_lagged <- seq_len(block_size) + i
 
-        y_block <- fastcpd_data[block_index, 1]
-        x_block <- fastcpd_data[block_index, -1, drop = FALSE]
+        y_block <- data_[block_index, 1]
+        x_block <- data_[block_index, -1, drop = FALSE]
 
-        y_block_lagged <- fastcpd_data[block_index_lagged, 1]
-        x_block_lagged <- fastcpd_data[block_index_lagged, -1, drop = FALSE]
+        y_block_lagged <- data_[block_index_lagged, 1]
+        x_block_lagged <- data_[block_index_lagged, -1, drop = FALSE]
 
         x_t_x <- crossprod(x_block)
         x_t_x_lagged <- crossprod(x_block_lagged)
@@ -460,15 +455,17 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   }
 
   result <- fastcpd_impl(
-    fastcpd_data, beta, segment_count, trim, momentum_coef, k, fastcpd_family,
+    data_, beta, segment_count, trim, momentum_coef, k, fastcpd_family,
     epsilon, min_prob, winsorise_minval, winsorise_maxval, p, order,
     cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
     lower, upper, line_search, mean_data_cov
   )
 
+  raw_cp_set <- c(result$raw_cp_set)
   cp_set <- c(result$cp_set)
 
   if (family %in% c("ar", "var") && length(order) == 1) {
+    raw_cp_set <- raw_cp_set + order
     cp_set <- cp_set + order
   }
 
@@ -487,6 +484,94 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   if (is.null(result$residual)) {
     result$residual <- numeric(0)
+  }
+
+  raw_residuals <- c(result$residual)
+
+  if (family == "mean" && p == 1) {
+    segments <- c(0, raw_cp_set, nrow(data))
+    for (segments_i in seq_len(length(segments) - 1)) {
+      segments_start <- segments[segments_i] + 1
+      segments_end <- segments[segments_i + 1]
+      segment_index <- segments_start:segments_end
+      raw_residuals[segment_index] <-
+        data[segment_index, 1] - mean(data[segment_index, 1])
+    }
+  }
+
+  if (!cp_only) {
+    tryCatch(
+      expr = if (family == "ar") {
+        raw_residuals <- c(rep(NA, p), raw_residuals)
+      } else if (family == "ma" || family == "arima") {
+        raw_residuals <- rep(NA, nrow(data))
+        segments <- c(0, raw_cp_set, nrow(data))
+        for (segments_i in seq_len(length(segments) - 1)) {
+          segments_start <- segments[segments_i] + 1
+          segments_end <- segments[segments_i + 1]
+          raw_residuals[segments_start:segments_end] <- forecast::Arima(
+            c(data[segments_start:segments_end, 1]),
+            order = order,
+            method = "ML",
+            include.mean = include_mean
+          )$residuals
+        }
+      } else if (family == "garch") {
+        raw_residuals <- rep(NA, nrow(data))
+        segments <- c(0, raw_cp_set, nrow(data))
+        for (segments_i in seq_len(length(segments) - 1)) {
+          segments_start <- segments[segments_i] + 1
+          segments_end <- segments[segments_i + 1]
+          raw_residuals[segments_start:segments_end] <- fGarch::garchFit(
+            formula = garch_formula,
+            data = data[segments_start:segments_end, 1],
+            include.mean = include_mean,
+            trace = FALSE
+          )@residuals
+        }
+      },
+      error = function(e) message("Residual calculation failed.")
+    )
+  }
+
+  if (
+    length(raw_cp_set) > nrow(data) / (p + 1) &&
+      (all(raw_residuals == 0) || stats::t.test(raw_residuals)$p.value < 0.05)
+  ) {
+    message(
+      "Warning: The number of change points is larger than the number of ",
+      "observations divided by the number of covariates plus one. ",
+      "The residuals are not independent. ",
+      "Retrying with a larger `beta` value (x2)."
+    )
+    return(
+      fastcpd(
+        formula = formula,
+        data = data,
+        beta = beta * 2,
+        segment_count = segment_count,
+        trim = trim,
+        momentum_coef = momentum_coef,
+        k = k,
+        family = family,
+        epsilon = epsilon,
+        min_prob = min_prob,
+        winsorise_minval = winsorise_minval,
+        winsorise_maxval = winsorise_maxval,
+        p = p,
+        order = order,
+        cost = cost,
+        cost_gradient = cost_gradient,
+        cost_hessian = cost_hessian,
+        cp_only = cp_only,
+        vanilla_percentage = vanilla_percentage,
+        warm_start = warm_start,
+        lower = lower,
+        upper = upper,
+        line_search = line_search,
+        ...
+      )
+    )
   }
 
   residuals <- c(result$residual)

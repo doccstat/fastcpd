@@ -188,7 +188,8 @@ List fastcpd_impl(
   }
 
   // Remove change points close to the boundaries.
-  colvec cp_set = cp_sets[n];
+  colvec raw_cp_set = cp_sets[n],
+         cp_set = cp_sets[n];
   cp_set = cp_set(arma::find(cp_set > trim * n));
   cp_set = cp_set(arma::find(cp_set < (1 - trim) * n));
   colvec cp_set_ = zeros<vec>(cp_set.n_elem + 1);
@@ -225,6 +226,7 @@ List fastcpd_impl(
 
   if (cp_only) {
     return List::create(
+      Named("raw_cp_set") = raw_cp_set,
       Named("cp_set") = cp_set,
       Named("cost_values") = R_NilValue,
       Named("residual") = R_NilValue,
@@ -287,6 +289,7 @@ List fastcpd_impl(
     }
   }
   return List::create(
+    Named("raw_cp_set") = raw_cp_set,
     Named("cp_set") = cp_set,
     Named("cost_values") = cost_values,
     Named("residual") = residual,
