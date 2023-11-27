@@ -3,6 +3,7 @@
 *   Preliminary support for ARMA(p, q) model with parameter `order = c(p, q)`
     and family `"arma"`.
 *   Add `fastcpd.arma` / `fastcpd_arma` for ARMA(p, q) model.
+*   Add adaptive increasing `beta` values.
 
 # fastcpd 0.9.7
 

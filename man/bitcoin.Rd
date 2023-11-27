@@ -30,7 +30,7 @@ ggplot2::ggplot(bitcoin, ggplot2::aes(x = date, y = price)) +
   ggplot2::geom_line()
 
 result <- suppressWarnings(
-  fastcpd::fastcpd.garch(diff(log(bitcoin$price[200:500])), c(1, 1))
+  fastcpd.garch(diff(log(bitcoin$price[200:500])), c(1, 1))
 )
 summary(result)
 bitcoin$date[result@cp_set + 200]
