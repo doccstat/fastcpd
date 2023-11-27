@@ -184,8 +184,6 @@ class Fastcpd {
   // will be a wrapper of the R function.
   function<mat(mat data, colvec theta)> cost_hessian_wrapper;
 
-  Nullable<Function> winsorize;
-
   // Solve logistic/poisson regression using Gradient Descent Extension to the
   // multivariate case
   //
@@ -333,8 +331,6 @@ class Fastcpd {
 
   const mat mean_data_cov;
   rowvec variance_data_mean;
-
-  void create_environment_functions();
 };
 
 class CostFunction {

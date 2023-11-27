@@ -173,7 +173,6 @@
 #' @return A class \code{fastcpd} object.
 #'
 #' @export
-#' @importFrom DescTools Winsorize
 #' @importFrom fastglm fastglm
 #' @importFrom glmnet glmnet cv.glmnet predict.glmnet
 #' @importFrom methods show

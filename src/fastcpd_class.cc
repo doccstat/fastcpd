@@ -46,16 +46,7 @@ Fastcpd::Fastcpd(
     variance_data_mean = mean(data, 0);
   }
 
-  create_environment_functions();
-}
-
-void Fastcpd::create_environment_functions() {
-  if (family == "poisson") {
-    Environment desc_tools = Environment::namespace_env("DescTools");
-    winsorize = as<Nullable<Function>>(desc_tools["Winsorize"]);
-  } else {
-    // TODO(doccstat): Store other environment functions.
-  }
+  // TODO(doccstat): Store environment functions from R.
 }
 
 colvec Fastcpd::get_err_sd() {
@@ -197,17 +188,11 @@ void Fastcpd::create_gradients() {
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
     ) * as_scalar(prob * (1 - prob));
   } else if (family == "poisson") {
-    Function winsorize_non_null = winsorize.get();
-    NumericVector winsorize_result = winsorize_non_null(
-      Rcpp::_["x"] = segment_theta_hat.row(0).t(),
-      Rcpp::_["minval"] = winsorise_minval,
-      Rcpp::_["maxval"] = winsorise_maxval
+    theta_hat.col(0) = clamp(
+      segment_theta_hat.row(0).t(), winsorise_minval, winsorise_maxval
     );
-    theta_hat.col(0) = vec(
-      winsorize_result.begin(), winsorize_result.size(), false
-    );
-    theta_sum.col(0) = vec(
-      winsorize_result.begin(), winsorize_result.size(), false
+    theta_sum.col(0) = clamp(
+      segment_theta_hat.row(0).t(), winsorise_minval, winsorise_maxval
     );
     hessian.slice(0) = (
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
@@ -237,14 +222,8 @@ void Fastcpd::update_fastcpd_parameters(const unsigned int t) {
     const double prob = 1 / (1 + exp(-as_scalar(coef_add * new_data.t())));
     hessian_new = (new_data.t() * new_data) * as_scalar(prob * (1 - prob));
   } else if (family == "poisson") {
-    Function winsorize_non_null = winsorize.get();
-    NumericVector winsorize_result = winsorize_non_null(
-      Rcpp::_["x"] = coef_add,
-      Rcpp::_["minval"] = winsorise_minval,
-      Rcpp::_["maxval"] = winsorise_maxval
-    );
-    coef_add = as<rowvec>(winsorize_result);
-    cum_coef_add = as<rowvec>(winsorize_result);
+    coef_add = clamp(coef_add, winsorise_minval, winsorise_maxval);
+    cum_coef_add = clamp(coef_add, winsorise_minval, winsorise_maxval);
     hessian_new =
         (new_data.t() * new_data) * as_scalar(
           exp(coef_add * new_data.t())
@@ -446,15 +425,9 @@ List Fastcpd::cost_update_step(
 
   // Winsorize if family is Poisson
   if (family == "poisson") {
-    Environment desc_tools = Environment::namespace_env("DescTools");
-    Function winsorize = desc_tools["Winsorize"];
-    NumericVector winsorize_result = winsorize(
-      Rcpp::_["x"] = theta_hat.col(i - 1),
-      Rcpp::_["minval"] = winsorise_minval,
-      Rcpp::_["maxval"] = winsorise_maxval
+    theta_hat.col(i - 1) = clamp(
+      theta_hat.col(i - 1), winsorise_minval, winsorise_maxval
     );
-    theta_hat.col(i - 1) =
-      vec(winsorize_result.begin(), winsorize_result.size(), false);
   } else if (family == "lasso" || family == "gaussian") {
     // Update theta_hat with L1 penalty
     double hessian_norm = norm(hessian_i, "fro");
@@ -494,15 +467,9 @@ List Fastcpd::cost_update_step(
 
       // Winsorize if family is Poisson
       if (family == "poisson") {
-        Environment desc_tools = Environment::namespace_env("DescTools");
-        Function winsorize = desc_tools["Winsorize"];
-        NumericVector winsorize_result = winsorize(
-          Rcpp::_["x"] = theta_hat.col(i - 1),
-          Rcpp::_["minval"] = winsorise_minval,
-          Rcpp::_["maxval"] = winsorise_maxval
+        theta_hat.col(i - 1) = clamp(
+          theta_hat.col(i - 1), winsorise_minval, winsorise_maxval
         );
-        theta_hat.col(i - 1) =
-            vec(winsorize_result.begin(), winsorize_result.size(), false);
       } else if (family == "lasso" || family == "gaussian") {
         double hessian_norm = norm(hessian_i, "fro");
         vec normd = arma::abs(theta_hat.col(i - 1)) - lambda / hessian_norm;

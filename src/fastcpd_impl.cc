@@ -92,14 +92,9 @@ List fastcpd_impl(
         colvec theta =
             fastcpd_class.get_theta_sum().col(i - 1) / (t - tau);
         if (family == "poisson" && t - tau >= p) {
-          Function winsorize_non_null =
-            fastcpd_class.winsorize.get();
-          NumericVector winsorize_result = winsorize_non_null(
-            Rcpp::_["x"] = theta,
-            Rcpp::_["minval"] = winsorise_minval,
-            Rcpp::_["maxval"] = winsorise_maxval
+          theta = clamp(
+            theta, winsorise_minval, winsorise_maxval
           );
-          theta = as<colvec>(winsorize_result);
         }
         if (!contain(FASTCPD_FAMILIES, family)) {
           Function cost_non_null = fastcpd_class.cost.get();
