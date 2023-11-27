@@ -86,9 +86,7 @@ List fastcpd_impl(
       mat data_segment = data.rows(tau, t - 1);
       if (t > vanilla_percentage * n) {
         // fastcpd
-        fastcpd_class.cost_update(
-          t, tau, i, k, momentum_coef, lambda, line_search
-        );
+        fastcpd_class.cost_update(t, tau, i, k, lambda, line_search);
         colvec theta =
             fastcpd_class.get_theta_sum().col(i - 1) / (t - tau);
         if (family == "poisson" && t - tau >= p) {

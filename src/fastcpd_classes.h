@@ -90,7 +90,6 @@ class Fastcpd {
       const unsigned int tau,
       const unsigned int i,
       Function k,
-      const double momentum_coef,
       const double lambda,
       const colvec line_search
   );
@@ -98,9 +97,6 @@ class Fastcpd {
   // Update the cost values for the segmentation.
   //
   // @param data A data frame containing the data to be segmented.
-  // @param theta_hat Estimated theta from the previous iteration.
-  // @param theta_sum Sum of estimated theta from the previous iteration.
-  // @param hessian Hessian matrix from the previous iteration.
   // @param tau Start of the current segment.
   // @param i Index of the current data in the whole data set.
   // @param k Number of epochs in SGD.
@@ -126,36 +122,23 @@ class Fastcpd {
   //
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   \code{hessian}, and \code{momentum}.
-  List cost_update_step(
+  List cost_update_steps(
     const mat data,
-    mat theta_hat,
-    mat theta_sum,
-    cube hessian,
     const int tau,
     const int i,
     Function k,
-    const string family,
     colvec momentum,
-    const double momentum_coef,
-    const double epsilon,
-    const double min_prob,
-    const double winsorise_minval,
-    const double winsorise_maxval,
     const double lambda,
-    function<List(
-        mat data,
-        Nullable<colvec> theta,
-        double lambda,
-        bool cv,
-        Nullable<colvec> start
-    )> cost_function_wrapper,
-    function<colvec(mat data, colvec theta)> cost_gradient_wrapper,
-    function<mat(mat data, colvec theta)> cost_hessian_wrapper,
-    colvec lower,
-    colvec upper,
-    colvec line_search,
-    const colvec order,
-    const mat mean_data_cov
+    colvec line_search
+  );
+
+  void cost_update_step(
+    const mat data,
+    const int i,
+    const int tau,
+    const int j,
+    const double lambda,
+    const colvec line_search
   );
 
   // `cost` is the cost function to be used.
@@ -325,6 +308,8 @@ class Fastcpd {
 
   // Momentum will be used in the update step if `momentum_coef` is not 0.
   colvec momentum;
+
+  const double momentum_coef;
 
   const colvec lower;
 
