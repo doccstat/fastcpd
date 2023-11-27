@@ -27,7 +27,6 @@ BugReports: https://github.com/doccstat/fastcpd/issues
 Depends:
     R (>= 2.10)
 Imports:
-    DescTools,
     fastglm,
     fGarch,
     forecast,
@@ -39,6 +38,7 @@ Imports:
     utils
 Suggests:
     abind,
+    DescTools,
     ggplot2,
     knitr,
     lubridate,

@@ -406,7 +406,7 @@ cost_poisson_update <- function(data_new, coef, cum_coef, cmatrix, epsilon = 0.0
   cmatrix <- cmatrix + (X_new %o% X_new) * min(as.numeric(mu), G)
   lik_dev <- as.numeric(-(Y_new - mu)) * X_new
   coef <- coef - solve(cmatrix + epsilon * diag(1, p), lik_dev)
-  coef <- Winsorize(coef, minval = L, maxval = H)
+  coef <- DescTools::Winsorize(coef, minval = L, maxval = H)
   cum_coef <- cum_coef + coef
   return(list(coef, cum_coef, cmatrix))
 }
@@ -463,7 +463,7 @@ segd_poisson <- function(data, beta, B = 10, trim = 0.03, epsilon = 0.001, G = 1
     coef.int[i, ] <- coef(out)
   }
   X1 <- data[1, 1:p]
-  cum_coef <- coef <- Winsorize(matrix(coef.int[1, ], p, 1), minval = L, maxval = H)
+  cum_coef <- coef <- DescTools::Winsorize(matrix(coef.int[1, ], p, 1), minval = L, maxval = H)
   e_eta <- exp(coef %*% X1)
   const <- e_eta
   cmatrix <- array((X1 %o% X1) * as.numeric(const), c(p, p, 1))
@@ -482,7 +482,7 @@ segd_poisson <- function(data, beta, B = 10, trim = 0.03, epsilon = 0.001, G = 1
       cum_coef[, i] <- out[[2]]
       cmatrix[, , i] <- out[[3]]
       k <- set[i] + 1
-      cum_coef_win <- Winsorize(cum_coef[, i] / (t - k + 1), minval = L, maxval = H)
+      cum_coef_win <- DescTools::Winsorize(cum_coef[, i] / (t - k + 1), minval = L, maxval = H)
       if (t - k >= p - 1) cval[i] <- neg_log_lik_poisson(data[k:t, ], cum_coef_win) else cval[i] <- 0
     }
 
@@ -490,7 +490,7 @@ segd_poisson <- function(data, beta, B = 10, trim = 0.03, epsilon = 0.001, G = 1
 
     cval[m] <- 0
     Xt <- data[t, 1:p]
-    cum_coef_add <- coef_add <- Winsorize(coef.int[index[t], ], minval = L, maxval = H) ####
+    cum_coef_add <- coef_add <- DescTools::Winsorize(coef.int[index[t], ], minval = L, maxval = H) ####
     e_eta_t <- exp(coef_add %*% Xt)
     const <- e_eta_t
     cmatrix_add <- (Xt %o% Xt) * as.numeric(const)

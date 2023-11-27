@@ -5,6 +5,7 @@
 
 using ::arma::accu;
 using ::arma::as_scalar;
+using ::arma::clamp;
 using ::arma::eye;
 using ::arma::index_min;
 using ::arma::join_cols;
