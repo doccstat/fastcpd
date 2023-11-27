@@ -15,6 +15,7 @@ Fastcpd::Fastcpd(
     const double winsorise_maxval,
     const double epsilon,
     const double min_prob,
+    const double momentum_coef,
     const colvec lower,
     const colvec upper,
     const mat mean_data_cov
@@ -29,6 +30,7 @@ Fastcpd::Fastcpd(
     winsorise_maxval(winsorise_maxval),
     epsilon(epsilon),
     min_prob(min_prob),
+    momentum_coef(momentum_coef),
     lower(lower),
     upper(upper),
     mean_data_cov(mean_data_cov) {

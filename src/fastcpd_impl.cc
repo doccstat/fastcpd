@@ -49,8 +49,8 @@ List fastcpd_impl(
 
   fastcpd::classes::Fastcpd fastcpd_class(
     data, beta, p, order, family, vanilla_percentage, segment_count,
-    winsorise_minval, winsorise_maxval, epsilon, min_prob, lower, upper,
-    mean_data_cov
+    winsorise_minval, winsorise_maxval, epsilon, min_prob, momentum_coef,
+    lower, upper, mean_data_cov
   );
 
   fastcpd_class.wrap_cost(cost);

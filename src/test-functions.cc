@@ -16,6 +16,7 @@ context("negative_log_likelihood_wo_theta Unit Test") {
       /* winsorise_maxval */ 0.0,
       /* epsilon */ 0.0,
       /* min_prob */ 0.0,
+      /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
       /* mean_data_cov */ mat()
@@ -57,6 +58,7 @@ context("negative_log_likelihood_wo_cv Unit Test") {
       /* winsorise_maxval */ 0.0,
       /* epsilon */ 0.0,
       /* min_prob */ 0.0,
+      /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
       /* mean_data_cov */ mat()
@@ -85,6 +87,7 @@ context("cost_update_gradient Unit Test") {
       /* winsorise_maxval */ 0.0,
       /* epsilon */ 0.0,
       /* min_prob */ 0.0,
+      /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
       /* mean_data_cov */ mat()
@@ -113,6 +116,7 @@ context("cost_update_hessian Unit Test") {
       /* winsorise_maxval */ 0.0,
       /* epsilon */ 0.0,
       /* min_prob */ 0.0,
+      /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
       /* mean_data_cov */ mat()
@@ -139,6 +143,7 @@ context("cost_update_hessian Unit Test") {
       /* winsorise_maxval */ 0.0,
       /* epsilon */ 0.0,
       /* min_prob */ 1e10,
+      /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
       /* mean_data_cov */ mat()
@@ -165,6 +170,7 @@ context("cost_update_hessian Unit Test") {
       /* winsorise_maxval */ 0.0,
       /* epsilon */ 0.0,
       /* min_prob */ 0.0,
+      /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
       /* mean_data_cov */ mat()

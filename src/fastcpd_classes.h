@@ -19,6 +19,7 @@ class Fastcpd {
     const double winsorise_maxval,
     const double epsilon,
     const double min_prob,
+    const double momentum_coef,
     const colvec lower,
     const colvec upper,
     const mat mean_data_cov
