@@ -16,9 +16,7 @@ fastcpd_garch(data, order = c(0, 0), ...)
 the GARCH model.}
 
 \item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
-\code{segment_count}. One special argument can be passed here is
-\code{include.mean}, which is a logical value indicating whether the
-mean should be included in the model. The default value is \code{TRUE}.}
+\code{segment_count}.}
 }
 \value{
 A class \code{fastcpd} object.

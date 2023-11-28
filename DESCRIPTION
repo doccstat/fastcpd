@@ -28,13 +28,13 @@ Depends:
     R (>= 2.10)
 Imports:
     fastglm,
-    fGarch,
     forecast,
     glmnet,
     Matrix,
     methods,
     Rcpp (>= 0.11.0),
     stats,
+    tseries,
     utils
 Suggests:
     abind,
