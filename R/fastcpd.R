@@ -357,21 +357,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     fastcpd_family <- "custom"
     vanilla_percentage <- 1
 
-    # By default in time series models, `include.mean` is set to be `TRUE`.
-    include_mean <- TRUE
-    if (methods::hasArg("include.mean")) {
-      include_mean <- eval.parent(match.call()[["include.mean"]])
-    }
-    garch_formula <-
-      stats::as.formula(paste0("~ garch(", order[1], ",", order[2], ")"))
     cost <- function(data) {
       tryCatch(
-        expr = fGarch::garchFit(
-          formula = garch_formula,
-          data = data,
-          include.mean = include_mean,
-          trace = FALSE
-        )@fit$value,
+        expr = tseries::garch(data, order, trace = FALSE)$n.likeli,
         error = function(e) 0
       )
     }
@@ -521,12 +509,11 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         for (segments_i in seq_len(length(segments) - 1)) {
           segments_start <- segments[segments_i] + 1
           segments_end <- segments[segments_i + 1]
-          raw_residuals[segments_start:segments_end] <- fGarch::garchFit(
-            formula = garch_formula,
-            data = data[segments_start:segments_end, 1],
-            include.mean = include_mean,
+          raw_residuals[segments_start:segments_end] <- tseries::garch(
+            data[segments_start:segments_end, 1],
+            order,
             trace = FALSE
-          )@residuals
+          )$residuals
         }
       },
       error = function(e) message("Residual calculation failed.")
@@ -609,12 +596,11 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         for (segments_i in seq_len(length(segments) - 1)) {
           segments_start <- segments[segments_i] + 1
           segments_end <- segments[segments_i + 1]
-          residuals[segments_start:segments_end] <- fGarch::garchFit(
-            formula = garch_formula,
-            data = data[segments_start:segments_end, 1],
-            include.mean = include_mean,
+          residuals[segments_start:segments_end] <- tseries::garch(
+            data[segments_start:segments_end, 1],
+            order,
             trace = FALSE
-          )@residuals
+          )$residuals
         }
       },
       error = function(e) message("Residual calculation failed.")

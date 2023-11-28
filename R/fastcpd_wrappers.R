@@ -159,9 +159,7 @@ fastcpd_binomial <- fastcpd.binomial
 #' @param order A positive integer vector of length two specifying the order of
 #'   the GARCH model.
 #' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
-#'   \code{segment_count}. One special argument can be passed here is
-#'   \code{include.mean}, which is a logical value indicating whether the
-#'   mean should be included in the model. The default value is \code{TRUE}.
+#'   \code{segment_count}.
 #'
 #' @return A class \code{fastcpd} object.
 #'
@@ -430,7 +428,7 @@ fastcpd_poisson <- fastcpd.poisson
 #'   - ma, NUMERIC(3): ARIMA(0, 0, q) model using `forecast::Arima`, where
 #'     \code{q} is the third element of the vector.
 #'   - arima, NUMERIC(3): ARIMA(p, d, q) model using `forecast::Arima`.
-#'   - garch, NUMERIC(2): GARCH(p, q) model using `fGarch::garchFit`.
+#'   - garch, NUMERIC(2): GARCH(p, q) model using `tseries::garch`.
 #'
 #' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
 #'   \code{segment_count}. One special argument can be passed here is

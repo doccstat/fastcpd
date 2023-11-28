@@ -28,7 +28,7 @@ specifying the order of the time series. Possible combinations with
 \item ma, NUMERIC(3): ARIMA(0, 0, q) model using \code{forecast::Arima}, where
 \code{q} is the third element of the vector.
 \item arima, NUMERIC(3): ARIMA(p, d, q) model using \code{forecast::Arima}.
-\item garch, NUMERIC(2): GARCH(p, q) model using \code{fGarch::garchFit}.
+\item garch, NUMERIC(2): GARCH(p, q) model using \code{tseries::garch}.
 }}
 
 \item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
