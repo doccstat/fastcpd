@@ -1,6 +1,11 @@
 testthat::test_that(
-  "examples/data-transcriptome.R", {
-    source("examples/data-transcriptome.R")
+  "examples/data-transcriptome.txt", {
+    examples_transcriptome <- readLines("examples/data-transcriptome.txt")
+    source(textConnection(paste(
+      examples_transcriptome[seq_len(length(examples_transcriptome) - 2) + 1],
+      collapse = "\n"
+    )))
+
     testthat::expect_equal(
       result@cp_set,
       c(
