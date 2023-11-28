@@ -34,7 +34,6 @@ and thus a formula is not required here.
 \donttest{
 set.seed(1)
 n <- 400
-p <- 1
 sigma_2 <- rep(1, n + 1)
 x <- rep(0, n + 1)
 for (i in seq_len(200)) {
@@ -46,7 +45,7 @@ for (i in 201:400) {
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
 result <- suppressWarnings(
-  fastcpd.garch(x[-1], c(1, 1), include.mean = FALSE, trim = 0)
+  fastcpd.garch(x[-1], c(1, 1), include.mean = FALSE)
 )
 summary(result)
 plot(result)

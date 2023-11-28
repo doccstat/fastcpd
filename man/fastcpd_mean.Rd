@@ -33,6 +33,6 @@ data <- rbind(
   mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
   mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
 )
-result <- fastcpd.mean(data, segment_count = 5)
+result <- fastcpd.mean(data)
 summary(result)
 }
