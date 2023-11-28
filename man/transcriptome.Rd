@@ -92,7 +92,7 @@ plots <- lapply(
         linewidth = 0.5,
         alpha = 0.7
       ) +
-      theme_void()
+      ggplot2::theme_void()
   }
 )
 
