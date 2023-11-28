@@ -67,7 +67,7 @@ context("negative_log_likelihood_wo_cv Unit Test") {
     const colvec data(kARMA32.data(), kARMA32.size());
     const colvec theta = 0.1 * ones<colvec>(6);
     const double value =
-      fastcpd_class.negative_log_likelihood_wo_cv(data, theta, 0.0, R_NilValue);
+      fastcpd_class.negative_log_likelihood_wo_cv(data, theta, 0.0);
     const double expected_value = 1363.288;
     expect_true(abs(value -  expected_value) < 0.001);
   }

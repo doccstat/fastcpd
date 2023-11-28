@@ -7,6 +7,8 @@ testthat::test_that(
     )))
 
     # TODO(doccstat): Deal with the randomness in the example.
-    # testthat::expect_equal(result@cp_set, 344)
+    testthat::expect_equal(
+      result@cp_set, c(344, 385)[1 + (Sys.info()["sysname"] != "Darwin")]
+    )
   }
 )

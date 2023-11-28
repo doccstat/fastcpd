@@ -202,8 +202,7 @@ class Fastcpd {
   double negative_log_likelihood_wo_cv(
       mat data,
       colvec theta,
-      double lambda,
-      Nullable<colvec> start
+      double lambda
   );
 
   // Function to calculate the gradient at the current data.
@@ -245,6 +244,8 @@ class Fastcpd {
       const double lambda,
       const bool cv
   );
+
+  Nullable<colvec> get_segment_theta_hat(const unsigned int t);
 
  private:
   // `data` is the data set to be segmented.
