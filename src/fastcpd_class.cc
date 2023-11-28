@@ -433,7 +433,7 @@ List Fastcpd::negative_log_likelihood(
   } else {
     return List::create(
       Named("value") =
-        negative_log_likelihood_wo_cv(data, as<colvec>(theta), lambda, start)
+        negative_log_likelihood_wo_cv(data, as<colvec>(theta), lambda)
     );
   }
 }
@@ -590,8 +590,7 @@ List Fastcpd::negative_log_likelihood_wo_theta(
 double Fastcpd::negative_log_likelihood_wo_cv(
     mat data,
     colvec theta,
-    double lambda,
-    Nullable<colvec> start
+    double lambda
 ) {
   vec y = data.col(0);
   if (family == "lasso" || family == "gaussian") {
@@ -867,6 +866,11 @@ List Fastcpd::cost_optim(
     // # nocov end
   }
   return cost_optim_result;
+}
+
+Nullable<colvec> Fastcpd::get_segment_theta_hat(const unsigned int t) {
+  const unsigned int segment_index = segment_indices(t - 1);
+  return Rcpp::wrap(segment_theta_hat[segment_index - 1]);
 }
 
 }  // namespace fastcpd::classes

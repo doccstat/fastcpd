@@ -120,8 +120,9 @@ List fastcpd_impl(
           if (warm_start && t - tau >= 10 * p) {
             cost_optim_result =
               fastcpd_class.negative_log_likelihood(
-                data_segment, R_NilValue, lambda,
-                false, Rcpp::wrap(start.col(tau))
+                data_segment, R_NilValue, lambda, false,
+                fastcpd_class.get_segment_theta_hat(t)
+                // Or use `Rcpp::wrap(start.col(tau))` for warm start.
             );
             start.col(tau) = as<colvec>(cost_optim_result["par"]);
           } else {
