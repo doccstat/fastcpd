@@ -64,7 +64,7 @@
 #' }
 #' @source <https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-TABM-147>
 #' @source <https://github.com/cran/ecp/tree/master/data>
-#' @example tests/testthat/examples/data-transcriptome.R
+#' @example tests/testthat/examples/data-transcriptome.txt
 "transcriptome"
 
 #' Occupancy Detection Data Set

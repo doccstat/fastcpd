@@ -65,8 +65,38 @@ Transcriptome analysis of 57 bladder carcinomas on Affymetrix HG-U95A and
 HG-U95Av2 microarrays
 }
 \examples{
+\donttest{
 result <- fastcpd.mean(transcriptome$"10", trim = 0.005)
 summary(result)
 plot(result)
+
+result_all <- fastcpd.mean(
+  transcriptome,
+  beta = (ncol(transcriptome) + 1) * log(nrow(transcriptome)) / 2 * 5,
+  trim = 0
+)
+
+plots <- lapply(
+  seq_len(ncol(transcriptome)), function(i) {
+    ggplot2::ggplot(
+      data = data.frame(
+        x = seq_along(transcriptome[, i]), y = transcriptome[, i]
+      ),
+      ggplot2::aes(x = x, y = y)
+    ) +
+      ggplot2::geom_line(color = "blue") +
+      ggplot2::geom_vline(
+        xintercept = result_all@cp_set,
+        color = "red",
+        linetype = "dotted",
+        linewidth = 0.5,
+        alpha = 0.7
+      ) +
+      theme_void()
+  }
+)
+
+gridExtra::grid.arrange(grobs = plots, ncol = 1, nrow = ncol(transcriptome))
+}
 }
 \keyword{datasets}
