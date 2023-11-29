@@ -32,6 +32,7 @@ reference:
       - fastcpd.garch
       - fastcpd.ma
       - fastcpd.ts
+      - fastcpd.var
 
   - subtitle: Unlabeled data
     desc: >
