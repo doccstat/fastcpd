@@ -470,6 +470,41 @@ fastcpd.ts <- function(  # nolint: Conventional R function style
 #' @export
 fastcpd_ts <- fastcpd.ts
 
+#' @title Find change points efficiently in VAR(p) models
+#'
+#' @description \code{fastcpd_var} and \code{fastcpd.var} are
+#'   wrapper functions of \code{\link{fastcpd.ts}} to find change points in
+#'   VAR(p) models. The function is similar to \code{\link{fastcpd.ts}}
+#'   except that the data is by default a matrix with row as an observation
+#'   and thus a formula is not required here.
+#'
+#' @example tests/testthat/examples/fastcpd_var.R
+#'
+#' @md
+#'
+#' @param data A matrix, a data frame or a time series object.
+#' @param order A positive integer specifying the order of the VAR model.
+#' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
+#'   \code{segment_count}.
+#'
+#' @return A class \code{fastcpd} object.
+#'
+#' @rdname fastcpd_var
+#' @export
+fastcpd.var <- function(  # nolint: Conventional R function style
+  data,
+  order = 0,
+  ...
+) {
+  result <- fastcpd.ts(data, "var", order, ...)
+  result@call <- match.call()
+  result
+}
+
+#' @rdname fastcpd_var
+#' @export
+fastcpd_var <- fastcpd.var
+
 #' @title Find change points efficiently in variance change models
 #'
 #' @description \code{fastcpd_variance} and \code{fastcpd.variance} are wrapper
