@@ -213,9 +213,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     check_family(
       family,
       c(
-        "lm", "binomial", "poisson", "lasso", "mean", "variance",
-        "meanvariance", "mv",
-        "arma", "ar", "var", "ma", "arima", "garch", "custom"
+        "lm", "binomial", "poisson", "lasso", "mlasso",
+        "mean", "variance", "meanvariance", "mv",
+        "arma", "ar", "var", "ma", "arima", "garch",
+        "custom"
       )
     )
   )
@@ -231,6 +232,8 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   match_formula <- eval(match_formula, parent.frame())
   y <- stats::model.response(match_formula, "any")
   data_ <- cbind(y, stats::model.matrix(formula, data = data))
+
+  p_response <- if (family == "mlasso") ncol(y) else 1
 
   fastcpd_family <- NULL
 
@@ -370,6 +373,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     fastcpd_family <- "gaussian"
   }
 
+  if (family == "mlasso") {
+    fastcpd_family <- "mgaussian"
+  }
+
   if (is.null(fastcpd_family)) {
     fastcpd_family <- family
   }
@@ -445,7 +452,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     data_, beta, segment_count, trim, momentum_coef, k, fastcpd_family,
     epsilon, min_prob, winsorise_minval, winsorise_maxval, p, order,
     cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
-    lower, upper, line_search, mean_data_cov
+    lower, upper, line_search, mean_data_cov, p_response
   )
 
   raw_cp_set <- c(result$raw_cp_set)

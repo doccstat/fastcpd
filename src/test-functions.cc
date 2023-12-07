@@ -19,7 +19,8 @@ context("negative_log_likelihood_wo_theta Unit Test") {
       /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
-      /* mean_data_cov */ mat()
+      /* mean_data_cov */ mat(),
+      /* p_response */ 0
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
@@ -61,7 +62,8 @@ context("negative_log_likelihood_wo_cv Unit Test") {
       /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
-      /* mean_data_cov */ mat()
+      /* mean_data_cov */ mat(),
+      /* p_response */ 0
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
@@ -90,7 +92,8 @@ context("cost_update_gradient Unit Test") {
       /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
-      /* mean_data_cov */ mat()
+      /* mean_data_cov */ mat(),
+      /* p_response */ 0
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
@@ -119,7 +122,8 @@ context("cost_update_hessian Unit Test") {
       /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
-      /* mean_data_cov */ mat()
+      /* mean_data_cov */ mat(),
+      /* p_response */ 0
     );
 
     const mat data = {{1, 1, 0.2}};
@@ -146,7 +150,8 @@ context("cost_update_hessian Unit Test") {
       /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
-      /* mean_data_cov */ mat()
+      /* mean_data_cov */ mat(),
+      /* p_response */ 0
     );
 
     const mat data = {{4, 1, 0.2}};
@@ -173,7 +178,8 @@ context("cost_update_hessian Unit Test") {
       /* momentum_coef */ 0.0,
       /* lower */ colvec(),
       /* upper */ colvec(),
-      /* mean_data_cov */ mat()
+      /* mean_data_cov */ mat(),
+      /* p_response */ 0
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());

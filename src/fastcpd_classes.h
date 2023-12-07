@@ -22,7 +22,8 @@ class Fastcpd {
     const double momentum_coef,
     const colvec lower,
     const colvec upper,
-    const mat mean_data_cov
+    const mat mean_data_cov,
+    const unsigned int p_response
   );
   // Return `err_sd`.
   colvec get_err_sd();
@@ -318,6 +319,8 @@ class Fastcpd {
 
   const mat mean_data_cov;
   rowvec variance_data_mean;
+
+  const unsigned int p_response;
 };
 
 class CostFunction {

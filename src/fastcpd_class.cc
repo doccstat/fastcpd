@@ -18,7 +18,8 @@ Fastcpd::Fastcpd(
     const double momentum_coef,
     const colvec lower,
     const colvec upper,
-    const mat mean_data_cov
+    const mat mean_data_cov,
+    const unsigned int p_response
 ) : data(data),
     beta(beta),
     p(p),
@@ -33,7 +34,8 @@ Fastcpd::Fastcpd(
     momentum_coef(momentum_coef),
     lower(lower),
     upper(upper),
-    mean_data_cov(mean_data_cov) {
+    mean_data_cov(mean_data_cov),
+    p_response(p_response) {
   n = data.n_rows;
   segment_indices = vec(n);
   segment_theta_hat = mat(segment_count, p);

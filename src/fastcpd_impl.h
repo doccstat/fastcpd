@@ -42,6 +42,8 @@
 // @param upper A vector containing the upper bounds for the parameters.
 // @param line_search A vector containing the line search coefficients.
 // @param mean_data_cov Covariance matrix of the data, only used in mean change.
+// @param p_response Dimension of the response, used with multivariate
+//   response.
 //
 // @return A list containing the change points and the cost values for each
 //   segment.
@@ -69,7 +71,8 @@ List fastcpd_impl(
     colvec lower,
     colvec upper,
     colvec line_search,
-    const mat mean_data_cov
+    const mat mean_data_cov,
+    const unsigned int p_response
 );
 
 #endif  // FASTCPD_IMPL_H_
