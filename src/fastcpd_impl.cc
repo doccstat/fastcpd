@@ -26,7 +26,8 @@ List fastcpd_impl(
     colvec lower,
     colvec upper,
     colvec line_search,
-    const mat mean_data_cov
+    const mat mean_data_cov,
+    const unsigned int p_response
 ) {
   // Set up the initial values.
   const int n = data.n_rows;
@@ -50,7 +51,7 @@ List fastcpd_impl(
   fastcpd::classes::Fastcpd fastcpd_class(
     data, beta, p, order, family, vanilla_percentage, segment_count,
     winsorise_minval, winsorise_maxval, epsilon, min_prob, momentum_coef,
-    lower, upper, mean_data_cov
+    lower, upper, mean_data_cov, p_response
   );
 
   fastcpd_class.wrap_cost(cost);
