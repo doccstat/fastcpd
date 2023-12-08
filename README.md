@@ -86,8 +86,6 @@ Package dependencies
   linear algebra.
 - [fastglm](https://github.com/jaredhuling/fastglm), for fast
   generalized linear models.
-- [DescTools](https://github.com/AndriSignorell/DescTools), for
-  Winsorizing Poisson data.
 - [glmnet](https://glmnet.stanford.edu/), for penalized regression.
 - [ggplot2](https://github.com/tidyverse/ggplot2), for data
   visualization.
@@ -250,14 +248,14 @@ summary(result)
 #>     family = "lm")
 #> 
 #> Change points:
-#> 100 194 
+#> 99 197 
 #> 
 #> Cost values:
-#> 48.71927 57.20738 63.15088 
+#> 48.36336 65.71493 46.37389 
 #> 
 #> Parameters:
 #>   segment 1  segment 2 segment 3
-#> 1 0.9520606 -0.8054074 0.3692224
+#> 1  0.956995 -0.8488617 0.4562731
 ```
 
 ### linear regression with noise variance not equal to 1
@@ -450,17 +448,17 @@ summary(result)
 #> 300 700 1000 
 #> 
 #> Cost values:
-#> 208.798 261.4523 189.2066 308.0149 
+#> 209.3166 262.0191 189.6773 308.4771 
 #> 
 #> Parameters:
 #> 50 x 4 sparse Matrix of class "dgCMatrix"
 #>       segment 1  segment 2 segment 3  segment 4
-#>  [1,] -2.877991  0.3218542  4.031359  .        
-#>  [2,] -2.814714 -0.3591500  3.896588  3.0998182
-#>  [3,] -2.802267 -0.1887120  2.558823  2.7608711
-#>  [4,] -1.911901  0.4617167  3.310737 -0.5238929
-#>  [5,] -3.053765 -0.4520943  2.080669 -3.3659884
-#>  [6,] -1.825253  0.4036493  4.784314  .        
+#>  [1,] -2.876798  0.3208273  4.030105  .        
+#>  [2,] -2.813362 -0.3583706  3.895664  3.0989168
+#>  [3,] -2.801067 -0.1878700  2.557583  2.7598671
+#>  [4,] -1.910738  0.4607120  3.309766 -0.5228579
+#>  [5,] -3.052728 -0.4509677  2.079685 -3.3649996
+#>  [6,] -1.823872  0.4025762  4.783195  .        
 #>  [7,]  .         .          .         .        
 #>  [8,]  .         .          .         .        
 #>  [9,]  .         .          .         .        

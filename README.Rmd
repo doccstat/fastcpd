@@ -95,8 +95,6 @@ conda install -c conda-forge r-fastcpd
     algebra.
 *   [fastglm](https://github.com/jaredhuling/fastglm), for fast generalized
     linear models.
-*   [DescTools](https://github.com/AndriSignorell/DescTools), for Winsorizing
-    Poisson data.
 *   [glmnet](https://glmnet.stanford.edu/), for penalized regression.
 *   [ggplot2](https://github.com/tidyverse/ggplot2), for data visualization.
 
@@ -124,7 +122,9 @@ pak::pkg_sysreqs("doccstat/fastcpd")
 
 The package should be able to install on Mac and any Linux distribution without any problems if all the
 dependencies are installed. However, if you encountered problems related to
-gfortran, it might be because `RcppArmadillo` is not installed previously. Try [Mac OSX stackoverflow solution](https://stackoverflow.com/a/72997915) or [Linux stackover solution](https://stackoverflow.com/a/15540919) if you have
+gfortran, it might be because `RcppArmadillo` is not installed previously.
+Try [Mac OSX stackoverflow solution](https://stackoverflow.com/a/72997915) or
+[Linux stackover solution](https://stackoverflow.com/a/15540919) if you have
 trouble installing `RcppArmadillo`.
 
 </details>
