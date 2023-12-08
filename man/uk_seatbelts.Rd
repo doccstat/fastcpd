@@ -26,9 +26,7 @@ uk_seatbelts
 Road Casualties in Great Britain 1969–84.
 }
 \examples{
-result_ar <- fastcpd.ar(
-  data = diff(uk_seatbelts[, "drivers"], lag = 12), order = 1
-)
+result_ar <- fastcpd.ar(diff(uk_seatbelts[, "drivers"], lag = 12), 1)
 summary(result_ar)
 plot(result_ar)
 

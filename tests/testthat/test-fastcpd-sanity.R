@@ -603,6 +603,8 @@ testthat::test_that("poisson regression", {
   change_points_poisson_fastcpd <- fastcpd::fastcpd(
     formula = y ~ . - 1,
     data = data.frame(y = data[, d + 1], x = data[, 1:d]),
+    # Default is now MBIC.
+    beta = beta,
     epsilon = 0.001,
     family = "poisson",
     segment_count = 10
