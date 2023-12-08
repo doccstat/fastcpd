@@ -656,266 +656,6 @@ summary(result_custom_two_epochs)
 #> 5  2.0797875  2.4047092
 ```
 
-### custom cost function mean change
-
-``` r
-library(fastcpd)
-set.seed(1)
-p <- 1
-data <- rbind(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
-  mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
-  mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
-)
-segment_count_guess <- 10
-block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
-block_count <- floor(nrow(data) / block_size)
-data_all_vars <- rep(0, block_count)
-for (block_index in seq_len(block_count)) {
-  block_start <- (block_index - 1) * block_size + 1
-  block_end <- if (block_index < block_count) {
-    block_index * block_size
-  } else {
-    nrow(data)
-  }
-  data_all_vars[block_index] <- var(data[block_start:block_end, ])
-}
-data_all_var <- mean(data_all_vars)
-mean_loss <- function(data) {
-  n <- nrow(data)
-  n / 2 * (
-    log(data_all_var) + log(2 * pi) +
-      sum((data - colMeans(data))^2 / data_all_var) / n
-  )
-}
-mean_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data.frame(data),
-  beta = (p + 1) * log(nrow(data)) / 2,
-  p = p,
-  cost = mean_loss
-)
-summary(mean_loss_result)
-#> 
-#> Call:
-#> fastcpd(formula = ~. - 1, data = data.frame(data), beta = (p + 
-#>     1) * log(nrow(data))/2, p = p, cost = mean_loss)
-#> 
-#> Change points:
-#> 300 700
-```
-
-### custom cost function multivariate mean change
-
-``` r
-library(fastcpd)
-set.seed(1)
-p <- 3
-data <- rbind(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
-  mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
-  mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
-)
-segment_count_guess <- 5
-block_size <- max(floor(sqrt(nrow(data)) / (segment_count_guess + 1)), 2)
-block_count <- floor(nrow(data) / block_size)
-data_all_covs <- array(NA, dim = c(block_count, p, p))
-for (block_index in seq_len(block_count)) {
-  block_start <- (block_index - 1) * block_size + 1
-  block_end <- if (block_index < block_count) {
-    block_index * block_size
-  } else {
-    nrow(data)
-  }
-  data_all_covs[block_index, , ] <- cov(data[block_start:block_end, ])
-}
-data_all_cov <- colMeans(data_all_covs)
-mean_loss <- function(data) {
-  n <- nrow(data)
-  demeaned_data <- sweep(data, 2, colMeans(data))
-  n / 2 * (
-    log(det(data_all_cov)) + p * log(2 * pi) +
-      sum(diag(solve(data_all_cov, crossprod(demeaned_data)))) / n
-  )
-}
-mean_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data.frame(data),
-  beta = (p + 1) * log(nrow(data)) / 2,
-  p = p,
-  cost = mean_loss
-)
-summary(mean_loss_result)
-#> 
-#> Call:
-#> fastcpd(formula = ~. - 1, data = data.frame(data), beta = (p + 
-#>     1) * log(nrow(data))/2, p = p, cost = mean_loss)
-#> 
-#> Change points:
-#> 300 700
-```
-
-### custom cost function variance change
-
-``` r
-library(fastcpd)
-set.seed(1)
-p <- 1
-data <- rbind.data.frame(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(0, p), sigma = diag(50, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(2, p))
-)
-data_all_mean <- colMeans(data)
-var_loss <- function(data) {
-  n <- nrow(data)
-  data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
-  n / 2 * (log(data_cov) + log(2 * pi) + (n - 1) / n)
-}
-var_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data,
-  beta = (p + 1) * log(nrow(data)) / 2,
-  p = p,
-  cost = var_loss
-)
-summary(var_loss_result)
-#> 
-#> Call:
-#> fastcpd(formula = ~. - 1, data = data, beta = (p + 1) * log(nrow(data))/2, 
-#>     p = p, cost = var_loss)
-#> 
-#> Change points:
-#> 300 699
-```
-
-### custom cost function multivariate variance change
-
-``` r
-library(fastcpd)
-set.seed(1)
-p <- 3
-data <- rbind.data.frame(
-  mvtnorm::rmvnorm(
-    300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-  ),
-  mvtnorm::rmvnorm(
-    400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-  ),
-  mvtnorm::rmvnorm(
-    300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-  )
-)
-data_all_mean <- colMeans(data)
-var_loss <- function(data) {
-  n <- nrow(data)
-  p <- ncol(data)
-  if (n < p) {
-    data_cov <- diag(p)
-  } else {
-    data_cov <- crossprod(sweep(data, 2, data_all_mean)) / (n - 1)
-  }
-  n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
-}
-var_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data,
-  beta = (p^2 + 1) * log(nrow(data)) / 2,
-  trim = 0.1,
-  p = p^2,
-  cost = var_loss
-)
-summary(var_loss_result)
-#> 
-#> Call:
-#> fastcpd(formula = ~. - 1, data = data, beta = (p^2 + 1) * log(nrow(data))/2, 
-#>     trim = 0.1, p = p^2, cost = var_loss)
-#> 
-#> Change points:
-#> 300 700
-```
-
-### custom cost function mean or variance change
-
-``` r
-library(fastcpd)
-set.seed(1)
-p <- 1
-data <- rbind.data.frame(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(50, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
-)
-meanvar_loss <- function(data) {
-  n <- nrow(data)
-  data_cov <- 1
-  if (n > 1) {
-    data_cov <- var(data)
-  }
-  n / 2 * (log(data_cov) + log(2 * pi) + (n - 1) / n)
-}
-meanvar_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data,
-  beta = (p^2 + p + 1) * log(nrow(data)) / 2,
-  p = p^2 + p,
-  cost = meanvar_loss
-)
-summary(meanvar_loss_result)
-#> 
-#> Call:
-#> fastcpd(formula = ~. - 1, data = data, beta = (p^2 + p + 1) * 
-#>     log(nrow(data))/2, p = p^2 + p, cost = meanvar_loss)
-#> 
-#> Change points:
-#> 300 700 1000 1300 1700
-```
-
-### custom cost function multivariate mean or variance change
-
-``` r
-library(fastcpd)
-set.seed(1)
-p <- 3
-data <- rbind.data.frame(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(50, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(50, p))
-)
-meanvar_loss <- function(data) {
-  n <- nrow(data)
-  p <- ncol(data)
-  if (n <= p) {
-    data_cov <- diag(p)
-  } else {
-    data_cov <- cov(data)
-  }
-  n / 2 * (log(det(data_cov)) + p * log(2 * pi) + p * (n - 1) / n)
-}
-meanvar_loss_result <- fastcpd(
-  formula = ~ . - 1,
-  data = data,
-  beta = (p^2 + p + 1) * log(nrow(data)) / 2,
-  trim = 0.01,
-  p = p^2 + p,
-  cost = meanvar_loss
-)
-summary(meanvar_loss_result)
-#> 
-#> Call:
-#> fastcpd(formula = ~. - 1, data = data, beta = (p^2 + p + 1) * 
-#>     log(nrow(data))/2, trim = 0.01, p = p^2 + p, cost = meanvar_loss)
-#> 
-#> Change points:
-#> 300 700 1000 1300 1700
-```
-
 ### custom cost function huber regression
 
 ``` r
@@ -993,6 +733,38 @@ summary(huber_regression_result)
 ```
 
 </details>
+
+## Make contributions
+
+We welcome contributions from everyone. Please follow the instructions
+below to make contributions.
+
+1.  Fork the repo.
+
+2.  Create a new branch from `main` branch.
+
+3.  Make changes and commit them.
+
+    1.  Please follow the [Google’s R style
+        guide](https://google.github.io/styleguide/Rguide.html) for
+        naming variables and functions.
+    2.  If you are adding a new family of models with new cost functions
+        with corresponding gradient and Hessian, please add them to
+        `src/fastcpd_class_cost.cc` with proper example and tests in
+        `vignettes/gallery.Rmd` and `tests/testthat/test-gallery.R`.
+    3.  Add the family name to `src/fastcpd_constants.h`.
+    4.  \[Recommended\] Add a new wrapper function in
+        `R/fastcpd_wrappers.R` for the new family of models and move the
+        examples to the new wrapper function as roxygen examples.
+    5.  Add the new wrapper function to the corresponding section in
+        `_pkgdown.yml`.
+
+4.  Push the changes to your fork.
+
+5.  Create a pull request.
+
+6.  Make sure the pull request does not create new warnings or errors in
+    `devtools::check()`.
 
 ## Contact us
 
