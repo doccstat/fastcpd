@@ -382,8 +382,13 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   }
 
   if (is.null(beta)) {
-    # Use the `beta` value obtained from BIC.
-    beta <- (p + 1) * log(nrow(data_)) / 2
+    if (nrow(data_) < 500) {
+      # Use the `beta` value obtained from BIC.
+      beta <- (p + 1) * log(nrow(data_)) / 2
+    } else {
+      # Use the `beta` value obtained from Modified BIC.
+      beta <- (p + 2) * log(nrow(data_)) / 2
+    }
 
     # TODO(doccstat): Variance estimation for VAR(p).
     # For linear regression models, an estimate of the variance is needed in the
