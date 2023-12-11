@@ -12,5 +12,5 @@
 ^\.covrignore$
 ^man/figures/cheatsheets\.pdf$
 ^data-raw$
-^\.shiny$
+^shiny$
 ^CRAN-SUBMISSION$

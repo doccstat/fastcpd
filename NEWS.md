@@ -1,3 +1,7 @@
+# fastcpd 0.9.9
+
+*   Add small shiny app.
+
 # fastcpd 0.9.8
 
 *   Preliminary support for ARMA(p, q) model with parameter `order = c(p, q)`

@@ -1,3 +1,4 @@
+\donttest{
 set.seed(1)
 n <- 1100
 p <- 3
@@ -15,3 +16,4 @@ result <- suppressWarnings(
 )
 summary(result)
 plot(result)
+}
