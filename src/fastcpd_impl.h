@@ -44,6 +44,7 @@
 // @param mean_data_cov Covariance matrix of the data, only used in mean change.
 // @param p_response Dimension of the response, used with multivariate
 //   response.
+// @param r_progress Whether to show progress bar.
 //
 // @return A list containing the change points and the cost values for each
 //   segment.
@@ -72,7 +73,8 @@ List fastcpd_impl(
     colvec upper,
     colvec line_search,
     const mat mean_data_cov,
-    const unsigned int p_response
+    const unsigned int p_response,
+    const bool r_progress
 );
 
 #endif  // FASTCPD_IMPL_H_

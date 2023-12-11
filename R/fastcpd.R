@@ -168,7 +168,9 @@
 #'   search will be performed to find the optimal step size for each update.
 #' @param ... Parameters specifically used for time series models. As of
 #'   the current implementation, only \code{include.mean} will not be ignored
-#'   and used in the ARIMA or GARCH model.
+#'   and used in the ARIMA or GARCH model. \code{r.progress} now will not be
+#'   ignored and used to control the progress bar. By default the progress bar
+#'   will be shown and to disable it, set \code{r.progress = FALSE}.
 #'
 #' @return A class \code{fastcpd} object.
 #'
@@ -453,11 +455,16 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     upper <- rep(Inf, p)
   }
 
+  r_progress <- TRUE
+  if (methods::hasArg("r.progress")) {
+    r_progress <- eval.parent(match.call()[["r.progress"]])
+  }
+
   result <- fastcpd_impl(
     data_, beta, segment_count, trim, momentum_coef, k, fastcpd_family,
     epsilon, min_prob, winsorise_minval, winsorise_maxval, p, order,
     cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
-    lower, upper, line_search, mean_data_cov, p_response
+    lower, upper, line_search, mean_data_cov, p_response, r_progress
   )
 
   raw_cp_set <- c(result$raw_cp_set)
