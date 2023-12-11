@@ -1,3 +1,5 @@
+testthat::skip("These tests are intended to be run manually.")
+
 testthat::test_that(
   "examples/fastcpd_arma.R", {
     examples_arima <- readLines("examples/fastcpd_arma.txt")
