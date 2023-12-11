@@ -1,68 +1,73 @@
-## Updates since last CRAN release (0.7.2)
+## Updates since last CRAN release (0.9.0)
 
-### fastcpd 0.8.4
+### fastcpd 0.9.8
 
-*   Add cheatsheets.
-*   Refactor code and utilize the `cost_function_wrapper`.
-*   Optimize warm start.
+*   Preliminary support for ARMA(p, q) model with parameter `order = c(p, q)`
+    and family `"arma"`.
+*   Add `fastcpd.arma` / `fastcpd_arma` for ARMA(p, q) model.
+*   Add adaptive increasing `beta` values.
 
-### fastcpd 0.8.3
+### fastcpd 0.9.7
 
-*   Add `fastcpd.ts` / `fastcpd_ts` for time series data.
-*   Fix pre segmengation bug for `lasso`.
-*   Fix bug related to `vanilla_percentage` parameter for `lasso`.
-*   Add tests with invalid family for `fastcpd.ts`.
-*   Remove the `cp_only = TRUE` default when the family is "custom".
-*   Improved plotting for "ar" and "var" families.
-*   Add test coverage for `cp_only = TRUE` and `fastcpd_ts`.
-*   Increase test coverage.
-*   Provide user selection when `ggplot2` is not installed.
+*   Add `lower` and `upper` parameters to denote the lower and upper bounds of
+    the parameters.
+*   Add line search.
+*   Add hardcoded ARMA(3, 2).
 
-### fastcpd 0.8.2
+### fastcpd 0.9.6
 
-*   Add cheatsheets WIP.
-*   Add smaller examples test for penalized linear regression.
+*   Add `bitcoin` and `well_log` data.
+*   Add residual calculation for mean family.
+*   Add plots for bitcoin data.
+*   Fix residual calculation for time series data when the seegments are
+    too small.
+*   Handle variance estimation errors.
 
-### fastcpd 0.8.1
+### fastcpd 0.9.5
 
-*   Add new "ar" family for autoregressive models.
-*   Add new "var" family for vector autoregressive models.
+*   Add wrapper functions of
+    AR(p) family: `fastcpd.ar` / `fastcpd_ar`,
+    ARIMA(p, d, q) family: `fastcpd.arima` / `fastcpd_arima`,
+    GARCH(p, q) family: `fastcpd.garch` / `fastcpd_garch`,
+    linear regression family: `fastcpd.lm` / `fastcpd_lm`,
+    logistic regression family: `fastcpd.binomial` / `fastcpd_binomial`,
+    poisson regression family: `fastcpd.poisson` / `fastcpd_poisson`,
+    penalized linear regression family: `fastcpd.lasso` / `fastcpd_lasso`,
+    MA(q) model: `fastcpd.ma` / `fastcpd_ma`,
+    mean change: `fastcpd.mean` / `fastcpd_mean`,
+    variance change: `fastcpd.variance` / `fastcpd_variance`,
+    mean or variance change: `fastcpd.meanvariance` / `fastcpd_meanvariance` /
+    `fastcpd.mv` / `fastcpd_mv`.
+*   Replace `"gaussian"` family with `"lm"`.
+*   Add progress bar.
+*   Fix design matrix from formula bug.
 
-### fastcpd 0.8.0
+### fastcpd 0.9.4
 
-*   Deal with the following:
+*   Fix sanity check.
+*   Add small AR(1) data in gallery.
+*   Fix VAR(p) model bug.
+*   Add VAR(2) example in Gallery.
+*   Remove commented code.
 
-        Due to the excessive calls to `glmnet` between R and C++,
-        it is better to use the R implementation of `fastcpd` for lasso.
+### fastcpd 0.9.3
 
-*   Separate the use of internal C++ cost functions and user-defined R cost
-    functions.
-*   Add Codecov Icicle plot in README.
-*   Remove `cost_optim` and `cost_update` from `RcppExports.R`.
-*   Estimate the variance in the "gaussian" family dynamically.
+*   Deprecate "vanilla" family by `vanilla_percentage` parameter.
+*   Add check utility functions.
+*   Add MA(4) example.
+*   Fix the bug when `beta` is updated but the old `beta` is still in use.
+*   Remove tests estimating the variance in the "gaussian" family dynamically.
+*   Merge `beta` updating into `get_segment_statistics`.
 
-### fastcpd 0.7.6
+### fastcpd 0.9.2
 
-*   Move default cost functions definition inside the `fastcpd` definition.
-*   Define constant unordered set to store the family sets.
-*   Avoid using `length(formals(cost))` to check the number of arguments of
-    `cost` function.
-*   Introduce an internal family "vanilla".
+*   Add gallery to vignettes.
+*   Remove cheatsheets pdf from the package.
+*   Use `forecast` package for ARIMA model.
+*   Use `fGarch` package for GARCH model.
 
-### fastcpd 0.7.5
+### fastcpd 0.9.1
 
-*   Add variance estimation example in linear regression.
-*   Update reference page.
-*   Add validation for `family`.
-*   Add user selection when `ggplot2` is not installed.
-*   Add AR(1) using `forecast` example in the tests.
-
-### fastcpd 0.7.4
-
-*   Update website UI.
-*   Update `fastcpd` documentation.
-
-### fastcpd 0.7.3
-
-*   Allow multiple response variables in the `formula`.
-*   Add fastcpd logo to README.
+*   Wrap `&&` around `||` by parentheses.
+*   Add ma(4) example using custom cost function.
+*   Add full support for AR(p), MA(q) and ARIMA(p, d, q) models.

@@ -1,6 +1,8 @@
 # Everything in this script is provided as is. The purpose of this script is to
 # do a sanity check on the C++ implementation of `fastcpd`.
 
+testthat::skip("These tests are intended to be run manually.")
+
 # nolint start: script provided as is
 
 #' Cost function for Logistic regression, i.e. binomial family in GLM.
