@@ -1,5 +1,3 @@
-testthat::skip("These tests are intended to be run manually.")
-
 testthat::test_that(
   "examples/fastcpd_arima.txt", {
     testthat::skip_if_not_installed("forecast")
@@ -10,9 +8,6 @@ testthat::test_that(
       collapse = "\n"
     )))
 
-    # TODO(doccstat): Deal with the randomness in the example.
-    testthat::expect_equal(
-      result@cp_set, c(270, 317)[1 + (Sys.info()["sysname"] == "Windows")]
-    )
+    testthat::expect_equal(result@cp_set, 178)
   }
 )

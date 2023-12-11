@@ -98,3 +98,10 @@ testthat::test_that(
     )
   }
 )
+
+testthat::test_that("beta x2", {
+  testthat::expect_equal(
+    fastcpd.mean(well_log, beta = log(length(well_log)))@cp_set,
+    c(566, 740, 1039, 1198, 1424, 1661, 1842, 2023, 2476, 2744, 3709, 3820)
+  )
+})
