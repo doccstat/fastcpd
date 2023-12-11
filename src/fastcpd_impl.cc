@@ -27,7 +27,8 @@ List fastcpd_impl(
     colvec upper,
     colvec line_search,
     const mat mean_data_cov,
-    const unsigned int p_response
+    const unsigned int p_response,
+    const bool r_progress
 ) {
   // Set up the initial values.
   const int n = data.n_rows;
@@ -46,7 +47,10 @@ List fastcpd_impl(
   f_t(0) = -beta;
 
   RProgress::RProgress rProgress("[:bar] :current/:total in :elapsed", n);
-  rProgress.tick(0);
+
+  if (r_progress) {
+    rProgress.tick(0);
+  }
 
   fastcpd::classes::Fastcpd fastcpd_class(
     data, beta, p, order, family, vanilla_percentage, segment_count,
@@ -67,7 +71,9 @@ List fastcpd_impl(
     fastcpd_class.create_gradients();
   }
 
-  rProgress.tick();
+  if (r_progress) {
+    rProgress.tick();
+  }
 
   for (int t = 2; t <= n; t++) {
     unsigned int r_t_count = r_t_set.n_elem;
@@ -179,7 +185,9 @@ List fastcpd_impl(
     // Objective function F(t).
     f_t(t) = min_obj;
 
-    rProgress.tick();
+    if (r_progress) {
+      rProgress.tick();
+    }
   }
 
   // Remove change points close to the boundaries.

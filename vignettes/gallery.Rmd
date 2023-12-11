@@ -50,7 +50,8 @@ result <- fastcpd(
   data = data.frame(y = y, x = x),
   beta = (2 * p + 1) * log(n) / 2,
   cost = multi_response_linear_loss,
-  cp_only = TRUE
+  cp_only = TRUE,
+  r.progress = FALSE
 )
 
 testthat::expect_equal(result@cp_set, c(102, 195))

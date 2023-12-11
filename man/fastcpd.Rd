@@ -210,7 +210,9 @@ search will be performed to find the optimal step size for each update.}
 
 \item{...}{Parameters specifically used for time series models. As of
 the current implementation, only \code{include.mean} will not be ignored
-and used in the ARIMA or GARCH model.}
+and used in the ARIMA or GARCH model. \code{r.progress} now will not be
+ignored and used to control the progress bar. By default the progress bar
+will be shown and to disable it, set \code{r.progress = FALSE}.}
 }
 \value{
 A class \code{fastcpd} object.

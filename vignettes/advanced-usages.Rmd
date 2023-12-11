@@ -39,7 +39,8 @@ y <- c(
 result <- fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
-  family = "lasso"
+  family = "lasso",
+  r.progress = FALSE
 )
 summary(result)
 ```
@@ -72,7 +73,8 @@ result_multiple_epochs <- fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
   family = "lasso",
-  k = function(x) if (x < 20) 1 else 0
+  k = function(x) if (x < 20) 1 else 0,
+  r.progress = FALSE
 )
 summary(result_multiple_epochs)
 ```
@@ -105,7 +107,8 @@ result_vanilla_percentage <- fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
   family = "lasso",
-  vanilla_percentage = 0.2
+  vanilla_percentage = 0.2,
+  r.progress = FALSE
 )
 summary(result_vanilla_percentage)
 ```
