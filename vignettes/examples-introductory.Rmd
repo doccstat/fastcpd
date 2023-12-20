@@ -1,0 +1,17 @@
+---
+title: "Introductory examples"
+output: rmarkdown::html_vignette
+description: |
+  Examples using basic features of the package.
+vignette: >
+  %\VignetteIndexEntry{Introductory examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(fastcpd)
+```
+
+Place holder.

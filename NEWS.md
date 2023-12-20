@@ -1,3 +1,7 @@
+# fastcpd 0.10.0
+
+*   Add package comparison with other packages.
+
 # fastcpd 0.9.9
 
 *   Add small shiny app.
