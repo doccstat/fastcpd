@@ -24,6 +24,8 @@ Description: Implements fast change point detection algorithm based on the
 License: GPL (>= 3)
 URL: https://fastcpd.xingchi.li, https://github.com/doccstat/fastcpd
 BugReports: https://github.com/doccstat/fastcpd/issues
+Depends:
+    R (>= 2.10)
 Imports:
     fastglm,
     forecast,
