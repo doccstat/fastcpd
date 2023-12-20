@@ -40,7 +40,6 @@ Suggests:
     breakfast,
     changepoint,
     cpm,
-    DescTools,
     ecp,
     fpop,
     ggplot2,
