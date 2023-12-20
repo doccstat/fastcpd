@@ -1,3 +1,4 @@
+\donttest{
 set.seed(1)
 n <- 1100
 p <- 3
@@ -13,3 +14,4 @@ y <- c(
 result <- fastcpd.poisson(cbind(y, x))
 summary(result)
 plot(result)
+}

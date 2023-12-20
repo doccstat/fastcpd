@@ -27,6 +27,7 @@ except that the data is by default a matrix or data frame with the response
 variable as the first column and thus a formula is not required here.
 }
 \examples{
+\donttest{
 set.seed(1)
 n <- 1100
 p <- 3
@@ -42,4 +43,5 @@ y <- c(
 result <- fastcpd.poisson(cbind(y, x))
 summary(result)
 plot(result)
+}
 }
