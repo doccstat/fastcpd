@@ -23,8 +23,11 @@ constexpr std::array FASTCPD_FAMILIES = {
 inline bool contain(std::vector<std::string> c, std::string e) {
   return std::find(std::begin(c), std::end(c), e) != std::end(c);
 };
-const std::vector<std::string> FASTCPD_FAMILIES =
-  {"gaussian", "binomial", "poisson", "lasso", "arma"};
+const std::vector<std::string> FASTCPD_FAMILIES = {
+  "gaussian", "binomial", "poisson", "lasso", "mgaussian",
+  "arma",
+  "mean", "variance", "meanvariance", "mv"
+};
 
 #endif  // defined(__cplusplus) && __cplusplus >= 201703L
 
