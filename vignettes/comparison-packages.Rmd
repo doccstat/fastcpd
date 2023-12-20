@@ -273,6 +273,10 @@ ecp::e.divisive(mv_data_1)$estimates
 changepoint::cpt.meanvar(c(mv_data_1))@cpts
 ```
 
+```{r univariate-mean-and-or-variance-change-cpm}
+cpm::processStream(mv_data_1, cpmType = "GLR")$changePoints
+```
+
 ```{r univariate-mean-and-or-variance-change-mcp}
 # Slower
 # plot(
