@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 
 # Data setup
 
-```{r data-setup}
+```{r data-setup-univariate-mean-change}
 set.seed(1)
 p <- 1
 
-# Univariate mean change data
+# Univariate mean change
 mean_data_1 <- rbind(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
   mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
@@ -30,8 +30,10 @@ mean_data_1 <- rbind(
 )
 
 plot.ts(mean_data_1)
+```
 
-# Univariate mean and/or variance change data
+```{r data-setup-univariate-mean-and-or-variance-change}
+# Univariate mean and/or variance change
 mv_data_1 <- rbind(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
@@ -42,10 +44,12 @@ mv_data_1 <- rbind(
 )
 
 plot.ts(mv_data_1)
+```
 
+```{r data-setup-multivariate-mean-change}
 p <- 3
 
-# Multivariate mean change data
+# Multivariate mean change
 mean_data_3 <- rbind(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
   mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
@@ -53,8 +57,10 @@ mean_data_3 <- rbind(
 )
 
 plot.ts(mean_data_3)
+```
 
-# Multivariate mean and/or variance change data
+```{r data-setup-multivariate-mean-and-or-variance-change}
+# Multivariate mean and/or variance change
 mv_data_3 <- rbind(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
@@ -65,7 +71,9 @@ mv_data_3 <- rbind(
 )
 
 plot.ts(mv_data_3)
+```
 
+```{r data-setup-linear-regression}
 # Linear regression
 n <- 300
 p <- 4
@@ -79,7 +87,9 @@ y <- c(
 lm_data <- data.frame(y = y, x = x)
 
 plot.ts(lm_data)
+```
 
+```{r data-setup-logistic-regression}
 # Logistic regression
 x <- matrix(rnorm(1500, 0, 1), ncol = 5)
 theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
@@ -104,9 +114,10 @@ y <- c(
 poisson_data <- data.frame(y = y, x = x)
 
 plot.ts(log(poisson_data$y))
-
 plot.ts(poisson_data[, -1])
+```
 
+```{r data-setup-lasso}
 # Lasso
 n <- 480
 p_true <- 6
@@ -128,7 +139,9 @@ y <- c(
 lasso_data <- data.frame(y = y, x = x)
 
 plot.ts(lasso_data[, seq_len(p_true + 1)])
+```
 
+```{r data-setup-ar3}
 # AR(3)
 n <- 1000
 x <- rep(0, n + 3)
@@ -141,7 +154,9 @@ for (i in 601:1000) {
 ar_data <- x[-seq_len(3)]
 
 plot.ts(ar_data)
+```
 
+```{r data-setup-garch11}
 # GARCH(1, 1)
 n <- 400
 sigma_2 <- rep(1, n + 1)
@@ -164,36 +179,58 @@ plot.ts(garch_data)
 The true change points are 300 and 700.
 Some methods are plotted due to the un-retrievable change points.
 
-```{r univariate-mean-change}
+```{r univariate-mean-change-fastcpd}
 fastcpd::fastcpd.mean(mean_data_1, r.progress = FALSE)@cp_set
+```
 
+```{r univariate-mean-change-strucchange}
 # Slow
 strucchange::breakpoints(y ~ 1, data = data.frame(y = mean_data_1))$breakpoints
+```
 
+```{r univariate-mean-change-ecp}
 # Slower
 ecp::e.divisive(mean_data_1)$estimates
+```
 
+```{r univariate-mean-change-changepoint}
 # Data need to be processed
 changepoint::cpt.mean(c(mean_data_1))@cpts
+```
 
+```{r univariate-mean-change-breakfast}
 breakfast::breakfast(mean_data_1)$cptmodel.list[[6]]$cpts
+```
 
+```{r univariate-mean-change-wbs}
 wbs::wbs(mean_data_1)$cpt$cpt.ic$mbic.penalty
+```
 
+```{r univariate-mean-change-mosum}
 # Data need to be processed. `G` is selected based on the example
 mosum::mosum(c(mean_data_1), G = 40)$cpts.info$cpts
+```
 
+```{r univariate-mean-change-fpop}
 fpop::Fpop(mean_data_1, nrow(mean_data_1))$t.est
+```
 
+```{r univariate-mean-change-stepR}
 stepR::stepFit(mean_data_1, alpha = 0.5)$rightEnd
+```
 
+```{r univariate-mean-change-cpm}
 cpm::processStream(mean_data_1, cpmType = "Student")$changePoints
+```
 
+```{r univariate-mean-change-segmented}
 segmented::segmented(
   lm(y ~ 1 + x, data.frame(y = mean_data_1, x = seq_len(nrow(mean_data_1)))),
   seg.Z = ~ x
 )$psi[, "Est."]
+```
 
+```{r univariate-mean-change-mcp}
 # Slowest
 plot(
   mcp::mcp(
@@ -202,9 +239,13 @@ plot(
     par_x = "x"
   )
 )
+```
 
+```{r univariate-mean-change-not}
 plot(not::not(mean_data_1, contrast = "pcwsConstMean"))
+```
 
+```{r univariate-mean-change-bcp}
 plot(bcp::bcp(mean_data_1))
 ```
 
@@ -213,15 +254,21 @@ plot(bcp::bcp(mean_data_1))
 The true change points are 300, 700, 1000, 1300 and 1700.
 Some methods are plotted due to the un-retrievable change points.
 
-```{r univariate-mean-and-or-variance-change}
+```{r univariate-mean-and-or-variance-change-fastcpd}
 fastcpd::fastcpd.mv(mv_data_1, r.progress = FALSE)@cp_set
+```
 
+```{r univariate-mean-and-or-variance-change-ecp}
 # Slow
 ecp::e.divisive(mv_data_1)$estimates
+```
 
+```{r univariate-mean-and-or-variance-change-changepoint}
 # Data need to be processed
 changepoint::cpt.meanvar(c(mv_data_1))@cpts
+```
 
+```{r univariate-mean-and-or-variance-change-mcp}
 # Slower
 plot(
   mcp::mcp(
@@ -230,7 +277,9 @@ plot(
     par_x = "x"
   )
 )
+```
 
+```{r univariate-mean-and-or-variance-change-not}
 plot(not::not(mv_data_1, contrast = "pcwsConstMeanVar"))
 ```
 
@@ -239,17 +288,23 @@ plot(not::not(mv_data_1, contrast = "pcwsConstMeanVar"))
 The true change points are 300 and 700.
 Some methods are plotted due to the un-retrievable change points.
 
-```{r multivariate-mean-change}
+```{r multivariate-mean-change-fastcpd}
 fastcpd::fastcpd.mean(mean_data_3, r.progress = FALSE)@cp_set
+```
 
+```{r multivariate-mean-change-strucchange}
 # Slow
 strucchange::breakpoints(
   cbind(y.1, y.2, y.3) ~ 1, data = data.frame(y = mean_data_3)
 )$breakpoints
+```
 
+```{r multivariate-mean-change-ecp}
 # Slower
 ecp::e.divisive(mean_data_3)$estimates
+```
 
+```{r multivariate-mean-change-bcp}
 plot(bcp::bcp(mean_data_3))
 ```
 
@@ -258,9 +313,11 @@ plot(bcp::bcp(mean_data_3))
 The true change points are 300, 700, 1000, 1300 and 1700.
 Some methods are plotted due to the un-retrievable change points.
 
-```{r multivariate-mean-and-or-variance-change}
+```{r multivariate-mean-and-or-variance-change-fastcpd}
 fastcpd::fastcpd.mv(mv_data_3, r.progress = FALSE)@cp_set
+```
 
+```{r multivariate-mean-and-or-variance-change-ecp}
 # Slow
 ecp::e.divisive(mv_data_3)$estimates
 ```
@@ -269,11 +326,15 @@ ecp::e.divisive(mv_data_3)$estimates
 
 The true change points are 100 and 200.
 
-```{r linear-regression}
+```{r linear-regression-fastcpd}
 fastcpd::fastcpd.lm(lm_data, r.progress = FALSE)@cp_set
+```
 
+```{r linear-regression-strucchange}
 strucchange::breakpoints(y ~ . - 1, data = lm_data)$breakpoints
+```
 
+```{r linear-regression-segmented}
 segmented::segmented(
   lm(
     y ~ . - 1,
@@ -287,9 +348,11 @@ segmented::segmented(
 
 The true change point is 125.
 
-```{r logistic-regression}
+```{r logistic-regression-fastcpd}
 fastcpd::fastcpd.binomial(binomial_data, r.progress = FALSE)@cp_set
+```
 
+```{r logistic-regression-strucchange}
 strucchange::breakpoints(y ~ . - 1, data = binomial_data)$breakpoints
 ```
 
@@ -297,9 +360,11 @@ strucchange::breakpoints(y ~ . - 1, data = binomial_data)$breakpoints
 
 The true change points are 500, 800 and 1000.
 
-```{r poisson-regression}
+```{r poisson-regression-fastcpd}
 fastcpd::fastcpd.poisson(poisson_data, r.progress = FALSE)@cp_set
+```
 
+```{r poisson-regression-strucchange}
 # Slow
 strucchange::breakpoints(y ~ . - 1, data = poisson_data)$breakpoints
 ```
@@ -308,9 +373,11 @@ strucchange::breakpoints(y ~ . - 1, data = poisson_data)$breakpoints
 
 The true change points are 80, 200 and 320.
 
-```{r lasso}
+```{r lasso-fastcpd}
 fastcpd::fastcpd.lasso(lasso_data, r.progress = FALSE)@cp_set
+```
 
+```{r lasso-strucchange}
 # Slow
 strucchange::breakpoints(y ~ . - 1, data = lasso_data)$breakpoints
 ```
@@ -320,16 +387,20 @@ strucchange::breakpoints(y ~ . - 1, data = lasso_data)$breakpoints
 The true change point is 600.
 Some methods are plotted due to the un-retrievable change points.
 
-```{r ar3}
+```{r ar3-fastcpd}
 fastcpd::fastcpd.ar(ar_data, 3, r.progress = FALSE)@cp_set
+```
 
+```{r ar3-segmented}
 segmented::segmented(
   lm(
     y ~ x + 1, data.frame(y = ar_data, x = seq_along(ar_data))
   ),
   seg.Z = ~ x
 )$psi[, "Est."]
+```
 
+```{r ar3-mcp}
 # Slow
 plot(
   mcp::mcp(
@@ -344,8 +415,10 @@ plot(
 
 The true change point is 200.
 
-```{r garch11}
+```{r garch11-fastcpd}
 fastcpd::fastcpd.garch(garch_data, c(1, 1), r.progress = FALSE)@cp_set
+```
 
+```{r garch11-strucchange}
 strucchange::breakpoints(x ~ 1, data = data.frame(x = garch_data))$breakpoints
 ```
