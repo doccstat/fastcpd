@@ -1,0 +1,17 @@
+---
+title: "Comparison with vanilla PELT"
+output: rmarkdown::html_vignette
+description: |
+  Speed comparison with vanilla PELT algorithm.
+vignette: >
+  %\VignetteIndexEntry{Comparison with vanilla PELT}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
+library(fastcpd)
+```
+
+Place holder.

@@ -1,7 +1,7 @@
 Type: Package
 Package: fastcpd
 Title: Fast Change Point Detection via Sequential Gradient Descent
-Version: 0.9.9
+Version: 0.10.0
 Authors@R: c(
     person("Xingchi", "Li", , "anthony.li@stat.tamu.edu",
            role = c("aut", "cre", "cph"),
@@ -25,7 +25,7 @@ License: GPL (>= 3)
 URL: https://fastcpd.xingchi.li, https://github.com/doccstat/fastcpd
 BugReports: https://github.com/doccstat/fastcpd/issues
 Depends:
-    R (>= 2.10)
+    R (>= 4.3.0)
 Imports:
     fastglm,
     forecast,
@@ -38,16 +38,29 @@ Imports:
     utils
 Suggests:
     abind,
+    bcp,
+    breakfast,
+    changepoint,
+    cpm,
     DescTools,
+    ecp,
+    fpop,
     ggplot2,
     gridExtra,
     knitr,
     lubridate,
+    mcp,
     mockthat,
+    mosum,
     mvtnorm,
+    not,
     numDeriv,
     rmarkdown,
+    segmented,
+    stepR,
+    strucchange,
     testthat (>= 3.0.0),
+    wbs,
     xml2,
     zoo
 LinkingTo:

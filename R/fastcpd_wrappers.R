@@ -373,7 +373,7 @@ fastcpd_mv <- fastcpd.meanvariance
 #'   except that the data is by default a matrix or data frame with the response
 #'   variable as the first column and thus a formula is not required here.
 #'
-#' @example tests/testthat/examples/fastcpd_poisson.txt
+#' @example tests/testthat/examples/fastcpd_poisson.R
 #'
 #' @md
 #'

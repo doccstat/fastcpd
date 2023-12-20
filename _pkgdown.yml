@@ -80,15 +80,17 @@ reference:
       - fastcpd-class
 
 articles:
-- title: Advanced usages
+- title: Examples
   navbar: ~
   contents:
-  - advanced-usages
+  - examples-introductory
+  - examples-advanced
 
-- title: Gallery
-  navbar: Gallery
+- title: Comparison
+  navbar: Comparison
   contents:
-  - gallery
+  - comparison-pelt
+  - comparison-packages
 
 authors:
   Xingchi Li:
