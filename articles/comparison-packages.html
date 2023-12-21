@@ -332,9 +332,6 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="fu">changepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/changepoint/man/cpt.meanvar.html" class="external-link">cpt.meanvar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">@</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1]  300 2000</span></span></code></pre></div>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">cpm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/cpm/man/processStream.html" class="external-link">processStream</a></span><span class="op">(</span><span class="va">mv_data_1</span>, cpmType <span class="op">=</span> <span class="st">"GLR"</span><span class="op">)</span><span class="op">$</span><span class="va">changePoints</span></span>
-<span><span class="co">#&gt;  [1]   21   24  293  300  417  693  701  981  985  999 1296 1300 1695</span></span></code></pre></div>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
 <span><span class="co"># plot(</span></span>
 <span><span class="co">#   mcp::mcp(</span></span>
@@ -343,7 +340,7 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="co">#     par_x = "x"</span></span>
 <span><span class="co">#   )</span></span>
 <span><span class="co"># )</span></span></code></pre></div>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">not</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/not/man/not.html" class="external-link">not</a></span><span class="op">(</span><span class="va">mv_data_1</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMeanVar"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/univariate-mean-and-or-variance-change-not-1.png" width="768"></p>
 <pre><code><span><span class="co">#&gt; Press [enter] to continue</span></span></code></pre>
@@ -354,20 +351,20 @@ methods are plotted due to the un-retrievable change points.</p>
 </h2>
 <p>The true change points are 300 and 700. Some methods are plotted due
 to the un-retrievable change points.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data_3</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y.1</span>, <span class="va">y.2</span>, <span class="va">y.3</span><span class="op">)</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean_data_3</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
 <span><span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span></span>
 <span><span class="co">#&gt; [1]    1  301  701 1001</span></span></code></pre></div>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">bcp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/bcp/man/bcp.html" class="external-link">bcp</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/multivariate-mean-change-bcp-1.png" width="768"></p>
 </div>
@@ -376,10 +373,10 @@ to the un-retrievable change points.</p>
 </h2>
 <p>The true change points are 300, 700, 1000, 1300 and 1700. Some
 methods are plotted due to the un-retrievable change points.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_meanvariance.html">fastcpd.mv</a></span><span class="op">(</span><span class="va">mv_data_3</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000 1300 1700</span></span></code></pre></div>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="va">mv_data_3</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span></span>
 <span><span class="co">#&gt; [1]    1  301  701 1001 1301 1701 2001</span></span></code></pre></div>
@@ -388,13 +385,13 @@ methods are plotted due to the un-retrievable change points.</p>
 <h2 id="linear-regression">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression"></a>
 </h2>
 <p>The true change points are 100 and 200.</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_lm.html">fastcpd.lm</a></span><span class="op">(</span><span class="va">lm_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 100 200</span></span></code></pre></div>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">lm_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 100 200</span></span></code></pre></div>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">segmented</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/segmented/man/segmented.html" class="external-link">segmented</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span>
 <span>    <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
@@ -408,10 +405,10 @@ methods are plotted due to the un-retrievable change points.</p>
 <h2 id="logistic-regression">Logistic regression<a class="anchor" aria-label="anchor" href="#logistic-regression"></a>
 </h2>
 <p>The true change point is 125.</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span><span class="va">binomial_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 125</span></span></code></pre></div>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">binomial_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 126</span></span></code></pre></div>
 </div>
@@ -419,10 +416,10 @@ methods are plotted due to the un-retrievable change points.</p>
 <h2 id="poisson-regression">Poisson regression<a class="anchor" aria-label="anchor" href="#poisson-regression"></a>
 </h2>
 <p>The true change points are 500, 800 and 1000.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_poisson.html">fastcpd.poisson</a></span><span class="op">(</span><span class="va">poisson_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 518 800 999</span></span></code></pre></div>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">poisson_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 525 690</span></span></code></pre></div>
@@ -431,10 +428,10 @@ methods are plotted due to the un-retrievable change points.</p>
 <h2 id="lasso">Lasso<a class="anchor" aria-label="anchor" href="#lasso"></a>
 </h2>
 <p>The true change points are 80, 200 and 320.</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1]  81 201 320</span></span></code></pre></div>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">lasso_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1]  80 200 320</span></span></code></pre></div>
@@ -444,10 +441,10 @@ methods are plotted due to the un-retrievable change points.</p>
 </h2>
 <p>The true change point is 600. Some methods are plotted due to the
 un-retrievable change points.</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_ar.html">fastcpd.ar</a></span><span class="op">(</span><span class="va">ar_data</span>, <span class="fl">3</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 597</span></span></code></pre></div>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">segmented</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/segmented/man/segmented.html" class="external-link">segmented</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span>
 <span>    <span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ar_data</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">ar_data</span><span class="op">)</span><span class="op">)</span></span>
@@ -455,7 +452,7 @@ un-retrievable change points.</p>
 <span>  seg.Z <span class="op">=</span> <span class="op">~</span> <span class="va">x</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">psi</span><span class="op">[</span>, <span class="st">"Est."</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] 683.0417</span></span></code></pre></div>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="co"># plot(</span></span>
 <span><span class="co">#   mcp::mcp(</span></span>
@@ -469,14 +466,14 @@ un-retrievable change points.</p>
 <h2 id="garch1-1">GARCH(1, 1)<a class="anchor" aria-label="anchor" href="#garch1-1"></a>
 </h2>
 <p>The true change point is 200.</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_garch.html">fastcpd.garch</a></span><span class="op">(</span><span class="va">garch_data</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; Registered S3 method overwritten by 'quantmod':</span></span>
 <span><span class="co">#&gt;   method            from</span></span>
 <span><span class="co">#&gt;   as.zoo.data.frame zoo</span></span>
 <span><span class="co">#&gt; Residual calculation failed.</span></span>
 <span><span class="co">#&gt; [1] 199</span></span></code></pre></div>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">x</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">garch_data</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 173</span></span></code></pre></div>
 </div>
