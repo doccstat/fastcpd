@@ -168,216 +168,82 @@ plot(result)
 
 ## Examples
 
-<!-- This example section is a direct copy from `fastcpd` documentation -->
-<details close>
-<summary>
-Click to open
-</summary>
+### Main function
 
-### linear regression with one-dimensional covariate
+- [`fastcpd`](https://fastcpd.xingchi.li/reference/fastcpd.html)
 
-``` r
-library(fastcpd)
-set.seed(1)
-p <- 1
-x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
-theta_0 <- matrix(c(1, -1, 0.5))
-y <- c(
-  x[1:100, ] * theta_0[1, ] + rnorm(100, 0, 1),
-  x[101:200, ] * theta_0[2, ] + rnorm(100, 0, 1),
-  x[201:300, ] * theta_0[3, ] + rnorm(100, 0, 1)
-)
-result <- fastcpd(
-  formula = y ~ . - 1,
-  data = data.frame(y = y, x = x),
-  family = "lm"
-)
-plot(result)
-```
+### Wrapper functions
 
-![](man/figures/README-linear_regression_with_one_dimensional_covariate-1.png)<!-- -->
+#### Time series
 
-``` r
-summary(result)
-#> 
-#> Call:
-#> fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x), 
-#>     family = "lm")
-#> 
-#> Change points:
-#> 99 197 
-#> 
-#> Cost values:
-#> 48.36336 65.71493 46.37389 
-#> 
-#> Parameters:
-#>   segment 1  segment 2 segment 3
-#> 1  0.956995 -0.8488617 0.4562731
-```
+- AR(p):
+  [`fastcpd_ar`](https://fastcpd.xingchi.li/reference/fastcpd_ar.html)
+- ARIMA(p, d, q):
+  [`fastcpd_arima`](https://fastcpd.xingchi.li/reference/fastcpd_arima.html)
+- ARMA(p, q):
+  [`fastcpd_arma`](https://fastcpd.xingchi.li/reference/fastcpd_arma.html)
+- GARCH(p, q):
+  [`fastcpd_garch`](https://fastcpd.xingchi.li/reference/fastcpd_garch.html)
+- MA(q):
+  [`fastcpd_ma`](https://fastcpd.xingchi.li/reference/fastcpd_ma.html)
+- VAR(p):
+  [`fastcpd_var`](https://fastcpd.xingchi.li/reference/fastcpd_var.html)
+- General time series:
+  [`fastcpd_ts`](https://fastcpd.xingchi.li/reference/fastcpd_ts.html)
 
-### custom logistic regression
+#### Unlabeled data
 
-``` r
-library(fastcpd)
-set.seed(1)
-p <- 5
-x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
-theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
-y <- c(
-  rbinom(200, 1, 1 / (1 + exp(-x[1:200, ] %*% theta[1, ]))),
-  rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] %*% theta[2, ])))
-)
-data <- data.frame(y = y, x = x)
-result_builtin <- suppressWarnings(fastcpd(
-  formula = y ~ . - 1,
-  data = data,
-  family = "binomial"
-))
-logistic_loss <- function(data, theta) {
-  x <- data[, -1]
-  y <- data[, 1]
-  u <- x %*% theta
-  nll <- -y * u + log(1 + exp(u))
-  nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
-  sum(nll)
-}
-logistic_loss_gradient <- function(data, theta) {
-  x <- data[nrow(data), -1]
-  y <- data[nrow(data), 1]
-  c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
-}
-logistic_loss_hessian <- function(data, theta) {
-  x <- data[nrow(data), -1]
-  prob <- 1 / (1 + exp(-x %*% theta))
-  (x %o% x) * c((1 - prob) * prob)
-}
-result_custom <- fastcpd(
-  formula = y ~ . - 1,
-  data = data,
-  epsilon = 1e-5,
-  cost = logistic_loss,
-  cost_gradient = logistic_loss_gradient,
-  cost_hessian = logistic_loss_hessian
-)
-cat(
-  "Change points detected by built-in logistic regression model: ",
-  result_builtin@cp_set, "\n",
-  "Change points detected by custom logistic regression model: ",
-  result_custom@cp_set, "\n",
-  sep = ""
-)
-#> Change points detected by built-in logistic regression model: 200
-#> Change points detected by custom logistic regression model: 201
-result_custom_two_epochs <- fastcpd(
-  formula = y ~ . - 1,
-  data = data,
-  k = function(x) 1,
-  epsilon = 1e-5,
-  cost = logistic_loss,
-  cost_gradient = logistic_loss_gradient,
-  cost_hessian = logistic_loss_hessian
-)
-summary(result_custom_two_epochs)
-#> 
-#> Call:
-#> fastcpd(formula = y ~ . - 1, data = data, k = function(x) 1, 
-#>     epsilon = 1e-05, cost = logistic_loss, cost_gradient = logistic_loss_gradient, 
-#>     cost_hessian = logistic_loss_hessian)
-#> 
-#> Change points:
-#> 200 
-#> 
-#> Parameters:
-#>    segment 1  segment 2
-#> 1 -0.6235240  2.0066479
-#> 2 -1.6767614  1.6278889
-#> 3 -1.7973433  4.6422022
-#> 4 -0.4842969 -0.1521062
-#> 5  2.0797875  2.4047092
-```
+- Mean change:
+  [`fastcpd_mean`](https://fastcpd.xingchi.li/reference/fastcpd_mean.html)
+- Variance change:
+  [`fastcpd_variance`](https://fastcpd.xingchi.li/reference/fastcpd_variance.html)
+- Mean and/or variance change:
+  [`fastcpd_meanvariance`](https://fastcpd.xingchi.li/reference/fastcpd_meanvariance.html)
 
-### custom cost function huber regression
+#### Regression data
 
-``` r
-library(fastcpd)
-set.seed(1)
-n <- 400 + 300 + 500
-p <- 5
-x <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(p))
-theta <- rbind(
-  mvtnorm::rmvnorm(1, mean = rep(0, p - 3), sigma = diag(p - 3)),
-  mvtnorm::rmvnorm(1, mean = rep(5, p - 3), sigma = diag(p - 3)),
-  mvtnorm::rmvnorm(1, mean = rep(9, p - 3), sigma = diag(p - 3))
-)
-theta <- cbind(theta, matrix(0, 3, 3))
-theta <- theta[rep(seq_len(3), c(400, 300, 500)), ]
-y_true <- rowSums(x * theta)
-factor <- c(
-  2 * stats::rbinom(400, size = 1, prob = 0.95) - 1,
-  2 * stats::rbinom(300, size = 1, prob = 0.95) - 1,
-  2 * stats::rbinom(500, size = 1, prob = 0.95) - 1
-)
-y <- factor * y_true + stats::rnorm(n)
-data <- cbind.data.frame(y, x)
-huber_threshold <- 1
-huber_loss <- function(data, theta) {
-  residual <- data[, 1] - data[, -1, drop = FALSE] %*% theta
-  indicator <- abs(residual) <= huber_threshold
-  sum(
-    residual^2 / 2 * indicator +
-      huber_threshold * (
-        abs(residual) - huber_threshold / 2
-      ) * (1 - indicator)
-  )
-}
-huber_loss_gradient <- function(data, theta) {
-  residual <- c(data[nrow(data), 1] - data[nrow(data), -1] %*% theta)
-  if (abs(residual) <= huber_threshold) {
-    -residual * data[nrow(data), -1]
-  } else {
-    -huber_threshold * sign(residual) * data[nrow(data), -1]
-  }
-}
-huber_loss_hessian <- function(data, theta) {
-  residual <- c(data[nrow(data), 1] - data[nrow(data), -1] %*% theta)
-  if (abs(residual) <= huber_threshold) {
-    outer(data[nrow(data), -1], data[nrow(data), -1])
-  } else {
-    0.01 * diag(length(theta))
-  }
-}
-huber_regression_result <- fastcpd(
-  formula = y ~ . - 1,
-  data = data,
-  beta = (p + 1) * log(n) / 2,
-  cost = huber_loss,
-  cost_gradient = huber_loss_gradient,
-  cost_hessian = huber_loss_hessian
-)
-summary(huber_regression_result)
-#> 
-#> Call:
-#> fastcpd(formula = y ~ . - 1, data = data, beta = (p + 1) * log(n)/2, 
-#>     cost = huber_loss, cost_gradient = huber_loss_gradient, cost_hessian = huber_loss_hessian)
-#> 
-#> Change points:
-#> 401 726 
-#> 
-#> Parameters:
-#>     segment 1   segment 2    segment 3
-#> 1 -0.52615415  2.77991463  8.744706508
-#> 2 -1.02443443  5.06390528  9.506534878
-#> 3 -0.09220421  0.01647923 -0.008908851
-#> 4 -0.01326592 -0.08103008 -0.047909865
-#> 5  0.02526703  0.01329142  0.025171681
-```
+- Logistic regression:
+  [`fastcpd_binomial`](https://fastcpd.xingchi.li/reference/fastcpd_binomial.html)
+- Penalized linear regression:
+  [`fastcpd_lasso`](https://fastcpd.xingchi.li/reference/fastcpd_lasso.html)
+- Linear regression:
+  [`fastcpd_lm`](https://fastcpd.xingchi.li/reference/fastcpd_lm.html)
+- Poisson regression:
+  [`fastcpd_poisson`](https://fastcpd.xingchi.li/reference/fastcpd_poisson.html)
 
-</details>
+### Utility functions
+
+- Plot: [`plot`](https://fastcpd.xingchi.li/reference/plot.html)
+- Print: [`print`](https://fastcpd.xingchi.li/reference/print.html)
+- Show: [`show`](https://fastcpd.xingchi.li/reference/show.html)
+- Summary:
+  [`summary`](https://fastcpd.xingchi.li/reference/summary.html)
+
+### Data
+
+- Bitcoin Market Price (USD):
+  [`bitcoin`](https://fastcpd.xingchi.li/reference/bitcoin.html)
+- Occupancy Detection Data Set:
+  [`occupancy`](https://fastcpd.xingchi.li/reference/occupancy.html)
+- Transcription Profiling of 57 Human Bladder Carcinoma Samples:
+  [`transcriptome`](https://fastcpd.xingchi.li/reference/transcriptome.html)
+- UK Seatbelts Data:
+  [`uk_seatbelts`](https://fastcpd.xingchi.li/reference/uk_seatbelts.html)
+- Well-log Dataset from Numerical Bayesian Methods Applied to Signal
+  Processing:
+  [`well_log`](https://fastcpd.xingchi.li/reference/well_log.html)
+
+### Main class
+
+- [`fastcpd`](https://fastcpd.xingchi.li/reference/fastcpd-class.html)
 
 ## Make contributions
 
+<details close>
+<summary>
 We welcome contributions from everyone. Please follow the instructions
 below to make contributions.
+</summary>
 
 1.  Fork the repo.
 
@@ -406,14 +272,21 @@ below to make contributions.
 6.  Make sure the pull request does not create new warnings or errors in
     `devtools::check()`.
 
+</details>
+
 ## Contact us
 
+<details close>
+<summary>
 Encountered a bug or unintended behavior?
+</summary>
 
 1.  File a ticket at [GitHub
     Issues](https://github.com/doccstat/fastcpd/issues).
 2.  Contact the authors specified in
     [DESCRIPTION](https://github.com/doccstat/fastcpd/blob/main/DESCRIPTION#L5-L10).
+
+</details>
 
 ## Stargazers over time
 
