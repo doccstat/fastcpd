@@ -16,6 +16,9 @@ knitr::opts_chunk$set(
 )
 ```
 
+All `mosum` code is commented out due to
+[link](https://github.com/doccstat/fastcpd/issues/4).
+
 All `mcp` code is commented out due to
 [link 1](https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531091)
 and
@@ -213,7 +216,7 @@ wbs::wbs(mean_data_1)$cpt$cpt.ic$mbic.penalty
 
 ```{r univariate-mean-change-mosum}
 # Data need to be processed. `G` is selected based on the example
-mosum::mosum(c(mean_data_1), G = 40)$cpts.info$cpts
+# mosum::mosum(c(mean_data_1), G = 40)$cpts.info$cpts
 ```
 
 ```{r univariate-mean-change-fpop}
