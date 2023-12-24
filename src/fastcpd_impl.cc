@@ -120,9 +120,7 @@ List fastcpd_impl(
         // vanilla PELT
         List cost_optim_result;
         if (!contain(FASTCPD_FAMILIES, family)) {
-          cost_optim_result = fastcpd_class.cost_optim(
-            data_segment, lambda, false
-          );
+          cost_optim_result = fastcpd_class.cost_optim(data_segment, lambda);
         } else {
           if (warm_start && t - tau >= 10 * p) {
             cost_optim_result =
@@ -265,9 +263,7 @@ List fastcpd_impl(
     mat data_segment = data.rows(segment_data_index);
     List cost_optim_result;
     if (!contain(FASTCPD_FAMILIES, family)) {
-      cost_optim_result = fastcpd_class.cost_optim(
-        data_segment, lambda, false
-      );
+      cost_optim_result = fastcpd_class.cost_optim(data_segment, lambda);
     } else {
       cost_optim_result = fastcpd_class.negative_log_likelihood(
         data_segment, R_NilValue, lambda, false, R_NilValue
