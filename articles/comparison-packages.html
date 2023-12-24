@@ -37,7 +37,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -281,7 +281,9 @@ to the un-retrievable change points.</p>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Data need to be processed. `G` is selected based on the example</span></span>
-<span><span class="co"># mosum::mosum(c(mean_data_1), G = 40)$cpts.info$cpts</span></span></code></pre></div>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">mosum</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mosum/man/mosum.html" class="external-link">mosum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">$</span><span class="va">cpts.info</span><span class="op">$</span><span class="va">cpts</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/fpop/man/Fpop.html" class="external-link">Fpop</a></span><span class="op">(</span><span class="va">mean_data_1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">t.est</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000</span></span></code></pre></div>
@@ -299,13 +301,15 @@ to the un-retrievable change points.</p>
 <span><span class="co">#&gt; [1] 495</span></span></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slowest</span></span>
-<span><span class="co"># plot(</span></span>
-<span><span class="co">#   mcp::mcp(</span></span>
-<span><span class="co">#     list(y ~ 1, ~ 1, ~ 1),</span></span>
-<span><span class="co">#     data = data.frame(y = mean_data_1, x = seq_len(nrow(mean_data_1))),</span></span>
-<span><span class="co">#     par_x = "x"</span></span>
-<span><span class="co">#   )</span></span>
-<span><span class="co"># )</span></span></code></pre></div>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>    <span class="fu">mcp</span><span class="fu">::</span><span class="fu"><a href="https://lindeloev.github.io/mcp/reference/mcp.html" class="external-link">mcp</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span>, <span class="op">~</span> <span class="fl">1</span>, <span class="op">~</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>      data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean_data_1</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      par_x <span class="op">=</span> <span class="st">"x"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">not</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/not/man/not.html" class="external-link">not</a></span><span class="op">(</span><span class="va">mean_data_1</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMean"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/univariate-mean-change-not-1.png" width="768"></p>
@@ -336,13 +340,15 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="co">#&gt;  [1]   21   24  293  300  417  693  701  981  985  999 1296 1300 1695</span></span></code></pre></div>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
-<span><span class="co"># plot(</span></span>
-<span><span class="co">#   mcp::mcp(</span></span>
-<span><span class="co">#     list(y ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1),</span></span>
-<span><span class="co">#     data = data.frame(y = mv_data_1, x = seq_len(nrow(mv_data_1))),</span></span>
-<span><span class="co">#     par_x = "x"</span></span>
-<span><span class="co">#   )</span></span>
-<span><span class="co"># )</span></span></code></pre></div>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>    <span class="fu">mcp</span><span class="fu">::</span><span class="fu"><a href="https://lindeloev.github.io/mcp/reference/mcp.html" class="external-link">mcp</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span>, <span class="op">~</span> <span class="fl">1</span>, <span class="op">~</span> <span class="fl">1</span>, <span class="op">~</span> <span class="fl">1</span>, <span class="op">~</span> <span class="fl">1</span>, <span class="op">~</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>      data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mv_data_1</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      par_x <span class="op">=</span> <span class="st">"x"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">not</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/not/man/not.html" class="external-link">not</a></span><span class="op">(</span><span class="va">mv_data_1</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMeanVar"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/univariate-mean-and-or-variance-change-not-1.png" width="768"></p>
@@ -457,13 +463,15 @@ un-retrievable change points.</p>
 <span><span class="co">#&gt; [1] 683.0417</span></span></code></pre></div>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
-<span><span class="co"># plot(</span></span>
-<span><span class="co">#   mcp::mcp(</span></span>
-<span><span class="co">#     list(y ~ 1 + ar(3), ~ 0 + ar(3)),</span></span>
-<span><span class="co">#     data = data.frame(y = ar_data, x = seq_along(ar_data)),</span></span>
-<span><span class="co">#     par_x = "x"</span></span>
-<span><span class="co">#   )</span></span>
-<span><span class="co"># )</span></span></code></pre></div>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>    <span class="fu">mcp</span><span class="fu">::</span><span class="fu"><a href="https://lindeloev.github.io/mcp/reference/mcp.html" class="external-link">mcp</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/ar.html" class="external-link">ar</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/ar.html" class="external-link">ar</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ar_data</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">ar_data</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      par_x <span class="op">=</span> <span class="st">"x"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="garch1-1">GARCH(1, 1)<a class="anchor" aria-label="anchor" href="#garch1-1"></a>
