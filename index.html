@@ -222,212 +222,107 @@ I countered problems related to gfortran on Mac OSX or Linux!
 <div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
 </h2>
-<!-- This example section is a direct copy from `fastcpd` documentation -->
-<details close><summary>
-Click to open
-</summary><div class="section level3">
-<h3 id="linear-regression-with-one-dimensional-covariate">linear regression with one-dimensional covariate<a class="anchor" aria-label="anchor" href="#linear-regression-with-one-dimensional-covariate"></a>
+<div class="section level3">
+<h3 id="main-function">Main function<a class="anchor" aria-label="anchor" href="#main-function"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="op">]</span> <span class="op">*</span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">101</span><span class="op">:</span><span class="fl">200</span>, <span class="op">]</span> <span class="op">*</span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">201</span><span class="op">:</span><span class="fl">300</span>, <span class="op">]</span> <span class="op">*</span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"lm"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-linear_regression_with_one_dimensional_covariate-1.png"><!-- --></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x), </span></span>
-<span><span class="co">#&gt;     family = "lm")</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 99 197 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Cost values:</span></span>
-<span><span class="co">#&gt; 48.36336 65.71493 46.37389 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt;   segment 1  segment 2 segment 3</span></span>
-<span><span class="co">#&gt; 1  0.956995 -0.8488617 0.4562731</span></span></code></pre></div>
+<ul>
+<li><a href="https://fastcpd.xingchi.li/reference/fastcpd.html"><code>fastcpd</code></a></li>
+</ul>
 </div>
 <div class="section level3">
-<h3 id="custom-logistic-regression">custom logistic regression<a class="anchor" aria-label="anchor" href="#custom-logistic-regression"></a>
+<h3 id="wrapper-functions">Wrapper functions<a class="anchor" aria-label="anchor" href="#wrapper-functions"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">375</span> <span class="op">*</span> <span class="va">p</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
-<span><span class="va">theta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">p</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">p</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fl">1</span>, <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">200</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">175</span>, <span class="fl">1</span>, <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span><span class="op">[</span><span class="fl">201</span><span class="op">:</span><span class="fl">375</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
-<span><span class="va">result_builtin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">data</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"binomial"</span></span>
-<span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">logistic_loss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="va">u</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span></span>
-<span>  <span class="va">nll</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="va">y</span> <span class="op">*</span> <span class="va">u</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">u</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">nll</span><span class="op">[</span><span class="va">u</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="va">y</span><span class="op">[</span><span class="va">u</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">]</span> <span class="op">*</span> <span class="va">u</span><span class="op">[</span><span class="va">u</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">]</span> <span class="op">+</span> <span class="va">u</span><span class="op">[</span><span class="va">u</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">]</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">nll</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">logistic_loss_gradient</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="va">x</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">logistic_loss_hessian</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="va">prob</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/outer.html" class="external-link">%o%</a></span> <span class="va">x</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">prob</span><span class="op">)</span> <span class="op">*</span> <span class="va">prob</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">result_custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">data</span>,</span>
-<span>  epsilon <span class="op">=</span> <span class="fl">1e-5</span>,</span>
-<span>  cost <span class="op">=</span> <span class="va">logistic_loss</span>,</span>
-<span>  cost_gradient <span class="op">=</span> <span class="va">logistic_loss_gradient</span>,</span>
-<span>  cost_hessian <span class="op">=</span> <span class="va">logistic_loss_hessian</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span></span>
-<span>  <span class="st">"Change points detected by built-in logistic regression model: "</span>,</span>
-<span>  <span class="va">result_builtin</span><span class="op">@</span><span class="va">cp_set</span>, <span class="st">"\n"</span>,</span>
-<span>  <span class="st">"Change points detected by custom logistic regression model: "</span>,</span>
-<span>  <span class="va">result_custom</span><span class="op">@</span><span class="va">cp_set</span>, <span class="st">"\n"</span>,</span>
-<span>  sep <span class="op">=</span> <span class="st">""</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Change points detected by built-in logistic regression model: 200</span></span>
-<span><span class="co">#&gt; Change points detected by custom logistic regression model: 201</span></span>
-<span><span class="va">result_custom_two_epochs</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">data</span>,</span>
-<span>  k <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fl">1</span>,</span>
-<span>  epsilon <span class="op">=</span> <span class="fl">1e-5</span>,</span>
-<span>  cost <span class="op">=</span> <span class="va">logistic_loss</span>,</span>
-<span>  cost_gradient <span class="op">=</span> <span class="va">logistic_loss_gradient</span>,</span>
-<span>  cost_hessian <span class="op">=</span> <span class="va">logistic_loss_hessian</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_custom_two_epochs</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = data, k = function(x) 1, </span></span>
-<span><span class="co">#&gt;     epsilon = 1e-05, cost = logistic_loss, cost_gradient = logistic_loss_gradient, </span></span>
-<span><span class="co">#&gt;     cost_hessian = logistic_loss_hessian)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 200 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt;    segment 1  segment 2</span></span>
-<span><span class="co">#&gt; 1 -0.6235240  2.0066479</span></span>
-<span><span class="co">#&gt; 2 -1.6767614  1.6278889</span></span>
-<span><span class="co">#&gt; 3 -1.7973433  4.6422022</span></span>
-<span><span class="co">#&gt; 4 -0.4842969 -0.1521062</span></span>
-<span><span class="co">#&gt; 5  2.0797875  2.4047092</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="time-series">Time series<a class="anchor" aria-label="anchor" href="#time-series"></a>
+</h4>
+<ul>
+<li>AR(p): <a href="https://fastcpd.xingchi.li/reference/fastcpd_ar.html"><code>fastcpd_ar</code></a>
+</li>
+<li>ARIMA(p, d, q): <a href="https://fastcpd.xingchi.li/reference/fastcpd_arima.html"><code>fastcpd_arima</code></a>
+</li>
+<li>ARMA(p, q): <a href="https://fastcpd.xingchi.li/reference/fastcpd_arma.html"><code>fastcpd_arma</code></a>
+</li>
+<li>GARCH(p, q): <a href="https://fastcpd.xingchi.li/reference/fastcpd_garch.html"><code>fastcpd_garch</code></a>
+</li>
+<li>MA(q): <a href="https://fastcpd.xingchi.li/reference/fastcpd_ma.html"><code>fastcpd_ma</code></a>
+</li>
+<li>VAR(p): <a href="https://fastcpd.xingchi.li/reference/fastcpd_var.html"><code>fastcpd_var</code></a>
+</li>
+<li>General time series: <a href="https://fastcpd.xingchi.li/reference/fastcpd_ts.html"><code>fastcpd_ts</code></a>
+</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="unlabeled-data">Unlabeled data<a class="anchor" aria-label="anchor" href="#unlabeled-data"></a>
+</h4>
+<ul>
+<li>Mean change: <a href="https://fastcpd.xingchi.li/reference/fastcpd_mean.html"><code>fastcpd_mean</code></a>
+</li>
+<li>Variance change: <a href="https://fastcpd.xingchi.li/reference/fastcpd_variance.html"><code>fastcpd_variance</code></a>
+</li>
+<li>Mean and/or variance change: <a href="https://fastcpd.xingchi.li/reference/fastcpd_meanvariance.html"><code>fastcpd_meanvariance</code></a>
+</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="regression-data">Regression data<a class="anchor" aria-label="anchor" href="#regression-data"></a>
+</h4>
+<ul>
+<li>Logistic regression: <a href="https://fastcpd.xingchi.li/reference/fastcpd_binomial.html"><code>fastcpd_binomial</code></a>
+</li>
+<li>Penalized linear regression: <a href="https://fastcpd.xingchi.li/reference/fastcpd_lasso.html"><code>fastcpd_lasso</code></a>
+</li>
+<li>Linear regression: <a href="https://fastcpd.xingchi.li/reference/fastcpd_lm.html"><code>fastcpd_lm</code></a>
+</li>
+<li>Poisson regression: <a href="https://fastcpd.xingchi.li/reference/fastcpd_poisson.html"><code>fastcpd_poisson</code></a>
+</li>
+</ul>
+</div>
 </div>
 <div class="section level3">
-<h3 id="custom-cost-function-huber-regression">custom cost function huber regression<a class="anchor" aria-label="anchor" href="#custom-cost-function-huber-regression"></a>
+<h3 id="utility-functions">Utility functions<a class="anchor" aria-label="anchor" href="#utility-functions"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">400</span> <span class="op">+</span> <span class="fl">300</span> <span class="op">+</span> <span class="fl">500</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">theta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">1</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span> <span class="op">-</span> <span class="fl">3</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span> <span class="op">-</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">1</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">5</span>, <span class="va">p</span> <span class="op">-</span> <span class="fl">3</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span> <span class="op">-</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">1</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">9</span>, <span class="va">p</span> <span class="op">-</span> <span class="fl">3</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span> <span class="op">-</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">theta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">theta</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">theta</span> <span class="op">&lt;-</span> <span class="va">theta</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">300</span>, <span class="fl">500</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
-<span><span class="va">y_true</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="va">theta</span><span class="op">)</span></span>
-<span><span class="va">factor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="fl">2</span> <span class="op">*</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">400</span>, size <span class="op">=</span> <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  <span class="fl">2</span> <span class="op">*</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">300</span>, size <span class="op">=</span> <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  <span class="fl">2</span> <span class="op">*</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">500</span>, size <span class="op">=</span> <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">factor</span> <span class="op">*</span> <span class="va">y_true</span> <span class="op">+</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span>
-<span><span class="va">huber_threshold</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">huber_loss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">residual</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">data</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span></span>
-<span>  <span class="va">indicator</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">residual</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">huber_threshold</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span></span>
-<span>    <span class="va">residual</span><span class="op">^</span><span class="fl">2</span> <span class="op">/</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">indicator</span> <span class="op">+</span></span>
-<span>      <span class="va">huber_threshold</span> <span class="op">*</span> <span class="op">(</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">residual</span><span class="op">)</span> <span class="op">-</span> <span class="va">huber_threshold</span> <span class="op">/</span> <span class="fl">2</span></span>
-<span>      <span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">indicator</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">huber_loss_gradient</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">residual</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">residual</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">huber_threshold</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="op">-</span><span class="va">residual</span> <span class="op">*</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>    <span class="op">-</span><span class="va">huber_threshold</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sign.html" class="external-link">sign</a></span><span class="op">(</span><span class="va">residual</span><span class="op">)</span> <span class="op">*</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="op">}</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">huber_loss_hessian</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">residual</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">residual</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">huber_threshold</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/outer.html" class="external-link">outer</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>, <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>    <span class="fl">0.01</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">theta</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">huber_regression_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">data</span>,</span>
-<span>  beta <span class="op">=</span> <span class="op">(</span><span class="va">p</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span>,</span>
-<span>  cost <span class="op">=</span> <span class="va">huber_loss</span>,</span>
-<span>  cost_gradient <span class="op">=</span> <span class="va">huber_loss_gradient</span>,</span>
-<span>  cost_hessian <span class="op">=</span> <span class="va">huber_loss_hessian</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">huber_regression_result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = data, beta = (p + 1) * log(n)/2, </span></span>
-<span><span class="co">#&gt;     cost = huber_loss, cost_gradient = huber_loss_gradient, cost_hessian = huber_loss_hessian)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 401 726 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt;     segment 1   segment 2    segment 3</span></span>
-<span><span class="co">#&gt; 1 -0.52615415  2.77991463  8.744706508</span></span>
-<span><span class="co">#&gt; 2 -1.02443443  5.06390528  9.506534878</span></span>
-<span><span class="co">#&gt; 3 -0.09220421  0.01647923 -0.008908851</span></span>
-<span><span class="co">#&gt; 4 -0.01326592 -0.08103008 -0.047909865</span></span>
-<span><span class="co">#&gt; 5  0.02526703  0.01329142  0.025171681</span></span></code></pre></div>
-
+<ul>
+<li>Plot: <a href="https://fastcpd.xingchi.li/reference/plot.html"><code>plot</code></a>
+</li>
+<li>Print: <a href="https://fastcpd.xingchi.li/reference/print.html"><code>print</code></a>
+</li>
+<li>Show: <a href="https://fastcpd.xingchi.li/reference/show.html"><code>show</code></a>
+</li>
+<li>Summary: <a href="https://fastcpd.xingchi.li/reference/summary.html"><code>summary</code></a>
+</li>
+</ul>
 </div>
-</details>
+<div class="section level3">
+<h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
+</h3>
+<ul>
+<li>Bitcoin Market Price (USD): <a href="https://fastcpd.xingchi.li/reference/bitcoin.html"><code>bitcoin</code></a>
+</li>
+<li>Occupancy Detection Data Set: <a href="https://fastcpd.xingchi.li/reference/occupancy.html"><code>occupancy</code></a>
+</li>
+<li>Transcription Profiling of 57 Human Bladder Carcinoma Samples: <a href="https://fastcpd.xingchi.li/reference/transcriptome.html"><code>transcriptome</code></a>
+</li>
+<li>UK Seatbelts Data: <a href="https://fastcpd.xingchi.li/reference/uk_seatbelts.html"><code>uk_seatbelts</code></a>
+</li>
+<li>Well-log Dataset from Numerical Bayesian Methods Applied to Signal Processing: <a href="https://fastcpd.xingchi.li/reference/well_log.html"><code>well_log</code></a>
+</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="main-class">Main class<a class="anchor" aria-label="anchor" href="#main-class"></a>
+</h3>
+<ul>
+<li><a href="https://fastcpd.xingchi.li/reference/fastcpd-class.html"><code>fastcpd</code></a></li>
+</ul>
+</div>
 </div>
 <div class="section level2">
 <h2 id="make-contributions">Make contributions<a class="anchor" aria-label="anchor" href="#make-contributions"></a>
 </h2>
-<p>We welcome contributions from everyone. Please follow the instructions below to make contributions.</p>
-<ol style="list-style-type: decimal">
+<details close><summary>
+We welcome contributions from everyone. Please follow the instructions below to make contributions.
+</summary><ol style="list-style-type: decimal">
 <li><p>Fork the repo.</p></li>
 <li><p>Create a new branch from <code>main</code> branch.</p></li>
 <li>
@@ -443,16 +338,17 @@ Click to open
 <li><p>Push the changes to your fork.</p></li>
 <li><p>Create a pull request.</p></li>
 <li><p>Make sure the pull request does not create new warnings or errors in <code>devtools::check()</code>.</p></li>
-</ol>
+</ol></details>
 </div>
 <div class="section level2">
 <h2 id="contact-us">Contact us<a class="anchor" aria-label="anchor" href="#contact-us"></a>
 </h2>
-<p>Encountered a bug or unintended behavior?</p>
-<ol style="list-style-type: decimal">
+<details close><summary>
+Encountered a bug or unintended behavior?
+</summary><ol style="list-style-type: decimal">
 <li>File a ticket at <a href="https://github.com/doccstat/fastcpd/issues" class="external-link">GitHub Issues</a>.</li>
 <li>Contact the authors specified in <a href="https://github.com/doccstat/fastcpd/blob/main/DESCRIPTION#L5-L10" class="external-link">DESCRIPTION</a>.</li>
-</ol>
+</ol></details>
 </div>
 <div class="section level2">
 <h2 id="stargazers-over-time">Stargazers over time<a class="anchor" aria-label="anchor" href="#stargazers-over-time"></a>
