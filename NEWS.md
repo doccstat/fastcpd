@@ -1,3 +1,8 @@
+# fastcpd 0.10.1
+
+*   Increase test coverage.
+*   Use `interactive()` to check if the current R session is interactive.
+
 # fastcpd 0.10.0
 
 *   Add package comparison with other packages.

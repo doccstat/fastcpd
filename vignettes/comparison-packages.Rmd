@@ -216,7 +216,9 @@ wbs::wbs(mean_data_1)$cpt$cpt.ic$mbic.penalty
 
 ```{r univariate-mean-change-mosum}
 # Data need to be processed. `G` is selected based on the example
-# mosum::mosum(c(mean_data_1), G = 40)$cpts.info$cpts
+if (interactive()) {
+  mosum::mosum(c(mean_data_1), G = 40)$cpts.info$cpts
+}
 ```
 
 ```{r univariate-mean-change-fpop}
@@ -240,13 +242,15 @@ segmented::segmented(
 
 ```{r univariate-mean-change-mcp}
 # Slowest
-# plot(
-#   mcp::mcp(
-#     list(y ~ 1, ~ 1, ~ 1),
-#     data = data.frame(y = mean_data_1, x = seq_len(nrow(mean_data_1))),
-#     par_x = "x"
-#   )
-# )
+if (interactive()) {
+  plot(
+    mcp::mcp(
+      list(y ~ 1, ~ 1, ~ 1),
+      data = data.frame(y = mean_data_1, x = seq_len(nrow(mean_data_1))),
+      par_x = "x"
+    )
+  )
+}
 ```
 
 ```{r univariate-mean-change-not}
@@ -282,13 +286,15 @@ cpm::processStream(mv_data_1, cpmType = "GLR")$changePoints
 
 ```{r univariate-mean-and-or-variance-change-mcp}
 # Slower
-# plot(
-#   mcp::mcp(
-#     list(y ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1),
-#     data = data.frame(y = mv_data_1, x = seq_len(nrow(mv_data_1))),
-#     par_x = "x"
-#   )
-# )
+if (interactive()) {
+  plot(
+    mcp::mcp(
+      list(y ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1),
+      data = data.frame(y = mv_data_1, x = seq_len(nrow(mv_data_1))),
+      par_x = "x"
+    )
+  )
+}
 ```
 
 ```{r univariate-mean-and-or-variance-change-not}
@@ -414,13 +420,15 @@ segmented::segmented(
 
 ```{r ar3-mcp}
 # Slow
-# plot(
-#   mcp::mcp(
-#     list(y ~ 1 + ar(3), ~ 0 + ar(3)),
-#     data = data.frame(y = ar_data, x = seq_along(ar_data)),
-#     par_x = "x"
-#   )
-# )
+if (interactive()) {
+  plot(
+    mcp::mcp(
+      list(y ~ 1 + ar(3), ~ 0 + ar(3)),
+      data = data.frame(y = ar_data, x = seq_along(ar_data)),
+      par_x = "x"
+    )
+  )
+}
 ```
 
 # GARCH(1, 1)

@@ -196,3 +196,35 @@ context("cost_update_hessian Unit Test") {
     expect_true(norm(hessian - expected_hessian, "fro") < 2e-5);
   }
 }
+
+context("update_theta_sum Unit Test") {
+  test_that("update performs normally") {
+    fastcpd::classes::Fastcpd fastcpd_class(
+      /* data */ mat(),
+      /* beta */ 0,
+      /* p */ 3,
+      /* order */ colvec({0}),
+      /* family */ "gaussian",
+      /* vanilla_percentage */ 0.0,
+      /* segment_count */ 0,
+      /* winsorise_minval */ 0.0,
+      /* winsorise_maxval */ 0.0,
+      /* epsilon */ 0.0,
+      /* min_prob */ 0.0,
+      /* momentum_coef */ 0.0,
+      /* lower */ colvec(),
+      /* upper */ colvec(),
+      /* mean_data_cov */ mat(),
+      /* p_response */ 0
+    );
+    fastcpd_class.create_theta_sum(0, colvec({1, 2, 3}));
+    fastcpd_class.update_theta_sum(0, colvec({4, 5, 6}));
+    expect_true(fastcpd_class.get_theta_sum().n_rows == 3);
+    expect_true(fastcpd_class.get_theta_sum().n_cols == 1);
+    colvec theta_sum = fastcpd_class.get_theta_sum().col(0);
+    colvec expected_theta_sum = {5, 7, 9};
+    expect_true(
+      arma::approx_equal(theta_sum, expected_theta_sum, "absdiff", 1e-6)
+    );
+  }
+}
