@@ -122,7 +122,7 @@ List Fastcpd::negative_log_likelihood_wo_theta(
           arma::trace(
             solve(mean_data_cov, residuals.t() * residuals)
           ) / data.n_rows
-      ),
+      ) + data.n_cols * log(data.n_rows),
       Named("residuals") = residuals
     );
   } else if (family == "variance") {
