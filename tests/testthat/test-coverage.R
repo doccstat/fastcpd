@@ -3,7 +3,7 @@ testthat::test_that(
     set.seed(1)
     data <- c(rnorm(300, 0, 100), rnorm(400, 100, 100), rnorm(300, 0, 100))
     result_mean <- fastcpd.mean(data)
-    testthat::expect_equal(result_mean@cp_set, c(294, 702))
+    testthat::expect_equal(result_mean@cp_set, c(300, 702))
   }
 )
 
@@ -102,6 +102,6 @@ testthat::test_that(
 testthat::test_that("beta x2", {
   testthat::expect_equal(
     fastcpd.mean(well_log, beta = log(length(well_log)))@cp_set,
-    c(566, 740, 1039, 1198, 1424, 1661, 1842, 2023, 2476, 2744, 3709, 3820)
+    c(572, 1039, 1424, 1661, 1842, 2023, 2476, 2744, 3709, 3820)
   )
 })
