@@ -1,7 +1,7 @@
 Type: Package
 Package: fastcpd
 Title: Fast Change Point Detection via Sequential Gradient Descent
-Version: 0.10.1
+Version: 0.10.2
 Authors@R: c(
     person("Xingchi", "Li", , "anthony.li@stat.tamu.edu",
            role = c("aut", "cre", "cph"),
@@ -38,7 +38,6 @@ Imports:
     utils
 Suggests:
     abind,
-    bcp,
     breakfast,
     changepoint,
     cpm,
