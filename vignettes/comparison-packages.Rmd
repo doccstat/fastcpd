@@ -24,6 +24,9 @@ All `mcp` code is commented out due to
 and
 [link 2](https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531284).
 
+All `bcp` code is commented out due to
+[link](https://github.com/doccstat/fastcpd/issues/5).
+
 # Data setup
 
 ```{r data-setup-univariate-mean-change}
@@ -258,7 +261,7 @@ plot(not::not(mean_data_1, contrast = "pcwsConstMean"))
 ```
 
 ```{r univariate-mean-change-bcp}
-plot(bcp::bcp(mean_data_1))
+# plot(bcp::bcp(mean_data_1))
 ```
 
 # Univariate mean and/or variance change
@@ -323,7 +326,7 @@ ecp::e.divisive(mean_data_3)$estimates
 ```
 
 ```{r multivariate-mean-change-bcp}
-plot(bcp::bcp(mean_data_3))
+# plot(bcp::bcp(mean_data_3))
 ```
 
 # Multivariate mean and/or variance change
