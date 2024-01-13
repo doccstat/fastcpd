@@ -37,7 +37,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,6 +100,7 @@
 <p>All <code>mcp</code> code is commented out due to <a href="https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531091" class="external-link">link
 1</a> and <a href="https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531284" class="external-link">link
 2</a>.</p>
+<p>All <code>bcp</code> code is commented out due to <a href="https://github.com/doccstat/fastcpd/issues/5" class="external-link">link</a>.</p>
 <div class="section level2">
 <h2 id="data-setup">Data setup<a class="anchor" aria-label="anchor" href="#data-setup"></a>
 </h2>
@@ -314,10 +315,7 @@ to the un-retrievable change points.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">not</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/not/man/not.html" class="external-link">not</a></span><span class="op">(</span><span class="va">mean_data_1</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMean"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/univariate-mean-change-not-1.png" width="768"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">bcp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/bcp/man/bcp.html" class="external-link">bcp</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: bcp</span></span>
-<span><span class="co">#&gt; Loading required package: grid</span></span></code></pre></div>
-<p><img src="comparison-packages_files/figure-html/univariate-mean-change-bcp-1.png" width="768"></p>
+<code class="sourceCode R"><span><span class="co"># plot(bcp::bcp(mean_data_1))</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="univariate-mean-andor-variance-change">Univariate mean and/or variance change<a class="anchor" aria-label="anchor" href="#univariate-mean-andor-variance-change"></a>
@@ -374,8 +372,7 @@ to the un-retrievable change points.</p>
 <span><span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span></span>
 <span><span class="co">#&gt; [1]    1  301  701 1001</span></span></code></pre></div>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">bcp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/bcp/man/bcp.html" class="external-link">bcp</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="comparison-packages_files/figure-html/multivariate-mean-change-bcp-1.png" width="768"></p>
+<code class="sourceCode R"><span><span class="co"># plot(bcp::bcp(mean_data_3))</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="multivariate-mean-andor-variance-change">Multivariate mean and/or variance change<a class="anchor" aria-label="anchor" href="#multivariate-mean-andor-variance-change"></a>

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +56,22 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.10.1" id="fastcpd-0101">fastcpd 0.10.1<a class="anchor" aria-label="anchor" href="#fastcpd-0101"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.10.2" id="fastcpd-0102">fastcpd 0.10.2<a class="anchor" aria-label="anchor" href="#fastcpd-0102"></a></h2>
+<ul><li>
+<p>Remove <code>bcp</code> according to</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Package ‘bcp’ was removed from the CRAN repository.</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Formerly available versions can be obtained from the archive.</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>Archived on <span class="dv">2024-01-12</span> as email to the maintainer is undeliverable.</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>A summary of the most recent check results can be obtained from the check results archive.</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>Please use the canonical form https<span class="sc">:</span><span class="er">//</span>CRAN.R<span class="sc">-</span>project.org<span class="sc">/</span>package<span class="ot">=</span>bcp to link to this page.</span></code></pre></div>
+</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.10.1" id="fastcpd-0101">fastcpd 0.10.1<a class="anchor" aria-label="anchor" href="#fastcpd-0101"></a></h2><p class="text-muted">CRAN release: 2024-01-09</p>
 <ul><li>Increase test coverage.</li>
 <li>Use <code><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive()</a></code> to check if the current R session is interactive.</li>
 </ul></div>
@@ -161,8 +176,8 @@
 <h2 class="pkg-version" data-toc-text="0.8.0" id="fastcpd-080">fastcpd 0.8.0<a class="anchor" aria-label="anchor" href="#fastcpd-080"></a></h2>
 <ul><li>
 <p>Deal with the following:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Due to the excessive calls to <span class="st">`</span><span class="at">glmnet</span><span class="st">`</span> between R and C<span class="sc">++</span>,</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>it is better to use the R implementation of <span class="st">`</span><span class="at">fastcpd</span><span class="st">`</span> <span class="cf">for</span> lasso.</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Due to the excessive calls to <span class="st">`</span><span class="at">glmnet</span><span class="st">`</span> between R and C<span class="sc">++</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>it is better to use the R implementation of <span class="st">`</span><span class="at">fastcpd</span><span class="st">`</span> <span class="cf">for</span> lasso.</span></code></pre></div>
 </li>
 <li><p>Separate the use of internal C++ cost functions and user-defined R cost functions.</p></li>
 <li><p>Add Codecov Icicle plot in README.</p></li>
@@ -199,10 +214,10 @@
 <ul><li><p>Add suggested package checking in tests.</p></li>
 <li>
 <p>Try to solve the <em>amazing</em> clang-ASAN error on CRAN:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Error <span class="cf">in</span> <span class="fu">dyn.load</span>(file, <span class="at">DLLpath =</span> DLLpath, ...) <span class="sc">:</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  unable to load shared object <span class="st">'/data/gannet/ripley/R/test-clang/mvtnorm/libs/mvtnorm.so'</span><span class="sc">:</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="er">/</span>data<span class="sc">/</span>gannet<span class="sc">/</span>ripley<span class="sc">/</span>R<span class="sc">/</span>test<span class="sc">-</span>clang<span class="sc">/</span>mvtnorm<span class="sc">/</span>libs<span class="sc">/</span>mvtnorm.so<span class="sc">:</span> undefined symbol<span class="sc">:</span> _ZNK7Fortran7runtime10Terminator5CrashEPKcz</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>Calls<span class="sc">:</span> <span class="er">&lt;</span>Anonymous<span class="sc">&gt;</span> ... asNamespace <span class="ot">-&gt;</span> loadNamespace <span class="ot">-&gt;</span> library.dynam <span class="ot">-&gt;</span> dyn.load</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Error <span class="cf">in</span> <span class="fu">dyn.load</span>(file, <span class="at">DLLpath =</span> DLLpath, ...) <span class="sc">:</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  unable to load shared object <span class="st">'/data/gannet/ripley/R/test-clang/mvtnorm/libs/mvtnorm.so'</span><span class="sc">:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="er">/</span>data<span class="sc">/</span>gannet<span class="sc">/</span>ripley<span class="sc">/</span>R<span class="sc">/</span>test<span class="sc">-</span>clang<span class="sc">/</span>mvtnorm<span class="sc">/</span>libs<span class="sc">/</span>mvtnorm.so<span class="sc">:</span> undefined symbol<span class="sc">:</span> _ZNK7Fortran7runtime10Terminator5CrashEPKcz</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>Calls<span class="sc">:</span> <span class="er">&lt;</span>Anonymous<span class="sc">&gt;</span> ... asNamespace <span class="ot">-&gt;</span> loadNamespace <span class="ot">-&gt;</span> library.dynam <span class="ot">-&gt;</span> dyn.load</span></code></pre></div>
 </li>
 </ul></div>
     <div class="section level2">
