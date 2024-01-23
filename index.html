@@ -55,7 +55,7 @@
     
     <a class="navbar-brand me-2" href="index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -188,7 +188,6 @@ I countered problems related to gfortran on Mac OSX or Linux!
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>It is hard to demonstrate all the features of <code>fastcpd</code> in a single example due to the flexibility of the package. For more examples, please refer to the <a href="https://fastcpd.xingchi.li/reference/index.html">function reference</a>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
@@ -199,11 +198,11 @@ I countered problems related to gfortran on Mac OSX or Linux!
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">601</span><span class="op">:</span><span class="fl">1000</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">x</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0.3</span> <span class="op">*</span> <span class="va">x</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fl">0.4</span> <span class="op">*</span> <span class="va">x</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="va">x</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="reference/fastcpd_ar.html">fastcpd.ar</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">3</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">]</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="reference/fastcpd_ar.html">fastcpd.ar</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">3</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">]</span>, <span class="fl">3</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd::fastcpd.ar(data = x[3 + seq_len(n)], order = 3)</span></span>
+<span><span class="co">#&gt; fastcpd::fastcpd.ar(data = x[3 + seq_len(n)], order = 3, r.progress = FALSE)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
 <span><span class="co">#&gt; 612 </span></span>
@@ -218,6 +217,12 @@ I countered problems related to gfortran on Mac OSX or Linux!
 <span><span class="co">#&gt; 3  0.07985424 -0.04544551</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-ar3-1.png"><!-- --></p>
+<blockquote>
+<p>[!NOTE] It is hard to demonstrate all the features of <code>fastcpd</code> in a single example due to the flexibility of the package. For more examples, please refer to the <a href="https://fastcpd.xingchi.li/reference/index.html">function reference</a>.</p>
+</blockquote>
+<blockquote>
+<p>[!NOTE] <code>r.progress = FALSE</code> is used to suppress the progress bar. Users are expected to see the progress bar when running the code by default.</p>
+</blockquote>
 </div>
 <div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
