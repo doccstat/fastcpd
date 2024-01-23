@@ -129,11 +129,6 @@ cheatsheet](man/figures/cheatsheets.png)](https://github.com/doccstat/fastcpd/bl
 
 ## Usage
 
-It is hard to demonstrate all the features of `fastcpd` in a single
-example due to the flexibility of the package. For more examples, please
-refer to the [function
-reference](https://fastcpd.xingchi.li/reference/index.html).
-
 ``` r
 set.seed(1)
 n <- 1000
@@ -144,11 +139,11 @@ for (i in 1:600) {
 for (i in 601:1000) {
   x[i + 1] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
 }
-result <- fastcpd::fastcpd.ar(x[3 + seq_len(n)], 3)
+result <- fastcpd::fastcpd.ar(x[3 + seq_len(n)], 3, r.progress = FALSE)
 summary(result)
 #> 
 #> Call:
-#> fastcpd::fastcpd.ar(data = x[3 + seq_len(n)], order = 3)
+#> fastcpd::fastcpd.ar(data = x[3 + seq_len(n)], order = 3, r.progress = FALSE)
 #> 
 #> Change points:
 #> 612 
@@ -165,6 +160,15 @@ plot(result)
 ```
 
 ![](man/figures/README-ar3-1.png)<!-- -->
+
+> \[!NOTE\] It is hard to demonstrate all the features of `fastcpd` in a
+> single example due to the flexibility of the package. For more
+> examples, please refer to the [function
+> reference](https://fastcpd.xingchi.li/reference/index.html).
+
+> \[!NOTE\] `r.progress = FALSE` is used to suppress the progress bar.
+> Users are expected to see the progress bar when running the code by
+> default.
 
 ## Examples
 
