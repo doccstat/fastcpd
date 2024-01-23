@@ -161,14 +161,16 @@ plot(result)
 
 ![](man/figures/README-ar3-1.png)<!-- -->
 
-<!-- Remove the escape in markdown file. -->
+<!-- Remove the escape in markdown file and manually split the line. -->
 
-> [!NOTE] It is hard to demonstrate all the features of `fastcpd` in a
+> [!TIP]
+> It is hard to demonstrate all the features of `fastcpd` in a
 > single example due to the flexibility of the package. For more
 > examples, please refer to the [function
 > reference](https://fastcpd.xingchi.li/reference/index.html).
 
-> [!NOTE] `r.progress = FALSE` is used to suppress the progress bar.
+> [!NOTE]
+> `r.progress = FALSE` is used to suppress the progress bar.
 > Users are expected to see the progress bar when running the code by
 > default.
 
