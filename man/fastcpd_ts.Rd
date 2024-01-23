@@ -47,6 +47,10 @@ except that the data is a time series data and the family is one of
 }
 \examples{
 \donttest{
+if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
+  "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+
 set.seed(1)
 n <- 600
 x <- rep(0, n + 1)

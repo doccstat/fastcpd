@@ -1,6 +1,6 @@
 testthat::test_that(
   "examples/fastcpd_ma.txt", {
-    testthat::skip_if_not_installed("forecast")
+    testthat::skip_if_not_installed("ggplot2")
 
     examples_ma <- readLines("examples/fastcpd_ma.txt")
     source(textConnection(paste(

@@ -33,6 +33,10 @@ default a matrix or data frame or a vector with each row / element as an
 observation and thus a formula is not required here.
 }
 \examples{
+if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
+  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+
 set.seed(1)
 p <- 3
 result <- fastcpd.mv(

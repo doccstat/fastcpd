@@ -1,3 +1,7 @@
+# fastcpd 0.10.3
+
+*   Add package check in examples and tests.
+
 # fastcpd 0.10.2
 
 *   Remove `bcp` according to

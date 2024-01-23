@@ -19,6 +19,10 @@ obtained from Alan Turing Institute GitHub repository and licensed under
 the MIT license. Outliers with value less or equal to 1e5 are removed.
 }
 \examples{
+if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
+  "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+
 result <- fastcpd.mean(well_log, trim = 0.002)
 summary(result)
 plot(result)
