@@ -1,6 +1,6 @@
 testthat::test_that(
   "examples/fastcpd_arima.txt", {
-    testthat::skip_if_not_installed("forecast")
+    testthat::skip_if_not_installed("ggplot2")
 
     examples_arima <- readLines("examples/fastcpd_arima.txt")
     source(textConnection(paste(

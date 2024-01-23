@@ -66,6 +66,12 @@ HG-U95Av2 microarrays
 }
 \examples{
 \donttest{
+for (package in c("ggplot2", "gridExtra")) {
+  if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
+    package, repos = "https://cloud.r-project.org", quiet = TRUE
+  )
+}
+
 result <- fastcpd.mean(transcriptome$"10", trim = 0.005)
 summary(result)
 plot(result)

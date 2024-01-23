@@ -1,3 +1,9 @@
+for (package in c("ggplot2", "lubridate", "zoo")) {
+  if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
+    package, repos = "https://cloud.r-project.org", quiet = TRUE
+  )
+}
+
 result_ar <- fastcpd.ar(diff(uk_seatbelts[, "drivers"], lag = 12), 1)
 summary(result_ar)
 plot(result_ar)

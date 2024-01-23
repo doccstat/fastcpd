@@ -1,5 +1,8 @@
 testthat::test_that(
   "examples/data-transcriptome.txt", {
+    testthat::skip_if_not_installed("ggplot2")
+    testthat::skip_if_not_installed("gridExtra")
+
     examples_transcriptome <- readLines("examples/data-transcriptome.txt")
     source(textConnection(paste(
       examples_transcriptome[seq_len(length(examples_transcriptome) - 2) + 1],

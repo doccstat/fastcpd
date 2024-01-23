@@ -1,3 +1,7 @@
+if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
+  "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+
 set.seed(1)
 n <- 1000
 x <- rep(0, n + 3)

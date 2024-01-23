@@ -30,6 +30,10 @@ and thus a formula is not required here.
 }
 \examples{
 \donttest{
+if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
+  "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+
 set.seed(1)
 n <- 300
 w <- rnorm(n + 3, 0, 3)

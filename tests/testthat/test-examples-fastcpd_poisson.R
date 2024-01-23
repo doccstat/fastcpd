@@ -1,5 +1,6 @@
 testthat::test_that(
   "examples/fastcpd_poisson.txt", {
+    testthat::skip_if_not_installed("ggplot2")
     testthat::skip_if_not_installed("mvtnorm")
 
     examples_poisson <- readLines("examples/fastcpd_poisson.txt")

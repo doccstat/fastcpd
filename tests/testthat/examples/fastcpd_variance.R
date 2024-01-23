@@ -1,3 +1,7 @@
+if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
+  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+
 set.seed(1)
 p <- 3
 result <- fastcpd.variance(
