@@ -7,7 +7,7 @@
 fastcpd(
   formula = y ~ . - 1,
   data,
-  beta = NULL,
+  beta = "MBIC",
   segment_count = 10,
   trim = 0.025,
   momentum_coef = 0,
@@ -54,10 +54,12 @@ covariates. The response is not necessary in the case of mean change or
 variance change, in which case the formula will need to be adjusted
 accordingly.}
 
-\item{beta}{Initial cost value specified in the algorithm in the paper.
-For the proper choice of a value, please refer to the paper. If not
-specified, BIC criterion is used to obtain a proper value, i.e.,
-\code{beta = (p + 1) * log(nrow(data)) / 2}.}
+\item{beta}{Penalty criterion for the number of change points.
+Take a string value of \code{"MBIC"}, \code{"BIC"}, \code{"MDL"}
+or a numeric value. If a numeric value is provided, the value will be
+used as the penalty criterion for the number of change points.
+By default, Modified BIC criterion is used to obtain a proper value, i.e.,
+\code{beta = (p + 2) * log(nrow(data)) / 2}.}
 
 \item{segment_count}{Number of segments for initial guess. If not specified,
 the initial guess on the number of segments is 10.}

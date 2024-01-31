@@ -4,7 +4,7 @@ for (package in c("ggplot2", "lubridate", "zoo")) {
   )
 }
 
-result_ar <- fastcpd.ar(diff(uk_seatbelts[, "drivers"], lag = 12), 1)
+result_ar <- fastcpd.ar(diff(uk_seatbelts[, "drivers"], 12), 1, beta = "BIC")
 summary(result_ar)
 plot(result_ar)
 
