@@ -61,6 +61,7 @@ testthat::test_that(
     result <- fastcpd(
       formula = y ~ . - 1,
       data = data.frame(y = y, x = x),
+      beta = "BIC",
       cost = logistic_loss,
       cost_gradient = logistic_loss_gradient,
       cost_hessian = logistic_loss_hessian,
@@ -82,7 +83,10 @@ testthat::test_that(
     )
     result <- suppressWarnings(
       fastcpd.binomial(
-        data.frame(y = y, x = x), vanilla_percentage = 1, warm_start = TRUE
+        data.frame(y = y, x = x),
+        beta = "BIC",
+        vanilla_percentage = 1,
+        warm_start = TRUE
       )
     )
     testthat::expect_equal(result@cp_set, 134)

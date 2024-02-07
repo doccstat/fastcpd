@@ -36,10 +36,12 @@
 #'   covariates. The response is not necessary in the case of mean change or
 #'   variance change, in which case the formula will need to be adjusted
 #'   accordingly.
-#' @param beta Initial cost value specified in the algorithm in the paper.
-#'   For the proper choice of a value, please refer to the paper. If not
-#'   specified, BIC criterion is used to obtain a proper value, i.e.,
-#'   \code{beta = (p + 1) * log(nrow(data)) / 2}.
+#' @param beta Penalty criterion for the number of change points.
+#'   Take a string value of \code{"MBIC"}, \code{"BIC"}, \code{"MDL"}
+#'   or a numeric value. If a numeric value is provided, the value will be
+#'   used as the penalty criterion for the number of change points.
+#'   By default, Modified BIC criterion is used to obtain a proper value, i.e.,
+#'   \code{beta = (p + 2) * log(nrow(data)) / 2}.
 #' @param segment_count Number of segments for initial guess. If not specified,
 #'   the initial guess on the number of segments is 10.
 #' @param trim Trimming for the boundary change points so that a change point
@@ -183,7 +185,7 @@
 fastcpd <- function(  # nolint: cyclomatic complexity
   formula = y ~ . - 1,
   data,
-  beta = NULL,
+  beta = "MBIC",
   segment_count = 10,
   trim = 0.025,
   momentum_coef = 0,
@@ -383,14 +385,18 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     fastcpd_family <- family
   }
 
-  if (is.null(beta)) {
-    if (nrow(data_) < 500) {
-      # Use the `beta` value obtained from BIC.
-      beta <- (p + 1) * log(nrow(data_)) / 2
-    } else {
-      # Use the `beta` value obtained from Modified BIC.
-      beta <- (p + 2) * log(nrow(data_)) / 2
-    }
+  if (is.character(beta)) {
+    beta <- switch(
+      beta,
+      BIC = (p + 1) * log(nrow(data_)) / 2,
+      MBIC = (p + 2) * log(nrow(data_)) / 2,
+      # TODO(doccstat): Verify the correctness of MDL.
+      MDL = (p + 1) * log(nrow(data_)) - p * log(log(nrow(data_)))
+    )
+
+    stopifnot(
+      "Invalid beta selection criterion provided." = !is.null(beta)
+    )
 
     # TODO(doccstat): Variance estimation for VAR(p).
     # For linear regression models, an estimate of the variance is needed in the
