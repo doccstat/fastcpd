@@ -57,9 +57,11 @@ accordingly.}
 \item{beta}{Penalty criterion for the number of change points.
 Take a string value of \code{"MBIC"}, \code{"BIC"}, \code{"MDL"}
 or a numeric value. If a numeric value is provided, the value will be
-used as the penalty criterion for the number of change points.
-By default, Modified BIC criterion is used to obtain a proper value, i.e.,
-\code{beta = (p + 2) * log(nrow(data)) / 2}.}
+used as the penalty criterion for the number of change points in the
+traditional Bayesian Information Criterion. By default, Modified BIC
+criterion is used to obtain a proper value, i.e.,
+\code{beta = (p + 2) * log(nrow(data)) / 2} with adjusted cost
+function.}
 
 \item{segment_count}{Number of segments for initial guess. If not specified,
 the initial guess on the number of segments is 10.}

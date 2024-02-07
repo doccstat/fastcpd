@@ -153,7 +153,8 @@ testthat::test_that(
     result <- fastcpd(
       formula = y ~ . - 1,
       data = data.frame(y = seq_len(100), x = seq_len(100)),
-      family = "lm"
+      family = "lm",
+      beta = "BIC"
     )
 
     testthat::expect_length(result@cp_set, 0)

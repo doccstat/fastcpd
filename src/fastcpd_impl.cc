@@ -87,9 +87,8 @@ List fastcpd_impl(
       int tau = r_t_set(i - 1);
       if (family == "lasso") {
         // Mean of `err_sd` only works if error sd is unchanged.
-        lambda = mean(
-          fastcpd_class.get_err_sd()
-        ) * sqrt(2 * std::log(p) / (t - tau));
+        lambda =
+          mean(fastcpd_class.get_err_sd()) * sqrt(2 * std::log(p) / (t - tau));
       }
       mat data_segment = data.rows(tau, t - 1);
       if (t > vanilla_percentage * n) {
@@ -113,7 +112,11 @@ List fastcpd_impl(
           List cost_result = fastcpd_class.negative_log_likelihood(
             data_segment, wrap(theta), lambda, false, R_NilValue
           );
-          cval(i - 1) = as<double>(cost_result["value"]);
+
+          // Adjust cost value.
+          cval(i - 1) = fastcpd_class.adjust_cost_value(
+            as<double>(cost_result["value"]), data_segment.n_rows
+          );
         } else {
           // t - tau < p or for lasso t - tau < 3
         }
@@ -140,7 +143,11 @@ List fastcpd_impl(
             );
           }
         }
-        cval(i - 1) = as<double>(cost_optim_result["value"]);
+
+        // Adjust cost value.
+        cval(i - 1) = fastcpd_class.adjust_cost_value(
+          as<double>(cost_optim_result["value"]), data_segment.n_rows
+        );
 
         // If `vanilla_percentage` is not 1, then we need to keep track of
         // thetas for later `fastcpd` steps.
@@ -275,7 +282,11 @@ List fastcpd_impl(
       );
     }
 
-    cost_values(i) = as<double>(cost_optim_result["value"]);
+
+    // Adjust cost value.
+    cost_values(i) = fastcpd_class.adjust_cost_value(
+      as<double>(cost_optim_result["value"]), data_segment.n_rows
+    );
 
     // Parameters are not involved for PELT.
     if (vanilla_percentage < 1) {
