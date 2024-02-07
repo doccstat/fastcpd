@@ -125,9 +125,11 @@ accordingly.</p></dd>
 <dd><p>Penalty criterion for the number of change points.
 Take a string value of <code>"MBIC"</code>, <code>"BIC"</code>, <code>"MDL"</code>
 or a numeric value. If a numeric value is provided, the value will be
-used as the penalty criterion for the number of change points.
-By default, Modified BIC criterion is used to obtain a proper value, i.e.,
-<code>beta = (p + 2) * log(nrow(data)) / 2</code>.</p></dd>
+used as the penalty criterion for the number of change points in the
+traditional Bayesian Information Criterion. By default, Modified BIC
+criterion is used to obtain a proper value, i.e.,
+<code>beta = (p + 2) * log(nrow(data)) / 2</code> with adjusted cost
+function.</p></dd>
 
 
 <dt>segment_count</dt>
@@ -378,7 +380,7 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-out co"><span class="r-pr">#&gt;</span> 99 197 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48.36336 65.71493 46.37389 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 47.25469 64.59611 45.30483 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   segment 1  segment 2 segment 3</span>

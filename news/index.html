@@ -57,13 +57,14 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.11.0" id="fastcpd-0110">fastcpd 0.11.0<a class="anchor" aria-label="anchor" href="#fastcpd-0110"></a></h2>
-<ul><li>
+<ul><li><p><strong>Note</strong>: From now on, MBIC is used as the default penalty selection for <code>beta</code> parameter.</p></li>
+<li>
 <p>Add penalty selection criteria using</p>
 <ol style="list-style-type: decimal"><li>BIC: <code>(p + 1) * log(nrow(data)) / 2</code>
 </li>
-<li>Modified BIC: <code>(p + 2) * log(nrow(data)) / 2</code>
-</li>
-</ol><p>In the mean time, a numeric value can be passed to <code>beta</code> as well to explicitly specify the penalty.</p>
+<li>Modified BIC: <code>(p + 2) * log(nrow(data)) / 2</code> with adjusted cost function.</li>
+<li>MDL: <code>(p + 2) * log(nrow(data)) / 2</code> with adjusted cost function.</li>
+</ol><p>In the mean time, a numeric value can be passed to <code>beta</code> as well to explicitly specify the penalty for BIC.</p>
 </li>
 </ul></div>
     <div class="section level2">

@@ -449,7 +449,7 @@ methods are plotted due to the un-retrievable change points.</p>
 <p>The true change points are 80, 200 and 320.</p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
-<span><span class="co">#&gt; [1]  81 201 320</span></span></code></pre></div>
+<span><span class="co">#&gt; [1]  80 202 320</span></span></code></pre></div>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">lasso_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
