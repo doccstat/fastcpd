@@ -122,6 +122,45 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "2d custom", {
+    set.seed(1)
+    p <- 2
+    x <- matrix(rnorm(300 * p, 0, 1), ncol = p)
+    theta <- rbind(rnorm(p, 0, 1), rnorm(p, 4, 1))
+    y <- c(
+      rbinom(150, 1, 1 / (1 + exp(-x[1:150, ] * theta[1, ]))),
+      rbinom(150, 1, 1 / (1 + exp(-x[151:300, ] * theta[2, ])))
+    )
+    logistic_loss <- function(data, theta) {
+      x <- data[, -1]
+      y <- data[, 1]
+      u <- x %*% theta
+      nll <- -y * u + log(1 + exp(u))
+      nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
+      sum(nll)
+    }
+    logistic_loss_gradient <- function(data, theta) {
+      x <- data[nrow(data), -1]
+      y <- data[nrow(data), 1]
+      c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
+    }
+    logistic_loss_hessian <- function(data, theta) {
+      x <- data[nrow(data), -1]
+      prob <- 1 / (1 + exp(-x %*% theta))
+      (x %o% x) * c((1 - prob) * prob)
+    }
+    result <- fastcpd(
+      formula = y ~ . - 1,
+      data = data.frame(y = y, x = x),
+      cost = logistic_loss,
+      cost_gradient = logistic_loss_gradient,
+      cost_hessian = logistic_loss_hessian
+    )
+    testthat::expect_equal(result@cp_set, 153)
+  }
+)
+
+testthat::test_that(
   "warm start", {
     set.seed(1)
     p <- 1
