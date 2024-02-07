@@ -1,4 +1,20 @@
 testthat::test_that(
+  "1d mean custom", {
+    set.seed(1)
+    result_mean <- fastcpd(
+      formula = ~ . - 1,
+      data = data.frame(x = c(rnorm(100, 0, 10), rnorm(200, 100, 10))),
+      cost = function(data) {
+        n <- nrow(data)
+        demeaned_data <- sweep(data, 2, colMeans(data))
+        n / 2 * (log(100) + log(2 * pi) + norm(demeaned_data, "2")^2 / n / 100)
+      }
+    )
+    testthat::expect_equal(result_mean@cp_set, 100)
+  }
+)
+
+testthat::test_that(
   "1d mean", {
     set.seed(1)
     data <- c(rnorm(300, 0, 100), rnorm(400, 100, 100), rnorm(300, 0, 100))
