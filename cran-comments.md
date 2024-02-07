@@ -1,19 +1,11 @@
-## Updates since last CRAN release (0.10.1)
+## Updates since last CRAN release (0.10.3)
 
-### fastcpd 0.10.3
+### fastcpd 0.11.0
 
-*   Add package check in examples and tests.
+*   Add penalty selection criteria using
 
-### fastcpd 0.10.2
+    1. BIC: `(p + 1) * log(nrow(data)) / 2`
+    1. Modified BIC: `(p + 2) * log(nrow(data)) / 2`
 
-*   Remove `bcp` according to
-
-        Package ‘bcp’ was removed from the CRAN repository.
-
-        Formerly available versions can be obtained from the archive.
-
-        Archived on 2024-01-12 as email to the maintainer is undeliverable.
-
-        A summary of the most recent check results can be obtained from the check results archive.
-
-        Please use the canonical form https://CRAN.R-project.org/package=bcp to link to this page.
+    In the mean time, a numeric value can be passed to `beta` as well to
+    explicitly specify the penalty.
