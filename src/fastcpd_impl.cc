@@ -6,6 +6,7 @@
 List fastcpd_impl(
     mat data,
     double beta,
+    const string cost_adjustment,
     const int segment_count,
     const double trim,
     const double momentum_coef,
@@ -53,8 +54,8 @@ List fastcpd_impl(
   }
 
   fastcpd::classes::Fastcpd fastcpd_class(
-    beta, data, epsilon, family, lower, mean_data_cov, min_prob,
-    momentum_coef, order, p, p_response, segment_count, upper,
+    beta, cost_adjustment, data, epsilon, family, lower, mean_data_cov,
+    min_prob, momentum_coef, order, p, p_response, segment_count, upper,
     vanilla_percentage, winsorise_maxval, winsorise_minval
   );
 

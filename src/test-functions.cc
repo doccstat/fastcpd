@@ -6,6 +6,7 @@ context("negative_log_likelihood_wo_theta Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* cost_adjustment */ "MBIC",
       /* data */ mat(),
       /* epsilon */ 0.0,
       /* family */ "arma",
@@ -49,6 +50,7 @@ context("negative_log_likelihood_wo_cv Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* cost_adjustment */ "MBIC",
       /* data */ mat(),
       /* epsilon */ 0.0,
       /* family */ "arma",
@@ -79,6 +81,7 @@ context("cost_update_gradient Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* cost_adjustment */ "MBIC",
       /* data */ mat(),
       /* epsilon */ 0.0,
       /* family */ "arma",
@@ -109,6 +112,7 @@ context("cost_update_hessian Unit Test") {
   test_that("binomal is correct for a two dimensional data") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* cost_adjustment */ "MBIC",
       /* data */ mat(),
       /* epsilon */ 0.0,
       /* family */ "binomial",
@@ -137,6 +141,7 @@ context("cost_update_hessian Unit Test") {
   test_that("poisson is correct for a two dimensional data") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* cost_adjustment */ "MBIC",
       /* data */ mat(),
       /* epsilon */ 0.0,
       /* family */ "poisson",
@@ -165,6 +170,7 @@ context("cost_update_hessian Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* cost_adjustment */ "MBIC",
       /* data */ mat(),
       /* epsilon */ 0.0,
       /* family */ "arma",
@@ -201,6 +207,7 @@ context("update_theta_sum Unit Test") {
   test_that("update performs normally") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* cost_adjustment */ "MBIC",
       /* data */ mat(),
       /* epsilon */ 0.0,
       /* family */ "gaussian",

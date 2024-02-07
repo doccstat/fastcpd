@@ -9,6 +9,7 @@ class Fastcpd {
  public:
   Fastcpd(
     const double beta,
+    const string cost_adjustment,
     mat data,
     const double epsilon,
     const string family,
@@ -249,6 +250,9 @@ class Fastcpd {
 
   // `beta` is the initial cost value.
   double beta;
+
+  // Adjustment to the cost function.
+  const string cost_adjustment;
 
   // `data` is the data set to be segmented.
   mat data;
