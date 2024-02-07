@@ -5,6 +5,7 @@ namespace fastcpd::classes {
 
 Fastcpd::Fastcpd(
     const double beta,
+    const string cost_adjustment,
     mat data,
     const double epsilon,
     const string family,
@@ -21,6 +22,7 @@ Fastcpd::Fastcpd(
     const double winsorise_maxval,
     const double winsorise_minval
 ) : beta(beta),
+    cost_adjustment(cost_adjustment),
     data(data),
     epsilon(epsilon),
     family(family),

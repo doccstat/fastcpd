@@ -385,13 +385,14 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     fastcpd_family <- family
   }
 
+  cost_adjustment <- if (is.character(beta)) beta else "MBIC"
+
   if (is.character(beta)) {
     beta <- switch(
       beta,
       BIC = (p + 1) * log(nrow(data_)) / 2,
       MBIC = (p + 2) * log(nrow(data_)) / 2,
-      # TODO(doccstat): Verify the correctness of MDL.
-      MDL = (p + 1) * log(nrow(data_)) - p * log(log(nrow(data_)))
+      MDL = (p + 2) * log(nrow(data_)) / 2
     )
 
     stopifnot(
@@ -467,10 +468,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   }
 
   result <- fastcpd_impl(
-    data_, beta, segment_count, trim, momentum_coef, k, fastcpd_family,
-    epsilon, min_prob, winsorise_minval, winsorise_maxval, p, order,
-    cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
-    lower, upper, line_search, mean_data_cov, p_response, r_progress
+    data_, beta, cost_adjustment, segment_count, trim, momentum_coef, k,
+    fastcpd_family, epsilon, min_prob, winsorise_minval, winsorise_maxval,
+    p, order, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage,
+    warm_start, lower, upper, line_search, mean_data_cov, p_response, r_progress
   )
 
   raw_cp_set <- c(result$raw_cp_set)
@@ -553,7 +554,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       "Warning: The number of change points is larger than the number of ",
       "observations divided by the number of covariates plus one. ",
       "The residuals are not independent. ",
-      "Retrying with a larger `beta` value (x2)."
+      "Retrying with a larger `beta` value (x2) with MBIC."
     )
     return(
       fastcpd(

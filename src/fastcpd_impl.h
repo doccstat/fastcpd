@@ -7,6 +7,7 @@
 //
 // @param data A data frame containing the data to be segmented.
 // @param beta Initial cost value.
+// @param cost_adjustment Adjustment for the cost function.
 // @param segment_count Number of segments for initial guess.
 // @param trim Trimming for the boundary change points.
 // @param momentum_coef Momentum coefficient to be applied to each update.
@@ -52,6 +53,7 @@
 List fastcpd_impl(
     mat data,
     double beta,
+    const string cost_adjustment,
     const int segment_count,
     const double trim,
     const double momentum_coef,

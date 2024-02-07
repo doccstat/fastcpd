@@ -73,9 +73,11 @@ List Fastcpd::negative_log_likelihood_wo_theta(
       predict_glmnet(out, data.cols(1, data.n_cols - 1), Named("s") = lambda)
     );
     vec residuals = data.col(0) - fitted_values;
-    return List::create(Named("par") = par,
-                  Named("value") = value / 2,
-                  Named("residuals") = residuals);
+    return List::create(
+      Named("par") = par,
+      Named("value") = value / 2,
+      Named("residuals") = residuals
+    );
   } else if (
     family == "binomial" || family == "poisson" || family == "gaussian"
   ) {
