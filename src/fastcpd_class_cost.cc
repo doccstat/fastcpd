@@ -10,14 +10,17 @@ List Fastcpd::negative_log_likelihood(
     bool cv,
     Nullable<colvec> start
 ) {
+  List result;
   if (theta.isNull()) {
-    return negative_log_likelihood_wo_theta(data, lambda, cv, start);
+    result = negative_log_likelihood_wo_theta(data, lambda, cv, start);
   } else {
-    return List::create(
+    result = List::create(
       Named("value") =
         negative_log_likelihood_wo_cv(data, as<colvec>(theta), lambda)
     );
   }
+  result["value"] = adjust_cost_value(result["value"], data.n_rows);
+  return result;
 }
 
 List Fastcpd::negative_log_likelihood_wo_theta(

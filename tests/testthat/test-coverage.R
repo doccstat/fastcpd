@@ -3,7 +3,7 @@ testthat::test_that(
     set.seed(1)
     result_mean <- fastcpd(
       formula = ~ . - 1,
-      data = data.frame(x = c(rnorm(100, 0, 10), rnorm(200, 100, 10))),
+      data = data.frame(x = c(rnorm(100, 0, 10), rnorm(100, 100, 10))),
       cost = function(data) {
         n <- nrow(data)
         demeaned_data <- sweep(data, 2, colMeans(data))

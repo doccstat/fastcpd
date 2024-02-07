@@ -112,11 +112,7 @@ List fastcpd_impl(
           List cost_result = fastcpd_class.negative_log_likelihood(
             data_segment, wrap(theta), lambda, false, R_NilValue
           );
-
-          // Adjust cost value.
-          cval(i - 1) = fastcpd_class.adjust_cost_value(
-            as<double>(cost_result["value"]), data_segment.n_rows
-          );
+          cval(i - 1) = as<double>(cost_result["value"]);
         } else {
           // t - tau < p or for lasso t - tau < 3
         }
@@ -143,11 +139,7 @@ List fastcpd_impl(
             );
           }
         }
-
-        // Adjust cost value.
-        cval(i - 1) = fastcpd_class.adjust_cost_value(
-          as<double>(cost_optim_result["value"]), data_segment.n_rows
-        );
+        cval(i - 1) = as<double>(cost_optim_result["value"]);
 
         // If `vanilla_percentage` is not 1, then we need to keep track of
         // thetas for later `fastcpd` steps.
@@ -282,11 +274,7 @@ List fastcpd_impl(
       );
     }
 
-
-    // Adjust cost value.
-    cost_values(i) = fastcpd_class.adjust_cost_value(
-      as<double>(cost_optim_result["value"]), data_segment.n_rows
-    );
+    cost_values(i) = as<double>(cost_optim_result["value"]);
 
     // Parameters are not involved for PELT.
     if (vanilla_percentage < 1) {
