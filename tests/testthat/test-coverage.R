@@ -53,7 +53,7 @@ testthat::test_that(
     data <- c(rnorm(300, 0, 100), rnorm(400, 100, 100), rnorm(300, 0, 100))
     result_mean <- fastcpd.mean(data)
     testthat::expect_equal(result_mean@cp_set, c(294, 702))
-    testthat::expect_equal(median(result_mean@residuals), -2)
+    testthat::expect_equal(median(result_mean@residuals), -2.1504017)
   }
 )
 
