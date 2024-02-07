@@ -5,22 +5,22 @@
 context("negative_log_likelihood_wo_theta Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
-      /* data */ mat(),
       /* beta */ 0,
-      /* p */ 0,
-      /* order */ colvec({3, 2}),
-      /* family */ "arma",
-      /* vanilla_percentage */ 0.0,
-      /* segment_count */ 0,
-      /* winsorise_minval */ 0.0,
-      /* winsorise_maxval */ 0.0,
+      /* data */ mat(),
       /* epsilon */ 0.0,
+      /* family */ "arma",
+      /* lower */ colvec(),
+      /* mean_data_cov */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
-      /* lower */ colvec(),
+      /* order */ colvec({3, 2}),
+      /* p */ 0,
+      /* p_response */ 0,
+      /* segment_count */ 0,
       /* upper */ colvec(),
-      /* mean_data_cov */ mat(),
-      /* p_response */ 0
+      /* vanilla_percentage */ 0.0,
+      /* winsorise_maxval */ 0.0,
+      /* winsorise_minval */ 0.0
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
@@ -48,22 +48,22 @@ context("negative_log_likelihood_wo_theta Unit Test") {
 context("negative_log_likelihood_wo_cv Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
-      /* data */ mat(),
       /* beta */ 0,
-      /* p */ 0,
-      /* order */ colvec({3, 2}),
-      /* family */ "arma",
-      /* vanilla_percentage */ 0.0,
-      /* segment_count */ 0,
-      /* winsorise_minval */ 0.0,
-      /* winsorise_maxval */ 0.0,
+      /* data */ mat(),
       /* epsilon */ 0.0,
+      /* family */ "arma",
+      /* lower */ colvec(),
+      /* mean_data_cov */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
-      /* lower */ colvec(),
+      /* order */ colvec({3, 2}),
+      /* p */ 0,
+      /* p_response */ 0,
+      /* segment_count */ 0,
       /* upper */ colvec(),
-      /* mean_data_cov */ mat(),
-      /* p_response */ 0
+      /* vanilla_percentage */ 0.0,
+      /* winsorise_maxval */ 0.0,
+      /* winsorise_minval */ 0.0
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
@@ -78,22 +78,22 @@ context("negative_log_likelihood_wo_cv Unit Test") {
 context("cost_update_gradient Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
-      /* data */ mat(),
       /* beta */ 0,
-      /* p */ 0,
-      /* order */ colvec({3, 2}),
-      /* family */ "arma",
-      /* vanilla_percentage */ 0.0,
-      /* segment_count */ 0,
-      /* winsorise_minval */ 0.0,
-      /* winsorise_maxval */ 0.0,
+      /* data */ mat(),
       /* epsilon */ 0.0,
+      /* family */ "arma",
+      /* lower */ colvec(),
+      /* mean_data_cov */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
-      /* lower */ colvec(),
+      /* order */ colvec({3, 2}),
+      /* p */ 0,
+      /* p_response */ 0,
+      /* segment_count */ 0,
       /* upper */ colvec(),
-      /* mean_data_cov */ mat(),
-      /* p_response */ 0
+      /* vanilla_percentage */ 0.0,
+      /* winsorise_maxval */ 0.0,
+      /* winsorise_minval */ 0.0
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
@@ -108,22 +108,22 @@ context("cost_update_gradient Unit Test") {
 context("cost_update_hessian Unit Test") {
   test_that("binomal is correct for a two dimensional data") {
     fastcpd::classes::Fastcpd fastcpd_class(
-      /* data */ mat(),
       /* beta */ 0,
-      /* p */ 0,
-      /* order */ colvec(),
-      /* family */ "binomial",
-      /* vanilla_percentage */ 0.0,
-      /* segment_count */ 0,
-      /* winsorise_minval */ 0.0,
-      /* winsorise_maxval */ 0.0,
+      /* data */ mat(),
       /* epsilon */ 0.0,
+      /* family */ "binomial",
+      /* lower */ colvec(),
+      /* mean_data_cov */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
-      /* lower */ colvec(),
+      /* order */ colvec(),
+      /* p */ 0,
+      /* p_response */ 0,
+      /* segment_count */ 0,
       /* upper */ colvec(),
-      /* mean_data_cov */ mat(),
-      /* p_response */ 0
+      /* vanilla_percentage */ 0.0,
+      /* winsorise_maxval */ 0.0,
+      /* winsorise_minval */ 0.0
     );
 
     const mat data = {{1, 1, 0.2}};
@@ -136,22 +136,22 @@ context("cost_update_hessian Unit Test") {
 
   test_that("poisson is correct for a two dimensional data") {
     fastcpd::classes::Fastcpd fastcpd_class(
-      /* data */ mat(),
       /* beta */ 0,
-      /* p */ 0,
-      /* order */ colvec(),
-      /* family */ "poisson",
-      /* vanilla_percentage */ 0.0,
-      /* segment_count */ 0,
-      /* winsorise_minval */ 0.0,
-      /* winsorise_maxval */ 0.0,
+      /* data */ mat(),
       /* epsilon */ 0.0,
+      /* family */ "poisson",
+      /* lower */ colvec(),
+      /* mean_data_cov */ mat(),
       /* min_prob */ 1e10,
       /* momentum_coef */ 0.0,
-      /* lower */ colvec(),
+      /* order */ colvec(),
+      /* p */ 0,
+      /* p_response */ 0,
+      /* segment_count */ 0,
       /* upper */ colvec(),
-      /* mean_data_cov */ mat(),
-      /* p_response */ 0
+      /* vanilla_percentage */ 0.0,
+      /* winsorise_maxval */ 0.0,
+      /* winsorise_minval */ 0.0
     );
 
     const mat data = {{4, 1, 0.2}};
@@ -164,22 +164,22 @@ context("cost_update_hessian Unit Test") {
 
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
-      /* data */ mat(),
       /* beta */ 0,
-      /* p */ 0,
-      /* order */ colvec({3, 2}),
-      /* family */ "arma",
-      /* vanilla_percentage */ 0.0,
-      /* segment_count */ 0,
-      /* winsorise_minval */ 0.0,
-      /* winsorise_maxval */ 0.0,
+      /* data */ mat(),
       /* epsilon */ 0.0,
+      /* family */ "arma",
+      /* lower */ colvec(),
+      /* mean_data_cov */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
-      /* lower */ colvec(),
+      /* order */ colvec({3, 2}),
+      /* p */ 0,
+      /* p_response */ 0,
+      /* segment_count */ 0,
       /* upper */ colvec(),
-      /* mean_data_cov */ mat(),
-      /* p_response */ 0
+      /* vanilla_percentage */ 0.0,
+      /* winsorise_maxval */ 0.0,
+      /* winsorise_minval */ 0.0
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
@@ -200,22 +200,22 @@ context("cost_update_hessian Unit Test") {
 context("update_theta_sum Unit Test") {
   test_that("update performs normally") {
     fastcpd::classes::Fastcpd fastcpd_class(
-      /* data */ mat(),
       /* beta */ 0,
-      /* p */ 3,
-      /* order */ colvec({0}),
-      /* family */ "gaussian",
-      /* vanilla_percentage */ 0.0,
-      /* segment_count */ 0,
-      /* winsorise_minval */ 0.0,
-      /* winsorise_maxval */ 0.0,
+      /* data */ mat(),
       /* epsilon */ 0.0,
+      /* family */ "gaussian",
+      /* lower */ colvec(),
+      /* mean_data_cov */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
-      /* lower */ colvec(),
+      /* order */ colvec(),
+      /* p */ 3,
+      /* p_response */ 0,
+      /* segment_count */ 0,
       /* upper */ colvec(),
-      /* mean_data_cov */ mat(),
-      /* p_response */ 0
+      /* vanilla_percentage */ 0.0,
+      /* winsorise_maxval */ 0.0,
+      /* winsorise_minval */ 0.0
     );
     fastcpd_class.create_theta_sum(0, colvec({1, 2, 3}));
     fastcpd_class.update_theta_sum(0, colvec({4, 5, 6}));
@@ -223,8 +223,6 @@ context("update_theta_sum Unit Test") {
     expect_true(fastcpd_class.get_theta_sum().n_cols == 1);
     colvec theta_sum = fastcpd_class.get_theta_sum().col(0);
     colvec expected_theta_sum = {5, 7, 9};
-    expect_true(
-      arma::approx_equal(theta_sum, expected_theta_sum, "absdiff", 1e-6)
-    );
+    expect_true(approx_equal(theta_sum, expected_theta_sum, "absdiff", 1e-6));
   }
 }

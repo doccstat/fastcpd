@@ -3,29 +3,45 @@
 
 #include "RcppArmadillo.h"
 
+using ::arma::abs;
 using ::arma::accu;
+using ::arma::approx_equal;
 using ::arma::as_scalar;
 using ::arma::clamp;
+using ::arma::cov;
+using ::arma::diff;
+using ::arma::dot;
 using ::arma::eye;
+using ::arma::floor;
 using ::arma::index_min;
 using ::arma::join_cols;
+using ::arma::join_rows;
+using ::arma::join_slices;
 using ::arma::linspace;
 using ::arma::log_det_sympd;
 using ::arma::max;
+using ::arma::mean;
 using ::arma::min;
 using ::arma::norm;
 using ::arma::ones;
+using ::arma::reverse;
 using ::arma::sign;
 using ::arma::solve;
+using ::arma::sort;
+using ::arma::square;
+using ::arma::trace;
+using ::arma::unique;
 using ::arma::zeros;
 using ::Rcpp::as;
 using ::Rcpp::Named;
 using ::Rcpp::stop;
+using ::Rcpp::wrap;
 
 using ::arma::colvec;
 using ::arma::cube;
 using ::arma::mat;
 using ::arma::rowvec;
+using ::arma::span;
 using ::arma::ucolvec;
 using ::arma::uvec;
 using ::arma::vec;

@@ -53,14 +53,14 @@ List fastcpd_impl(
   }
 
   fastcpd::classes::Fastcpd fastcpd_class(
-    data, beta, p, order, family, vanilla_percentage, segment_count,
-    winsorise_minval, winsorise_maxval, epsilon, min_prob, momentum_coef,
-    lower, upper, mean_data_cov, p_response
+    beta, data, epsilon, family, lower, mean_data_cov, min_prob,
+    momentum_coef, order, p, p_response, segment_count, upper,
+    vanilla_percentage, winsorise_maxval, winsorise_minval
   );
 
-  fastcpd_class.wrap_cost(cost);
-  fastcpd_class.wrap_cost_gradient(cost_gradient);
-  fastcpd_class.wrap_cost_hessian(cost_hessian);
+  fastcpd_class.create_cost_function_wrapper(cost);
+  fastcpd_class.create_cost_gradient_wrapper(cost_gradient);
+  fastcpd_class.create_cost_hessian_wrapper(cost_hessian);
 
   if (contain(FASTCPD_FAMILIES, family) || vanilla_percentage < 1) {
     fastcpd_class.create_segment_indices();
@@ -88,12 +88,12 @@ List fastcpd_impl(
         // Mean of `err_sd` only works if error sd is unchanged.
         lambda = mean(
           fastcpd_class.get_err_sd()
-        ) * sqrt(2 * log(p) / (t - tau));
+        ) * sqrt(2 * std::log(p) / (t - tau));
       }
       mat data_segment = data.rows(tau, t - 1);
       if (t > vanilla_percentage * n) {
         // fastcpd
-        fastcpd_class.cost_update(t, tau, i, k, lambda, line_search);
+        fastcpd_class.update_cost_parameters(t, tau, i, k, lambda, line_search);
         colvec theta =
             fastcpd_class.get_theta_sum().col(i - 1) / (t - tau);
         if (family == "poisson" && t - tau >= p) {
@@ -110,7 +110,7 @@ List fastcpd_impl(
           (family == "lasso" && t - tau >= 3)
         ) {
           List cost_result = fastcpd_class.negative_log_likelihood(
-            data_segment, Rcpp::wrap(theta), lambda, false, R_NilValue
+            data_segment, wrap(theta), lambda, false, R_NilValue
           );
           cval(i - 1) = as<double>(cost_result["value"]);
         } else {
@@ -120,14 +120,16 @@ List fastcpd_impl(
         // vanilla PELT
         List cost_optim_result;
         if (!contain(FASTCPD_FAMILIES, family)) {
-          cost_optim_result = fastcpd_class.cost_optim(data_segment, lambda);
+          cost_optim_result = fastcpd_class.get_optimized_cost(
+            data_segment, lambda
+          );
         } else {
           if (warm_start && t - tau >= 10 * p) {
             cost_optim_result =
               fastcpd_class.negative_log_likelihood(
                 data_segment, R_NilValue, lambda, false,
                 fastcpd_class.get_segment_theta_hat(t)
-                // Or use `Rcpp::wrap(start.col(tau))` for warm start.
+                // Or use `wrap(start.col(tau))` for warm start.
             );
             start.col(tau) = as<colvec>(cost_optim_result["par"]);
           } else {
@@ -197,10 +199,10 @@ List fastcpd_impl(
   if (cp_set.n_elem) {
     cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
   }
-  cp_set = arma::sort(arma::unique(std::move(cp_set_)));
+  cp_set = sort(unique(std::move(cp_set_)));
 
   // Remove change points close to each other.
-  ucolvec cp_set_too_close = arma::find(arma::diff(cp_set) <= trim * n);
+  ucolvec cp_set_too_close = arma::find(diff(cp_set) <= trim * n);
   if (cp_set_too_close.n_elem > 0) {
     int rest_element_count = cp_set.n_elem - cp_set_too_close.n_elem;
     colvec cp_set_rest_left = zeros<vec>(rest_element_count),
@@ -221,7 +223,7 @@ List fastcpd_impl(
         i_right++;
       }
     }
-    cp_set = arma::floor((cp_set_rest_left + cp_set_rest_right) / 2);
+    cp_set = floor((cp_set_rest_left + cp_set_rest_right) / 2);
   }
   cp_set = cp_set(arma::find(cp_set > 0));
 
@@ -240,7 +242,7 @@ List fastcpd_impl(
     cp_loc_.rows(1, cp_loc_.n_elem - 2) = cp_set;
   }
   cp_loc_(cp_loc_.n_elem - 1) = n;
-  colvec cp_loc = arma::unique(std::move(cp_loc_));
+  colvec cp_loc = unique(std::move(cp_loc_));
   colvec cost_values = zeros<vec>(cp_loc.n_elem - 1);
   mat thetas = zeros<mat>(p, cp_loc.n_elem - 1);
   mat residual;
@@ -263,7 +265,9 @@ List fastcpd_impl(
     mat data_segment = data.rows(segment_data_index);
     List cost_optim_result;
     if (!contain(FASTCPD_FAMILIES, family)) {
-      cost_optim_result = fastcpd_class.cost_optim(data_segment, lambda);
+      cost_optim_result = fastcpd_class.get_optimized_cost(
+        data_segment, lambda
+      );
     } else {
       cost_optim_result = fastcpd_class.negative_log_likelihood(
         data_segment, R_NilValue, lambda, false, R_NilValue
