@@ -40,7 +40,8 @@ testthat::test_that(
         n <- nrow(data)
         demeaned_data <- sweep(data, 2, colMeans(data))
         n / 2 * (log(100) + log(2 * pi) + norm(demeaned_data, "2")^2 / n / 100)
-      }
+      },
+      cp_only = TRUE
     )
     testthat::expect_equal(result_mean@cp_set, 100)
   }
