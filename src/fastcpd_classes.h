@@ -180,6 +180,9 @@ class Fastcpd {
     colvec line_search
   );
 
+  // Adjust cost value for MBIC and MDL.
+  double adjust_cost_value(double value, const unsigned int nrows);
+
   // Update `err_sd` for a specific segment.
   void update_err_sd(const unsigned int segment_index, const double err_var);
 

@@ -423,6 +423,19 @@ void Fastcpd::update_cost_parameters_step(
   hessian.slice(i - 1) = std::move(hessian_i);
 }
 
+double Fastcpd::adjust_cost_value(
+  double value,
+  const unsigned int nrows
+) {
+  if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
+    value += data.n_cols * std::log((double) nrows / data.n_rows) / 2;
+  }
+  if (cost_adjustment == "MDL") {
+    value *= std::log2(M_E);
+  }
+  return value;
+}
+
 List Fastcpd::get_optimized_cost(
     const mat data_segment,
     const double lambda

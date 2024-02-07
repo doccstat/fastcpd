@@ -122,7 +122,7 @@ List Fastcpd::negative_log_likelihood_wo_theta(
       Named("value") = data.n_rows / 2.0 * (
         std::log(2.0 * M_PI) * data.n_cols + log_det_sympd(mean_data_cov) +
           trace(solve(mean_data_cov, residuals.t() * residuals)) / data.n_rows
-      ) + data.n_cols * std::log(data.n_rows),
+      ),
       Named("residuals") = residuals
     );
   } else if (family == "variance") {

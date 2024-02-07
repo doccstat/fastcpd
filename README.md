@@ -137,7 +137,7 @@ for (i in 1:600) {
   x[i + 3] <- 0.6 * x[i + 2] - 0.2 * x[i + 1] + 0.1 * x[i] + rnorm(1, 0, 3)
 }
 for (i in 601:1000) {
-  x[i + 1] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
+  x[i + 3] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
 }
 result <- fastcpd::fastcpd.ar(x[3 + seq_len(n)], 3, r.progress = FALSE)
 summary(result)
@@ -146,33 +146,41 @@ summary(result)
 #> fastcpd::fastcpd.ar(data = x[3 + seq_len(n)], order = 3, r.progress = FALSE)
 #> 
 #> Change points:
-#> 612 
+#> 614 
 #> 
 #> Cost values:
-#> 2748.404 2022.597 
+#> 2743.514 2028.114 
 #> 
 #> Parameters:
-#>     segment 1   segment 2
-#> 1  0.57656238  0.13006290
-#> 2 -0.21582749 -0.03084403
-#> 3  0.07985424 -0.04544551
+#>     segment 1 segment 2
+#> 1  0.57120256 0.2371809
+#> 2 -0.20985108 0.4031244
+#> 3  0.08221978 0.2290323
 plot(result)
 ```
 
 ![](man/figures/README-ar3-1.png)<!-- -->
 
-<!-- Remove the escape in markdown file and manually split the line. -->
+<details open>
+<summary>
+Tip
+</summary>
 
-> [!TIP]
-> It is hard to demonstrate all the features of `fastcpd` in a
-> single example due to the flexibility of the package. For more
-> examples, please refer to the [function
-> reference](https://fastcpd.xingchi.li/reference/index.html).
+It is hard to demonstrate all the features of `fastcpd` in a single
+example due to the flexibility of the package. For more examples, please
+refer to the [function
+reference](https://fastcpd.xingchi.li/reference/index.html).
 
-> [!NOTE]
-> `r.progress = FALSE` is used to suppress the progress bar.
-> Users are expected to see the progress bar when running the code by
-> default.
+</details>
+<details open>
+<summary>
+Note
+</summary>
+
+`r.progress = FALSE` is used to suppress the progress bar. Users are
+expected to see the progress bar when running the code by default.
+
+</details>
 
 ## Examples
 
