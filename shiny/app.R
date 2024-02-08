@@ -3,6 +3,8 @@ library(shiny)
 # Define UI for the app
 ui <- fluidPage(
 
+  theme = bslib::bs_theme(bootswatch = "flatly"),
+
   # App title
   titlePanel(
     paste0(
