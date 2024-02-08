@@ -51,7 +51,7 @@ testthat::test_that(
   "1d mean", {
     set.seed(1)
     data <- c(rnorm(300, 0, 100), rnorm(400, 100, 100), rnorm(300, 0, 100))
-    result_mean <- fastcpd.mean(data)
+    result_mean <- fastcpd.mean(data, beta = "MDL")
     testthat::expect_equal(result_mean@cp_set, c(294, 702))
     testthat::expect_equal(median(result_mean@residuals), -2.1504017)
   }
@@ -115,7 +115,8 @@ testthat::test_that(
       cost = logistic_loss,
       cost_gradient = logistic_loss_gradient,
       cost_hessian = logistic_loss_hessian,
-      k = function(x) if (x < 10) 1 else 0
+      k = function(x) if (x < 10) 1 else 0,
+      r.progress = FALSE
     )
     testthat::expect_equal(result@cp_set, 147)
   }
