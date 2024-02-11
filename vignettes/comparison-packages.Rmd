@@ -32,8 +32,8 @@ for (
   package in c(
     "ggplot2", "mvtnorm",
     # "bcp",
-    "breakfast", "changepoint", "cpm", "ecp", "fpop", "gfpop", "mcp",
-    "mosum", "not", "segmented", "stepR", "strucchange", "wbs"
+    "breakfast", "changepoint", "cpm", "ecp", "fpop", "gfpop", "jointseg",
+    "mcp", "mosum", "not", "segmented", "stepR", "strucchange", "wbs"
   )
 ) {
   if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
@@ -254,6 +254,10 @@ gfpop::gfpop(
 )$changepoints
 ```
 
+```{r univariate-mean-change-jointseg}
+jointseg::jointSeg(mean_data_1, K = 2)$bestBkp
+```
+
 ```{r univariate-mean-change-stepR}
 stepR::stepFit(mean_data_1, alpha = 0.5)$rightEnd
 ```
@@ -337,6 +341,10 @@ Some methods are plotted due to the un-retrievable change points.
 
 ```{r multivariate-mean-change-fastcpd}
 fastcpd::fastcpd.mean(mean_data_3, r.progress = FALSE)@cp_set
+```
+
+```{r multivariate-mean-change-jointseg}
+jointseg::jointSeg(mean_data_3, K = 5)$bestBkp
 ```
 
 ```{r multivariate-mean-change-strucchange}
