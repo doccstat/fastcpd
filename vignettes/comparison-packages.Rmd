@@ -32,7 +32,7 @@ for (
   package in c(
     "ggplot2", "mvtnorm",
     # "bcp",
-    "breakfast", "changepoint", "cpm", "ecp", "fpop", "mcp",
+    "breakfast", "changepoint", "cpm", "ecp", "fpop", "gfpop", "mcp",
     "mosum", "not", "segmented", "stepR", "strucchange", "wbs"
   )
 ) {
@@ -241,6 +241,17 @@ if (interactive()) {
 
 ```{r univariate-mean-change-fpop}
 fpop::Fpop(mean_data_1, nrow(mean_data_1))$t.est
+```
+
+```{r univariate-mean-change-gfpop}
+gfpop::gfpop(
+  data = mean_data_1,
+  mygraph = gfpop::graph(
+    penalty = 2 * log(nrow(mean_data_1)) * gfpop::sdDiff(mean_data_1) ^ 2,
+    type = "updown"
+  ),
+  type = "mean"
+)$changepoints
 ```
 
 ```{r univariate-mean-change-stepR}
