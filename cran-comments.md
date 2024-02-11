@@ -2,7 +2,7 @@
 
 ### fastcpd 0.11.1
 
-*   Add package comparison with `gfpop`.
+*   Add package comparison with `gfpop` and `jointseg`.
 
 ### fastcpd 0.11.0
 
