@@ -1,3 +1,7 @@
+# fastcpd 0.11.1
+
+*   Add package comparison with `gfpop`.
+
 # fastcpd 0.11.0
 
 *   **Note**: From now on, MBIC is used as the default penalty selection for
