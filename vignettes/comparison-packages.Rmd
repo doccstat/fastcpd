@@ -33,7 +33,7 @@ for (
     "ggplot2", "mvtnorm",
     # "bcp",
     "breakfast", "changepoint", "cpm", "CptNonPar", "ecp", "fpop", "gfpop",
-    "jointseg", "mcp", "mosum", "not", "Rbeast",
+    "InspectChangepoint", "jointseg", "mcp", "mosum", "not", "Rbeast",
     "segmented", "stepR", "strucchange", "VARDetect", "wbs"
   )
 ) {
@@ -276,6 +276,14 @@ gfpop::gfpop(
 )$changepoints
 ```
 
+```{r univariate-mean-change-InspectChangepoint}
+InspectChangepoint::inspect(
+  t(mean_data_1),
+  threshold =
+    InspectChangepoint::compute.threshold(nrow(mean_data_1), ncol(mean_data_1))
+)$changepoints[, "location"]
+```
+
 ```{r univariate-mean-change-jointseg}
 jointseg::jointSeg(mean_data_1, K = 2)$bestBkp
 ```
@@ -349,6 +357,14 @@ CptNonPar::np.mojo(mv_data_1, G = floor(length(mv_data_1) / 6))$cpts
 cpm::processStream(mv_data_1, cpmType = "GLR")$changePoints
 ```
 
+```{r univariate-mean-and-or-variance-change-InspectChangepoint}
+InspectChangepoint::inspect(
+  t(mv_data_1),
+  threshold =
+    InspectChangepoint::compute.threshold(nrow(mv_data_1), ncol(mv_data_1))
+)$changepoints[, "location"]
+```
+
 ```{r univariate-mean-and-or-variance-change-Rbeast}
 Rbeast::beast(
   mv_data_1, season = "none", print.progress = FALSE, quiet = TRUE
@@ -383,6 +399,14 @@ fastcpd::fastcpd.mean(mean_data_3, r.progress = FALSE)@cp_set
 
 ```{r multivariate-mean-change-CptNonPar}
 CptNonPar::np.mojo(mean_data_3, G = floor(nrow(mean_data_3) / 6))$cpts
+```
+
+```{r multivariate-mean-change-InspectChangepoint}
+InspectChangepoint::inspect(
+  t(mean_data_3),
+  threshold =
+    InspectChangepoint::compute.threshold(nrow(mean_data_3), ncol(mean_data_3))
+)$changepoints[, "location"]
 ```
 
 ```{r multivariate-mean-change-jointseg}
@@ -430,6 +454,14 @@ fastcpd::fastcpd.mv(mv_data_3, r.progress = FALSE)@cp_set
 ```{r multivariate-mean-and-or-variance-change-ecp}
 # Slow
 ecp::e.divisive(mv_data_3)$estimates
+```
+
+```{r multivariate-mean-and-or-variance-change-InspectChangepoint}
+InspectChangepoint::inspect(
+  t(mv_data_3),
+  threshold =
+    InspectChangepoint::compute.threshold(nrow(mv_data_3), ncol(mv_data_3))
+)$changepoints[, "location"]
 ```
 
 ```{r multivariate-mean-and-or-variance-change-Rbeast}

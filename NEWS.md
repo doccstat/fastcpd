@@ -1,7 +1,7 @@
 # fastcpd 0.11.1
 
-*   Add package comparison with `CptNonPar`, `gfpop`, `jointseg`, `Rbeast` and
-    `VARDetect`.
+*   Add package comparison with `CptNonPar`, `gfpop`, `InspectChangepoint`,
+    `jointseg`, `Rbeast` and `VARDetect`.
 
 # fastcpd 0.11.0
 
