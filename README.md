@@ -127,6 +127,11 @@ installing `RcppArmadillo`.
 [![fastcpd
 cheatsheet](man/figures/cheatsheets.png)](https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf)
 
+### R Shiny App
+
+Available soon:
+[rshiny.fastcpd.xingchi.li](https://rshiny.fastcpd.xingchi.li)
+
 ## Usage
 
 ``` r
