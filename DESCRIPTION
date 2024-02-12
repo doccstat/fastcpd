@@ -55,6 +55,7 @@ Suggests:
     mvtnorm,
     not,
     numDeriv,
+    Rbeast,
     rmarkdown,
     segmented,
     stepR,

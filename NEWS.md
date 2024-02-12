@@ -1,6 +1,6 @@
 # fastcpd 0.11.1
 
-*   Add package comparison with `gfpop` and `jointseg`.
+*   Add package comparison with `gfpop`, `jointseg` and `Rbeast`.
 
 # fastcpd 0.11.0
 
