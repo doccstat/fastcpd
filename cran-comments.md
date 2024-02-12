@@ -2,7 +2,7 @@
 
 ### fastcpd 0.11.1
 
-*   Add package comparison with `gfpop`, `jointseg` and `Rbeast`.
+*   Add package comparison with `CptNonPar`, `gfpop`, `jointseg` and `Rbeast`.
 
 ### fastcpd 0.11.0
 
