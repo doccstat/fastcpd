@@ -32,8 +32,9 @@ for (
   package in c(
     "ggplot2", "mvtnorm",
     # "bcp",
-    "breakfast", "changepoint", "cpm", "ecp", "fpop", "gfpop", "jointseg",
-    "mcp", "mosum", "not", "Rbeast", "segmented", "stepR", "strucchange", "wbs"
+    "breakfast", "changepoint", "cpm", "CptNonPar", "ecp", "fpop", "gfpop",
+    "jointseg", "mcp", "mosum", "not", "Rbeast",
+    "segmented", "stepR", "strucchange", "wbs"
   )
 ) {
   if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
@@ -209,6 +210,10 @@ Some methods are plotted due to the un-retrievable change points.
 fastcpd::fastcpd.mean(mean_data_1, r.progress = FALSE)@cp_set
 ```
 
+```{r univariate-mean-change-CptNonPar}
+CptNonPar::np.mojo(mean_data_1, G = floor(length(mean_data_1) / 6))$cpts
+```
+
 ```{r univariate-mean-change-strucchange}
 # Slow
 strucchange::breakpoints(y ~ 1, data = data.frame(y = mean_data_1))$breakpoints
@@ -319,6 +324,10 @@ ecp::e.divisive(mv_data_1)$estimates
 changepoint::cpt.meanvar(c(mv_data_1))@cpts
 ```
 
+```{r univariate-mean-and-or-variance-change-CptNonPar}
+CptNonPar::np.mojo(mv_data_1, G = floor(length(mv_data_1) / 6))$cpts
+```
+
 ```{r univariate-mean-and-or-variance-change-cpm}
 cpm::processStream(mv_data_1, cpmType = "GLR")$changePoints
 ```
@@ -353,6 +362,10 @@ Some methods are plotted due to the un-retrievable change points.
 
 ```{r multivariate-mean-change-fastcpd}
 fastcpd::fastcpd.mean(mean_data_3, r.progress = FALSE)@cp_set
+```
+
+```{r multivariate-mean-change-CptNonPar}
+CptNonPar::np.mojo(mean_data_3, G = floor(nrow(mean_data_3) / 6))$cpts
 ```
 
 ```{r multivariate-mean-change-jointseg}
@@ -484,6 +497,10 @@ Some methods are plotted due to the un-retrievable change points.
 fastcpd::fastcpd.ar(ar_data, 3, r.progress = FALSE)@cp_set
 ```
 
+```{r ar3-CptNonPar}
+CptNonPar::np.mojo(ar_data, G = floor(length(ar_data) / 6))$cpts
+```
+
 ```{r ar3-segmented}
 segmented::segmented(
   lm(
@@ -512,6 +529,10 @@ The true change point is 200.
 
 ```{r garch11-fastcpd}
 fastcpd::fastcpd.garch(garch_data, c(1, 1), r.progress = FALSE)@cp_set
+```
+
+```{r garch11-CptNonPar}
+CptNonPar::np.mojo(garch_data, G = floor(length(garch_data) / 6))$cpts
 ```
 
 ```{r garch11-strucchange}
