@@ -388,8 +388,8 @@ to the un-retrievable change points.</p>
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data_3</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">mean_data_3</span>, K <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span></span>
-<span><span class="co">#&gt; [1]  74 289 297 300 700</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">mean_data_3</span>, K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span></span>
+<span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span></span>
