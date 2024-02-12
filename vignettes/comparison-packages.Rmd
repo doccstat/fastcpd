@@ -34,7 +34,7 @@ for (
     # "bcp",
     "breakfast", "changepoint", "cpm", "CptNonPar", "ecp", "fpop", "gfpop",
     "jointseg", "mcp", "mosum", "not", "Rbeast",
-    "segmented", "stepR", "strucchange", "wbs"
+    "segmented", "stepR", "strucchange", "VARDetect", "wbs"
   )
 ) {
   if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
@@ -199,6 +199,23 @@ for (i in 201:400) {
 garch_data <- x[-1]
 
 plot.ts(garch_data)
+```
+
+```{r data-setup-var2}
+n <- 1000
+p <- 2
+theta_1 <- matrix(c(-0.3, 0.6, -0.5, 0.4, 0.2, 0.2, 0.2, -0.2), nrow = p)
+theta_2 <- matrix(c(0.3, -0.4, 0.1, -0.5, -0.5, -0.2, -0.5, 0.2), nrow = p)
+x <- matrix(0, n + 2, p)
+for (i in 1:600) {
+  x[i + 2, ] <- theta_1 %*% c(x[i + 1, ], x[i, ]) + rnorm(p, 0, 1)
+}
+for (i in 601:n) {
+  x[i + 2, ] <- theta_2 %*% c(x[i + 1, ], x[i, ]) + rnorm(p, 0, 1)
+}
+var_data <- x[-seq_len(2), ]
+
+plot.ts(var_data)
 ```
 
 # Univariate mean change
@@ -537,4 +554,16 @@ CptNonPar::np.mojo(garch_data, G = floor(length(garch_data) / 6))$cpts
 
 ```{r garch11-strucchange}
 strucchange::breakpoints(x ~ 1, data = data.frame(x = garch_data))$breakpoints
+```
+
+# VAR(2)
+
+The true change points is 500.
+
+```{r var2-fastcpd}
+fastcpd::fastcpd.var(var_data, 2, r.progress = FALSE)@cp_set
+```
+
+```{r var2-VARDetect}
+try(VARDetect::tbss(var_data))
 ```
