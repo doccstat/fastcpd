@@ -62,6 +62,7 @@ Suggests:
     stepR,
     strucchange,
     testthat (>= 3.0.0),
+    VARDetect,
     wbs,
     xml2,
     zoo
