@@ -344,7 +344,7 @@ fastcpd::fastcpd.mean(mean_data_3, r.progress = FALSE)@cp_set
 ```
 
 ```{r multivariate-mean-change-jointseg}
-jointseg::jointSeg(mean_data_3, K = 5)$bestBkp
+jointseg::jointSeg(mean_data_3, K = 2)$bestBkp
 ```
 
 ```{r multivariate-mean-change-strucchange}
