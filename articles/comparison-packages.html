@@ -107,7 +107,7 @@
 <span>    <span class="st">"ggplot2"</span>, <span class="st">"mvtnorm"</span>,</span>
 <span>    <span class="co"># "bcp",</span></span>
 <span>    <span class="st">"breakfast"</span>, <span class="st">"changepoint"</span>, <span class="st">"cpm"</span>, <span class="st">"CptNonPar"</span>, <span class="st">"ecp"</span>, <span class="st">"fpop"</span>, <span class="st">"gfpop"</span>,</span>
-<span>    <span class="st">"jointseg"</span>, <span class="st">"mcp"</span>, <span class="st">"mosum"</span>, <span class="st">"not"</span>, <span class="st">"Rbeast"</span>,</span>
+<span>    <span class="st">"InspectChangepoint"</span>, <span class="st">"jointseg"</span>, <span class="st">"mcp"</span>, <span class="st">"mosum"</span>, <span class="st">"not"</span>, <span class="st">"Rbeast"</span>,</span>
 <span>    <span class="st">"segmented"</span>, <span class="st">"stepR"</span>, <span class="st">"strucchange"</span>, <span class="st">"VARDetect"</span>, <span class="st">"wbs"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">{</span></span>
@@ -332,26 +332,239 @@ to the un-retrievable change points.</p>
 <span><span class="op">)</span><span class="op">$</span><span class="va">changepoints</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000</span></span></code></pre></div>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">mean_data_1</span>, K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span></span>
+<code class="sourceCode R"><span><span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/inspect.html" class="external-link">inspect</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span>,</span>
+<span>  threshold <span class="op">=</span></span>
+<span>    <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/compute.threshold.html" class="external-link">compute.threshold</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Calculating threshold...</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 1%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 2%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 3%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 4%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 5%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 6%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 7%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 8%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 9%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 10%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 11%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 12%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 13%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 14%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 15%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 16%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 17%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 18%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 19%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 20%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 21%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 22%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 23%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 24%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 25%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 26%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 27%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 28%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 29%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 30%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 31%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 32%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 33%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 34%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 35%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 36%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 37%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 38%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 39%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 40%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 41%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 42%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 43%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 44%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 45%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 46%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 47%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 48%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 49%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 50%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 51%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 52%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 53%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 54%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 55%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 56%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 57%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 58%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 59%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 60%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 61%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 62%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 63%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 64%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 65%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 66%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 67%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 68%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 69%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 70%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 71%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 72%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 73%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 74%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 75%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 76%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 77%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 78%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 79%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 80%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 81%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 82%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 83%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 84%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 85%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 86%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 87%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 88%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 89%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 90%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 91%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 92%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 93%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 94%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 95%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 96%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 97%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 98%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 99%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 100%. Threshold = 4.23973</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">mean_data_1</span>, K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span></span>
+<span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
 <span>  <span class="va">mean_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;  [1] 701 301 NaN NaN NaN NaN NaN NaN NaN NaN</span></span></code></pre></div>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stepR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stepR/man/stepFit.html" class="external-link">stepFit</a></span><span class="op">(</span><span class="va">mean_data_1</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">$</span><span class="va">rightEnd</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000</span></span></code></pre></div>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cpm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/cpm/man/processStream.html" class="external-link">processStream</a></span><span class="op">(</span><span class="va">mean_data_1</span>, cpmType <span class="op">=</span> <span class="st">"Student"</span><span class="op">)</span><span class="op">$</span><span class="va">changePoints</span></span>
 <span><span class="co">#&gt; [1] 299 699</span></span></code></pre></div>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">segmented</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/segmented/man/segmented.html" class="external-link">segmented</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean_data_1</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  seg.Z <span class="op">=</span> <span class="op">~</span> <span class="va">x</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">psi</span><span class="op">[</span>, <span class="st">"Est."</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] 495</span></span></code></pre></div>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slowest</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
@@ -362,10 +575,10 @@ to the un-retrievable change points.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">not</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/not/man/not.html" class="external-link">not</a></span><span class="op">(</span><span class="va">mean_data_1</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMean"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/univariate-mean-change-not-1.png" width="768"></p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot(bcp::bcp(mean_data_1))</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -373,29 +586,562 @@ to the un-retrievable change points.</p>
 </h2>
 <p>The true change points are 300, 700, 1000, 1300 and 1700. Some
 methods are plotted due to the un-retrievable change points.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_meanvariance.html">fastcpd.mv</a></span><span class="op">(</span><span class="va">mv_data_1</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1]  300  701 1000 1300 1699</span></span></code></pre></div>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span></span>
 <span><span class="co">#&gt; [1]    1  301  702 1000 1301 1702 2001</span></span></code></pre></div>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Data need to be processed</span></span>
 <span><span class="fu">changepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/changepoint/man/cpt.meanvar.html" class="external-link">cpt.meanvar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">@</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1]  300 2000</span></span></code></pre></div>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">mv_data_1</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1]  333  701 1300</span></span></code></pre></div>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cpm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/cpm/man/processStream.html" class="external-link">processStream</a></span><span class="op">(</span><span class="va">mv_data_1</span>, cpmType <span class="op">=</span> <span class="st">"GLR"</span><span class="op">)</span><span class="op">$</span><span class="va">changePoints</span></span>
 <span><span class="co">#&gt;  [1]   21   24  293  300  417  693  701  981  985  999 1296 1300 1695</span></span></code></pre></div>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/inspect.html" class="external-link">inspect</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span>,</span>
+<span>  threshold <span class="op">=</span></span>
+<span>    <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/compute.threshold.html" class="external-link">compute.threshold</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Calculating threshold...</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 1%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 2%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 3%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 4%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 5%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 6%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 7%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 8%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 9%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 10%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 11%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 12%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 13%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 14%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 15%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 16%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 17%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 18%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 19%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 20%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 21%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 22%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 23%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 24%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 25%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 26%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 27%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 28%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 29%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 30%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 31%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 32%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 33%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 34%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 35%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 36%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 37%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 38%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 39%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 40%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 41%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 42%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 43%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 44%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 45%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 46%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 47%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 48%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 49%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 50%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 51%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 52%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 53%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 54%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 55%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 56%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 57%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 58%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 59%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 60%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 61%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 62%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 63%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 64%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 65%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 66%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 67%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 68%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 69%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 70%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 71%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 72%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 73%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 74%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 75%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 76%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 77%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 78%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 79%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 80%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 81%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 82%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 83%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 84%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 85%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 86%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 87%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 88%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 89%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 90%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 91%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 92%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 93%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 94%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 95%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 96%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 97%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 98%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 99%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 100%. Threshold = 3.752783</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt;   [1]  300  701  703  704  705  708  710  711  713  714  716  717  718  721  723</span></span>
+<span><span class="co">#&gt;  [16]  725  726  731  733  735  736  737  739  742  745  752  754  756  758  759</span></span>
+<span><span class="co">#&gt;  [31]  768  770  771  778  785  790  793  795  796  797  799  800  803  804  805</span></span>
+<span><span class="co">#&gt;  [46]  806  807  808  821  828  829  833  835  837  840  841  842  848  851  852</span></span>
+<span><span class="co">#&gt;  [61]  854  855  857  862  863  865  867  868  876  878  879  880  882  883  884</span></span>
+<span><span class="co">#&gt;  [76]  887  889  894  898  899  905  906  907  908  909  912  919  926  927  928</span></span>
+<span><span class="co">#&gt;  [91]  930  933  934  935  936  938  940  952  955  956  960  962  963  966  967</span></span>
+<span><span class="co">#&gt; [106]  969  970  974  976  977  978  980  985  987  990  997  998  999 1300 1708</span></span>
+<span><span class="co">#&gt; [121] 1712 1714 1721 1723 1725 1726 1728 1729 1730 1732 1733 1742 1743 1757 1758</span></span>
+<span><span class="co">#&gt; [136] 1761 1762 1764 1765 1770 1771 1776 1779 1780 1782 1784 1786 1789 1791 1792</span></span>
+<span><span class="co">#&gt; [151] 1793 1797 1799 1801 1803 1804 1805 1806 1808 1809 1811 1812 1813 1816 1818</span></span>
+<span><span class="co">#&gt; [166] 1829 1831 1832 1836 1837 1838 1842 1844 1845 1851 1854 1855 1857 1859 1861</span></span>
+<span><span class="co">#&gt; [181] 1862 1865 1868 1869 1872 1873 1875 1876 1880 1882 1883 1891 1895 1905 1906</span></span>
+<span><span class="co">#&gt; [196] 1908 1911 1912 1914 1915 1917 1920 1922 1929 1931 1932 1933 1939 1941 1943</span></span>
+<span><span class="co">#&gt; [211] 1944 1947 1949 1950 1952 1953 1954 1959 1960 1962 1963 1964 1966 1970 1971</span></span>
+<span><span class="co">#&gt; [226] 1978 1980 1981 1985 1986 1987 1990 1991 1993 1995 1997 1998</span></span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
 <span>  <span class="va">mv_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
-<span><span class="co">#&gt;  [1]  702  301 1301  855  794  769  957  937  961  941</span></span></code></pre></div>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;  [1]  702 1301  301  794  855  769  957 1884  961 1892</span></span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
@@ -406,7 +1152,7 @@ methods are plotted due to the un-retrievable change points.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">not</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/not/man/not.html" class="external-link">not</a></span><span class="op">(</span><span class="va">mv_data_1</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMeanVar"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/univariate-mean-and-or-variance-change-not-1.png" width="768"></p>
 <pre><code><span><span class="co">#&gt; Press [enter] to continue</span></span></code></pre>
@@ -417,16 +1163,229 @@ methods are plotted due to the un-retrievable change points.</p>
 </h2>
 <p>The true change points are 300 and 700. Some methods are plotted due
 to the un-retrievable change points.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data_3</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">mean_data_3</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/inspect.html" class="external-link">inspect</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span>,</span>
+<span>  threshold <span class="op">=</span></span>
+<span>    <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/compute.threshold.html" class="external-link">compute.threshold</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Calculating threshold...</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 1%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 2%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 3%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 4%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 5%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 6%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 7%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 8%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 9%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 10%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 11%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 12%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 13%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 14%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 15%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 16%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 17%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 18%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 19%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 20%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 21%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 22%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 23%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 24%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 25%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 26%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 27%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 28%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 29%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 30%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 31%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 32%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 33%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 34%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 35%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 36%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 37%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 38%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 39%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 40%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 41%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 42%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 43%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 44%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 45%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 46%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 47%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 48%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 49%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 50%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 51%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 52%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 53%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 54%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 55%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 56%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 57%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 58%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 59%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 60%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 61%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 62%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 63%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 64%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 65%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 66%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 67%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 68%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 69%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 70%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 71%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 72%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 73%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 74%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 75%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 76%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 77%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 78%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 79%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 80%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 81%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 82%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 83%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 84%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 85%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 86%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 87%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 88%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 89%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 90%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 91%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 92%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 93%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 94%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 95%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 96%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 97%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 98%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 99%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 100%. Threshold = 4.34669</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">mean_data_3</span>, K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
 <span>    <span class="va">result_Rbeast</span> <span class="op">&lt;-</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast123.html" class="external-link">beast123</a></span><span class="op">(</span></span>
@@ -438,27 +1397,27 @@ to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,]  301  701  701</span></span>
-<span><span class="co">#&gt;  [2,]  701  301  301</span></span>
-<span><span class="co">#&gt;  [3,]   75   96  290</span></span>
-<span><span class="co">#&gt;  [4,]  122  NaN  287</span></span>
-<span><span class="co">#&gt;  [5,]  118  NaN    5</span></span>
-<span><span class="co">#&gt;  [6,]   71  NaN  NaN</span></span>
-<span><span class="co">#&gt;  [7,]   46  NaN  NaN</span></span>
-<span><span class="co">#&gt;  [8,]  133  NaN  NaN</span></span>
-<span><span class="co">#&gt;  [9,]   52  NaN  NaN</span></span>
-<span><span class="co">#&gt; [10,]   84  NaN  NaN</span></span></code></pre></div>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;  [1,]  701  301  701</span></span>
+<span><span class="co">#&gt;  [2,]  301  701  301</span></span>
+<span><span class="co">#&gt;  [3,]   76  295  290</span></span>
+<span><span class="co">#&gt;  [4,]  123  NaN  605</span></span>
+<span><span class="co">#&gt;  [5,]   82  NaN  661</span></span>
+<span><span class="co">#&gt;  [6,]   52  NaN  NaN</span></span>
+<span><span class="co">#&gt;  [7,]   89  NaN  NaN</span></span>
+<span><span class="co">#&gt;  [8,]  768  NaN  NaN</span></span>
+<span><span class="co">#&gt;  [9,]  112  NaN  NaN</span></span>
+<span><span class="co">#&gt; [10,]  156  NaN  NaN</span></span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y.1</span>, <span class="va">y.2</span>, <span class="va">y.3</span><span class="op">)</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean_data_3</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
 <span><span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span></span>
 <span><span class="co">#&gt; [1]    1  301  701 1001</span></span></code></pre></div>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot(bcp::bcp(mean_data_3))</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -466,14 +1425,647 @@ to the un-retrievable change points.</p>
 </h2>
 <p>The true change points are 300, 700, 1000, 1300 and 1700. Some
 methods are plotted due to the un-retrievable change points.</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_meanvariance.html">fastcpd.mv</a></span><span class="op">(</span><span class="va">mv_data_3</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000 1300 1700</span></span></code></pre></div>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="va">mv_data_3</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span></span>
 <span><span class="co">#&gt; [1]    1  301  701 1001 1301 1701 2001</span></span></code></pre></div>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/inspect.html" class="external-link">inspect</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">mv_data_3</span><span class="op">)</span>,</span>
+<span>  threshold <span class="op">=</span></span>
+<span>    <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/compute.threshold.html" class="external-link">compute.threshold</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mv_data_3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">mv_data_3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Calculating threshold...</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 1%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 2%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 3%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 4%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 5%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 6%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 7%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 8%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 9%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 10%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 11%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 12%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 13%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 14%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 15%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 16%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 17%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 18%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 19%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 20%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 21%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 22%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 23%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 24%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 25%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 26%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 27%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 28%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 29%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 30%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 31%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 32%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 33%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 34%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 35%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 36%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 37%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 38%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 39%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 40%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 41%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 42%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 43%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 44%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 45%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 46%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 47%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 48%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 49%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 50%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 51%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 52%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 53%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 54%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 55%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 56%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 57%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 58%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 59%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 60%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 61%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 62%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 63%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 64%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 65%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 66%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 67%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 68%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 69%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 70%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 71%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 72%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 73%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 74%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 75%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 76%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 77%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 78%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 79%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 80%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 81%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 82%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 83%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 84%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 85%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 86%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 87%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 88%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 89%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 90%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 91%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 92%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 93%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 94%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 95%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 96%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 97%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 98%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 99%</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; 100%. Threshold = 4.260259</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt; Loading required namespace: RSpectra</span></span>
+<span><span class="co">#&gt;   [1]  300  700  703  704  705  706  708  710  713  714  715  717  719  720  722</span></span>
+<span><span class="co">#&gt;  [16]  723  724  726  727  728  730  731  732  733  734  736  737  739  741  742</span></span>
+<span><span class="co">#&gt;  [31]  743  745  746  748  749  751  753  755  757  759  760  761  762  763  764</span></span>
+<span><span class="co">#&gt;  [46]  765  767  768  770  772  773  775  777  778  779  781  783  785  787  789</span></span>
+<span><span class="co">#&gt;  [61]  791  793  795  796  798  800  802  804  806  807  809  810  812  814  816</span></span>
+<span><span class="co">#&gt;  [76]  818  819  821  822  823  825  827  828  831  833  835  837  839  841  843</span></span>
+<span><span class="co">#&gt;  [91]  845  846  848  850  851  853  854  855  857  859  861  862  864  865  866</span></span>
+<span><span class="co">#&gt; [106]  867  869  871  874  875  877  879  880  881  883  885  887  889  890  892</span></span>
+<span><span class="co">#&gt; [121]  894  895  897  898  899  900  902  903  904  906  907  908  909  911  913</span></span>
+<span><span class="co">#&gt; [136]  915  916  918  919  921  922  924  928  929  930  932  933  934  935  937</span></span>
+<span><span class="co">#&gt; [151]  938  939  940  942  943  945  947  951  953  955  957  958  960  961  963</span></span>
+<span><span class="co">#&gt; [166]  965  966  968  970  972  973  975  976  979  981  982  984  986  987  989</span></span>
+<span><span class="co">#&gt; [181]  990  992  995  996  998  999 1000 1300 1700 1701 1703 1705 1706 1708 1710</span></span>
+<span><span class="co">#&gt; [196] 1711 1712 1713 1714 1716 1717 1718 1719 1720 1721 1723 1725 1726 1727 1728</span></span>
+<span><span class="co">#&gt; [211] 1730 1731 1732 1733 1735 1736 1737 1739 1740 1741 1743 1744 1746 1747 1749</span></span>
+<span><span class="co">#&gt; [226] 1750 1752 1753 1754 1755 1756 1758 1759 1761 1762 1764 1765 1767 1769 1770</span></span>
+<span><span class="co">#&gt; [241] 1771 1773 1774 1776 1777 1779 1780 1782 1784 1785 1787 1789 1792 1794 1795</span></span>
+<span><span class="co">#&gt; [256] 1796 1798 1800 1801 1803 1804 1805 1807 1809 1810 1811 1812 1814 1815 1817</span></span>
+<span><span class="co">#&gt; [271] 1819 1821 1822 1823 1824 1826 1827 1829 1830 1832 1833 1834 1836 1838 1840</span></span>
+<span><span class="co">#&gt; [286] 1841 1844 1846 1847 1849 1851 1853 1854 1856 1857 1858 1860 1861 1862 1863</span></span>
+<span><span class="co">#&gt; [301] 1865 1866 1868 1870 1871 1873 1874 1875 1877 1879 1880 1882 1883 1884 1886</span></span>
+<span><span class="co">#&gt; [316] 1887 1888 1889 1891 1893 1894 1896 1897 1898 1900 1906 1908 1909 1910 1912</span></span>
+<span><span class="co">#&gt; [331] 1913 1915 1916 1918 1919 1921 1922 1924 1925 1926 1927 1929 1931 1933 1934</span></span>
+<span><span class="co">#&gt; [346] 1935 1937 1938 1940 1941 1943 1945 1947 1949 1951 1952 1953 1955 1957 1959</span></span>
+<span><span class="co">#&gt; [361] 1961 1963 1965 1966 1968 1969 1971 1972 1974 1975 1976 1977 1979 1980 1981</span></span>
+<span><span class="co">#&gt; [376] 1983 1984 1985 1987 1988 1990 1992 1994 1996 1998</span></span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
 <span>    <span class="va">result_Rbeast</span> <span class="op">&lt;-</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast123.html" class="external-link">beast123</a></span><span class="op">(</span></span>
@@ -485,28 +2077,28 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,] 1301  301  701</span></span>
-<span><span class="co">#&gt;  [2,]  301 1301 1301</span></span>
-<span><span class="co">#&gt;  [3,]  701  701  301</span></span>
-<span><span class="co">#&gt;  [4,]  749 1732 1969</span></span>
-<span><span class="co">#&gt;  [5,]  977  833 1952</span></span>
-<span><span class="co">#&gt;  [6,] 1989 1292 1919</span></span>
-<span><span class="co">#&gt;  [7,]  876  645 1948</span></span>
-<span><span class="co">#&gt;  [8,]  925  681 1983</span></span>
-<span><span class="co">#&gt;  [9,]  900  729  969</span></span>
-<span><span class="co">#&gt; [10,]  817  800 1913</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1,] 1301 1301  701</span></span>
+<span><span class="co">#&gt;  [2,]  701  701  301</span></span>
+<span><span class="co">#&gt;  [3,]  301  301 1301</span></span>
+<span><span class="co">#&gt;  [4,]  749  946 1952</span></span>
+<span><span class="co">#&gt;  [5,]  876  958 1993</span></span>
+<span><span class="co">#&gt;  [6,]  896  966 1919</span></span>
+<span><span class="co">#&gt;  [7,] 1989 1883 1969</span></span>
+<span><span class="co">#&gt;  [8,]  735 1894  797</span></span>
+<span><span class="co">#&gt;  [9,]  983 1874  808</span></span>
+<span><span class="co">#&gt; [10,]  842 1731 1913</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="linear-regression">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression"></a>
 </h2>
 <p>The true change points are 100 and 200.</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_lm.html">fastcpd.lm</a></span><span class="op">(</span><span class="va">lm_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 100 200</span></span></code></pre></div>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">lm_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 100 200</span></span></code></pre></div>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">segmented</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/segmented/man/segmented.html" class="external-link">segmented</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span>
 <span>    <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
@@ -520,10 +2112,10 @@ methods are plotted due to the un-retrievable change points.</p>
 <h2 id="logistic-regression">Logistic regression<a class="anchor" aria-label="anchor" href="#logistic-regression"></a>
 </h2>
 <p>The true change point is 125.</p>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span><span class="va">binomial_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 125</span></span></code></pre></div>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">binomial_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 126</span></span></code></pre></div>
 </div>
@@ -531,10 +2123,10 @@ methods are plotted due to the un-retrievable change points.</p>
 <h2 id="poisson-regression">Poisson regression<a class="anchor" aria-label="anchor" href="#poisson-regression"></a>
 </h2>
 <p>The true change points are 500, 800 and 1000.</p>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_poisson.html">fastcpd.poisson</a></span><span class="op">(</span><span class="va">poisson_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 518 800 999</span></span></code></pre></div>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">poisson_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 525 690</span></span></code></pre></div>
@@ -543,10 +2135,10 @@ methods are plotted due to the un-retrievable change points.</p>
 <h2 id="lasso">Lasso<a class="anchor" aria-label="anchor" href="#lasso"></a>
 </h2>
 <p>The true change points are 80, 200 and 320.</p>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1]  80 202 320</span></span></code></pre></div>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">lasso_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1]  80 200 320</span></span></code></pre></div>
@@ -556,13 +2148,13 @@ methods are plotted due to the un-retrievable change points.</p>
 </h2>
 <p>The true change point is 600. Some methods are plotted due to the
 un-retrievable change points.</p>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_ar.html">fastcpd.ar</a></span><span class="op">(</span><span class="va">ar_data</span>, <span class="fl">3</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 597</span></span></code></pre></div>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">ar_data</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">ar_data</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; numeric(0)</span></span></code></pre></div>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">segmented</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/segmented/man/segmented.html" class="external-link">segmented</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span>
 <span>    <span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ar_data</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">ar_data</span><span class="op">)</span><span class="op">)</span></span>
@@ -570,7 +2162,7 @@ un-retrievable change points.</p>
 <span>  seg.Z <span class="op">=</span> <span class="op">~</span> <span class="va">x</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">psi</span><span class="op">[</span>, <span class="st">"Est."</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] 683.0417</span></span></code></pre></div>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
@@ -586,17 +2178,17 @@ un-retrievable change points.</p>
 <h2 id="garch1-1">GARCH(1, 1)<a class="anchor" aria-label="anchor" href="#garch1-1"></a>
 </h2>
 <p>The true change point is 200.</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_garch.html">fastcpd.garch</a></span><span class="op">(</span><span class="va">garch_data</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; Registered S3 method overwritten by 'quantmod':</span></span>
 <span><span class="co">#&gt;   method            from</span></span>
 <span><span class="co">#&gt;   as.zoo.data.frame zoo</span></span>
 <span><span class="co">#&gt; Residual calculation failed.</span></span>
 <span><span class="co">#&gt; [1] 199</span></span></code></pre></div>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">garch_data</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">garch_data</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1] 200</span></span></code></pre></div>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">x</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">garch_data</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 173</span></span></code></pre></div>
 </div>
@@ -604,10 +2196,10 @@ un-retrievable change points.</p>
 <h2 id="var2">VAR(2)<a class="anchor" aria-label="anchor" href="#var2"></a>
 </h2>
 <p>The true change points is 500.</p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_var.html">fastcpd.var</a></span><span class="op">(</span><span class="va">var_data</span>, <span class="fl">2</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 614</span></span></code></pre></div>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">VARDetect</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VARDetect/man/tbss.html" class="external-link">tbss</a></span><span class="op">(</span><span class="va">var_data</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "first.brk.points:"</span></span>
 <span><span class="co">#&gt; [1] 589 651</span></span>
