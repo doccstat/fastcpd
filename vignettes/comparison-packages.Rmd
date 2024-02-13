@@ -277,11 +277,17 @@ gfpop::gfpop(
 ```
 
 ```{r univariate-mean-change-InspectChangepoint}
-InspectChangepoint::inspect(
-  t(mean_data_1),
-  threshold =
-    InspectChangepoint::compute.threshold(nrow(mean_data_1), ncol(mean_data_1))
-)$changepoints[, "location"]
+invisible(
+  capture.output(
+    result_InspectChangepoint <- InspectChangepoint::inspect(
+      t(mean_data_1),
+      threshold = InspectChangepoint::compute.threshold(
+        nrow(mean_data_1), ncol(mean_data_1)
+      )
+    )
+  )
+)
+result_InspectChangepoint$changepoints[, "location"]
 ```
 
 ```{r univariate-mean-change-jointseg}
@@ -358,11 +364,17 @@ cpm::processStream(mv_data_1, cpmType = "GLR")$changePoints
 ```
 
 ```{r univariate-mean-and-or-variance-change-InspectChangepoint}
-InspectChangepoint::inspect(
-  t(mv_data_1),
-  threshold =
-    InspectChangepoint::compute.threshold(nrow(mv_data_1), ncol(mv_data_1))
-)$changepoints[, "location"]
+invisible(
+  capture.output(
+    result_InspectChangepoint <- InspectChangepoint::inspect(
+      t(mv_data_1),
+      threshold = InspectChangepoint::compute.threshold(
+        nrow(mv_data_1), ncol(mv_data_1)
+      )
+    )
+  )
+)
+result_InspectChangepoint$changepoints[, "location"]
 ```
 
 ```{r univariate-mean-and-or-variance-change-Rbeast}
@@ -402,11 +414,17 @@ CptNonPar::np.mojo(mean_data_3, G = floor(nrow(mean_data_3) / 6))$cpts
 ```
 
 ```{r multivariate-mean-change-InspectChangepoint}
-InspectChangepoint::inspect(
-  t(mean_data_3),
-  threshold =
-    InspectChangepoint::compute.threshold(nrow(mean_data_3), ncol(mean_data_3))
-)$changepoints[, "location"]
+invisible(
+  capture.output(
+    result_InspectChangepoint <- InspectChangepoint::inspect(
+      t(mean_data_3),
+      threshold = InspectChangepoint::compute.threshold(
+        nrow(mean_data_3), ncol(mean_data_3)
+      )
+    )
+  )
+)
+result_InspectChangepoint$changepoints[, "location"]
 ```
 
 ```{r multivariate-mean-change-jointseg}
@@ -457,11 +475,17 @@ ecp::e.divisive(mv_data_3)$estimates
 ```
 
 ```{r multivariate-mean-and-or-variance-change-InspectChangepoint}
-InspectChangepoint::inspect(
-  t(mv_data_3),
-  threshold =
-    InspectChangepoint::compute.threshold(nrow(mv_data_3), ncol(mv_data_3))
-)$changepoints[, "location"]
+invisible(
+  capture.output(
+    result_InspectChangepoint <- InspectChangepoint::inspect(
+      t(mv_data_3),
+      threshold = InspectChangepoint::compute.threshold(
+        nrow(mv_data_3), ncol(mv_data_3)
+      )
+    )
+  )
+)
+result_InspectChangepoint$changepoints[, "location"]
 ```
 
 ```{r multivariate-mean-and-or-variance-change-Rbeast}
