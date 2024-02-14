@@ -92,8 +92,6 @@ The value should be one of <code>"ar"</code>, <code>"var"</code>, <code>"arima"<
 <dd><p>A positive integer or a vector of length less than four
 specifying the order of the time series. Possible combinations with
 <code>family</code> are:</p><ul><li><p>ar, NUMERIC(1): AR(p) model using linear regression.</p></li>
-<li><p>ar, NUMERIC(3): ARIMA(p, 0, 0) model using <code><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">forecast::Arima</a></code>, where
-<code>p</code> is the first element of the vector.</p></li>
 <li><p>var, NUMERIC(1): VAR(p) model using linear regression.</p></li>
 <li><p>ma, NUMERIC(1): MA(q) model using <code><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">forecast::Arima</a></code>.</p></li>
 <li><p>ma, NUMERIC(3): ARIMA(0, 0, q) model using <code><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">forecast::Arima</a></code>, where
@@ -141,20 +139,16 @@ mean should be included in the model. The default value is <code>TRUE</code>.</p
 <span class="r-in"><span>  trim <span class="op">=</span> <span class="fl">0</span>,</span></span>
 <span class="r-in"><span>  beta <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fl">1</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span> <span class="op">*</span> <span class="fl">3</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>first element used of 'length.out' argument</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>longer object length is not a multiple of shorter object length</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>first element used of 'length.out' argument</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>first element used of 'length.out' argument</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>longer object length is not a multiple of shorter object length</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in rep(-Inf, p):</span> invalid 'times' argument</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.ts(data = x[1 + seq_len(n)], family = "ar", order = c(1, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     0, 0), include.mean = FALSE, trim = 0, beta = (1 + 1 + 1) * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     log(n)/2 * 3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 301 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 623.7791 643.8769 </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'summary': object 'result' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="fastcpd_ts-1.png" alt="" width="700" height="433"></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'result' not found</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
