@@ -89,6 +89,7 @@ parameters and returns a <code>fastcpd</code> object.</p>
 <span>  lower <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  upper <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  line_search <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,</span>
+<span>  cost_adjustment <span class="op">=</span> <span class="st">"MBIC"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -309,6 +310,15 @@ the upper bound will be set to be <code>Inf</code> for all parameters.</p></dd>
 <dt>line_search</dt>
 <dd><p>If a vector of numeric values are provided, line
 search will be performed to find the optimal step size for each update.</p></dd>
+
+
+<dt>cost_adjustment</dt>
+<dd><p>Cost adjustment criterion for the number of change
+points. Can be <code>"BIC"</code>, <code>"MBIC"</code>, <code>"MDL"</code> or NULL.
+By default, the cost adjustment criterion is set to be <code>"MBIC"</code>.
+MBIC and MDL modifies the cost function by adding a small negative
+term to the cost function. MDL then transforms the cost function to
+log2 based. BIC or NULL does not modify the cost function.</p></dd>
 
 
 <dt>...</dt>
