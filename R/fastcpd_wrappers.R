@@ -11,8 +11,7 @@
 #' @md
 #'
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
-#' @param order A positive integer or a vector of length three with the last
-#'   two elements being zeros specifying the order of the AR model.
+#' @param order A positive integer specifying the order of the AR model.
 #' @param ... Other arguments passed to \code{\link{fastcpd}}, for example,
 #'   \code{segment_count}. One special argument can be passed here is
 #'   \code{include.mean}, which is a logical value indicating whether the
@@ -421,8 +420,6 @@ fastcpd_poisson <- fastcpd.poisson
 #'   `family` are:
 #'
 #'   - ar, NUMERIC(1): AR(p) model using linear regression.
-#'   - ar, NUMERIC(3): ARIMA(p, 0, 0) model using `forecast::Arima`, where
-#'     \code{p} is the first element of the vector.
 #'   - var, NUMERIC(1): VAR(p) model using linear regression.
 #'   - ma, NUMERIC(1): MA(q) model using `forecast::Arima`.
 #'   - ma, NUMERIC(3): ARIMA(0, 0, q) model using `forecast::Arima`, where

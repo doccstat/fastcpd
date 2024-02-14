@@ -12,8 +12,7 @@ fastcpd_ar(data, order = 0, ...)
 \arguments{
 \item{data}{A numeric vector, a matrix, a data frame or a time series object.}
 
-\item{order}{A positive integer or a vector of length three with the last
-two elements being zeros specifying the order of the AR model.}
+\item{order}{A positive integer specifying the order of the AR model.}
 
 \item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
 \code{segment_count}. One special argument can be passed here is
