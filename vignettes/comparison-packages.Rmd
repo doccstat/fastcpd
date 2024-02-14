@@ -45,6 +45,8 @@ for (
 
 # Data setup
 
+## Univariate mean change
+
 ```{r data-setup-univariate-mean-change}
 set.seed(1)
 p <- 1
@@ -58,6 +60,8 @@ mean_data_1 <- rbind(
 
 plot.ts(mean_data_1)
 ```
+
+## Univariate mean and/or variance change
 
 ```{r data-setup-univariate-mean-and-or-variance-change}
 # Univariate mean and/or variance change
@@ -73,6 +77,8 @@ mv_data_1 <- rbind(
 plot.ts(mv_data_1)
 ```
 
+## Multivariate mean change
+
 ```{r data-setup-multivariate-mean-change}
 p <- 3
 
@@ -85,6 +91,8 @@ mean_data_3 <- rbind(
 
 plot.ts(mean_data_3)
 ```
+
+## Multivariate mean and/or variance change
 
 ```{r data-setup-multivariate-mean-and-or-variance-change}
 # Multivariate mean and/or variance change
@@ -99,6 +107,8 @@ mv_data_3 <- rbind(
 
 plot.ts(mv_data_3)
 ```
+
+## Linear regression
 
 ```{r data-setup-linear-regression}
 # Linear regression
@@ -116,6 +126,8 @@ lm_data <- data.frame(y = y, x = x)
 plot.ts(lm_data)
 ```
 
+## Logistic regression
+
 ```{r data-setup-logistic-regression}
 # Logistic regression
 x <- matrix(rnorm(1500, 0, 1), ncol = 5)
@@ -126,6 +138,12 @@ y <- c(
 )
 binomial_data <- data.frame(y = y, x = x)
 
+plot.ts(binomial_data)
+```
+
+## Poisson regression
+
+```{r data-setup-poisson-regression}
 # Poisson regression
 n <- 1100
 p <- 3
@@ -143,6 +161,8 @@ poisson_data <- data.frame(y = y, x = x)
 plot.ts(log(poisson_data$y))
 plot.ts(poisson_data[, -1])
 ```
+
+## Lasso
 
 ```{r data-setup-lasso}
 # Lasso
@@ -168,6 +188,8 @@ lasso_data <- data.frame(y = y, x = x)
 plot.ts(lasso_data[, seq_len(p_true + 1)])
 ```
 
+## AR(3)
+
 ```{r data-setup-ar3}
 # AR(3)
 n <- 1000
@@ -182,6 +204,8 @@ ar_data <- x[-seq_len(3)]
 
 plot.ts(ar_data)
 ```
+
+## GARCH(1, 1)
 
 ```{r data-setup-garch11}
 # GARCH(1, 1)
@@ -200,6 +224,8 @@ garch_data <- x[-1]
 
 plot.ts(garch_data)
 ```
+
+## VAR(2)
 
 ```{r data-setup-var2}
 n <- 1000
