@@ -21,8 +21,6 @@ specifying the order of the time series. Possible combinations with
 \code{family} are:
 \itemize{
 \item ar, NUMERIC(1): AR(p) model using linear regression.
-\item ar, NUMERIC(3): ARIMA(p, 0, 0) model using \code{forecast::Arima}, where
-\code{p} is the first element of the vector.
 \item var, NUMERIC(1): VAR(p) model using linear regression.
 \item ma, NUMERIC(1): MA(q) model using \code{forecast::Arima}.
 \item ma, NUMERIC(3): ARIMA(0, 0, q) model using \code{forecast::Arima}, where
