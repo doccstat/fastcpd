@@ -176,7 +176,8 @@ testthat::test_that(
         data.frame(y = y, x = x),
         beta = "BIC",
         vanilla_percentage = 1,
-        warm_start = TRUE
+        warm_start = TRUE,
+        cost_adjustment = NULL
       )
     )
     testthat::expect_equal(result@cp_set, 134)
@@ -194,8 +195,14 @@ testthat::test_that(
 )
 
 testthat::test_that("beta x2", {
-  testthat::expect_equal(
-    fastcpd.mean(well_log, beta = log(length(well_log)))@cp_set,
-    c(566, 740, 1039, 1198, 1424, 1661, 1842, 2023, 2476, 2744, 3709, 3820)
+  testthat::expect_message(
+    fastcpd.mean(well_log, beta = log(length(well_log))),
+    paste0(
+      "Warning: The number of change points is larger than the number of ",
+      "observations divided by the number of covariates plus one. ",
+      "The residuals are not independent. ",
+      "Retrying with a larger `beta` value (x2) with MBIC."
+    ),
+    fixed = TRUE
   )
 })

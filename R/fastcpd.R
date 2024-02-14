@@ -170,6 +170,12 @@
 #'   the upper bound will be set to be \code{Inf} for all parameters.
 #' @param line_search If a vector of numeric values are provided, line
 #'   search will be performed to find the optimal step size for each update.
+#' @param cost_adjustment Cost adjustment criterion for the number of change
+#'   points. Can be \code{"BIC"}, \code{"MBIC"}, \code{"MDL"} or NULL.
+#'   By default, the cost adjustment criterion is set to be \code{"MBIC"}.
+#'   MBIC and MDL modifies the cost function by adding a small negative
+#'   term to the cost function. MDL then transforms the cost function to
+#'   log2 based. BIC or NULL does not modify the cost function.
 #' @param ... Parameters specifically used for time series models. As of
 #'   the current implementation, only \code{include.mean} will not be ignored
 #'   and used in the ARIMA or GARCH model. \code{r.progress} now will not be
@@ -208,6 +214,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   lower = NULL,
   upper = NULL,
   line_search = c(1),
+  cost_adjustment = "MBIC",
   ...
 ) {
   family <- ifelse(is.null(family), "custom", tolower(family))
@@ -228,6 +235,11 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   )
 
   stopifnot(check_cost(cost, cost_gradient, cost_hessian, family))
+
+  if (is.null(cost_adjustment)) {
+    cost_adjustment <- "BIC"
+  }
+  stopifnot(cost_adjustment %in% c("BIC", "MBIC", "MDL"))
 
   # The following code is adapted from the `lm` function from base R.
   match_formula <- match.call(expand.dots = FALSE)
@@ -386,8 +398,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   if (is.null(fastcpd_family)) {
     fastcpd_family <- family
   }
-
-  cost_adjustment <- if (is.character(beta)) beta else "BIC"
 
   if (is.character(beta)) {
     beta <- switch(
