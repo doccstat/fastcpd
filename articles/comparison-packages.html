@@ -118,6 +118,9 @@
 <div class="section level2">
 <h2 id="data-setup">Data setup<a class="anchor" aria-label="anchor" href="#data-setup"></a>
 </h2>
+<div class="section level3">
+<h3 id="univariate-mean-change">Univariate mean change<a class="anchor" aria-label="anchor" href="#univariate-mean-change"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
@@ -131,6 +134,10 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/data-setup-univariate-mean-change-1.png" width="768"></p>
+</div>
+<div class="section level3">
+<h3 id="univariate-mean-andor-variance-change">Univariate mean and/or variance change<a class="anchor" aria-label="anchor" href="#univariate-mean-andor-variance-change"></a>
+</h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Univariate mean and/or variance change</span></span>
 <span><span class="va">mv_data_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
@@ -144,6 +151,10 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/data-setup-univariate-mean-and-or-variance-change-1.png" width="768"></p>
+</div>
+<div class="section level3">
+<h3 id="multivariate-mean-change">Multivariate mean change<a class="anchor" aria-label="anchor" href="#multivariate-mean-change"></a>
+</h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
 <span></span>
@@ -156,6 +167,10 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/data-setup-multivariate-mean-change-1.png" width="768"></p>
+</div>
+<div class="section level3">
+<h3 id="multivariate-mean-andor-variance-change">Multivariate mean and/or variance change<a class="anchor" aria-label="anchor" href="#multivariate-mean-andor-variance-change"></a>
+</h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Multivariate mean and/or variance change</span></span>
 <span><span class="va">mv_data_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
@@ -169,6 +184,10 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">mv_data_3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/data-setup-multivariate-mean-and-or-variance-change-1.png" width="768"></p>
+</div>
+<div class="section level3">
+<h3 id="linear-regression">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression"></a>
+</h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Linear regression</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">300</span></span>
@@ -184,6 +203,10 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">lm_data</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/data-setup-linear-regression-1.png" width="768"></p>
+</div>
+<div class="section level3">
+<h3 id="logistic-regression">Logistic regression<a class="anchor" aria-label="anchor" href="#logistic-regression"></a>
+</h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Logistic regression</span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1500</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
@@ -194,7 +217,14 @@
 <span><span class="op">)</span></span>
 <span><span class="va">binomial_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Poisson regression</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">binomial_data</span><span class="op">)</span></span></code></pre></div>
+<p><img src="comparison-packages_files/figure-html/data-setup-logistic-regression-1.png" width="768"></p>
+</div>
+<div class="section level3">
+<h3 id="poisson-regression">Poisson regression<a class="anchor" aria-label="anchor" href="#poisson-regression"></a>
+</h3>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Poisson regression</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1100</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
@@ -209,11 +239,15 @@
 <span><span class="va">poisson_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">poisson_data</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="comparison-packages_files/figure-html/data-setup-logistic-regression-1.png" width="768"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">poisson_data</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="comparison-packages_files/figure-html/data-setup-logistic-regression-2.png" width="768"></p>
+<p><img src="comparison-packages_files/figure-html/data-setup-poisson-regression-1.png" width="768"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">poisson_data</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<p><img src="comparison-packages_files/figure-html/data-setup-poisson-regression-2.png" width="768"></p>
+</div>
+<div class="section level3">
+<h3 id="lasso">Lasso<a class="anchor" aria-label="anchor" href="#lasso"></a>
+</h3>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Lasso</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">480</span></span>
 <span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">6</span></span>
@@ -236,7 +270,11 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">lasso_data</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">p_true</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/data-setup-lasso-1.png" width="768"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+</div>
+<div class="section level3">
+<h3 id="ar3">AR(3)<a class="anchor" aria-label="anchor" href="#ar3"></a>
+</h3>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># AR(3)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span> <span class="op">+</span> <span class="fl">3</span><span class="op">)</span></span>
@@ -250,7 +288,11 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">ar_data</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/data-setup-ar3-1.png" width="768"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+</div>
+<div class="section level3">
+<h3 id="garch1-1">GARCH(1, 1)<a class="anchor" aria-label="anchor" href="#garch1-1"></a>
+</h3>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># GARCH(1, 1)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">400</span></span>
 <span><span class="va">sigma_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">n</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -267,7 +309,11 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">garch_data</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/data-setup-garch11-1.png" width="768"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+</div>
+<div class="section level3">
+<h3 id="var2">VAR(2)<a class="anchor" aria-label="anchor" href="#var2"></a>
+</h3>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
 <span><span class="va">theta_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.3</span>, <span class="fl">0.6</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.4</span>, <span class="fl">0.2</span>, <span class="fl">0.2</span>, <span class="fl">0.2</span>, <span class="op">-</span><span class="fl">0.2</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
@@ -284,44 +330,45 @@
 <span><span class="fu"><a href="https://rdrr.io/r/stats/plot.ts.html" class="external-link">plot.ts</a></span><span class="op">(</span><span class="va">var_data</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/data-setup-var2-1.png" width="768"></p>
 </div>
+</div>
 <div class="section level2">
-<h2 id="univariate-mean-change">Univariate mean change<a class="anchor" aria-label="anchor" href="#univariate-mean-change"></a>
+<h2 id="univariate-mean-change-1">Univariate mean change<a class="anchor" aria-label="anchor" href="#univariate-mean-change-1"></a>
 </h2>
 <p>The true change points are 300 and 700. Some methods are plotted due
 to the un-retrievable change points.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data_1</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">mean_data_1</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
 <span><span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span></span>
 <span><span class="co">#&gt; [1]    1  301  701 1001</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Data need to be processed</span></span>
 <span><span class="fu">changepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/changepoint/man/cpt.mean.html" class="external-link">cpt.mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">@</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1]  300 1000</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">breakfast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/breakfast/man/breakfast.html" class="external-link">breakfast</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">$</span><span class="va">cptmodel.list</span><span class="op">[[</span><span class="fl">6</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">wbs</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/wbs/man/wbs.html" class="external-link">wbs</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">$</span><span class="va">cpt</span><span class="op">$</span><span class="va">cpt.ic</span><span class="op">$</span><span class="va">mbic.penalty</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Data need to be processed. `G` is selected based on the example</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">mosum</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mosum/man/mosum.html" class="external-link">mosum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">$</span><span class="va">cpts.info</span><span class="op">$</span><span class="va">cpts</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/fpop/man/Fpop.html" class="external-link">Fpop</a></span><span class="op">(</span><span class="va">mean_data_1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">t.est</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000</span></span></code></pre></div>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/gfpop.html" class="external-link">gfpop</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">mean_data_1</span>,</span>
 <span>  mygraph <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/graph.html" class="external-link">graph</a></span><span class="op">(</span></span>
@@ -331,7 +378,7 @@ to the un-retrievable change points.</p>
 <span>  type <span class="op">=</span> <span class="st">"mean"</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">changepoints</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000</span></span></code></pre></div>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
@@ -346,27 +393,27 @@ to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_InspectChangepoint</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">mean_data_1</span>, K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
 <span>  <span class="va">mean_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;  [1] 701 301 NaN NaN NaN NaN NaN NaN NaN NaN</span></span></code></pre></div>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stepR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stepR/man/stepFit.html" class="external-link">stepFit</a></span><span class="op">(</span><span class="va">mean_data_1</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">$</span><span class="va">rightEnd</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000</span></span></code></pre></div>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cpm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/cpm/man/processStream.html" class="external-link">processStream</a></span><span class="op">(</span><span class="va">mean_data_1</span>, cpmType <span class="op">=</span> <span class="st">"Student"</span><span class="op">)</span><span class="op">$</span><span class="va">changePoints</span></span>
 <span><span class="co">#&gt; [1] 299 699</span></span></code></pre></div>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">segmented</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/segmented/man/segmented.html" class="external-link">segmented</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean_data_1</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  seg.Z <span class="op">=</span> <span class="op">~</span> <span class="va">x</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">psi</span><span class="op">[</span>, <span class="st">"Est."</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] 495</span></span></code></pre></div>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slowest</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
@@ -377,35 +424,35 @@ to the un-retrievable change points.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">not</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/not/man/not.html" class="external-link">not</a></span><span class="op">(</span><span class="va">mean_data_1</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMean"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/univariate-mean-change-not-1.png" width="768"></p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot(bcp::bcp(mean_data_1))</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="univariate-mean-andor-variance-change">Univariate mean and/or variance change<a class="anchor" aria-label="anchor" href="#univariate-mean-andor-variance-change"></a>
+<h2 id="univariate-mean-andor-variance-change-1">Univariate mean and/or variance change<a class="anchor" aria-label="anchor" href="#univariate-mean-andor-variance-change-1"></a>
 </h2>
 <p>The true change points are 300, 700, 1000, 1300 and 1700. Some
 methods are plotted due to the un-retrievable change points.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_meanvariance.html">fastcpd.mv</a></span><span class="op">(</span><span class="va">mv_data_1</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1]  300  701 1000 1300 1699</span></span></code></pre></div>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span></span>
 <span><span class="co">#&gt; [1]    1  301  702 1000 1301 1702 2001</span></span></code></pre></div>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Data need to be processed</span></span>
 <span><span class="fu">changepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/changepoint/man/cpt.meanvar.html" class="external-link">cpt.meanvar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">@</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1]  300 2000</span></span></code></pre></div>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">mv_data_1</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mv_data_1</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1]  333  701 1300</span></span></code></pre></div>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cpm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/cpm/man/processStream.html" class="external-link">processStream</a></span><span class="op">(</span><span class="va">mv_data_1</span>, cpmType <span class="op">=</span> <span class="st">"GLR"</span><span class="op">)</span><span class="op">$</span><span class="va">changePoints</span></span>
 <span><span class="co">#&gt;  [1]   21   24  293  300  417  693  701  981  985  999 1296 1300 1695</span></span></code></pre></div>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
@@ -419,30 +466,25 @@ methods are plotted due to the un-retrievable change points.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">result_InspectChangepoint</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   [1]  300  701  703  704  705  708  710  711  713  714  716  717  718  721  723</span></span>
-<span><span class="co">#&gt;  [16]  725  726  731  733  735  736  737  739  742  745  747  748  752  754  756</span></span>
-<span><span class="co">#&gt;  [31]  758  759  768  770  771  778  782  784  785  790  793  795  796  797  799</span></span>
-<span><span class="co">#&gt;  [46]  800  803  804  805  806  807  808  809  821  828  829  833  835  837  840</span></span>
-<span><span class="co">#&gt;  [61]  841  842  848  849  851  852  854  855  857  862  863  865  867  868  876</span></span>
-<span><span class="co">#&gt;  [76]  878  879  880  882  883  884  886  887  889  894  898  899  905  906  907</span></span>
-<span><span class="co">#&gt;  [91]  908  909  912  919  926  927  928  930  933  934  935  936  938  940  944</span></span>
-<span><span class="co">#&gt; [106]  947  950  952  954  955  956  960  962  963  965  966  967  969  970  974</span></span>
-<span><span class="co">#&gt; [121]  976  977  978  980  985  987  988  990  997  998  999 1300 1708 1712 1714</span></span>
-<span><span class="co">#&gt; [136] 1716 1717 1718 1719 1721 1723 1725 1726 1728 1729 1730 1732 1733 1742 1743</span></span>
-<span><span class="co">#&gt; [151] 1746 1748 1750 1755 1757 1758 1761 1762 1764 1765 1770 1771 1776 1778 1779</span></span>
-<span><span class="co">#&gt; [166] 1780 1782 1784 1786 1789 1791 1792 1793 1797 1799 1801 1803 1804 1805 1806</span></span>
-<span><span class="co">#&gt; [181] 1808 1809 1811 1812 1813 1816 1818 1829 1831 1832 1836 1837 1838 1842 1844</span></span>
-<span><span class="co">#&gt; [196] 1845 1851 1854 1855 1857 1859 1861 1862 1865 1868 1869 1872 1873 1875 1876</span></span>
-<span><span class="co">#&gt; [211] 1879 1880 1882 1883 1891 1895 1905 1906 1908 1911 1912 1914 1915 1917 1919</span></span>
-<span><span class="co">#&gt; [226] 1920 1922 1929 1931 1932 1933 1937 1938 1939 1941 1943 1944 1945 1947 1949</span></span>
-<span><span class="co">#&gt; [241] 1950 1952 1953 1954 1959 1960 1962 1963 1964 1966 1970 1971 1978 1980 1981</span></span>
-<span><span class="co">#&gt; [256] 1985 1986 1987 1990 1991 1993 1995 1997 1998</span></span></code></pre></div>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;   [1]  300  701  703  704  708  710  711  713  714  716  717  718  721  723  725</span></span>
+<span><span class="co">#&gt;  [16]  726  731  733  735  736  737  739  745  752  754  756  758  759  768  770</span></span>
+<span><span class="co">#&gt;  [31]  771  778  785  790  793  795  796  797  799  800  805  806  807  808  821</span></span>
+<span><span class="co">#&gt;  [46]  828  833  835  837  840  841  842  848  851  852  854  857  876  879  880</span></span>
+<span><span class="co">#&gt;  [61]  905  906  919  926  927  930  933  934  935  936  940  952  955  956  960</span></span>
+<span><span class="co">#&gt;  [76]  962  963  966  967  970  976  977  980  985  997 1300 1708 1712 1714 1721</span></span>
+<span><span class="co">#&gt;  [91] 1723 1725 1726 1728 1729 1730 1732 1733 1742 1743 1757 1758 1761 1762 1764</span></span>
+<span><span class="co">#&gt; [106] 1765 1770 1771 1776 1779 1780 1782 1784 1786 1789 1791 1792 1793 1797 1799</span></span>
+<span><span class="co">#&gt; [121] 1801 1803 1804 1805 1809 1811 1812 1816 1818 1829 1831 1832 1836 1842 1844</span></span>
+<span><span class="co">#&gt; [136] 1845 1854 1855 1857 1859 1861 1862 1865 1868 1869 1872 1875 1876 1880 1882</span></span>
+<span><span class="co">#&gt; [151] 1883 1891 1895 1905 1906 1911 1912 1914 1915 1917 1929 1931 1932 1933 1939</span></span>
+<span><span class="co">#&gt; [166] 1941 1943 1947 1949 1950 1952 1953 1954 1959 1960 1962 1963 1964 1966 1970</span></span>
+<span><span class="co">#&gt; [181] 1971 1978 1980 1981 1985 1986 1987 1990 1991 1993 1997 1998</span></span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
 <span>  <span class="va">mv_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
-<span><span class="co">#&gt;  [1]  702 1301  301  855  794  769 1860 1856 1884 1892</span></span></code></pre></div>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;  [1]  702 1301  301  794  855  769  937  941 1860 1856</span></span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
@@ -453,24 +495,24 @@ methods are plotted due to the un-retrievable change points.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">not</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/not/man/not.html" class="external-link">not</a></span><span class="op">(</span><span class="va">mv_data_1</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMeanVar"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="comparison-packages_files/figure-html/univariate-mean-and-or-variance-change-not-1.png" width="768"></p>
 <pre><code><span><span class="co">#&gt; Press [enter] to continue</span></span></code></pre>
 <p><img src="comparison-packages_files/figure-html/univariate-mean-and-or-variance-change-not-2.png" width="768"></p>
 </div>
 <div class="section level2">
-<h2 id="multivariate-mean-change">Multivariate mean change<a class="anchor" aria-label="anchor" href="#multivariate-mean-change"></a>
+<h2 id="multivariate-mean-change-1">Multivariate mean change<a class="anchor" aria-label="anchor" href="#multivariate-mean-change-1"></a>
 </h2>
 <p>The true change points are 300 and 700. Some methods are plotted due
 to the un-retrievable change points.</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data_3</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">mean_data_3</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
@@ -485,10 +527,10 @@ to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_InspectChangepoint</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">mean_data_3</span>, K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
 <span>    <span class="va">result_Rbeast</span> <span class="op">&lt;-</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast123.html" class="external-link">beast123</a></span><span class="op">(</span></span>
@@ -500,42 +542,42 @@ to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,]  701  701  301</span></span>
-<span><span class="co">#&gt;  [2,]  301  301  701</span></span>
-<span><span class="co">#&gt;  [3,]   77  286  291</span></span>
-<span><span class="co">#&gt;  [4,]   70  NaN  285</span></span>
-<span><span class="co">#&gt;  [5,]  124  NaN  744</span></span>
-<span><span class="co">#&gt;  [6,]   85  NaN  676</span></span>
-<span><span class="co">#&gt;  [7,]  149  NaN  NaN</span></span>
-<span><span class="co">#&gt;  [8,]  673  NaN  NaN</span></span>
-<span><span class="co">#&gt;  [9,]  NaN  NaN  NaN</span></span>
-<span><span class="co">#&gt; [10,]  NaN  NaN  NaN</span></span></code></pre></div>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;  [1,]  301  701  701</span></span>
+<span><span class="co">#&gt;  [2,]  701  301  301</span></span>
+<span><span class="co">#&gt;  [3,]   50  296  290</span></span>
+<span><span class="co">#&gt;  [4,]   71  NaN  286</span></span>
+<span><span class="co">#&gt;  [5,]  125  NaN  580</span></span>
+<span><span class="co">#&gt;  [6,]   78  NaN  NaN</span></span>
+<span><span class="co">#&gt;  [7,]  117  NaN  NaN</span></span>
+<span><span class="co">#&gt;  [8,]  131  NaN  NaN</span></span>
+<span><span class="co">#&gt;  [9,]   89  NaN  NaN</span></span>
+<span><span class="co">#&gt; [10,]   30  NaN  NaN</span></span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y.1</span>, <span class="va">y.2</span>, <span class="va">y.3</span><span class="op">)</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean_data_3</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
 <span><span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="va">mean_data_3</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span></span>
 <span><span class="co">#&gt; [1]    1  301  701 1001</span></span></code></pre></div>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot(bcp::bcp(mean_data_3))</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="multivariate-mean-andor-variance-change">Multivariate mean and/or variance change<a class="anchor" aria-label="anchor" href="#multivariate-mean-andor-variance-change"></a>
+<h2 id="multivariate-mean-andor-variance-change-1">Multivariate mean and/or variance change<a class="anchor" aria-label="anchor" href="#multivariate-mean-andor-variance-change-1"></a>
 </h2>
 <p>The true change points are 300, 700, 1000, 1300 and 1700. Some
 methods are plotted due to the un-retrievable change points.</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_meanvariance.html">fastcpd.mv</a></span><span class="op">(</span><span class="va">mv_data_3</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000 1300 1700</span></span></code></pre></div>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="va">mv_data_3</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span></span>
 <span><span class="co">#&gt; [1]    1  301  701 1001 1301 1701 2001</span></span></code></pre></div>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
@@ -549,33 +591,33 @@ methods are plotted due to the un-retrievable change points.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">result_InspectChangepoint</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   [1]  300  700  703  704  705  706  708  710  713  714  715  717  719  720  722</span></span>
-<span><span class="co">#&gt;  [16]  723  724  726  727  728  730  731  732  733  734  736  737  739  741  742</span></span>
-<span><span class="co">#&gt;  [31]  743  745  746  748  749  751  753  755  757  759  760  761  762  763  764</span></span>
-<span><span class="co">#&gt;  [46]  765  767  768  770  772  773  775  777  778  779  781  783  785  787  789</span></span>
-<span><span class="co">#&gt;  [61]  791  793  795  796  798  800  802  804  806  807  809  810  812  814  816</span></span>
-<span><span class="co">#&gt;  [76]  818  819  821  822  823  825  827  828  831  833  835  837  839  841  843</span></span>
-<span><span class="co">#&gt;  [91]  845  846  848  850  851  853  854  855  857  859  861  862  864  865  866</span></span>
-<span><span class="co">#&gt; [106]  867  869  871  874  875  877  879  880  881  883  885  887  889  890  892</span></span>
-<span><span class="co">#&gt; [121]  894  895  897  898  899  900  902  903  904  906  907  908  911  913  915</span></span>
-<span><span class="co">#&gt; [136]  916  918  919  921  922  924  928  929  930  932  933  934  935  937  938</span></span>
-<span><span class="co">#&gt; [151]  939  940  942  943  945  947  951  953  955  957  958  960  961  963  965</span></span>
-<span><span class="co">#&gt; [166]  966  968  970  972  973  975  976  979  981  982  984  986  987  989  990</span></span>
-<span><span class="co">#&gt; [181]  992  995  996  998  999 1000 1300 1700 1701 1703 1705 1706 1708 1710 1711</span></span>
-<span><span class="co">#&gt; [196] 1712 1713 1714 1716 1717 1718 1719 1720 1721 1723 1725 1726 1727 1728 1730</span></span>
-<span><span class="co">#&gt; [211] 1731 1732 1733 1735 1736 1737 1739 1740 1741 1743 1744 1746 1747 1749 1750</span></span>
-<span><span class="co">#&gt; [226] 1752 1753 1754 1755 1756 1758 1759 1761 1762 1764 1765 1767 1769 1770 1771</span></span>
-<span><span class="co">#&gt; [241] 1773 1774 1776 1777 1779 1780 1782 1784 1785 1787 1789 1792 1794 1795 1796</span></span>
-<span><span class="co">#&gt; [256] 1798 1800 1801 1803 1804 1805 1807 1809 1810 1811 1812 1814 1815 1817 1819</span></span>
-<span><span class="co">#&gt; [271] 1821 1822 1823 1824 1826 1827 1829 1830 1832 1833 1834 1836 1838 1840 1841</span></span>
-<span><span class="co">#&gt; [286] 1844 1846 1847 1849 1851 1853 1854 1856 1857 1858 1860 1861 1862 1863 1865</span></span>
-<span><span class="co">#&gt; [301] 1866 1868 1870 1871 1873 1874 1875 1877 1879 1880 1882 1883 1884 1886 1887</span></span>
-<span><span class="co">#&gt; [316] 1888 1889 1891 1893 1894 1896 1897 1898 1900 1906 1908 1909 1910 1912 1913</span></span>
-<span><span class="co">#&gt; [331] 1915 1916 1918 1919 1921 1922 1924 1925 1926 1927 1929 1931 1933 1934 1935</span></span>
-<span><span class="co">#&gt; [346] 1937 1938 1940 1941 1943 1945 1947 1949 1951 1952 1953 1955 1957 1959 1961</span></span>
-<span><span class="co">#&gt; [361] 1963 1965 1966 1968 1969 1971 1972 1974 1975 1976 1977 1979 1980 1981 1983</span></span>
-<span><span class="co">#&gt; [376] 1984 1985 1987 1988 1990 1992 1994 1996 1998</span></span></code></pre></div>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;   [1]  300  700  703  704  705  706  708  710  711  713  714  715  717  719  720</span></span>
+<span><span class="co">#&gt;  [16]  722  723  724  726  727  728  730  731  732  733  734  736  737  739  741</span></span>
+<span><span class="co">#&gt;  [31]  742  743  745  746  748  749  751  753  755  757  759  760  761  762  763</span></span>
+<span><span class="co">#&gt;  [46]  764  765  767  768  770  772  773  775  777  778  779  781  783  785  787</span></span>
+<span><span class="co">#&gt;  [61]  789  791  793  795  796  798  800  802  804  806  807  809  810  812  814</span></span>
+<span><span class="co">#&gt;  [76]  816  818  819  821  822  823  825  827  828  831  833  835  837  839  841</span></span>
+<span><span class="co">#&gt;  [91]  843  845  846  848  850  851  853  854  855  857  859  861  862  864  865</span></span>
+<span><span class="co">#&gt; [106]  866  867  869  871  874  875  877  879  880  881  883  885  887  889  890</span></span>
+<span><span class="co">#&gt; [121]  892  894  895  897  898  899  900  902  903  904  906  907  908  909  911</span></span>
+<span><span class="co">#&gt; [136]  913  915  916  918  919  921  922  924  928  929  930  932  933  934  935</span></span>
+<span><span class="co">#&gt; [151]  937  938  939  940  942  943  945  947  951  953  955  957  958  960  961</span></span>
+<span><span class="co">#&gt; [166]  963  965  966  968  970  972  973  975  976  979  981  982  984  986  987</span></span>
+<span><span class="co">#&gt; [181]  989  990  992  995  996  998  999 1000 1300 1700 1701 1703 1705 1706 1708</span></span>
+<span><span class="co">#&gt; [196] 1710 1711 1712 1713 1714 1716 1717 1718 1719 1720 1721 1723 1725 1726 1727</span></span>
+<span><span class="co">#&gt; [211] 1728 1730 1731 1732 1733 1735 1736 1737 1739 1740 1741 1743 1744 1746 1747</span></span>
+<span><span class="co">#&gt; [226] 1749 1750 1752 1753 1754 1755 1756 1758 1759 1761 1762 1764 1765 1767 1769</span></span>
+<span><span class="co">#&gt; [241] 1770 1771 1773 1774 1776 1777 1779 1780 1782 1784 1785 1787 1789 1791 1792</span></span>
+<span><span class="co">#&gt; [256] 1794 1795 1796 1798 1800 1801 1803 1804 1805 1807 1809 1810 1811 1812 1814</span></span>
+<span><span class="co">#&gt; [271] 1815 1817 1819 1821 1822 1823 1824 1826 1827 1829 1830 1832 1833 1834 1836</span></span>
+<span><span class="co">#&gt; [286] 1838 1840 1841 1844 1846 1847 1849 1851 1853 1854 1856 1857 1858 1860 1861</span></span>
+<span><span class="co">#&gt; [301] 1862 1863 1865 1866 1868 1870 1871 1873 1874 1875 1877 1879 1880 1882 1883</span></span>
+<span><span class="co">#&gt; [316] 1884 1886 1887 1888 1889 1891 1893 1894 1896 1897 1898 1900 1906 1908 1909</span></span>
+<span><span class="co">#&gt; [331] 1910 1912 1913 1915 1916 1918 1919 1921 1922 1924 1925 1926 1927 1929 1931</span></span>
+<span><span class="co">#&gt; [346] 1933 1934 1935 1937 1938 1940 1941 1943 1945 1947 1949 1951 1952 1953 1955</span></span>
+<span><span class="co">#&gt; [361] 1957 1959 1961 1963 1965 1966 1968 1969 1971 1972 1974 1975 1976 1977 1979</span></span>
+<span><span class="co">#&gt; [376] 1980 1981 1983 1984 1985 1987 1988 1990 1992 1994 1996 1998</span></span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
 <span>    <span class="va">result_Rbeast</span> <span class="op">&lt;-</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast123.html" class="external-link">beast123</a></span><span class="op">(</span></span>
@@ -587,28 +629,28 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,]  301  701 1301</span></span>
-<span><span class="co">#&gt;  [2,] 1301 1301  701</span></span>
-<span><span class="co">#&gt;  [3,]  701  301  301</span></span>
-<span><span class="co">#&gt;  [4,]  857  945  969</span></span>
-<span><span class="co">#&gt;  [5,]  890  958 1952</span></span>
-<span><span class="co">#&gt;  [6,]  749 1986 1993</span></span>
-<span><span class="co">#&gt;  [7,] 1989  127 1913</span></span>
-<span><span class="co">#&gt;  [8,]  768 1284 1969</span></span>
-<span><span class="co">#&gt;  [9,]  977 1819 1919</span></span>
-<span><span class="co">#&gt; [10,]  896 1721 1847</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1,]  701  701 1301</span></span>
+<span><span class="co">#&gt;  [2,]  301 1301  301</span></span>
+<span><span class="co">#&gt;  [3,] 1301  301  701</span></span>
+<span><span class="co">#&gt;  [4,]  925 1988 1952</span></span>
+<span><span class="co">#&gt;  [5,]  749 1732  969</span></span>
+<span><span class="co">#&gt;  [6,]  977 1719 1969</span></span>
+<span><span class="co">#&gt;  [7,] 1989  NaN  981</span></span>
+<span><span class="co">#&gt;  [8,]  768  NaN 1913</span></span>
+<span><span class="co">#&gt;  [9,]  985  NaN 1824</span></span>
+<span><span class="co">#&gt; [10,]  969  NaN  805</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="linear-regression">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression"></a>
+<h2 id="linear-regression-1">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression-1"></a>
 </h2>
 <p>The true change points are 100 and 200.</p>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_lm.html">fastcpd.lm</a></span><span class="op">(</span><span class="va">lm_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 100 200</span></span></code></pre></div>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">lm_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 100 200</span></span></code></pre></div>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">segmented</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/segmented/man/segmented.html" class="external-link">segmented</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span>
 <span>    <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
@@ -619,52 +661,52 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="co">#&gt; [1] 105</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="logistic-regression">Logistic regression<a class="anchor" aria-label="anchor" href="#logistic-regression"></a>
+<h2 id="logistic-regression-1">Logistic regression<a class="anchor" aria-label="anchor" href="#logistic-regression-1"></a>
 </h2>
 <p>The true change point is 125.</p>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span><span class="va">binomial_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 125</span></span></code></pre></div>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">binomial_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 126</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="poisson-regression">Poisson regression<a class="anchor" aria-label="anchor" href="#poisson-regression"></a>
+<h2 id="poisson-regression-1">Poisson regression<a class="anchor" aria-label="anchor" href="#poisson-regression-1"></a>
 </h2>
 <p>The true change points are 500, 800 and 1000.</p>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_poisson.html">fastcpd.poisson</a></span><span class="op">(</span><span class="va">poisson_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 518 800 999</span></span></code></pre></div>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">poisson_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 525 690</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="lasso">Lasso<a class="anchor" aria-label="anchor" href="#lasso"></a>
+<h2 id="lasso-1">Lasso<a class="anchor" aria-label="anchor" href="#lasso-1"></a>
 </h2>
 <p>The true change points are 80, 200 and 320.</p>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1]  80 202 320</span></span></code></pre></div>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">lasso_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1]  80 200 320</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="ar3">AR(3)<a class="anchor" aria-label="anchor" href="#ar3"></a>
+<h2 id="ar3-1">AR(3)<a class="anchor" aria-label="anchor" href="#ar3-1"></a>
 </h2>
 <p>The true change point is 600. Some methods are plotted due to the
 un-retrievable change points.</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_ar.html">fastcpd.ar</a></span><span class="op">(</span><span class="va">ar_data</span>, <span class="fl">3</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 597</span></span></code></pre></div>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">ar_data</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">ar_data</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; numeric(0)</span></span></code></pre></div>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">segmented</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/segmented/man/segmented.html" class="external-link">segmented</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span>
 <span>    <span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">ar_data</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">ar_data</span><span class="op">)</span><span class="op">)</span></span>
@@ -672,7 +714,7 @@ un-retrievable change points.</p>
 <span>  seg.Z <span class="op">=</span> <span class="op">~</span> <span class="va">x</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">psi</span><span class="op">[</span>, <span class="st">"Est."</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] 683.0417</span></span></code></pre></div>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
@@ -685,31 +727,31 @@ un-retrievable change points.</p>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="garch1-1">GARCH(1, 1)<a class="anchor" aria-label="anchor" href="#garch1-1"></a>
+<h2 id="garch1-1-1">GARCH(1, 1)<a class="anchor" aria-label="anchor" href="#garch1-1-1"></a>
 </h2>
 <p>The true change point is 200.</p>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_garch.html">fastcpd.garch</a></span><span class="op">(</span><span class="va">garch_data</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; Registered S3 method overwritten by 'quantmod':</span></span>
 <span><span class="co">#&gt;   method            from</span></span>
 <span><span class="co">#&gt;   as.zoo.data.frame zoo</span></span>
 <span><span class="co">#&gt; Residual calculation failed.</span></span>
 <span><span class="co">#&gt; [1] 199</span></span></code></pre></div>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">garch_data</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">garch_data</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span></span>
 <span><span class="co">#&gt; [1] 200</span></span></code></pre></div>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">x</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">garch_data</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="co">#&gt; [1] 173</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="var2">VAR(2)<a class="anchor" aria-label="anchor" href="#var2"></a>
+<h2 id="var2-1">VAR(2)<a class="anchor" aria-label="anchor" href="#var2-1"></a>
 </h2>
 <p>The true change points is 500.</p>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_var.html">fastcpd.var</a></span><span class="op">(</span><span class="va">var_data</span>, <span class="fl">2</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 614</span></span></code></pre></div>
-<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">VARDetect</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VARDetect/man/tbss.html" class="external-link">tbss</a></span><span class="op">(</span><span class="va">var_data</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "first.brk.points:"</span></span>
 <span><span class="co">#&gt; [1] 589 651</span></span>
