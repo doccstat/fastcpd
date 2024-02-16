@@ -648,7 +648,7 @@ strucchange::breakpoints(x ~ 1, data = data.frame(x = garch_data))$breakpoints
 
 # VAR(2)
 
-The true change points is 500.
+The true change points is 600.
 
 ```{r var2-fastcpd}
 fastcpd::fastcpd.var(var_data, 2, r.progress = FALSE)@cp_set
