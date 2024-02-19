@@ -112,14 +112,14 @@ plot.ts(mv_data_3)
 
 ```{r data-setup-linear-regression}
 # Linear regression
-n <- 300
+n <- 1000
 p <- 4
 x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
 theta_0 <- rbind(c(1, 3.2, -1, 0), c(-1, -0.5, 2.5, -2), c(0.8, 0, 1, 2))
 y <- c(
-  x[1:100, ] %*% theta_0[1, ] + rnorm(100, 0, 3),
-  x[101:200, ] %*% theta_0[2, ] + rnorm(100, 0, 3),
-  x[201:300, ] %*% theta_0[3, ] + rnorm(100, 0, 3)
+  x[1:300, ] %*% theta_0[1, ] + rnorm(300, 0, 10),
+  x[301:700, ] %*% theta_0[2, ] + rnorm(400, 0, 10),
+  x[701:n, ] %*% theta_0[3, ] + rnorm(300, 0, 10)
 )
 lm_data <- data.frame(y = y, x = x)
 
@@ -130,11 +130,11 @@ plot.ts(lm_data)
 
 ```{r data-setup-logistic-regression}
 # Logistic regression
-x <- matrix(rnorm(1500, 0, 1), ncol = 5)
+x <- matrix(rnorm(300 * 5, 0, 1), ncol = 5)
 theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
 y <- c(
-  rbinom(125, 1, 1 / (1 + exp(-x[1:125, ] %*% theta[1, ]))),
-  rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] %*% theta[2, ])))
+  rbinom(175, 1, 1 / (1 + exp(-x[1:175, ] %*% theta[1, ]))),
+  rbinom(125, 1, 1 / (1 + exp(-x[176:300, ] %*% theta[2, ])))
 )
 binomial_data <- data.frame(y = y, x = x)
 
@@ -537,7 +537,7 @@ result_Rbeast$trend$cp
 
 # Linear regression
 
-The true change points are 100 and 200.
+The true change points are 300 and 700.
 
 ```{r linear-regression-fastcpd}
 fastcpd::fastcpd.lm(lm_data, r.progress = FALSE)@cp_set
@@ -559,7 +559,7 @@ segmented::segmented(
 
 # Logistic regression
 
-The true change point is 125.
+The true change point is 175.
 
 ```{r logistic-regression-fastcpd}
 fastcpd::fastcpd.binomial(binomial_data, r.progress = FALSE)@cp_set
