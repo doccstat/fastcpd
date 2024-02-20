@@ -200,7 +200,6 @@ testthat::test_that("beta x2", {
     paste0(
       "Warning: The number of change points is larger than the number of ",
       "observations divided by the number of covariates plus one. ",
-      "The residuals are not independent. ",
       "Retrying with a larger `beta` value (x2) with MBIC."
     ),
     fixed = TRUE

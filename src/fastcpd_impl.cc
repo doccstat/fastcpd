@@ -45,6 +45,7 @@ List fastcpd_impl(
   });
   // Objective function: F(0) = -beta.
   colvec f_t = zeros<vec>(n + 1);
+  f_t.fill(arma::datum::inf);
   f_t(0) = -beta;
 
   RProgress::RProgress rProgress("[:bar] :current/:total in :elapsed", n);
