@@ -1,3 +1,7 @@
+# fastcpd 0.11.2
+
+*   Export variance estimator function for linear models.
+
 # fastcpd 0.11.1
 
 *   Add package comparison with `CptNonPar`, `gfpop`, `InspectChangepoint`,

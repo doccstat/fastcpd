@@ -1,0 +1,15 @@
+if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
+  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+
+set.seed(1)
+n <- 300
+p <- 4
+x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+theta_0 <- rbind(c(1, 3.2, -1, 0), c(-1, -0.5, 2.5, -2), c(0.8, 0, 1, 2))
+y <- c(
+  x[1:100, ] %*% theta_0[1, ] + rnorm(100, 0, 3),
+  x[101:200, ] %*% theta_0[2, ] + rnorm(100, 0, 3),
+  x[201:300, ] %*% theta_0[3, ] + rnorm(100, 0, 3)
+)
+sigma2 <- lm_variance(cbind(y, x))
