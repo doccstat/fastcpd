@@ -77,6 +77,36 @@ List fastcpd_impl(
     rProgress.tick();
   }
 
+#ifdef FASTCPD_DEBUG
+
+  colvec cvec = zeros<vec>(n + 1);
+  colvec tau_stars = zeros<vec>(n + 1);
+
+  for (int t = 1; t <= n; t++) {
+    cvec.fill(arma::datum::inf);
+    for (int s = t; s <= n; s++) {
+      List cost_optim_result =
+        fastcpd_class.negative_log_likelihood(
+          data.rows(t - 1, s - 1), R_NilValue, lambda, false, R_NilValue
+      );
+      cvec(s) = as<double>(cost_optim_result["value"]);
+    }
+
+    colvec new_f_t = f_t(t - 1) + cvec + beta;
+    ucolvec f_t_condition = arma::find(new_f_t < f_t);
+    if (f_t_condition.n_elem > 0) {
+      f_t.rows(f_t_condition) = new_f_t.rows(f_t_condition);
+      tau_stars.rows(f_t_condition) = (t - 1) * ones<vec>(f_t_condition.n_elem);
+    }
+    cp_sets[t] = join_cols(cp_sets[tau_stars(t - 1)], colvec{tau_stars(t - 1)});
+
+    if (r_progress) {
+      rProgress.tick();
+    }
+  }
+
+#else
+
   for (int t = 2; t <= n; t++) {
     unsigned int r_t_count = r_t_set.n_elem;
 
@@ -190,6 +220,8 @@ List fastcpd_impl(
       rProgress.tick();
     }
   }
+
+#endif
 
   // Remove change points close to the boundaries.
   colvec raw_cp_set = cp_sets[n],
