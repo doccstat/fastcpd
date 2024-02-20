@@ -554,14 +554,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     )
   }
 
-  if (
-    length(raw_cp_set) > nrow(data) / (p + 1) &&
-      (all(raw_residuals == 0) || stats::t.test(raw_residuals)$p.value < 0.05)
-  ) {
+  if (length(raw_cp_set) > nrow(data) / (p + 1)) {
     message(
       "Warning: The number of change points is larger than the number of ",
       "observations divided by the number of covariates plus one. ",
-      "The residuals are not independent. ",
       "Retrying with a larger `beta` value (x2) with MBIC."
     )
     return(
