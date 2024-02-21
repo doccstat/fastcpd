@@ -54,8 +54,10 @@ reference:
 
   - title: Utility functions
     desc: >
-      The following functions help with visualization and analyzation of the data.
+      The following functions help with visualization and analyzation of the
+      data.
     contents:
+      - lm_variance
       - plot.fastcpd
       - print.fastcpd
       - show.fastcpd
