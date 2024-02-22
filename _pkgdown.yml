@@ -85,6 +85,7 @@ articles:
 - title: Examples
   navbar: ~
   contents:
+  - examples-custom-model
   - examples-introductory
   - examples-advanced
 
