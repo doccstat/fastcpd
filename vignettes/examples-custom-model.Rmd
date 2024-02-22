@@ -1,0 +1,89 @@
+---
+title: "Custom logistic regression model"
+output: rmarkdown::html_vignette
+description: |
+  Examples of using custom model to reproduce change point detection in
+  logistic regression models.
+vignette: >
+  %\VignetteIndexEntry{Custom logistic regression model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(fastcpd)
+```
+
+```{r package_installation}
+for (package in c("ggplot2", "mvtnorm")) {
+  if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
+    package, repos = "https://cloud.r-project.org", quiet = TRUE
+  )
+}
+```
+
+We try to reproduce the logistic regression models with
+custom cost functions and show that the results are similar to the built-in
+logistic regression models.
+
+The built-in logistic regression model in `fastcpd()` is implemented with the
+help of the **fastcpd** package **fastglm**. The **fastcpd** package
+utilizes the iteratively reweighted least squares with the step-halving approach
+to help safeguard against convergence issues. If a
+custom cost function is used with gradient descent, we should expect the results
+may not be the exact same as the built-in logistic regression model.
+
+Specifying the `cost`, `cost_gradient` and `cost_hessian`
+parameters below,
+we can obtain similar results as the built-in logistic regression
+model.
+
+```{r fastcpd_binomial}
+set.seed(1)
+x <- matrix(rnorm(1500, 0, 1), ncol = 5)
+theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
+y <- c(
+  rbinom(125, 1, 1 / (1 + exp(-x[1:125, ] %*% theta[1, ]))),
+  rbinom(175, 1, 1 / (1 + exp(-x[126:300, ] %*% theta[2, ])))
+)
+binomial_data <- data.frame(y = y, x = x)
+
+result <- fastcpd.binomial(cbind(y, x), r.progress = FALSE)
+summary(result)
+```
+
+```{r custom_cost_functions}
+logistic_loss <- function(data, theta) {
+  x <- data[, -1]
+  y <- data[, 1]
+  u <- x %*% theta
+  nll <- -y * u + log(1 + exp(u))
+  nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
+  sum(nll)
+}
+logistic_gradient <- function(data, theta) {
+  x <- data[nrow(data), -1]
+  y <- data[nrow(data), 1]
+  c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
+}
+logistic_hessian <- function(data, theta) {
+  x <- data[nrow(data), -1]
+  prob <- 1 / (1 + exp(-x %*% theta))
+  (x %o% x) * c((1 - prob) * prob)
+}
+result <- fastcpd(
+  y ~ . - 1, binomial_data, epsilon = 1e-5, cost = logistic_loss,
+  cost_gradient = logistic_gradient, cost_hessian = logistic_hessian,
+  r.progress = FALSE
+)
+summary(result)
+```
+
+Note that the result obtained through custom cost functions is inferior
+compared to
+the one obtained through built-in models.
+We remark that the results can be improved with extra parameters
+already provided in the package.
+The detailed discussion of several advanced usages of the package can be found
+in [placeholder for the advanced usage vignette]().
