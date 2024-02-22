@@ -86,4 +86,5 @@ the one obtained through built-in models.
 We remark that the results can be improved with extra parameters
 already provided in the package.
 The detailed discussion of several advanced usages of the package can be found
-in [placeholder for the advanced usage vignette]().
+in
+[Advanced examples](https://fastcpd.xingchi.li/articles/examples-advanced.html).
