@@ -128,9 +128,7 @@ results as the built-in logistic regression model.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">binomial_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: fit_glm: fitted probabilities numerically 0 or 1 occurred</span></span>
-<span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: fit_glm: fitted probabilities numerically 0 or 1 occurred</span></span>
 <span></span>
 <span><span class="co">#&gt; Warning: fit_glm: fitted probabilities numerically 0 or 1 occurred</span></span>
@@ -141,21 +139,21 @@ results as the built-in logistic regression model.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd.binomial(data = cbind(y, x), r.progress = FALSE)</span></span>
+<span><span class="co">#&gt; fastcpd.binomial(data = cbind(y, x), r.progress = FALSE, cost_adjustment = NULL)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 26 126 </span></span>
+<span><span class="co">#&gt; 126 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Cost values:</span></span>
-<span><span class="co">#&gt; -7.337058 45.02614 29.13457 </span></span>
+<span><span class="co">#&gt; 56.90525 30.76875 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt;     segment 1  segment 2 segment 3</span></span>
-<span><span class="co">#&gt; 1 -3082.38994  0.8954373  1.878525</span></span>
-<span><span class="co">#&gt; 2 -3237.90057 -0.8695879  2.704376</span></span>
-<span><span class="co">#&gt; 3  6229.16318  0.8846224  3.702310</span></span>
-<span><span class="co">#&gt; 4 -1898.80626 -0.7841684  2.258796</span></span>
-<span><span class="co">#&gt; 5   -88.08179  0.1614090  2.524173</span></span></code></pre></div>
+<span><span class="co">#&gt;    segment 1 segment 2</span></span>
+<span><span class="co">#&gt; 1  0.7259293  1.878525</span></span>
+<span><span class="co">#&gt; 2 -1.0294802  2.704376</span></span>
+<span><span class="co">#&gt; 3  1.0576503  3.702310</span></span>
+<span><span class="co">#&gt; 4 -0.8812767  2.258796</span></span>
+<span><span class="co">#&gt; 5  0.2419351  2.524173</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">logistic_loss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
