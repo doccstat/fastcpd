@@ -49,7 +49,7 @@ y <- c(
 )
 binomial_data <- data.frame(y = y, x = x)
 
-result <- fastcpd.binomial(cbind(y, x), r.progress = FALSE)
+result <- fastcpd.binomial(cbind(y, x), r.progress = FALSE, cost_adjustment = NULL)
 summary(result)
 ```
 
