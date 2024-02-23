@@ -428,7 +428,7 @@ double Fastcpd::adjust_cost_value(
   const unsigned int nrows
 ) {
   if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
-    value += data.n_cols * std::log((double) nrows / data.n_rows) / 2;
+    value += data.n_cols * std::log(nrows) / 2;
   }
   if (cost_adjustment == "MDL") {
     value *= std::log2(M_E);
