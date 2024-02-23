@@ -41,7 +41,9 @@ y <- c(
   rbinom(150, 1, 1 / (1 + exp(-x[1:150, ] \%*\% theta[1, ]))),
   rbinom(250, 1, 1 / (1 + exp(-x[151:400, ] \%*\% theta[2, ])))
 )
-result <- suppressWarnings(fastcpd.binomial(cbind(y, x)))
+result <- suppressWarnings(
+  fastcpd.binomial(cbind(y, x), cost_adjustment = NULL)
+)
 summary(result)
 plot(result)
 }
