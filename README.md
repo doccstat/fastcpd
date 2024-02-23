@@ -117,7 +117,7 @@ the package. They are only required for the vignettes. If you want to
 learn more about the package comparison and other vignettes, you could
 either check out vignettes on
 [CRAN](https://CRAN.R-project.org/package=fastcpd) or [pkgdown generated
-documentation](https://fastcpd.xingchi.li/articles).
+documentation](https://fastcpd.xingchi.li/articles/).
 
 </details>
 <details close>
