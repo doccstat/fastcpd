@@ -587,7 +587,9 @@ strucchange::breakpoints(y ~ . - 1, data = poisson_data)$breakpoints
 The true change points are 80, 200 and 320.
 
 ```{r lasso-fastcpd}
-fastcpd::fastcpd.lasso(lasso_data, r.progress = FALSE)@cp_set
+fastcpd::fastcpd.lasso(
+  lasso_data, beta = "BIC", cost_adjustment = "BIC", r.progress = FALSE
+)@cp_set
 ```
 
 ```{r lasso-strucchange}
