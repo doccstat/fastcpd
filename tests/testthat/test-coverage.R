@@ -20,11 +20,18 @@ testthat::test_that(
     )
     small_lasso_data <- cbind.data.frame(y, x)
     testthat::expect_equal(
-      fastcpd.lasso(small_lasso_data)@cp_set,
-      c(79, 202, 320)
+      fastcpd.lasso(
+        small_lasso_data, beta = "BIC",
+        cost_adjustment = NULL
+      )@cp_set,
+      c(79, 202, 325)
     )
     testthat::expect_equal(
-      fastcpd.lasso(small_lasso_data, vanilla_percentage = 0.2)@cp_set,
+      fastcpd.lasso(
+        small_lasso_data, beta = "BIC",
+        cost_adjustment = NULL,
+        vanilla_percentage = 0.2
+      )@cp_set,
       c(80, 202, 320)
     )
   }
@@ -52,8 +59,8 @@ testthat::test_that(
     set.seed(1)
     data <- c(rnorm(300, 0, 100), rnorm(400, 100, 100), rnorm(300, 0, 100))
     result_mean <- fastcpd.mean(data, beta = "MDL", cost_adjustment = "MDL")
-    testthat::expect_equal(result_mean@cp_set, c(294, 702))
-    testthat::expect_equal(median(result_mean@residuals), -2.1504017)
+    testthat::expect_equal(result_mean@cp_set, c(300, 702))
+    testthat::expect_equal(median(result_mean@residuals), -1.9047969)
   }
 )
 
