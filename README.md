@@ -167,7 +167,7 @@ summary(result)
 #> 614 
 #> 
 #> Cost values:
-#> 2743.514 2028.114 
+#> 2757.324 2041.923 
 #> 
 #> Parameters:
 #>     segment 1 segment 2
@@ -247,6 +247,8 @@ expected to see the progress bar when running the code by default.
 
 ### Utility functions
 
+- Variance estimation in linear models:
+  [`lm_variance`](https://fastcpd.xingchi.li/reference/lm_variance.html)
 - Plot: [`plot`](https://fastcpd.xingchi.li/reference/plot.html)
 - Print: [`print`](https://fastcpd.xingchi.li/reference/print.html)
 - Show: [`show`](https://fastcpd.xingchi.li/reference/show.html)
