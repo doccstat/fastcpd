@@ -291,6 +291,7 @@ fastcpd_ma <- fastcpd.ma
 #'   formula is not required here.
 #'
 #' @example tests/testthat/examples/fastcpd_mean.R
+#' @example tests/testthat/examples/fastcpd_mean-time.R
 #'
 #' @md
 #'

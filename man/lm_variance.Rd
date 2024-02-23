@@ -35,5 +35,5 @@ y <- c(
   x[101:200, ] \%*\% theta_0[2, ] + rnorm(100, 0, 3),
   x[201:300, ] \%*\% theta_0[3, ] + rnorm(100, 0, 3)
 )
-sigma2 <- lm_variance(cbind(y, x))
+(sigma2 <- lm_variance(cbind(y, x)))
 }
