@@ -122,7 +122,9 @@ testthat::test_that(
       cost = logistic_loss,
       cost_gradient = logistic_loss_gradient,
       cost_hessian = logistic_loss_hessian,
-      k = function(x) if (x < 10) 1 else 0,
+      multiple_epochs = function(segment_length) {
+        if (segment_length < 10) 1 else 0
+      },
       r.progress = FALSE
     )
     testthat::expect_equal(result@cp_set, 147)

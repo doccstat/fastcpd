@@ -11,7 +11,7 @@ fastcpd(
   segment_count = 10,
   trim = 0.025,
   momentum_coef = 0,
-  k = function(x) 0,
+  multiple_epochs = function(x) 0,
   family = NULL,
   epsilon = 1e-10,
   min_prob = 10^10,
@@ -80,18 +80,19 @@ parameter is used when the loss function is bad-shaped so that
 maintaining a momentum from previous update is desired. Default value is
 0, meaning the algorithm doesn't maintain a momentum by default.}
 
-\item{k}{Function on number of epochs in SGD. \code{k} should be a function
-taking only a parameter \code{x} meaning the current number of data
+\item{multiple_epochs}{Function on number of epochs in SGD.
+\code{multiple_epochs} should be a function taking only a parameter
+\code{segment_length} meaning the current number of data
 points considered since last segmentaion. The return value of the
 function should be an integer indicating how many epochs should be
 performed apart from the default update. By default the function returns
 0, meaning no multiple epochs will be used to update the parameters.
 Example usage:
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{  k = function(x) \{
-    if (x < n / segment_count / 4 * 1) 3
-    else if (x < n / segment_count / 4 * 2) 2
-    else if (x < n / segment_count / 4 * 3) 1
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{  multiple_epochs = function(segment_length) \{
+    if (segment_length < n / segment_count / 4 * 1) 3
+    else if (segment_length < n / segment_count / 4 * 2) 2
+    else if (segment_length < n / segment_count / 4 * 3) 1
     else 0
   \}
 }\if{html}{\out{</div>}}
@@ -327,7 +328,7 @@ cat(
 result_custom_two_epochs <- fastcpd(
   formula = y ~ . - 1,
   data = data,
-  k = function(x) 1,
+  multiple_epochs = function(segment_length) 1,
   epsilon = 1e-5,
   cost = logistic_loss,
   cost_gradient = logistic_loss_gradient,

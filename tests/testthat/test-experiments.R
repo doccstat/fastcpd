@@ -434,7 +434,7 @@ testthat::test_that(
     result_custom_two_epochs <- fastcpd(
       formula = y ~ . - 1,
       data = data,
-      k = function(x) 1,
+      multiple_epochs = function(segment_length) 1,
       epsilon = 1e-5,
       cost = logistic_loss,
       cost_gradient = logistic_loss_gradient,

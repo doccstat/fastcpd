@@ -81,7 +81,7 @@ result_multiple_epochs <- fastcpd(
   formula = y ~ . - 1,
   data = data.frame(y = y, x = x),
   family = "lasso",
-  k = function(x) if (x < 20) 1 else 0,
+  multiple_epochs = function(segment_length) if (segment_length < 20) 1 else 0,
   r.progress = FALSE
 )
 summary(result_multiple_epochs)
