@@ -57,18 +57,19 @@
 #'   parameter is used when the loss function is bad-shaped so that
 #'   maintaining a momentum from previous update is desired. Default value is
 #'   0, meaning the algorithm doesn't maintain a momentum by default.
-#' @param k Function on number of epochs in SGD. \code{k} should be a function
-#'   taking only a parameter \code{x} meaning the current number of data
+#' @param multiple_epochs Function on number of epochs in SGD.
+#'   \code{multiple_epochs} should be a function taking only a parameter
+#'   \code{segment_length} meaning the current number of data
 #'   points considered since last segmentaion. The return value of the
 #'   function should be an integer indicating how many epochs should be
 #'   performed apart from the default update. By default the function returns
 #'   0, meaning no multiple epochs will be used to update the parameters.
 #'   Example usage:
 #'   ```r
-#'     k = function(x) {
-#'       if (x < n / segment_count / 4 * 1) 3
-#'       else if (x < n / segment_count / 4 * 2) 2
-#'       else if (x < n / segment_count / 4 * 3) 1
+#'     multiple_epochs = function(segment_length) {
+#'       if (segment_length < n / segment_count / 4 * 1) 3
+#'       else if (segment_length < n / segment_count / 4 * 2) 2
+#'       else if (segment_length < n / segment_count / 4 * 3) 1
 #'       else 0
 #'     }
 #'   ```
@@ -197,7 +198,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   segment_count = 10,
   trim = 0.025,
   momentum_coef = 0,
-  k = function(x) 0,
+  multiple_epochs = function(x) 0,
   family = NULL,
   epsilon = 1e-10,
   min_prob = 10^10,
@@ -431,10 +432,11 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   }
 
   result <- fastcpd_impl(
-    data_, beta, cost_adjustment, segment_count, trim, momentum_coef, k,
-    fastcpd_family, epsilon, min_prob, winsorise_minval, winsorise_maxval,
-    p, order, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage,
-    warm_start, lower, upper, line_search, mean_data_cov, p_response, r_progress
+    data_, beta, cost_adjustment, segment_count, trim, momentum_coef,
+    multiple_epochs, fastcpd_family, epsilon, min_prob, winsorise_minval,
+    winsorise_maxval, p, order, cost, cost_gradient, cost_hessian, cp_only,
+    vanilla_percentage, warm_start, lower, upper, line_search, mean_data_cov,
+    p_response, r_progress
   )
 
   raw_cp_set <- c(result$raw_cp_set)
@@ -523,7 +525,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         segment_count = segment_count,
         trim = trim,
         momentum_coef = momentum_coef,
-        k = k,
+        multiple_epochs = multiple_epochs,
         family = family,
         epsilon = epsilon,
         min_prob = min_prob,
