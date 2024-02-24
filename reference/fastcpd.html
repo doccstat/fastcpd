@@ -73,7 +73,7 @@ parameters and returns a <code>fastcpd</code> object.</p>
 <span>  segment_count <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  trim <span class="op">=</span> <span class="fl">0.025</span>,</span>
 <span>  momentum_coef <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  k <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fl">0</span>,</span>
+<span>  multiple_epochs <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fl">0</span>,</span>
 <span>  family <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  epsilon <span class="op">=</span> <span class="fl">1e-10</span>,</span>
 <span>  min_prob <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="fl">10</span>,</span>
@@ -156,18 +156,19 @@ maintaining a momentum from previous update is desired. Default value is
 0, meaning the algorithm doesn't maintain a momentum by default.</p></dd>
 
 
-<dt>k</dt>
-<dd><p>Function on number of epochs in SGD. <code>k</code> should be a function
-taking only a parameter <code>x</code> meaning the current number of data
+<dt>multiple_epochs</dt>
+<dd><p>Function on number of epochs in SGD.
+<code>multiple_epochs</code> should be a function taking only a parameter
+<code>segment_length</code> meaning the current number of data
 points considered since last segmentaion. The return value of the
 function should be an integer indicating how many epochs should be
 performed apart from the default update. By default the function returns
 0, meaning no multiple epochs will be used to update the parameters.
 Example usage:</p>
-<p></p><div class="sourceCode r"><pre><code><span>  <span class="va">k</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">x</span> <span class="op">&lt;</span> <span class="va">n</span> <span class="op">/</span> <span class="va">segment_count</span> <span class="op">/</span> <span class="fl">4</span> <span class="op">*</span> <span class="fl">1</span><span class="op">)</span> <span class="fl">3</span></span>
-<span>    <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">x</span> <span class="op">&lt;</span> <span class="va">n</span> <span class="op">/</span> <span class="va">segment_count</span> <span class="op">/</span> <span class="fl">4</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span> <span class="fl">2</span></span>
-<span>    <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">x</span> <span class="op">&lt;</span> <span class="va">n</span> <span class="op">/</span> <span class="va">segment_count</span> <span class="op">/</span> <span class="fl">4</span> <span class="op">*</span> <span class="fl">3</span><span class="op">)</span> <span class="fl">1</span></span>
+<p></p><div class="sourceCode r"><pre><code><span>  <span class="va">multiple_epochs</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">segment_length</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">segment_length</span> <span class="op">&lt;</span> <span class="va">n</span> <span class="op">/</span> <span class="va">segment_count</span> <span class="op">/</span> <span class="fl">4</span> <span class="op">*</span> <span class="fl">1</span><span class="op">)</span> <span class="fl">3</span></span>
+<span>    <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">segment_length</span> <span class="op">&lt;</span> <span class="va">n</span> <span class="op">/</span> <span class="va">segment_count</span> <span class="op">/</span> <span class="fl">4</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span> <span class="fl">2</span></span>
+<span>    <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">segment_length</span> <span class="op">&lt;</span> <span class="va">n</span> <span class="op">/</span> <span class="va">segment_count</span> <span class="op">/</span> <span class="fl">4</span> <span class="op">*</span> <span class="fl">3</span><span class="op">)</span> <span class="fl">1</span></span>
 <span>    <span class="kw">else</span> <span class="fl">0</span></span>
 <span>  <span class="op">}</span></span></code></pre><p></p></div>
 <p>This function will perform 3 epochs for the first quarter of the data, 2
@@ -451,7 +452,7 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-in"><span><span class="va">result_custom_two_epochs</span> <span class="op">&lt;-</span> <span class="fu">fastcpd</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">data</span>,</span></span>
-<span class="r-in"><span>  k <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  multiple_epochs <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">segment_length</span><span class="op">)</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>  epsilon <span class="op">=</span> <span class="fl">1e-5</span>,</span></span>
 <span class="r-in"><span>  cost <span class="op">=</span> <span class="va">logistic_loss</span>,</span></span>
 <span class="r-in"><span>  cost_gradient <span class="op">=</span> <span class="va">logistic_loss_gradient</span>,</span></span>
@@ -460,7 +461,7 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_custom_two_epochs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = y ~ . - 1, data = data, k = function(x) 1, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = y ~ . - 1, data = data, multiple_epochs = function(segment_length) 1, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     epsilon = 1e-05, cost = logistic_loss, cost_gradient = logistic_loss_gradient, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     cost_hessian = logistic_loss_hessian)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
