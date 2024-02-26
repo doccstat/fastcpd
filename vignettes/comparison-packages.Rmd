@@ -562,7 +562,9 @@ segmented::segmented(
 The true change point is 175.
 
 ```{r logistic-regression-fastcpd}
-fastcpd::fastcpd.binomial(binomial_data, r.progress = FALSE)@cp_set
+fastcpd::fastcpd.binomial(
+  binomial_data, cost_adjustment = NULL, r.progress = FALSE
+)@cp_set
 ```
 
 ```{r logistic-regression-strucchange}
