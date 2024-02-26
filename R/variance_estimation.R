@@ -95,12 +95,7 @@ variance_mean <- function(data) {
       data[i + 1, , drop = FALSE] - data[i, , drop = FALSE]
     )
   }
-  sigma <- colMeans(variance_estimation, na.rm = TRUE) / 2
-  if (p == 1) {
-    c(sigma)
-  } else {
-    sigma
-  }
+  colMeans(variance_estimation, na.rm = TRUE) / 2
 }
 
 #' @rdname variance_mean

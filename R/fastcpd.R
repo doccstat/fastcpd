@@ -267,20 +267,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   if (family == "mean") {
     vanilla_percentage <- 1
     p <- ncol(data_)
-    block_size <- max(floor(sqrt(nrow(data_)) / (segment_count + 1)), 2)
-    block_count <- floor(nrow(data_) / block_size)
-    data_all_covs <- array(NA, dim = c(block_count, p, p))
-    for (block_index in seq_len(block_count)) {
-      block_start <- (block_index - 1) * block_size + 1
-      block_end <- if (block_index < block_count) {
-        block_index * block_size
-      } else {
-        nrow(data_)
-      }
-      data_all_covs[block_index, , ] <-
-        stats::cov(data_[block_start:block_end, , drop = FALSE])
-    }
-    mean_data_cov <- colMeans(data_all_covs)
+    mean_data_cov <- variance.mean(data_)
   } else {
     mean_data_cov <- diag(1)
   }
