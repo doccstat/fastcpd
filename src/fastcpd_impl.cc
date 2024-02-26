@@ -36,17 +36,16 @@ List fastcpd_impl(
   double lambda = 0;
   mat start = zeros<mat>(p, n);
 
-  // After t = 1, the r_t_set R_t contains 0 and 1.
-  ucolvec r_t_set = {0, 1};
-  // C(0) = NULL, C(1) = {0}.
+  ucolvec r_t_set = {0};
+
   std::vector<colvec> cp_sets = {zeros<vec>(0)};
   linspace(1, n, n).for_each([&](int i) {
     cp_sets.push_back(zeros<vec>(1));
   });
-  // Objective function: F(0) = -beta.
-  colvec f_t = zeros<vec>(n + 1);
-  f_t.fill(arma::datum::inf);
-  f_t(0) = -beta;
+
+  colvec fvec = zeros<vec>(n + 1);
+  fvec.fill(arma::datum::inf);
+  fvec(0) = -beta;
 
   RProgress::RProgress rProgress("[:bar] :current/:total in :elapsed", n);
 
@@ -92,10 +91,10 @@ List fastcpd_impl(
       cvec(s) = as<double>(cost_optim_result["value"]);
     }
 
-    colvec new_f_t = f_t(t - 1) + cvec + beta;
-    ucolvec f_t_condition = arma::find(new_f_t < f_t);
+    colvec new_fvec = fvec(t - 1) + cvec + beta;
+    ucolvec f_t_condition = arma::find(new_fvec < fvec);
     if (f_t_condition.n_elem > 0) {
-      f_t.rows(f_t_condition) = new_f_t.rows(f_t_condition);
+      fvec.rows(f_t_condition) = new_fvec.rows(f_t_condition);
       tau_stars.rows(f_t_condition) = (t - 1) * ones<vec>(f_t_condition.n_elem);
     }
     cp_sets[t] = join_cols(cp_sets[tau_stars(t - 1)], colvec{tau_stars(t - 1)});
@@ -107,7 +106,7 @@ List fastcpd_impl(
 
 #else
 
-  for (int t = 2; t <= n; t++) {
+  for (int t = 1; t <= n; t++) {
     unsigned int r_t_count = r_t_set.n_elem;
 
     // Number of cost values is the same as the number of elements in R_t.
@@ -193,7 +192,7 @@ List fastcpd_impl(
     cval(r_t_count - 1) = 0;
 
     // `beta` adjustment seems to work but there might be better choices.
-    colvec obj = cval + f_t.rows(r_t_set) + fastcpd_class.get_beta();
+    colvec obj = cval + fvec.rows(r_t_set) + fastcpd_class.get_beta();
     double min_obj = min(obj);
     double tau_star = r_t_set(index_min(obj));
 
@@ -201,7 +200,7 @@ List fastcpd_impl(
     cp_sets[t] = join_cols(cp_sets[tau_star], colvec{tau_star});
 
     // Step 5
-    ucolvec pruned_left = arma::find(cval + f_t.rows(r_t_set) <= min_obj);
+    ucolvec pruned_left = arma::find(cval + fvec.rows(r_t_set) <= min_obj);
     ucolvec pruned_r_t_set = zeros<ucolvec>(pruned_left.n_elem + 1);
     pruned_r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
     pruned_r_t_set(pruned_left.n_elem) = t;
@@ -214,7 +213,7 @@ List fastcpd_impl(
     }
 
     // Objective function F(t).
-    f_t(t) = min_obj;
+    fvec(t) = min_obj;
 
     if (r_progress) {
       rProgress.tick();
