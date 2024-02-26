@@ -88,9 +88,6 @@
     <loc>https://fastcpd.xingchi.li/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://fastcpd.xingchi.li/reference/lm_variance.html</loc>
-  </url>
-  <url>
     <loc>https://fastcpd.xingchi.li/reference/occupancy.html</loc>
   </url>
   <url>
@@ -110,6 +107,12 @@
   </url>
   <url>
     <loc>https://fastcpd.xingchi.li/reference/uk_seatbelts.html</loc>
+  </url>
+  <url>
+    <loc>https://fastcpd.xingchi.li/reference/variance_lm.html</loc>
+  </url>
+  <url>
+    <loc>https://fastcpd.xingchi.li/reference/variance_mean.html</loc>
   </url>
   <url>
     <loc>https://fastcpd.xingchi.li/reference/well_log.html</loc>
