@@ -9,6 +9,7 @@
 #'
 #' @slot call The call of the function.
 #' @slot data The data passed to the function.
+#' @slot order The order of the time series model.
 #' @slot family The family of the model.
 #' @slot cp_set The set of change points.
 #' @slot cost_values The cost function values for each segment.
@@ -25,6 +26,7 @@ setClass(
   representation(
     call = "language",
     data = "data.frame",
+    order = "numeric",
     family = "character",
     cp_set = "numeric",
     cost_values = "numeric",
@@ -65,11 +67,14 @@ plot.fastcpd <- function(x, ...) {  # nolint: cyclomatic complexity
     # Draw lines for time series data and points for other data.
     if (x@family %in% c("ar", "ma", "arma", "arima", "garch")) {
       line_or_point <- ggplot2::geom_line
+      y_label <-
+        paste0(toupper(x@family), "(", paste0(x@order, collapse = ", "), ")")
     } else {
       line_or_point <- ggplot2::geom_point
+      y_label <- "response"
     }
     p <- p + line_or_point(
-      data = data.frame(x = seq_len(nrow(x@data)), y = y, label = "response"),
+      data = data.frame(x = seq_len(nrow(x@data)), y = y, label = y_label),
       ggplot2::aes(x = x, y = y)
     )
 

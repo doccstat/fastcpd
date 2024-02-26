@@ -598,6 +598,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     Class = "fastcpd",
     call = match.call(),
     data = data.frame(data),
+    order = order,
     family = family,
     cp_set = cp_set,
     cost_values = c(result$cost_values),
