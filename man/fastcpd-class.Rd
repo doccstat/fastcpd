@@ -19,6 +19,8 @@ select using \code{@}.
 
 \item{\code{data}}{The data passed to the function.}
 
+\item{\code{order}}{The order of the time series model.}
+
 \item{\code{family}}{The family of the model.}
 
 \item{\code{cp_set}}{The set of change points.}
