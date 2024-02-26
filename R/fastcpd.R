@@ -414,7 +414,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     # `beta` provided. Only estimate the variance for Gaussian family when
     # `beta` is null.
     if (family == "lm" || fastcpd_family == "gaussian") {
-      beta <- beta * lm_variance(data_)
+      beta <- beta * variance.lm(data_)
     }
   }
 

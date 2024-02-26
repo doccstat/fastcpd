@@ -21,11 +21,7 @@
 #'
 #' @rdname fastcpd_ar
 #' @export
-fastcpd.ar <- function(  # nolint: Conventional R function style
-  data,
-  order = 0,
-  ...
-) {
+fastcpd_ar <- function(data, order = 0, ...) {
   result <- fastcpd.ts(c(data), "ar", order, ...)
   result@call <- match.call()
   result
@@ -33,7 +29,7 @@ fastcpd.ar <- function(  # nolint: Conventional R function style
 
 #' @rdname fastcpd_ar
 #' @export
-fastcpd_ar <- fastcpd.ar
+fastcpd.ar <- fastcpd_ar  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in ARIMA(p, d, q) models
 #'
@@ -59,11 +55,7 @@ fastcpd_ar <- fastcpd.ar
 #'
 #' @rdname fastcpd_arima
 #' @export
-fastcpd.arima <- function(  # nolint: Conventional R function style
-  data,
-  order = 0,
-  ...
-) {
+fastcpd_arima <- function(data, order = 0, ...) {
   result <- fastcpd.ts(c(data), "arima", order, ...)
   result@call <- match.call()
   result
@@ -71,7 +63,7 @@ fastcpd.arima <- function(  # nolint: Conventional R function style
 
 #' @rdname fastcpd_arima
 #' @export
-fastcpd_arima <- fastcpd.arima
+fastcpd.arima <- fastcpd_arima  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in ARMA(p, q) models
 #'
@@ -95,11 +87,7 @@ fastcpd_arima <- fastcpd.arima
 #'
 #' @rdname fastcpd_arma
 #' @export
-fastcpd.arma <- function(  # nolint: Conventional R function style
-  data,
-  order = c(0, 0),
-  ...
-) {
+fastcpd_arma <- function(data, order = c(0, 0), ...) {
   result <- fastcpd.ts(c(data), "arma", order, ...)
   result@call <- match.call()
   result
@@ -107,7 +95,7 @@ fastcpd.arma <- function(  # nolint: Conventional R function style
 
 #' @rdname fastcpd_arma
 #' @export
-fastcpd_arma <- fastcpd.arma
+fastcpd.arma <- fastcpd_arma  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in logistic regression models
 #'
@@ -130,7 +118,7 @@ fastcpd_arma <- fastcpd.arma
 #'
 #' @rdname fastcpd_binomial
 #' @export
-fastcpd.binomial <- function(data, ...) {  # nolint: Conventional R function style
+fastcpd_binomial <- function(data, ...) {
   result <- fastcpd(
     data = data.frame(y = data[, 1], x = data[, -1]), family = "binomial", ...
   )
@@ -140,7 +128,7 @@ fastcpd.binomial <- function(data, ...) {  # nolint: Conventional R function sty
 
 #' @rdname fastcpd_binomial
 #' @export
-fastcpd_binomial <- fastcpd.binomial
+fastcpd.binomial <- fastcpd_binomial  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in GARCH(p, q) models
 #'
@@ -164,11 +152,7 @@ fastcpd_binomial <- fastcpd.binomial
 #'
 #' @rdname fastcpd_garch
 #' @export
-fastcpd.garch <- function(  # nolint: Conventional R function style
-  data,
-  order = c(0, 0),
-  ...
-) {
+fastcpd_garch <- function(data, order = c(0, 0), ...) {
   result <- fastcpd.ts(c(data), "garch", order, ...)
   result@call <- match.call()
   result
@@ -176,7 +160,7 @@ fastcpd.garch <- function(  # nolint: Conventional R function style
 
 #' @rdname fastcpd_garch
 #' @export
-fastcpd_garch <- fastcpd.garch
+fastcpd.garch <- fastcpd_garch  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in penalized linear regression models
 #'
@@ -199,7 +183,7 @@ fastcpd_garch <- fastcpd.garch
 #'
 #' @rdname fastcpd_lasso
 #' @export
-fastcpd.lasso <- function(data, ...) {  # nolint: Conventional R function style
+fastcpd_lasso <- function(data, ...) {
   result <- fastcpd(
     data = data.frame(y = data[, 1], x = data[, -1]), family = "lasso", ...
   )
@@ -209,7 +193,7 @@ fastcpd.lasso <- function(data, ...) {  # nolint: Conventional R function style
 
 #' @rdname fastcpd_lasso
 #' @export
-fastcpd_lasso <- fastcpd.lasso
+fastcpd.lasso <- fastcpd_lasso  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in linear regression models
 #'
@@ -232,7 +216,7 @@ fastcpd_lasso <- fastcpd.lasso
 #'
 #' @rdname fastcpd_lm
 #' @export
-fastcpd.lm <- function(data, ...) {  # nolint: Conventional R function style
+fastcpd_lm <- function(data, ...) {
   result <- fastcpd(
     data = data.frame(y = data[, 1], x = data[, -1]), family = "lm", ...
   )
@@ -242,7 +226,7 @@ fastcpd.lm <- function(data, ...) {  # nolint: Conventional R function style
 
 #' @rdname fastcpd_lm
 #' @export
-fastcpd_lm <- fastcpd.lm
+fastcpd.lm <- fastcpd_lm  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in MA(q) models
 #'
@@ -268,11 +252,7 @@ fastcpd_lm <- fastcpd.lm
 #'
 #' @rdname fastcpd_ma
 #' @export
-fastcpd.ma <- function(  # nolint: Conventional R function style
-  data,
-  order = 0,
-  ...
-) {
+fastcpd_ma <- function(data, order = 0, ...) {
   result <- fastcpd.ts(c(data), "ma", order, ...)
   result@call <- match.call()
   result
@@ -280,7 +260,7 @@ fastcpd.ma <- function(  # nolint: Conventional R function style
 
 #' @rdname fastcpd_ma
 #' @export
-fastcpd_ma <- fastcpd.ma
+fastcpd.ma <- fastcpd_ma  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in mean change models
 #'
@@ -303,7 +283,7 @@ fastcpd_ma <- fastcpd.ma
 #'
 #' @rdname fastcpd_mean
 #' @export
-fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
+fastcpd_mean <- function(data, ...) {
   if (is.null(dim(data)) || length(dim(data)) == 1) {
     data <- matrix(data, ncol = 1)
   }
@@ -316,7 +296,7 @@ fastcpd.mean <- function(data, ...) {  # nolint: Conventional R function style
 
 #' @rdname fastcpd_mean
 #' @export
-fastcpd_mean <- fastcpd.mean
+fastcpd.mean <- fastcpd_mean  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in variance change models
 #'
@@ -339,10 +319,7 @@ fastcpd_mean <- fastcpd.mean
 #'
 #' @rdname fastcpd_meanvariance
 #' @export
-fastcpd.meanvariance <- function(  # nolint: Conventional R function style
-  data,
-  ...
-) {
+fastcpd_meanvariance <- function(data, ...) {
   if (is.null(dim(data)) || length(dim(data)) == 1) {
     data <- matrix(data, ncol = 1)
   }
@@ -355,15 +332,16 @@ fastcpd.meanvariance <- function(  # nolint: Conventional R function style
 
 #' @rdname fastcpd_meanvariance
 #' @export
-fastcpd_meanvariance <- fastcpd.meanvariance
+fastcpd.meanvariance <-  # nolint: Conventional R function style
+  fastcpd_meanvariance
 
 #' @rdname fastcpd_meanvariance
 #' @export
-fastcpd.mv <- fastcpd.meanvariance  # nolint: Conventional R function style
+fastcpd_mv <- fastcpd_meanvariance
 
 #' @rdname fastcpd_meanvariance
 #' @export
-fastcpd_mv <- fastcpd.meanvariance
+fastcpd.mv <- fastcpd_meanvariance  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in Poisson regression models
 #'
@@ -386,10 +364,7 @@ fastcpd_mv <- fastcpd.meanvariance
 #'
 #' @rdname fastcpd_poisson
 #' @export
-fastcpd.poisson <- function(  # nolint: Conventional R function style
-  data,
-  ...
-) {
+fastcpd_poisson <- function(data, ...) {
   result <- fastcpd(
     data = data.frame(y = data[, 1], x = data[, -1]), family = "poisson", ...
   )
@@ -399,7 +374,7 @@ fastcpd.poisson <- function(  # nolint: Conventional R function style
 
 #' @rdname fastcpd_poisson
 #' @export
-fastcpd_poisson <- fastcpd.poisson
+fastcpd.poisson <- fastcpd_poisson  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in time series data
 #'
@@ -437,12 +412,7 @@ fastcpd_poisson <- fastcpd.poisson
 #'
 #' @rdname fastcpd_ts
 #' @export
-fastcpd.ts <- function(  # nolint: Conventional R function style
-  data,
-  family = NULL,
-  order = c(0, 0, 0),
-  ...
-) {
+fastcpd_ts <- function(data, family = NULL, order = c(0, 0, 0), ...) {
   if (!is.null(family)) {
     family <- tolower(family)
   }
@@ -466,7 +436,7 @@ fastcpd.ts <- function(  # nolint: Conventional R function style
 
 #' @rdname fastcpd_ts
 #' @export
-fastcpd_ts <- fastcpd.ts
+fastcpd.ts <- fastcpd_ts  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in VAR(p) models
 #'
@@ -489,11 +459,7 @@ fastcpd_ts <- fastcpd.ts
 #'
 #' @rdname fastcpd_var
 #' @export
-fastcpd.var <- function(  # nolint: Conventional R function style
-  data,
-  order = 0,
-  ...
-) {
+fastcpd_var <- function(data, order = 0, ...) {
   result <- fastcpd.ts(data, "var", order, ...)
   result@call <- match.call()
   result
@@ -501,7 +467,7 @@ fastcpd.var <- function(  # nolint: Conventional R function style
 
 #' @rdname fastcpd_var
 #' @export
-fastcpd_var <- fastcpd.var
+fastcpd.var <- fastcpd_var  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in variance change models
 #'
@@ -523,10 +489,7 @@ fastcpd_var <- fastcpd.var
 #'
 #' @rdname fastcpd_variance
 #' @export
-fastcpd.variance <- function(  # nolint: Conventional R function style
-  data,
-  ...
-) {
+fastcpd_variance <- function(data, ...) {
   if (is.null(dim(data)) || length(dim(data)) == 1) {
     data <- matrix(data, ncol = 1)
   }
@@ -539,4 +502,4 @@ fastcpd.variance <- function(  # nolint: Conventional R function style
 
 #' @rdname fastcpd_variance
 #' @export
-fastcpd_variance <- fastcpd.variance
+fastcpd.variance <- fastcpd_variance  # nolint: Conventional R function style

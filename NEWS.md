@@ -1,3 +1,7 @@
+# fastcpd 0.11.3
+
+*   Add Rice estimator for mean change variance estimation.
+
 # fastcpd 0.11.2
 
 *   Export variance estimator function for linear models.

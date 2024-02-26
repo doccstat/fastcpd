@@ -57,7 +57,8 @@ reference:
       The following functions help with visualization and analyzation of the
       data.
     contents:
-      - lm_variance
+      - variance_lm
+      - variance_mean
       - plot.fastcpd
       - print.fastcpd
       - show.fastcpd
