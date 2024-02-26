@@ -2,7 +2,7 @@
 #'
 #' @description Estimate the variance for each block and then take the average.
 #'
-#' @example tests/testthat/examples/lm_variance.R
+#' @example tests/testthat/examples/variance_lm.R
 #'
 #' @md
 #'
@@ -13,9 +13,9 @@
 #'
 #' @return A numeric value representing the variance.
 #'
-#' @rdname lm_variance
+#' @rdname variance_lm
 #' @export
-lm_variance <- function(data, block_size = NULL, p = NULL) {
+variance_lm <- function(data, block_size = NULL, p = NULL) {
   if (is.null(p)) {
     p <- ncol(data) - 1
   }
@@ -66,3 +66,43 @@ lm_variance <- function(data, block_size = NULL, p = NULL) {
   }
   mean(variance_estimation, na.rm = TRUE)
 }
+
+#' @rdname variance_lm
+#' @export
+variance.lm <- variance_lm  # nolint: Conventional R function style
+
+#' @title Variance estimation for mean change models
+#'
+#' @description Implement Rice estimator.
+#'
+#' @example tests/testthat/examples/variance_mean.R
+#'
+#' @md
+#'
+#' @param data A matrix or a data frame with data points as each row.
+#'
+#' @return A matrix representing the variance-covariance matrix or a numeric
+#'   value representing the variance.
+#'
+#' @rdname variance_mean
+#' @export
+variance_mean <- function(data) {
+  n <- nrow(data)
+  p <- ncol(data)
+  variance_estimation <- array(NA, c(n - 1, p, p))
+  for (i in seq_len(n - 1)) {
+    variance_estimation[i, , ] <- crossprod(
+      data[i + 1, , drop = FALSE] - data[i, , drop = FALSE]
+    )
+  }
+  sigma <- colMeans(variance_estimation, na.rm = TRUE) / 2
+  if (p == 1) {
+    c(sigma)
+  } else {
+    sigma
+  }
+}
+
+#' @rdname variance_mean
+#' @export
+variance.mean <- variance_mean  # nolint: Conventional R function style
