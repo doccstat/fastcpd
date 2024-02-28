@@ -88,3 +88,8 @@ already provided in the package.
 The detailed discussion of several advanced usages of the package can be found
 in
 [Advanced examples](https://fastcpd.xingchi.li/articles/examples-advanced.html).
+
+# Appendix: all code snippets
+
+```{r ref.label = knitr::all_labels(), echo = TRUE, eval = FALSE}
+```
