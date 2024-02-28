@@ -291,7 +291,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     data_ <- cbind(y, x)
   } else if (family == "var") {
     stopifnot(check_var_order(order))
-    fastcpd_family <- "custom"
+    fastcpd_family <- "mgaussian"
+    p_response <- ncol(data)
+    p <- order * p_response^2
 
     # Preprocess the data for VAR(p) model to be used in linear regression.
     vanilla_percentage <- 1
@@ -303,24 +305,8 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     }
     data_ <- cbind(y, x)
 
-    lm_x_col <- order * ncol(data)
-    sigma_ <- variance.lm(data_, ncol(data))
-    cost <- function(data) {
-      x <- data[, (ncol(data) - lm_x_col + 1):ncol(data), drop = FALSE]
-      y <- data[, 1:(ncol(data) - lm_x_col), drop = FALSE]
-
-      if (nrow(data) <= lm_x_col + 1) {
-        x_t_x <- diag(lm_x_col)
-      } else {
-        x_t_x <- crossprod(x)
-      }
-
-      residuals <- y - x %*% solve(x_t_x, t(x)) %*% y
-      value <-
-        nrow(data) * (ncol(data - lm_x_col) * log(2 * pi) + log(det(sigma_)))
-      (value + sum(diag(residuals %*% solve(sigma_, t(residuals))))) / 2
-    }
-    p <- order^2 * ncol(data_)
+    # Make the variance estimate symmetric.
+    sigma_ <- as.matrix(Matrix::nearPD(variance.lm(data_, ncol(data)))$mat)
   } else if (family == "ma") {
     stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
     stopifnot(check_ma_order(order))
