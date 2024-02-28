@@ -42,7 +42,8 @@
 // @param lower A vector containing the lower bounds for the parameters.
 // @param upper A vector containing the upper bounds for the parameters.
 // @param line_search A vector containing the line search coefficients.
-// @param mean_data_cov Covariance matrix of the data, only used in mean change.
+// @param variance_estimate Covariance matrix of the data, only used in mean
+//   change and gaussian.
 // @param p_response Dimension of the response, used with multivariate
 //   response.
 // @param r_progress Whether to show progress bar.
@@ -74,7 +75,7 @@ List fastcpd_impl(
     colvec lower,
     colvec upper,
     colvec line_search,
-    const mat mean_data_cov,
+    const mat variance_estimate,
     const unsigned int p_response,
     const bool r_progress
 );

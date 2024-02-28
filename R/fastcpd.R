@@ -264,26 +264,18 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     vanilla_percentage <- 1
   }
 
+  sigma_ <- diag(1)
   if (family == "mean") {
     vanilla_percentage <- 1
     p <- ncol(data_)
-    mean_data_cov <- variance.mean(data_)
-  } else {
-    mean_data_cov <- diag(1)
-  }
-
-  if (family == "variance") {
+    sigma_ <- variance.mean(data_)
+  } else if (family == "variance") {
     vanilla_percentage <- 1
     p <- ncol(data_)^2
-  }
-
-  if (family == "meanvariance" || family == "mv") {
+  } else if (family == "meanvariance" || family == "mv") {
     vanilla_percentage <- 1
     p <- ncol(data_) + ncol(data_)^2
-  }
-
-  # Pre-process the data for the time series models.
-  if (family == "ar") {
+  } else if (family == "ar") {
     # Check the validity of the parameters for AR(p) model.
     stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
     stopifnot(check_ar_order(order))
@@ -426,7 +418,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     data_, beta, cost_adjustment, segment_count, trim, momentum_coef,
     multiple_epochs, fastcpd_family, epsilon, min_prob, winsorise_minval,
     winsorise_maxval, p, order, cost, cost_gradient, cost_hessian, cp_only,
-    vanilla_percentage, warm_start, lower, upper, line_search, mean_data_cov,
+    vanilla_percentage, warm_start, lower, upper, line_search, sigma_,
     p_response, r_progress
   )
 
