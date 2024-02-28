@@ -5,15 +5,14 @@ for (package in c("ggplot2", "mvtnorm")) {
 }
 
 set.seed(1)
+n <- 500
 p <- 4
-x <- mvtnorm::rmvnorm(400, rep(0, p), diag(p))
+x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
 theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
 y <- c(
-  rbinom(150, 1, 1 / (1 + exp(-x[1:150, ] %*% theta[1, ]))),
-  rbinom(250, 1, 1 / (1 + exp(-x[151:400, ] %*% theta[2, ])))
+  rbinom(300, 1, 1 / (1 + exp(-x[1:300, ] %*% theta[1, ]))),
+  rbinom(200, 1, 1 / (1 + exp(-x[301:n, ] %*% theta[2, ])))
 )
-result <- suppressWarnings(
-  fastcpd.binomial(cbind(y, x), cost_adjustment = NULL)
-)
+result <- suppressWarnings(fastcpd.binomial(cbind(y, x)))
 summary(result)
 plot(result)
