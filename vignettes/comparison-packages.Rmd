@@ -48,10 +48,9 @@ for (
 ## Univariate mean change
 
 ```{r data-setup-univariate-mean-change}
+# Univariate mean change
 set.seed(1)
 p <- 1
-
-# Univariate mean change
 mean_data_1 <- rbind(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
   mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
@@ -65,6 +64,8 @@ plot.ts(mean_data_1)
 
 ```{r data-setup-univariate-mean-and-or-variance-change}
 # Univariate mean and/or variance change
+set.seed(1)
+p <- 1
 mv_data_1 <- rbind(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
@@ -80,9 +81,9 @@ plot.ts(mv_data_1)
 ## Multivariate mean change
 
 ```{r data-setup-multivariate-mean-change}
-p <- 3
-
 # Multivariate mean change
+set.seed(1)
+p <- 3
 mean_data_3 <- rbind(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
   mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
@@ -96,6 +97,8 @@ plot.ts(mean_data_3)
 
 ```{r data-setup-multivariate-mean-and-or-variance-change}
 # Multivariate mean and/or variance change
+set.seed(1)
+p <- 3
 mv_data_3 <- rbind(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
   mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
@@ -112,14 +115,15 @@ plot.ts(mv_data_3)
 
 ```{r data-setup-linear-regression}
 # Linear regression
-n <- 1000
+set.seed(1)
+n <- 300
 p <- 4
 x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
 theta_0 <- rbind(c(1, 3.2, -1, 0), c(-1, -0.5, 2.5, -2), c(0.8, 0, 1, 2))
 y <- c(
-  x[1:300, ] %*% theta_0[1, ] + rnorm(300, 0, 10),
-  x[301:700, ] %*% theta_0[2, ] + rnorm(400, 0, 10),
-  x[701:n, ] %*% theta_0[3, ] + rnorm(300, 0, 10)
+  x[1:100, ] %*% theta_0[1, ] + rnorm(100, 0, 3),
+  x[101:200, ] %*% theta_0[2, ] + rnorm(100, 0, 3),
+  x[201:n, ] %*% theta_0[3, ] + rnorm(100, 0, 3)
 )
 lm_data <- data.frame(y = y, x = x)
 
@@ -130,11 +134,14 @@ plot.ts(lm_data)
 
 ```{r data-setup-logistic-regression}
 # Logistic regression
-x <- matrix(rnorm(300 * 5, 0, 1), ncol = 5)
-theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
+set.seed(1)
+n <- 500
+p <- 4
+x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
 y <- c(
-  rbinom(175, 1, 1 / (1 + exp(-x[1:175, ] %*% theta[1, ]))),
-  rbinom(125, 1, 1 / (1 + exp(-x[176:300, ] %*% theta[2, ])))
+  rbinom(300, 1, 1 / (1 + exp(-x[1:300, ] %*% theta[1, ]))),
+  rbinom(200, 1, 1 / (1 + exp(-x[301:n, ] %*% theta[2, ])))
 )
 binomial_data <- data.frame(y = y, x = x)
 
@@ -145,6 +152,7 @@ plot.ts(binomial_data)
 
 ```{r data-setup-poisson-regression}
 # Poisson regression
+set.seed(1)
 n <- 1100
 p <- 3
 x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
@@ -166,6 +174,7 @@ plot.ts(poisson_data[, -1])
 
 ```{r data-setup-lasso}
 # Lasso
+set.seed(1)
 n <- 480
 p_true <- 6
 p <- 50
@@ -192,6 +201,7 @@ plot.ts(lasso_data[, seq_len(p_true + 1)])
 
 ```{r data-setup-ar3}
 # AR(3)
+set.seed(1)
 n <- 1000
 x <- rep(0, n + 3)
 for (i in 1:600) {
@@ -209,6 +219,7 @@ plot.ts(ar_data)
 
 ```{r data-setup-garch11}
 # GARCH(1, 1)
+set.seed(1)
 n <- 400
 sigma_2 <- rep(1, n + 1)
 x <- rep(0, n + 1)
@@ -228,15 +239,17 @@ plot.ts(garch_data)
 ## VAR(2)
 
 ```{r data-setup-var2}
-n <- 1000
+# VAR(2)
+set.seed(1)
+n <- 800
 p <- 2
 theta_1 <- matrix(c(-0.3, 0.6, -0.5, 0.4, 0.2, 0.2, 0.2, -0.2), nrow = p)
 theta_2 <- matrix(c(0.3, -0.4, 0.1, -0.5, -0.5, -0.2, -0.5, 0.2), nrow = p)
 x <- matrix(0, n + 2, p)
-for (i in 1:600) {
+for (i in 1:500) {
   x[i + 2, ] <- theta_1 %*% c(x[i + 1, ], x[i, ]) + rnorm(p, 0, 1)
 }
-for (i in 601:n) {
+for (i in 501:n) {
   x[i + 2, ] <- theta_2 %*% c(x[i + 1, ], x[i, ]) + rnorm(p, 0, 1)
 }
 var_data <- x[-seq_len(2), ]
@@ -562,9 +575,7 @@ segmented::segmented(
 The true change point is 175.
 
 ```{r logistic-regression-fastcpd}
-fastcpd::fastcpd.binomial(
-  binomial_data, cost_adjustment = NULL, r.progress = FALSE
-)@cp_set
+fastcpd::fastcpd.binomial(binomial_data, r.progress = FALSE)@cp_set
 ```
 
 ```{r logistic-regression-strucchange}
@@ -589,9 +600,7 @@ strucchange::breakpoints(y ~ . - 1, data = poisson_data)$breakpoints
 The true change points are 80, 200 and 320.
 
 ```{r lasso-fastcpd}
-fastcpd::fastcpd.lasso(
-  lasso_data, beta = "BIC", cost_adjustment = "BIC", r.progress = FALSE
-)@cp_set
+fastcpd::fastcpd.lasso(lasso_data, r.progress = FALSE)@cp_set
 ```
 
 ```{r lasso-strucchange}
@@ -652,12 +661,19 @@ strucchange::breakpoints(x ~ 1, data = data.frame(x = garch_data))$breakpoints
 
 # VAR(2)
 
-The true change points is 600.
+The true change points is 500.
 
 ```{r var2-fastcpd}
-fastcpd::fastcpd.var(var_data, 2, r.progress = FALSE)@cp_set
+fastcpd::fastcpd.var(
+  var_data, 2, cost_adjustment = NULL, r.progress = FALSE
+)@cp_set
 ```
 
 ```{r var2-VARDetect}
-try(VARDetect::tbss(var_data))
+VARDetect::tbss(var_data)
+```
+
+# Appendix: all code snippets
+
+```{r ref.label = knitr::all_labels(), echo = TRUE, eval = FALSE}
 ```

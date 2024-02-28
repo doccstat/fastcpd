@@ -7,7 +7,7 @@ x <- matrix(0, n + 2, p)
 for (i in 1:500) {
   x[i + 2, ] <- theta_1 %*% c(x[i + 1, ], x[i, ]) + rnorm(p, 0, 1)
 }
-for (i in 501:800) {
+for (i in 501:n) {
   x[i + 2, ] <- theta_2 %*% c(x[i + 1, ], x[i, ]) + rnorm(p, 0, 1)
 }
 result <- fastcpd.var(x, 2, cost_adjustment = NULL)

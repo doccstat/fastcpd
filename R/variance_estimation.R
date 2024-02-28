@@ -16,6 +16,7 @@
 #' @rdname variance_lm
 #' @export
 variance_lm <- function(data, d = 1, block_size = ncol(data) - d + 1) {
+  data <- as.matrix(data)
   n <- nrow(data)
   estimators <- array(NA, c(n - block_size, d, d))
   for (i in seq_len(n - block_size)) {
