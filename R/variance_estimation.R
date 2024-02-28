@@ -8,63 +8,76 @@
 #'
 #' @param data A matrix or a data frame with the response variable as the first
 #'   column.
+#' @param d The dimension of the response variable.
 #' @param block_size The size of the blocks to use for variance estimation.
-#' @param p The number of predictors in the model.
 #'
 #' @return A numeric value representing the variance.
 #'
 #' @rdname variance_lm
 #' @export
-variance_lm <- function(data, block_size = NULL, p = NULL) {
-  if (is.null(p)) {
-    p <- ncol(data) - 1
-  }
-  if (is.null(block_size)) {
-    block_size <- p + 1
-  }
+variance_lm <- function(data, d = 1, block_size = ncol(data) - d + 1) {
   n <- nrow(data)
-  variance_estimation <- rep(NA, n - block_size)
+  estimators <- array(NA, c(n - block_size, d, d))
   for (i in seq_len(n - block_size)) {
     block_index <- seq_len(block_size) + i - 1
     block_index_lagged <- seq_len(block_size) + i
 
-    y_block <- data[block_index, 1]
-    x_block <- data[block_index, -1, drop = FALSE]
+    y_block <- data[block_index, seq_len(d), drop = FALSE]
+    x_block <- data[block_index, -seq_len(d), drop = FALSE]
 
-    y_block_lagged <- data[block_index_lagged, 1]
-    x_block_lagged <- data[block_index_lagged, -1, drop = FALSE]
+    y_block_lagged <- data[block_index_lagged, seq_len(d), drop = FALSE]
+    x_block_lagged <- data[block_index_lagged, -seq_len(d), drop = FALSE]
 
     x_t_x <- crossprod(x_block)
     x_t_x_lagged <- crossprod(x_block_lagged)
 
     tryCatch(
       expr = {
-        block_slope <-
-          solve(crossprod(x_block), crossprod(x_block, y_block))
+        block_slope <- solve(crossprod(x_block), crossprod(x_block, y_block))
         block_lagged_slope <- solve(
           crossprod(x_block_lagged),
           crossprod(x_block_lagged, y_block_lagged)
         )
         x_t_x_inv <- solve(x_t_x)
         x_t_x_inv_lagged <- solve(x_t_x_lagged)
-        inv_product <- x_t_x_inv %*% x_t_x_inv_lagged
         cross_term_x <- crossprod(
           x_block[-1, , drop = FALSE],
           x_block_lagged[-block_size, , drop = FALSE]
         )
-        cross_term <- inv_product %*% cross_term_x
+        cross_term <- x_t_x_inv %*% x_t_x_inv_lagged %*% cross_term_x
         delta_numerator <- crossprod(block_slope - block_lagged_slope)
-        delta_denominator <-
-          sum(diag(x_t_x_inv + x_t_x_inv_lagged - 2 * cross_term))
-        variance_estimation[i] <- delta_numerator / delta_denominator
+        delta_denominator <- matrix(0, d, d)
+        for (j in seq_len(d)) {
+          for (k in seq_len(d)) {
+            if (j != k) {
+              delta_denominator[j, k] <- delta_denominator[j, k] + crossprod(
+                block_slope[, j] - block_lagged_slope[, k]
+              )
+            }
+          }
+        }
+        delta_denominator <- delta_denominator + sum(
+          diag(x_t_x_inv + x_t_x_inv_lagged - 2 * cross_term)
+        )
+        estimators[i, , ] <- delta_numerator / delta_denominator
       },
       error = function(e) {
-        variance_estimation[i] <- NA
+        estimators[i, , ] <- matrix(NA, d, d)
         message("Variance estimation failed for block ", i, ".")
       }
     )
   }
-  mean(variance_estimation, na.rm = TRUE)
+  if (d == 1) {
+    # nolint start
+    # estimators <- stats::na.exclude(c(estimators))
+    # outlier_threshold <-
+    #   stats::quantile(estimators, 0.75) + 3 * stats::IQR(estimators)
+    # estimators[estimators > outlier_threshold] <- NA
+    # nolint end
+    mean(c(estimators), na.rm = TRUE)
+  } else {
+    colMeans(estimators, na.rm = TRUE)
+  }
 }
 
 #' @rdname variance_lm
@@ -89,13 +102,13 @@ variance.lm <- variance_lm  # nolint: Conventional R function style
 variance_mean <- function(data) {
   n <- nrow(data)
   p <- ncol(data)
-  variance_estimation <- array(NA, c(n - 1, p, p))
+  estimators <- array(NA, c(n - 1, p, p))
   for (i in seq_len(n - 1)) {
-    variance_estimation[i, , ] <- crossprod(
+    estimators[i, , ] <- crossprod(
       data[i + 1, , drop = FALSE] - data[i, , drop = FALSE]
     )
   }
-  colMeans(variance_estimation, na.rm = TRUE) / 2
+  colMeans(estimators, na.rm = TRUE) / 2
 }
 
 #' @rdname variance_mean
