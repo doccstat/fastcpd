@@ -5,17 +5,17 @@
 \alias{variance.lm}
 \title{Variance estimation for linear models with change points}
 \usage{
-variance_lm(data, block_size = NULL, p = NULL)
+variance_lm(data, d = 1, block_size = ncol(data) - d + 1)
 
-variance.lm(data, block_size = NULL, p = NULL)
+variance.lm(data, d = 1, block_size = ncol(data) - d + 1)
 }
 \arguments{
 \item{data}{A matrix or a data frame with the response variable as the first
 column.}
 
-\item{block_size}{The size of the blocks to use for variance estimation.}
+\item{d}{The dimension of the response variable.}
 
-\item{p}{The number of predictors in the model.}
+\item{block_size}{The size of the blocks to use for variance estimation.}
 }
 \value{
 A numeric value representing the variance.
@@ -32,11 +32,27 @@ set.seed(1)
 n <- 300
 p <- 4
 x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
-theta_0 <- rbind(c(1, 3.2, -1, 0), c(-1, -0.5, 2.5, -2), c(0.8, 0, 1, 2))
+theta <- rbind(c(1, 3.2, -1, 0), c(-1, -0.5, 2.5, -2), c(0.8, 0, 1, 2))
 y <- c(
-  x[1:100, ] \%*\% theta_0[1, ] + rnorm(100, 0, 3),
-  x[101:200, ] \%*\% theta_0[2, ] + rnorm(100, 0, 3),
-  x[201:300, ] \%*\% theta_0[3, ] + rnorm(100, 0, 3)
+  x[1:100, ] \%*\% theta[1, ] + rnorm(100, 0, 3),
+  x[101:200, ] \%*\% theta[2, ] + rnorm(100, 0, 3),
+  x[201:300, ] \%*\% theta[3, ] + rnorm(100, 0, 3)
 )
 (sigma2 <- variance.lm(cbind(y, x)))
+
+set.seed(1)
+n <- 300
+p <- 4
+d <- 2
+x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+theta <- cbind(c(1, 3.2, -1, 0), c(-1, -0.5, 2.5, -2), c(0.8, 0, 1, 2))
+theta <- cbind(theta, theta)
+y <- rbind(
+  x[1:100, ] \%*\% theta[, 1:2] + mvtnorm::rmvnorm(100, rep(0, d), 3 * diag(d)),
+  x[101:200, ] \%*\% theta[, 3:4] + mvtnorm::rmvnorm(100, rep(0, d), 3 * diag(d)),
+  x[201:300, ] \%*\% theta[, 5:6] + mvtnorm::rmvnorm(100, rep(0, d), 3 * diag(d))
+)
+(sigma <- variance.lm(cbind(y, x), d = d))
+# TODO(doccstat): variance estimator for linear model with multi response is
+# not implemented yet.
 }
