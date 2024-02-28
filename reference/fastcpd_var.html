@@ -113,20 +113,20 @@ and thus a formula is not required here.</p>
 <span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">500</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">2</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="va">theta_1</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span>, <span class="op">]</span>, <span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">p</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">501</span><span class="op">:</span><span class="fl">800</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">501</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">2</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="va">theta_2</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span>, <span class="op">]</span>, <span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">p</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.var</span><span class="op">(</span><span class="va">x</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.var</span><span class="op">(</span><span class="va">x</span>, <span class="fl">2</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.var(data = x, order = 2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.var(data = x, order = 2, cost_adjustment = NULL)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 518 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3433.927 1851.81 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1537.24 807.8969 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
