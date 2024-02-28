@@ -11,7 +11,6 @@ context("negative_log_likelihood_wo_theta Unit Test") {
       /* epsilon */ 0.0,
       /* family */ "arma",
       /* lower */ colvec(),
-      /* variance_estimate */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
       /* order */ colvec({3, 2}),
@@ -20,6 +19,7 @@ context("negative_log_likelihood_wo_theta Unit Test") {
       /* segment_count */ 0,
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
+      /* variance_estimate */ mat(),
       /* winsorise_maxval */ 0.0,
       /* winsorise_minval */ 0.0
     );
@@ -55,7 +55,6 @@ context("negative_log_likelihood_wo_cv Unit Test") {
       /* epsilon */ 0.0,
       /* family */ "arma",
       /* lower */ colvec(),
-      /* variance_estimate */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
       /* order */ colvec({3, 2}),
@@ -64,6 +63,7 @@ context("negative_log_likelihood_wo_cv Unit Test") {
       /* segment_count */ 0,
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
+      /* variance_estimate */ mat(),
       /* winsorise_maxval */ 0.0,
       /* winsorise_minval */ 0.0
     );
@@ -86,7 +86,6 @@ context("cost_update_gradient Unit Test") {
       /* epsilon */ 0.0,
       /* family */ "arma",
       /* lower */ colvec(),
-      /* variance_estimate */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
       /* order */ colvec({3, 2}),
@@ -95,6 +94,7 @@ context("cost_update_gradient Unit Test") {
       /* segment_count */ 0,
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
+      /* variance_estimate */ mat(),
       /* winsorise_maxval */ 0.0,
       /* winsorise_minval */ 0.0
     );
@@ -117,7 +117,6 @@ context("cost_update_hessian Unit Test") {
       /* epsilon */ 0.0,
       /* family */ "binomial",
       /* lower */ colvec(),
-      /* variance_estimate */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
       /* order */ colvec(),
@@ -126,6 +125,7 @@ context("cost_update_hessian Unit Test") {
       /* segment_count */ 0,
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
+      /* variance_estimate */ mat(),
       /* winsorise_maxval */ 0.0,
       /* winsorise_minval */ 0.0
     );
@@ -146,7 +146,6 @@ context("cost_update_hessian Unit Test") {
       /* epsilon */ 0.0,
       /* family */ "poisson",
       /* lower */ colvec(),
-      /* variance_estimate */ mat(),
       /* min_prob */ 1e10,
       /* momentum_coef */ 0.0,
       /* order */ colvec(),
@@ -155,6 +154,7 @@ context("cost_update_hessian Unit Test") {
       /* segment_count */ 0,
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
+      /* variance_estimate */ mat(),
       /* winsorise_maxval */ 0.0,
       /* winsorise_minval */ 0.0
     );
@@ -175,7 +175,6 @@ context("cost_update_hessian Unit Test") {
       /* epsilon */ 0.0,
       /* family */ "arma",
       /* lower */ colvec(),
-      /* variance_estimate */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
       /* order */ colvec({3, 2}),
@@ -184,6 +183,7 @@ context("cost_update_hessian Unit Test") {
       /* segment_count */ 0,
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
+      /* variance_estimate */ mat(),
       /* winsorise_maxval */ 0.0,
       /* winsorise_minval */ 0.0
     );
@@ -212,7 +212,6 @@ context("update_theta_sum Unit Test") {
       /* epsilon */ 0.0,
       /* family */ "gaussian",
       /* lower */ colvec(),
-      /* variance_estimate */ mat(),
       /* min_prob */ 0.0,
       /* momentum_coef */ 0.0,
       /* order */ colvec(),
@@ -221,6 +220,7 @@ context("update_theta_sum Unit Test") {
       /* segment_count */ 0,
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
+      /* variance_estimate */ mat(),
       /* winsorise_maxval */ 0.0,
       /* winsorise_minval */ 0.0
     );

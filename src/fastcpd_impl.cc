@@ -54,9 +54,9 @@ List fastcpd_impl(
   }
 
   fastcpd::classes::Fastcpd fastcpd_class(
-    beta, cost_adjustment, data, epsilon, family, lower, variance_estimate,
+    beta, cost_adjustment, data, epsilon, family, lower,
     min_prob, momentum_coef, order, p, p_response, segment_count, upper,
-    vanilla_percentage, winsorise_maxval, winsorise_minval
+    vanilla_percentage, variance_estimate, winsorise_maxval, winsorise_minval
   );
 
   fastcpd_class.create_cost_function_wrapper(cost);

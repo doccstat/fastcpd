@@ -14,7 +14,6 @@ class Fastcpd {
     const double epsilon,
     const string family,
     const colvec lower,
-    const mat variance_estimate,
     const double min_prob,
     const double momentum_coef,
     const colvec order,
@@ -23,6 +22,7 @@ class Fastcpd {
     const int segment_count,
     const colvec upper,
     const double vanilla_percentage,
+    const mat variance_estimate,
     const double winsorise_maxval,
     const double winsorise_minval
   );
