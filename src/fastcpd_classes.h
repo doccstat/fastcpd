@@ -14,7 +14,7 @@ class Fastcpd {
     const double epsilon,
     const string family,
     const colvec lower,
-    const mat mean_data_cov,
+    const mat variance_estimate,
     const double min_prob,
     const double momentum_coef,
     const colvec order,
@@ -98,8 +98,8 @@ class Fastcpd {
   // @param cv Whether to perform cross-validation to find the best lambda.
   // @param start Starting point for the optimization for warm start.
   // @param order Order of the time series models.
-  // @param mean_data_cov Covariance matrix of the data,
-  //   only used in mean change.
+  // @param variance_estimate Covariance matrix of the data,
+  //   only used in mean change and lm.
   //
   // @return Negative log likelihood of the corresponding data with the given
   //   family.
@@ -276,8 +276,6 @@ class Fastcpd {
   // Lower bound of the parameters to be estimated during the optimization.
   const colvec lower;
 
-  const mat mean_data_cov;
-
   const double min_prob;
 
   // Momentum will be used in the update step if `momentum_coef` is not 0.
@@ -319,6 +317,7 @@ class Fastcpd {
   const double vanilla_percentage;
 
   rowvec variance_data_mean;
+  const mat variance_estimate;
 
   // `winsorise_maxval` is the maximum value to be winsorised. Only used for
   // poisson.

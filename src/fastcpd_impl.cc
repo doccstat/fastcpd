@@ -27,7 +27,7 @@ List fastcpd_impl(
     colvec lower,
     colvec upper,
     colvec line_search,
-    const mat mean_data_cov,
+    const mat variance_estimate,
     const unsigned int p_response,
     const bool r_progress
 ) {
@@ -54,7 +54,7 @@ List fastcpd_impl(
   }
 
   fastcpd::classes::Fastcpd fastcpd_class(
-    beta, cost_adjustment, data, epsilon, family, lower, mean_data_cov,
+    beta, cost_adjustment, data, epsilon, family, lower, variance_estimate,
     min_prob, momentum_coef, order, p, p_response, segment_count, upper,
     vanilla_percentage, winsorise_maxval, winsorise_minval
   );

@@ -123,8 +123,8 @@ List Fastcpd::negative_log_likelihood_wo_theta(
     return List::create(
       Named("par") = par,
       Named("value") = data.n_rows / 2.0 * (
-        std::log(2.0 * M_PI) * data.n_cols + log_det_sympd(mean_data_cov) +
-          trace(solve(mean_data_cov, residuals.t() * residuals)) / data.n_rows
+        std::log(2.0 * M_PI) * data.n_cols + log_det_sympd(variance_estimate) +
+          trace(solve(variance_estimate, residuals.t() * residuals)) / data.n_rows
       ),
       Named("residuals") = residuals
     );
@@ -165,9 +165,32 @@ List Fastcpd::negative_log_likelihood_wo_theta(
       Named("value") = value,
       Named("residuals") = residuals
     );
+  } else if (family == "mgaussian") {
+    mat x = data.cols(p_response, data.n_cols - 1);
+    mat y = data.cols(0, p_response - 1);
+    mat x_t_x;
+
+    if (data.n_rows <= data.n_cols - p_response + 1) {
+      x_t_x = eye<mat>(data.n_cols - p_response, data.n_cols - p_response);
+    } else {
+      x_t_x = x.t() * x;
+    }
+
+    mat par = solve(x_t_x, x.t()) * y;
+    mat residuals = y - x * par;
+    residuals.raw_print();
+    double value =
+      p_response * std::log(2.0 * M_PI) + log_det_sympd(variance_estimate);
+    value *= data.n_rows;
+    value += trace(solve(variance_estimate, residuals.t() * residuals));
+    return List::create(
+      Named("par") = par,
+      Named("value") = value / 2,
+      Named("residuals") = residuals
+    );
   } else {
     // # nocov start
-    stop("This branch should not be reached at functions.cc: 103.");
+    stop("This branch should not be reached at fastcpd_class_cost.cc: 193.");
     // # nocov end
   }
 }
