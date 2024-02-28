@@ -10,7 +10,6 @@ Fastcpd::Fastcpd(
     const double epsilon,
     const string family,
     const colvec lower,
-    const mat variance_estimate,
     const double min_prob,
     const double momentum_coef,
     const colvec order,
@@ -19,6 +18,7 @@ Fastcpd::Fastcpd(
     const int segment_count,
     const colvec upper,
     const double vanilla_percentage,
+    const mat variance_estimate,
     const double winsorise_maxval,
     const double winsorise_minval
 ) : beta(beta),
@@ -27,7 +27,6 @@ Fastcpd::Fastcpd(
     epsilon(epsilon),
     family(family),
     lower(lower),
-    variance_estimate(variance_estimate),
     min_prob(min_prob),
     momentum_coef(momentum_coef),
     order(order),
@@ -36,6 +35,7 @@ Fastcpd::Fastcpd(
     segment_count(segment_count),
     upper(upper),
     vanilla_percentage(vanilla_percentage),
+    variance_estimate(variance_estimate),
     winsorise_maxval(winsorise_maxval),
     winsorise_minval(winsorise_minval) {
   n = data.n_rows;
