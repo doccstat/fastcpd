@@ -310,10 +310,12 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         data_[(order - p_i) + seq_len(nrow(data_) - order), ]
     }
     data_ <- cbind(y, x)
+
     lm_x_col <- order * ncol(data)
+    sigma_ <- variance.lm(data_, ncol(data))
     cost <- function(data) {
-      x <- data[, (ncol(data) - lm_x_col + 1):ncol(data)]
-      y <- data[, 1:(ncol(data) - lm_x_col)]
+      x <- data[, (ncol(data) - lm_x_col + 1):ncol(data), drop = FALSE]
+      y <- data[, 1:(ncol(data) - lm_x_col), drop = FALSE]
 
       if (nrow(data) <= lm_x_col + 1) {
         x_t_x <- diag(lm_x_col)
@@ -321,8 +323,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         x_t_x <- crossprod(x)
       }
 
-      # TODO(doccstat): Verify the correctness of the cost function for VAR(p).
-      norm(y - x %*% solve(x_t_x, t(x)) %*% y, type = "F")^2 / 2
+      residuals <- y - x %*% solve(x_t_x, t(x)) %*% y
+      value <-
+        nrow(data) * (ncol(data - lm_x_col) * log(2 * pi) + log(det(sigma_)))
+      (value + sum(diag(residuals %*% solve(sigma_, t(residuals))))) / 2
     }
     p <- order^2 * ncol(data_)
   } else if (family == "ma") {
