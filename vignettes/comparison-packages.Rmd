@@ -550,7 +550,7 @@ result_Rbeast$trend$cp
 
 # Linear regression
 
-The true change points are 300 and 700.
+The true change points are 100 and 200.
 
 ```{r linear-regression-fastcpd}
 fastcpd::fastcpd.lm(lm_data, r.progress = FALSE)@cp_set
@@ -572,7 +572,7 @@ segmented::segmented(
 
 # Logistic regression
 
-The true change point is 175.
+The true change point is 300.
 
 ```{r logistic-regression-fastcpd}
 fastcpd::fastcpd.binomial(binomial_data, r.progress = FALSE)@cp_set
