@@ -27,5 +27,3 @@ y <- rbind(
   x[201:300, ] %*% theta[, 5:6] + mvtnorm::rmvnorm(100, rep(0, d), 3 * diag(d))
 )
 (sigma <- variance.lm(cbind(y, x), d = d))
-# TODO(doccstat): variance estimator for linear model with multi response is
-# not implemented yet.
