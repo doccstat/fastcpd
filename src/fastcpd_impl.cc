@@ -283,6 +283,8 @@ List fastcpd_impl(
     family == "meanvariance" || family == "mv"
   ) {
     residual = zeros<mat>(data.n_rows, data.n_cols);
+  } else if (family == "mgaussian") {
+    residual = zeros<mat>(data.n_rows, p_response);
   } else {
     residual = zeros<mat>(data.n_rows, 1);
   }
