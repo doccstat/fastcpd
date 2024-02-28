@@ -1,4 +1,4 @@
-pandoc: 2.19.2
+pandoc: 3.1.11
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
@@ -7,7 +7,7 @@ articles:
   examples-advanced: examples-advanced.html
   examples-custom-model: examples-custom-model.html
   examples-introductory: examples-introductory.html
-last_built: 2024-02-27T01:54Z
+last_built: 2024-02-28T19:33Z
 urls:
   reference: https://fastcpd.xingchi.li/reference
   article: https://fastcpd.xingchi.li/articles
