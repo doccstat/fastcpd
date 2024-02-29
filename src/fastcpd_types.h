@@ -45,6 +45,7 @@ using ::arma::span;
 using ::arma::ucolvec;
 using ::arma::uvec;
 using ::arma::vec;
+using ::Rcpp::checkUserInterrupt;
 using ::Rcpp::Environment;
 using ::Rcpp::Function;
 using ::Rcpp::InternalFunction;
