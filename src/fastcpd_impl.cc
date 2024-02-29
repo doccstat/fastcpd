@@ -72,6 +72,7 @@ List fastcpd_impl(
     fastcpd_class.create_gradients();
   }
 
+  checkUserInterrupt();
   if (r_progress) {
     rProgress.tick();
   }
@@ -99,6 +100,7 @@ List fastcpd_impl(
     }
     cp_sets[t] = join_cols(cp_sets[tau_stars(t - 1)], colvec{tau_stars(t - 1)});
 
+    checkUserInterrupt();
     if (r_progress) {
       rProgress.tick();
     }
@@ -215,6 +217,7 @@ List fastcpd_impl(
     // Objective function F(t).
     fvec(t) = min_obj;
 
+    checkUserInterrupt();
     if (r_progress) {
       rProgress.tick();
     }
