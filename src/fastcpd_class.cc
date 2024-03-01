@@ -147,7 +147,7 @@ void Fastcpd::create_segment_statistics() {
     mat data_segment = data.rows(segment_indices_);
     rowvec segment_theta;
     if (!contain(FASTCPD_FAMILIES, family)) {
-      segment_theta = as<rowvec>(get_optimized_cost(data_segment, 0)["par"]);
+      segment_theta = as<rowvec>(get_optimized_cost(data_segment)["par"]);
     } else {
       segment_theta = as<rowvec>(
         cost_function_wrapper(
@@ -436,10 +436,7 @@ double Fastcpd::adjust_cost_value(
   return value;
 }
 
-List Fastcpd::get_optimized_cost(
-    const mat data_segment,
-    const double lambda
-) {
+List Fastcpd::get_optimized_cost(const mat data_segment) {
   Function cost_ = cost.get();
   List cost_optim_result;
   if (vanilla_percentage == 1) {

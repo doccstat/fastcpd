@@ -73,14 +73,10 @@ class Fastcpd {
   // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   //
   // @param data_segment A data frame containing a segment of the data.
-  // @param lambda Lambda for L1 regularization.
   //
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   and \code{hessian}.
-  List get_optimized_cost(
-      const mat data_segment,
-      const double lambda
-  );
+  List get_optimized_cost(const mat data_segment);
 
   Nullable<colvec> get_segment_theta_hat(const unsigned int t);
 
