@@ -370,7 +370,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       beta,
       BIC = (p + 1) * log(nrow(data_)) / 2,
       MBIC = (p + 2) * log(nrow(data_)) / 2,
-      MDL = (p + 2) * log(nrow(data_)) / 2
+      MDL = (p + 2) * log2(nrow(data_)) / 2
     )
 
     stopifnot(
