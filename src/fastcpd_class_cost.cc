@@ -29,6 +29,9 @@ List Fastcpd::negative_log_likelihood_wo_theta(
     bool cv,
     Nullable<colvec> start
 ) {
+  if (data.n_rows == 1) {
+    return List::create(Named("value") = 0);
+  }
   if (family == "lasso" && cv) {
     Environment glmnet = Environment::namespace_env("glmnet"),
                 stats = Environment::namespace_env("stats");

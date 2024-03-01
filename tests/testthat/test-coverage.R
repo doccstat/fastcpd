@@ -24,7 +24,7 @@ testthat::test_that(
         small_lasso_data, beta = "BIC",
         cost_adjustment = NULL
       )@cp_set,
-      c(79, 202, 325)
+      c(79, 201, 325)
     )
     testthat::expect_equal(
       fastcpd.lasso(
@@ -32,7 +32,7 @@ testthat::test_that(
         cost_adjustment = NULL,
         vanilla_percentage = 0.2
       )@cp_set,
-      c(80, 202, 320)
+      c(79, 201, 320)
     )
   }
 )
