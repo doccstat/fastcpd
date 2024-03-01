@@ -184,17 +184,8 @@ List fastcpd_impl(
       }
     }
 
-    if (!contain(FASTCPD_FAMILIES, family)) {
-      List cost_optim_result =
-        fastcpd_class.get_optimized_cost(data.row(t - 1));
-      cval(r_t_count - 1) = as<double>(cost_optim_result["value"]);
-    } else {
-      List cost_optim_result =
-        fastcpd_class.negative_log_likelihood(
-          data.row(t - 1), R_NilValue, lambda, false, R_NilValue
-      );
-      cval(r_t_count - 1) = as<double>(cost_optim_result["value"]);
-    }
+    cval(r_t_count - 1) = 0;
+
 
     if (vanilla_percentage != 1) {
       fastcpd_class.update_fastcpd_parameters(t);
