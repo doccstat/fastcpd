@@ -13,7 +13,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // fastcpd_impl
-List fastcpd_impl(mat data, double beta, const string cost_adjustment, const int segment_count, const double trim, const double momentum_coef, Function k, const string family, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const int p, const colvec order, Nullable<Function> cost, Nullable<Function> cost_gradient, Nullable<Function> cost_hessian, const bool cp_only, const double vanilla_percentage, const bool warm_start, colvec lower, colvec upper, colvec line_search, const mat variance_estimate, const unsigned int p_response, const bool r_progress);
+List fastcpd_impl(mat data, double beta, const string cost_adjustment, const int segment_count, const double trim, const double momentum_coef, Nullable<Function> k, const string family, const double epsilon, const double min_prob, const double winsorise_minval, const double winsorise_maxval, const int p, const colvec order, Nullable<Function> cost, Nullable<Function> cost_gradient, Nullable<Function> cost_hessian, const bool cp_only, const double vanilla_percentage, const bool warm_start, colvec lower, colvec upper, colvec line_search, const mat variance_estimate, const unsigned int p_response, const bool r_progress);
 RcppExport SEXP _fastcpd_fastcpd_impl(SEXP dataSEXP, SEXP betaSEXP, SEXP cost_adjustmentSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP kSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP min_probSEXP, SEXP winsorise_minvalSEXP, SEXP winsorise_maxvalSEXP, SEXP pSEXP, SEXP orderSEXP, SEXP costSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP cp_onlySEXP, SEXP vanilla_percentageSEXP, SEXP warm_startSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP line_searchSEXP, SEXP variance_estimateSEXP, SEXP p_responseSEXP, SEXP r_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -24,7 +24,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int >::type segment_count(segment_countSEXP);
     Rcpp::traits::input_parameter< const double >::type trim(trimSEXP);
     Rcpp::traits::input_parameter< const double >::type momentum_coef(momentum_coefSEXP);
-    Rcpp::traits::input_parameter< Function >::type k(kSEXP);
+    Rcpp::traits::input_parameter< Nullable<Function> >::type k(kSEXP);
     Rcpp::traits::input_parameter< const string >::type family(familySEXP);
     Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
     Rcpp::traits::input_parameter< const double >::type min_prob(min_probSEXP);

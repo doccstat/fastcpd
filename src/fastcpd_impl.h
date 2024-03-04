@@ -58,7 +58,7 @@ List fastcpd_impl(
     const int segment_count,
     const double trim,
     const double momentum_coef,
-    Function k,
+    Nullable<Function> k,
     const string family,
     const double epsilon,
     const double min_prob,
