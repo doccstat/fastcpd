@@ -190,6 +190,7 @@ List Fastcpd::run() {
   mat start = zeros<mat>(p, n);
 
   ucolvec r_t_set = {0};
+  DEBUG_RCOUT(r_t_set);
 
   std::vector<colvec> cp_sets = {zeros<vec>(0)};
   linspace(1, n, n).for_each([&](int i) {
@@ -361,7 +362,7 @@ List Fastcpd::run() {
 
     // Objective function F(t).
     fvec(t) = min_obj;
-    DEBUG_RCOUT(fvec);
+    DEBUG_RCOUT(fvec.rows(0, t));
 
     checkUserInterrupt();
     if (r_progress) {
