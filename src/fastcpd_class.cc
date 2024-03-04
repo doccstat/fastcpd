@@ -338,7 +338,9 @@ List Fastcpd::run() {
     // Step 5
     ucolvec pruned_left = arma::find(cval + fvec.rows(r_t_set) <= min_obj);
     ucolvec pruned_r_t_set = zeros<ucolvec>(pruned_left.n_elem + 1);
-    pruned_r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
+    if (pruned_left.n_elem) {
+      pruned_r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
+    }
     pruned_r_t_set(pruned_left.n_elem) = t;
     r_t_set = std::move(pruned_r_t_set);
 
