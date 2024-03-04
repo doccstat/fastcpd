@@ -3,6 +3,12 @@
 
 #include "RcppArmadillo.h"
 
+#ifdef DEBUG
+#  define DEBUG_RCOUT(x) Rcout << #x << ": " << x << std::endl
+#else
+#  define DEBUG_RCOUT(x) do {} while (0)
+#endif
+
 using ::arma::abs;
 using ::arma::accu;
 using ::arma::approx_equal;
@@ -52,6 +58,7 @@ using ::Rcpp::InternalFunction;
 using ::Rcpp::List;
 using ::Rcpp::Nullable;
 using ::Rcpp::NumericVector;
+using ::Rcpp::Rcout;
 using ::Rcpp::S4;
 using ::std::function;
 using ::std::string;

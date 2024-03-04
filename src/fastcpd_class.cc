@@ -255,13 +255,16 @@ List Fastcpd::run() {
 #else
 
   for (int t = 1; t <= n; t++) {
+    DEBUG_RCOUT(t);
     unsigned int r_t_count = r_t_set.n_elem;
+    DEBUG_RCOUT(r_t_count);
 
     // Number of cost values is the same as the number of elements in R_t.
     colvec cval = zeros<vec>(r_t_count);
 
     // For tau in R_t \ {t-1}.
     for (unsigned int i = 1; i < r_t_count; i++) {
+      DEBUG_RCOUT(i);
       int tau = r_t_set(i - 1);
       if (family == "lasso") {
         // Mean of `err_sd` only works if error sd is unchanged.
@@ -321,6 +324,7 @@ List Fastcpd::run() {
       }
     }
 
+    DEBUG_RCOUT(cval);
     cval(r_t_count - 1) = 0;
 
     if (vanilla_percentage != 1) {
@@ -334,15 +338,20 @@ List Fastcpd::run() {
 
     // Step 4
     cp_sets[t] = join_cols(cp_sets[tau_star], colvec{tau_star});
+    DEBUG_RCOUT(cp_sets[t]);
 
     // Step 5
     ucolvec pruned_left = arma::find(cval + fvec.rows(r_t_set) <= min_obj);
+    DEBUG_RCOUT(pruned_left);
     ucolvec pruned_r_t_set = zeros<ucolvec>(pruned_left.n_elem + 1);
+    DEBUG_RCOUT(pruned_r_t_set);
     if (pruned_left.n_elem) {
       pruned_r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
     }
+    DEBUG_RCOUT(pruned_r_t_set);
     pruned_r_t_set(pruned_left.n_elem) = t;
     r_t_set = std::move(pruned_r_t_set);
+    DEBUG_RCOUT(r_t_set);
 
     if (vanilla_percentage != 1) {
       update_theta_hat(pruned_left);
@@ -352,6 +361,7 @@ List Fastcpd::run() {
 
     // Objective function F(t).
     fvec(t) = min_obj;
+    DEBUG_RCOUT(fvec);
 
     checkUserInterrupt();
     if (r_progress) {
