@@ -151,8 +151,6 @@ get_variance_estimation <- function(data, family, p_response) {
     as.matrix(Matrix::nearPD(variance.lm(data, p_response))$mat)
   } else if (family == "lm" || family == "ar") {
     as.matrix(variance.lm(data))
-  } else if (family == "var") {
-    as.matrix(Matrix::nearPD(variance.lm(data, p_response))$mat)
   } else {
     diag(1)
   }
