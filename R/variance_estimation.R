@@ -40,6 +40,8 @@ variance.arma <- variance_arma  # nolint: Conventional R function style
 #'   column.
 #' @param d The dimension of the response variable.
 #' @param block_size The size of the blocks to use for variance estimation.
+#' @param outlier_iqr The number of interquartile ranges to use as a threshold
+#'   for outlier detection.
 #'
 #' @return A numeric value representing the variance.
 #'

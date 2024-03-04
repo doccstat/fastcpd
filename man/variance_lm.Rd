@@ -5,9 +5,9 @@
 \alias{variance.lm}
 \title{Variance estimation for linear models with change points}
 \usage{
-variance_lm(data, d = 1, block_size = ncol(data) - d + 1)
+variance_lm(data, d = 1, block_size = ncol(data) - d + 1, outlier_iqr = Inf)
 
-variance.lm(data, d = 1, block_size = ncol(data) - d + 1)
+variance.lm(data, d = 1, block_size = ncol(data) - d + 1, outlier_iqr = Inf)
 }
 \arguments{
 \item{data}{A matrix or a data frame with the response variable as the first
@@ -16,6 +16,9 @@ column.}
 \item{d}{The dimension of the response variable.}
 
 \item{block_size}{The size of the blocks to use for variance estimation.}
+
+\item{outlier_iqr}{The number of interquartile ranges to use as a threshold
+for outlier detection.}
 }
 \value{
 A numeric value representing the variance.
