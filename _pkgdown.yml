@@ -57,6 +57,7 @@ reference:
       The following functions help with visualization and analyzation of the
       data.
     contents:
+      - variance_arma
       - variance_lm
       - variance_mean
       - plot.fastcpd
