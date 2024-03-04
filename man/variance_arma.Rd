@@ -25,7 +25,7 @@ Estimate the variance for each block and then take the average.
 \examples{
 set.seed(1)
 n <- 300
-w <- rnorm(n + 3, 0, 3)
+w <- rnorm(n + 3, 0, 10)
 x <- rep(0, n + 3)
 for (i in 1:200) {
   x[i + 3] <- 0.1 * x[i + 2] - 0.3 * x[i + 1] + 0.1 * x[i] +
