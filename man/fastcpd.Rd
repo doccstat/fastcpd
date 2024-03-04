@@ -253,15 +253,12 @@ Proceedings of Machine Learning Research, 1129-1143.
 }
 
 \examples{
-\donttest{
 for (package in c("ggplot2", "mvtnorm")) {
   if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
     package, repos = "https://cloud.r-project.org", quiet = TRUE
   )
 }
 
-### linear regression with one-dimensional covariate
-library(fastcpd)
 set.seed(1)
 p <- 1
 x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
@@ -271,16 +268,33 @@ y <- c(
   x[101:200, ] * theta_0[2, ] + rnorm(100, 0, 1),
   x[201:300, ] * theta_0[3, ] + rnorm(100, 0, 1)
 )
-result <- fastcpd(
-  formula = y ~ . - 1,
-  data = data.frame(y = y, x = x),
-  family = "lm"
-)
-plot(result)
+result <- fastcpd.lm(cbind(y, x))
 summary(result)
+plot(result)
+if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
+  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
+)
 
-### custom logistic regression
-library(fastcpd)
+set.seed(1)
+n <- 600
+p <- 4
+d <- 2
+x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+theta_1 <- matrix(runif(8, -3, -1), nrow = p)
+theta_2 <- matrix(runif(8, -1, 3), nrow = p)
+y <- rbind(
+  x[1:350, ] \%*\% theta_1 + mvtnorm::rmvnorm(350, rep(0, d), 3 * diag(d)),
+  x[351:n, ] \%*\% theta_2 + mvtnorm::rmvnorm(250, rep(0, d), 3 * diag(d))
+)
+result_mlm <- fastcpd(
+  cbind(y.1, y.2) ~ . - 1, cbind.data.frame(y = y, x = x), family = "lm"
+)
+summary(result_mlm)
+\donttest{
+if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
+  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+
 set.seed(1)
 p <- 5
 x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
@@ -290,11 +304,7 @@ y <- c(
   rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] \%*\% theta[2, ])))
 )
 data <- data.frame(y = y, x = x)
-result_builtin <- suppressWarnings(fastcpd(
-  formula = y ~ . - 1,
-  data = data,
-  family = "binomial"
-))
+result_builtin <- suppressWarnings(fastcpd.binomial(data))
 logistic_loss <- function(data, theta) {
   x <- data[, -1]
   y <- data[, 1]
@@ -338,9 +348,11 @@ result_custom_two_epochs <- fastcpd(
   cost_hessian = logistic_loss_hessian
 )
 summary(result_custom_two_epochs)
+}
+if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
+  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
+)
 
-### custom cost function huber regression
-library(fastcpd)
 set.seed(1)
 n <- 400 + 300 + 500
 p <- 5
@@ -396,5 +408,4 @@ huber_regression_result <- fastcpd(
   cost_hessian = huber_loss_hessian
 )
 summary(huber_regression_result)
-}
 }
