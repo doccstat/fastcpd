@@ -29,6 +29,7 @@ List fastcpd_impl(
     const unsigned int p_response,
     const bool r_progress
 ) {
+  DEBUG_RCOUT(beta);
   fastcpd::classes::Fastcpd fastcpd_class(
     beta, cost, cost_adjustment, cost_gradient, cost_hessian, cp_only, data,
     epsilon, family, k, line_search, lower, min_prob, momentum_coef, order, p,

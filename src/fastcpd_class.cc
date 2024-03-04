@@ -155,6 +155,7 @@ void Fastcpd::create_segment_statistics() {
   for (
     int segment_index = 0; segment_index < segment_count; ++segment_index
   ) {
+    DEBUG_RCOUT(segment_index);
     ucolvec segment_indices_ = arma::find(segment_indices == segment_index + 1);
     mat data_segment = data.rows(segment_indices_);
     rowvec segment_theta;
@@ -167,6 +168,7 @@ void Fastcpd::create_segment_statistics() {
         )["par"]
       );
     }
+    DEBUG_RCOUT(segment_theta);
 
     // Initialize the estimated coefficients for each segment to be the
     // estimated coefficients in the segment.
@@ -176,6 +178,7 @@ void Fastcpd::create_segment_statistics() {
         data_segment.cols(1, data_segment.n_cols - 1) * segment_theta.t();
         double err_var = as_scalar(mean(square(segment_residual)));
         update_err_sd(segment_index, err_var);
+        DEBUG_RCOUT(err_sd);
         act_num(segment_index) = accu(abs(segment_theta) > 0);
     }
   }
@@ -200,6 +203,7 @@ List Fastcpd::run() {
   colvec fvec = zeros<vec>(n + 1);
   fvec.fill(arma::datum::inf);
   fvec(0) = -beta;
+  DEBUG_RCOUT(fvec(0));
 
   RProgress::RProgress rProgress("[:bar] :current/:total in :elapsed", n);
 
@@ -210,6 +214,7 @@ List Fastcpd::run() {
   create_cost_function_wrapper(cost);
   create_cost_gradient_wrapper(cost_gradient);
   create_cost_hessian_wrapper(cost_hessian);
+  DEBUG_RCOUT(family);
 
   if (contain(FASTCPD_FAMILIES, family) || vanilla_percentage < 1) {
     create_segment_indices();
@@ -551,6 +556,7 @@ void Fastcpd::update_fastcpd_parameters(const unsigned int t) {
 }
 
 void Fastcpd::create_cost_function_wrapper(Nullable<Function> cost) {
+  DEBUG_RCOUT(family);
   if (contain(FASTCPD_FAMILIES, family)) {
     cost_function_wrapper = std::bind(  // # nocov start
       &Fastcpd::negative_log_likelihood,  // # nocov end
