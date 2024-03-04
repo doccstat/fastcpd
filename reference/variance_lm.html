@@ -63,9 +63,9 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">variance_lm</span><span class="op">(</span><span class="va">data</span>, d <span class="op">=</span> <span class="fl">1</span>, block_size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">-</span> <span class="va">d</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">variance_lm</span><span class="op">(</span><span class="va">data</span>, d <span class="op">=</span> <span class="fl">1</span>, block_size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">-</span> <span class="va">d</span> <span class="op">+</span> <span class="fl">1</span>, outlier_iqr <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">variance.lm</span><span class="op">(</span><span class="va">data</span>, d <span class="op">=</span> <span class="fl">1</span>, block_size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">-</span> <span class="va">d</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">variance.lm</span><span class="op">(</span><span class="va">data</span>, d <span class="op">=</span> <span class="fl">1</span>, block_size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">-</span> <span class="va">d</span> <span class="op">+</span> <span class="fl">1</span>, outlier_iqr <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -81,6 +81,11 @@ column.</p></dd>
 
 <dt>block_size</dt>
 <dd><p>The size of the blocks to use for variance estimation.</p></dd>
+
+
+<dt>outlier_iqr</dt>
+<dd><p>The number of interquartile ranges to use as a threshold
+for outlier detection.</p></dd>
 
 </dl></div>
     <div class="section level2">
