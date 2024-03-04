@@ -9,20 +9,29 @@ class Fastcpd {
  public:
   Fastcpd(
     const double beta,
+    Nullable<Function> cost,
     const string cost_adjustment,
+    Nullable<Function> cost_gradient,
+    Nullable<Function> cost_hessian,
+    const bool cp_only,
     mat data,
     const double epsilon,
     const string family,
+    Nullable<Function> k,
+    colvec line_search,
     const colvec lower,
     const double min_prob,
     const double momentum_coef,
     const colvec order,
     const int p,
     const unsigned int p_response,
+    const bool r_progress,
     const int segment_count,
+    const double trim,
     const colvec upper,
     const double vanilla_percentage,
     const mat variance_estimate,
+    const bool warm_start,
     const double winsorise_maxval,
     const double winsorise_minval
   );
@@ -48,6 +57,35 @@ class Fastcpd {
   // @return Hessian at the current data.
   mat cost_update_hessian(mat data, colvec theta);
 
+  // Set \code{theta_sum} for a specific column.
+  void create_theta_sum(const unsigned int col, colvec new_theta_sum);
+
+  // Get the value of \code{theta_sum}.
+  mat get_theta_sum();
+
+  List negative_log_likelihood_wo_theta(
+      mat data,
+      double lambda,
+      bool cv,
+      Nullable<colvec> start
+  );
+
+  double negative_log_likelihood_wo_cv(
+      mat data,
+      colvec theta,
+      double lambda
+  );
+
+  List run();
+
+  // Update \code{theta_sum} for a specific column by adding to that column.
+  void update_theta_sum(const unsigned int col, colvec new_theta_sum);
+
+ private:
+
+  // Adjust cost value for MBIC and MDL.
+  double adjust_cost_value(double value, const unsigned int nrows);
+
   void create_cost_function_wrapper(Nullable<Function> cost);
   void create_cost_gradient_wrapper(Nullable<Function> cost_gradient);
   void create_cost_hessian_wrapper(Nullable<Function> cost_hessian);
@@ -62,14 +100,6 @@ class Fastcpd {
   // Initialize theta_hat_t_t to be the estimate in the segment.
   void create_segment_statistics();
 
-  // Set \code{theta_sum} for a specific column.
-  void create_theta_sum(const unsigned int col, colvec new_theta_sum);
-
-  double get_beta();
-
-  // Return `err_sd`.
-  colvec get_err_sd();
-
   // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   //
   // @param data_segment A data frame containing a segment of the data.
@@ -77,11 +107,6 @@ class Fastcpd {
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   and \code{hessian}.
   List get_optimized_cost(const mat data_segment);
-
-  Nullable<colvec> get_segment_theta_hat(const unsigned int t);
-
-  // Get the value of \code{theta_sum}.
-  mat get_theta_sum();
 
   // Solve logistic/poisson regression using Gradient Descent Extension to the
   // multivariate case
@@ -105,19 +130,6 @@ class Fastcpd {
       double lambda,
       bool cv = false,
       Nullable<colvec> start = R_NilValue
-  );
-
-  List negative_log_likelihood_wo_theta(
-      mat data,
-      double lambda,
-      bool cv,
-      Nullable<colvec> start
-  );
-
-  double negative_log_likelihood_wo_cv(
-      mat data,
-      colvec theta,
-      double lambda
   );
 
   void update_cost_parameters(
@@ -176,9 +188,6 @@ class Fastcpd {
     colvec line_search
   );
 
-  // Adjust cost value for MBIC and MDL.
-  double adjust_cost_value(double value, const unsigned int nrows);
-
   // Update `err_sd` for a specific segment.
   void update_err_sd(const unsigned int segment_index, const double err_var);
 
@@ -212,11 +221,17 @@ class Fastcpd {
   // Prune the columns of \code{theta_sum}.
   void update_theta_sum(ucolvec pruned_left);
 
-  // Update \code{theta_sum} for a specific column by adding to that column.
-  void update_theta_sum(const unsigned int col, colvec new_theta_sum);
+  // `act_num` is used in Lasso and Gaussian families only.
+  colvec act_num;
+
+  // `beta` is the initial cost value.
+  double beta;
 
   // `cost` is the cost function to be used.
   Nullable<Function> cost;
+
+  // Adjustment to the cost function.
+  const string cost_adjustment;
 
   // Cost function. If the cost function is provided in R, this will be a
   // wrapper of the R function.
@@ -242,16 +257,7 @@ class Fastcpd {
   // will be a wrapper of the R function.
   function<mat(mat data, colvec theta)> cost_hessian_wrapper;
 
- private:
-
-  // `act_num` is used in Lasso and Gaussian families only.
-  colvec act_num;
-
-  // `beta` is the initial cost value.
-  double beta;
-
-  // Adjustment to the cost function.
-  const string cost_adjustment;
+  const bool cp_only;
 
   // `data` is the data set to be segmented.
   mat data;
@@ -268,6 +274,10 @@ class Fastcpd {
 
   // `hessian` stores the Hessian matrix up to the current data point.
   cube hessian;
+
+  Nullable<Function> k;
+
+  colvec line_search;
 
   // Lower bound of the parameters to be estimated during the optimization.
   const colvec lower;
@@ -290,6 +300,8 @@ class Fastcpd {
   // Number of response variables in regression.
   const unsigned int p_response;
 
+  const bool r_progress;
+
   // `segment_count` is the number of segments for initial guess.
   const int segment_count;
 
@@ -307,6 +319,8 @@ class Fastcpd {
   // point.
   mat theta_sum;
 
+  const double trim;
+
   // Upper bound of the parameters to be estimated during the optimization.
   const colvec upper;
 
@@ -314,6 +328,8 @@ class Fastcpd {
 
   rowvec variance_data_mean;
   const mat variance_estimate;
+
+  const bool warm_start;
 
   // `winsorise_maxval` is the maximum value to be winsorised. Only used for
   // poisson.
