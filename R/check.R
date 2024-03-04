@@ -143,3 +143,107 @@ check_cost <- function(cost, cost_gradient, cost_hessian, family) {  # nolint
     TRUE
   }
 }
+
+get_variance_estimation <- function(data, family, p_response) {
+  if (family == "mean") {
+    variance.mean(data)
+  } else if (family == "var" || family == "lm" && p_response > 1) {
+    as.matrix(Matrix::nearPD(variance.lm(data, p_response))$mat)
+  } else if (family == "lm" || family == "ar") {
+    as.matrix(variance.lm(data))
+  } else if (family == "var") {
+    as.matrix(Matrix::nearPD(variance.lm(data, p_response))$mat)
+  } else {
+    diag(1)
+  }
+}
+
+get_fastcpd_family <- function(family, p_response) {
+  if (family %in% c(
+    "binomial", "poisson", "lasso",
+    "mean", "variance", "meanvariance", "mv", "arma"
+  )) {
+    family
+  } else if (family == "lm" && p_response == 1 || family == "ar") {
+    "gaussian"
+  } else if (family == "var" || family == "lm" && p_response > 1) {
+    "mgaussian"
+  } else {
+    "custom"
+  }
+}
+
+get_vanilla_percentage <- function(vanilla_percentage, cost, fastcpd_family) {
+  if (!is.null(cost) && length(formals(cost)) == 1 || fastcpd_family %in% c(
+    "mean", "variance", "meanvariance", "mv", "arima", "garch", "mgaussian"
+  )) {
+    1
+  } else {
+    vanilla_percentage
+  }
+}
+
+get_beta <- function(beta, p, n, fastcpd_family, sigma_) {
+  if (is.character(beta)) {
+    if (!(beta %in% c("BIC", "MBIC", "MDL"))) {
+      stop("Invalid beta selection criterion provided.")
+    }
+
+    beta <- switch(
+      beta,
+      BIC = (p + 1) * log(n) / 2,
+      MBIC = (p + 2) * log(n) / 2,
+      MDL = (p + 2) * log2(n) / 2
+    )
+
+    # For linear regression models, an estimate of the variance is needed in the
+    # cost function. The variance estimation is only for "lm" family with no
+    # `beta` provided. Only estimate the variance for Gaussian family when
+    # `beta` is null.
+    if (fastcpd_family == "gaussian") {
+      beta * c(sigma_)
+    } else {
+      beta
+    }
+  } else {
+    beta
+  }
+}
+
+get_p_response <- function(family, y, data) {
+  if (family %in% c(
+    "mean", "variance", "meanvariance", "mv", "ma", "arma", "arima", "garch"
+  )) {
+    0
+  } else if (family == "var") {
+    ncol(data)
+  } else if (is.null(ncol(y))) {
+    1
+  } else {
+    ncol(y)
+  }
+}
+
+get_p <- function(data_, family, p_response, order, include_mean) {
+  if (family == "mean") {
+    ncol(data_)
+  } else if (family == "variance") {
+    ncol(data_)^2
+  } else if (family == "meanvariance" || family == "mv") {
+    ncol(data_)^2 + ncol(data_)
+  } else if (family == "ar") {
+    order
+  } else if (family == "arma") {
+    sum(order) + 1
+  } else if (family == "arima") {
+    sum(order[-2]) + 1 + include_mean
+  } else if (family == "garch") {
+    sum(order) + 1
+  } else if (family == "var") {
+    order * p_response^2
+  } else if (family == "lm" && p_response > 1) {
+    (ncol(data_) - p_response) * p_response
+  } else {
+    ncol(data_) - 1
+  }
+}

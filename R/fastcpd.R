@@ -177,11 +177,13 @@
 #'   MBIC and MDL modifies the cost function by adding a small negative
 #'   term to the cost function. MDL then transforms the cost function to
 #'   log2 based. BIC or NULL does not modify the cost function.
-#' @param ... Parameters specifically used for time series models. As of
-#'   the current implementation, only \code{include.mean} will not be ignored
-#'   and used in the ARIMA or GARCH model. \code{r.progress} now will not be
-#'   ignored and used to control the progress bar. By default the progress bar
-#'   will be shown and to disable it, set \code{r.progress = FALSE}.
+#' @param ... Parameters specifically used for time series models. The following
+#'   parameters will not be ignored:
+#'
+#'   - \code{include.mean} is used for ARIMA and GARCH modes.
+#'   - \code{r.progress} is used to control the progress bar. By default the
+#'     progress bar will be shown. To disable it, set \code{r.progress = FALSE}.
+#'   - \code{p.response} is used to specify the number of response variables.
 #'
 #' @return A class \code{fastcpd} object.
 #'
@@ -212,31 +214,29 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   cp_only = FALSE,
   vanilla_percentage = 0,
   warm_start = FALSE,
-  lower = NULL,
-  upper = NULL,
+  lower = rep(-Inf, p),
+  upper = rep(Inf, p),
   line_search = c(1),
   cost_adjustment = "MBIC",
   ...
 ) {
+  # Check the validity of the `family` parameter.
   family <- ifelse(is.null(family), "custom", tolower(family))
-
-  # Vanilla is not a `fastcpd` family and can not be set manually by the user.
-  # `vanilla` is used to distinguish the cost function parameters in the
-  # implementation.
   stopifnot(
     check_family(
       family,
       c(
-        "lm", "binomial", "poisson", "lasso", "mlasso",
-        "mean", "variance", "meanvariance", "mv",
-        "arma", "ar", "var", "ma", "arima", "garch",
+        "lm", "binomial", "poisson", "lasso", "mlasso", "mean", "variance",
+        "meanvariance", "mv", "arma", "ar", "var", "ma", "arima", "garch",
         "custom"
       )
     )
   )
 
+  # Check the validity of the `cost` parameter.
   stopifnot(check_cost(cost, cost_gradient, cost_hessian, family))
 
+  # Check the validity of the `cost_adjustment` parameter.
   if (is.null(cost_adjustment)) {
     cost_adjustment <- "BIC"
   }
@@ -249,40 +249,42 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   match_formula$drop.unused.levels <- TRUE
   match_formula[[1L]] <- quote(stats::model.frame)
   match_formula <- eval(match_formula, parent.frame())
-  y <- stats::model.response(match_formula, "any")
+  y <- stats::model.response(match_formula, "numeric")
   data_ <- cbind(y, stats::model.matrix(formula, data = data))
 
-  p_response <- if (family == "mlasso") ncol(y) else 1
-
-  fastcpd_family <- NULL
-
-  # If a cost function provided has an explicit solution, i.e. does not depend
-  # on the parameters, e.g., mean change, then the percentage of vanilla PELT
-  # is set to be 1.
-  if (!is.null(cost) && length(formals(cost)) == 1) {
-    family <- "custom"
-    vanilla_percentage <- 1
+  # Check the parameters passed in the ellipsis.
+  include_mean <- TRUE
+  p_response <- get_p_response(family, y, data)
+  r_progress <- TRUE
+  if (methods::hasArg("include.mean")) {
+    include_mean <- eval.parent(match.call()[["include.mean"]])
+  }
+  if (methods::hasArg("p.response")) {
+    p_response <- eval.parent(match.call()[["p.response"]])
+  }
+  if (methods::hasArg("r.progress")) {
+    r_progress <- eval.parent(match.call()[["r.progress"]])
   }
 
-  sigma_ <- diag(1)
-  if (family == "mean") {
-    vanilla_percentage <- 1
-    p <- ncol(data_)
-    sigma_ <- variance.mean(data_)
-  } else if (family == "variance") {
-    vanilla_percentage <- 1
-    p <- ncol(data_)^2
-  } else if (family == "meanvariance" || family == "mv") {
-    vanilla_percentage <- 1
-    p <- ncol(data_) + ncol(data_)^2
-  } else if (family == "ar") {
-    # Check the validity of the parameters for AR(p) model.
+  p <- get_p(data_, family, p_response, order, include_mean)
+
+  if (family == "ar") {
     stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
     stopifnot(check_ar_order(order))
+  } else if (family == "var") {
+    stopifnot(check_var_order(order))
+  } else if (family == "ma") {
+    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
+    stopifnot(check_ma_order(order))
+  } else if (family == "garch") {
+    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
+    stopifnot(check_garch_order(order))
+  } else if (family == "arima") {
+    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
+    stopifnot(check_arima_order(order))
+  }
 
-    # Preprocess the data for AR(p) model to be used in linear regression.
-    p <- order
-    fastcpd_family <- "gaussian"
+  if (family == "ar") {
     y <- data_[p + seq_len(nrow(data_) - p), ]
     x <- matrix(NA, nrow(data_) - p, p)
     for (p_i in seq_len(p)) {
@@ -290,13 +292,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     }
     data_ <- cbind(y, x)
   } else if (family == "var") {
-    stopifnot(check_var_order(order))
-    fastcpd_family <- "mgaussian"
-    p_response <- ncol(data)
-    p <- order * p_response^2
-
-    # Preprocess the data for VAR(p) model to be used in linear regression.
-    vanilla_percentage <- 1
     y <- data_[order + seq_len(nrow(data_) - order), ]
     x <- matrix(NA, nrow(data_) - order, order * ncol(data_))
     for (p_i in seq_len(order)) {
@@ -304,31 +299,20 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         data_[(order - p_i) + seq_len(nrow(data_) - order), ]
     }
     data_ <- cbind(y, x)
-
-    # Make the variance estimate symmetric.
-    sigma_ <- as.matrix(Matrix::nearPD(variance.lm(data_, ncol(data)))$mat)
   } else if (family == "ma") {
-    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
-    stopifnot(check_ma_order(order))
+    # TODO(doccstat): Deprecate MA model.
     family <- "arima"
     order <- c(rep(0, 3 - length(order)), order)
-  }
-
-  if (family == "arma") {
-    p <- sum(order) + 1
+  } else if (family == "garch") {
+    cost <- function(data) {
+      tryCatch(
+        expr = tseries::garch(data, order, trace = FALSE)$n.likeli,
+        error = function(e) 0
+      )
+    }
   }
 
   if (family == "arima") {
-    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
-    stopifnot(check_arima_order(order))
-    fastcpd_family <- "custom"
-    vanilla_percentage <- 1
-
-    # By default in time series models, `include.mean` is set to be `TRUE`.
-    include_mean <- TRUE
-    if (methods::hasArg("include.mean")) {
-      include_mean <- eval.parent(match.call()[["include.mean"]])
-    }
     cost <- function(data) {
       tryCatch(
         expr = -forecast::Arima(
@@ -337,68 +321,13 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         error = function(e) 0
       )
     }
-    p <- sum(order[-2]) + 1 + include_mean
-  } else if (family == "garch") {
-    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
-    stopifnot(check_garch_order(order))
-    fastcpd_family <- "custom"
-    vanilla_percentage <- 1
-
-    cost <- function(data) {
-      tryCatch(
-        expr = tseries::garch(data, order, trace = FALSE)$n.likeli,
-        error = function(e) 0
-      )
-    }
-    p <- 1 + sum(order)
   }
 
-  if (family == "lm") {
-    fastcpd_family <- "gaussian"
-  }
-
-  if (family == "mlasso") {
-    fastcpd_family <- "mgaussian"
-  }
-
-  if (is.null(fastcpd_family)) {
-    fastcpd_family <- family
-  }
-
-  if (is.character(beta)) {
-    beta <- switch(
-      beta,
-      BIC = (p + 1) * log(nrow(data_)) / 2,
-      MBIC = (p + 2) * log(nrow(data_)) / 2,
-      MDL = (p + 2) * log2(nrow(data_)) / 2
-    )
-
-    stopifnot(
-      "Invalid beta selection criterion provided." = !is.null(beta)
-    )
-
-    # TODO(doccstat): Variance estimation for VAR(p).
-    # For linear regression models, an estimate of the variance is needed in the
-    # cost function. The variance estimation is only for "lm" family with no
-    # `beta` provided. Only estimate the variance for Gaussian family when
-    # `beta` is null.
-    if (family == "lm" || fastcpd_family == "gaussian") {
-      beta <- beta * variance.lm(data_)
-    }
-  }
-
-  if (is.null(lower)) {
-    lower <- rep(-Inf, p)
-  }
-
-  if (is.null(upper)) {
-    upper <- rep(Inf, p)
-  }
-
-  r_progress <- TRUE
-  if (methods::hasArg("r.progress")) {
-    r_progress <- eval.parent(match.call()[["r.progress"]])
-  }
+  fastcpd_family <- get_fastcpd_family(family, p_response)
+  sigma_ <- get_variance_estimation(data_, family, p_response)
+  vanilla_percentage <-
+    get_vanilla_percentage(vanilla_percentage, cost, fastcpd_family)
+  beta <- get_beta(beta, p, nrow(data_), fastcpd_family, sigma_)
 
   result <- fastcpd_impl(
     data_, beta, cost_adjustment, segment_count, trim, momentum_coef,

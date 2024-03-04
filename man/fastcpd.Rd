@@ -25,8 +25,8 @@ fastcpd(
   cp_only = FALSE,
   vanilla_percentage = 0,
   warm_start = FALSE,
-  lower = NULL,
-  upper = NULL,
+  lower = rep(-Inf, p),
+  upper = rep(Inf, p),
   line_search = c(1),
   cost_adjustment = "MBIC",
   ...
@@ -221,11 +221,14 @@ MBIC and MDL modifies the cost function by adding a small negative
 term to the cost function. MDL then transforms the cost function to
 log2 based. BIC or NULL does not modify the cost function.}
 
-\item{...}{Parameters specifically used for time series models. As of
-the current implementation, only \code{include.mean} will not be ignored
-and used in the ARIMA or GARCH model. \code{r.progress} now will not be
-ignored and used to control the progress bar. By default the progress bar
-will be shown and to disable it, set \code{r.progress = FALSE}.}
+\item{...}{Parameters specifically used for time series models. The following
+parameters will not be ignored:
+\itemize{
+\item \code{include.mean} is used for ARIMA and GARCH modes.
+\item \code{r.progress} is used to control the progress bar. By default the
+progress bar will be shown. To disable it, set \code{r.progress = FALSE}.
+\item \code{p.response} is used to specify the number of response variables.
+}}
 }
 \value{
 A class \code{fastcpd} object.
