@@ -87,8 +87,8 @@ parameters and returns a <code>fastcpd</code> object.</p>
 <span>  cp_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  vanilla_percentage <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  warm_start <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  lower <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  upper <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="va">p</span><span class="op">)</span>,</span>
+<span>  upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">Inf</span>, <span class="va">p</span><span class="op">)</span>,</span>
 <span>  line_search <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,</span>
 <span>  cost_adjustment <span class="op">=</span> <span class="st">"MBIC"</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -324,11 +324,12 @@ log2 based. BIC or NULL does not modify the cost function.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Parameters specifically used for time series models. As of
-the current implementation, only <code>include.mean</code> will not be ignored
-and used in the ARIMA or GARCH model. <code>r.progress</code> now will not be
-ignored and used to control the progress bar. By default the progress bar
-will be shown and to disable it, set <code>r.progress = FALSE</code>.</p></dd>
+<dd><p>Parameters specifically used for time series models. The following
+parameters will not be ignored:</p><ul><li><p><code>include.mean</code> is used for ARIMA and GARCH modes.</p></li>
+<li><p><code>r.progress</code> is used to control the progress bar. By default the
+progress bar will be shown. To disable it, set <code>r.progress = FALSE</code>.</p></li>
+<li><p><code>p.response</code> is used to specify the number of response variables.</p></li>
+</ul></dd>
 
 </dl></div>
     <div class="section level2">
