@@ -224,7 +224,7 @@ List Fastcpd::run() {
     rProgress.tick();
   }
 
-#ifdef FASTCPD_DEBUG
+#ifdef EXPERIMENT
 
   colvec cvec = zeros<vec>(n + 1);
   colvec tau_stars = zeros<vec>(n + 1);
@@ -357,7 +357,7 @@ List Fastcpd::run() {
     }
   }
 
-#endif
+#endif  // EXPERIMENT
 
   // Remove change points close to the boundaries.
   colvec raw_cp_set = cp_sets[n],
