@@ -179,11 +179,13 @@ List Fastcpd::negative_log_likelihood_wo_theta(
     }
 
     mat par = solve(x_t_x, x.t()) * y;
+    DEBUG_RCOUT(par);
     mat residuals = y - x * par;
     double value =
       p_response * std::log(2.0 * M_PI) + log_det_sympd(variance_estimate);
     value *= data.n_rows;
     value += trace(solve(variance_estimate, residuals.t() * residuals));
+    DEBUG_RCOUT(value);
     return List::create(
       Named("par") = par,
       Named("value") = value / 2,
