@@ -1,3 +1,33 @@
+#' @title Variance estimation for ARMA model with change points
+#'
+#' @description Estimate the variance for each block and then take the average.
+#'
+#' @example tests/testthat/examples/variance_arma.R
+#'
+#' @md
+#'
+#' @param data A one-column matrix or a vector.
+#' @param p The order of the autoregressive part.
+#' @param q The order of the moving average part.
+#'
+#' @return A numeric value representing the variance.
+#'
+#' @rdname variance_arma
+#' @export
+variance_arma <- function(data, p, q) {
+  p <- min(3 * p, 15)
+  y <- data[p + seq_len(length(data) - p)]
+  x <- matrix(NA, length(data) - p, p)
+  for (p_i in seq_len(p)) {
+    x[, p_i] <- data[(p - p_i) + seq_len(length(data) - p)]
+  }
+  variance.lm(cbind(y, x), outlier_iqr = 3)
+}
+
+#' @rdname variance_arma
+#' @export
+variance.arma <- variance_arma  # nolint: Conventional R function style
+
 #' @title Variance estimation for linear models with change points
 #'
 #' @description Estimate the variance for each block and then take the average.
@@ -15,7 +45,12 @@
 #'
 #' @rdname variance_lm
 #' @export
-variance_lm <- function(data, d = 1, block_size = ncol(data) - d + 1) {
+variance_lm <- function(
+  data,
+  d = 1,
+  block_size = ncol(data) - d + 1,
+  outlier_iqr = Inf
+) {
   data <- as.matrix(data)
   n <- nrow(data)
   estimators <- array(NA, c(n - block_size, d, d))
@@ -69,13 +104,10 @@ variance_lm <- function(data, d = 1, block_size = ncol(data) - d + 1) {
     )
   }
   if (d == 1) {
-    # nolint start
-    # estimators <- stats::na.exclude(c(estimators))
-    # outlier_threshold <-
-    #   stats::quantile(estimators, 0.75) + 3 * stats::IQR(estimators)
-    # estimators[estimators > outlier_threshold] <- NA
-    # nolint end
-    mean(c(estimators), na.rm = TRUE)
+    estimators <- stats::na.exclude(c(estimators))
+    outlier_threshold <-
+      stats::quantile(estimators, 0.75) + outlier_iqr * stats::IQR(estimators)
+    mean(estimators[estimators < outlier_threshold], na.rm = TRUE)
   } else {
     colMeans(estimators, na.rm = TRUE)
   }
