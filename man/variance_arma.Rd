@@ -5,9 +5,9 @@
 \alias{variance.arma}
 \title{Variance estimation for ARMA model with change points}
 \usage{
-variance_arma(data, p, q)
+variance_arma(data, p = 1, q = NULL, ar_p = min(3 * p, 15))
 
-variance.arma(data, p, q)
+variance.arma(data, p = 1, q = NULL, ar_p = min(3 * p, 15))
 }
 \arguments{
 \item{data}{A one-column matrix or a vector.}
@@ -15,6 +15,8 @@ variance.arma(data, p, q)
 \item{p}{The order of the autoregressive part.}
 
 \item{q}{The order of the moving average part.}
+
+\item{ar_p}{The order or AR(ar_p) model to approximate the ARMA(p, q) model.}
 }
 \value{
 A numeric value representing the variance.
@@ -35,5 +37,5 @@ for (i in 201:n) {
   x[i + 3] <- 0.3 * x[i + 2] + 0.1 * x[i + 1] - 0.3 * x[i] -
     0.6 * w[i + 2] - 0.1 * w[i + 1] + w[i + 3]
 }
-(sigma2 <- variance.arma(x[-seq_len(3)], p = 3, q = 2))
+(sigma2 <- variance.arma(x[-seq_len(3)], p = 3))
 }

@@ -9,17 +9,17 @@
 #' @param data A one-column matrix or a vector.
 #' @param p The order of the autoregressive part.
 #' @param q The order of the moving average part.
+#' @param ar_p The order or AR(ar_p) model to approximate the ARMA(p, q) model.
 #'
 #' @return A numeric value representing the variance.
 #'
 #' @rdname variance_arma
 #' @export
-variance_arma <- function(data, p, q) {
-  p <- min(3 * p, 15)
-  y <- data[p + seq_len(length(data) - p)]
-  x <- matrix(NA, length(data) - p, p)
-  for (p_i in seq_len(p)) {
-    x[, p_i] <- data[(p - p_i) + seq_len(length(data) - p)]
+variance_arma <- function(data, p = 1, q = NULL, ar_p = min(3 * p, 15)) {
+  y <- data[ar_p + seq_len(length(data) - ar_p)]
+  x <- matrix(NA, length(data) - ar_p, ar_p)
+  for (p_i in seq_len(ar_p)) {
+    x[, p_i] <- data[(ar_p - p_i) + seq_len(length(data) - ar_p)]
   }
   variance.lm(cbind(y, x), outlier_iqr = 3)
 }
