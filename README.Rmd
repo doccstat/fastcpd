@@ -218,6 +218,8 @@ to see the progress bar when running the code by default.
 
 ### Utility functions
 
+-   Variance estimation in ARMA models:
+    [`variance_arma`](https://fastcpd.xingchi.li/reference/variance_arma.html)
 -   Variance estimation in linear models:
     [`variance_lm`](https://fastcpd.xingchi.li/reference/variance_lm.html)
 -   Variance estimation in mean change models:

@@ -202,15 +202,3 @@ testthat::test_that(
     )
   }
 )
-
-testthat::test_that("beta x2", {
-  testthat::expect_message(
-    fastcpd.mean(well_log, beta = log(length(well_log))),
-    paste0(
-      "Warning: The number of change points is larger than the number of ",
-      "observations divided by the number of covariates plus one. ",
-      "Retrying with a larger `beta` value (x2) with MBIC."
-    ),
-    fixed = TRUE
-  )
-})

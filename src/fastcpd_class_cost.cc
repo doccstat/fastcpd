@@ -99,9 +99,11 @@ List Fastcpd::negative_log_likelihood_wo_theta(
     vec par = as<vec>(out["coefficients"]);
     vec residuals = as<vec>(out["residuals"]);
     double value = out["deviance"];
-    return List::create(Named("par") = par,
-                  Named("value") = value / 2,
-                  Named("residuals") = residuals);
+    return List::create(
+      Named("par") = par,
+      Named("value") = value / 2,
+      Named("residuals") = residuals
+    );
   } else if (family == "arma") {
     Environment stats = Environment::namespace_env("stats");
     Function arima = stats["arima"];
@@ -132,13 +134,11 @@ List Fastcpd::negative_log_likelihood_wo_theta(
     );
   } else if (family == "variance") {
     mat residuals = data.each_row() - variance_data_mean;
-    mat par = residuals.t() * residuals / (data.n_rows - 1);
-    double value =
-      data.n_cols * (std::log(2.0 * M_PI) + (data.n_rows - 1) / data.n_rows);
+    mat par = residuals.t() * residuals / data.n_rows;
+    double value = data.n_rows * data.n_cols * (std::log(2.0 * M_PI) + 1) / 2.0;
     if (data.n_rows >= data.n_cols) {
-      value += log_det_sympd(par);
+      value += data.n_rows * log_det_sympd(par) / 2.0;
     }
-    value *= data.n_rows / 2.0;
     return List::create(
       Named("par") = par,
       Named("value") = value,
@@ -147,14 +147,12 @@ List Fastcpd::negative_log_likelihood_wo_theta(
   } else if (family == "meanvariance" || family == "mv") {
     mat covariance = cov(data);
 
-    double value =
-      data.n_cols * (std::log(2.0 * M_PI) + (data.n_rows - 1) / data.n_rows);
+    double value = data.n_rows * data.n_cols * (std::log(2.0 * M_PI) + 1) / 2.0;
     if (data.n_rows >= data.n_cols) {
-      value += log_det_sympd(
+      value += data.n_rows * log_det_sympd(
         covariance + epsilon * eye<mat>(data.n_cols, data.n_cols)
-      );
+      ) / 2.0;
     }
-    value *= data.n_rows / 2.0;
 
     colvec par = zeros(data.n_cols * data.n_cols + data.n_cols);
     par.rows(0, data.n_cols - 1) = mean(data, 0).t();
