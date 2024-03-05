@@ -673,6 +673,70 @@ fastcpd::fastcpd.var(
 VARDetect::tbss(var_data)
 ```
 
+# Time comparison using `well_log`
+
+```{r time-comparison-well-log, eval = FALSE}
+microbenchmark_result <- microbenchmark::microbenchmark(
+  fastcpd = fastcpd.mean(well_log, trim = 0.003, r.progress = FALSE),
+  changepoint = changepoint::cpt.mean(well_log, method = "PELT"),
+  CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
+  strucchange =
+    strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),
+  ecp = ecp::e.divisive(matrix(well_log)),
+  breakfast = breakfast::breakfast(well_log),
+  wbs = wbs::wbs(well_log),
+  mosum = mosum::mosum(c(well_log), G = 40),
+  fpop = fpop::Fpop(well_log, nrow(well_log)),
+  gfpop = gfpop::gfpop(
+    data = well_log,
+    mygraph = gfpop::graph(
+      penalty = 2 * log(length(well_log)) * gfpop::sdDiff(well_log) ^ 2,
+      type = "updown"
+    ),
+    type = "mean"
+  ),
+  InspectChangepoint = InspectChangepoint::inspect(
+    well_log,
+    threshold = InspectChangepoint::compute.threshold(length(well_log), 1)
+  ),
+  jointseg = jointseg::jointSeg(well_log, K = 12),
+  Rbeast = Rbeast::beast(
+    well_log, season = "none", print.progress = FALSE, quiet = TRUE
+  ),
+  stepR = stepR::stepFit(well_log, alpha = 0.5),
+  # mcp = mcp::mcp(
+  #   list(y ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1),
+  #   data = data.frame(y = well_log, x = seq_along(well_log)),
+  #   par_x = "x"
+  # ),
+  not = not::not(well_log, contrast = "pcwsConstMean"),
+  times = 10
+)
+#> Unit: milliseconds
+#>                expr          min           lq         mean       median           uq          max neval
+#>             fastcpd 4.010279e+02 4.129134e+02 4.171979e+02 4.148564e+02 4.196057e+02 4.350300e+02    10
+#>         changepoint 3.195488e+01 3.230887e+01 3.743290e+01 3.352390e+01 4.418598e+01 4.980063e+01    10
+#>           CptNonPar 1.809139e+04 1.867986e+04 1.904000e+04 1.876936e+04 1.947816e+04 2.076009e+04    10
+#>         strucchange 5.813672e+04 5.831023e+04 5.963604e+04 5.952739e+04 6.139957e+04 6.173251e+04    10
+#>                 ecp 7.534981e+05 7.642983e+05 7.742041e+05 7.661485e+05 7.880130e+05 8.003981e+05    10
+#>           breakfast 9.231426e+03 9.261763e+03 9.514283e+03 9.492325e+03 9.630395e+03 1.001344e+04    10
+#>                 wbs 1.133042e+02 1.168601e+02 1.189637e+02 1.187244e+02 1.201765e+02 1.281057e+02    10
+#>               mosum 1.082397e+00 1.167387e+00 1.213233e+00 1.209105e+00 1.286479e+00 1.320333e+00    10
+#>                fpop 2.407630e+00 2.481348e+00 2.641625e+00 2.551970e+00 2.618455e+00 3.328585e+00    10
+#>               gfpop 5.918783e+01 5.959448e+01 6.081621e+01 6.006626e+01 6.048699e+01 6.725864e+01    10
+#>  InspectChangepoint 1.550181e+02 1.885944e+02 2.103973e+02 2.030795e+02 2.262247e+02 3.025476e+02    10
+#>            jointseg 1.082510e+01 1.082948e+01 1.174498e+01 1.110779e+01 1.221183e+01 1.424236e+01    10
+#>              Rbeast 6.311987e+02 6.634019e+02 6.702594e+02 6.680217e+02 6.846772e+02 7.048629e+02    10
+#>               stepR 2.812109e+01 2.836331e+01 2.864408e+01 2.862293e+01 2.897236e+01 2.933441e+01    10
+#>                 not 9.350182e+01 9.469137e+01 9.684097e+01 9.647117e+01 9.763828e+01 1.031233e+02    10
+```
+
+```{r time-comparison-well-log-plot, eval = FALSE}
+ggplot2::autoplot(microbenchmark_result)
+```
+
+![Plot of the running time using `well_log` data](comparison-packages-plot.svg)
+
 # Appendix: all code snippets
 
 ```{r ref.label = knitr::all_labels(), echo = TRUE, eval = FALSE}
