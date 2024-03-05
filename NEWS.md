@@ -1,3 +1,8 @@
+# fastcpd 0.12.0
+
+*   Add Rice estimation for ARMA model variance estimation.
+*   Add time comparison using Well-log data in vignettes.
+
 # fastcpd 0.11.3
 
 *   Add Rice estimator for mean change variance estimation.

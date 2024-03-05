@@ -412,42 +412,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     )
   }
 
-  if (length(raw_cp_set) > nrow(data) / (p + 1)) {
-    message(
-      "Warning: The number of change points is larger than the number of ",
-      "observations divided by the number of covariates plus one. ",
-      "Retrying with a larger `beta` value (x2) with MBIC."
-    )
-    return(
-      fastcpd(
-        formula = formula,
-        data = data,
-        beta = beta * 2,
-        segment_count = segment_count,
-        trim = trim,
-        momentum_coef = momentum_coef,
-        multiple_epochs = multiple_epochs,
-        family = family,
-        epsilon = epsilon,
-        min_prob = min_prob,
-        winsorise_minval = winsorise_minval,
-        winsorise_maxval = winsorise_maxval,
-        p = p,
-        order = order,
-        cost = cost,
-        cost_gradient = cost_gradient,
-        cost_hessian = cost_hessian,
-        cp_only = cp_only,
-        vanilla_percentage = vanilla_percentage,
-        warm_start = warm_start,
-        lower = lower,
-        upper = upper,
-        line_search = line_search,
-        ...
-      )
-    )
-  }
-
   residuals <- c(result$residual)
 
   if (family == "mean" && p == 1) {
