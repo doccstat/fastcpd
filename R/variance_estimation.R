@@ -9,19 +9,37 @@
 #' @param data A one-column matrix or a vector.
 #' @param p The order of the autoregressive part.
 #' @param q The order of the moving average part.
-#' @param ar_p The order or AR(ar_p) model to approximate the ARMA(p, q) model.
+#' @param max_order The maximum order of the AR model to consider.
 #'
 #' @return A numeric value representing the variance.
 #'
 #' @rdname variance_arma
 #' @export
-variance_arma <- function(data, p = 1, q = NULL, ar_p = min(3 * p, 15)) {
-  y <- data[ar_p + seq_len(length(data) - ar_p)]
-  x <- matrix(NA, length(data) - ar_p, ar_p)
-  for (p_i in seq_len(ar_p)) {
-    x[, p_i] <- data[(ar_p - p_i) + seq_len(length(data) - ar_p)]
+variance_arma <- function(data, p, q, max_order = p * q) {
+  table <- data.frame(
+    "sigma2" = numeric(max_order),
+    "AIC" = numeric(max_order),
+    "BIC" = numeric(max_order),
+    row.names = paste0("AR(", seq_len(max_order), ")")
+  )
+  for (order in seq_len(max_order)) {
+    y <- data[order + seq_len(length(data) - order)]
+    x <- matrix(NA, length(data) - order, order)
+    for (p_i in seq_len(order)) {
+      x[, p_i] <- data[(order - p_i) + seq_len(length(data) - order)]
+    }
+    sigma2 <- variance.lm(cbind(y, x))
+    table[order, ] <- c(
+      sigma2,
+      log(sigma2) + 2 * order / length(data),
+      log(sigma2) + order * log(length(data)) / length(data)
+    )
   }
-  variance.lm(cbind(y, x), outlier_iqr = 3)
+  list(
+    table = table,
+    sigma2_aic = table[which.min(table$AIC), "sigma2"],
+    sigma2_bic = table[which.min(table$BIC), "sigma2"]
+  )
 }
 
 #' @rdname variance_arma
