@@ -1,3 +1,8 @@
+#ifdef EXPERIMENT
+#include <algorithm>
+#include <execution>
+#endif
+
 #include "fastcpd_classes.h"
 #include "fastcpd_constants.h"
 #include "RProgress.h"
@@ -232,30 +237,38 @@ List Fastcpd::run() {
 
 #ifdef EXPERIMENT
 
-  colvec cvec = zeros<vec>(n + 1);
+  std::vector<double> cmat_vec((n + 1) * n, 0.0);
   colvec tau_stars = zeros<vec>(n + 1);
 
-  for (int t = 1; t <= n; t++) {
-    cvec.fill(arma::datum::inf);
-    for (int s = t; s <= n; s++) {
-      List cost_optim_result = negative_log_likelihood(
-        data.rows(t - 1, s - 1), R_NilValue, lambda, false, R_NilValue
-      );
-      cvec(s) = as<double>(cost_optim_result["value"]);
+  std::for_each(
+    std::execution::par_unseq,
+    cmat_vec.begin(),
+    cmat_vec.end(),
+    [&](double& cval) {
+      int index = &cval - &cmat_vec[0];
+      int s = index % (n + 1);
+      int t = index / (n + 1);
+      if (s > t) {
+        List cost_optim_result = negative_log_likelihood(
+          data.rows(t, s - 1), R_NilValue, lambda, false, R_NilValue
+        );
+        cval = as<double>(cost_optim_result["value"]);
+      } else {
+        cval = arma::datum::inf;
+      }
     }
+  );
 
-    colvec new_fvec = fvec(t - 1) + cvec + beta;
+  arma::Mat<double> cmat(cmat_vec.data(), n + 1, n, /* copy_aux_mem */ false);
+
+  for (int t = 1; t <= n; t++) {
+    colvec new_fvec = fvec(t - 1) + cmat.col(t - 1) + beta;
     ucolvec f_t_condition = arma::find(new_fvec < fvec);
     if (f_t_condition.n_elem > 0) {
       fvec.rows(f_t_condition) = new_fvec.rows(f_t_condition);
       tau_stars.rows(f_t_condition) = (t - 1) * ones<vec>(f_t_condition.n_elem);
     }
     cp_sets[t] = join_cols(cp_sets[tau_stars(t - 1)], colvec{tau_stars(t - 1)});
-
-    checkUserInterrupt();
-    if (r_progress) {
-      rProgress.tick();
-    }
   }
 
 #else
