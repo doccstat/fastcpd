@@ -502,7 +502,7 @@ methods are plotted due to the un-retrievable change points.</p>
 <code class="sourceCode R"><span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
 <span>  <span class="va">mv_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
-<span><span class="co">#&gt;  [1]  301 1301 1794 1855 1986  701 1981 1769  709  713</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] 1301  301  701 1794 1855 1986 1981 1769 1859 1779</span></span></code></pre></div>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -561,10 +561,10 @@ to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,]  701  301  701</span></span>
-<span><span class="co">#&gt;  [2,]  301  701  301</span></span>
-<span><span class="co">#&gt;  [3,]  619  128  221</span></span>
-<span><span class="co">#&gt;  [4,]  142  727  206</span></span>
+<span><span class="co">#&gt;  [1,]  301  701  301</span></span>
+<span><span class="co">#&gt;  [2,]  701  301  701</span></span>
+<span><span class="co">#&gt;  [3,]  643  144  NaN</span></span>
+<span><span class="co">#&gt;  [4,]  622  NaN  NaN</span></span>
 <span><span class="co">#&gt;  [5,]  NaN  NaN  NaN</span></span>
 <span><span class="co">#&gt;  [6,]  NaN  NaN  NaN</span></span>
 <span><span class="co">#&gt;  [7,]  NaN  NaN  NaN</span></span>
@@ -649,16 +649,16 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,] 1301  301  702</span></span>
-<span><span class="co">#&gt;  [2,]  301 1301 1301</span></span>
-<span><span class="co">#&gt;  [3,]  701  701  301</span></span>
-<span><span class="co">#&gt;  [4,] 1994  807  760</span></span>
-<span><span class="co">#&gt;  [5,]  877  830 1924</span></span>
-<span><span class="co">#&gt;  [6,] 1978  881 1971</span></span>
-<span><span class="co">#&gt;  [7,]  861  874  769</span></span>
-<span><span class="co">#&gt;  [8,] 1905  887 1880</span></span>
-<span><span class="co">#&gt;  [9,] 1912  820  763</span></span>
-<span><span class="co">#&gt; [10,] 1855  997 1941</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1,] 1301  301 1301</span></span>
+<span><span class="co">#&gt;  [2,]  301 1301  301</span></span>
+<span><span class="co">#&gt;  [3,]  701  701  702</span></span>
+<span><span class="co">#&gt;  [4,] 1994  830 1924</span></span>
+<span><span class="co">#&gt;  [5,] 1978  807 1880</span></span>
+<span><span class="co">#&gt;  [6,]  877  874  770</span></span>
+<span><span class="co">#&gt;  [7,]  861  881 1919</span></span>
+<span><span class="co">#&gt;  [8,] 1934  989  774</span></span>
+<span><span class="co">#&gt;  [9,] 1929  825 1862</span></span>
+<span><span class="co">#&gt; [10,] 1905  978  833</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="linear-regression-1">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression-1"></a>
@@ -795,9 +795,73 @@ un-retrievable change points.</p>
 <span><span class="co">#&gt; Estimated change points are: 501</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="appendix-all-code-snippets">Appendix: all code snippets<a class="anchor" aria-label="anchor" href="#appendix-all-code-snippets"></a>
+<h2 id="time-comparison-using-well_log">Time comparison using <code>well_log</code><a class="anchor" aria-label="anchor" href="#time-comparison-using-well_log"></a>
 </h2>
 <div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">microbenchmark_result</span> <span class="op">&lt;-</span> <span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu">microbenchmark</span><span class="op">(</span></span>
+<span>  fastcpd <span class="op">=</span> <span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">well_log</span>, trim <span class="op">=</span> <span class="fl">0.003</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>  changepoint <span class="op">=</span> <span class="fu">changepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/changepoint/man/cpt.mean.html" class="external-link">cpt.mean</a></span><span class="op">(</span><span class="va">well_log</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span>,</span>
+<span>  CptNonPar <span class="op">=</span> <span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">well_log</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  strucchange <span class="op">=</span></span>
+<span>    <span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">well_log</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  ecp <span class="op">=</span> <span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  breakfast <span class="op">=</span> <span class="fu">breakfast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/breakfast/man/breakfast.html" class="external-link">breakfast</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>,</span>
+<span>  wbs <span class="op">=</span> <span class="fu">wbs</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/wbs/man/wbs.html" class="external-link">wbs</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>,</span>
+<span>  mosum <span class="op">=</span> <span class="fu">mosum</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mosum/man/mosum.html" class="external-link">mosum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>,</span>
+<span>  fpop <span class="op">=</span> <span class="fu">fpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/fpop/man/Fpop.html" class="external-link">Fpop</a></span><span class="op">(</span><span class="va">well_log</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  gfpop <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/gfpop.html" class="external-link">gfpop</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">well_log</span>,</span>
+<span>    mygraph <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/graph.html" class="external-link">graph</a></span><span class="op">(</span></span>
+<span>      penalty <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/sdDiff.html" class="external-link">sdDiff</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">^</span> <span class="fl">2</span>,</span>
+<span>      type <span class="op">=</span> <span class="st">"updown"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    type <span class="op">=</span> <span class="st">"mean"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  InspectChangepoint <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/inspect.html" class="external-link">inspect</a></span><span class="op">(</span></span>
+<span>    <span class="va">well_log</span>,</span>
+<span>    threshold <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/compute.threshold.html" class="external-link">compute.threshold</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  jointseg <span class="op">=</span> <span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">well_log</span>, K <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>,</span>
+<span>  Rbeast <span class="op">=</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
+<span>    <span class="va">well_log</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  stepR <span class="op">=</span> <span class="fu">stepR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stepR/man/stepFit.html" class="external-link">stepFit</a></span><span class="op">(</span><span class="va">well_log</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
+<span>  <span class="co"># mcp = mcp::mcp(</span></span>
+<span>  <span class="co">#   list(y ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1),</span></span>
+<span>  <span class="co">#   data = data.frame(y = well_log, x = seq_along(well_log)),</span></span>
+<span>  <span class="co">#   par_x = "x"</span></span>
+<span>  <span class="co"># ),</span></span>
+<span>  not <span class="op">=</span> <span class="fu">not</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/not/man/not.html" class="external-link">not</a></span><span class="op">(</span><span class="va">well_log</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMean"</span><span class="op">)</span>,</span>
+<span>  times <span class="op">=</span> <span class="fl">10</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Unit: milliseconds</span></span>
+<span><span class="co">#&gt;                expr          min           lq         mean       median           uq          max neval</span></span>
+<span><span class="co">#&gt;             fastcpd 4.010279e+02 4.129134e+02 4.171979e+02 4.148564e+02 4.196057e+02 4.350300e+02    10</span></span>
+<span><span class="co">#&gt;         changepoint 3.195488e+01 3.230887e+01 3.743290e+01 3.352390e+01 4.418598e+01 4.980063e+01    10</span></span>
+<span><span class="co">#&gt;           CptNonPar 1.809139e+04 1.867986e+04 1.904000e+04 1.876936e+04 1.947816e+04 2.076009e+04    10</span></span>
+<span><span class="co">#&gt;         strucchange 5.813672e+04 5.831023e+04 5.963604e+04 5.952739e+04 6.139957e+04 6.173251e+04    10</span></span>
+<span><span class="co">#&gt;                 ecp 7.534981e+05 7.642983e+05 7.742041e+05 7.661485e+05 7.880130e+05 8.003981e+05    10</span></span>
+<span><span class="co">#&gt;           breakfast 9.231426e+03 9.261763e+03 9.514283e+03 9.492325e+03 9.630395e+03 1.001344e+04    10</span></span>
+<span><span class="co">#&gt;                 wbs 1.133042e+02 1.168601e+02 1.189637e+02 1.187244e+02 1.201765e+02 1.281057e+02    10</span></span>
+<span><span class="co">#&gt;               mosum 1.082397e+00 1.167387e+00 1.213233e+00 1.209105e+00 1.286479e+00 1.320333e+00    10</span></span>
+<span><span class="co">#&gt;                fpop 2.407630e+00 2.481348e+00 2.641625e+00 2.551970e+00 2.618455e+00 3.328585e+00    10</span></span>
+<span><span class="co">#&gt;               gfpop 5.918783e+01 5.959448e+01 6.081621e+01 6.006626e+01 6.048699e+01 6.725864e+01    10</span></span>
+<span><span class="co">#&gt;  InspectChangepoint 1.550181e+02 1.885944e+02 2.103973e+02 2.030795e+02 2.262247e+02 3.025476e+02    10</span></span>
+<span><span class="co">#&gt;            jointseg 1.082510e+01 1.082948e+01 1.174498e+01 1.110779e+01 1.221183e+01 1.424236e+01    10</span></span>
+<span><span class="co">#&gt;              Rbeast 6.311987e+02 6.634019e+02 6.702594e+02 6.680217e+02 6.846772e+02 7.048629e+02    10</span></span>
+<span><span class="co">#&gt;               stepR 2.812109e+01 2.836331e+01 2.864408e+01 2.862293e+01 2.897236e+01 2.933441e+01    10</span></span>
+<span><span class="co">#&gt;                 not 9.350182e+01 9.469137e+01 9.684097e+01 9.647117e+01 9.763828e+01 1.031233e+02    10</span></span></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">microbenchmark_result</span><span class="op">)</span></span></code></pre></div>
+<div class="float">
+<img src="comparison-packages-plot.svg" alt="Plot of the running time using well_log data"><div class="figcaption">Plot of the running time using
+<code>well_log</code> data</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="appendix-all-code-snippets">Appendix: all code snippets<a class="anchor" aria-label="anchor" href="#appendix-all-code-snippets"></a>
+</h2>
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span></span>
 <span>  collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span>, eval <span class="op">=</span> <span class="cn">TRUE</span>, cache <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  warning <span class="op">=</span> <span class="cn">FALSE</span>, fig.width <span class="op">=</span> <span class="fl">8</span>, fig.height <span class="op">=</span> <span class="fl">5</span></span>
@@ -1164,7 +1228,61 @@ un-retrievable change points.</p>
 <span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_var.html">fastcpd.var</a></span><span class="op">(</span></span>
 <span>  <span class="va">var_data</span>, <span class="fl">2</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
-<span><span class="fu">VARDetect</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VARDetect/man/tbss.html" class="external-link">tbss</a></span><span class="op">(</span><span class="va">var_data</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">VARDetect</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VARDetect/man/tbss.html" class="external-link">tbss</a></span><span class="op">(</span><span class="va">var_data</span><span class="op">)</span></span>
+<span><span class="va">microbenchmark_result</span> <span class="op">&lt;-</span> <span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu">microbenchmark</span><span class="op">(</span></span>
+<span>  fastcpd <span class="op">=</span> <span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">well_log</span>, trim <span class="op">=</span> <span class="fl">0.003</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>  changepoint <span class="op">=</span> <span class="fu">changepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/changepoint/man/cpt.mean.html" class="external-link">cpt.mean</a></span><span class="op">(</span><span class="va">well_log</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span>,</span>
+<span>  CptNonPar <span class="op">=</span> <span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">well_log</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  strucchange <span class="op">=</span></span>
+<span>    <span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">well_log</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  ecp <span class="op">=</span> <span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  breakfast <span class="op">=</span> <span class="fu">breakfast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/breakfast/man/breakfast.html" class="external-link">breakfast</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>,</span>
+<span>  wbs <span class="op">=</span> <span class="fu">wbs</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/wbs/man/wbs.html" class="external-link">wbs</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>,</span>
+<span>  mosum <span class="op">=</span> <span class="fu">mosum</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mosum/man/mosum.html" class="external-link">mosum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>,</span>
+<span>  fpop <span class="op">=</span> <span class="fu">fpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/fpop/man/Fpop.html" class="external-link">Fpop</a></span><span class="op">(</span><span class="va">well_log</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  gfpop <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/gfpop.html" class="external-link">gfpop</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">well_log</span>,</span>
+<span>    mygraph <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/graph.html" class="external-link">graph</a></span><span class="op">(</span></span>
+<span>      penalty <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/sdDiff.html" class="external-link">sdDiff</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">^</span> <span class="fl">2</span>,</span>
+<span>      type <span class="op">=</span> <span class="st">"updown"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    type <span class="op">=</span> <span class="st">"mean"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  InspectChangepoint <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/inspect.html" class="external-link">inspect</a></span><span class="op">(</span></span>
+<span>    <span class="va">well_log</span>,</span>
+<span>    threshold <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/compute.threshold.html" class="external-link">compute.threshold</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  jointseg <span class="op">=</span> <span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">well_log</span>, K <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>,</span>
+<span>  Rbeast <span class="op">=</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
+<span>    <span class="va">well_log</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  stepR <span class="op">=</span> <span class="fu">stepR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stepR/man/stepFit.html" class="external-link">stepFit</a></span><span class="op">(</span><span class="va">well_log</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
+<span>  <span class="co"># mcp = mcp::mcp(</span></span>
+<span>  <span class="co">#   list(y ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1),</span></span>
+<span>  <span class="co">#   data = data.frame(y = well_log, x = seq_along(well_log)),</span></span>
+<span>  <span class="co">#   par_x = "x"</span></span>
+<span>  <span class="co"># ),</span></span>
+<span>  not <span class="op">=</span> <span class="fu">not</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/not/man/not.html" class="external-link">not</a></span><span class="op">(</span><span class="va">well_log</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMean"</span><span class="op">)</span>,</span>
+<span>  times <span class="op">=</span> <span class="fl">10</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Unit: milliseconds</span></span>
+<span><span class="co">#&gt;                expr          min           lq         mean       median           uq          max neval</span></span>
+<span><span class="co">#&gt;             fastcpd 4.010279e+02 4.129134e+02 4.171979e+02 4.148564e+02 4.196057e+02 4.350300e+02    10</span></span>
+<span><span class="co">#&gt;         changepoint 3.195488e+01 3.230887e+01 3.743290e+01 3.352390e+01 4.418598e+01 4.980063e+01    10</span></span>
+<span><span class="co">#&gt;           CptNonPar 1.809139e+04 1.867986e+04 1.904000e+04 1.876936e+04 1.947816e+04 2.076009e+04    10</span></span>
+<span><span class="co">#&gt;         strucchange 5.813672e+04 5.831023e+04 5.963604e+04 5.952739e+04 6.139957e+04 6.173251e+04    10</span></span>
+<span><span class="co">#&gt;                 ecp 7.534981e+05 7.642983e+05 7.742041e+05 7.661485e+05 7.880130e+05 8.003981e+05    10</span></span>
+<span><span class="co">#&gt;           breakfast 9.231426e+03 9.261763e+03 9.514283e+03 9.492325e+03 9.630395e+03 1.001344e+04    10</span></span>
+<span><span class="co">#&gt;                 wbs 1.133042e+02 1.168601e+02 1.189637e+02 1.187244e+02 1.201765e+02 1.281057e+02    10</span></span>
+<span><span class="co">#&gt;               mosum 1.082397e+00 1.167387e+00 1.213233e+00 1.209105e+00 1.286479e+00 1.320333e+00    10</span></span>
+<span><span class="co">#&gt;                fpop 2.407630e+00 2.481348e+00 2.641625e+00 2.551970e+00 2.618455e+00 3.328585e+00    10</span></span>
+<span><span class="co">#&gt;               gfpop 5.918783e+01 5.959448e+01 6.081621e+01 6.006626e+01 6.048699e+01 6.725864e+01    10</span></span>
+<span><span class="co">#&gt;  InspectChangepoint 1.550181e+02 1.885944e+02 2.103973e+02 2.030795e+02 2.262247e+02 3.025476e+02    10</span></span>
+<span><span class="co">#&gt;            jointseg 1.082510e+01 1.082948e+01 1.174498e+01 1.110779e+01 1.221183e+01 1.424236e+01    10</span></span>
+<span><span class="co">#&gt;              Rbeast 6.311987e+02 6.634019e+02 6.702594e+02 6.680217e+02 6.846772e+02 7.048629e+02    10</span></span>
+<span><span class="co">#&gt;               stepR 2.812109e+01 2.836331e+01 2.864408e+01 2.862293e+01 2.897236e+01 2.933441e+01    10</span></span>
+<span><span class="co">#&gt;                 not 9.350182e+01 9.469137e+01 9.684097e+01 9.647117e+01 9.763828e+01 1.031233e+02    10</span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">microbenchmark_result</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
