@@ -153,6 +153,7 @@ variance.lm <- variance_lm  # nolint: Conventional R function style
 #' @rdname variance_mean
 #' @export
 variance_mean <- function(data) {
+  data <- as.matrix(data)
   n <- nrow(data)
   p <- ncol(data)
   estimators <- array(NA, c(n - 1, p, p))
