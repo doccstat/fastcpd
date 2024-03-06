@@ -768,8 +768,9 @@ ggplot2::ggplot() +
     panel.background = ggplot2::element_blank(),
     panel.border = ggplot2::element_rect(colour = "black", fill = NA),
     panel.grid.major = ggplot2::element_blank(),
-    panel.grid.minor = ggplot2::element_blank(),
-  )
+    panel.grid.minor = ggplot2::element_blank()
+  ) +
+  ggplot2::xlab(NULL) + ggplot2::ylab(NULL)
 ```
 
 ![Plot of the detection using `well_log` data](comparison-packages-well_log-cpts.svg)
