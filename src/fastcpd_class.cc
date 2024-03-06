@@ -771,7 +771,7 @@ double Fastcpd::adjust_cost_value(
 List Fastcpd::get_optimized_cost(const mat data_segment) {
   Function cost_ = cost.get();
   List cost_optim_result;
-  if (vanilla_percentage == 1) {
+  if (cost_gradient.isNull() && cost_hessian.isNull()) {
     cost_optim_result = List::create(
       Named("par") = R_NilValue,
       Named("value") = cost_(data_segment),
