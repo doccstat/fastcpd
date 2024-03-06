@@ -35,5 +35,32 @@ result <- fastcpd.mean(
 )
 summary(result)
 plot(result)
+\donttest{
+if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
+  "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+
+sigma_ <- sqrt(c(variance.mean(well_log)))
+median_loss <- function(data) {
+  sum(abs(data - matrixStats::colMedians(data))) / sigma_ / 2
+}
+result <- fastcpd(
+  formula = ~ x - 1,
+  data = cbind.data.frame(x = well_log),
+  cost = median_loss,
+  trim = 0
+)
+summary(result)
+
+p <- ggplot2::ggplot() +
+  ggplot2::geom_vline(xintercept = result@cp_set, color = "red") +
+  ggplot2::geom_point(
+    data = data.frame(
+      x = seq_along(well_log), y = c(well_log), label = "well_log"
+    ),
+    ggplot2::aes(x = x, y = y)
+  )
+print(p)
+}
 }
 \keyword{datasets}
