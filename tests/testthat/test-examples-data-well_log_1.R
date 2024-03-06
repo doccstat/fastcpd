@@ -1,8 +1,8 @@
 testthat::test_that(
-  "examples/data-well_log.R", {
+  "examples/data-well_log_1.R", {
     testthat::skip_if_not_installed("ggplot2")
 
-    source("examples/data-well_log.R")
+    source("examples/data-well_log_1.R")
     testthat::expect_equal(
       result@cp_set,
       c(
