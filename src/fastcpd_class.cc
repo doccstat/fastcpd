@@ -719,12 +719,13 @@ void Fastcpd::update_cost_parameters_step(
       line_search_index < line_search.n_elem;
       line_search_index++
     ) {
+      colvec theta_candidate =
+        theta_hat.col(i - 1) + line_search[line_search_index] * momentum;
       DEBUG_RCOUT(theta_candidate);
+      colvec theta_upper_bound = arma::min(std::move(theta_candidate), upper);
+      colvec theta_projected = arma::max(std::move(theta_upper_bound), lower);
       line_search_costs[line_search_index] = cost_function_wrapper(
-        data, wrap(arma::max(arma::min(
-          theta_hat.col(i - 1) + line_search[line_search_index] * momentum,
-          upper
-        ), lower)), lambda, false, R_NilValue
+        data, wrap(theta_projected), lambda, false, R_NilValue
       )["value"];
     }
   }

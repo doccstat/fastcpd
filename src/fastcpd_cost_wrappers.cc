@@ -4,7 +4,7 @@ namespace fastcpd::classes {
 
 CostFunction::CostFunction(Function cost) : cost(cost) {}
 
-List CostFunction::operator()(  // # nocov
+List CostFunction::operator()(
     mat data,
     Nullable<colvec> theta,
     double lambda,  // UNUSED
@@ -12,7 +12,10 @@ List CostFunction::operator()(  // # nocov
     Nullable<colvec> start  // UNUSED
 ) {
   DEBUG_RCOUT(data.n_rows);
-  return theta.isNull()? cost(data) : cost(data, theta);  // # nocov
+  SEXP value = theta.isNull()? cost(data) : cost(data, as<colvec>(theta));
+  return List::create(
+      Named("value") = as<double>(value)
+  );
 }
 
 CostGradient::CostGradient(Function cost_gradient) :
