@@ -414,7 +414,7 @@ to the un-retrievable change points.</p>
 <code class="sourceCode R"><span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
 <span>  <span class="va">mean_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
-<span><span class="co">#&gt;  [1] 301 701 NaN NaN NaN NaN NaN NaN NaN NaN</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] 701 301 NaN NaN NaN NaN NaN NaN NaN NaN</span></span></code></pre></div>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stepR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stepR/man/stepFit.html" class="external-link">stepFit</a></span><span class="op">(</span><span class="va">mean_data_1</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">$</span><span class="va">rightEnd</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000</span></span></code></pre></div>
@@ -502,7 +502,7 @@ methods are plotted due to the un-retrievable change points.</p>
 <code class="sourceCode R"><span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
 <span>  <span class="va">mv_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
-<span><span class="co">#&gt;  [1]  301 1301  701 1794 1986 1855 1981 1769 1859 1779</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] 1301  301 1794 1986  701 1855 1981 1769 1860 1779</span></span></code></pre></div>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -561,10 +561,10 @@ to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,]  701  701  701</span></span>
-<span><span class="co">#&gt;  [2,]  301  301  301</span></span>
-<span><span class="co">#&gt;  [3,]  NaN  927  NaN</span></span>
-<span><span class="co">#&gt;  [4,]  NaN  336  NaN</span></span>
+<span><span class="co">#&gt;  [1,]  301  701  701</span></span>
+<span><span class="co">#&gt;  [2,]  701  301  301</span></span>
+<span><span class="co">#&gt;  [3,]  160  334  767</span></span>
+<span><span class="co">#&gt;  [4,]  171  187  NaN</span></span>
 <span><span class="co">#&gt;  [5,]  NaN  NaN  NaN</span></span>
 <span><span class="co">#&gt;  [6,]  NaN  NaN  NaN</span></span>
 <span><span class="co">#&gt;  [7,]  NaN  NaN  NaN</span></span>
@@ -649,16 +649,16 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,] 1301  301  301</span></span>
-<span><span class="co">#&gt;  [2,]  301 1301  702</span></span>
-<span><span class="co">#&gt;  [3,]  701  701 1301</span></span>
-<span><span class="co">#&gt;  [4,]  877  830  757</span></span>
-<span><span class="co">#&gt;  [5,] 1994  807 1941</span></span>
-<span><span class="co">#&gt;  [6,] 1940  881 1971</span></span>
-<span><span class="co">#&gt;  [7,] 1978  887  764</span></span>
-<span><span class="co">#&gt;  [8,]  872  989 1761</span></span>
-<span><span class="co">#&gt;  [9,] 1986  985 1754</span></span>
-<span><span class="co">#&gt; [10,] 1825  874  845</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1,]  301  301 1301</span></span>
+<span><span class="co">#&gt;  [2,] 1301  701  301</span></span>
+<span><span class="co">#&gt;  [3,]  701 1301  702</span></span>
+<span><span class="co">#&gt;  [4,] 1994  830 1971</span></span>
+<span><span class="co">#&gt;  [5,] 1978  881  760</span></span>
+<span><span class="co">#&gt;  [6,] 1905 1979  756</span></span>
+<span><span class="co">#&gt;  [7,] 1912  807 1924</span></span>
+<span><span class="co">#&gt;  [8,]  877  874 1941</span></span>
+<span><span class="co">#&gt;  [9,]  822  989 1802</span></span>
+<span><span class="co">#&gt; [10,] 1825 1946 1880</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="linear-regression-1">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression-1"></a>
@@ -795,9 +795,110 @@ un-retrievable change points.</p>
 <span><span class="co">#&gt; Estimated change points are: 501</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="time-comparison-using-well_log">Time comparison using <code>well_log</code><a class="anchor" aria-label="anchor" href="#time-comparison-using-well_log"></a>
+<h2 id="detection-comparison-using-well_log">Detection comparison using <code>well_log</code><a class="anchor" aria-label="anchor" href="#detection-comparison-using-well_log"></a>
 </h2>
 <div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  fastcpd <span class="op">=</span> <span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">well_log</span>, trim <span class="op">=</span> <span class="fl">0.003</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span>,</span>
+<span>  changepoint <span class="op">=</span> <span class="fu">changepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/changepoint/man/cpt.mean.html" class="external-link">cpt.mean</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">@</span><span class="va">cpts</span>,</span>
+<span>  CptNonPar <span class="op">=</span></span>
+<span>    <span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">well_log</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span>,</span>
+<span>  strucchange <span class="op">=</span> <span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span></span>
+<span>    <span class="va">y</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">well_log</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span>,</span>
+<span>  ecp <span class="op">=</span> <span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span>,</span>
+<span>  breakfast <span class="op">=</span> <span class="fu">breakfast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/breakfast/man/breakfast.html" class="external-link">breakfast</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">$</span><span class="va">cptmodel.list</span><span class="op">[[</span><span class="fl">6</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">cpts</span>,</span>
+<span>  wbs <span class="op">=</span> <span class="fu">wbs</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/wbs/man/wbs.html" class="external-link">wbs</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">$</span><span class="va">cpt</span><span class="op">$</span><span class="va">cpt.ic</span><span class="op">$</span><span class="va">mbic.penalty</span>,</span>
+<span>  mosum <span class="op">=</span> <span class="fu">mosum</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mosum/man/mosum.html" class="external-link">mosum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">$</span><span class="va">cpts.info</span><span class="op">$</span><span class="va">cpts</span>,</span>
+<span>  <span class="co"># fpop = fpop::Fpop(well_log, length(well_log))$t.est,  # meaningless</span></span>
+<span>  gfpop <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/gfpop.html" class="external-link">gfpop</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">well_log</span>,</span>
+<span>    mygraph <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/graph.html" class="external-link">graph</a></span><span class="op">(</span></span>
+<span>      penalty <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/sdDiff.html" class="external-link">sdDiff</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">^</span> <span class="fl">2</span>,</span>
+<span>      type <span class="op">=</span> <span class="st">"updown"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    type <span class="op">=</span> <span class="st">"mean"</span></span>
+<span>  <span class="op">)</span><span class="op">$</span><span class="va">changepoints</span>,</span>
+<span>  InspectChangepoint <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/inspect.html" class="external-link">inspect</a></span><span class="op">(</span></span>
+<span>    <span class="va">well_log</span>,</span>
+<span>    threshold <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/compute.threshold.html" class="external-link">compute.threshold</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span>,</span>
+<span>  jointseg <span class="op">=</span> <span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">well_log</span>, K <span class="op">=</span> <span class="fl">12</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span>,</span>
+<span>  Rbeast <span class="op">=</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
+<span>    <span class="va">well_log</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span>,</span>
+<span>  stepR <span class="op">=</span> <span class="fu">stepR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stepR/man/stepFit.html" class="external-link">stepFit</a></span><span class="op">(</span><span class="va">well_log</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">$</span><span class="va">rightEnd</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">package_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">comparison_table</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">package_index</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">package_list</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">package</span> <span class="op">&lt;-</span> <span class="va">package_list</span><span class="op">[[</span><span class="va">package_index</span><span class="op">]</span><span class="op">]</span></span>
+<span>  <span class="va">comparison_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>    <span class="va">comparison_table</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>      change_point <span class="op">=</span> <span class="va">result</span><span class="op">[[</span><span class="va">package</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      package <span class="op">=</span> <span class="va">package</span>,</span>
+<span>      y_offset <span class="op">=</span> <span class="op">(</span><span class="va">package_index</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">400</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">most_selected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">comparison_table</span><span class="op">$</span><span class="va">change_point</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">most_selected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">most_selected</span><span class="op">[</span><span class="va">most_selected</span> <span class="op">&gt;=</span> <span class="fl">4</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">most_selected</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">most_selected</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">most_selected</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">2</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">most_selected</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
+<span>    <span class="va">most_selected</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">most_selected</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="fl">0.5</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span>
+<span><span class="op">(</span><span class="va">most_selected</span> <span class="op">&lt;-</span> <span class="va">most_selected</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">most_selected</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1]    6.0  314.0  434.0  704.0  776.0 1021.0 1057.0 1347.0 1405.0 1502.0 1661.0 1842.0 2023.0 2202.0</span></span>
+<span><span class="co">#&gt; [15] 2384.5 2445.0 2507.0 2567.5 2738.0 2921.0 3094.0 3251.0 3464.0 3499.0 3622.0 3709.0 3820.0 3976.0</span></span></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span></span>
+<span>    xintercept <span class="op">=</span> <span class="va">most_selected</span>,</span>
+<span>    color <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>    linetype <span class="op">=</span> <span class="st">"dashed"</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.2</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">comparison_table</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">change_point</span>, y <span class="op">=</span> <span class="fl">95000</span> <span class="op">+</span> <span class="va">y_offset</span>, color <span class="op">=</span> <span class="va">package</span><span class="op">)</span>,</span>
+<span>    shape <span class="op">=</span> <span class="fl">17</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">1.75</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">comparison_table</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">95000</span> <span class="op">+</span> <span class="va">y_offset</span>, color <span class="op">=</span> <span class="va">package</span><span class="op">)</span>,</span>
+<span>    linetype <span class="op">=</span> <span class="st">"dashed"</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span></span>
+<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">95000</span> <span class="op">-</span> <span class="fl">500</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span>    xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">+</span> <span class="fl">200</span><span class="op">)</span>,</span>
+<span>    expand <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span>
+<span>    panel.background <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    panel.border <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_rect</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"black"</span>, fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>    panel.grid.major <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    panel.grid.minor <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<div class="float">
+<img src="comparison-packages-well_log-cpts.svg" alt="Plot of the detection using well_log data"><div class="figcaption">Plot of the detection using
+<code>well_log</code> data</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="time-comparison-using-well_log">Time comparison using <code>well_log</code><a class="anchor" aria-label="anchor" href="#time-comparison-using-well_log"></a>
+</h2>
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">microbenchmark_result</span> <span class="op">&lt;-</span> <span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu">microbenchmark</span><span class="op">(</span></span>
 <span>  fastcpd <span class="op">=</span> <span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">well_log</span>, trim <span class="op">=</span> <span class="fl">0.003</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>  changepoint <span class="op">=</span> <span class="fu">changepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/changepoint/man/cpt.mean.html" class="external-link">cpt.mean</a></span><span class="op">(</span><span class="va">well_log</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span>,</span>
@@ -851,17 +952,17 @@ un-retrievable change points.</p>
 <span><span class="co">#&gt;              Rbeast 6.311987e+02 6.634019e+02 6.702594e+02 6.680217e+02 6.846772e+02 7.048629e+02    10</span></span>
 <span><span class="co">#&gt;               stepR 2.812109e+01 2.836331e+01 2.864408e+01 2.862293e+01 2.897236e+01 2.933441e+01    10</span></span>
 <span><span class="co">#&gt;                 not 9.350182e+01 9.469137e+01 9.684097e+01 9.647117e+01 9.763828e+01 1.031233e+02    10</span></span></code></pre></div>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">microbenchmark_result</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
-<img src="comparison-packages-plot.svg" alt="Plot of the running time using well_log data"><div class="figcaption">Plot of the running time using
+<img src="comparison-packages-well_log-time.svg" alt="Plot of the running time using well_log data"><div class="figcaption">Plot of the running time using
 <code>well_log</code> data</div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="appendix-all-code-snippets">Appendix: all code snippets<a class="anchor" aria-label="anchor" href="#appendix-all-code-snippets"></a>
 </h2>
-<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span></span>
 <span>  collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span>, eval <span class="op">=</span> <span class="cn">TRUE</span>, cache <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  warning <span class="op">=</span> <span class="cn">FALSE</span>, fig.width <span class="op">=</span> <span class="fl">8</span>, fig.height <span class="op">=</span> <span class="fl">5</span></span>
@@ -1229,6 +1330,97 @@ un-retrievable change points.</p>
 <span>  <span class="va">var_data</span>, <span class="fl">2</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="fu">VARDetect</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VARDetect/man/tbss.html" class="external-link">tbss</a></span><span class="op">(</span><span class="va">var_data</span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  fastcpd <span class="op">=</span> <span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">well_log</span>, trim <span class="op">=</span> <span class="fl">0.003</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span>,</span>
+<span>  changepoint <span class="op">=</span> <span class="fu">changepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/changepoint/man/cpt.mean.html" class="external-link">cpt.mean</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">@</span><span class="va">cpts</span>,</span>
+<span>  CptNonPar <span class="op">=</span></span>
+<span>    <span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">well_log</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span>,</span>
+<span>  strucchange <span class="op">=</span> <span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span></span>
+<span>    <span class="va">y</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">well_log</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span>,</span>
+<span>  ecp <span class="op">=</span> <span class="fu">ecp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecp/man/e.divisive.html" class="external-link">e.divisive</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">estimates</span>,</span>
+<span>  breakfast <span class="op">=</span> <span class="fu">breakfast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/breakfast/man/breakfast.html" class="external-link">breakfast</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">$</span><span class="va">cptmodel.list</span><span class="op">[[</span><span class="fl">6</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">cpts</span>,</span>
+<span>  wbs <span class="op">=</span> <span class="fu">wbs</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/wbs/man/wbs.html" class="external-link">wbs</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">$</span><span class="va">cpt</span><span class="op">$</span><span class="va">cpt.ic</span><span class="op">$</span><span class="va">mbic.penalty</span>,</span>
+<span>  mosum <span class="op">=</span> <span class="fu">mosum</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mosum/man/mosum.html" class="external-link">mosum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">$</span><span class="va">cpts.info</span><span class="op">$</span><span class="va">cpts</span>,</span>
+<span>  <span class="co"># fpop = fpop::Fpop(well_log, length(well_log))$t.est,  # meaningless</span></span>
+<span>  gfpop <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/gfpop.html" class="external-link">gfpop</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">well_log</span>,</span>
+<span>    mygraph <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/graph.html" class="external-link">graph</a></span><span class="op">(</span></span>
+<span>      penalty <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/sdDiff.html" class="external-link">sdDiff</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">^</span> <span class="fl">2</span>,</span>
+<span>      type <span class="op">=</span> <span class="st">"updown"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    type <span class="op">=</span> <span class="st">"mean"</span></span>
+<span>  <span class="op">)</span><span class="op">$</span><span class="va">changepoints</span>,</span>
+<span>  InspectChangepoint <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/inspect.html" class="external-link">inspect</a></span><span class="op">(</span></span>
+<span>    <span class="va">well_log</span>,</span>
+<span>    threshold <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/compute.threshold.html" class="external-link">compute.threshold</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span>,</span>
+<span>  jointseg <span class="op">=</span> <span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">well_log</span>, K <span class="op">=</span> <span class="fl">12</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span>,</span>
+<span>  Rbeast <span class="op">=</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
+<span>    <span class="va">well_log</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span>,</span>
+<span>  stepR <span class="op">=</span> <span class="fu">stepR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stepR/man/stepFit.html" class="external-link">stepFit</a></span><span class="op">(</span><span class="va">well_log</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">$</span><span class="va">rightEnd</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">package_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">comparison_table</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">package_index</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">package_list</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">package</span> <span class="op">&lt;-</span> <span class="va">package_list</span><span class="op">[[</span><span class="va">package_index</span><span class="op">]</span><span class="op">]</span></span>
+<span>  <span class="va">comparison_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>    <span class="va">comparison_table</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>      change_point <span class="op">=</span> <span class="va">result</span><span class="op">[[</span><span class="va">package</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      package <span class="op">=</span> <span class="va">package</span>,</span>
+<span>      y_offset <span class="op">=</span> <span class="op">(</span><span class="va">package_index</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">400</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">most_selected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">comparison_table</span><span class="op">$</span><span class="va">change_point</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">most_selected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">most_selected</span><span class="op">[</span><span class="va">most_selected</span> <span class="op">&gt;=</span> <span class="fl">4</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">most_selected</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">most_selected</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">most_selected</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">2</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">most_selected</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
+<span>    <span class="va">most_selected</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">most_selected</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="fl">0.5</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span>
+<span><span class="op">(</span><span class="va">most_selected</span> <span class="op">&lt;-</span> <span class="va">most_selected</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">most_selected</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1]    6.0  314.0  434.0  704.0  776.0 1021.0 1057.0 1347.0 1405.0 1502.0 1661.0 1842.0 2023.0 2202.0</span></span>
+<span><span class="co">#&gt; [15] 2384.5 2445.0 2507.0 2567.5 2738.0 2921.0 3094.0 3251.0 3464.0 3499.0 3622.0 3709.0 3820.0 3976.0</span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span></span>
+<span>    xintercept <span class="op">=</span> <span class="va">most_selected</span>,</span>
+<span>    color <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>    linetype <span class="op">=</span> <span class="st">"dashed"</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.2</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">comparison_table</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">change_point</span>, y <span class="op">=</span> <span class="fl">95000</span> <span class="op">+</span> <span class="va">y_offset</span>, color <span class="op">=</span> <span class="va">package</span><span class="op">)</span>,</span>
+<span>    shape <span class="op">=</span> <span class="fl">17</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">1.75</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">comparison_table</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">95000</span> <span class="op">+</span> <span class="va">y_offset</span>, color <span class="op">=</span> <span class="va">package</span><span class="op">)</span>,</span>
+<span>    linetype <span class="op">=</span> <span class="st">"dashed"</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span></span>
+<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">95000</span> <span class="op">-</span> <span class="fl">500</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span>    xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">+</span> <span class="fl">200</span><span class="op">)</span>,</span>
+<span>    expand <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span>
+<span>    panel.background <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    panel.border <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_rect</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"black"</span>, fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>    panel.grid.major <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    panel.grid.minor <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="op">)</span></span>
 <span><span class="va">microbenchmark_result</span> <span class="op">&lt;-</span> <span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu">microbenchmark</span><span class="op">(</span></span>
 <span>  fastcpd <span class="op">=</span> <span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">well_log</span>, trim <span class="op">=</span> <span class="fl">0.003</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>  changepoint <span class="op">=</span> <span class="fu">changepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/changepoint/man/cpt.mean.html" class="external-link">cpt.mean</a></span><span class="op">(</span><span class="va">well_log</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span>,</span>
