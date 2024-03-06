@@ -290,10 +290,12 @@ List Fastcpd::run() {
         lambda = mean(err_sd) * sqrt(2 * std::log(p) / (t - tau));
       }
       mat data_segment = data.rows(tau, t - 1);
+      DEBUG_RCOUT(data_segment);
       if (t > vanilla_percentage * n) {
         // fastcpd
         update_cost_parameters(t, tau, i, k.get(), lambda, line_search);
         colvec theta = theta_sum.col(i - 1) / (t - tau);
+        DEBUG_RCOUT(theta);
         if (family == "poisson" && t - tau >= p) {
           theta = clamp(theta, winsorise_minval, winsorise_maxval);
         }
@@ -637,6 +639,7 @@ void Fastcpd::update_cost_parameters(
   List cost_update_result = update_cost_parameters_steps(
     data.rows(0, t - 1), tau, i, k, momentum, lambda, line_search
   );
+  DEBUG_RCOUT(line_search);
   update_theta_hat(i - 1, as<colvec>(cost_update_result[0]));
   create_theta_sum(i - 1, as<colvec>(cost_update_result[1]));
   update_hessian(i - 1, as<mat>(cost_update_result[2]));
@@ -674,6 +677,7 @@ void Fastcpd::update_cost_parameters_step(
   const double lambda,
   const colvec line_search
 ) {
+  DEBUG_RCOUT(data_start);
   mat hessian_i = hessian.slice(i - 1);
   colvec gradient;
 
@@ -681,11 +685,13 @@ void Fastcpd::update_cost_parameters_step(
     mat cost_hessian_result = cost_hessian_wrapper(
       data.rows(data_start, data_end), theta_hat.col(i - 1)
     );
+    DEBUG_RCOUT(cost_hessian_result);
     hessian_i += cost_hessian_result;
     colvec cost_gradient_result = cost_gradient_wrapper(
       data.rows(data_start, data_end), theta_hat.col(i - 1)
     );
     gradient = cost_gradient_result;
+    DEBUG_RCOUT(gradient);
   } else {
     hessian_i += cost_update_hessian(
       data.rows(data_start, data_end), theta_hat.col(i - 1)
@@ -701,6 +707,7 @@ void Fastcpd::update_cost_parameters_step(
 
   // Calculate momentum step
   momentum = momentum_coef * momentum - solve(hessian_psd, gradient);
+  DEBUG_RCOUT(momentum);
 
   double best_learning_rate = 1;
   colvec line_search_costs = zeros<colvec>(line_search.n_elem);
@@ -712,6 +719,7 @@ void Fastcpd::update_cost_parameters_step(
       line_search_index < line_search.n_elem;
       line_search_index++
     ) {
+      DEBUG_RCOUT(theta_candidate);
       line_search_costs[line_search_index] = cost_function_wrapper(
         data, wrap(arma::max(arma::min(
           theta_hat.col(i - 1) + line_search[line_search_index] * momentum,
@@ -721,6 +729,7 @@ void Fastcpd::update_cost_parameters_step(
     }
   }
   best_learning_rate = line_search[line_search_costs.index_min()];
+  DEBUG_RCOUT(best_learning_rate);
 
   // Update theta_hat with momentum
   theta_hat.col(i - 1) += best_learning_rate * momentum;
