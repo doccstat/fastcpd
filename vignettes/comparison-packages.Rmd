@@ -677,7 +677,7 @@ VARDetect::tbss(var_data)
 
 ```{r time-comparison-well-log, eval = FALSE}
 microbenchmark_result <- microbenchmark::microbenchmark(
-  fastcpd = fastcpd.mean(well_log, trim = 0.003, r.progress = FALSE),
+  fastcpd = fastcpd::fastcpd.mean(well_log, trim = 0.003, r.progress = FALSE),
   changepoint = changepoint::cpt.mean(well_log, method = "PELT"),
   CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
   strucchange =
