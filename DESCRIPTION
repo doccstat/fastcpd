@@ -51,6 +51,7 @@ Suggests:
     jointseg,
     knitr,
     lubridate,
+    matrixStats,
     mcp,
     mockthat,
     mosum,

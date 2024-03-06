@@ -1,6 +1,7 @@
 testthat::test_that(
   "examples/data-well_log-quantile.R", {
     testthat::skip_if_not_installed("ggplot2")
+    testthat::skip_if_not_installed("matrixStats")
 
     examples_transcriptome <- readLines("examples/data-well_log-quantile.txt")
     source(textConnection(paste(
