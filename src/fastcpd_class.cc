@@ -293,7 +293,7 @@ List Fastcpd::run() {
       if (t > vanilla_percentage * n) {
         // fastcpd
         update_cost_parameters(t, tau, i, k.get(), lambda, line_search);
-        colvec theta = get_theta_sum().col(i - 1) / (t - tau);
+        colvec theta = theta_sum.col(i - 1) / (t - tau);
         if (family == "poisson" && t - tau >= p) {
           theta = clamp(theta, winsorise_minval, winsorise_maxval);
         }
