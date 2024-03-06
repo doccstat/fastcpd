@@ -113,5 +113,6 @@
 #'
 #' @format A Time-Series of length 3989.
 #' @source <https://github.com/alan-turing-institute/TCPD>
-#' @example tests/testthat/examples/data-well_log.R
+#' @example tests/testthat/examples/data-well_log_1.R
+#' @example tests/testthat/examples/data-well_log_2.R
 "well_log"
