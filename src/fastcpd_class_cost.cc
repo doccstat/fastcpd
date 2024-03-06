@@ -245,7 +245,7 @@ double Fastcpd::negative_log_likelihood_wo_cv(
       dot(variance_term, variance_term) / 2.0 / theta(sum(order));
   } else {
     // # nocov start
-    stop("This branch should not be reached at functions.cc: 153.");
+    stop("This branch should not be reached at functions.cc: 248.");
     // # nocov end
   }
 }
