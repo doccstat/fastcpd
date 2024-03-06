@@ -673,6 +673,107 @@ fastcpd::fastcpd.var(
 VARDetect::tbss(var_data)
 ```
 
+# Detection comparison using `well_log`
+
+```{r detection-comparison-well-log, eval = FALSE}
+result <- list(
+  fastcpd = fastcpd.mean(well_log, trim = 0.003)@cp_set,
+  changepoint = changepoint::cpt.mean(well_log)@cpts,
+  CptNonPar =
+    CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6))$cpts,
+  strucchange = strucchange::breakpoints(
+    y ~ 1, data = data.frame(y = well_log)
+  )$breakpoints,
+  ecp = ecp::e.divisive(matrix(well_log))$estimates,
+  breakfast = breakfast::breakfast(well_log)$cptmodel.list[[6]]$cpts,
+  wbs = wbs::wbs(well_log)$cpt$cpt.ic$mbic.penalty,
+  mosum = mosum::mosum(c(well_log), G = 40)$cpts.info$cpts,
+  # fpop = fpop::Fpop(well_log, length(well_log))$t.est,  # meaningless
+  gfpop = gfpop::gfpop(
+    data = well_log,
+    mygraph = gfpop::graph(
+      penalty = 2 * log(length(well_log)) * gfpop::sdDiff(well_log) ^ 2,
+      type = "updown"
+    ),
+    type = "mean"
+  )$changepoints,
+  InspectChangepoint = InspectChangepoint::inspect(
+    well_log,
+    threshold = InspectChangepoint::compute.threshold(length(well_log), 1)
+  )$changepoints[, "location"],
+  jointseg = jointseg::jointSeg(well_log, K = 12)$bestBkp,
+  Rbeast = Rbeast::beast(
+    well_log, season = "none", print.progress = FALSE, quiet = TRUE
+  )$trend$cp,
+  stepR = stepR::stepFit(well_log, alpha = 0.5)$rightEnd
+)
+
+package_list <- sort(names(result), decreasing = TRUE)
+comparison_table <- NULL
+for (package_index in seq_along(package_list)) {
+  package <- package_list[[package_index]]
+  comparison_table <- rbind(
+    comparison_table,
+    data.frame(
+      change_point = result[[package]],
+      package = package,
+      y_offset = (package_index - 1) * 400
+    )
+  )
+}
+
+most_selected <- sort(table(comparison_table$change_point), decreasing = TRUE)
+most_selected <- sort(as.numeric(names(most_selected[most_selected >= 4])))
+for (i in seq_len(length(most_selected) - 1)) {
+  if (most_selected[i + 1] - most_selected[i] < 2) {
+    most_selected[i] <- NA
+    most_selected[i + 1] <- most_selected[i + 1] - 0.5
+  }
+}
+(most_selected <- most_selected[!is.na(most_selected)])
+#>  [1]    6.0  314.0  434.0  704.0  776.0 1021.0 1057.0 1347.0 1405.0 1502.0 1661.0 1842.0 2023.0 2202.0
+#> [15] 2384.5 2445.0 2507.0 2567.5 2738.0 2921.0 3094.0 3251.0 3464.0 3499.0 3622.0 3709.0 3820.0 3976.0
+```
+
+```{r detection-comparison-well-log-plot, eval = FALSE}
+ggplot2::ggplot() +
+  ggplot2::geom_point(
+    data = data.frame(x = seq_along(well_log), y = c(well_log)),
+    ggplot2::aes(x = x, y = y)
+  ) +
+  ggplot2::geom_vline(
+    xintercept = most_selected,
+    color = "black",
+    linetype = "dashed",
+    alpha = 0.2
+  ) +
+  ggplot2::geom_point(
+    data = comparison_table,
+    ggplot2::aes(x = change_point, y = 95000 + y_offset, color = package),
+    shape = 17,
+    size = 1.75
+  ) +
+  ggplot2::geom_hline(
+    data = comparison_table,
+    ggplot2::aes(yintercept = 95000 + y_offset, color = package),
+    linetype = "dashed",
+    alpha = 0.1
+  ) +
+  ggplot2::coord_cartesian(
+    ylim = c(95000 - 500, max(well_log) + 1000),
+    xlim = c(-200, length(well_log) + 200),
+    expand = FALSE
+  ) +
+  ggplot2::theme(
+    panel.background = ggplot2::element_blank(),
+    panel.border = ggplot2::element_rect(colour = "black", fill = NA),
+    panel.grid.major = ggplot2::element_blank(),
+    panel.grid.minor = ggplot2::element_blank(),
+  )
+```
+
+![Plot of the detection using `well_log` data](comparison-packages-well_log-cpts.svg)
+
 # Time comparison using `well_log`
 
 ```{r time-comparison-well-log, eval = FALSE}
@@ -735,7 +836,7 @@ microbenchmark_result <- microbenchmark::microbenchmark(
 ggplot2::autoplot(microbenchmark_result)
 ```
 
-![Plot of the running time using `well_log` data](comparison-packages-plot.svg)
+![Plot of the running time using `well_log` data](comparison-packages-well_log-time.svg)
 
 # Appendix: all code snippets
 
