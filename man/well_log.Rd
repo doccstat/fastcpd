@@ -50,7 +50,7 @@ result <- fastcpd(
   formula = ~ x - 1,
   data = cbind.data.frame(x = well_log),
   cost = median_loss,
-  trim = 0
+  trim = 0.002
 )
 summary(result)
 
