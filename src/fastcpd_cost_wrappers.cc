@@ -13,7 +13,7 @@ List CostFunction::operator()(  // # nocov
 ) {
   DEBUG_RCOUT(data.n_rows);
   SEXP value =
-    theta.isNull()? cost(data) : cost(data, as<colvec>(theta));  // # nocov
+    theta.isNull() ? cost(data) : cost(data, as<colvec>(theta));  // # nocov
   return List::create(
       Named("value") = as<double>(value)  // # nocov
   );

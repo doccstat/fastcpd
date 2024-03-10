@@ -18,6 +18,7 @@ fastcpd(
   winsorise_minval = -20,
   winsorise_maxval = 20,
   p = ncol(data) - 1,
+  pruning = TRUE,
   order = c(0, 0, 0),
   cost = NULL,
   cost_gradient = NULL,
@@ -130,6 +131,11 @@ to be winsorised.}
 covariates will be inferred from the data, i.e.,
 \code{p = ncol(data) - 1}. This parameter is superseded by \code{order} in the
 case of time series models: "ar", "var", "arima".}
+
+\item{pruning}{If \code{TRUE}, the algorithm will perform pruning on the
+change points. By default, the value is set to be \code{TRUE}. Pruning
+should be set to be \code{FALSE} if the pruning condition is not
+satisfied.}
 
 \item{order}{Order of the AR(p), VAR(p) or ARIMA(p, d, q) model.}
 

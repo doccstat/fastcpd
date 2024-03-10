@@ -24,6 +24,7 @@ class Fastcpd {
     const double momentum_coef,
     const colvec order,
     const int p,
+    const bool pruning,
     const unsigned int p_response,
     const bool r_progress,
     const int segment_count,
@@ -296,6 +297,8 @@ class Fastcpd {
 
   // `p` is the number of parameters to be estimated.
   const int p;
+
+  const bool pruning;
 
   // Number of response variables in regression.
   const unsigned int p_response;
