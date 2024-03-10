@@ -15,6 +15,7 @@ List fastcpd_impl(
     const double winsorise_minval,
     const double winsorise_maxval,
     const int p,
+    const bool pruning,
     const colvec order,
     Nullable<Function> cost,
     Nullable<Function> cost_gradient,
@@ -33,8 +34,9 @@ List fastcpd_impl(
   fastcpd::classes::Fastcpd fastcpd_class(
     beta, cost, cost_adjustment, cost_gradient, cost_hessian, cp_only, data,
     epsilon, family, k, line_search, lower, min_prob, momentum_coef, order, p,
-    p_response, r_progress, segment_count, trim, upper, vanilla_percentage,
-    variance_estimate, warm_start, winsorise_maxval, winsorise_minval
+    pruning, p_response, r_progress, segment_count, trim, upper,
+    vanilla_percentage, variance_estimate, warm_start,
+    winsorise_maxval, winsorise_minval
   );
   return fastcpd_class.run();
 }

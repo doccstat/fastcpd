@@ -26,6 +26,7 @@ Fastcpd::Fastcpd(
     const double momentum_coef,
     const colvec order,
     const int p,
+    const bool pruning,
     const unsigned int p_response,
     const bool r_progress,
     const int segment_count,
@@ -52,6 +53,7 @@ Fastcpd::Fastcpd(
     momentum_coef(momentum_coef),
     order(order),
     p(p),
+    pruning(pruning),
     p_response(p_response),
     r_progress(r_progress),
     segment_count(segment_count),
@@ -76,10 +78,173 @@ Fastcpd::Fastcpd(
   // TODO(doccstat): Store environment functions from R.
 }
 
-void Fastcpd::update_err_sd(
-  const unsigned int segment_index, const double err_var
+double Fastcpd::adjust_cost_value(
+  double value,
+  const unsigned int nrows
 ) {
-  err_sd(segment_index) = sqrt(err_var);
+  if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
+    value += data.n_cols * std::log(nrows) / 2;
+  }
+  if (cost_adjustment == "MDL") {
+    value *= std::log2(M_E);
+  }
+  return value;
+}
+
+List Fastcpd::get_optimized_cost(const mat data_segment) {
+  Function cost_ = cost.get();
+  List cost_optim_result;
+  if (cost_gradient.isNull() && cost_hessian.isNull()) {
+    cost_optim_result = List::create(
+      Named("par") = R_NilValue,
+      Named("value") = cost_(data_segment),
+      Named("residuals") = R_NilValue
+    );
+  } else if (p == 1) {
+    Environment stats = Environment::namespace_env("stats");
+    Function optim = stats["optim"];
+    List optim_result = optim(
+      Named("par") = 0,
+      Named("fn") = InternalFunction(
+        +[](double theta, mat data, Function cost_) {
+          return cost_(
+            Named("data") = data,
+            Named("theta") = std::log(theta / (1 - theta))
+          );
+        }
+      ),
+      Named("method") = "Brent",
+      Named("lower") = 0,
+      Named("upper") = 1,
+      Named("data") = data_segment,
+      Named("cost") = cost_
+    );
+    cost_optim_result = List::create(
+      Named("par") = std::log(
+        as<double>(optim_result["par"]) / (1 - as<double>(optim_result["par"]))
+      ),
+      Named("value") = exp(as<double>(optim_result["value"])) /
+        (1 + exp(as<double>(optim_result["value"]))),
+      Named("residuals") = R_NilValue
+    );
+  } else if (p > 1) {
+    Environment stats = Environment::namespace_env("stats");
+    Function optim = stats["optim"];
+    List optim_result = optim(
+      Named("par") = zeros<vec>(p),
+      Named("fn") = cost_,
+      Named("method") = "L-BFGS-B",
+      Named("data") = data_segment,
+      Named("lower") = lower,
+      Named("upper") = upper
+    );
+    cost_optim_result = List::create(
+      Named("par") = optim_result["par"],
+      Named("value") = optim_result["value"],
+      Named("residuals") = R_NilValue
+    );
+  } else {
+    // # nocov start
+    stop("This branch should not be reached at classes.cc: 945.");
+    // # nocov end
+  }
+  return cost_optim_result;
+}
+
+mat Fastcpd::get_theta_sum() {
+  return theta_sum;
+}
+
+void Fastcpd::create_cost_function_wrapper(Nullable<Function> cost) {
+  DEBUG_RCOUT(family);
+  if (contain(FASTCPD_FAMILIES, family)) {
+    cost_function_wrapper = std::bind(  // # nocov start
+      &Fastcpd::negative_log_likelihood,  // # nocov end
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2,
+      std::placeholders::_3,
+      std::placeholders::_4,
+      std::placeholders::_5
+    );
+  } else {
+    fastcpd::classes::CostFunction costFunction(cost.get());
+    cost_function_wrapper = costFunction;
+  }
+}
+
+void Fastcpd::create_cost_gradient_wrapper(Nullable<Function> cost_gradient) {
+  if (contain(FASTCPD_FAMILIES, family)) {
+    cost_gradient_wrapper = std::bind(  // # nocov start
+      &Fastcpd::cost_update_gradient,  // # nocov end
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2
+    );
+  } else if (cost_gradient.isNotNull()) {
+    fastcpd::classes::CostGradient costGradient(cost_gradient.get());
+    cost_gradient_wrapper = costGradient;
+  } else if (cost_gradient.isNull()) {
+    // `cost_gradient` can be `NULL` in the case of vanilla PELT.
+  } else {
+    // # nocov start
+    stop("This branch should not be reached at classes.cc: 290.");
+    // # nocov end
+  }
+}
+
+void Fastcpd::create_cost_hessian_wrapper(Nullable<Function> cost_hessian) {
+  if (contain(FASTCPD_FAMILIES, family)) {
+    cost_hessian_wrapper = std::bind(  // # nocov start
+      &Fastcpd::cost_update_hessian,  // # nocov end
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2
+    );
+  } else if (cost_hessian.isNotNull()) {
+    fastcpd::classes::CostHessian costHessian(cost_hessian.get());
+    cost_hessian_wrapper = costHessian;
+  } else if (cost_hessian.isNull()) {
+    // `cost_hessian` can be `NULL` in the case of vanilla PELT.
+  } else {
+    // # nocov start
+    stop("This branch should not be reached at classes.cc: 304.");
+    // # nocov end
+  }
+}
+
+void Fastcpd::create_gradients() {
+  if (family == "binomial") {
+    theta_sum.col(0) = segment_theta_hat.row(0).t();
+    theta_hat.col(0) = segment_theta_hat.row(0).t();
+    const double prob = 1 / (1 + exp(
+      -as_scalar(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
+    ));
+    hessian.slice(0) = (
+      data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
+    ) * as_scalar(prob * (1 - prob));
+  } else if (family == "poisson") {
+    theta_hat.col(0) = clamp(
+      segment_theta_hat.row(0).t(), winsorise_minval, winsorise_maxval
+    );
+    theta_sum.col(0) = clamp(
+      segment_theta_hat.row(0).t(), winsorise_minval, winsorise_maxval
+    );
+    hessian.slice(0) = (
+      data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
+    ) * as_scalar(
+      exp(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
+    );
+  } else if (family == "lasso" || family == "gaussian") {
+    theta_hat.col(0) = segment_theta_hat.row(0).t();
+    theta_sum.col(0) = segment_theta_hat.row(0).t();
+    hessian.slice(0) = epsilon * eye<mat>(p, p) +
+      data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1);
+  } else if (!contain(FASTCPD_FAMILIES, family)) {
+    theta_hat.col(0) = segment_theta_hat.row(0).t();
+    theta_sum.col(0) = segment_theta_hat.row(0).t();
+    hessian.slice(0) = zeros<mat>(p, p);
+  }
 }
 
 void Fastcpd::create_segment_indices() {
@@ -100,58 +265,6 @@ void Fastcpd::create_segment_indices() {
       )).fill(segment_index);
     }
   }
-}
-
-void Fastcpd::update_theta_hat(
-  const unsigned int col, colvec new_theta_hat
-) {
-  theta_hat.col(col) = new_theta_hat;
-}
-
-void Fastcpd::update_theta_hat(colvec new_theta_hat) {
-  theta_hat = join_rows(theta_hat, new_theta_hat);
-}
-
-void Fastcpd::create_theta_sum(
-  const unsigned int col, colvec new_theta_sum
-) {
-  theta_sum.col(col) = new_theta_sum;
-}
-
-mat Fastcpd::get_theta_sum() {
-  return theta_sum;
-}
-
-void Fastcpd::update_theta_sum(
-  const unsigned int col, colvec new_theta_sum
-) {
-  theta_sum.col(col) += new_theta_sum;
-}
-
-void Fastcpd::update_theta_sum(colvec new_theta_sum) {
-  theta_sum = join_rows(theta_sum, new_theta_sum);
-}
-
-void Fastcpd::update_hessian(
-  const unsigned int slice, mat new_hessian
-) {
-  hessian.slice(slice) = new_hessian;
-}
-
-void Fastcpd::update_hessian(mat new_hessian) {
-  hessian = join_slices(hessian, new_hessian);
-}
-
-void Fastcpd::update_theta_hat(ucolvec pruned_left) {
-  theta_hat = theta_hat.cols(pruned_left);
-}
-
-void Fastcpd::update_theta_sum(ucolvec pruned_left) {
-  theta_sum = theta_sum.cols(pruned_left);
-}
-
-void Fastcpd::update_hessian(ucolvec pruned_left) {
-  hessian = hessian.slices(pruned_left);
 }
 
 // TODO(doccstat): Use `segment_theta` as warm start.
@@ -190,6 +303,60 @@ void Fastcpd::create_segment_statistics() {
   if (family == "lasso") {
     beta = beta * (1 + mean(act_num));
   }
+}
+
+void Fastcpd::create_theta_sum(
+  const unsigned int col, colvec new_theta_sum
+) {
+  theta_sum.col(col) = new_theta_sum;
+}
+
+void Fastcpd::update_err_sd(
+  const unsigned int segment_index, const double err_var
+) {
+  err_sd(segment_index) = sqrt(err_var);
+}
+
+void Fastcpd::update_hessian(
+  const unsigned int slice, mat new_hessian
+) {
+  hessian.slice(slice) = new_hessian;
+}
+
+void Fastcpd::update_hessian(mat new_hessian) {
+  hessian = join_slices(hessian, new_hessian);
+}
+
+void Fastcpd::update_hessian(ucolvec pruned_left) {
+  hessian = hessian.slices(pruned_left);
+}
+
+void Fastcpd::update_theta_hat(colvec new_theta_hat) {
+  theta_hat = join_rows(theta_hat, new_theta_hat);
+}
+
+void Fastcpd::update_theta_hat(
+  const unsigned int col, colvec new_theta_hat
+) {
+  theta_hat.col(col) = new_theta_hat;
+}
+
+void Fastcpd::update_theta_sum(
+  const unsigned int col, colvec new_theta_sum
+) {
+  theta_sum.col(col) += new_theta_sum;
+}
+
+void Fastcpd::update_theta_sum(colvec new_theta_sum) {
+  theta_sum = join_rows(theta_sum, new_theta_sum);
+}
+
+void Fastcpd::update_theta_hat(ucolvec pruned_left) {
+  theta_hat = theta_hat.cols(pruned_left);
+}
+
+void Fastcpd::update_theta_sum(ucolvec pruned_left) {
+  theta_sum = theta_sum.cols(pruned_left);
 }
 
 List Fastcpd::run() {
@@ -361,8 +528,9 @@ List Fastcpd::run() {
     cp_sets[t] = join_cols(cp_sets[tau_star], colvec{tau_star});
     DEBUG_RCOUT(cp_sets[t]);
 
-    // Step 5
-    ucolvec pruned_left = arma::find(cval + fvec.rows(r_t_set) <= min_obj);
+    // Pruning step.
+    ucolvec pruned_left =
+      pruning ? arma::find(cval + fvec.rows(r_t_set) <= min_obj) : r_t_set;
     DEBUG_RCOUT(pruned_left);
     ucolvec pruned_r_t_set = zeros<ucolvec>(pruned_left.n_elem + 1);
     DEBUG_RCOUT(pruned_r_t_set);
@@ -502,132 +670,6 @@ List Fastcpd::run() {
   );
 }
 
-void Fastcpd::update_momentum(colvec new_momentum) {
-  momentum = new_momentum;
-}
-
-void Fastcpd::create_gradients() {
-  if (family == "binomial") {
-    theta_sum.col(0) = segment_theta_hat.row(0).t();
-    theta_hat.col(0) = segment_theta_hat.row(0).t();
-    const double prob = 1 / (1 + exp(
-      -as_scalar(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
-    ));
-    hessian.slice(0) = (
-      data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
-    ) * as_scalar(prob * (1 - prob));
-  } else if (family == "poisson") {
-    theta_hat.col(0) = clamp(
-      segment_theta_hat.row(0).t(), winsorise_minval, winsorise_maxval
-    );
-    theta_sum.col(0) = clamp(
-      segment_theta_hat.row(0).t(), winsorise_minval, winsorise_maxval
-    );
-    hessian.slice(0) = (
-      data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
-    ) * as_scalar(
-      exp(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
-    );
-  } else if (family == "lasso" || family == "gaussian") {
-    theta_hat.col(0) = segment_theta_hat.row(0).t();
-    theta_sum.col(0) = segment_theta_hat.row(0).t();
-    hessian.slice(0) = epsilon * eye<mat>(p, p) +
-      data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1);
-  } else if (!contain(FASTCPD_FAMILIES, family)) {
-    theta_hat.col(0) = segment_theta_hat.row(0).t();
-    theta_sum.col(0) = segment_theta_hat.row(0).t();
-    hessian.slice(0) = zeros<mat>(p, p);
-  }
-}
-
-void Fastcpd::update_fastcpd_parameters(const unsigned int t) {
-  // for tau = t-1
-  rowvec new_data = data.row(t - 1).tail(data.n_cols - 1);
-  const int segment_index = segment_indices(t - 1);
-  rowvec cum_coef_add = segment_theta_hat.row(segment_index - 1),
-             coef_add = segment_theta_hat.row(segment_index - 1);
-  mat hessian_new;
-  if (family == "binomial") {
-    const double prob = 1 / (1 + exp(-as_scalar(coef_add * new_data.t())));
-    hessian_new = (new_data.t() * new_data) * as_scalar(prob * (1 - prob));
-  } else if (family == "poisson") {
-    coef_add = clamp(coef_add, winsorise_minval, winsorise_maxval);
-    cum_coef_add = clamp(coef_add, winsorise_minval, winsorise_maxval);
-    hessian_new =
-        (new_data.t() * new_data) * as_scalar(
-          exp(coef_add * new_data.t())
-        );
-  } else if (family == "lasso" || family == "gaussian") {
-    hessian_new = new_data.t() * new_data + epsilon * eye<mat>(p, p);
-  } else if (family == "arma") {
-    hessian_new = cost_update_hessian(data.rows(0, t - 1), coef_add.t());
-  } else if (!contain(FASTCPD_FAMILIES, family)) {
-    hessian_new = zeros<mat>(p, p);
-  }
-
-  update_theta_hat(coef_add.t());
-  update_theta_sum(cum_coef_add.t());
-  update_hessian(hessian_new);
-}
-
-void Fastcpd::create_cost_function_wrapper(Nullable<Function> cost) {
-  DEBUG_RCOUT(family);
-  if (contain(FASTCPD_FAMILIES, family)) {
-    cost_function_wrapper = std::bind(  // # nocov start
-      &Fastcpd::negative_log_likelihood,  // # nocov end
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2,
-      std::placeholders::_3,
-      std::placeholders::_4,
-      std::placeholders::_5
-    );
-  } else {
-    fastcpd::classes::CostFunction costFunction(cost.get());
-    cost_function_wrapper = costFunction;
-  }
-}
-
-void Fastcpd::create_cost_gradient_wrapper(Nullable<Function> cost_gradient) {
-  if (contain(FASTCPD_FAMILIES, family)) {
-    cost_gradient_wrapper = std::bind(  // # nocov start
-      &Fastcpd::cost_update_gradient,  // # nocov end
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2
-    );
-  } else if (cost_gradient.isNotNull()) {
-    fastcpd::classes::CostGradient costGradient(cost_gradient.get());
-    cost_gradient_wrapper = costGradient;
-  } else if (cost_gradient.isNull()) {
-    // `cost_gradient` can be `NULL` in the case of vanilla PELT.
-  } else {
-    // # nocov start
-    stop("This branch should not be reached at classes.cc: 290.");
-    // # nocov end
-  }
-}
-
-void Fastcpd::create_cost_hessian_wrapper(Nullable<Function> cost_hessian) {
-  if (contain(FASTCPD_FAMILIES, family)) {
-    cost_hessian_wrapper = std::bind(  // # nocov start
-      &Fastcpd::cost_update_hessian,  // # nocov end
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2
-    );
-  } else if (cost_hessian.isNotNull()) {
-    fastcpd::classes::CostHessian costHessian(cost_hessian.get());
-    cost_hessian_wrapper = costHessian;
-  } else if (cost_hessian.isNull()) {
-    // `cost_hessian` can be `NULL` in the case of vanilla PELT.
-  } else {
-    // # nocov start
-    stop("This branch should not be reached at classes.cc: 304.");
-    // # nocov end
-  }
-}
-
 void Fastcpd::update_cost_parameters(
   const unsigned int t,
   const unsigned int tau,
@@ -755,77 +797,38 @@ void Fastcpd::update_cost_parameters_step(
   hessian.slice(i - 1) = std::move(hessian_i);
 }
 
-double Fastcpd::adjust_cost_value(
-  double value,
-  const unsigned int nrows
-) {
-  if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
-    value += data.n_cols * std::log(nrows) / 2;
+void Fastcpd::update_fastcpd_parameters(const unsigned int t) {
+  // for tau = t-1
+  rowvec new_data = data.row(t - 1).tail(data.n_cols - 1);
+  const int segment_index = segment_indices(t - 1);
+  rowvec cum_coef_add = segment_theta_hat.row(segment_index - 1),
+             coef_add = segment_theta_hat.row(segment_index - 1);
+  mat hessian_new;
+  if (family == "binomial") {
+    const double prob = 1 / (1 + exp(-as_scalar(coef_add * new_data.t())));
+    hessian_new = (new_data.t() * new_data) * as_scalar(prob * (1 - prob));
+  } else if (family == "poisson") {
+    coef_add = clamp(coef_add, winsorise_minval, winsorise_maxval);
+    cum_coef_add = clamp(coef_add, winsorise_minval, winsorise_maxval);
+    hessian_new =
+        (new_data.t() * new_data) * as_scalar(
+          exp(coef_add * new_data.t())
+        );
+  } else if (family == "lasso" || family == "gaussian") {
+    hessian_new = new_data.t() * new_data + epsilon * eye<mat>(p, p);
+  } else if (family == "arma") {
+    hessian_new = cost_update_hessian(data.rows(0, t - 1), coef_add.t());
+  } else if (!contain(FASTCPD_FAMILIES, family)) {
+    hessian_new = zeros<mat>(p, p);
   }
-  if (cost_adjustment == "MDL") {
-    value *= std::log2(M_E);
-  }
-  return value;
+
+  update_theta_hat(coef_add.t());
+  update_theta_sum(cum_coef_add.t());
+  update_hessian(hessian_new);
 }
 
-List Fastcpd::get_optimized_cost(const mat data_segment) {
-  Function cost_ = cost.get();
-  List cost_optim_result;
-  if (cost_gradient.isNull() && cost_hessian.isNull()) {
-    cost_optim_result = List::create(
-      Named("par") = R_NilValue,
-      Named("value") = cost_(data_segment),
-      Named("residuals") = R_NilValue
-    );
-  } else if (p == 1) {
-    Environment stats = Environment::namespace_env("stats");
-    Function optim = stats["optim"];
-    List optim_result = optim(
-      Named("par") = 0,
-      Named("fn") = InternalFunction(
-        +[](double theta, mat data, Function cost_) {
-          return cost_(
-            Named("data") = data,
-            Named("theta") = std::log(theta / (1 - theta))
-          );
-        }
-      ),
-      Named("method") = "Brent",
-      Named("lower") = 0,
-      Named("upper") = 1,
-      Named("data") = data_segment,
-      Named("cost") = cost_
-    );
-    cost_optim_result = List::create(
-      Named("par") = std::log(
-        as<double>(optim_result["par"]) / (1 - as<double>(optim_result["par"]))
-      ),
-      Named("value") = exp(as<double>(optim_result["value"])) /
-        (1 + exp(as<double>(optim_result["value"]))),
-      Named("residuals") = R_NilValue
-    );
-  } else if (p > 1) {
-    Environment stats = Environment::namespace_env("stats");
-    Function optim = stats["optim"];
-    List optim_result = optim(
-      Named("par") = zeros<vec>(p),
-      Named("fn") = cost_,
-      Named("method") = "L-BFGS-B",
-      Named("data") = data_segment,
-      Named("lower") = lower,
-      Named("upper") = upper
-    );
-    cost_optim_result = List::create(
-      Named("par") = optim_result["par"],
-      Named("value") = optim_result["value"],
-      Named("residuals") = R_NilValue
-    );
-  } else {
-    // # nocov start
-    stop("This branch should not be reached at classes.cc: 945.");
-    // # nocov end
-  }
-  return cost_optim_result;
+void Fastcpd::update_momentum(colvec new_momentum) {
+  momentum = new_momentum;
 }
 
 }  // namespace fastcpd::classes
