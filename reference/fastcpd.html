@@ -71,7 +71,7 @@ parameters and returns a <code>fastcpd</code> object.</p>
 <span>  <span class="va">data</span>,</span>
 <span>  beta <span class="op">=</span> <span class="st">"MBIC"</span>,</span>
 <span>  segment_count <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  trim <span class="op">=</span> <span class="fl">0.025</span>,</span>
+<span>  trim <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  momentum_coef <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  multiple_epochs <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fl">0</span>,</span>
 <span>  family <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -80,6 +80,7 @@ parameters and returns a <code>fastcpd</code> object.</p>
 <span>  winsorise_minval <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>,</span>
 <span>  winsorise_maxval <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
+<span>  pruning <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>  cost <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cost_gradient <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -216,6 +217,13 @@ to be winsorised.</p></dd>
 covariates will be inferred from the data, i.e.,
 <code>p = ncol(data) - 1</code>. This parameter is superseded by <code>order</code> in the
 case of time series models: "ar", "var", "arima".</p></dd>
+
+
+<dt>pruning</dt>
+<dd><p>If <code>TRUE</code>, the algorithm will perform pruning on the
+change points. By default, the value is set to be <code>TRUE</code>. Pruning
+should be set to be <code>FALSE</code> if the pruning condition is not
+satisfied.</p></dd>
 
 
 <dt>order</dt>
