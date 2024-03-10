@@ -9,7 +9,7 @@ fastcpd(
   data,
   beta = "MBIC",
   segment_count = 10,
-  trim = 0.025,
+  trim = 0.02,
   momentum_coef = 0,
   multiple_epochs = function(x) 0,
   family = NULL,
