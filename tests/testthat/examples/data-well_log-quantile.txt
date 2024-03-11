@@ -5,9 +5,9 @@ for (package in c("ggplot2", "matrixStats")) {
   )
 }
 
-sigma_ <- sqrt(c(variance.mean(well_log)))
+sigma2 <- variance.median(well_log)
 median_loss <- function(data) {
-  sum(abs(data - matrixStats::colMedians(data))) / sigma_ / 2
+  sum(abs(data - matrixStats::colMedians(data))) / sqrt(sigma2) / 2
 }
 result <- fastcpd(
   formula = ~ x - 1,
