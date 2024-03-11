@@ -285,7 +285,7 @@ void Fastcpd::create_segment_statistics() {
     int segment_index = 0; segment_index < segment_count; ++segment_index
   ) {
     DEBUG_RCOUT(segment_index);
-    ucolvec segment_indices_ = arma::find(segment_indices == segment_index + 1);
+    ucolvec segment_indices_ = find(segment_indices == segment_index + 1);
     mat data_segment = data.rows(segment_indices_);
     rowvec segment_theta;
     if (!contain(FASTCPD_FAMILIES, family)) {
@@ -441,7 +441,7 @@ List Fastcpd::run() {
 
   for (int t = 1; t <= n; t++) {
     colvec new_fvec = fvec(t - 1) + cmat.col(t - 1) + beta;
-    ucolvec f_t_condition = arma::find(new_fvec < fvec);
+    ucolvec f_t_condition = find(new_fvec < fvec);
     if (f_t_condition.n_elem > 0) {
       fvec.rows(f_t_condition) = new_fvec.rows(f_t_condition);
       tau_stars.rows(f_t_condition) = (t - 1) * ones<vec>(f_t_condition.n_elem);
@@ -540,10 +540,10 @@ List Fastcpd::run() {
     DEBUG_RCOUT(cp_sets[t]);
 
     // Pruning step.
-    double c0 = 0;
+    double convexity_coef = 0;
 
-    ucolvec pruned_left =
-      pruning ? arma::find(cval + fvec.rows(r_t_set) + c0 <= min_obj) : r_t_set;
+    ucolvec pruned_left = pruning ?
+      find(cval + fvec.rows(r_t_set) + convexity_coef <= min_obj) : r_t_set;
     DEBUG_RCOUT(pruned_left);
     ucolvec pruned_r_t_set = zeros<ucolvec>(pruned_left.n_elem + 1);
     DEBUG_RCOUT(pruned_r_t_set);
@@ -576,8 +576,8 @@ List Fastcpd::run() {
   // Remove change points close to the boundaries.
   colvec raw_cp_set = cp_sets[n],
          cp_set = cp_sets[n];
-  cp_set = cp_set(arma::find(cp_set > trim * n));
-  cp_set = cp_set(arma::find(cp_set < (1 - trim) * n));
+  cp_set = cp_set(find(cp_set > trim * n));
+  cp_set = cp_set(find(cp_set < (1 - trim) * n));
   colvec cp_set_ = zeros<vec>(cp_set.n_elem + 1);
   if (cp_set.n_elem) {
     cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
@@ -585,21 +585,21 @@ List Fastcpd::run() {
   cp_set = sort(unique(std::move(cp_set_)));
 
   // Remove change points close to each other.
-  ucolvec cp_set_too_close = arma::find(diff(cp_set) <= trim * n);
+  ucolvec cp_set_too_close = find(diff(cp_set) <= trim * n);
   if (cp_set_too_close.n_elem > 0) {
     int rest_element_count = cp_set.n_elem - cp_set_too_close.n_elem;
     colvec cp_set_rest_left = zeros<vec>(rest_element_count),
           cp_set_rest_right = zeros<vec>(rest_element_count);
     for (unsigned int i = 0, i_left = 0, i_right = 0; i < cp_set.n_elem; i++) {
       if (
-        ucolvec left_find = arma::find(cp_set_too_close == i);
+        ucolvec left_find = find(cp_set_too_close == i);
         left_find.n_elem == 0
       ) {
         cp_set_rest_left(i_left) = cp_set(i);
         i_left++;
       }
       if (
-        ucolvec right_find = arma::find(cp_set_too_close == i - 1);
+        ucolvec right_find = find(cp_set_too_close == i - 1);
         right_find.n_elem == 0
       ) {
         cp_set_rest_right(i_right) = cp_set(i);
@@ -608,7 +608,7 @@ List Fastcpd::run() {
     }
     cp_set = floor((cp_set_rest_left + cp_set_rest_right) / 2);
   }
-  cp_set = cp_set(arma::find(cp_set > 0));
+  cp_set = cp_set(find(cp_set > 0));
 
   if (cp_only) {
     return List::create(

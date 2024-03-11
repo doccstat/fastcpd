@@ -17,6 +17,7 @@ using ::arma::clamp;
 using ::arma::cov;
 using ::arma::diff;
 using ::arma::dot;
+using ::arma::find;
 using ::arma::eye;
 using ::arma::floor;
 using ::arma::index_min;
