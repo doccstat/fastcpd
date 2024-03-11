@@ -82,13 +82,24 @@ double Fastcpd::adjust_cost_value(
   double value,
   const unsigned int nrows
 ) {
+  if (cost_adjustment == "MDL") {
+    value = value * std::log2(M_E);
+  }
+  return value + get_cost_adjustment_value(nrows);
+}
+
+double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
+  if (nrows == 0) {
+    return 0;
+  }
+  double adjusted = 0;
   if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
-    value += data.n_cols * std::log(nrows) / 2;
+    adjusted = data.n_cols * std::log(nrows) / 2;
   }
   if (cost_adjustment == "MDL") {
-    value *= std::log2(M_E);
+    adjusted *= std::log2(M_E);
   }
-  return value;
+  return adjusted;
 }
 
 List Fastcpd::get_optimized_cost(const mat data_segment) {
@@ -529,8 +540,10 @@ List Fastcpd::run() {
     DEBUG_RCOUT(cp_sets[t]);
 
     // Pruning step.
+    double c0 = 0;
+
     ucolvec pruned_left =
-      pruning ? arma::find(cval + fvec.rows(r_t_set) <= min_obj) : r_t_set;
+      pruning ? arma::find(cval + fvec.rows(r_t_set) + c0 <= min_obj) : r_t_set;
     DEBUG_RCOUT(pruned_left);
     ucolvec pruned_r_t_set = zeros<ucolvec>(pruned_left.n_elem + 1);
     DEBUG_RCOUT(pruned_r_t_set);
