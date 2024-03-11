@@ -168,3 +168,25 @@ variance_mean <- function(data) {
 #' @rdname variance_mean
 #' @export
 variance.mean <- variance_mean  # nolint: Conventional R function style
+
+#' @title Variance estimation for median change models
+#'
+#' @description Implement Rice estimator.
+#'
+#' @example tests/testthat/examples/variance_median.R
+#'
+#' @md
+#'
+#' @param data A vector of data points.
+#'
+#' @return A numeric value representing the variance.
+#'
+#' @rdname variance_median
+#' @export
+variance_median <- function(data) {
+  2 * (2 * mean(abs(diff(c(data)))) / 3)^2
+}
+
+#' @rdname variance_median
+#' @export
+variance.median <- variance_median  # nolint: Conventional R function style

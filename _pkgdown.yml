@@ -60,6 +60,7 @@ reference:
       - variance_arma
       - variance_lm
       - variance_mean
+      - variance_median
       - plot.fastcpd
       - print.fastcpd
       - show.fastcpd
