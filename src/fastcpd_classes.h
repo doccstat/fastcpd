@@ -101,6 +101,8 @@ class Fastcpd {
   // Initialize theta_hat_t_t to be the estimate in the segment.
   void create_segment_statistics();
 
+  double get_cost_adjustment_value(const unsigned nrows);
+
   // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   //
   // @param data_segment A data frame containing a segment of the data.
