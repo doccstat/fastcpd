@@ -40,6 +40,7 @@ using ::arma::trace;
 using ::arma::unique;
 using ::arma::zeros;
 using ::Rcpp::as;
+using ::Rcpp::checkUserInterrupt;
 using ::Rcpp::Named;
 using ::Rcpp::stop;
 using ::Rcpp::wrap;
@@ -52,16 +53,16 @@ using ::arma::span;
 using ::arma::ucolvec;
 using ::arma::uvec;
 using ::arma::vec;
-using ::Rcpp::checkUserInterrupt;
 using ::Rcpp::Environment;
 using ::Rcpp::Function;
 using ::Rcpp::InternalFunction;
 using ::Rcpp::List;
 using ::Rcpp::Nullable;
 using ::Rcpp::NumericVector;
-using ::Rcpp::Rcout;
 using ::Rcpp::S4;
 using ::std::function;
 using ::std::string;
+
+using ::Rcpp::Rcout;
 
 #endif  // FASTCPD_TYPES_H_

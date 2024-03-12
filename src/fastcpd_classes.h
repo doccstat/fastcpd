@@ -20,7 +20,6 @@ class Fastcpd {
     Nullable<Function> k,
     colvec line_search,
     const colvec lower,
-    const double min_prob,
     const double momentum_coef,
     const colvec order,
     const int p,
@@ -49,9 +48,6 @@ class Fastcpd {
   //
   // @param data A data frame containing the data to be segmented.
   // @param theta Estimated theta from the previous iteration.
-  // @param family Family of the model.
-  // @param min_prob Minimum probability to avoid numerical issues.
-  // @param order Order of the time series models.
   //
   // @return Hessian at the current data.
   mat cost_update_hessian(mat data, colvec theta);
@@ -159,19 +155,10 @@ class Fastcpd {
   // @param k Number of epochs in SGD.
   // @param family Family of the model.
   // @param momentum Momentum from the previous iteration.
-  // @param momentum_coef Momentum coefficient to be applied to the current
-  //   momentum.
   // @param epsilon Epsilon to avoid numerical issues. Only used for binomial
   //   and poisson.
-  // @param min_prob Minimum probability to avoid numerical issues.
-  //   Only used for poisson.
   // @param lambda Lambda for L1 regularization. Only used for lasso.
-  // @param cost_gradient Gradient for custom cost function.
-  // @param cost_hessian Hessian for custom cost function.
-  // @param lower A vector containing the lower bounds for the parameters.
-  // @param upper A vector containing the upper bounds for the parameters.
   // @param line_search A vector containing the line search coefficients.
-  // @param order Order of the time series models.
   //
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   \code{hessian}, and \code{momentum}.
@@ -278,8 +265,6 @@ class Fastcpd {
 
   // Lower bound of the parameters to be estimated during the optimization.
   const colvec lower;
-
-  const double min_prob;
 
   // Momentum will be used in the update step if `momentum_coef` is not 0.
   colvec momentum;
