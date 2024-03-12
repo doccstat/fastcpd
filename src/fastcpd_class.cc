@@ -87,9 +87,6 @@ double Fastcpd::adjust_cost_value(
 }
 
 double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
-  if (nrows == 0) {
-    return 0;
-  }
   double adjusted = 0;
   if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
     adjusted = data.n_cols * std::log(nrows) / 2;
