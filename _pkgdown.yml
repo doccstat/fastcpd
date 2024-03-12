@@ -88,15 +88,14 @@ articles:
 - title: Examples
   navbar: ~
   contents:
-  - examples-custom-model
-  - examples-introductory
   - examples-advanced
+  - examples-custom-model
 
 - title: Comparison
   navbar: Comparison
   contents:
-  - comparison-pelt
   - comparison-packages
+  - comparison-pelt
 
 authors:
   Xingchi Li:
