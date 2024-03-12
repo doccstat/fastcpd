@@ -12,7 +12,7 @@ parameters and returns a fastcpd object."><meta property="og:image" content="htt
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,26 +70,25 @@ parameters and returns a <code>fastcpd</code> object.</p>
 <span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">data</span>,</span>
 <span>  beta <span class="op">=</span> <span class="st">"MBIC"</span>,</span>
+<span>  cost_adjustment <span class="op">=</span> <span class="st">"MBIC"</span>,</span>
+<span>  family <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cost <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cost_gradient <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cost_hessian <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  line_search <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,</span>
+<span>  lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="va">p</span><span class="op">)</span>,</span>
+<span>  upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">Inf</span>, <span class="va">p</span><span class="op">)</span>,</span>
 <span>  segment_count <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  trim <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  momentum_coef <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  multiple_epochs <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fl">0</span>,</span>
-<span>  family <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  epsilon <span class="op">=</span> <span class="fl">1e-10</span>,</span>
-<span>  min_prob <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="fl">10</span>,</span>
+<span>  order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>  p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
 <span>  pruning <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
-<span>  cost <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  cost_gradient <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  cost_hessian <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cp_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  vanilla_percentage <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  warm_start <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="va">p</span><span class="op">)</span>,</span>
-<span>  upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">Inf</span>, <span class="va">p</span><span class="op">)</span>,</span>
-<span>  line_search <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,</span>
-<span>  cost_adjustment <span class="op">=</span> <span class="st">"MBIC"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -131,6 +130,84 @@ traditional Bayesian Information Criterion. By default, Modified BIC
 criterion is used to obtain a proper value, i.e.,
 <code>beta = (p + 2) * log(nrow(data)) / 2</code> with adjusted cost
 function.</p></dd>
+
+
+<dt>cost_adjustment</dt>
+<dd><p>Cost adjustment criterion for the number of change
+points. Can be <code>"BIC"</code>, <code>"MBIC"</code>, <code>"MDL"</code> or NULL.
+By default, the cost adjustment criterion is set to be <code>"MBIC"</code>.
+MBIC and MDL modifies the cost function by adding a small negative
+term to the cost function. MDL then transforms the cost function to
+log2 based. BIC or NULL does not modify the cost function.</p></dd>
+
+
+<dt>family</dt>
+<dd><p>Family of the model. Can be <code>"lm"</code>, <code>"binomial"</code>,
+<code>"poisson"</code>, <code>"lasso"</code>, <code>"custom"</code>, <code>"ar"</code>,
+<code>"var"</code>, <code>"ma"</code>, <code>"arima"</code>, <code>"garch"</code> or
+<code>NULL</code>. For simplicity, user can also omit this parameter,
+indicating that they will be using their own cost functions. Omitting the
+parameter is the same as specifying the parameter to be <code>"custom"</code>
+or <code>NULL</code>, in which case, users must specify the cost function, with
+optional gradient and corresponding Hessian matrix functions.</p></dd>
+
+
+<dt>cost</dt>
+<dd><p>Cost function to be used. This and the following two parameters
+should not be specified at the same time with <code>family</code>. If not
+specified, the default is the negative log-likelihood for the
+corresponding family. Custom cost functions can be provided in the
+following two formats:</p><ul><li><p><code>cost = function(data) {...}</code></p></li>
+<li><p><code>cost = function(data, theta) {...}</code></p></li>
+</ul><p>In both methods, users should implement the cost value calculation based
+on the data provided, where the data parameter can be considered as a
+segment of the original data frame in the form of a matrix. The first
+method is used when the cost function has an explicit solution, in which
+case the cost function value can be calculated directly from the data.
+The second method is used when the cost function does not have an
+explicit solution, in which case the cost function value can be
+calculated from the data and the estimated parameters. In the case of
+only one <code>data</code> argument is provided, <code>fastcpd</code> performs the
+vanilla PELT algorithm since no parameter updating is performed.</p></dd>
+
+
+<dt>cost_gradient</dt>
+<dd><p>Gradient function for the custom cost function.
+Example usage:</p>
+<p></p><div class="sourceCode r"><pre><code><span>  <span class="va">cost_gradient</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">...</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">gradient</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span></code></pre><p></p></div>
+<p>The gradient function should take two parameters, the first one being a
+segment of the data in the format of a matrix, the second one being the
+estimated parameters. The gradient function should return the gradient of
+the cost function with respect to the data and parameters.</p></dd>
+
+
+<dt>cost_hessian</dt>
+<dd><p>Hessian function for the custom cost function. Similar to
+the gradient function, the Hessian function should take two parameters,
+the first one being a segment of the data in the format of a matrix, the
+second one being the estimated parameters. The Hessian function should
+return the Hessian matrix of the cost function with respect to the data
+and parameters.</p></dd>
+
+
+<dt>line_search</dt>
+<dd><p>If a vector of numeric values are provided, line
+search will be performed to find the optimal step size for each update.</p></dd>
+
+
+<dt>lower</dt>
+<dd><p>Lower bound for the parameters. Used to specify the
+domain of the parameter after each gradient descent step. If not specified,
+the lower bound will be set to be <code>-Inf</code> for all parameters.</p></dd>
+
+
+<dt>upper</dt>
+<dd><p>Upper bound for the parameters. Used to specify the
+domain of the parameter after each gradient descent step. If not specified,
+the upper bound will be set to be <code>Inf</code> for all parameters.</p></dd>
 
 
 <dt>segment_count</dt>
@@ -179,25 +256,13 @@ users to tune the performance of the algorithm if the result is not
 ideal. Details are discussed in the paper.</p></dd>
 
 
-<dt>family</dt>
-<dd><p>Family of the model. Can be <code>"lm"</code>, <code>"binomial"</code>,
-<code>"poisson"</code>, <code>"lasso"</code>, <code>"custom"</code>, <code>"ar"</code>,
-<code>"var"</code>, <code>"ma"</code>, <code>"arima"</code>, <code>"garch"</code> or
-<code>NULL</code>. For simplicity, user can also omit this parameter,
-indicating that they will be using their own cost functions. Omitting the
-parameter is the same as specifying the parameter to be <code>"custom"</code>
-or <code>NULL</code>, in which case, users must specify the cost function, with
-optional gradient and corresponding Hessian matrix functions.</p></dd>
-
-
 <dt>epsilon</dt>
 <dd><p>Epsilon to avoid numerical issues. Only used for the Hessian
 computation in Logistic Regression and Poisson Regression.</p></dd>
 
 
-<dt>min_prob</dt>
-<dd><p>Minimum probability to avoid numerical issues. Only used
-for Poisson Regression.</p></dd>
+<dt>order</dt>
+<dd><p>Order of the AR(p), VAR(p) or ARIMA(p, d, q) model.</p></dd>
 
 
 <dt>p</dt>
@@ -212,51 +277,6 @@ case of time series models: "ar", "var", "arima".</p></dd>
 change points. By default, the value is set to be <code>TRUE</code>. Pruning
 should be set to be <code>FALSE</code> if the pruning condition is not
 satisfied.</p></dd>
-
-
-<dt>order</dt>
-<dd><p>Order of the AR(p), VAR(p) or ARIMA(p, d, q) model.</p></dd>
-
-
-<dt>cost</dt>
-<dd><p>Cost function to be used. This and the following two parameters
-should not be specified at the same time with <code>family</code>. If not
-specified, the default is the negative log-likelihood for the
-corresponding family. Custom cost functions can be provided in the
-following two formats:</p><ul><li><p><code>cost = function(data) {...}</code></p></li>
-<li><p><code>cost = function(data, theta) {...}</code></p></li>
-</ul><p>In both methods, users should implement the cost value calculation based
-on the data provided, where the data parameter can be considered as a
-segment of the original data frame in the form of a matrix. The first
-method is used when the cost function has an explicit solution, in which
-case the cost function value can be calculated directly from the data.
-The second method is used when the cost function does not have an
-explicit solution, in which case the cost function value can be
-calculated from the data and the estimated parameters. In the case of
-only one <code>data</code> argument is provided, <code>fastcpd</code> performs the
-vanilla PELT algorithm since no parameter updating is performed.</p></dd>
-
-
-<dt>cost_gradient</dt>
-<dd><p>Gradient function for the custom cost function.
-Example usage:</p>
-<p></p><div class="sourceCode r"><pre><code><span>  <span class="va">cost_gradient</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">...</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">gradient</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span></code></pre><p></p></div>
-<p>The gradient function should take two parameters, the first one being a
-segment of the data in the format of a matrix, the second one being the
-estimated parameters. The gradient function should return the gradient of
-the cost function with respect to the data and parameters.</p></dd>
-
-
-<dt>cost_hessian</dt>
-<dd><p>Hessian function for the custom cost function. Similar to
-the gradient function, the Hessian function should take two parameters,
-the first one being a segment of the data in the format of a matrix, the
-second one being the estimated parameters. The Hessian function should
-return the Hessian matrix of the cost function with respect to the data
-and parameters.</p></dd>
 
 
 <dt>cp_only</dt>
@@ -291,32 +311,6 @@ processed through sequential gradient descent.</p></dd>
 <dd><p>If <code>TRUE</code>, the algorithm will use the estimated
 parameters from the previous segment as the initial value for the
 current segment. This parameter is only used for <code>"glm"</code> families.</p></dd>
-
-
-<dt>lower</dt>
-<dd><p>Lower bound for the parameters. Used to specify the
-domain of the parameter after each gradient descent step. If not specified,
-the lower bound will be set to be <code>-Inf</code> for all parameters.</p></dd>
-
-
-<dt>upper</dt>
-<dd><p>Upper bound for the parameters. Used to specify the
-domain of the parameter after each gradient descent step. If not specified,
-the upper bound will be set to be <code>Inf</code> for all parameters.</p></dd>
-
-
-<dt>line_search</dt>
-<dd><p>If a vector of numeric values are provided, line
-search will be performed to find the optimal step size for each update.</p></dd>
-
-
-<dt>cost_adjustment</dt>
-<dd><p>Cost adjustment criterion for the number of change
-points. Can be <code>"BIC"</code>, <code>"MBIC"</code>, <code>"MDL"</code> or NULL.
-By default, the cost adjustment criterion is set to be <code>"MBIC"</code>.
-MBIC and MDL modifies the cost function by adding a small negative
-term to the cost function. MDL then transforms the cost function to
-log2 based. BIC or NULL does not modify the cost function.</p></dd>
 
 
 <dt>...</dt>
@@ -477,9 +471,9 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_custom_two_epochs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = y ~ . - 1, data = data, multiple_epochs = function(segment_length) 1, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     epsilon = 1e-05, cost = logistic_loss, cost_gradient = logistic_loss_gradient, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     cost_hessian = logistic_loss_hessian)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = y ~ . - 1, data = data, cost = logistic_loss, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     cost_gradient = logistic_loss_gradient, cost_hessian = logistic_loss_hessian, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     multiple_epochs = function(segment_length) 1, epsilon = 1e-05)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 200 </span>

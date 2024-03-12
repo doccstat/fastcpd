@@ -39,7 +39,7 @@ logistic regression models.
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -181,9 +181,9 @@ results as the built-in logistic regression model.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = binomial_data, epsilon = 1e-05, </span></span>
-<span><span class="co">#&gt;     cost = logistic_loss, cost_gradient = logistic_gradient, </span></span>
-<span><span class="co">#&gt;     cost_hessian = logistic_hessian, r.progress = FALSE)</span></span>
+<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = binomial_data, cost = logistic_loss, </span></span>
+<span><span class="co">#&gt;     cost_gradient = logistic_gradient, cost_hessian = logistic_hessian, </span></span>
+<span><span class="co">#&gt;     epsilon = 1e-05, r.progress = FALSE)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
 <span><span class="co">#&gt; 22 125 </span></span>

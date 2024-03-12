@@ -37,7 +37,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -502,7 +502,7 @@ methods are plotted due to the un-retrievable change points.</p>
 <code class="sourceCode R"><span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
 <span>  <span class="va">mv_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
-<span><span class="co">#&gt;  [1] 1301  301  701 1794 1855 1986 1981 1769 1859 1779</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1]  301 1301 1986  701 1855 1794 1981 1769  709  713</span></span></code></pre></div>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -561,11 +561,11 @@ to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,]  701  701  701</span></span>
-<span><span class="co">#&gt;  [2,]  301  301  301</span></span>
-<span><span class="co">#&gt;  [3,]  616  128  NaN</span></span>
-<span><span class="co">#&gt;  [4,]  NaN  131  NaN</span></span>
-<span><span class="co">#&gt;  [5,]  NaN  309  NaN</span></span>
+<span><span class="co">#&gt;  [1,]  301  701  701</span></span>
+<span><span class="co">#&gt;  [2,]  701  301  301</span></span>
+<span><span class="co">#&gt;  [3,]  619  NaN  759</span></span>
+<span><span class="co">#&gt;  [4,]  NaN  NaN  790</span></span>
+<span><span class="co">#&gt;  [5,]  NaN  NaN  239</span></span>
 <span><span class="co">#&gt;  [6,]  NaN  NaN  NaN</span></span>
 <span><span class="co">#&gt;  [7,]  NaN  NaN  NaN</span></span>
 <span><span class="co">#&gt;  [8,]  NaN  NaN  NaN</span></span>
@@ -649,16 +649,16 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,] 1301  701 1301</span></span>
-<span><span class="co">#&gt;  [2,]  301 1301  301</span></span>
-<span><span class="co">#&gt;  [3,]  701  301  702</span></span>
-<span><span class="co">#&gt;  [4,] 1994  830 1924</span></span>
-<span><span class="co">#&gt;  [5,] 1905  807  833</span></span>
-<span><span class="co">#&gt;  [6,] 1912  869  769</span></span>
-<span><span class="co">#&gt;  [7,] 1962  887  845</span></span>
-<span><span class="co">#&gt;  [8,] 1824  874 1971</span></span>
-<span><span class="co">#&gt;  [9,] 1958  881  776</span></span>
-<span><span class="co">#&gt; [10,] 1978 1960 1880</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1,]  301  701 1301</span></span>
+<span><span class="co">#&gt;  [2,] 1301 1301  702</span></span>
+<span><span class="co">#&gt;  [3,]  701  301  301</span></span>
+<span><span class="co">#&gt;  [4,] 1994  881 1924</span></span>
+<span><span class="co">#&gt;  [5,] 1788  830  769</span></span>
+<span><span class="co">#&gt;  [6,] 1905  887  831</span></span>
+<span><span class="co">#&gt;  [7,] 1779 1960  794</span></span>
+<span><span class="co">#&gt;  [8,] 1984  825  845</span></span>
+<span><span class="co">#&gt;  [9,] 1912  807 1971</span></span>
+<span><span class="co">#&gt; [10,]  823 1980 1880</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="linear-regression-1">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression-1"></a>
