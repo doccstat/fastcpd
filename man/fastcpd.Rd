@@ -8,26 +8,25 @@ fastcpd(
   formula = y ~ . - 1,
   data,
   beta = "MBIC",
+  cost_adjustment = "MBIC",
+  family = NULL,
+  cost = NULL,
+  cost_gradient = NULL,
+  cost_hessian = NULL,
+  line_search = c(1),
+  lower = rep(-Inf, p),
+  upper = rep(Inf, p),
   segment_count = 10,
   trim = 0.02,
   momentum_coef = 0,
   multiple_epochs = function(x) 0,
-  family = NULL,
   epsilon = 1e-10,
-  min_prob = 10^10,
+  order = c(0, 0, 0),
   p = ncol(data) - 1,
   pruning = TRUE,
-  order = c(0, 0, 0),
-  cost = NULL,
-  cost_gradient = NULL,
-  cost_hessian = NULL,
   cp_only = FALSE,
   vanilla_percentage = 0,
   warm_start = FALSE,
-  lower = rep(-Inf, p),
-  upper = rep(Inf, p),
-  line_search = c(1),
-  cost_adjustment = "MBIC",
   ...
 )
 }
@@ -63,46 +62,12 @@ criterion is used to obtain a proper value, i.e.,
 \code{beta = (p + 2) * log(nrow(data)) / 2} with adjusted cost
 function.}
 
-\item{segment_count}{Number of segments for initial guess. If not specified,
-the initial guess on the number of segments is 10.}
-
-\item{trim}{Trimming for the boundary change points so that a change point
-close to the boundary will not be counted as a change point. This
-parameter also specifies the minimum distance between two change points.
-If.   several change points have mutual distances smaller than
-\code{trim * nrow(data)}, those change points will be merged into one
-single change point. The value of this parameter should be between
-0 and 1.}
-
-\item{momentum_coef}{Momentum coefficient to be applied to each update. This
-parameter is used when the loss function is bad-shaped so that
-maintaining a momentum from previous update is desired. Default value is
-0, meaning the algorithm doesn't maintain a momentum by default.}
-
-\item{multiple_epochs}{Function on number of epochs in SGD.
-\code{multiple_epochs} should be a function taking only a parameter
-\code{segment_length} meaning the current number of data
-points considered since last segmentaion. The return value of the
-function should be an integer indicating how many epochs should be
-performed apart from the default update. By default the function returns
-0, meaning no multiple epochs will be used to update the parameters.
-Example usage:
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{  multiple_epochs = function(segment_length) \{
-    if (segment_length < n / segment_count / 4 * 1) 3
-    else if (segment_length < n / segment_count / 4 * 2) 2
-    else if (segment_length < n / segment_count / 4 * 3) 1
-    else 0
-  \}
-}\if{html}{\out{</div>}}
-
-This function will perform 3 epochs for the first quarter of the data, 2
-epochs for the second quarter of the data, 1 epoch for the third quarter
-of the data and no multiple epochs for the last quarter of the data.
-Experiments show that performing multiple epochs will significantly
-affect the performance of the algorithm. This parameter is left for the
-users to tune the performance of the algorithm if the result is not
-ideal. Details are discussed in the paper.}
+\item{cost_adjustment}{Cost adjustment criterion for the number of change
+points. Can be \code{"BIC"}, \code{"MBIC"}, \code{"MDL"} or NULL.
+By default, the cost adjustment criterion is set to be \code{"MBIC"}.
+MBIC and MDL modifies the cost function by adding a small negative
+term to the cost function. MDL then transforms the cost function to
+log2 based. BIC or NULL does not modify the cost function.}
 
 \item{family}{Family of the model. Can be \code{"lm"}, \code{"binomial"},
 \code{"poisson"}, \code{"lasso"}, \code{"custom"}, \code{"ar"},
@@ -112,24 +77,6 @@ indicating that they will be using their own cost functions. Omitting the
 parameter is the same as specifying the parameter to be \code{"custom"}
 or \code{NULL}, in which case, users must specify the cost function, with
 optional gradient and corresponding Hessian matrix functions.}
-
-\item{epsilon}{Epsilon to avoid numerical issues. Only used for the Hessian
-computation in Logistic Regression and Poisson Regression.}
-
-\item{min_prob}{Minimum probability to avoid numerical issues. Only used
-for Poisson Regression.}
-
-\item{p}{Number of covariates in the model. If not specified, the number of
-covariates will be inferred from the data, i.e.,
-\code{p = ncol(data) - 1}. This parameter is superseded by \code{order} in the
-case of time series models: "ar", "var", "arima".}
-
-\item{pruning}{If \code{TRUE}, the algorithm will perform pruning on the
-change points. By default, the value is set to be \code{TRUE}. Pruning
-should be set to be \code{FALSE} if the pruning condition is not
-satisfied.}
-
-\item{order}{Order of the AR(p), VAR(p) or ARIMA(p, d, q) model.}
 
 \item{cost}{Cost function to be used. This and the following two parameters
 should not be specified at the same time with \code{family}. If not
@@ -173,6 +120,73 @@ second one being the estimated parameters. The Hessian function should
 return the Hessian matrix of the cost function with respect to the data
 and parameters.}
 
+\item{line_search}{If a vector of numeric values are provided, line
+search will be performed to find the optimal step size for each update.}
+
+\item{lower}{Lower bound for the parameters. Used to specify the
+domain of the parameter after each gradient descent step. If not specified,
+the lower bound will be set to be \code{-Inf} for all parameters.}
+
+\item{upper}{Upper bound for the parameters. Used to specify the
+domain of the parameter after each gradient descent step. If not specified,
+the upper bound will be set to be \code{Inf} for all parameters.}
+
+\item{segment_count}{Number of segments for initial guess. If not specified,
+the initial guess on the number of segments is 10.}
+
+\item{trim}{Trimming for the boundary change points so that a change point
+close to the boundary will not be counted as a change point. This
+parameter also specifies the minimum distance between two change points.
+If.   several change points have mutual distances smaller than
+\code{trim * nrow(data)}, those change points will be merged into one
+single change point. The value of this parameter should be between
+0 and 1.}
+
+\item{momentum_coef}{Momentum coefficient to be applied to each update. This
+parameter is used when the loss function is bad-shaped so that
+maintaining a momentum from previous update is desired. Default value is
+0, meaning the algorithm doesn't maintain a momentum by default.}
+
+\item{multiple_epochs}{Function on number of epochs in SGD.
+\code{multiple_epochs} should be a function taking only a parameter
+\code{segment_length} meaning the current number of data
+points considered since last segmentaion. The return value of the
+function should be an integer indicating how many epochs should be
+performed apart from the default update. By default the function returns
+0, meaning no multiple epochs will be used to update the parameters.
+Example usage:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{  multiple_epochs = function(segment_length) \{
+    if (segment_length < n / segment_count / 4 * 1) 3
+    else if (segment_length < n / segment_count / 4 * 2) 2
+    else if (segment_length < n / segment_count / 4 * 3) 1
+    else 0
+  \}
+}\if{html}{\out{</div>}}
+
+This function will perform 3 epochs for the first quarter of the data, 2
+epochs for the second quarter of the data, 1 epoch for the third quarter
+of the data and no multiple epochs for the last quarter of the data.
+Experiments show that performing multiple epochs will significantly
+affect the performance of the algorithm. This parameter is left for the
+users to tune the performance of the algorithm if the result is not
+ideal. Details are discussed in the paper.}
+
+\item{epsilon}{Epsilon to avoid numerical issues. Only used for the Hessian
+computation in Logistic Regression and Poisson Regression.}
+
+\item{order}{Order of the AR(p), VAR(p) or ARIMA(p, d, q) model.}
+
+\item{p}{Number of covariates in the model. If not specified, the number of
+covariates will be inferred from the data, i.e.,
+\code{p = ncol(data) - 1}. This parameter is superseded by \code{order} in the
+case of time series models: "ar", "var", "arima".}
+
+\item{pruning}{If \code{TRUE}, the algorithm will perform pruning on the
+change points. By default, the value is set to be \code{TRUE}. Pruning
+should be set to be \code{FALSE} if the pruning condition is not
+satisfied.}
+
 \item{cp_only}{If \code{TRUE}, only the change points are returned.
 Otherwise, the cost function values together with the estimated
 parameters for each segment are also returned. By default the value is
@@ -200,24 +214,6 @@ processed through sequential gradient descent.}
 \item{warm_start}{If \code{TRUE}, the algorithm will use the estimated
 parameters from the previous segment as the initial value for the
 current segment. This parameter is only used for \code{"glm"} families.}
-
-\item{lower}{Lower bound for the parameters. Used to specify the
-domain of the parameter after each gradient descent step. If not specified,
-the lower bound will be set to be \code{-Inf} for all parameters.}
-
-\item{upper}{Upper bound for the parameters. Used to specify the
-domain of the parameter after each gradient descent step. If not specified,
-the upper bound will be set to be \code{Inf} for all parameters.}
-
-\item{line_search}{If a vector of numeric values are provided, line
-search will be performed to find the optimal step size for each update.}
-
-\item{cost_adjustment}{Cost adjustment criterion for the number of change
-points. Can be \code{"BIC"}, \code{"MBIC"}, \code{"MDL"} or NULL.
-By default, the cost adjustment criterion is set to be \code{"MBIC"}.
-MBIC and MDL modifies the cost function by adding a small negative
-term to the cost function. MDL then transforms the cost function to
-log2 based. BIC or NULL does not modify the cost function.}
 
 \item{...}{Parameters specifically used for time series models. The following
 parameters will not be ignored:

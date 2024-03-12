@@ -11,7 +11,6 @@ List fastcpd_impl(
     Nullable<Function> k,
     const string family,
     const double epsilon,
-    const double min_prob,
     const int p,
     const bool pruning,
     const colvec order,
@@ -31,7 +30,7 @@ List fastcpd_impl(
   DEBUG_RCOUT(beta);
   fastcpd::classes::Fastcpd fastcpd_class(
     beta, cost, cost_adjustment, cost_gradient, cost_hessian, cp_only, data,
-    epsilon, family, k, line_search, lower, min_prob, momentum_coef, order, p,
+    epsilon, family, k, line_search, lower, momentum_coef, order, p,
     pruning, p_response, r_progress, segment_count, trim, upper,
     vanilla_percentage, variance_estimate, warm_start
   );

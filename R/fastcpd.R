@@ -47,42 +47,12 @@
 #'   criterion is used to obtain a proper value, i.e.,
 #'   \code{beta = (p + 2) * log(nrow(data)) / 2} with adjusted cost
 #'   function.
-#' @param segment_count Number of segments for initial guess. If not specified,
-#'   the initial guess on the number of segments is 10.
-#' @param trim Trimming for the boundary change points so that a change point
-#'   close to the boundary will not be counted as a change point. This
-#'   parameter also specifies the minimum distance between two change points.
-#'   If.   several change points have mutual distances smaller than
-#'   \code{trim * nrow(data)}, those change points will be merged into one
-#'   single change point. The value of this parameter should be between
-#'   0 and 1.
-#' @param momentum_coef Momentum coefficient to be applied to each update. This
-#'   parameter is used when the loss function is bad-shaped so that
-#'   maintaining a momentum from previous update is desired. Default value is
-#'   0, meaning the algorithm doesn't maintain a momentum by default.
-#' @param multiple_epochs Function on number of epochs in SGD.
-#'   \code{multiple_epochs} should be a function taking only a parameter
-#'   \code{segment_length} meaning the current number of data
-#'   points considered since last segmentaion. The return value of the
-#'   function should be an integer indicating how many epochs should be
-#'   performed apart from the default update. By default the function returns
-#'   0, meaning no multiple epochs will be used to update the parameters.
-#'   Example usage:
-#'   ```r
-#'     multiple_epochs = function(segment_length) {
-#'       if (segment_length < n / segment_count / 4 * 1) 3
-#'       else if (segment_length < n / segment_count / 4 * 2) 2
-#'       else if (segment_length < n / segment_count / 4 * 3) 1
-#'       else 0
-#'     }
-#'   ```
-#'   This function will perform 3 epochs for the first quarter of the data, 2
-#'   epochs for the second quarter of the data, 1 epoch for the third quarter
-#'   of the data and no multiple epochs for the last quarter of the data.
-#'   Experiments show that performing multiple epochs will significantly
-#'   affect the performance of the algorithm. This parameter is left for the
-#'   users to tune the performance of the algorithm if the result is not
-#'   ideal. Details are discussed in the paper.
+#' @param cost_adjustment Cost adjustment criterion for the number of change
+#'   points. Can be \code{"BIC"}, \code{"MBIC"}, \code{"MDL"} or NULL.
+#'   By default, the cost adjustment criterion is set to be \code{"MBIC"}.
+#'   MBIC and MDL modifies the cost function by adding a small negative
+#'   term to the cost function. MDL then transforms the cost function to
+#'   log2 based. BIC or NULL does not modify the cost function.
 #' @param family Family of the model. Can be \code{"lm"}, \code{"binomial"},
 #'   \code{"poisson"}, \code{"lasso"}, \code{"custom"}, \code{"ar"},
 #'   \code{"var"}, \code{"ma"}, \code{"arima"}, \code{"garch"} or
@@ -91,19 +61,6 @@
 #'   parameter is the same as specifying the parameter to be \code{"custom"}
 #'   or \code{NULL}, in which case, users must specify the cost function, with
 #'   optional gradient and corresponding Hessian matrix functions.
-#' @param epsilon Epsilon to avoid numerical issues. Only used for the Hessian
-#'   computation in Logistic Regression and Poisson Regression.
-#' @param min_prob Minimum probability to avoid numerical issues. Only used
-#'   for Poisson Regression.
-#' @param p Number of covariates in the model. If not specified, the number of
-#'   covariates will be inferred from the data, i.e.,
-#'   \code{p = ncol(data) - 1}. This parameter is superseded by `order` in the
-#'   case of time series models: "ar", "var", "arima".
-#' @param pruning If \code{TRUE}, the algorithm will perform pruning on the
-#'   change points. By default, the value is set to be \code{TRUE}. Pruning
-#'   should be set to be \code{FALSE} if the pruning condition is not
-#'   satisfied.
-#' @param order Order of the AR(p), VAR(p) or ARIMA(p, d, q) model.
 #' @param cost Cost function to be used. This and the following two parameters
 #'   should not be specified at the same time with \code{family}. If not
 #'   specified, the default is the negative log-likelihood for the
@@ -141,6 +98,61 @@
 #'   second one being the estimated parameters. The Hessian function should
 #'   return the Hessian matrix of the cost function with respect to the data
 #'   and parameters.
+#' @param line_search If a vector of numeric values are provided, line
+#'   search will be performed to find the optimal step size for each update.
+#' @param lower Lower bound for the parameters. Used to specify the
+#'   domain of the parameter after each gradient descent step. If not specified,
+#'   the lower bound will be set to be \code{-Inf} for all parameters.
+#' @param upper Upper bound for the parameters. Used to specify the
+#'   domain of the parameter after each gradient descent step. If not specified,
+#'   the upper bound will be set to be \code{Inf} for all parameters.
+#' @param segment_count Number of segments for initial guess. If not specified,
+#'   the initial guess on the number of segments is 10.
+#' @param trim Trimming for the boundary change points so that a change point
+#'   close to the boundary will not be counted as a change point. This
+#'   parameter also specifies the minimum distance between two change points.
+#'   If.   several change points have mutual distances smaller than
+#'   \code{trim * nrow(data)}, those change points will be merged into one
+#'   single change point. The value of this parameter should be between
+#'   0 and 1.
+#' @param momentum_coef Momentum coefficient to be applied to each update. This
+#'   parameter is used when the loss function is bad-shaped so that
+#'   maintaining a momentum from previous update is desired. Default value is
+#'   0, meaning the algorithm doesn't maintain a momentum by default.
+#' @param multiple_epochs Function on number of epochs in SGD.
+#'   \code{multiple_epochs} should be a function taking only a parameter
+#'   \code{segment_length} meaning the current number of data
+#'   points considered since last segmentaion. The return value of the
+#'   function should be an integer indicating how many epochs should be
+#'   performed apart from the default update. By default the function returns
+#'   0, meaning no multiple epochs will be used to update the parameters.
+#'   Example usage:
+#'   ```r
+#'     multiple_epochs = function(segment_length) {
+#'       if (segment_length < n / segment_count / 4 * 1) 3
+#'       else if (segment_length < n / segment_count / 4 * 2) 2
+#'       else if (segment_length < n / segment_count / 4 * 3) 1
+#'       else 0
+#'     }
+#'   ```
+#'   This function will perform 3 epochs for the first quarter of the data, 2
+#'   epochs for the second quarter of the data, 1 epoch for the third quarter
+#'   of the data and no multiple epochs for the last quarter of the data.
+#'   Experiments show that performing multiple epochs will significantly
+#'   affect the performance of the algorithm. This parameter is left for the
+#'   users to tune the performance of the algorithm if the result is not
+#'   ideal. Details are discussed in the paper.
+#' @param epsilon Epsilon to avoid numerical issues. Only used for the Hessian
+#'   computation in Logistic Regression and Poisson Regression.
+#' @param order Order of the AR(p), VAR(p) or ARIMA(p, d, q) model.
+#' @param p Number of covariates in the model. If not specified, the number of
+#'   covariates will be inferred from the data, i.e.,
+#'   \code{p = ncol(data) - 1}. This parameter is superseded by `order` in the
+#'   case of time series models: "ar", "var", "arima".
+#' @param pruning If \code{TRUE}, the algorithm will perform pruning on the
+#'   change points. By default, the value is set to be \code{TRUE}. Pruning
+#'   should be set to be \code{FALSE} if the pruning condition is not
+#'   satisfied.
 #' @param cp_only If \code{TRUE}, only the change points are returned.
 #'   Otherwise, the cost function values together with the estimated
 #'   parameters for each segment are also returned. By default the value is
@@ -166,20 +178,6 @@
 #' @param warm_start If \code{TRUE}, the algorithm will use the estimated
 #'   parameters from the previous segment as the initial value for the
 #'   current segment. This parameter is only used for \code{"glm"} families.
-#' @param lower Lower bound for the parameters. Used to specify the
-#'   domain of the parameter after each gradient descent step. If not specified,
-#'   the lower bound will be set to be \code{-Inf} for all parameters.
-#' @param upper Upper bound for the parameters. Used to specify the
-#'   domain of the parameter after each gradient descent step. If not specified,
-#'   the upper bound will be set to be \code{Inf} for all parameters.
-#' @param line_search If a vector of numeric values are provided, line
-#'   search will be performed to find the optimal step size for each update.
-#' @param cost_adjustment Cost adjustment criterion for the number of change
-#'   points. Can be \code{"BIC"}, \code{"MBIC"}, \code{"MDL"} or NULL.
-#'   By default, the cost adjustment criterion is set to be \code{"MBIC"}.
-#'   MBIC and MDL modifies the cost function by adding a small negative
-#'   term to the cost function. MDL then transforms the cost function to
-#'   log2 based. BIC or NULL does not modify the cost function.
 #' @param ... Parameters specifically used for time series models. The following
 #'   parameters will not be ignored:
 #'
@@ -200,26 +198,25 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   formula = y ~ . - 1,
   data,
   beta = "MBIC",
+  cost_adjustment = "MBIC",
+  family = NULL,
+  cost = NULL,
+  cost_gradient = NULL,
+  cost_hessian = NULL,
+  line_search = c(1),
+  lower = rep(-Inf, p),
+  upper = rep(Inf, p),
   segment_count = 10,
   trim = 0.02,
   momentum_coef = 0,
   multiple_epochs = function(x) 0,
-  family = NULL,
   epsilon = 1e-10,
-  min_prob = 10^10,
+  order = c(0, 0, 0),
   p = ncol(data) - 1,
   pruning = TRUE,
-  order = c(0, 0, 0),
-  cost = NULL,
-  cost_gradient = NULL,
-  cost_hessian = NULL,
   cp_only = FALSE,
   vanilla_percentage = 0,
   warm_start = FALSE,
-  lower = rep(-Inf, p),
-  upper = rep(Inf, p),
-  line_search = c(1),
-  cost_adjustment = "MBIC",
   ...
 ) {
   # Check the validity of the `family` parameter.
@@ -333,7 +330,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   result <- fastcpd_impl(
     data_, beta, cost_adjustment, segment_count, trim, momentum_coef,
-    multiple_epochs, fastcpd_family, epsilon, min_prob, p, pruning, order, cost,
+    multiple_epochs, fastcpd_family, epsilon, p, pruning, order, cost,
     cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower,
     upper, line_search, sigma_, p_response, r_progress
   )

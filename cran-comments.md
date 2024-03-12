@@ -1,5 +1,14 @@
 ## Updates since last CRAN release (0.10.3)
 
+### fastcpd 0.12.1
+
+*   Remove useless C++ codes.
+*   Add more debug points in C++.
+*   Add more examples for data `well_log`.
+*   Add detection comparison for `well_log` data.
+*   Add a variance estimator for median change.
+*   Deprecate `winsorize_minval` and `winsorize_maxval`.
+
 ### fastcpd 0.12.0
 
 *   Add Rice estimation for ARMA model variance estimation.

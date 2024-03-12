@@ -318,7 +318,8 @@ mat Fastcpd::cost_update_hessian(mat data, colvec theta) {
     hessian = (x.t() * x) * as_scalar((1 - prob) * prob);
   } else if (family.compare("poisson") == 0) {
     double prob = exp(as_scalar(x * theta));
-    hessian = (x.t() * x) * std::min(as_scalar(prob), min_prob);
+    // Prevent numerical issues if `prob` is too large.
+    hessian = (x.t() * x) * std::min(as_scalar(prob), 1e10);
   } else if (family == "lasso" || family == "gaussian") {
     hessian = x.t() * x;
   } else if (family == "arma") {

@@ -17,8 +17,6 @@
 //   and its gradient (and Hessian).
 // @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
 //   poisson.
-// @param min_prob Minimum probability to avoid numerical issues. Only used for
-//   poisson.
 // @param p Number of parameters to be estimated.
 // @param pruning Whether to prune the change points.
 // @param order Order for time series models.
@@ -58,7 +56,6 @@ List fastcpd_impl(
     Nullable<Function> k,
     const string family,
     const double epsilon,
-    const double min_prob,
     const int p,
     const bool pruning,
     const colvec order,
