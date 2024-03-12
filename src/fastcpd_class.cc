@@ -75,6 +75,10 @@ Fastcpd::Fastcpd(
   momentum = vec(p);
   variance_data_mean = mean(data, 0);
 
+  create_cost_function_wrapper(cost);
+  create_cost_gradient_wrapper(cost_gradient);
+  create_cost_hessian_wrapper(cost_hessian);
+
   // TODO(doccstat): Store environment functions from R.
 }
 
@@ -394,11 +398,6 @@ List Fastcpd::run() {
     rProgress.tick(0);
   }
 
-  create_cost_function_wrapper(cost);
-  create_cost_gradient_wrapper(cost_gradient);
-  create_cost_hessian_wrapper(cost_hessian);
-  DEBUG_RCOUT(family);
-
   if (contain(FASTCPD_FAMILIES, family) || vanilla_percentage < 1) {
     create_segment_indices();
     create_segment_statistics();
@@ -485,7 +484,7 @@ List Fastcpd::run() {
           (family != "lasso" && t - tau >= p) ||
           (family == "lasso" && t - tau >= 3)
         ) {
-          List cost_result = negative_log_likelihood(
+          List cost_result = cost_function_wrapper(
             data_segment, wrap(theta), lambda, false, R_NilValue
           );
           cval(i - 1) = as<double>(cost_result["value"]);
@@ -500,14 +499,14 @@ List Fastcpd::run() {
         } else {
           if (warm_start && t - tau >= 10 * p) {
             cost_optim_result =
-              negative_log_likelihood(
+              cost_function_wrapper(
                 data_segment, R_NilValue, lambda, false,
                 wrap(segment_theta_hat[segment_indices(t - 1) - 1])
                 // Or use `wrap(start.col(tau))` for warm start.
             );
             start.col(tau) = as<colvec>(cost_optim_result["par"]);
           } else {
-            cost_optim_result = negative_log_likelihood(
+            cost_optim_result = cost_function_wrapper(
               data_segment, R_NilValue, lambda, false, R_NilValue
             );
           }
@@ -652,7 +651,7 @@ List Fastcpd::run() {
     if (!contain(FASTCPD_FAMILIES, family)) {
       cost_optim_result = get_optimized_cost(data_segment);
     } else {
-      cost_optim_result = negative_log_likelihood(
+      cost_optim_result = cost_function_wrapper(
         data_segment, R_NilValue, lambda, false, R_NilValue
       );
     }
