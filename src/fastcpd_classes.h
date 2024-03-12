@@ -32,9 +32,7 @@ class Fastcpd {
     const colvec upper,
     const double vanilla_percentage,
     const mat variance_estimate,
-    const bool warm_start,
-    const double winsorise_maxval,
-    const double winsorise_minval
+    const bool warm_start
   );
 
   // Function to calculate the gradient at the current data.
@@ -167,10 +165,6 @@ class Fastcpd {
   //   and poisson.
   // @param min_prob Minimum probability to avoid numerical issues.
   //   Only used for poisson.
-  // @param winsorise_minval Minimum value to be winsorised. Only used for
-  //   poisson.
-  // @param winsorise_maxval Maximum value to be winsorised. Only used for
-  //   poisson.
   // @param lambda Lambda for L1 regularization. Only used for lasso.
   // @param cost_gradient Gradient for custom cost function.
   // @param cost_hessian Hessian for custom cost function.
@@ -335,14 +329,6 @@ class Fastcpd {
   const mat variance_estimate;
 
   const bool warm_start;
-
-  // `winsorise_maxval` is the maximum value to be winsorised. Only used for
-  // poisson.
-  const double winsorise_maxval;
-
-  // `winsorise_minval` is the minimum value to be winsorised. Only used for
-  // poisson.
-  const double winsorise_minval;
 };
 
 class CostFunction {

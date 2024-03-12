@@ -15,8 +15,6 @@ fastcpd(
   family = NULL,
   epsilon = 1e-10,
   min_prob = 10^10,
-  winsorise_minval = -20,
-  winsorise_maxval = 20,
   p = ncol(data) - 1,
   pruning = TRUE,
   order = c(0, 0, 0),
@@ -120,12 +118,6 @@ computation in Logistic Regression and Poisson Regression.}
 
 \item{min_prob}{Minimum probability to avoid numerical issues. Only used
 for Poisson Regression.}
-
-\item{winsorise_minval}{Minimum value for the parameter in Poisson Regression
-to be winsorised.}
-
-\item{winsorise_maxval}{Maximum value for the parameter in Poisson Regression
-to be winsorised.}
 
 \item{p}{Number of covariates in the model. If not specified, the number of
 covariates will be inferred from the data, i.e.,

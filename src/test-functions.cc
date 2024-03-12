@@ -29,9 +29,7 @@ context("negative_log_likelihood_wo_theta Unit Test") {
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
       /* variance_estimate */ mat(),
-      /* warm_start */ false,
-      /* winsorise_maxval */ 0.0,
-      /* winsorise_minval */ 0.0
+      /* warm_start */ false
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
@@ -83,9 +81,7 @@ context("negative_log_likelihood_wo_cv Unit Test") {
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
       /* variance_estimate */ mat(),
-      /* warm_start */ false,
-      /* winsorise_maxval */ 0.0,
-      /* winsorise_minval */ 0.0
+      /* warm_start */ false
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
@@ -124,9 +120,7 @@ context("cost_update_gradient Unit Test") {
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
       /* variance_estimate */ mat(),
-      /* warm_start */ false,
-      /* winsorise_maxval */ 0.0,
-      /* winsorise_minval */ 0.0
+      /* warm_start */ false
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
@@ -165,9 +159,7 @@ context("cost_update_hessian Unit Test") {
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
       /* variance_estimate */ mat(),
-      /* warm_start */ false,
-      /* winsorise_maxval */ 0.0,
-      /* winsorise_minval */ 0.0
+      /* warm_start */ false
     );
 
     const mat data = {{1, 1, 0.2}};
@@ -204,9 +196,7 @@ context("cost_update_hessian Unit Test") {
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
       /* variance_estimate */ mat(),
-      /* warm_start */ false,
-      /* winsorise_maxval */ 0.0,
-      /* winsorise_minval */ 0.0
+      /* warm_start */ false
     );
 
     const mat data = {{4, 1, 0.2}};
@@ -243,9 +233,7 @@ context("cost_update_hessian Unit Test") {
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
       /* variance_estimate */ mat(),
-      /* warm_start */ false,
-      /* winsorise_maxval */ 0.0,
-      /* winsorise_minval */ 0.0
+      /* warm_start */ false
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
@@ -290,9 +278,7 @@ context("update_theta_sum Unit Test") {
       /* upper */ colvec(),
       /* vanilla_percentage */ 0.0,
       /* variance_estimate */ mat(),
-      /* warm_start */ false,
-      /* winsorise_maxval */ 0.0,
-      /* winsorise_minval */ 0.0
+      /* warm_start */ false
     );
     fastcpd_class.create_theta_sum(0, colvec({1, 2, 3}));
     fastcpd_class.update_theta_sum(0, colvec({4, 5, 6}));

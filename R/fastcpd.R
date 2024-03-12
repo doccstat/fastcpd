@@ -95,10 +95,6 @@
 #'   computation in Logistic Regression and Poisson Regression.
 #' @param min_prob Minimum probability to avoid numerical issues. Only used
 #'   for Poisson Regression.
-#' @param winsorise_minval Minimum value for the parameter in Poisson Regression
-#'   to be winsorised.
-#' @param winsorise_maxval Maximum value for the parameter in Poisson Regression
-#'   to be winsorised.
 #' @param p Number of covariates in the model. If not specified, the number of
 #'   covariates will be inferred from the data, i.e.,
 #'   \code{p = ncol(data) - 1}. This parameter is superseded by `order` in the
@@ -211,8 +207,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   family = NULL,
   epsilon = 1e-10,
   min_prob = 10^10,
-  winsorise_minval = -20,
-  winsorise_maxval = 20,
   p = ncol(data) - 1,
   pruning = TRUE,
   order = c(0, 0, 0),
@@ -339,10 +333,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   result <- fastcpd_impl(
     data_, beta, cost_adjustment, segment_count, trim, momentum_coef,
-    multiple_epochs, fastcpd_family, epsilon, min_prob, winsorise_minval,
-    winsorise_maxval, p, pruning, order, cost, cost_gradient, cost_hessian,
-    cp_only, vanilla_percentage, warm_start, lower, upper, line_search, sigma_,
-    p_response, r_progress
+    multiple_epochs, fastcpd_family, epsilon, min_prob, p, pruning, order, cost,
+    cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower,
+    upper, line_search, sigma_, p_response, r_progress
   )
 
   raw_cp_set <- c(result$raw_cp_set)

@@ -34,9 +34,7 @@ Fastcpd::Fastcpd(
     const colvec upper,
     const double vanilla_percentage,
     const mat variance_estimate,
-    const bool warm_start,
-    const double winsorise_maxval,
-    const double winsorise_minval
+    const bool warm_start
 ) : beta(beta),
     cost(cost),
     cost_adjustment(cost_adjustment),
@@ -61,9 +59,7 @@ Fastcpd::Fastcpd(
     upper(upper),
     vanilla_percentage(vanilla_percentage),
     variance_estimate(variance_estimate),
-    warm_start(warm_start),
-    winsorise_maxval(winsorise_maxval),
-    winsorise_minval(winsorise_minval) {
+    warm_start(warm_start) {
   n = data.n_rows;
   segment_indices = vec(n);
   segment_theta_hat = mat(segment_count, p);
@@ -239,12 +235,8 @@ void Fastcpd::create_gradients() {
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
     ) * as_scalar(prob * (1 - prob));
   } else if (family == "poisson") {
-    theta_hat.col(0) = clamp(
-      segment_theta_hat.row(0).t(), winsorise_minval, winsorise_maxval
-    );
-    theta_sum.col(0) = clamp(
-      segment_theta_hat.row(0).t(), winsorise_minval, winsorise_maxval
-    );
+    theta_hat.col(0) = segment_theta_hat.row(0).t();
+    theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian.slice(0) = (
       data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
     ) * as_scalar(
@@ -473,9 +465,6 @@ List Fastcpd::run() {
         update_cost_parameters(t, tau, i, k.get(), lambda, line_search);
         colvec theta = theta_sum.col(i - 1) / (t - tau);
         DEBUG_RCOUT(theta);
-        if (family == "poisson" && t - tau >= p) {
-          theta = clamp(theta, winsorise_minval, winsorise_maxval);
-        }
         if (!contain(FASTCPD_FAMILIES, family)) {
           Function cost_non_null = cost.get();
           SEXP cost_result = cost_non_null(data_segment, theta);
@@ -792,12 +781,7 @@ void Fastcpd::update_cost_parameters_step(
   theta_hat.col(i - 1) = arma::min(theta_hat.col(i - 1), upper);
   theta_hat.col(i - 1) = arma::max(theta_hat.col(i - 1), lower);
 
-  // Winsorize if family is Poisson
-  if (family == "poisson") {
-    theta_hat.col(i - 1) = clamp(
-      theta_hat.col(i - 1), winsorise_minval, winsorise_maxval
-    );
-  } else if (family == "lasso" || family == "gaussian") {
+  if (family == "lasso" || family == "gaussian") {
     // Update theta_hat with L1 penalty
     double hessian_norm = norm(hessian_i, "fro");
     vec normd = abs(theta_hat.col(i - 1)) - lambda / hessian_norm;
@@ -820,8 +804,7 @@ void Fastcpd::update_fastcpd_parameters(const unsigned int t) {
     const double prob = 1 / (1 + exp(-as_scalar(coef_add * new_data.t())));
     hessian_new = (new_data.t() * new_data) * as_scalar(prob * (1 - prob));
   } else if (family == "poisson") {
-    coef_add = clamp(coef_add, winsorise_minval, winsorise_maxval);
-    cum_coef_add = clamp(coef_add, winsorise_minval, winsorise_maxval);
+    cum_coef_add = coef_add;
     hessian_new =
         (new_data.t() * new_data) * as_scalar(
           exp(coef_add * new_data.t())
