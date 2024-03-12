@@ -1,8 +1,6 @@
 # Everything in this script is provided as is. The purpose of this script is to
 # do a sanity check on the C++ implementation of `fastcpd`.
 
-testthat::skip("These tests are intended to be run manually.")
-
 # nolint start: script provided as is
 
 #' Cost function for Logistic regression, i.e. binomial family in GLM.
@@ -274,18 +272,22 @@ testthat::test_that("logistic regression", {
     formula = y ~ . - 1,
     data = data.frame(y = y, x = x),
     family = "binomial",
-    segment_count = 5
+    segment_count = 5,
+    beta = "BIC",
+    cost_adjustment = "BIC"
   ))@cp_set
-
-  change_points_binomial_fastcpd_sanity <- segd_binomial(
-    cbind(x, y), (kDimension + 1) * log(kNumberOfDataPoints) / 2,
-    B = 5
-  )$cp
 
   testthat::expect_equal(
     change_points_binomial_fastcpd,
     kChangePointLocation
   )
+
+  testthat::skip("Skip vanilla logistic regression.")
+
+  change_points_binomial_fastcpd_sanity <- segd_binomial(
+    cbind(x, y), (kDimension + 1) * log(kNumberOfDataPoints) / 2,
+    B = 5
+  )$cp
 
   testthat::expect_equal(
     change_points_binomial_fastcpd,
@@ -605,20 +607,22 @@ testthat::test_that("poisson regression", {
   change_points_poisson_fastcpd <- fastcpd::fastcpd(
     formula = y ~ . - 1,
     data = data.frame(y = data[, d + 1], x = data[, 1:d]),
-    # Default is now MBIC.
     beta = beta,
+    cost_adjustment = "BIC",
     epsilon = 0.001,
     family = "poisson",
     segment_count = 10
   )@cp_set
 
-  change_points_poisson_fastcpd_sanity <-
-    segd_poisson(data, beta, trim = 0.03, B = 10, epsilon = 0.001, G = 10^10, L = -20, H = 20)$cp
-
   testthat::expect_equal(
     change_points_poisson_fastcpd,
     c(380, 751, 1136, 1251)
   )
+
+  testthat::skip("Skip vanilla poisson regression.")
+
+  change_points_poisson_fastcpd_sanity <-
+    segd_poisson(data, beta, trim = 0.03, B = 10, epsilon = 0.001, G = 10^10, L = -20, H = 20)$cp
 
   testthat::expect_equal(
     change_points_poisson_fastcpd,
@@ -966,15 +970,18 @@ testthat::test_that("penalized linear regression", {
     data = data.frame(y = data[, d + 1], x = data[, 1:d]),
     family = "lasso",
     epsilon = 1e-5,
-    beta = beta
+    beta = beta,
+    cost_adjustment = "BIC"
   )@cp_set
-
-  change_points_lasso_fastcpd_sanity <- segd_lasso(data, beta, B = 10, trim = 0.025)$cp
 
   testthat::expect_equal(
     change_points_lasso_fastcpd,
     c(100, 300, 520, 800, 901)
   )
+
+  testthat::skip("Skip vanilla penalized linear regression.")
+
+  change_points_lasso_fastcpd_sanity <- segd_lasso(data, beta, B = 10, trim = 0.025)$cp
 
   testthat::expect_equal(
     change_points_lasso_fastcpd,

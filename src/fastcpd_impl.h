@@ -19,10 +19,6 @@
 //   poisson.
 // @param min_prob Minimum probability to avoid numerical issues. Only used for
 //   poisson.
-// @param winsorise_minval Minimum value to be winsorised. Only used for
-//   poisson.
-// @param winsorise_maxval Maximum value to be winsorised. Only used for
-//   poisson.
 // @param p Number of parameters to be estimated.
 // @param pruning Whether to prune the change points.
 // @param order Order for time series models.
@@ -63,8 +59,6 @@ List fastcpd_impl(
     const string family,
     const double epsilon,
     const double min_prob,
-    const double winsorise_minval,
-    const double winsorise_maxval,
     const int p,
     const bool pruning,
     const colvec order,
