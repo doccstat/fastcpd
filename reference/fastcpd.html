@@ -77,8 +77,6 @@ parameters and returns a <code>fastcpd</code> object.</p>
 <span>  family <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  epsilon <span class="op">=</span> <span class="fl">1e-10</span>,</span>
 <span>  min_prob <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="fl">10</span>,</span>
-<span>  winsorise_minval <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>,</span>
-<span>  winsorise_maxval <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
 <span>  pruning <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
@@ -200,16 +198,6 @@ computation in Logistic Regression and Poisson Regression.</p></dd>
 <dt>min_prob</dt>
 <dd><p>Minimum probability to avoid numerical issues. Only used
 for Poisson Regression.</p></dd>
-
-
-<dt>winsorise_minval</dt>
-<dd><p>Minimum value for the parameter in Poisson Regression
-to be winsorised.</p></dd>
-
-
-<dt>winsorise_maxval</dt>
-<dd><p>Maximum value for the parameter in Poisson Regression
-to be winsorised.</p></dd>
 
 
 <dt>p</dt>
