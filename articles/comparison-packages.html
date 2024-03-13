@@ -105,9 +105,9 @@
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span></span>
 <span>  <span class="va">package</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="st">"ggplot2"</span>, <span class="st">"mvtnorm"</span>,</span>
-<span>    <span class="co"># "bcp",</span></span>
+<span>    <span class="co"># "bcp", "Rbeast",</span></span>
 <span>    <span class="st">"breakfast"</span>, <span class="st">"changepoint"</span>, <span class="st">"cpm"</span>, <span class="st">"CptNonPar"</span>, <span class="st">"ecp"</span>, <span class="st">"fpop"</span>, <span class="st">"gfpop"</span>,</span>
-<span>    <span class="st">"InspectChangepoint"</span>, <span class="st">"jointseg"</span>, <span class="st">"mcp"</span>, <span class="st">"mosum"</span>, <span class="st">"not"</span>, <span class="st">"Rbeast"</span>,</span>
+<span>    <span class="st">"InspectChangepoint"</span>, <span class="st">"jointseg"</span>, <span class="st">"mcp"</span>, <span class="st">"mosum"</span>, <span class="st">"not"</span>,</span>
 <span>    <span class="st">"segmented"</span>, <span class="st">"stepR"</span>, <span class="st">"strucchange"</span>, <span class="st">"VARDetect"</span>, <span class="st">"wbs"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">{</span></span>
@@ -410,10 +410,9 @@ to the un-retrievable change points.</p>
 <code class="sourceCode R"><span><span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">mean_data_1</span>, K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
-<span>  <span class="va">mean_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
-<span><span class="co">#&gt;  [1] 701 301 NaN NaN NaN NaN NaN NaN NaN NaN</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Rbeast::beast(</span></span>
+<span><span class="co">#   mean_data_1, season = "none", print.progress = FALSE, quiet = TRUE</span></span>
+<span><span class="co"># )$trend$cp</span></span></code></pre></div>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stepR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stepR/man/stepFit.html" class="external-link">stepFit</a></span><span class="op">(</span><span class="va">mean_data_1</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">$</span><span class="va">rightEnd</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000</span></span></code></pre></div>
@@ -498,10 +497,9 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="co">#&gt; [241] 1952 1955 1956 1960 1962 1963 1966 1967 1969 1970 1974 1976 1977 1978 1980</span></span>
 <span><span class="co">#&gt; [256] 1985 1987 1990 1997 1998</span></span></code></pre></div>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
-<span>  <span class="va">mv_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
-<span><span class="co">#&gt;  [1] 1301  301 1855 1794  701 1986 1981 1769 1860 1779</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Rbeast::beast(</span></span>
+<span><span class="co">#   mv_data_1, season = "none", print.progress = FALSE, quiet = TRUE</span></span>
+<span><span class="co"># )$trend$cp</span></span></code></pre></div>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slower</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -549,27 +547,16 @@ to the un-retrievable change points.</p>
 <code class="sourceCode R"><span><span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">mean_data_3</span>, K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span></span>
 <span><span class="co">#&gt; [1] 300 700</span></span></code></pre></div>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
-<span>    <span class="va">result_Rbeast</span> <span class="op">&lt;-</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast123.html" class="external-link">beast123</a></span><span class="op">(</span></span>
-<span>      <span class="va">mean_data_3</span>,</span>
-<span>      metadata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>whichDimIsTime <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>      season <span class="op">=</span> <span class="st">"none"</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
-<span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,]  701  701  301</span></span>
-<span><span class="co">#&gt;  [2,]  301  301  701</span></span>
-<span><span class="co">#&gt;  [3,]  619  212  NaN</span></span>
-<span><span class="co">#&gt;  [4,]  NaN  NaN  NaN</span></span>
-<span><span class="co">#&gt;  [5,]  NaN  NaN  NaN</span></span>
-<span><span class="co">#&gt;  [6,]  NaN  NaN  NaN</span></span>
-<span><span class="co">#&gt;  [7,]  NaN  NaN  NaN</span></span>
-<span><span class="co">#&gt;  [8,]  NaN  NaN  NaN</span></span>
-<span><span class="co">#&gt;  [9,]  NaN  NaN  NaN</span></span>
-<span><span class="co">#&gt; [10,]  NaN  NaN  NaN</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># invisible(</span></span>
+<span><span class="co">#   capture.output(</span></span>
+<span><span class="co">#     result_Rbeast &lt;- Rbeast::beast123(</span></span>
+<span><span class="co">#       mean_data_3,</span></span>
+<span><span class="co">#       metadata = list(whichDimIsTime = 1),</span></span>
+<span><span class="co">#       season = "none"</span></span>
+<span><span class="co">#     )</span></span>
+<span><span class="co">#   )</span></span>
+<span><span class="co"># )</span></span>
+<span><span class="co"># result_Rbeast$trend$cp</span></span></code></pre></div>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span></span>
@@ -637,27 +624,16 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="co">#&gt; [376] 1963 1964 1966 1967 1968 1970 1972 1974 1976 1977 1978 1982 1983 1985 1987</span></span>
 <span><span class="co">#&gt; [391] 1990 1992 1993 1994 1996 1997</span></span></code></pre></div>
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
-<span>    <span class="va">result_Rbeast</span> <span class="op">&lt;-</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast123.html" class="external-link">beast123</a></span><span class="op">(</span></span>
-<span>      <span class="va">mv_data_3</span>,</span>
-<span>      metadata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>whichDimIsTime <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>      season <span class="op">=</span> <span class="st">"none"</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
-<span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,] 1301  301 1301</span></span>
-<span><span class="co">#&gt;  [2,]  301 1301  702</span></span>
-<span><span class="co">#&gt;  [3,]  701  701  301</span></span>
-<span><span class="co">#&gt;  [4,] 1994  830 1924</span></span>
-<span><span class="co">#&gt;  [5,] 1934 1980  769</span></span>
-<span><span class="co">#&gt;  [6,]  877  874 1971</span></span>
-<span><span class="co">#&gt;  [7,] 1929  807 1880</span></span>
-<span><span class="co">#&gt;  [8,] 1905  825 1919</span></span>
-<span><span class="co">#&gt;  [9,] 1912  881  760</span></span>
-<span><span class="co">#&gt; [10,] 1978 1855 1965</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># invisible(</span></span>
+<span><span class="co">#   capture.output(</span></span>
+<span><span class="co">#     result_Rbeast &lt;- Rbeast::beast123(</span></span>
+<span><span class="co">#       mv_data_3,</span></span>
+<span><span class="co">#       metadata = list(whichDimIsTime = 1),</span></span>
+<span><span class="co">#       season = "none"</span></span>
+<span><span class="co">#     )</span></span>
+<span><span class="co">#   )</span></span>
+<span><span class="co"># )</span></span>
+<span><span class="co"># result_Rbeast$trend$cp</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="linear-regression-1">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression-1"></a>
@@ -970,9 +946,9 @@ un-retrievable change points.</p>
 <span><span class="kw">for</span> <span class="op">(</span></span>
 <span>  <span class="va">package</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="st">"ggplot2"</span>, <span class="st">"mvtnorm"</span>,</span>
-<span>    <span class="co"># "bcp",</span></span>
+<span>    <span class="co"># "bcp", "Rbeast",</span></span>
 <span>    <span class="st">"breakfast"</span>, <span class="st">"changepoint"</span>, <span class="st">"cpm"</span>, <span class="st">"CptNonPar"</span>, <span class="st">"ecp"</span>, <span class="st">"fpop"</span>, <span class="st">"gfpop"</span>,</span>
-<span>    <span class="st">"InspectChangepoint"</span>, <span class="st">"jointseg"</span>, <span class="st">"mcp"</span>, <span class="st">"mosum"</span>, <span class="st">"not"</span>, <span class="st">"Rbeast"</span>,</span>
+<span>    <span class="st">"InspectChangepoint"</span>, <span class="st">"jointseg"</span>, <span class="st">"mcp"</span>, <span class="st">"mosum"</span>, <span class="st">"not"</span>,</span>
 <span>    <span class="st">"segmented"</span>, <span class="st">"stepR"</span>, <span class="st">"strucchange"</span>, <span class="st">"VARDetect"</span>, <span class="st">"wbs"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">{</span></span>
@@ -1174,9 +1150,9 @@ un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_InspectChangepoint</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
 <span><span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">mean_data_1</span>, K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span></span>
-<span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
-<span>  <span class="va">mean_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
+<span><span class="co"># Rbeast::beast(</span></span>
+<span><span class="co">#   mean_data_1, season = "none", print.progress = FALSE, quiet = TRUE</span></span>
+<span><span class="co"># )$trend$cp</span></span>
 <span><span class="fu">stepR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stepR/man/stepFit.html" class="external-link">stepFit</a></span><span class="op">(</span><span class="va">mean_data_1</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">$</span><span class="va">rightEnd</span></span>
 <span><span class="fu">cpm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/cpm/man/processStream.html" class="external-link">processStream</a></span><span class="op">(</span><span class="va">mean_data_1</span>, cpmType <span class="op">=</span> <span class="st">"Student"</span><span class="op">)</span><span class="op">$</span><span class="va">changePoints</span></span>
 <span><span class="fu">segmented</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/segmented/man/segmented.html" class="external-link">segmented</a></span><span class="op">(</span></span>
@@ -1215,9 +1191,9 @@ un-retrievable change points.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">result_InspectChangepoint</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
-<span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
-<span>  <span class="va">mv_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
+<span><span class="co"># Rbeast::beast(</span></span>
+<span><span class="co">#   mv_data_1, season = "none", print.progress = FALSE, quiet = TRUE</span></span>
+<span><span class="co"># )$trend$cp</span></span>
 <span><span class="co"># Slower</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
@@ -1245,16 +1221,16 @@ un-retrievable change points.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">result_InspectChangepoint</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
 <span><span class="fu">jointseg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jointseg/man/jointSeg.html" class="external-link">jointSeg</a></span><span class="op">(</span><span class="va">mean_data_3</span>, K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">bestBkp</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
-<span>    <span class="va">result_Rbeast</span> <span class="op">&lt;-</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast123.html" class="external-link">beast123</a></span><span class="op">(</span></span>
-<span>      <span class="va">mean_data_3</span>,</span>
-<span>      metadata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>whichDimIsTime <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>      season <span class="op">=</span> <span class="st">"none"</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
+<span><span class="co"># invisible(</span></span>
+<span><span class="co">#   capture.output(</span></span>
+<span><span class="co">#     result_Rbeast &lt;- Rbeast::beast123(</span></span>
+<span><span class="co">#       mean_data_3,</span></span>
+<span><span class="co">#       metadata = list(whichDimIsTime = 1),</span></span>
+<span><span class="co">#       season = "none"</span></span>
+<span><span class="co">#     )</span></span>
+<span><span class="co">#   )</span></span>
+<span><span class="co"># )</span></span>
+<span><span class="co"># result_Rbeast$trend$cp</span></span>
 <span><span class="co"># Slow</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y.1</span>, <span class="va">y.2</span>, <span class="va">y.3</span><span class="op">)</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean_data_3</span><span class="op">)</span></span>
@@ -1278,16 +1254,16 @@ un-retrievable change points.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">result_InspectChangepoint</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
-<span>    <span class="va">result_Rbeast</span> <span class="op">&lt;-</span> <span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast123.html" class="external-link">beast123</a></span><span class="op">(</span></span>
-<span>      <span class="va">mv_data_3</span>,</span>
-<span>      metadata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>whichDimIsTime <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>      season <span class="op">=</span> <span class="st">"none"</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">result_Rbeast</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
+<span><span class="co"># invisible(</span></span>
+<span><span class="co">#   capture.output(</span></span>
+<span><span class="co">#     result_Rbeast &lt;- Rbeast::beast123(</span></span>
+<span><span class="co">#       mv_data_3,</span></span>
+<span><span class="co">#       metadata = list(whichDimIsTime = 1),</span></span>
+<span><span class="co">#       season = "none"</span></span>
+<span><span class="co">#     )</span></span>
+<span><span class="co">#   )</span></span>
+<span><span class="co"># )</span></span>
+<span><span class="co"># result_Rbeast$trend$cp</span></span>
 <span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_lm.html">fastcpd.lm</a></span><span class="op">(</span><span class="va">lm_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/strucchange/man/breakpoints.html" class="external-link">breakpoints</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">lm_data</span><span class="op">)</span><span class="op">$</span><span class="va">breakpoints</span></span>
 <span><span class="fu">segmented</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/segmented/man/segmented.html" class="external-link">segmented</a></span><span class="op">(</span></span>
