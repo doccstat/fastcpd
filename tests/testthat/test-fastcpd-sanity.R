@@ -3,304 +3,37 @@
 
 # nolint start: script provided as is
 
-#' Cost function for Logistic regression, i.e. binomial family in GLM.
-#'
-#' @param data Data to be used to calculate the cost values. The last column is
-#'     the response variable.
-#' @param family Family of the distribution.
-#' @keywords internal
-#'
-#' @noRd
-#' @return Cost value for the corresponding segment of data.
-cost_glm_binomial <- function(data, family = "binomial") {
-  data <- as.matrix(data)
-  p <- dim(data)[2] - 1
-  out <- fastglm::fastglm(
-    as.matrix(data[, 1:p]), data[, p + 1],
-    family = family
-  )
-  return(out$deviance / 2)
-}
-
-#' Implementation of vanilla PELT for logistic regression type data.
-#'
-#' @param data Data to be used for change point detection.
-#' @param beta Penalty coefficient for the number of change points.
-#' @param cost Cost function to be used to calculate cost values.
-#' @keywords internal
-#'
-#' @noRd
-#' @return A list consisting of two: change point locations and negative log
-#'     likelihood values for each segment.
-pelt_vanilla_binomial <- function(data, beta, cost = cost_glm_binomial) {
-  n <- dim(data)[1]
-  p <- dim(data)[2] - 1
-  Fobj <- c(-beta, 0)
-  cp_set <- list(NULL, 0)
-  set <- c(0, 1)
-  for (t in 2:n)
-  {
-    m <- length(set)
-    cval <- rep(NA, m)
-    for (i in 1:m)
-    {
-      k <- set[i] + 1
-      cval[i] <- 0
-      if (t - k >= p - 1) cval[i] <- suppressWarnings(cost(data[k:t, ]))
-    }
-    obj <- cval + Fobj[set + 1] + beta
-    min_val <- min(obj)
-    ind <- which(obj == min_val)[1]
-    cp_set_add <- c(cp_set[[set[ind] + 1]], set[ind])
-    cp_set <- append(cp_set, list(cp_set_add))
-    ind2 <- (cval + Fobj[set + 1]) <= min_val
-    set <- c(set[ind2], t)
-    Fobj <- c(Fobj, min_val)
-  }
-  cp <- cp_set[[n + 1]]
-  nLL <- 0
-  cp_loc <- unique(c(0, cp, n))
-  for (i in 1:(length(cp_loc) - 1))
-  {
-    seg <- (cp_loc[i] + 1):cp_loc[i + 1]
-    data_seg <- data[seg, ]
-    out <- fastglm::fastglm(
-      as.matrix(data_seg[, 1:p]), data_seg[, p + 1],
-      family = "binomial"
-    )
-    nLL <- out$deviance / 2 + nLL
-  }
-
-  output <- list(cp, nLL)
-  names(output) <- c("cp", "nLL")
-  return(output)
-}
-
-#' Function to update the coefficients using gradient descent.
-#'
-#' @param data_new New data point used to update the coeffient.
-#' @param coef Previous coeffient to be updated.
-#' @param cum_coef Summation of all the past coefficients to be used in
-#'     averaging.
-#' @param cmatrix Hessian matrix in gradient descent.
-#' @param epsilon Small adjustment to avoid singularity when doing inverse on
-#'     the Hessian matrix.
-#' @keywords internal
-#'
-#' @noRd
-#' @return A list of values containing the new coefficients, summation of
-#'     coefficients so far and all the Hessian matrices.
-cost_logistic_update <- function(
-    data_new, coef, cum_coef, cmatrix, epsilon = 1e-10) {
-  p <- length(data_new) - 1
-  X_new <- data_new[1:p]
-  Y_new <- data_new[p + 1]
-  eta <- X_new %*% coef
-  mu <- 1 / (1 + exp(-eta))
-  cmatrix <- cmatrix + (X_new %o% X_new) * as.numeric((1 - mu) * mu)
-  lik_dev <- as.numeric(-(Y_new - mu)) * X_new
-  coef <- coef - solve(cmatrix + epsilon * diag(1, p), lik_dev)
-  cum_coef <- cum_coef + coef
-  return(list(coef, cum_coef, cmatrix))
-}
-
-#' Calculate negative log likelihood given data segment and guess of
-#' coefficient.
-#'
-#' @param data Data to be used to calculate the negative log likelihood.
-#' @param b Guess of the coefficient.
-#' @keywords internal
-#'
-#' @noRd
-#' @return Negative log likelihood.
-neg_log_lik_binomial <- function(data, b) {
-  p <- dim(data)[2] - 1
-  X <- data[, 1:p, drop = FALSE]
-  Y <- data[, p + 1, drop = FALSE]
-  u <- as.numeric(X %*% b)
-  L <- -Y * u + log(1 + exp(u))
-  return(sum(L))
-}
-
-#' Find change points using dynamic programming with pruning and SeGD.
-#'
-#' @param data Data used to find change points.
-#' @param beta Penalty coefficient for the number of change points.
-#' @param B Initial guess on the number of change points.
-#' @param trim Propotion of the data to ignore the change points at the
-#'     beginning, ending and between change points.
-#' @keywords internal
-#'
-#' @noRd
-#' @return A list containing potential change point locations and negative log
-#'     likelihood for each segment based on the change points guess.
-segd_binomial <- function(data, beta, B = 10, trim = 0.025) {
-  n <- dim(data)[1]
-  p <- dim(data)[2] - 1
-  Fobj <- c(-beta, 0)
-  cp_set <- list(NULL, 0)
-  set <- c(0, 1)
-
-  # choose the initial values based on pre-segmentation
-
-  index <- rep(1:B, rep(n / B, B))
-  coef.int <- matrix(NA, B, p)
-  for (i in 1:B)
-  {
-    out <- fastglm::fastglm(
-      as.matrix(data[index == i, 1:p]),
-      data[index == i, p + 1],
-      family = "binomial"
-    )
-    coef.int[i, ] <- coef(out)
-  }
-  X1 <- data[1, 1:p]
-  cum_coef <- coef <- matrix(coef.int[1, ], p, 1)
-  e_eta <- exp(coef %*% X1)
-  const <- e_eta / (1 + e_eta)^2
-  cmatrix <- array((X1 %o% X1) * as.numeric(const), c(p, p, 1))
-
-  for (t in 2:n)
-  {
-    m <- length(set)
-    cval <- rep(NA, m)
-
-    for (i in 1:(m - 1))
-    {
-      coef_c <- coef[, i]
-      cum_coef_c <- cum_coef[, i]
-      cmatrix_c <- cmatrix[, , i]
-      out <- cost_logistic_update(data[t, ], coef_c, cum_coef_c, cmatrix_c)
-      coef[, i] <- out[[1]]
-      cum_coef[, i] <- out[[2]]
-      cmatrix[, , i] <- out[[3]]
-      k <- set[i] + 1
-      cval[i] <- 0
-      if (t - k >= p - 1) {
-        cval[i] <-
-          neg_log_lik_binomial(data[k:t, ], cum_coef[, i] / (t - k + 1))
-      }
-    }
-
-    # the choice of initial values requires further investigation
-
-    cval[m] <- 0
-    Xt <- data[t, 1:p]
-    cum_coef_add <- coef_add <- coef.int[index[t], ]
-    e_eta_t <- exp(coef_add %*% Xt)
-    const <- e_eta_t / (1 + e_eta_t)^2
-    cmatrix_add <- (Xt %o% Xt) * as.numeric(const)
-
-    coef <- cbind(coef, coef_add)
-    cum_coef <- cbind(cum_coef, cum_coef_add)
-    cmatrix <- abind::abind(cmatrix, cmatrix_add, along = 3)
-
-    # Adding a momentum term (TBD)
-
-    obj <- cval + Fobj[set + 1] + beta
-    min_val <- min(obj)
-    ind <- which(obj == min_val)[1]
-    cp_set_add <- c(cp_set[[set[ind] + 1]], set[ind])
-    cp_set <- append(cp_set, list(cp_set_add))
-    ind2 <- (cval + Fobj[set + 1]) <= min_val
-    set <- c(set[ind2], t)
-    coef <- coef[, ind2, drop = FALSE]
-    cum_coef <- cum_coef[, ind2, drop = FALSE]
-    cmatrix <- cmatrix[, , ind2, drop = FALSE]
-    Fobj <- c(Fobj, min_val)
-  }
-
-  # Remove change-points close to the boundaries
-
-  cp <- cp_set[[n + 1]]
-  if (length(cp) > 0) {
-    ind3 <- (seq_len(length(cp)))[(cp < trim * n) | (cp > (1 - trim) * n)]
-    cp <- cp[-ind3]
-  }
-
-  nLL <- 0
-  cp_loc <- unique(c(0, cp, n))
-  for (i in 1:(length(cp_loc) - 1))
-  {
-    seg <- (cp_loc[i] + 1):cp_loc[i + 1]
-    data_seg <- data[seg, ]
-    out <- fastglm::fastglm(
-      as.matrix(data_seg[, 1:p]), data_seg[, p + 1],
-      family = "binomial"
-    )
-    nLL <- out$deviance / 2 + nLL
-  }
-
-  output <- list(cp, nLL)
-  names(output) <- c("cp", "nLL")
-  return(output)
-}
-
 testthat::test_that("logistic regression", {
-  # This is the same example with `fastcpd` documentation. Please keep it in
-  # sync if the documentation ever changes.
   set.seed(1)
-
-  kChangePointLocation <- 125
-  kNumberOfDataPoints <- 300
-  kDimension <- 5
-
-  # There are 300 five-dimensional data points.
-  x <- matrix(rnorm(kNumberOfDataPoints * kDimension, 0, 1), ncol = kDimension)
+  p <- 5
+  x <- matrix(rnorm(300 * p, 0, 1), ncol = p)
 
   # Randomly generate coefficients with different means.
-  theta <- rbind(rnorm(kDimension, 0, 1), rnorm(kDimension, 2, 1))
+  theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
 
   # Randomly generate response variables based on the segmented data and
   # corresponding coefficients
   y <- c(
-    rbinom(
-      kChangePointLocation,
-      1,
-      1 / (1 + exp(-x[1:kChangePointLocation, ] %*% theta[1, ]))
-    ),
-    rbinom(
-      kNumberOfDataPoints - kChangePointLocation,
-      1,
-      1 / (1 + exp(
-        -x[(kChangePointLocation + 1):kNumberOfDataPoints, ] %*% theta[2, ]
-      ))
-    )
+    rbinom(125, 1, 1 / (1 + exp(-x[1:125, ] %*% theta[1, ]))),
+    rbinom(300 - 125, 1, 1 / (1 + exp(-x[(125 + 1):300, ] %*% theta[2, ])))
   )
 
-  change_points_binomial_fastcpd <- suppressWarnings(fastcpd::fastcpd(
-    formula = y ~ . - 1,
-    data = data.frame(y = y, x = x),
-    family = "binomial",
+  change_points_binomial_fastcpd <- suppressWarnings(fastcpd.binomial(
+    cbind(y, x),
     segment_count = 5,
     beta = "BIC",
     cost_adjustment = "BIC"
   ))@cp_set
 
-  testthat::expect_equal(
-    change_points_binomial_fastcpd,
-    kChangePointLocation
-  )
-
-  testthat::skip("Skip vanilla logistic regression.")
-
-  change_points_binomial_fastcpd_sanity <- segd_binomial(
-    cbind(x, y), (kDimension + 1) * log(kNumberOfDataPoints) / 2,
-    B = 5
-  )$cp
-
-  testthat::expect_equal(
-    change_points_binomial_fastcpd,
-    change_points_binomial_fastcpd_sanity
-  )
+  testthat::expect_equal(change_points_binomial_fastcpd, 125)
 
   warning_messages <- testthat::capture_warnings(
-    change_points_binomial_fastcpd_vanilla <- fastcpd::fastcpd(
-      formula = y ~ . - 1,
-      data = data.frame(y = y, x = x),
-      family = "binomial",
+    change_points_binomial_fastcpd_vanilla <- fastcpd.binomial(
+      cbind(y, x),
       segment_count = 5,
-      vanilla_percentage = 1
+      vanilla_percentage = 1,
+      beta = "BIC",
+      cost_adjustment = "BIC"
     )@cp_set
   )
 
@@ -312,242 +45,8 @@ testthat::test_that("logistic regression", {
     ), c(6, 3984))
   )
 
-  change_points_binomial_fastcpd_vanilla_sanity <- pelt_vanilla_binomial(
-    cbind(x, y), (kDimension + 1) * log(kNumberOfDataPoints) / 2
-  )$cp
-
-  testthat::expect_equal(
-    change_points_binomial_fastcpd_vanilla,
-    kChangePointLocation
-  )
-  testthat::expect_equal(
-    c(0, change_points_binomial_fastcpd_vanilla),
-    change_points_binomial_fastcpd_vanilla_sanity
-  )
+  testthat::expect_equal(change_points_binomial_fastcpd_vanilla, 125)
 })
-
-#' Cost function for Poisson regression.
-#'
-#' @param data Data to be used to calculate the cost values. The last column is
-#'     the response variable.
-#' @param family Family of the distribution.
-#' @keywords internal
-#'
-#' @noRd
-#' @return Cost value for the corresponding segment of data.
-cost_glm_poisson <- function(data, family = "poisson") {
-  data <- as.matrix(data)
-  p <- dim(data)[2] - 1
-  out <- fastglm(as.matrix(data[, 1:p]), data[, p + 1], family = family)
-  return(out$deviance / 2)
-}
-
-#' Implementation of vanilla PELT for poisson regression type data.
-#'
-#' @param data Data to be used for change point detection.
-#' @param beta Penalty coefficient for the number of change points.
-#' @param cost Cost function to be used to calculate cost values.
-#' @keywords internal
-#'
-#' @noRd
-#' @return A list consisting of two: change point locations and negative log
-#'     likelihood values for each segment.
-pelt_vanilla_poisson <- function(data, beta, cost = cost_glm_poisson) {
-  n <- dim(data)[1]
-  p <- dim(data)[2] - 1
-  Fobj <- c(-beta, 0)
-  cp_set <- list(NULL, 0)
-  set <- c(0, 1)
-  for (t in 2:n)
-  {
-    m <- length(set)
-    cval <- rep(NA, m)
-    for (i in 1:m)
-    {
-      k <- set[i] + 1
-      if (t - k >= p - 1) cval[i] <- suppressWarnings(cost(data[k:t, ])) else cval[i] <- 0
-    }
-    obj <- cval + Fobj[set + 1] + beta
-    min_val <- min(obj)
-    ind <- which(obj == min_val)[1]
-    cp_set_add <- c(cp_set[[set[ind] + 1]], set[ind])
-    cp_set <- append(cp_set, list(cp_set_add))
-    ind2 <- (cval + Fobj[set + 1]) <= min_val
-    set <- c(set[ind2], t)
-    Fobj <- c(Fobj, min_val)
-    # if (t %% 100 == 0) print(t)
-  }
-  cp <- cp_set[[n + 1]]
-  output <- list(cp)
-  names(output) <- c("cp")
-
-  return(output)
-}
-
-#' Function to update the coefficients using gradient descent.
-#'
-#' @param data_new New data point used to update the coeffient.
-#' @param coef Previous coeffient to be updated.
-#' @param cum_coef Summation of all the past coefficients to be used in
-#'     averaging.
-#' @param cmatrix Hessian matrix in gradient descent.
-#' @param epsilon Small adjustment to avoid singularity when doing inverse on
-#'     the Hessian matrix.
-#' @param G Upper bound for the coefficient.
-#' @param L Winsorization lower bound.
-#' @param H Winsorization upper bound.
-#' @keywords internal
-#'
-#' @noRd
-#' @return A list of values containing the new coefficients, summation of
-#'     coefficients so far and all the Hessian matrices.
-cost_poisson_update <- function(data_new, coef, cum_coef, cmatrix, epsilon = 0.001, G = 10^10, L = -20, H = 20) {
-  p <- length(data_new) - 1
-  X_new <- data_new[1:p]
-  Y_new <- data_new[p + 1]
-  eta <- X_new %*% coef
-  mu <- exp(eta)
-  cmatrix <- cmatrix + (X_new %o% X_new) * min(as.numeric(mu), G)
-  lik_dev <- as.numeric(-(Y_new - mu)) * X_new
-  coef <- coef - solve(cmatrix + epsilon * diag(1, p), lik_dev)
-  coef <- pmin(pmax(coef, L), H)
-  cum_coef <- cum_coef + coef
-  return(list(coef, cum_coef, cmatrix))
-}
-
-#' Calculate negative log likelihood given data segment and guess of
-#' coefficient.
-#'
-#' @param data Data to be used to calculate the negative log likelihood.
-#' @param b Guess of the coefficient.
-#' @keywords internal
-#'
-#' @noRd
-#' @return Negative log likelihood.
-neg_log_lik_poisson <- function(data, b) {
-  p <- dim(data)[2] - 1
-  X <- data[, 1:p, drop = FALSE]
-  Y <- data[, p + 1, drop = FALSE]
-  u <- as.numeric(X %*% b)
-  L <- -Y * u + exp(u) + lfactorial(Y)
-  return(sum(L))
-}
-
-#' Find change points using dynamic programming with pruning and SeGD.
-#'
-#' @param data Data used to find change points.
-#' @param beta Penalty coefficient for the number of change points.
-#' @param B Initial guess on the number of change points.
-#' @param trim Propotion of the data to ignore the change points at the
-#'     beginning, ending and between change points.
-#' @param epsilon Small adjustment to avoid singularity when doing inverse on
-#'    the Hessian matrix.
-#' @param G Upper bound for the coefficient.
-#' @param L Winsorization lower bound.
-#' @param H Winsorization upper bound.
-#' @keywords internal
-#'
-#' @noRd
-#' @return A list containing potential change point locations and negative log
-#'     likelihood for each segment based on the change points guess.
-segd_poisson <- function(data, beta, B = 10, trim = 0.03, epsilon = 0.001, G = 10^10, L = -20, H = 20) {
-  n <- dim(data)[1]
-  p <- dim(data)[2] - 1
-  Fobj <- c(-beta, 0)
-  cp_set <- list(NULL, 0)
-  set <- c(0, 1)
-
-  # choose the initial values based on pre-segmentation
-
-  index <- rep(1:B, rep(n / B, B))
-  coef.int <- matrix(NA, B, p)
-  for (i in 1:B)
-  {
-    out <- fastglm(x = as.matrix(data[index == i, 1:p]), y = data[index == i, p + 1], family = "poisson")
-    coef.int[i, ] <- coef(out)
-  }
-  X1 <- data[1, 1:p]
-  cum_coef <- coef <- pmin(pmax(matrix(coef.int[1, ], p, 1), L), H)
-  e_eta <- exp(coef %*% X1)
-  const <- e_eta
-  cmatrix <- array((X1 %o% X1) * as.numeric(const), c(p, p, 1))
-
-  for (t in 2:n)
-  {
-    m <- length(set)
-    cval <- rep(NA, m)
-    for (i in 1:(m - 1))
-    {
-      coef_c <- coef[, i]
-      cum_coef_c <- cum_coef[, i]
-      cmatrix_c <- cmatrix[, , i]
-      out <- cost_poisson_update(data[t, ], coef_c, cum_coef_c, cmatrix_c, epsilon = epsilon, G = G, L = L, H = H)
-      coef[, i] <- out[[1]]
-      cum_coef[, i] <- out[[2]]
-      cmatrix[, , i] <- out[[3]]
-      k <- set[i] + 1
-      cum_coef_win <- pmin(pmax(cum_coef[, i] / (t - k + 1), L), H)
-      if (t - k >= p - 1) cval[i] <- neg_log_lik_poisson(data[k:t, ], cum_coef_win) else cval[i] <- 0
-    }
-
-    # the choice of initial values requires further investigation
-
-    cval[m] <- 0
-    Xt <- data[t, 1:p]
-    cum_coef_add <- coef_add <- pmin(pmax(coef.int[index[t], ], L), H)
-    e_eta_t <- exp(coef_add %*% Xt)
-    const <- e_eta_t
-    cmatrix_add <- (Xt %o% Xt) * as.numeric(const)
-    coef <- cbind(coef, coef_add)
-    cum_coef <- cbind(cum_coef, cum_coef_add)
-    cmatrix <- abind::abind(cmatrix, cmatrix_add, along = 3)
-
-    # Adding a momentum term (TBD)
-
-    obj <- cval + Fobj[set + 1] + beta
-    min_val <- min(obj)
-    ind <- which(obj == min_val)[1]
-    cp_set_add <- c(cp_set[[set[ind] + 1]], set[ind])
-    cp_set <- append(cp_set, list(cp_set_add))
-    ind2 <- (cval + Fobj[set + 1]) <= min_val
-    set <- c(set[ind2], t)
-    coef <- coef[, ind2, drop = FALSE]
-    cum_coef <- cum_coef[, ind2, drop = FALSE]
-    cmatrix <- cmatrix[, , ind2, drop = FALSE]
-    Fobj <- c(Fobj, min_val)
-  }
-
-  # Remove change-points close to the boundaries
-
-  cp <- cp_set[[n + 1]]
-  if (length(cp) > 0) {
-    ind3 <- (1:length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
-    if (length(ind3) > 0) cp <- cp[-ind3]
-  }
-
-  cp <- sort(unique(c(0, cp)))
-  index <- which((diff(cp) < trim * n) == TRUE)
-  if (length(index) > 0) cp <- floor((cp[-(index + 1)] + cp[-index]) / 2)
-  cp <- cp[cp > 0]
-
-  # nLL <- 0
-  # cp_loc <- unique(c(0,cp,n))
-  # for(i in 1:(length(cp_loc)-1))
-  # {
-  #   seg <- (cp_loc[i]+1):cp_loc[i+1]
-  #   data_seg <- data[seg,]
-  #   out <- fastglm(as.matrix(data_seg[, 1:p]), data_seg[, p+1], family="Poisson")
-  #   nLL <- out$deviance/2 + nLL
-  # }
-
-  # output <- list(cp, nLL)
-  # names(output) <- c("cp", "nLL")
-
-  output <- list(cp)
-  names(output) <- c("cp")
-
-  return(output)
-}
 
 # Generate data from poisson regression models with change-points
 #' @param n Number of observations.
@@ -588,11 +87,11 @@ testthat::test_that("poisson regression", {
   }
   delta <- c(5, 7, 9, 11, 13)
   a.sq <- 1
-  delta.new <- delta * sqrt(a.sq) / sqrt(as.numeric(t(delta) %*% Sigma %*% delta))
+  delta.new <-
+    delta * sqrt(a.sq) / sqrt(as.numeric(t(delta) %*% Sigma %*% delta))
   true.cp.loc <- c(375, 750, 1125)
 
   # regression coefficients
-
   true.coef <- matrix(0, nrow = d, ncol = length(true.cp.loc) + 1)
   true.coef[, 1] <- c(1, 1.2, -1, 0.5, -2)
   true.coef[, 2] <- true.coef[, 1] + delta.new
@@ -604,13 +103,11 @@ testthat::test_that("poisson regression", {
   g_tr <- out[[2]]
   beta <- log(n) * (d + 1) / 2
 
-  change_points_poisson_fastcpd <- fastcpd::fastcpd(
-    formula = y ~ . - 1,
-    data = data.frame(y = data[, d + 1], x = data[, 1:d]),
+  change_points_poisson_fastcpd <- fastcpd.poisson(
+    cbind(data[, d + 1], data[, 1:d]),
     beta = beta,
     cost_adjustment = "BIC",
     epsilon = 0.001,
-    family = "poisson",
     segment_count = 10
   )@cp_set
 
@@ -619,23 +116,13 @@ testthat::test_that("poisson regression", {
     c(380, 751, 1136, 1251)
   )
 
-  testthat::skip("Skip vanilla poisson regression.")
-
-  change_points_poisson_fastcpd_sanity <-
-    segd_poisson(data, beta, trim = 0.03, B = 10, epsilon = 0.001, G = 10^10, L = -20, H = 20)$cp
-
-  testthat::expect_equal(
-    change_points_poisson_fastcpd,
-    change_points_poisson_fastcpd_sanity
-  )
-
   warning_messages <- testthat::capture_warnings(
-    change_points_poisson_fastcpd_vanilla <- fastcpd::fastcpd(
-      formula = y ~ . - 1,
-      data = data.frame(y = data[, d + 1], x = data[, 1:d]),
-      family = "poisson",
+    change_points_poisson_fastcpd_vanilla <- fastcpd.poisson(
+      cbind(data[, d + 1], data[, 1:d]),
       segment_count = 10,
-      vanilla_percentage = 1
+      vanilla_percentage = 1,
+      beta = beta,
+      cost_adjustment = "BIC"
     )@cp_set
   )
 
@@ -643,283 +130,11 @@ testthat::test_that("poisson regression", {
     warning_messages, rep("fit_glm: fitted rates numerically 0 occurred", 1539)
   )
 
-  change_points_poisson_fastcpd_vanilla_sanity <-
-    pelt_vanilla_poisson(data, beta)$cp
-
   testthat::expect_equal(
     change_points_poisson_fastcpd_vanilla,
     c(374, 752, 1133)
   )
-
-  testthat::expect_equal(
-    c(0, change_points_poisson_fastcpd_vanilla),
-    change_points_poisson_fastcpd_vanilla_sanity
-  )
 })
-
-#' Cost function for penalized linear regression.
-#'
-#' @param data Data to be used to calculate the cost values. The last column is
-#'     the response variable.
-#' @param lambda Penalty coefficient.
-#' @param family Family of the distribution.
-#' @keywords internal
-#'
-#' @noRd
-#' @return Cost value for the corresponding segment of data.
-cost_lasso <- function(data, lambda, family = "gaussian") {
-  data <- as.matrix(data)
-  n <- dim(data)[1]
-  p <- dim(data)[2] - 1
-  out <- glmnet(as.matrix(data[, 1:p]), data[, p + 1], family = family, lambda = lambda)
-  return(deviance(out) / 2)
-}
-
-#' Implementation of vanilla PELT for penalized linear regression type data.
-#'
-#' @param data Data to be used for change point detection.
-#' @param beta Penalty coefficient for the number of change points.
-#' @param B Initial guess on the number of change points.
-#' @param cost Cost function to be used to calculate cost values.
-#' @param family Family of the distribution.
-#' @keywords internal
-#'
-#' @noRd
-#' @return A list consisting of two: change point locations and negative log
-#'     likelihood values for each segment.
-pelt_vanilla_lasso <- function(data, beta, B = 10, cost = cost_lasso, family = "gaussian") {
-  n <- dim(data)[1]
-  p <- dim(data)[2] - 1
-  index <- rep(1:B, rep(n / B, B))
-  err_sd <- act_num <- rep(NA, B)
-  for (i in 1:B)
-  {
-    cvfit <- cv.glmnet(as.matrix(data[index == i, 1:p]), data[index == i, p + 1], family = family)
-    coef <- coef(cvfit, s = "lambda.1se")[-1]
-    resi <- data[index == i, p + 1] - as.matrix(data[index == i, 1:p]) %*% as.numeric(coef)
-    err_sd[i] <- sqrt(mean(resi^2))
-    act_num[i] <- sum(abs(coef) > 0)
-  }
-  err_sd_mean <- mean(err_sd) # only works if error sd is unchanged.
-  act_num_mean <- mean(act_num)
-  beta <- (act_num_mean + 1) * beta # seems to work but there might be better choices
-
-  Fobj <- c(-beta, 0)
-  cp_set <- list(NULL, 0)
-  set <- c(0, 1)
-  for (t in 2:n)
-  {
-    m <- length(set)
-    cval <- rep(NA, m)
-    for (i in 1:m)
-    {
-      k <- set[i] + 1
-      if (t - k >= 1) cval[i] <- suppressWarnings(cost(data[k:t, ], lambda = err_sd_mean * sqrt(2 * log(p) / (t - k + 1)))) else cval[i] <- 0
-    }
-    obj <- cval + Fobj[set + 1] + beta
-    min_val <- min(obj)
-    ind <- which(obj == min_val)[1]
-    cp_set_add <- c(cp_set[[set[ind] + 1]], set[ind])
-    cp_set <- append(cp_set, list(cp_set_add))
-    ind2 <- (cval + Fobj[set + 1]) <= min_val
-    set <- c(set[ind2], t)
-    Fobj <- c(Fobj, min_val)
-    if (t %% 100 == 0) print(t)
-  }
-  cp <- cp_set[[n + 1]]
-  # nLL <- 0
-  # cp_loc <- unique(c(0,cp,n))
-  # for(i in 1:(length(cp_loc)-1))
-  # {
-  #  seg <- (cp_loc[i]+1):cp_loc[i+1]
-  #  data_seg <- data[seg,]
-  #  out <- glmnet(as.matrix(data_seg[, 1:p]), data_seg[, p+1], lambda=lambda, family=family)
-  #  nLL <- deviance(out)/2 + nLL
-  # }
-  # output <- list(cp, nLL)
-  output <- list(cp)
-  names(output) <- c("cp")
-  return(output)
-}
-
-#' Function to update the coefficients using gradient descent.
-#' @param a Coefficient to be updated.
-#' @param lambda Penalty coefficient.
-#' @keywords internal
-#'
-#' @noRd
-#' @return Updated coefficient.
-soft_threshold <- function(a, lambda) {
-  sign(a) * pmax(abs(a) - lambda, 0)
-}
-
-#' Function to update the coefficients using gradient descent.
-#'
-#' @param data_new New data point used to update the coeffient.
-#' @param coef Previous coeffient to be updated.
-#' @param cum_coef Summation of all the past coefficients to be used in
-#'     averaging.
-#' @param cmatrix Hessian matrix in gradient descent.
-#' @param lambda Penalty coefficient.
-#' @keywords internal
-#'
-#' @noRd
-#' @return A list of values containing the new coefficients, summation of
-#'     coefficients so far and all the Hessian matrices.
-cost_lasso_update <- function(data_new, coef, cum_coef, cmatrix, lambda) {
-  p <- length(data_new) - 1
-  X_new <- data_new[1:p]
-  Y_new <- data_new[p + 1]
-  mu <- X_new %*% coef
-  cmatrix <- cmatrix + X_new %o% X_new
-  # B <- as.vector(cmatrix_inv%*%X_new)
-  # cmatrix_inv <- cmatrix_inv - B%o%B/(1+sum(X_new*B))
-  lik_dev <- as.numeric(-(Y_new - mu)) * X_new
-  coef <- coef - solve(cmatrix, lik_dev)
-  nc <- norm(cmatrix, type = "F") # the choice of norm affects the speed. Spectral norm is more accurate but slower than F norm.
-  coef <- soft_threshold(coef, lambda / nc)
-  cum_coef <- cum_coef + coef
-  return(list(coef, cum_coef, cmatrix))
-}
-
-#' Calculate negative log likelihood given data segment and guess of
-#' coefficient.
-#'
-#' @param data Data to be used to calculate the negative log likelihood.
-#' @param b Guess of the coefficient.
-#' @param lambda Penalty coefficient.
-#' @keywords internal
-#'
-#' @noRd
-#' @return Negative log likelihood.
-neg_log_lik_lasso <- function(data, b, lambda) {
-  p <- dim(data)[2] - 1
-  X <- data[, 1:p, drop = FALSE]
-  Y <- data[, p + 1, drop = FALSE]
-  resi <- Y - X %*% b
-  L <- sum(resi^2) / 2 + lambda * sum(abs(b))
-  return(L)
-}
-
-#' Find change points using dynamic programming with pruning and SeGD.
-#'
-#' @param data Data used to find change points.
-#' @param beta Penalty coefficient for the number of change points.
-#' @param B Initial guess on the number of change points.
-#' @param trim Propotion of the data to ignore the change points at the
-#'     beginning, ending and between change points.
-#' @param epsilon Small adjustment to avoid singularity when doing inverse on
-#'    the Hessian matrix.
-#' @param family Family of the distribution.
-#' @keywords internal
-#'
-#' @noRd
-#' @return A list containing potential change point locations and negative log
-#'     likelihood for each segment based on the change points guess.
-segd_lasso <- function(data, beta, B = 10, trim = 0.025, epsilon = 1e-5, family = "gaussian") {
-  n <- dim(data)[1]
-  p <- dim(data)[2] - 1
-  Fobj <- c(-beta, 0)
-  cp_set <- list(NULL, 0)
-  set <- c(0, 1)
-
-  # choose the initial values based on pre-segmentation
-
-  index <- rep(1:B, rep(n / B, B))
-  coef.int <- matrix(NA, B, p)
-  err_sd <- act_num <- rep(NA, B)
-  for (i in 1:B)
-  {
-    cvfit <- cv.glmnet(as.matrix(data[index == i, 1:p]), data[index == i, p + 1], family = family)
-    coef.int[i, ] <- coef(cvfit, s = "lambda.1se")[-1]
-    resi <- data[index == i, p + 1] - as.matrix(data[index == i, 1:p]) %*% as.numeric(coef.int[i, ])
-    err_sd[i] <- sqrt(mean(resi^2))
-    act_num[i] <- sum(abs(coef.int[i, ]) > 0)
-  }
-  err_sd_mean <- mean(err_sd) # only works if error sd is unchanged.
-  act_num_mean <- mean(act_num)
-  beta <- (act_num_mean + 1) * beta # seems to work but there might be better choices
-
-  X1 <- data[1, 1:p]
-  cum_coef <- coef <- matrix(coef.int[1, ], p, 1)
-  eta <- coef %*% X1
-  # c_int <- diag(1/epsilon,p) - X1%o%X1/epsilon^2/(1+sum(X1^2)/epsilon)
-  # cmatrix_inv <- array(c_int, c(p,p,1))
-  cmatrix <- array(X1 %o% X1 + epsilon * diag(1, p), c(p, p, 1))
-
-  for (t in 2:n)
-  {
-    m <- length(set)
-    cval <- rep(NA, m)
-
-    for (i in 1:(m - 1))
-    {
-      coef_c <- coef[, i]
-      cum_coef_c <- cum_coef[, i]
-      # cmatrix_inv_c <- cmatrix_inv[,,i]
-      cmatrix_c <- cmatrix[, , i]
-      k <- set[i] + 1
-      out <- cost_lasso_update(data[t, ], coef_c, cum_coef_c, cmatrix_c, lambda = err_sd_mean * sqrt(2 * log(p) / (t - k + 1)))
-      coef[, i] <- out[[1]]
-      cum_coef[, i] <- out[[2]]
-      # cmatrix_inv[,,i] <- out[[3]]
-      cmatrix[, , i] <- out[[3]]
-      if (t - k >= 2) cval[i] <- neg_log_lik_lasso(data[k:t, ], cum_coef[, i] / (t - k + 1), lambda = err_sd_mean * sqrt(2 * log(p) / (t - k + 1))) else cval[i] <- 0
-    }
-
-    # the choice of initial values requires further investigation
-
-    cval[m] <- 0
-    Xt <- data[t, 1:p]
-    cum_coef_add <- coef_add <- coef.int[index[t], ]
-    # cmatrix_inv_add <- diag(1/epsilon,p) - Xt%o%Xt/epsilon^2/(1+sum(Xt^2)/epsilon)
-
-    coef <- cbind(coef, coef_add)
-    cum_coef <- cbind(cum_coef, cum_coef_add)
-    # cmatrix_inv <- abind::abind(cmatrix_inv, cmatrix_inv_add, along=3)
-    cmatrix <- abind::abind(cmatrix, Xt %o% Xt + epsilon * diag(1, p), along = 3)
-
-    obj <- cval + Fobj[set + 1] + beta
-    min_val <- min(obj)
-    ind <- which(obj == min_val)[1]
-    cp_set_add <- c(cp_set[[set[ind] + 1]], set[ind])
-    cp_set <- append(cp_set, list(cp_set_add))
-    ind2 <- (cval + Fobj[set + 1]) <= min_val
-    set <- c(set[ind2], t)
-    coef <- coef[, ind2, drop = FALSE]
-    cum_coef <- cum_coef[, ind2, drop = FALSE]
-    cmatrix <- cmatrix[, , ind2, drop = FALSE]
-    # cmatrix_inv <- cmatrix_inv[,,ind2,drop=FALSE]
-    Fobj <- c(Fobj, min_val)
-  }
-
-  # Remove change-points close to the boundaries and merge change-points
-
-  cp <- cp_set[[n + 1]]
-  if (length(cp) > 0) {
-    ind3 <- (1:length(cp))[(cp < trim * n) | (cp > (1 - trim) * n)]
-    if (length(ind3) > 0) cp <- cp[-ind3]
-  }
-
-  cp <- sort(unique(c(0, cp)))
-  index <- which((diff(cp) < trim * n) == TRUE)
-  if (length(index) > 0) cp <- floor((cp[-(index + 1)] + cp[-index]) / 2)
-  cp <- cp[cp > 0]
-
-  # nLL <- 0
-  # cp_loc <- unique(c(0,cp,n))
-  # for(i in 1:(length(cp_loc)-1))
-  # {
-  #  seg <- (cp_loc[i]+1):cp_loc[i+1]
-  #  data_seg <- data[seg,]
-  #  out <- fastglm(as.matrix(data_seg[, 1:p]), data_seg[, p+1], family="binomial")
-  #  nLL <- out$deviance/2 + nLL
-  # }
-
-  output <- list(cp)
-  names(output) <- c("cp")
-  return(output)
-}
 
 # Generate data from penalized linear regression models with change-points
 #' @param n Number of observations.
@@ -965,10 +180,8 @@ testthat::test_that("penalized linear regression", {
   data <- out[[1]]
   beta <- log(n) / 2 # beta here has different meaning
 
-  change_points_lasso_fastcpd <- fastcpd::fastcpd(
-    formula = y ~ . - 1,
-    data = data.frame(y = data[, d + 1], x = data[, 1:d]),
-    family = "lasso",
+  change_points_lasso_fastcpd <- fastcpd.lasso(
+    cbind(data[, d + 1], data[, 1:d]),
     epsilon = 1e-5,
     beta = beta,
     cost_adjustment = "BIC"
@@ -979,34 +192,17 @@ testthat::test_that("penalized linear regression", {
     c(100, 300, 520, 800, 901)
   )
 
-  testthat::skip("Skip vanilla penalized linear regression.")
-
-  change_points_lasso_fastcpd_sanity <- segd_lasso(data, beta, B = 10, trim = 0.025)$cp
-
-  testthat::expect_equal(
-    change_points_lasso_fastcpd,
-    change_points_lasso_fastcpd_sanity
-  )
-
-  change_points_lasso_fastcpd_vanilla <- fastcpd::fastcpd(
-    formula = y ~ . - 1,
-    data = data.frame(y = data[, d + 1], x = data[, 1:d]),
-    family = "lasso",
+  change_points_lasso_fastcpd_vanilla <- fastcpd.lasso(
+    cbind(data[, d + 1], data[, 1:d]),
     vanilla_percentage = 1,
     epsilon = 1e-5,
-    beta = beta
+    beta = beta,
+    cost_adjustment = "BIC"
   )@cp_set
-
-  change_points_lasso_fastcpd_vanilla_sanity <- pelt_vanilla_lasso(data, beta, cost = cost_lasso)$cp
 
   testthat::expect_equal(
     change_points_lasso_fastcpd_vanilla,
     c(103, 299, 510, 800, 900)
-  )
-
-  testthat::expect_equal(
-    c(0, change_points_lasso_fastcpd_vanilla),
-    change_points_lasso_fastcpd_vanilla_sanity
   )
 })
 
