@@ -1,3 +1,7 @@
+# fastcpd 0.12.2
+
+*   Update vignettes.
+
 # fastcpd 0.12.1
 
 *   Remove useless C++ codes.
