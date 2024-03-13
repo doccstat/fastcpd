@@ -1,6 +1,8 @@
 # Everything in this script is provided as is. The purpose of this script is to
 # do a sanity check on the C++ implementation of `fastcpd`.
 
+testthat::skip("Skip due to time limit on CRAN.")
+
 # nolint start: script provided as is
 
 testthat::test_that("logistic regression", {
