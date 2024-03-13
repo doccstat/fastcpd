@@ -31,9 +31,9 @@ All `bcp` code is commented out due to
 for (
   package in c(
     "ggplot2", "mvtnorm",
-    # "bcp",
+    # "bcp", "Rbeast",
     "breakfast", "changepoint", "cpm", "CptNonPar", "ecp", "fpop", "gfpop",
-    "InspectChangepoint", "jointseg", "mcp", "mosum", "not", "Rbeast",
+    "InspectChangepoint", "jointseg", "mcp", "mosum", "not",
     "segmented", "stepR", "strucchange", "VARDetect", "wbs"
   )
 ) {
@@ -336,9 +336,9 @@ jointseg::jointSeg(mean_data_1, K = 2)$bestBkp
 ```
 
 ```{r univariate-mean-change-Rbeast}
-Rbeast::beast(
-  mean_data_1, season = "none", print.progress = FALSE, quiet = TRUE
-)$trend$cp
+# Rbeast::beast(
+#   mean_data_1, season = "none", print.progress = FALSE, quiet = TRUE
+# )$trend$cp
 ```
 
 ```{r univariate-mean-change-stepR}
@@ -421,9 +421,9 @@ result_InspectChangepoint$changepoints[, "location"]
 ```
 
 ```{r univariate-mean-and-or-variance-change-Rbeast}
-Rbeast::beast(
-  mv_data_1, season = "none", print.progress = FALSE, quiet = TRUE
-)$trend$cp
+# Rbeast::beast(
+#   mv_data_1, season = "none", print.progress = FALSE, quiet = TRUE
+# )$trend$cp
 ```
 
 ```{r univariate-mean-and-or-variance-change-mcp}
@@ -477,16 +477,16 @@ jointseg::jointSeg(mean_data_3, K = 2)$bestBkp
 ```
 
 ```{r multivariate-mean-change-Rbeast}
-invisible(
-  capture.output(
-    result_Rbeast <- Rbeast::beast123(
-      mean_data_3,
-      metadata = list(whichDimIsTime = 1),
-      season = "none"
-    )
-  )
-)
-result_Rbeast$trend$cp
+# invisible(
+#   capture.output(
+#     result_Rbeast <- Rbeast::beast123(
+#       mean_data_3,
+#       metadata = list(whichDimIsTime = 1),
+#       season = "none"
+#     )
+#   )
+# )
+# result_Rbeast$trend$cp
 ```
 
 ```{r multivariate-mean-change-strucchange}
@@ -536,16 +536,16 @@ result_InspectChangepoint$changepoints[, "location"]
 ```
 
 ```{r multivariate-mean-and-or-variance-change-Rbeast}
-invisible(
-  capture.output(
-    result_Rbeast <- Rbeast::beast123(
-      mv_data_3,
-      metadata = list(whichDimIsTime = 1),
-      season = "none"
-    )
-  )
-)
-result_Rbeast$trend$cp
+# invisible(
+#   capture.output(
+#     result_Rbeast <- Rbeast::beast123(
+#       mv_data_3,
+#       metadata = list(whichDimIsTime = 1),
+#       season = "none"
+#     )
+#   )
+# )
+# result_Rbeast$trend$cp
 ```
 
 # Linear regression
