@@ -71,6 +71,7 @@ parameters and returns a <code>fastcpd</code> object.</p>
 <span>  beta <span class="op">=</span> <span class="st">"MBIC"</span>,</span>
 <span>  cost_adjustment <span class="op">=</span> <span class="st">"MBIC"</span>,</span>
 <span>  family <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  convexity_coef <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  cost <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cost_gradient <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cost_hessian <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -149,6 +150,10 @@ indicating that they will be using their own cost functions. Omitting the
 parameter is the same as specifying the parameter to be <code>"custom"</code>
 or <code>NULL</code>, in which case, users must specify the cost function, with
 optional gradient and corresponding Hessian matrix functions.</p></dd>
+
+
+<dt>convexity_coef</dt>
+<dd><p>Convexity coefficient used in the pruning condition.</p></dd>
 
 
 <dt>cost</dt>
