@@ -136,16 +136,16 @@ results as the built-in logistic regression model.</p>
 <span></span>
 <span><span class="co">#&gt; Warning: fit_glm: fitted probabilities numerically 0 or 1 occurred</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; fastcpd.binomial(data = cbind(y, x), r.progress = FALSE, cost_adjustment = NULL)</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 126 </span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 126</span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Cost values:</span></span>
-<span><span class="co">#&gt; 56.90525 30.76875 </span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 56.90525 30.76875</span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Parameters:</span></span>
 <span><span class="co">#&gt;    segment 1 segment 2</span></span>
 <span><span class="co">#&gt; 1  0.7259293  1.878525</span></span>
@@ -178,15 +178,15 @@ results as the built-in logistic regression model.</p>
 <span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = binomial_data, cost = logistic_loss, </span></span>
-<span><span class="co">#&gt;     cost_gradient = logistic_gradient, cost_hessian = logistic_hessian, </span></span>
+<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = binomial_data, cost = logistic_loss,</span></span>
+<span><span class="co">#&gt;     cost_gradient = logistic_gradient, cost_hessian = logistic_hessian,</span></span>
 <span><span class="co">#&gt;     epsilon = 1e-05, r.progress = FALSE)</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 22 125 </span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 22 125</span></span>
+<span><span class="co">#&gt;</span></span>
 <span><span class="co">#&gt; Parameters:</span></span>
 <span><span class="co">#&gt;   segment 1  segment 2 segment 3</span></span>
 <span><span class="co">#&gt; 1 -59.20045  0.8170446  1.902379</span></span>
@@ -204,7 +204,7 @@ examples</a>.</p>
 <h2 id="appendix-all-code-snippets">Appendix: all code snippets<a class="anchor" aria-label="anchor" href="#appendix-all-code-snippets"></a>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span>, eval <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">package</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ggplot2"</span>, <span class="st">"mvtnorm"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="va">package</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span>
@@ -221,7 +221,31 @@ examples</a>.</p>
 <span><span class="va">binomial_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: fit_glm: fitted probabilities numerically 0 or 1 occurred</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: fit_glm: fitted probabilities numerically 0 or 1 occurred</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: fit_glm: fitted probabilities numerically 0 or 1 occurred</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning: fit_glm: fitted probabilities numerically 0 or 1 occurred</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; fastcpd.binomial(data = cbind(y, x), r.progress = FALSE, cost_adjustment = NULL)</span></span>
+<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; Change points:</span></span>
+<span><span class="co">#&gt; 126</span></span>
+<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; Cost values:</span></span>
+<span><span class="co">#&gt; 56.90525 30.76875</span></span>
+<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; Parameters:</span></span>
+<span><span class="co">#&gt;    segment 1 segment 2</span></span>
+<span><span class="co">#&gt; 1  0.7259293  1.878525</span></span>
+<span><span class="co">#&gt; 2 -1.0294802  2.704376</span></span>
+<span><span class="co">#&gt; 3  1.0576503  3.702310</span></span>
+<span><span class="co">#&gt; 4 -0.8812767  2.258796</span></span>
+<span><span class="co">#&gt; 5  0.2419351  2.524173</span></span>
 <span><span class="va">logistic_loss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
 <span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
@@ -245,7 +269,23 @@ examples</a>.</p>
 <span>  cost_gradient <span class="op">=</span> <span class="va">logistic_gradient</span>, cost_hessian <span class="op">=</span> <span class="va">logistic_hessian</span>,</span>
 <span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = binomial_data, cost = logistic_loss,</span></span>
+<span><span class="co">#&gt;     cost_gradient = logistic_gradient, cost_hessian = logistic_hessian,</span></span>
+<span><span class="co">#&gt;     epsilon = 1e-05, r.progress = FALSE)</span></span>
+<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; Change points:</span></span>
+<span><span class="co">#&gt; 22 125</span></span>
+<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; Parameters:</span></span>
+<span><span class="co">#&gt;   segment 1  segment 2 segment 3</span></span>
+<span><span class="co">#&gt; 1 -59.20045  0.8170446  1.902379</span></span>
+<span><span class="co">#&gt; 2 -34.56676 -0.9600438  2.751578</span></span>
+<span><span class="co">#&gt; 3 216.53373  0.9353306  3.734179</span></span>
+<span><span class="co">#&gt; 4 -80.96420 -0.7393653  2.247423</span></span>
+<span><span class="co">#&gt; 5  51.25224  0.1390591  2.535372</span></span></code></pre></div>
 </div>
   </main>
 </div>

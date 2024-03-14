@@ -1048,7 +1048,7 @@
 </h2>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span></span>
-<span>  collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span>, eval <span class="op">=</span> <span class="cn">TRUE</span>, cache <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span>, eval <span class="op">=</span> <span class="cn">FALSE</span>, cache <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  warning <span class="op">=</span> <span class="cn">FALSE</span>, fig.width <span class="op">=</span> <span class="fl">8</span>, fig.height <span class="op">=</span> <span class="fl">5</span></span>
 <span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
@@ -1841,6 +1841,7 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">segd_binomial</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, <span class="op">(</span><span class="va">p</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">300</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span>, B <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">$</span><span class="va">cp</span></span>
+<span><span class="co">#&gt; [1] 125</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span>,</span>
@@ -1849,8 +1850,10 @@
 <span>  cost_adjustment <span class="op">=</span> <span class="st">"BIC"</span>,</span>
 <span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
+<span><span class="co">#&gt; [1] 125</span></span>
 <span></span>
 <span><span class="fu">pelt_vanilla_binomial</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, <span class="op">(</span><span class="va">p</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">300</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">cp</span></span>
+<span><span class="co">#&gt; [1]   0 125</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span>,</span>
@@ -1860,6 +1863,7 @@
 <span>  cost_adjustment <span class="op">=</span> <span class="st">"BIC"</span>,</span>
 <span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
+<span><span class="co">#&gt; [1] 125</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1500</span></span>
 <span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
@@ -1889,6 +1893,7 @@
 <span><span class="fu">segd_poisson</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>, <span class="va">beta</span>, trim <span class="op">=</span> <span class="fl">0.03</span>, B <span class="op">=</span> <span class="fl">10</span>, epsilon <span class="op">=</span> <span class="fl">0.001</span>, G <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="fl">10</span>, L <span class="op">=</span> <span class="op">-</span><span class="fl">20</span>, H <span class="op">=</span> <span class="fl">20</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">cp</span></span>
+<span><span class="co">#&gt; [1]  380  751 1136 1251</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/fastcpd_poisson.html">fastcpd.poisson</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span>, <span class="va">d</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span>, <span class="va">data</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="va">d</span><span class="op">]</span><span class="op">)</span>,</span>
@@ -1898,8 +1903,10 @@
 <span>  segment_count <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
+<span><span class="co">#&gt; [1]  380  751 1136 1251</span></span>
 <span></span>
 <span><span class="fu">pelt_vanilla_poisson</span><span class="op">(</span><span class="va">data</span>, <span class="va">beta</span><span class="op">)</span><span class="op">$</span><span class="va">cp</span></span>
+<span><span class="co">#&gt; [1]    0  374  752 1133</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/fastcpd_poisson.html">fastcpd.poisson</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span>, <span class="va">d</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span>, <span class="va">data</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="va">d</span><span class="op">]</span><span class="op">)</span>,</span>
@@ -1909,6 +1916,7 @@
 <span>  cost_adjustment <span class="op">=</span> <span class="st">"BIC"</span>,</span>
 <span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
+<span><span class="co">#&gt; [1]  374  752 1133</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
 <span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
@@ -1924,6 +1932,7 @@
 <span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span> <span class="co"># beta here has different meaning</span></span>
 <span></span>
 <span><span class="fu">segd_lasso</span><span class="op">(</span><span class="va">data</span>, <span class="va">beta</span>, B <span class="op">=</span> <span class="fl">10</span>, trim <span class="op">=</span> <span class="fl">0.025</span><span class="op">)</span><span class="op">$</span><span class="va">cp</span></span>
+<span><span class="co">#&gt; [1] 100 300 520 800 901</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span>, <span class="va">d</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span>, <span class="va">data</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="va">d</span><span class="op">]</span><span class="op">)</span>,</span>
@@ -1932,8 +1941,20 @@
 <span>  cost_adjustment <span class="op">=</span> <span class="st">"BIC"</span>,</span>
 <span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
+<span><span class="co">#&gt; [1] 100 300 520 800 901</span></span>
 <span></span>
 <span><span class="fu">pelt_vanilla_lasso</span><span class="op">(</span><span class="va">data</span>, <span class="va">beta</span>, cost <span class="op">=</span> <span class="va">cost_lasso</span><span class="op">)</span><span class="op">$</span><span class="va">cp</span></span>
+<span><span class="co">#&gt; [1] 100</span></span>
+<span><span class="co">#&gt; [1] 200</span></span>
+<span><span class="co">#&gt; [1] 300</span></span>
+<span><span class="co">#&gt; [1] 400</span></span>
+<span><span class="co">#&gt; [1] 500</span></span>
+<span><span class="co">#&gt; [1] 600</span></span>
+<span><span class="co">#&gt; [1] 700</span></span>
+<span><span class="co">#&gt; [1] 800</span></span>
+<span><span class="co">#&gt; [1] 900</span></span>
+<span><span class="co">#&gt; [1] 1000</span></span>
+<span><span class="co">#&gt; [1]   0 103 299 510 800 900</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span>, <span class="va">d</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span>, <span class="va">data</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="va">d</span><span class="op">]</span><span class="op">)</span>,</span>
@@ -1942,7 +1963,8 @@
 <span>  beta <span class="op">=</span> <span class="va">beta</span>,</span>
 <span>  cost_adjustment <span class="op">=</span> <span class="st">"BIC"</span>,</span>
 <span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span></code></pre></div>
+<span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
+<span><span class="co">#&gt; [1] 103 299 510 800 900</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
