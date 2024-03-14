@@ -9,6 +9,7 @@ class Fastcpd {
  public:
   Fastcpd(
     const double beta,
+    const double convexity_coef,
     Nullable<Function> cost,
     const string cost_adjustment,
     Nullable<Function> cost_gradient,
@@ -210,6 +211,8 @@ class Fastcpd {
 
   // `beta` is the initial cost value.
   double beta;
+
+  const double convexity_coef;
 
   // `cost` is the cost function to be used.
   Nullable<Function> cost;

@@ -61,6 +61,7 @@
 #'   parameter is the same as specifying the parameter to be \code{"custom"}
 #'   or \code{NULL}, in which case, users must specify the cost function, with
 #'   optional gradient and corresponding Hessian matrix functions.
+#' @param convexity_coef Convexity coefficient used in the pruning condition.
 #' @param cost Cost function to be used. This and the following two parameters
 #'   should not be specified at the same time with \code{family}. If not
 #'   specified, the default is the negative log-likelihood for the
@@ -200,6 +201,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   beta = "MBIC",
   cost_adjustment = "MBIC",
   family = NULL,
+  convexity_coef = 0,
   cost = NULL,
   cost_gradient = NULL,
   cost_hessian = NULL,
@@ -329,10 +331,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   beta <- get_beta(beta, p, nrow(data_), fastcpd_family, sigma_)
 
   result <- fastcpd_impl(
-    data_, beta, cost_adjustment, segment_count, trim, momentum_coef,
-    multiple_epochs, fastcpd_family, epsilon, p, pruning, order, cost,
-    cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower,
-    upper, line_search, sigma_, p_response, r_progress
+    data_, beta, convexity_coef, cost_adjustment, segment_count, trim,
+    momentum_coef, multiple_epochs, fastcpd_family, epsilon, p, pruning, order,
+    cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
+    lower, upper, line_search, sigma_, p_response, r_progress
   )
 
   raw_cp_set <- c(result$raw_cp_set)

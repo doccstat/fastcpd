@@ -6,6 +6,7 @@ context("negative_log_likelihood_wo_theta Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -57,6 +58,7 @@ context("negative_log_likelihood_wo_cv Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -95,6 +97,7 @@ context("cost_update_gradient Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -133,6 +136,7 @@ context("cost_update_hessian Unit Test") {
   test_that("binomal is correct for a two dimensional data") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -169,6 +173,7 @@ context("cost_update_hessian Unit Test") {
   test_that("poisson is correct for a two dimensional data") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -205,6 +210,7 @@ context("cost_update_hessian Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -249,6 +255,7 @@ context("update_theta_sum Unit Test") {
   test_that("update performs normally") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
+      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
