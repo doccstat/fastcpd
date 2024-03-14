@@ -50,12 +50,12 @@ if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
 )
 
 set.seed(1)
-n <- 300
+n <- 250
 x <- rep(0, n + 1)
-for (i in 1:150) {
+for (i in 1:180) {
   x[i + 1] <- 0.8 * x[i] + rnorm(1, 0, 2)
 }
-for (i in 151:n) {
+for (i in 181:n) {
   x[i + 1] <- 0.1 * x[i] + rnorm(1, 0, 2)
 }
 result <- fastcpd.ts(
