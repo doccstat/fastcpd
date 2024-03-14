@@ -10,6 +10,7 @@ fastcpd(
   beta = "MBIC",
   cost_adjustment = "MBIC",
   family = NULL,
+  convexity_coef = 0,
   cost = NULL,
   cost_gradient = NULL,
   cost_hessian = NULL,
@@ -77,6 +78,8 @@ indicating that they will be using their own cost functions. Omitting the
 parameter is the same as specifying the parameter to be \code{"custom"}
 or \code{NULL}, in which case, users must specify the cost function, with
 optional gradient and corresponding Hessian matrix functions.}
+
+\item{convexity_coef}{Convexity coefficient used in the pruning condition.}
 
 \item{cost}{Cost function to be used. This and the following two parameters
 should not be specified at the same time with \code{family}. If not

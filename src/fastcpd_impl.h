@@ -7,6 +7,7 @@
 //
 // @param data A data frame containing the data to be segmented.
 // @param beta Initial cost value.
+// @param convexity_coef The constant to satisfy the pruning condition.
 // @param cost_adjustment Adjustment for the cost function.
 // @param segment_count Number of segments for initial guess.
 // @param trim Trimming for the boundary change points.
@@ -49,6 +50,7 @@
 List fastcpd_impl(
     mat data,
     double beta,
+    const double convexity_coef,
     const string cost_adjustment,
     const int segment_count,
     const double trim,
