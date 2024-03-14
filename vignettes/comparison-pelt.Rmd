@@ -11,7 +11,7 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE, comment = "#>", eval = TRUE, cache = FALSE,
+  collapse = TRUE, comment = "#>", eval = FALSE, cache = FALSE,
   warning = FALSE, fig.width = 8, fig.height = 5
 )
 library(fastcpd)
@@ -826,6 +826,7 @@ y <- c(
 )
 
 segd_binomial(cbind(x, y), (p + 1) * log(300) / 2, B = 5)$cp
+#> [1] 125
 
 fastcpd.binomial(
   cbind(y, x),
@@ -834,8 +835,10 @@ fastcpd.binomial(
   cost_adjustment = "BIC",
   r.progress = FALSE
 )@cp_set
+#> [1] 125
 
 pelt_vanilla_binomial(cbind(x, y), (p + 1) * log(300) / 2)$cp
+#> [1]   0 125
 
 fastcpd.binomial(
   cbind(y, x),
@@ -845,6 +848,7 @@ fastcpd.binomial(
   cost_adjustment = "BIC",
   r.progress = FALSE
 )@cp_set
+#> [1] 125
 ```
 
 # Poisson regression
@@ -879,6 +883,7 @@ beta <- log(n) * (d + 1) / 2
 segd_poisson(
   data, beta, trim = 0.03, B = 10, epsilon = 0.001, G = 10^10, L = -20, H = 20
 )$cp
+#> [1]  380  751 1136 1251
 
 fastcpd.poisson(
   cbind(data[, d + 1], data[, 1:d]),
@@ -888,8 +893,10 @@ fastcpd.poisson(
   segment_count = 10,
   r.progress = FALSE
 )@cp_set
+#> [1]  380  751 1136 1251
 
 pelt_vanilla_poisson(data, beta)$cp
+#> [1]    0  374  752 1133
 
 fastcpd.poisson(
   cbind(data[, d + 1], data[, 1:d]),
@@ -899,6 +906,7 @@ fastcpd.poisson(
   cost_adjustment = "BIC",
   r.progress = FALSE
 )@cp_set
+#> [1]  374  752 1133
 ```
 
 # Penalized linear regression
@@ -919,6 +927,7 @@ data <- out[[1]]
 beta <- log(n) / 2 # beta here has different meaning
 
 segd_lasso(data, beta, B = 10, trim = 0.025)$cp
+#> [1] 100 300 520 800 901
 
 fastcpd.lasso(
   cbind(data[, d + 1], data[, 1:d]),
@@ -927,8 +936,20 @@ fastcpd.lasso(
   cost_adjustment = "BIC",
   r.progress = FALSE
 )@cp_set
+#> [1] 100 300 520 800 901
 
 pelt_vanilla_lasso(data, beta, cost = cost_lasso)$cp
+#> [1] 100
+#> [1] 200
+#> [1] 300
+#> [1] 400
+#> [1] 500
+#> [1] 600
+#> [1] 700
+#> [1] 800
+#> [1] 900
+#> [1] 1000
+#> [1]   0 103 299 510 800 900
 
 fastcpd.lasso(
   cbind(data[, d + 1], data[, 1:d]),
@@ -938,9 +959,10 @@ fastcpd.lasso(
   cost_adjustment = "BIC",
   r.progress = FALSE
 )@cp_set
+#> [1] 103 299 510 800 900
 ```
 
 # Appendix: all code snippets
 
-```{r ref.label = knitr::all_labels(), echo = TRUE, eval = FALSE}
+```{r ref.label = knitr::all_labels(), echo = TRUE}
 ```
