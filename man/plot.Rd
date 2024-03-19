@@ -61,6 +61,8 @@ of segments.}
 
 \item{panel_background}{Background of the panel.}
 
+\item{panel_border}{Border of the panel.}
+
 \item{panel_grid_major}{Major grid lines of the panel.}
 
 \item{panel_grid_minor}{Minor grid lines of the panel.}
