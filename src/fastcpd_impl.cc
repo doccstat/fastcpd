@@ -13,7 +13,6 @@ List fastcpd_impl(
     const string family,
     const double epsilon,
     const int p,
-    const bool pruning,
     const colvec order,
     Nullable<Function> cost,
     Nullable<Function> cost_gradient,
@@ -32,7 +31,7 @@ List fastcpd_impl(
   fastcpd::classes::Fastcpd fastcpd_class(
     beta, convexity_coef, cost, cost_adjustment, cost_gradient, cost_hessian,
     cp_only, data, epsilon, family, k, line_search, lower, momentum_coef, order,
-    p, pruning, p_response, r_progress, segment_count, trim, upper,
+    p, p_response, r_progress, segment_count, trim, upper,
     vanilla_percentage, variance_estimate, warm_start
   );
   return fastcpd_class.run();

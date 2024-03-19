@@ -24,7 +24,6 @@ fastcpd(
   epsilon = 1e-10,
   order = c(0, 0, 0),
   p = ncol(data) - 1,
-  pruning = TRUE,
   cp_only = FALSE,
   vanilla_percentage = 0,
   warm_start = FALSE,
@@ -79,7 +78,8 @@ parameter is the same as specifying the parameter to be \code{"custom"}
 or \code{NULL}, in which case, users must specify the cost function, with
 optional gradient and corresponding Hessian matrix functions.}
 
-\item{convexity_coef}{Convexity coefficient used in the pruning condition.}
+\item{convexity_coef}{Convexity coefficient used in the pruning condition.
+If set to be \code{-Inf}, no pruning will be performed.}
 
 \item{cost}{Cost function to be used. This and the following two parameters
 should not be specified at the same time with \code{family}. If not
@@ -184,11 +184,6 @@ computation in Logistic Regression and Poisson Regression.}
 covariates will be inferred from the data, i.e.,
 \code{p = ncol(data) - 1}. This parameter is superseded by \code{order} in the
 case of time series models: "ar", "var", "arima".}
-
-\item{pruning}{If \code{TRUE}, the algorithm will perform pruning on the
-change points. By default, the value is set to be \code{TRUE}. Pruning
-should be set to be \code{FALSE} if the pruning condition is not
-satisfied.}
 
 \item{cp_only}{If \code{TRUE}, only the change points are returned.
 Otherwise, the cost function values together with the estimated
