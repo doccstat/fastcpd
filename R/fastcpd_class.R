@@ -188,6 +188,7 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
 #' @param data_point_size Size of the data points.
 #' @param legend_position Position of the legend.
 #' @param panel_background Background of the panel.
+#' @param panel_border Border of the panel.
 #' @param panel_grid_major Major grid lines of the panel.
 #' @param panel_grid_minor Minor grid lines of the panel.
 #' @param segment_separator_alpha Alpha of the segment separator lines.
