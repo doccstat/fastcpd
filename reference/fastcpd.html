@@ -12,7 +12,7 @@ parameters and returns a fastcpd object."><meta property="og:image" content="htt
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,6 +85,7 @@ parameters and returns a <code>fastcpd</code> object.</p>
 <span>  epsilon <span class="op">=</span> <span class="fl">1e-10</span>,</span>
 <span>  order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>  p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
+<span>  pruning <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cp_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  vanilla_percentage <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  warm_start <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -152,8 +153,7 @@ optional gradient and corresponding Hessian matrix functions.</p></dd>
 
 
 <dt>convexity_coef</dt>
-<dd><p>Convexity coefficient used in the pruning condition.
-If set to be <code>-Inf</code>, no pruning will be performed.</p></dd>
+<dd><p>Convexity coefficient used in the pruning condition.</p></dd>
 
 
 <dt>cost</dt>
@@ -274,6 +274,13 @@ computation in Logistic Regression and Poisson Regression.</p></dd>
 covariates will be inferred from the data, i.e.,
 <code>p = ncol(data) - 1</code>. This parameter is superseded by <code>order</code> in the
 case of time series models: "ar", "var", "arima".</p></dd>
+
+
+<dt>pruning</dt>
+<dd><p>If <code>TRUE</code>, the algorithm will perform pruning on the
+change points. By default, the value is set to be <code>TRUE</code>. Pruning
+should be set to be <code>FALSE</code> if the pruning condition is not
+satisfied.</p></dd>
 
 
 <dt>cp_only</dt>
