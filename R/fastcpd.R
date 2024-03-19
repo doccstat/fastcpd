@@ -325,6 +325,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   vanilla_percentage <-
     get_vanilla_percentage(vanilla_percentage, cost, fastcpd_family)
   beta <- get_beta(beta, p, nrow(data_), fastcpd_family, sigma_)
+  convexity_coef <- get_convexity_coef(convexity_coef, fastcpd_family)
 
   result <- fastcpd_impl(
     data_, beta, convexity_coef, cost_adjustment, segment_count, trim,

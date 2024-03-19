@@ -208,6 +208,14 @@ get_beta <- function(beta, p, n, fastcpd_family, sigma_) {
   }
 }
 
+get_convexity_coef <- function(convexity_coef, fastcpd_family) {
+  if (fastcpd_family == "mgaussian") {
+    -Inf
+  } else {
+    convexity_coef
+  }
+}
+
 get_p_response <- function(family, y, data) {
   if (family %in% c(
     "mean", "variance", "meanvariance", "mv", "ma", "arma", "arima", "garch"
