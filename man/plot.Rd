@@ -11,9 +11,17 @@
   data_point_alpha = 0.8,
   data_point_linewidth = 0.5,
   data_point_size = 1,
-  segment_separator_alpha = 0.7,
+  legend_position = "none",
+  panel_background = ggplot2::element_blank(),
+  panel_border = ggplot2::element_rect(fill = NA, colour = "grey20"),
+  panel_grid_major = ggplot2::element_line(colour = "grey98"),
+  panel_grid_minor = ggplot2::element_line(colour = "grey98"),
+  segment_separator_alpha = 0.8,
   segment_separator_color = "grey",
   segment_separator_linetype = "dashed",
+  strip_background = ggplot2::element_rect(fill = "grey85", colour = "grey20"),
+  xlab = NULL,
+  ylab = NULL,
   ...
 )
 
@@ -23,9 +31,17 @@
   data_point_alpha = 0.8,
   data_point_linewidth = 0.5,
   data_point_size = 1,
-  segment_separator_alpha = 0.7,
+  legend_position = "none",
+  panel_background = ggplot2::element_blank(),
+  panel_border = ggplot2::element_rect(fill = NA, colour = "grey20"),
+  panel_grid_major = ggplot2::element_line(colour = "grey98"),
+  panel_grid_minor = ggplot2::element_line(colour = "grey98"),
+  segment_separator_alpha = 0.8,
   segment_separator_color = "grey",
   segment_separator_linetype = "dashed",
+  strip_background = ggplot2::element_rect(fill = "grey85", colour = "grey20"),
+  xlab = NULL,
+  ylab = NULL,
   ...
 )
 }
@@ -41,11 +57,25 @@ of segments.}
 
 \item{data_point_size}{Size of the data points.}
 
+\item{legend_position}{Position of the legend.}
+
+\item{panel_background}{Background of the panel.}
+
+\item{panel_grid_major}{Major grid lines of the panel.}
+
+\item{panel_grid_minor}{Minor grid lines of the panel.}
+
 \item{segment_separator_alpha}{Alpha of the segment separator lines.}
 
 \item{segment_separator_color}{Color of the segment separator lines.}
 
 \item{segment_separator_linetype}{Linetype of the segment separator lines.}
+
+\item{strip_background}{Background of the strip.}
+
+\item{xlab}{Label for the x-axis.}
+
+\item{ylab}{Label for the y-axis.}
 
 \item{...}{Ignored.}
 }
