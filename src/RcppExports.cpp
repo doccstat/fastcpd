@@ -13,8 +13,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // fastcpd_impl
-List fastcpd_impl(mat data, double beta, const double convexity_coef, const string cost_adjustment, const int segment_count, const double trim, const double momentum_coef, Nullable<Function> k, const string family, const double epsilon, const int p, const bool pruning, const colvec order, Nullable<Function> cost, Nullable<Function> cost_gradient, Nullable<Function> cost_hessian, const bool cp_only, const double vanilla_percentage, const bool warm_start, colvec lower, colvec upper, colvec line_search, const mat variance_estimate, const unsigned int p_response, const bool r_progress);
-RcppExport SEXP _fastcpd_fastcpd_impl(SEXP dataSEXP, SEXP betaSEXP, SEXP convexity_coefSEXP, SEXP cost_adjustmentSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP kSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP pSEXP, SEXP pruningSEXP, SEXP orderSEXP, SEXP costSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP cp_onlySEXP, SEXP vanilla_percentageSEXP, SEXP warm_startSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP line_searchSEXP, SEXP variance_estimateSEXP, SEXP p_responseSEXP, SEXP r_progressSEXP) {
+List fastcpd_impl(mat data, double beta, const double convexity_coef, const string cost_adjustment, const int segment_count, const double trim, const double momentum_coef, Nullable<Function> k, const string family, const double epsilon, const int p, const colvec order, Nullable<Function> cost, Nullable<Function> cost_gradient, Nullable<Function> cost_hessian, const bool cp_only, const double vanilla_percentage, const bool warm_start, colvec lower, colvec upper, colvec line_search, const mat variance_estimate, const unsigned int p_response, const bool r_progress);
+RcppExport SEXP _fastcpd_fastcpd_impl(SEXP dataSEXP, SEXP betaSEXP, SEXP convexity_coefSEXP, SEXP cost_adjustmentSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP kSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP pSEXP, SEXP orderSEXP, SEXP costSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP cp_onlySEXP, SEXP vanilla_percentageSEXP, SEXP warm_startSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP line_searchSEXP, SEXP variance_estimateSEXP, SEXP p_responseSEXP, SEXP r_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -29,7 +29,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const string >::type family(familySEXP);
     Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
     Rcpp::traits::input_parameter< const int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< const bool >::type pruning(pruningSEXP);
     Rcpp::traits::input_parameter< const colvec >::type order(orderSEXP);
     Rcpp::traits::input_parameter< Nullable<Function> >::type cost(costSEXP);
     Rcpp::traits::input_parameter< Nullable<Function> >::type cost_gradient(cost_gradientSEXP);
@@ -43,7 +42,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const mat >::type variance_estimate(variance_estimateSEXP);
     Rcpp::traits::input_parameter< const unsigned int >::type p_response(p_responseSEXP);
     Rcpp::traits::input_parameter< const bool >::type r_progress(r_progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(fastcpd_impl(data, beta, convexity_coef, cost_adjustment, segment_count, trim, momentum_coef, k, family, epsilon, p, pruning, order, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper, line_search, variance_estimate, p_response, r_progress));
+    rcpp_result_gen = Rcpp::wrap(fastcpd_impl(data, beta, convexity_coef, cost_adjustment, segment_count, trim, momentum_coef, k, family, epsilon, p, order, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper, line_search, variance_estimate, p_response, r_progress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -51,7 +50,7 @@ END_RCPP
 RcppExport SEXP run_testthat_tests(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_fastcpd_fastcpd_impl", (DL_FUNC) &_fastcpd_fastcpd_impl, 25},
+    {"_fastcpd_fastcpd_impl", (DL_FUNC) &_fastcpd_fastcpd_impl, 24},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };

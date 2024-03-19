@@ -19,7 +19,6 @@
 // @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
 //   poisson.
 // @param p Number of parameters to be estimated.
-// @param pruning Whether to prune the change points.
 // @param order Order for time series models.
 // @param cost Cost function to be used. If not specified, the default is
 //   the negative log-likelihood for the corresponding family.
@@ -59,7 +58,6 @@ List fastcpd_impl(
     const string family,
     const double epsilon,
     const int p,
-    const bool pruning,
     const colvec order,
     Nullable<Function> cost,
     Nullable<Function> cost_gradient,

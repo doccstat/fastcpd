@@ -26,7 +26,6 @@ Fastcpd::Fastcpd(
     const double momentum_coef,
     const colvec order,
     const int p,
-    const bool pruning,
     const unsigned int p_response,
     const bool r_progress,
     const int segment_count,
@@ -51,7 +50,6 @@ Fastcpd::Fastcpd(
     momentum_coef(momentum_coef),
     order(order),
     p(p),
-    pruning(pruning),
     p_response(p_response),
     r_progress(r_progress),
     segment_count(segment_count),
@@ -525,8 +523,8 @@ List Fastcpd::run() {
     DEBUG_RCOUT(cp_sets[t]);
 
     // Pruning step.
-    ucolvec pruned_left = pruning ?
-      find(cval + fvec.rows(r_t_set) + convexity_coef <= min_obj) : r_t_set;
+    ucolvec pruned_left =
+      find(cval + fvec.rows(r_t_set) + convexity_coef <= min_obj);
     DEBUG_RCOUT(pruned_left);
     ucolvec pruned_r_t_set = zeros<ucolvec>(pruned_left.n_elem + 1);
     DEBUG_RCOUT(pruned_r_t_set);
