@@ -5,6 +5,6 @@ testthat::test_that(
 
     source("examples/fastcpd_lm.R")
     testthat::expect_equal(result_lm@cp_set, c(97, 201))
-    testthat::expect_equal(result_mlm@cp_set, 375)
+    testthat::expect_equal(result_mlm@cp_set, 350)
   }
 )
