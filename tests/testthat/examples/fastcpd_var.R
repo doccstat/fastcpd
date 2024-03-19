@@ -10,5 +10,5 @@ for (i in 1:200) {
 for (i in 201:n) {
   x[i + 2, ] <- theta_2 %*% c(x[i + 1, ], x[i, ]) + rnorm(p, 0, 1)
 }
-result <- fastcpd.var(x, 2, convexity_coef = -Inf)
+result <- fastcpd.var(x, 2)
 summary(result)
