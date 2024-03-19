@@ -25,20 +25,8 @@ for (segment_index in seq_along(segment_starts)) {
   residual <- c(residual, segment - median(segment))
 }
 
-p <- ggplot2::ggplot() +
-  ggplot2::geom_vline(xintercept = result@cp_set, color = "red") +
-  ggplot2::geom_point(
-    data = data.frame(
-      x = seq_along(well_log), y = c(well_log), label = "well_log"
-    ),
-    ggplot2::aes(x = x, y = y)
-  ) +
-  ggplot2::geom_point(
-    data = data.frame(
-      x = seq_along(residual), y = residual, label = "residuals"
-    ),
-    ggplot2::aes(x = x, y = y)
-  ) +
-  ggplot2::facet_wrap("label", nrow = 2, scales = "free_y")
-print(p)
+result@residuals <- residual
+result@family <- "mean"
+result@data <- data.frame(x = c(well_log))
+plot(result)
 }
