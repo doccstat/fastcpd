@@ -15,15 +15,18 @@ cp_dates <- as.Date("1969-01-01", format = "%Y-%m-%d")
 cp_dates <- cp_dates + lubridate::period(month = 1 + result_lm@cp_set + 12)
 cp_dates <- zoo::as.yearmon(cp_dates)
 
+dates <- zoo::as.yearmon(time(uk_seatbelts))
+
 uk_seatbelts_df <- data.frame(
-  dates = zoo::as.yearmon(time(uk_seatbelts)),
-  drivers = c(uk_seatbelts[, "drivers"])
+  dates = dates,
+  drivers = c(uk_seatbelts[, "drivers"]),
+  color = as.factor((dates < cp_dates[1]) + (dates < cp_dates[2]))
 )
 
 ggplot2::ggplot() +
   ggplot2::geom_line(
     data = uk_seatbelts_df,
-    mapping = ggplot2::aes(x = dates, y = drivers)
+    mapping = ggplot2::aes(x = dates, y = drivers, color = color)
   ) +
   ggplot2::geom_vline(
     xintercept = cp_dates,
@@ -37,4 +40,6 @@ ggplot2::ggplot() +
     y = 1025,
     label = as.character(cp_dates),
     color = "blue"
-  )
+  ) +
+  ggplot2::theme_bw() +
+  ggplot2::theme(legend.position = "none")

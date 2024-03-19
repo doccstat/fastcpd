@@ -7,40 +7,45 @@
 \usage{
 \method{plot}{fastcpd}(
   x,
-  segment_separator_alpha = 0.7,
-  segment_separator_color = "grey",
-  segment_separator_linetype = "dashed",
+  color_max_count = Inf,
   data_point_alpha = 0.8,
   data_point_linewidth = 0.5,
   data_point_size = 1,
+  segment_separator_alpha = 0.7,
+  segment_separator_color = "grey",
+  segment_separator_linetype = "dashed",
   ...
 )
 
 \S4method{plot}{fastcpd,missing}(
   x,
-  segment_separator_alpha = 0.7,
-  segment_separator_color = "grey",
-  segment_separator_linetype = "dashed",
+  color_max_count = Inf,
   data_point_alpha = 0.8,
   data_point_linewidth = 0.5,
   data_point_size = 1,
+  segment_separator_alpha = 0.7,
+  segment_separator_color = "grey",
+  segment_separator_linetype = "dashed",
   ...
 )
 }
 \arguments{
 \item{x}{\code{fastcpd} object.}
 
-\item{segment_separator_alpha}{Alpha of the segment separator lines.}
-
-\item{segment_separator_color}{Color of the segment separator lines.}
-
-\item{segment_separator_linetype}{Linetype of the segment separator lines.}
+\item{color_max_count}{Maximum number of colors to use for the plotting
+of segments.}
 
 \item{data_point_alpha}{Alpha of the data points.}
 
 \item{data_point_linewidth}{Linewidth of the data points.}
 
 \item{data_point_size}{Size of the data points.}
+
+\item{segment_separator_alpha}{Alpha of the segment separator lines.}
+
+\item{segment_separator_color}{Color of the segment separator lines.}
+
+\item{segment_separator_linetype}{Linetype of the segment separator lines.}
 
 \item{...}{Ignored.}
 }
