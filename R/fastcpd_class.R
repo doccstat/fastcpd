@@ -39,7 +39,16 @@ setClass(
 #' @method plot fastcpd
 #' @rdname plot
 #' @export
-plot.fastcpd <- function(x, ...) {  # nolint: cyclomatic complexity
+plot.fastcpd <- function(  # nolint: cyclomatic complexity
+  x,
+  segment_separator_alpha = 0.7,
+  segment_separator_color = "grey",
+  segment_separator_linetype = "dashed",
+  data_point_alpha = 0.8,
+  data_point_linewidth = 0.5,
+  data_point_size = 1,
+  ...
+) {
   # Plot the built in families only.
   stopifnot(
     "Built-in plot only works for built-in families." = x@family != "custom"
@@ -60,59 +69,93 @@ plot.fastcpd <- function(x, ...) {  # nolint: cyclomatic complexity
     }
   }
   if (require_namespace("ggplot2")) {
+    n <- nrow(x@data)
+    family <- x@family
+    change_points <- sort(c(0, x@cp_set, n))
+    color <- as.factor(rep(seq_along(change_points[-1]), diff(change_points)))
+
     y <- x@data[, 1]
     p <- ggplot2::ggplot() +
-      ggplot2::geom_vline(xintercept = x@cp_set, color = "red")
+      ggplot2::geom_vline(
+        xintercept = x@cp_set,
+        color = segment_separator_color,
+        linetype = segment_separator_linetype,
+        alpha = segment_separator_alpha
+      )
 
     # Draw lines for time series data and points for other data.
-    if (x@family %in% c("ar", "ma", "arma", "arima", "garch")) {
-      line_or_point <- ggplot2::geom_line
+    if (family %in% c("ar", "ma", "arma", "arima", "garch")) {
       y_label <-
-        paste0(toupper(x@family), "(", paste0(x@order, collapse = ", "), ")")
+        paste0(toupper(family), "(", paste0(x@order, collapse = ", "), ")")
+    } else if (family %in% c("mean", "variance", "meanvariance", "mv")) {
+      y_label <- "data"
     } else {
-      line_or_point <- ggplot2::geom_point
       y_label <- "response"
     }
-    p <- p + line_or_point(
-      data = data.frame(x = seq_len(nrow(x@data)), y = y, label = y_label),
-      ggplot2::aes(x = x, y = y)
-    )
 
-    if (x@family != "var" && !x@cp_only) {
-      p <- p + ggplot2::geom_point(
-        data = data.frame(
-          x = seq_len(nrow(x@data)),
-          y = x@residuals,
-          label = "residual"
-        ),
-        ggplot2::aes(x = x, y = y),
-        na.rm = TRUE
+    data_label_color <- data.frame(
+      x = seq_len(n), y = y, label = y_label, color = color
+    )
+    residual_label_color <- data.frame(
+      x = seq_len(n),
+      y = x@residuals,
+      label = "residual",
+      color = color
+    )
+    covariate_label_color <- data.frame(
+      x = seq_len(n),
+      y = x@data[, ncol(x@data)],
+      label = "covariate",
+      color = color
+    )
+    aesthetic_mapping <- ggplot2::aes(x = x, y = y, color = color)
+
+    if (family %in% c("ar", "ma", "arma", "arima", "garch")) {
+      p <- p + ggplot2::geom_line(
+        data = data_label_color, aesthetic_mapping, alpha = data_point_alpha,
+        linewidth = data_point_linewidth
       )
-      if (ncol(x@data) == 2 || (x@family == "ar" && nrow(x@thetas) == 1)) {
-        xend <- c(x@cp_set, nrow(x@data))
+    } else {
+      p <- p + ggplot2::geom_point(
+        data = data_label_color, aesthetic_mapping, alpha = data_point_alpha,
+        size = data_point_size
+      )
+    }
+
+    if (family != "var" && !x@cp_only) {
+      p <- p + ggplot2::geom_point(
+        data = residual_label_color,
+        aesthetic_mapping,
+        na.rm = TRUE,
+        alpha = data_point_alpha,
+        size = data_point_size
+      )
+      if (ncol(x@data) == 2 || (family == "ar" && nrow(x@thetas) == 1)) {
+        xend <- c(x@cp_set, n)
         yend <- as.numeric(x@thetas)
+
+        coefficient_label <- data.frame(
+          x = c(1, x@cp_set),
+          y = yend,
+          xend = xend,
+          yend = yend,
+          label = "coefficient"
+        )
+
         p <- p + ggplot2::geom_point(
-          data = data.frame(
-            x = seq_len(nrow(x@data)),
-            y = x@data[, ncol(x@data)],
-            label = "covariate"
-          ),
-          ggplot2::aes(x = x, y = y)
+          data = covariate_label_color,
+          aesthetic_mapping,
+          size = data_point_size
         )
         p <- p + ggplot2::geom_segment(
-          data = data.frame(
-            x = c(1, x@cp_set),
-            y = yend,
-            xend = xend,
-            yend = yend,
-            label = "coefficient"
-          ),
+          data = coefficient_label,
           ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
           col = "blue"
         )
       }
       p <- p + ggplot2::facet_wrap("label", nrow = 2, scales = "free_y")
     }
+    p <- p + ggplot2::theme_bw() + ggplot2::theme(legend.position = "none")
     print(p)
   }
   invisible()
@@ -120,7 +163,12 @@ plot.fastcpd <- function(x, ...) {  # nolint: cyclomatic complexity
 
 #' Plot the data and the change points for a \code{fastcpd} object
 #' @param x \code{fastcpd} object.
-#' @param y Ignored.
+#' @param segment_separator_alpha Alpha of the segment separator lines.
+#' @param segment_separator_color Color of the segment separator lines.
+#' @param segment_separator_linetype Linetype of the segment separator lines.
+#' @param data_point_alpha Alpha of the data points.
+#' @param data_point_linewidth Linewidth of the data points.
+#' @param data_point_size Size of the data points.
 #' @param ... Ignored.
 #'
 #' @return No return value, called for plotting.

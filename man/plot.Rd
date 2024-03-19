@@ -5,16 +5,44 @@
 \alias{plot,fastcpd,missing-method}
 \title{Plot the data and the change points for a \code{fastcpd} object}
 \usage{
-\method{plot}{fastcpd}(x, ...)
+\method{plot}{fastcpd}(
+  x,
+  segment_separator_alpha = 0.7,
+  segment_separator_color = "grey",
+  segment_separator_linetype = "dashed",
+  data_point_alpha = 0.8,
+  data_point_linewidth = 0.5,
+  data_point_size = 1,
+  ...
+)
 
-\S4method{plot}{fastcpd,missing}(x, y, ...)
+\S4method{plot}{fastcpd,missing}(
+  x,
+  segment_separator_alpha = 0.7,
+  segment_separator_color = "grey",
+  segment_separator_linetype = "dashed",
+  data_point_alpha = 0.8,
+  data_point_linewidth = 0.5,
+  data_point_size = 1,
+  ...
+)
 }
 \arguments{
 \item{x}{\code{fastcpd} object.}
 
-\item{...}{Ignored.}
+\item{segment_separator_alpha}{Alpha of the segment separator lines.}
 
-\item{y}{Ignored.}
+\item{segment_separator_color}{Color of the segment separator lines.}
+
+\item{segment_separator_linetype}{Linetype of the segment separator lines.}
+
+\item{data_point_alpha}{Alpha of the data points.}
+
+\item{data_point_linewidth}{Linewidth of the data points.}
+
+\item{data_point_size}{Size of the data points.}
+
+\item{...}{Ignored.}
 }
 \value{
 No return value, called for plotting.
