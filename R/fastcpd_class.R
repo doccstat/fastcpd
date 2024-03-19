@@ -45,9 +45,17 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
   data_point_alpha = 0.8,
   data_point_linewidth = 0.5,
   data_point_size = 1,
-  segment_separator_alpha = 0.7,
+  legend_position = "none",
+  panel_background = ggplot2::element_blank(),
+  panel_border = ggplot2::element_rect(fill = NA, colour = "grey20"),
+  panel_grid_major = ggplot2::element_line(colour = "grey98"),
+  panel_grid_minor = ggplot2::element_line(colour = "grey98"),
+  segment_separator_alpha = 0.8,
   segment_separator_color = "grey",
   segment_separator_linetype = "dashed",
+  strip_background = ggplot2::element_rect(fill = "grey85", colour = "grey20"),
+  xlab = NULL,
+  ylab = NULL,
   ...
 ) {
   # Plot the built in families only.
@@ -157,7 +165,15 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
       }
       p <- p + ggplot2::facet_wrap("label", nrow = 2, scales = "free_y")
     }
-    p <- p + ggplot2::theme_bw() + ggplot2::theme(legend.position = "none")
+    p <- p + ggplot2::theme(
+      legend.position = legend_position,
+      panel.background = panel_background,
+      panel.border = panel_border,
+      panel.grid.major = panel_grid_major,
+      panel.grid.minor = panel_grid_minor,
+      strip.background = strip_background,
+    )
+    p <- p + ggplot2::xlab(xlab) + ggplot2::ylab(ylab)
     print(p)
   }
   invisible()
@@ -170,9 +186,16 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
 #' @param data_point_alpha Alpha of the data points.
 #' @param data_point_linewidth Linewidth of the data points.
 #' @param data_point_size Size of the data points.
+#' @param legend_position Position of the legend.
+#' @param panel_background Background of the panel.
+#' @param panel_grid_major Major grid lines of the panel.
+#' @param panel_grid_minor Minor grid lines of the panel.
 #' @param segment_separator_alpha Alpha of the segment separator lines.
 #' @param segment_separator_color Color of the segment separator lines.
 #' @param segment_separator_linetype Linetype of the segment separator lines.
+#' @param strip_background Background of the strip.
+#' @param xlab Label for the x-axis.
+#' @param ylab Label for the y-axis.
 #' @param ... Ignored.
 #'
 #' @return No return value, called for plotting.
