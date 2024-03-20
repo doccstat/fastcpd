@@ -17,7 +17,7 @@ A matrix representing the variance-covariance matrix or a numeric
 value representing the variance.
 }
 \description{
-Implement Rice estimator.
+Implement Rice estimator for variance in mean change models.
 }
 \examples{
 if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(

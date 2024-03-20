@@ -3,7 +3,7 @@
 \name{plot.fastcpd}
 \alias{plot.fastcpd}
 \alias{plot,fastcpd,missing-method}
-\title{Plot the data and the change points for a \code{fastcpd} object}
+\title{Plot the data and the change points for a \linkS4class{fastcpd} object}
 \usage{
 \method{plot}{fastcpd}(
   x,
@@ -46,7 +46,7 @@
 )
 }
 \arguments{
-\item{x}{\code{fastcpd} object.}
+\item{x}{A \linkS4class{fastcpd} object.}
 
 \item{color_max_count}{Maximum number of colors to use for the plotting
 of segments.}
@@ -85,7 +85,7 @@ of segments.}
 No return value, called for plotting.
 }
 \description{
-Plot the data and the change points for a \code{fastcpd} object
+Plot the data and the change points for a \linkS4class{fastcpd} object
 }
 \examples{
 for (package in c("ggplot2", "mvtnorm")) {

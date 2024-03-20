@@ -20,28 +20,30 @@ The value should be one of \code{"ar"}, \code{"var"}, \code{"arima"} or
 specifying the order of the time series. Possible combinations with
 \code{family} are:
 \itemize{
-\item ar, NUMERIC(1): AR(p) model using linear regression.
-\item var, NUMERIC(1): VAR(p) model using linear regression.
-\item ma, NUMERIC(1): MA(q) model using \code{forecast::Arima}.
-\item ma, NUMERIC(3): ARIMA(0, 0, q) model using \code{forecast::Arima}, where
-\code{q} is the third element of the vector.
-\item arima, NUMERIC(3): ARIMA(p, d, q) model using \code{forecast::Arima}.
-\item garch, NUMERIC(2): GARCH(p, q) model using \code{tseries::garch}.
+\item \code{"ar"}, NUMERIC(1): AR(\eqn{p}) model using linear regression.
+\item \code{"var"}, NUMERIC(1): VAR(\eqn{p}) model using linear regression.
+\item \code{"ma"}, NUMERIC(1): MA(\eqn{q}) model using \code{\link[forecast:Arima]{forecast::Arima()}}.
+\item \code{"ma"}, NUMERIC(3): ARIMA(0, 0, \eqn{q}) model using
+\code{\link[forecast:Arima]{forecast::Arima()}}, where \eqn{q} is the third element of the vector.
+\item \code{"arima"}, NUMERIC(3): ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model
+using \code{\link[forecast:Arima]{forecast::Arima()}}.
+\item \code{"garch"}, NUMERIC(2): GARCH(\eqn{p}, \eqn{q}) model using
+\code{\link[tseries:garch]{tseries::garch()}}.
 }}
 
-\item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
+\item{...}{Other arguments passed to \code{\link[=fastcpd]{fastcpd()}}, for example,
 \code{segment_count}. One special argument can be passed here is
 \code{include.mean}, which is a logical value indicating whether the
 mean should be included in the model. The default value is \code{TRUE}.}
 }
 \value{
-A class \code{fastcpd} object.
+A \linkS4class{fastcpd} object.
 }
 \description{
-\code{fastcpd_ts} is a wrapper function for \code{fastcpd} to find
-change points in time series data. The function is similar to \code{fastcpd}
-except that the data is a time series data and the family is one of
-\code{"ar"}, \code{"var"}, \code{"arima"} or \code{"garch"}.
+\code{\link[=fastcpd_ts]{fastcpd_ts()}} and \code{\link[=fastcpd.ts]{fastcpd.ts()}} are wrapper functions for
+\code{\link[=fastcpd]{fastcpd()}} to find change points in time series data. The function is
+similar to \code{\link[=fastcpd]{fastcpd()}} except that the data is a time series data and the
+family is one of \code{"ar"}, \code{"var"}, \code{"arima"} or \code{"garch"}.
 }
 \examples{
 \donttest{
@@ -69,4 +71,7 @@ result <- fastcpd.ts(
 summary(result)
 plot(result)
 }
+}
+\seealso{
+\code{\link[=fastcpd]{fastcpd()}}
 }

@@ -3,10 +3,11 @@
 \docType{class}
 \name{fastcpd-class}
 \alias{fastcpd-class}
-\title{An S4 class to store the output created with \link{fastcpd}}
+\title{An S4 class to store the output created with \code{\link[=fastcpd]{fastcpd()}}}
 \description{
-This S4 class stores the output from \link{fastcpd}. A fastcpd object consist
-of several slots including the call to \link{fastcpd}, the data used, the
+This S4 class stores the output from \code{\link[=fastcpd]{fastcpd()}} and
+\link{fastcpd.family}. A fastcpd object consist
+of several slots including the call to \code{\link[=fastcpd]{fastcpd()}}, the data used, the
 family of the model, the change points, the cost values, the residuals, the
 estimated parameters and a boolean indicating whether the model was fitted
 with only change points or with change points and parameters, which you can
@@ -33,7 +34,7 @@ Used only for built-in families.}
 \item{\code{thetas}}{The estimated parameters for each segment. Used only for
 built-in families.}
 
-\item{\code{cp_only}}{A boolean indicating whether `fastcpd` was run to return
+\item{\code{cp_only}}{A boolean indicating whether \code{\link[=fastcpd]{fastcpd()}} was run to return
 only the change points or the change points with the estimated parameters
 and cost values for each segment.}
 }}

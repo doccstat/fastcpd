@@ -7,14 +7,14 @@
 \format{
 A data frame with 9752 rows and 7 variables:
 \describe{
-  \item{date}{Character in the format "YYYY-MM-DD hh:mm:ss" from
-    2015-02-11 14:48:00 to 2015-02-18 09:19:00}
-  \item{Temperature}{Temperature in Celsius}
-  \item{Humidity}{Humidity}
-  \item{Light}{Light}
-  \item{CO2}{CO2}
-  \item{HumidityRatio}{Humidity Ratio}
-  \item{Occupancy}{Binary variable with values 0 (unoccupied) and 1}
+\item{date}{Character in the format "YYYY-MM-DD hh:mm:ss" from
+  2015-02-11 14:48:00 to 2015-02-18 09:19:00}
+\item{Temperature}{Temperature in Celsius}
+\item{Humidity}{Humidity}
+\item{Light}{Light}
+\item{CO2}{CO2}
+\item{HumidityRatio}{Humidity Ratio}
+\item{Occupancy}{Binary variable with values 0 (unoccupied) and 1}
 }
 }
 \source{
@@ -24,8 +24,8 @@ A data frame with 9752 rows and 7 variables:
 occupancy
 }
 \description{
-Data set for binary classification of room occupancy from temperature,
-humidity, light and CO2 measurements. Ground-truth occupancy was obtained
-from time stamped pictures that were taken every minute.
+Data set for binary classification of room occupancy from
+temperature, humidity, light and CO2 measurements. Ground-truth occupancy
+was obtained from time stamped pictures that were taken every minute.
 }
 \keyword{datasets}

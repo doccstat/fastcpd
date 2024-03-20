@@ -3,7 +3,7 @@
 \name{fastcpd_garch}
 \alias{fastcpd_garch}
 \alias{fastcpd.garch}
-\title{Find change points efficiently in GARCH(p, q) models}
+\title{Find change points efficiently in GARCH(\eqn{p}, \eqn{q}) models}
 \usage{
 fastcpd_garch(data, order = c(0, 0), ...)
 
@@ -15,16 +15,16 @@ fastcpd.garch(data, order = c(0, 0), ...)
 \item{order}{A positive integer vector of length two specifying the order of
 the GARCH model.}
 
-\item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
+\item{...}{Other arguments passed to \code{\link[=fastcpd]{fastcpd()}}, for example,
 \code{segment_count}.}
 }
 \value{
-A class \code{fastcpd} object.
+A \linkS4class{fastcpd} object.
 }
 \description{
-\code{"fastcpd_garch"} and \code{"fastcpd.garch"} are
-wrapper functions of \code{\link{fastcpd}} to find change points in
-GARCH(p, q) models. The function is similar to \code{"fastcpd"}
+\code{\link[=fastcpd_garch]{fastcpd_garch()}} and \code{\link[=fastcpd.garch]{fastcpd.garch()}} are
+wrapper functions of \code{\link[=fastcpd]{fastcpd()}} to find change points in
+GARCH(\eqn{p}, \eqn{q}) models. The function is similar to \code{\link[=fastcpd]{fastcpd()}}
 except that the data is by default a one-column matrix or univariate vector
 and thus a formula is not required here.
 }
@@ -52,4 +52,7 @@ result <- suppressWarnings(
 summary(result)
 plot(result)
 }
+}
+\seealso{
+\code{\link[=fastcpd]{fastcpd()}}
 }

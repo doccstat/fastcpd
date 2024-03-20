@@ -3,7 +3,8 @@
 \docType{data}
 \name{well_log}
 \alias{well_log}
-\title{Well-log Dataset from Numerical Bayesian Methods Applied to Signal Processing}
+\title{Well-log Dataset from Numerical Bayesian Methods Applied to
+Signal Processing}
 \format{
 A Time-Series of length 3989.
 }
@@ -14,9 +15,9 @@ A Time-Series of length 3989.
 well_log
 }
 \description{
-This is the well-known well-log dataset used in many changepoint papers
-obtained from Alan Turing Institute GitHub repository and licensed under
-the MIT license. Outliers with value less or equal to 1e5 are removed.
+This is the well-known well-log dataset used in many changepoint
+papers obtained from Alan Turing Institute GitHub repository and licensed
+under the MIT license. Outliers with value less or equal to 1e5 are removed.
 }
 \examples{
 if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(

@@ -1,17 +1,11 @@
 #' @title Variance estimation for ARMA model with change points
-#'
-#' @description Estimate the variance for each block and then take the average.
-#'
-#' @example tests/testthat/examples/variance_arma.R
-#'
-#' @md
-#'
 #' @param data A one-column matrix or a vector.
 #' @param p The order of the autoregressive part.
 #' @param q The order of the moving average part.
 #' @param max_order The maximum order of the AR model to consider.
-#'
 #' @return A numeric value representing the variance.
+#' @description Estimate the variance for each block and then take the average.
+#' @example tests/testthat/examples/variance_arma.R
 #'
 #' @rdname variance_arma
 #' @export
@@ -47,21 +41,15 @@ variance_arma <- function(data, p, q, max_order = p * q) {
 variance.arma <- variance_arma  # nolint: Conventional R function style
 
 #' @title Variance estimation for linear models with change points
-#'
-#' @description Estimate the variance for each block and then take the average.
-#'
-#' @example tests/testthat/examples/variance_lm.R
-#'
-#' @md
-#'
 #' @param data A matrix or a data frame with the response variable as the first
-#'   column.
+#' column.
 #' @param d The dimension of the response variable.
 #' @param block_size The size of the blocks to use for variance estimation.
 #' @param outlier_iqr The number of interquartile ranges to use as a threshold
-#'   for outlier detection.
-#'
+#' for outlier detection.
 #' @return A numeric value representing the variance.
+#' @description Estimate the variance for each block and then take the average.
+#' @example tests/testthat/examples/variance_lm.R
 #'
 #' @rdname variance_lm
 #' @export
@@ -138,17 +126,11 @@ variance_lm <- function(
 variance.lm <- variance_lm  # nolint: Conventional R function style
 
 #' @title Variance estimation for mean change models
-#'
-#' @description Implement Rice estimator.
-#'
-#' @example tests/testthat/examples/variance_mean.R
-#'
-#' @md
-#'
 #' @param data A matrix or a data frame with data points as each row.
-#'
 #' @return A matrix representing the variance-covariance matrix or a numeric
-#'   value representing the variance.
+#' value representing the variance.
+#' @description Implement Rice estimator for variance in mean change models.
+#' @example tests/testthat/examples/variance_mean.R
 #'
 #' @rdname variance_mean
 #' @export
@@ -170,16 +152,10 @@ variance_mean <- function(data) {
 variance.mean <- variance_mean  # nolint: Conventional R function style
 
 #' @title Variance estimation for median change models
-#'
-#' @description Implement Rice estimator.
-#'
-#' @example tests/testthat/examples/variance_median.R
-#'
-#' @md
-#'
 #' @param data A vector of data points.
-#'
 #' @return A numeric value representing the variance.
+#' @description Implement Rice estimator.
+#' @example tests/testthat/examples/variance_median.R
 #'
 #' @rdname variance_median
 #' @export

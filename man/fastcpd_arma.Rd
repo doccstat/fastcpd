@@ -3,7 +3,7 @@
 \name{fastcpd_arma}
 \alias{fastcpd_arma}
 \alias{fastcpd.arma}
-\title{Find change points efficiently in ARMA(p, q) models}
+\title{Find change points efficiently in ARMA(\eqn{p}, \eqn{q}) models}
 \usage{
 fastcpd_arma(data, order = c(0, 0), ...)
 
@@ -15,16 +15,16 @@ fastcpd.arma(data, order = c(0, 0), ...)
 \item{order}{A vector of length two specifying the order of the ARMA
 model.}
 
-\item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
+\item{...}{Other arguments passed to \code{\link[=fastcpd]{fastcpd()}}, for example,
 \code{segment_count}.}
 }
 \value{
-A class \code{fastcpd} object.
+A \linkS4class{fastcpd} object.
 }
 \description{
-\code{fastcpd_arma} and \code{fastcpd.arma} are
-wrapper functions of \code{\link{fastcpd}} to find change points in
-ARMA(p, q) models. The function is similar to \code{\link{fastcpd}}
+\code{\link[=fastcpd_arma]{fastcpd_arma()}} and \code{\link[=fastcpd.arma]{fastcpd.arma()}} are
+wrapper functions of \code{\link[=fastcpd]{fastcpd()}} to find change points in
+ARMA(\eqn{p}, \eqn{q}) models. The function is similar to \code{\link[=fastcpd]{fastcpd()}}
 except that the data is by default a one-column matrix or univariate vector
 and thus a formula is not required here.
 }
@@ -59,4 +59,7 @@ result <- suppressWarnings(
 summary(result)
 plot(result)
 }
+}
+\seealso{
+\code{\link[=fastcpd]{fastcpd()}}
 }

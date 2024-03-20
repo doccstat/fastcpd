@@ -3,7 +3,8 @@
 \name{fastcpd_arima}
 \alias{fastcpd_arima}
 \alias{fastcpd.arima}
-\title{Find change points efficiently in ARIMA(p, d, q) models}
+\title{Find change points efficiently in
+ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models}
 \usage{
 fastcpd_arima(data, order = 0, ...)
 
@@ -15,18 +16,19 @@ fastcpd.arima(data, order = 0, ...)
 \item{order}{A vector of length three specifying the order of the ARIMA
 model.}
 
-\item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
+\item{...}{Other arguments passed to \code{\link[=fastcpd]{fastcpd()}}, for example,
 \code{segment_count}. One special argument can be passed here is
 \code{include.mean}, which is a logical value indicating whether the
 mean should be included in the model. The default value is \code{TRUE}.}
 }
 \value{
-A class \code{fastcpd} object.
+A \linkS4class{fastcpd} object.
 }
 \description{
-\code{fastcpd_arima} and \code{fastcpd.arima} are
-wrapper functions of \code{\link{fastcpd}} to find change points in
-ARIMA(p, d, q) models. The function is similar to \code{\link{fastcpd}}
+\code{\link[=fastcpd_arima]{fastcpd_arima()}} and \code{\link[=fastcpd.arima]{fastcpd.arima()}} are
+wrapper functions of \code{\link[=fastcpd]{fastcpd()}} to find change points in
+ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models.
+The function is similar to \code{\link[=fastcpd]{fastcpd()}}
 except that the data is by default a one-column matrix or univariate vector
 and thus a formula is not required here.
 }
@@ -58,4 +60,7 @@ result <- fastcpd.arima(
 summary(result)
 plot(result)
 }
+}
+\seealso{
+\code{\link[=fastcpd]{fastcpd()}}
 }

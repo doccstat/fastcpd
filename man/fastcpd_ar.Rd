@@ -3,7 +3,7 @@
 \name{fastcpd_ar}
 \alias{fastcpd_ar}
 \alias{fastcpd.ar}
-\title{Find change points efficiently in AR(p) models}
+\title{Find change points efficiently in AR(\eqn{p}) models}
 \usage{
 fastcpd_ar(data, order = 0, ...)
 
@@ -14,19 +14,19 @@ fastcpd.ar(data, order = 0, ...)
 
 \item{order}{A positive integer specifying the order of the AR model.}
 
-\item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
+\item{...}{Other arguments passed to \code{\link[=fastcpd]{fastcpd()}}, for example,
 \code{segment_count}. One special argument can be passed here is
 \code{include.mean}, which is a logical value indicating whether the
 mean should be included in the model. The default value is \code{TRUE}.}
 }
 \value{
-A class \code{fastcpd} object.
+A \linkS4class{fastcpd} object.
 }
 \description{
-\code{fastcpd_ar} and \code{fastcpd.ar} are
-wrapper functions of \code{\link{fastcpd}} to find change points in
-AR(p) models. The function is similar to \code{\link{fastcpd}}
-except that the data is by default a one-column matrix or univariate vector
+\code{\link[=fastcpd_ar]{fastcpd_ar()}} and \code{\link[=fastcpd.ar]{fastcpd.ar()}} are
+wrapper functions of \code{\link[=fastcpd]{fastcpd()}} to find change points in
+AR(\eqn{p}) models. The function is similar to \code{\link[=fastcpd]{fastcpd()}} except that
+the data is by default a one-column matrix or univariate vector
 and thus a formula is not required here.
 }
 \examples{
@@ -46,4 +46,7 @@ for (i in 601:1000) {
 result <- fastcpd.ar(x[3 + seq_len(n)], 3)
 summary(result)
 plot(result)
+}
+\seealso{
+\code{\link[=fastcpd]{fastcpd()}}
 }
