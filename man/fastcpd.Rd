@@ -32,110 +32,122 @@ fastcpd(
 }
 \arguments{
 \item{formula}{A formula object specifying the model to be fitted. The
-optional response variable should be on the left hand side of the formula
-while the covariates should be on the right hand side. The intercept term
-should be removed from the formula. The response variable is not
-necessary if the data considered is not of regression type. For example,
-a mean or variance change model does not necessarily have response
-variables. By default an intercept column will be added to the data
-similar to the \code{lm} function in \proglang{R}. Thus it is suggested
-that user should remove the intercept term from the formula by appending
-\code{- 1} to the formula. The default formula is suitable for regression
-data sets with one-dimensional response variable and the rest being
-covariates without intercept. The naming of variables used in the formula
-should be consistent with the column names in the data frame provided in
-\code{data}.}
+(optional) response variable should be on the LHS of the formula, while the
+covariates should be on the RHS. The naming of variables used in the
+formula should be consistent with the column names in the data frame
+provided in \code{data}. The intercept term should be removed from the
+formula. The response variable is not needed for mean/variance change
+models and time series models. By default, an intercept column will be
+added to the data, similar to the \code{lm} function in \proglang{R}.
+Thus, it is suggested that users should remove the intercept term by
+appending \code{- 1} to the formula. Note that the \code{fastcpd.family()}
+functions do not require a formula input.}
 
-\item{data}{A data frame containing the data to be segmented where each row
-denotes each data point. In one-dimensional response variable regression
-settings, the first column is the response variable while the rest are
-covariates. The response is not necessary in the case of mean change or
-variance change, in which case the formula will need to be adjusted
-accordingly.}
+\item{data}{A data frame of dimension \eqn{T \times d}{T * d} containing the
+data to be segmented (where each row denotes a data point
+\eqn{z_t \in \mathbb{R}^d}{z_t in R^d} for \eqn{t = 1, \ldots, T}) is
+required in the main function, while a matrix or a vector input is also
+accepted in the \code{fastcpd.family()} functions.}
 
-\item{beta}{Penalty criterion for the number of change points.
-Take a string value of \code{"MBIC"}, \code{"BIC"}, \code{"MDL"}
-or a numeric value. If a numeric value is provided, the value will be
-used as the penalty criterion for the number of change points in the
-traditional Bayesian Information Criterion. By default, Modified BIC
-criterion is used to obtain a proper value, i.e.,
-\code{beta = (p + 2) * log(nrow(data)) / 2} with adjusted cost
-function.}
+\item{beta}{Penalty criterion for the number of change points. This parameter
+takes a string value of \code{"BIC"}, \code{"MBIC"}, \code{"MDL"} or a
+numeric value. If a numeric value is provided, the value will be used as
+the penalty. By default, the mBIC criterion is used, where
+\eqn{\beta = (d + 2) \log(T) / 2}{\beta = (d + 2) log(T) / 2}. This
+parameter usage should be paired with \code{cost_adjustment} described
+below. Discussions about the penalty criterion can be found in the
+references.}
 
-\item{cost_adjustment}{Cost adjustment criterion for the number of change
-points. Can be \code{"BIC"}, \code{"MBIC"}, \code{"MDL"} or NULL.
-By default, the cost adjustment criterion is set to be \code{"MBIC"}.
-MBIC and MDL modifies the cost function by adding a small negative
-term to the cost function. MDL then transforms the cost function to
-log2 based. BIC or NULL does not modify the cost function.}
+\item{cost_adjustment}{Cost adjustment criterion. It can be \code{"BIC"},
+\code{"MBIC"}, \code{"MDL"} or \code{NULL}. By default, the cost adjustment
+criterion is set to be \code{"MBIC"}. The \code{"MBIC"} and \code{"MDL"}
+criteria modify the cost function by adding a negative adjustment term to
+the cost function. \code{"BIC"} or \code{NULL} does not modify the cost
+function. Details can in found in the references.}
 
-\item{family}{Family of the model. Can be \code{"lm"}, \code{"binomial"},
-\code{"poisson"}, \code{"lasso"}, \code{"custom"}, \code{"ar"},
-\code{"var"}, \code{"ma"}, \code{"arima"}, \code{"garch"} or
-\code{NULL}. For simplicity, user can also omit this parameter,
-indicating that they will be using their own cost functions. Omitting the
-parameter is the same as specifying the parameter to be \code{"custom"}
-or \code{NULL}, in which case, users must specify the cost function, with
-optional gradient and corresponding Hessian matrix functions.}
+\item{family}{Family class of the change point model. It can be \code{"mean"}
+for mean change, \code{"variance"} for variance change,
+\code{"meanvariance"} or \code{"mv"}, for mean and/or variance change,
+\code{"lm"} for linear regression, \code{"binomial"} for logistic
+regression, \code{"poisson"} for Poisson regression, \code{"lasso"} for
+penalized linear regression, \code{"ar"} for AR(\eqn{p}) models,
+\code{"ma"} for MA(\eqn{q}) models,
+\code{"arma"} for ARMA(\eqn{p}, \eqn{q}) models,
+\code{"arima"} for ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models,
+\code{"garch"} for GARCH(\eqn{p}, \eqn{q}) models,
+\code{"var"} for VAR(\eqn{p}) models and
+\code{"custom"} for user specified custom models. Omitting this parameter
+is the same as specifying the parameter to be \code{"custom"} or
+\code{NULL}, in which case, users must specify the custom cost function.}
 
 \item{convexity_coef}{Convexity coefficient used in the pruning condition.
 If set to be \code{-Inf}, no pruning will be performed.}
 
-\item{cost}{Cost function to be used. This and the following two parameters
-should not be specified at the same time with \code{family}. If not
-specified, the default is the negative log-likelihood for the
-corresponding family. Custom cost functions can be provided in the
-following two formats:
+\item{cost}{Cost function to be used. \code{cost}, \code{cost_gradient}, and
+\code{cost_hessian} should not be specified at the same time with
+\code{family} as built-in families have cost functions implemented in C++
+to provide better performance. If not specified, the default is the
+negative log-likelihood for the corresponding family. Custom cost functions
+can be provided in the following two formats:
 \itemize{
 \item \code{cost = function(data) \{...\}}
 \item \code{cost = function(data, theta) \{...\}}
 }
 
-In both methods, users should implement the cost value calculation based
-on the data provided, where the data parameter can be considered as a
-segment of the original data frame in the form of a matrix. The first
-method is used when the cost function has an explicit solution, in which
-case the cost function value can be calculated directly from the data.
-The second method is used when the cost function does not have an
-explicit solution, in which case the cost function value can be
-calculated from the data and the estimated parameters. In the case of
-only one \code{data} argument is provided, \code{fastcpd} performs the
-vanilla PELT algorithm since no parameter updating is performed.}
+Users can specify a loss function using the second format that will be used
+to calculate the cost value. In both formats, the input data is a subset of
+the original data frame in the form of a matrix (matrix with a single
+column in the case of a univariate data set). In the first format, the
+specified cost function directly calculates the cost value. \code{\link[=fastcpd]{fastcpd()}}
+performs the vanilla PELT algorithm, and \code{cost_gradient} and
+\code{cost_hessian} should not be provided since no parameter updating is
+necessary for vanilla PELT. In the second format, the loss function
+\eqn{\sum_{i = s}^t l(z_i, \theta)}{sum_{i = s}^t l(z_i, \theta)}
+is provided, which has to be optimized over the parameter \eqn{\theta} to
+obtain the cost value. A detailed discussion about the custom cost function
+usage can be found in the references.}
 
-\item{cost_gradient}{Gradient function for the custom cost function.
+\item{cost_gradient}{Gradient of the custom cost function. Example usage:
 Example usage:
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{  cost_gradient = function(data, theta) \{
-    ...
-    return(gradient)
-  \}
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{cost_gradient = function(data, theta) \{
+  ...
+  return(gradient)
+\}
 }\if{html}{\out{</div>}}
 
-The gradient function should take two parameters, the first one being a
-segment of the data in the format of a matrix, the second one being the
-estimated parameters. The gradient function should return the gradient of
-the cost function with respect to the data and parameters.}
+The gradient function takes two inputs, the first being a matrix
+representing a segment of the data, similar to the format used in the
+\code{cost} function, and the second being the parameter that needs to be
+optimized. The gradient function returns the value of the gradient of the
+loss function, i.e.,
+\eqn{\sum_{i = s}^t \nabla l(z_i, \theta)}{sum_{i = s}^t l'(z_i, \theta)}.}
 
-\item{cost_hessian}{Hessian function for the custom cost function. Similar to
-the gradient function, the Hessian function should take two parameters,
-the first one being a segment of the data in the format of a matrix, the
-second one being the estimated parameters. The Hessian function should
-return the Hessian matrix of the cost function with respect to the data
-and parameters.}
+\item{cost_hessian}{Hessian of the custom loss function. The Hessian function
+takes two inputs, the first being a matrix representing a segment of the
+data, similar to the format used in the \code{cost} function, and the
+second being the parameter that needs to be optimized. The gradient
+function returns the Hessian of the loss function, i.e.,
+\eqn{\sum_{i = s}^t \nabla^2 l(z_i, \theta)}{%
+  sum_{i = s}^t l''(z_i, \theta)}.}
 
-\item{line_search}{If a vector of numeric values are provided, line
-search will be performed to find the optimal step size for each update.}
+\item{line_search}{If a vector of numeric values is provided, a line search
+will be performed to find the optimal step size for each update. Detailed
+usage of \code{line_search} can be found in the references.}
 
-\item{lower}{Lower bound for the parameters. Used to specify the
-domain of the parameter after each gradient descent step. If not specified,
-the lower bound will be set to be \code{-Inf} for all parameters.}
+\item{lower}{Lower bound for the parameters. Used to specify the domain of
+the parameters after each gradient descent step. If not specified, the
+lower bound will be set to be \code{-Inf} for all parameters. \code{lower}
+is especially useful when the estimated parameters take only positive
+values, such as the noise variance.}
 
-\item{upper}{Upper bound for the parameters. Used to specify the
-domain of the parameter after each gradient descent step. If not specified,
-the upper bound will be set to be \code{Inf} for all parameters.}
+\item{upper}{Upper bound for the parameters. Used to specify the domain of
+the parameters after each gradient descent step. If not specified, the
+upper bound will be set to be \code{Inf} for all parameters.}
 
-\item{segment_count}{Number of segments for initial guess. If not specified,
-the initial guess on the number of segments is 10.}
+\item{segment_count}{An initial guess of the number of segments. If not
+specified, the initial guess of the number of segments is 10. The initial
+guess affects the initial estimates of the parameters in SeGD.}
 
 \item{trim}{Trimming for the boundary change points so that a change point
 close to the boundary will not be counted as a change point. This
@@ -150,35 +162,32 @@ parameter is used when the loss function is bad-shaped so that
 maintaining a momentum from previous update is desired. Default value is
 0, meaning the algorithm doesn't maintain a momentum by default.}
 
-\item{multiple_epochs}{Function on number of epochs in SGD.
-\code{multiple_epochs} should be a function taking only a parameter
-\code{segment_length} meaning the current number of data
-points considered since last segmentaion. The return value of the
-function should be an integer indicating how many epochs should be
-performed apart from the default update. By default the function returns
-0, meaning no multiple epochs will be used to update the parameters.
-Example usage:
+\item{multiple_epochs}{A function can be specified such that an adaptive
+number of multiple epochs can be utilized to improve the algorithm's
+performance. \code{multiple_epochs} is a function of the length of the data
+segment. The function returns an integer indicating how many epochs should
+be performed apart from the default update. By default, the function
+returns zero, meaning no multiple epochs will be used to update the
+parameters. Example usage:
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{  multiple_epochs = function(segment_length) \{
-    if (segment_length < n / segment_count / 4 * 1) 3
-    else if (segment_length < n / segment_count / 4 * 2) 2
-    else if (segment_length < n / segment_count / 4 * 3) 1
-    else 0
-  \}
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{multiple_epochs = function(segment_length) \{
+  if (segment_length < n / segment_count / 4 * 1) 3
+  else if (segment_length < n / segment_count / 4 * 2) 2
+  else if (segment_length < n / segment_count / 4 * 3) 1
+  else 0
+\}
 }\if{html}{\out{</div>}}
 
-This function will perform 3 epochs for the first quarter of the data, 2
-epochs for the second quarter of the data, 1 epoch for the third quarter
-of the data and no multiple epochs for the last quarter of the data.
-Experiments show that performing multiple epochs will significantly
-affect the performance of the algorithm. This parameter is left for the
-users to tune the performance of the algorithm if the result is not
-ideal. Details are discussed in the paper.}
+This function will perform three epochs for the first quarter of the data,
+two epochs for the second quarter of the data, one epoch for the third
+quarter of the data, and no additional epoch for the last quarter of the
+data.}
 
 \item{epsilon}{Epsilon to avoid numerical issues. Only used for the Hessian
 computation in Logistic Regression and Poisson Regression.}
 
-\item{order}{Order of the AR(p), VAR(p) or ARIMA(p, d, q) model.}
+\item{order}{Order of the AR(\eqn{p}), VAR(\eqn{p}) or
+ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model.}
 
 \item{p}{Number of covariates in the model. If not specified, the number of
 covariates will be inferred from the data, i.e.,
@@ -195,31 +204,30 @@ segment need to be calculated and stored. If the users are only
 interested in the change points, setting \code{cp_only} to be \code{TRUE}
 will help with the computational cost.}
 
-\item{vanilla_percentage}{How many of the data should be processed through
-vanilla PELT. Range should be between 0 and 1. The \code{fastcpd}
-algorithm is based on gradient descent and thus a starting estimate can
-be crucial. At the beginning of the algorithm, vanilla PELT can be
-performed to obtain a relatively accurate estimate of the parameters
-despite the small amount of the data being used. If set to be 0, all data
-will be processed through sequential gradient descnet. If set to be 1,
-all data will be processed through vaniall PELT. If the cost function
-have an explicit solution, i.e. does not depend on coefficients like the
-mean change case, this parameter will be set to be 1. If the value is set
-to be between 0 and 1, the first \code{vanilla_percentage * nrow(data)}
-data points will be processed through vanilla PELT and the rest will be
-processed through sequential gradient descent.}
+\item{vanilla_percentage}{The parameter \eqn{v} is between zero and one.
+For each segment, when its length is no more than \eqn{vT}, the cost
+value will be computed by performing an exact minimization of the loss
+function over the parameter. When its length is greater than
+\eqn{vT}, the cost value is approximated through SeGD.
+Therefore, this parameter induces an algorithm that can be interpreted as
+an interpolation between dynamic programming with SeGD (\eqn{v = 0}) and
+the vanilla PELT (\eqn{v = 1}).
+The readers are referred to the references for more details.}
 
 \item{warm_start}{If \code{TRUE}, the algorithm will use the estimated
 parameters from the previous segment as the initial value for the
-current segment. This parameter is only used for \code{"glm"} families.}
+current segment. This parameter is only used for the \code{"glm"} families.}
 
-\item{...}{Parameters specifically used for time series models. The following
-parameters will not be ignored:
+\item{...}{Other parameters for specific models.
 \itemize{
-\item \code{include.mean} is used for ARIMA and GARCH modes.
+\item \code{include.mean} is used to determine if a mean/intercept term should
+be included in the ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) or
+GARCH(\eqn{p}, \eqn{q}) models.
 \item \code{r.progress} is used to control the progress bar. By default the
 progress bar will be shown. To disable it, set \code{r.progress = FALSE}.
 \item \code{p.response} is used to specify the number of response variables.
+This parameter is especially useful for linear models with multivariate
+responses.
 }}
 }
 \value{
@@ -231,7 +239,7 @@ parameters and returns a \code{fastcpd} object.
 }
 \section{Gallery}{
 
-\url{https://fastcpd.xingchi.li/articles/gallery.html}
+\url{https://github.com/doccstat/fastcpd/tree/main/tests/testthat/examples}
 }
 
 \section{References}{
@@ -245,102 +253,25 @@ Proceedings of Machine Learning Research, 1129-1143.
 }
 
 \examples{
-for (package in c("ggplot2", "mvtnorm")) {
-  if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
-    package, repos = "https://cloud.r-project.org", quiet = TRUE
-  )
-}
-
-set.seed(1)
-p <- 1
-x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
-theta_0 <- matrix(c(1, -1, 0.5))
-y <- c(
-  x[1:100, ] * theta_0[1, ] + rnorm(100, 0, 1),
-  x[101:200, ] * theta_0[2, ] + rnorm(100, 0, 1),
-  x[201:300, ] * theta_0[3, ] + rnorm(100, 0, 1)
-)
-result <- fastcpd.lm(cbind(y, x))
-summary(result)
-plot(result)
 if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
   "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
 )
 
 set.seed(1)
-n <- 600
+n <- 200
 p <- 4
 d <- 2
 x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
 theta_1 <- matrix(runif(8, -3, -1), nrow = p)
 theta_2 <- matrix(runif(8, -1, 3), nrow = p)
 y <- rbind(
-  x[1:350, ] \%*\% theta_1 + mvtnorm::rmvnorm(350, rep(0, d), 3 * diag(d)),
-  x[351:n, ] \%*\% theta_2 + mvtnorm::rmvnorm(250, rep(0, d), 3 * diag(d))
+  x[1:125, ] \%*\% theta_1 + mvtnorm::rmvnorm(125, rep(0, d), 3 * diag(d)),
+  x[126:n, ] \%*\% theta_2 + mvtnorm::rmvnorm(75, rep(0, d), 3 * diag(d))
 )
 result_mlm <- fastcpd(
   cbind(y.1, y.2) ~ . - 1, cbind.data.frame(y = y, x = x), family = "lm"
 )
 summary(result_mlm)
-\donttest{
-if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
-  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
-)
-
-set.seed(1)
-p <- 5
-x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
-theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
-y <- c(
-  rbinom(200, 1, 1 / (1 + exp(-x[1:200, ] \%*\% theta[1, ]))),
-  rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] \%*\% theta[2, ])))
-)
-data <- data.frame(y = y, x = x)
-result_builtin <- suppressWarnings(fastcpd.binomial(data))
-logistic_loss <- function(data, theta) {
-  x <- data[, -1]
-  y <- data[, 1]
-  u <- x \%*\% theta
-  nll <- -y * u + log(1 + exp(u))
-  nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
-  sum(nll)
-}
-logistic_loss_gradient <- function(data, theta) {
-  x <- data[nrow(data), -1]
-  y <- data[nrow(data), 1]
-  c(-(y - 1 / (1 + exp(-x \%*\% theta)))) * x
-}
-logistic_loss_hessian <- function(data, theta) {
-  x <- data[nrow(data), -1]
-  prob <- 1 / (1 + exp(-x \%*\% theta))
-  (x \%o\% x) * c((1 - prob) * prob)
-}
-result_custom <- fastcpd(
-  formula = y ~ . - 1,
-  data = data,
-  epsilon = 1e-5,
-  cost = logistic_loss,
-  cost_gradient = logistic_loss_gradient,
-  cost_hessian = logistic_loss_hessian
-)
-cat(
-  "Change points detected by built-in logistic regression model: ",
-  result_builtin@cp_set, "\n",
-  "Change points detected by custom logistic regression model: ",
-  result_custom@cp_set, "\n",
-  sep = ""
-)
-result_custom_two_epochs <- fastcpd(
-  formula = y ~ . - 1,
-  data = data,
-  multiple_epochs = function(segment_length) 1,
-  epsilon = 1e-5,
-  cost = logistic_loss,
-  cost_gradient = logistic_loss_gradient,
-  cost_hessian = logistic_loss_hessian
-)
-summary(result_custom_two_epochs)
-}
 if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
   "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
 )
@@ -400,4 +331,72 @@ huber_regression_result <- fastcpd(
   cost_hessian = huber_loss_hessian
 )
 summary(huber_regression_result)
+\donttest{
+if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
+  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
+)
+
+set.seed(1)
+p <- 5
+x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
+theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
+y <- c(
+  rbinom(200, 1, 1 / (1 + exp(-x[1:200, ] \%*\% theta[1, ]))),
+  rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] \%*\% theta[2, ])))
+)
+data <- data.frame(y = y, x = x)
+result_builtin <- suppressWarnings(fastcpd.binomial(data))
+logistic_loss <- function(data, theta) {
+  x <- data[, -1]
+  y <- data[, 1]
+  u <- x \%*\% theta
+  nll <- -y * u + log(1 + exp(u))
+  nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
+  sum(nll)
+}
+logistic_loss_gradient <- function(data, theta) {
+  x <- data[nrow(data), -1]
+  y <- data[nrow(data), 1]
+  c(-(y - 1 / (1 + exp(-x \%*\% theta)))) * x
+}
+logistic_loss_hessian <- function(data, theta) {
+  x <- data[nrow(data), -1]
+  prob <- 1 / (1 + exp(-x \%*\% theta))
+  (x \%o\% x) * c((1 - prob) * prob)
+}
+result_custom <- fastcpd(
+  formula = y ~ . - 1,
+  data = data,
+  epsilon = 1e-5,
+  cost = logistic_loss,
+  cost_gradient = logistic_loss_gradient,
+  cost_hessian = logistic_loss_hessian
+)
+cat(
+  "Change points detected by built-in logistic regression model: ",
+  result_builtin@cp_set, "\n",
+  "Change points detected by custom logistic regression model: ",
+  result_custom@cp_set, "\n",
+  sep = ""
+)
+result_custom_two_epochs <- fastcpd(
+  formula = y ~ . - 1,
+  data = data,
+  multiple_epochs = function(segment_length) 1,
+  epsilon = 1e-5,
+  cost = logistic_loss,
+  cost_gradient = logistic_loss_gradient,
+  cost_hessian = logistic_loss_hessian
+)
+summary(result_custom_two_epochs)
+}
+}
+\seealso{
+\code{\link[=plot]{plot()}} for plotting the results, \code{\link[=summary]{summary()}} for summarizing the
+results. Aliases: \code{\link[=fastcpd.mean]{fastcpd.mean()}}, \code{\link[=fastcpd.variance]{fastcpd.variance()}}, \code{\link[=fastcpd.mv]{fastcpd.mv()}},
+\code{\link[=fastcpd.meanvariance]{fastcpd.meanvariance()}} for basic statistics change models;
+\code{\link[=fastcpd.lm]{fastcpd.lm()}}, \code{\link[=fastcpd.binomial]{fastcpd.binomial()}}, \code{\link[=fastcpd.poisson]{fastcpd.poisson()}},
+\code{\link[=fastcpd.lasso]{fastcpd.lasso()}} for regression coefficients change models;
+\code{\link[=fastcpd.ar]{fastcpd.ar()}}, \code{\link[=fastcpd.var]{fastcpd.var()}}, \code{\link[=fastcpd.ma]{fastcpd.ma()}}, \code{\link[=fastcpd.arima]{fastcpd.arima()}},
+\code{\link[=fastcpd.arma]{fastcpd.arma()}} for change in time series models.
 }
