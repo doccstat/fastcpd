@@ -28,7 +28,7 @@ custom cost functions and show that the results are similar to the built-in
 logistic regression models.
 
 The built-in logistic regression model in `fastcpd()` is implemented with the
-help of the **fastcpd** package **fastglm**. The **fastcpd** package
+help of the **fastglm** package. The **fastglm** package
 utilizes the iteratively reweighted least squares with the step-halving approach
 to help safeguard against convergence issues. If a
 custom cost function is used with gradient descent, we should expect the results
@@ -127,7 +127,7 @@ We remark that the results can be improved with extra parameters
 already provided in the package.
 The detailed discussion of several advanced usages of the package can be found
 in
-[Advanced examples](https://fastcpd.xingchi.li/articles/examples-advanced.html).
+[Advanced examples](examples-advanced.html).
 
 # Appendix: all code snippets
 
