@@ -180,6 +180,7 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
 }
 
 #' Plot the data and the change points for a \code{fastcpd} object
+#' @example tests/testthat/examples/plot.R
 #' @param x \code{fastcpd} object.
 #' @param color_max_count Maximum number of colors to use for the plotting
 #'   of segments.

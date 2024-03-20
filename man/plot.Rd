@@ -87,3 +87,23 @@ No return value, called for plotting.
 \description{
 Plot the data and the change points for a \code{fastcpd} object
 }
+\examples{
+for (package in c("ggplot2", "mvtnorm")) {
+  if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
+    package, repos = "https://cloud.r-project.org", quiet = TRUE
+  )
+}
+
+set.seed(1)
+p <- 1
+x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))
+theta_0 <- matrix(c(1, -1, 0.5))
+y <- c(
+  x[1:100, ] * theta_0[1, ] + rnorm(100, 0, 1),
+  x[101:200, ] * theta_0[2, ] + rnorm(100, 0, 1),
+  x[201:300, ] * theta_0[3, ] + rnorm(100, 0, 1)
+)
+result <- fastcpd.lm(cbind(y, x))
+summary(result)
+plot(result)
+}
