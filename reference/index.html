@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,10 +76,20 @@
       <p class="section-desc"></p><p>Simplified functions are provided for each family.</p>
 
       
-    </div><div class="section level2">
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="fastcpd_family.html">fastcpd_family</a></code> <code><a href="fastcpd_family.html">fastcpd.family</a></code> 
+        </dt>
+        <dd>Wrapper functions for fastcpd</dd>
+      </dl></div><div class="section level2">
       
       <h3 id="time-series">Time series<a class="anchor" aria-label="anchor" href="#time-series"></a></h3>
-      <p class="section-desc"></p><p><code><a href="../reference/fastcpd_ts.html">fastcpd.ts()</a></code> and <code><a href="../reference/fastcpd_ts.html">fastcpd_ts()</a></code> are the main functions for time series data.</p>
+      <p class="section-desc"></p><p><code><a href="../reference/fastcpd_ts.html">fastcpd_ts()</a></code> and <code><a href="../reference/fastcpd_ts.html">fastcpd.ts()</a></code> are the main functions for time series data (also wrapper functions of <code><a href="../reference/fastcpd.html">fastcpd()</a></code>).</p>
 
       
     </div><div id="" class="section level2">
@@ -91,27 +101,28 @@
           
           <code><a href="fastcpd_ar.html">fastcpd_ar()</a></code> <code><a href="fastcpd_ar.html">fastcpd.ar()</a></code> 
         </dt>
-        <dd>Find change points efficiently in AR(p) models</dd>
+        <dd>Find change points efficiently in AR(\(p\)) models</dd>
       </dl><dl><dt>
           
           <code><a href="fastcpd_arima.html">fastcpd_arima()</a></code> <code><a href="fastcpd_arima.html">fastcpd.arima()</a></code> 
         </dt>
-        <dd>Find change points efficiently in ARIMA(p, d, q) models</dd>
+        <dd>Find change points efficiently in
+ARIMA(\(p\), \(d\), \(q\)) models</dd>
       </dl><dl><dt>
           
           <code><a href="fastcpd_arma.html">fastcpd_arma()</a></code> <code><a href="fastcpd_arma.html">fastcpd.arma()</a></code> 
         </dt>
-        <dd>Find change points efficiently in ARMA(p, q) models</dd>
+        <dd>Find change points efficiently in ARMA(\(p\), \(q\)) models</dd>
       </dl><dl><dt>
           
           <code><a href="fastcpd_garch.html">fastcpd_garch()</a></code> <code><a href="fastcpd_garch.html">fastcpd.garch()</a></code> 
         </dt>
-        <dd>Find change points efficiently in GARCH(p, q) models</dd>
+        <dd>Find change points efficiently in GARCH(\(p\), \(q\)) models</dd>
       </dl><dl><dt>
           
           <code><a href="fastcpd_ma.html">fastcpd_ma()</a></code> <code><a href="fastcpd_ma.html">fastcpd.ma()</a></code> 
         </dt>
-        <dd>Find change points efficiently in MA(q) models</dd>
+        <dd>Find change points efficiently in MA(\(q\)) models</dd>
       </dl><dl><dt>
           
           <code><a href="fastcpd_ts.html">fastcpd_ts()</a></code> <code><a href="fastcpd_ts.html">fastcpd.ts()</a></code> 
@@ -121,7 +132,7 @@
           
           <code><a href="fastcpd_var.html">fastcpd_var()</a></code> <code><a href="fastcpd_var.html">fastcpd.var()</a></code> 
         </dt>
-        <dd>Find change points efficiently in VAR(p) models</dd>
+        <dd>Find change points efficiently in VAR(\(p\)) models</dd>
       </dl></div><div class="section level2">
       
       <h3 id="unlabeled-data">Unlabeled data<a class="anchor" aria-label="anchor" href="#unlabeled-data"></a></h3>
@@ -185,6 +196,12 @@
       <p class="section-desc"></p><p>The following functions help with visualization and analyzation of the data.</p>
 
       
+    </div><div class="section level2">
+      
+      <h3 id="variance-estimation">Variance estimation<a class="anchor" aria-label="anchor" href="#variance-estimation"></a></h3>
+      
+
+      
     </div><div id="" class="section level2">
       
       
@@ -210,26 +227,37 @@
           <code><a href="variance_median.html">variance_median()</a></code> <code><a href="variance_median.html">variance.median()</a></code> 
         </dt>
         <dd>Variance estimation for median change models</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      
+      <h3 id="class-methods">Class methods<a class="anchor" aria-label="anchor" href="#class-methods"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
           <code><a href="plot.html">plot(<i>&lt;fastcpd&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;fastcpd&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> 
         </dt>
-        <dd>Plot the data and the change points for a <code>fastcpd</code> object</dd>
+        <dd>Plot the data and the change points for a fastcpd object</dd>
       </dl><dl><dt>
           
           <code><a href="print.html">print(<i>&lt;fastcpd&gt;</i>)</a></code> <code><a href="print.html">print(<i>&lt;fastcpd&gt;</i>)</a></code> 
         </dt>
-        <dd>Print the call and the change points for a <code>fastcpd</code> object</dd>
+        <dd>Print the call and the change points for a fastcpd object</dd>
       </dl><dl><dt>
           
           <code><a href="show.html">show(<i>&lt;fastcpd&gt;</i>)</a></code> <code><a href="show.html">show(<i>&lt;fastcpd&gt;</i>)</a></code> 
         </dt>
-        <dd>Show the available methods for a <code>fastcpd</code> object</dd>
+        <dd>Show the available methods for a fastcpd object</dd>
       </dl><dl><dt>
           
           <code><a href="summary.html">summary(<i>&lt;fastcpd&gt;</i>)</a></code> <code><a href="summary.html">summary(<i>&lt;fastcpd&gt;</i>)</a></code> 
         </dt>
-        <dd>Show the summary of a <code>fastcpd</code> object</dd>
+        <dd>Show the summary of a fastcpd object</dd>
       </dl></div><div class="section level2">
       <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a></h2>
       
@@ -265,7 +293,8 @@
           
           <code><a href="well_log.html">well_log</a></code> 
         </dt>
-        <dd>Well-log Dataset from Numerical Bayesian Methods Applied to Signal Processing</dd>
+        <dd>Well-log Dataset from Numerical Bayesian Methods Applied to
+Signal Processing</dd>
       </dl></div><div class="section level2">
       <h2 id="main-class">Main class<a class="anchor" aria-label="anchor" href="#main-class"></a></h2>
       
@@ -281,7 +310,7 @@
           
           <code><a href="fastcpd-class.html">fastcpd-class</a></code> 
         </dt>
-        <dd>An S4 class to store the output created with fastcpd</dd>
+        <dd>An S4 class to store the output created with <code><a href="../reference/fastcpd.html">fastcpd()</a></code></dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
