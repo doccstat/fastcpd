@@ -108,12 +108,12 @@ logistic regression models.
 functions and show that the results are similar to the built-in logistic
 regression models.</p>
 <p>The built-in logistic regression model in <code><a href="../reference/fastcpd.html">fastcpd()</a></code> is
-implemented with the help of the <strong>fastcpd</strong> package
-<strong>fastglm</strong>. The <strong>fastcpd</strong> package utilizes
-the iteratively reweighted least squares with the step-halving approach
-to help safeguard against convergence issues. If a custom cost function
-is used with gradient descent, we should expect the results may not be
-the exact same as the built-in logistic regression model.</p>
+implemented with the help of the <strong>fastglm</strong> package. The
+<strong>fastglm</strong> package utilizes the iteratively reweighted
+least squares with the step-halving approach to help safeguard against
+convergence issues. If a custom cost function is used with gradient
+descent, we should expect the results may not be the exact same as the
+built-in logistic regression model.</p>
 <p>Specifying the <code>cost</code>, <code>cost_gradient</code> and
 <code>cost_hessian</code> parameters below, we can obtain similar
 results as the built-in logistic regression model.</p>
@@ -198,7 +198,7 @@ results as the built-in logistic regression model.</p>
 inferior compared to the one obtained through built-in models. We remark
 that the results can be improved with extra parameters already provided
 in the package. The detailed discussion of several advanced usages of
-the package can be found in <a href="https://fastcpd.xingchi.li/articles/examples-advanced.html">Advanced
+the package can be found in <a href="examples-advanced.html">Advanced
 examples</a>.</p>
 <div class="section level2">
 <h2 id="appendix-all-code-snippets">Appendix: all code snippets<a class="anchor" aria-label="anchor" href="#appendix-all-code-snippets"></a>
