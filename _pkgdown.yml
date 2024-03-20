@@ -20,8 +20,6 @@ reference:
   - title: Wrapper functions
     desc: >
       Simplified functions are provided for each family.
-    contents:
-      - fastcpd.family
 
   - subtitle: Time series
     desc: >
