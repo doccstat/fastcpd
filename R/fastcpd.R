@@ -193,13 +193,14 @@
 #'
 #' @return A class \code{fastcpd} object.
 #'
-#' @seealso [plot()] for plotting the results, [summary()] for summarizing the
-#'   results. Aliases: [fastcpd.mean()], [fastcpd.variance()], [fastcpd.mv()],
+#' @seealso [fastcpd::plot()] for plotting the results,
+#'   [fastcpd::summary()] for summarizing the results.
+#'   Aliases: [fastcpd.mean()], [fastcpd.variance()], [fastcpd.mv()],
 #'   [fastcpd.meanvariance()] for basic statistics change models;
 #'   [fastcpd.lm()], [fastcpd.binomial()], [fastcpd.poisson()],
 #'   [fastcpd.lasso()] for regression coefficients change models;
 #'   [fastcpd.ar()], [fastcpd.var()], [fastcpd.ma()], [fastcpd.arima()],
-#'   [fastcpd.arma()] for change in time series models.
+#'   [fastcpd.arma()], [fastcpd.garch()] for change in time series models.
 #'
 #' @export
 #' @importFrom fastglm fastglm
