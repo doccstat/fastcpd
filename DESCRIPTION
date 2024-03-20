@@ -1,7 +1,7 @@
 Type: Package
 Package: fastcpd
 Title: Fast Change Point Detection via Sequential Gradient Descent
-Version: 0.12.4
+Version: 0.13.0
 Authors@R: c(
     person("Xingchi", "Li", , "anthony.li@stat.tamu.edu",
            role = c("aut", "cre", "cph"),

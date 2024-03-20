@@ -3,22 +3,22 @@
 \name{summary.fastcpd}
 \alias{summary.fastcpd}
 \alias{summary,fastcpd-method}
-\title{Show the summary of a \code{fastcpd} object}
+\title{Show the summary of a \linkS4class{fastcpd} object}
 \usage{
 \method{summary}{fastcpd}(object, ...)
 
 \S4method{summary}{fastcpd}(object, ...)
 }
 \arguments{
-\item{object}{\code{fastcpd} object.}
+\item{object}{A \linkS4class{fastcpd} object.}
 
 \item{...}{Ignored.}
 }
 \value{
-Return a (temporarily) invisible copy of the \code{fastcpd} object.
-  Called primarily for printing the summary of the model including the
-  call, the change points, the cost values and the estimated parameters.
+Return a (temporarily) invisible copy of the \linkS4class{fastcpd} object.
+Called primarily for printing the summary of the model including the
+call, the change points, the cost values and the estimated parameters.
 }
 \description{
-Show the summary of a \code{fastcpd} object
+Show the summary of a \linkS4class{fastcpd} object
 }

@@ -12,16 +12,16 @@ fastcpd.variance(data, ...)
 \arguments{
 \item{data}{A matrix, a data frame or a vector.}
 
-\item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
+\item{...}{Other arguments passed to \code{\link[=fastcpd]{fastcpd()}}, for example,
 \code{segment_count}.}
 }
 \value{
-A class \code{fastcpd} object.
+A \linkS4class{fastcpd} object.
 }
 \description{
-\code{fastcpd_variance} and \code{fastcpd.variance} are wrapper
-functions of \code{\link{fastcpd}} to find the variance change. The
-function is similar to \code{\link{fastcpd}} except that the data is by
+\code{\link[=fastcpd_variance]{fastcpd_variance()}} and \code{\link[=fastcpd.variance]{fastcpd.variance()}} are wrapper
+functions of \code{\link[=fastcpd]{fastcpd()}} to find the variance change. The
+function is similar to \code{\link[=fastcpd]{fastcpd()}} except that the data is by
 default a matrix or data frame or a vector with each row / element as an
 observation and thus a formula is not required here.
 }
@@ -40,4 +40,7 @@ result <- fastcpd.variance(
   )
 )
 summary(result)
+}
+\seealso{
+\code{\link[=fastcpd]{fastcpd()}}
 }

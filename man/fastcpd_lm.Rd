@@ -13,16 +13,16 @@ fastcpd.lm(data, ...)
 \item{data}{A matrix or a data frame with the response variable as the first
 column.}
 
-\item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
+\item{...}{Other arguments passed to \code{\link[=fastcpd]{fastcpd()}}, for example,
 \code{segment_count}.}
 }
 \value{
-A class \code{fastcpd} object.
+A \linkS4class{fastcpd} object.
 }
 \description{
-\code{"fastcpd_lm"} and \code{"fastcpd.lm"} are wrapper
-functions of \code{\link{fastcpd}} to find change points in linear
-regression models. The function is similar to \code{"fastcpd"} except that
+\code{\link[=fastcpd_lm]{fastcpd_lm()}} and \code{\link[=fastcpd.lm]{fastcpd.lm()}} are wrapper
+functions of \code{\link[=fastcpd]{fastcpd()}} to find change points in linear
+regression models. The function is similar to \code{\link[=fastcpd]{fastcpd()}} except that
 the data is by default a matrix or data frame with the response variable
 as the first column and thus a formula is not required here.
 }
@@ -60,4 +60,7 @@ y <- rbind(
 )
 result_mlm <- fastcpd.lm(cbind.data.frame(y = y, x = x), p.response = 2)
 summary(result_mlm)
+}
+\seealso{
+\code{\link[=fastcpd]{fastcpd()}}
 }

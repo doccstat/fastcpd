@@ -20,11 +20,13 @@ reference:
   - title: Wrapper functions
     desc: >
       Simplified functions are provided for each family.
+    contents:
+      - fastcpd.family
 
   - subtitle: Time series
     desc: >
-      `fastcpd.ts()` and `fastcpd_ts()` are the main functions for time series
-      data.
+      `fastcpd_ts()` and `fastcpd.ts()` are the main functions for time series
+      data (also wrapper functions of `fastcpd()`).
     contents:
       - fastcpd.ar
       - fastcpd.arima
@@ -56,11 +58,16 @@ reference:
     desc: >
       The following functions help with visualization and analyzation of the
       data.
+
+  - subtitle: Variance estimation
     contents:
-      - variance_arma
-      - variance_lm
-      - variance_mean
-      - variance_median
+      - variance.arma
+      - variance.lm
+      - variance.mean
+      - variance.median
+
+  - subtitle: Class methods
+    contents:
       - plot.fastcpd
       - print.fastcpd
       - show.fastcpd

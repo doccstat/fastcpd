@@ -3,7 +3,7 @@
 \name{fastcpd_ma}
 \alias{fastcpd_ma}
 \alias{fastcpd.ma}
-\title{Find change points efficiently in MA(q) models}
+\title{Find change points efficiently in MA(\eqn{q}) models}
 \usage{
 fastcpd_ma(data, order = 0, ...)
 
@@ -15,18 +15,18 @@ fastcpd.ma(data, order = 0, ...)
 \item{order}{A positive integer or a vector of length three with the first
 two elements being zeros specifying the order of the MA model.}
 
-\item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
+\item{...}{Other arguments passed to \code{\link[=fastcpd]{fastcpd()}}, for example,
 \code{segment_count}. One special argument can be passed here is
 \code{include.mean}, which is a logical value indicating whether the
 mean should be included in the model. The default value is \code{TRUE}.}
 }
 \value{
-A class \code{fastcpd} object.
+A \linkS4class{fastcpd} object.
 }
 \description{
-\code{fastcpd_ma} and \code{fastcpd.ma} are
-wrapper functions of \code{\link{fastcpd}} to find change points in
-MA(q) models. The function is similar to \code{\link{fastcpd}}
+\code{\link[=fastcpd_ma]{fastcpd_ma()}} and \code{\link[=fastcpd.ma]{fastcpd.ma()}} are
+wrapper functions of \code{\link[=fastcpd]{fastcpd()}} to find change points in
+MA(\eqn{q}) models. The function is similar to \code{\link[=fastcpd]{fastcpd()}}
 except that the data is by default a one-column matrix or univariate vector
 and thus a formula is not required here.
 }
@@ -54,4 +54,7 @@ result <- suppressMessages(
 summary(result)
 plot(result)
 }
+}
+\seealso{
+\code{\link[=fastcpd]{fastcpd()}}
 }

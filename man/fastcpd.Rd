@@ -38,16 +38,16 @@ formula should be consistent with the column names in the data frame
 provided in \code{data}. The intercept term should be removed from the
 formula. The response variable is not needed for mean/variance change
 models and time series models. By default, an intercept column will be
-added to the data, similar to the \code{lm} function in \proglang{R}.
+added to the data, similar to the \code{\link[=lm]{lm()}} function.
 Thus, it is suggested that users should remove the intercept term by
-appending \code{- 1} to the formula. Note that the \code{fastcpd.family()}
+appending \code{- 1} to the formula. Note that the \link{fastcpd.family}
 functions do not require a formula input.}
 
 \item{data}{A data frame of dimension \eqn{T \times d}{T * d} containing the
 data to be segmented (where each row denotes a data point
 \eqn{z_t \in \mathbb{R}^d}{z_t in R^d} for \eqn{t = 1, \ldots, T}) is
 required in the main function, while a matrix or a vector input is also
-accepted in the \code{fastcpd.family()} functions.}
+accepted in the \link{fastcpd.family} functions.}
 
 \item{beta}{Penalty criterion for the number of change points. This parameter
 takes a string value of \code{"BIC"}, \code{"MBIC"}, \code{"MDL"} or a
@@ -93,7 +93,6 @@ can be provided in the following two formats:
 \item \code{cost = function(data) \{...\}}
 \item \code{cost = function(data, theta) \{...\}}
 }
-
 Users can specify a loss function using the second format that will be used
 to calculate the cost value. In both formats, the input data is a subset of
 the original data frame in the form of a matrix (matrix with a single
@@ -128,8 +127,7 @@ takes two inputs, the first being a matrix representing a segment of the
 data, similar to the format used in the \code{cost} function, and the
 second being the parameter that needs to be optimized. The gradient
 function returns the Hessian of the loss function, i.e.,
-\eqn{\sum_{i = s}^t \nabla^2 l(z_i, \theta)}{%
-  sum_{i = s}^t l''(z_i, \theta)}.}
+\eqn{\sum_{i = s}^t \nabla^2 l(z_i, \theta)}{sum_{i = s}^t l''(z_i, \theta)}.}
 
 \item{line_search}{If a vector of numeric values is provided, a line search
 will be performed to find the optimal step size for each update. Detailed
@@ -220,8 +218,8 @@ current segment. This parameter is only used for the \code{"glm"} families.}
 
 \item{...}{Other parameters for specific models.
 \itemize{
-\item \code{include.mean} is used to determine if a mean/intercept term should
-be included in the ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) or
+\item \code{include.mean} is used to determine if a mean/intercept term
+should be included in the ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) or
 GARCH(\eqn{p}, \eqn{q}) models.
 \item \code{r.progress} is used to control the progress bar. By default the
 progress bar will be shown. To disable it, set \code{r.progress = FALSE}.
@@ -231,11 +229,11 @@ responses.
 }}
 }
 \value{
-A class \code{fastcpd} object.
+A \linkS4class{fastcpd} object.
 }
 \description{
-\code{fastcpd} takes in formulas, data, families and extra
-parameters and returns a \code{fastcpd} object.
+\code{\link[=fastcpd]{fastcpd()}} takes in formulas, data, families and extra
+parameters and returns a \linkS4class{fastcpd} object.
 }
 \section{Gallery}{
 
@@ -392,12 +390,7 @@ summary(result_custom_two_epochs)
 }
 }
 \seealso{
-\code{\link[=plot]{plot()}} for plotting the results,
-\code{\link[=summary]{summary()}} for summarizing the results.
-Aliases: \code{\link[=fastcpd.mean]{fastcpd.mean()}}, \code{\link[=fastcpd.variance]{fastcpd.variance()}}, \code{\link[=fastcpd.mv]{fastcpd.mv()}},
-\code{\link[=fastcpd.meanvariance]{fastcpd.meanvariance()}} for basic statistics change models;
-\code{\link[=fastcpd.lm]{fastcpd.lm()}}, \code{\link[=fastcpd.binomial]{fastcpd.binomial()}}, \code{\link[=fastcpd.poisson]{fastcpd.poisson()}},
-\code{\link[=fastcpd.lasso]{fastcpd.lasso()}} for regression coefficients change models;
-\code{\link[=fastcpd.ar]{fastcpd.ar()}}, \code{\link[=fastcpd.var]{fastcpd.var()}}, \code{\link[=fastcpd.ma]{fastcpd.ma()}}, \code{\link[=fastcpd.arima]{fastcpd.arima()}},
-\code{\link[=fastcpd.arma]{fastcpd.arma()}}, \code{\link[=fastcpd.garch]{fastcpd.garch()}} for change in time series models.
+\link{fastcpd.family} for the family-specific function;
+\code{\link[=plot.fastcpd]{plot.fastcpd()}} for plotting the results,
+\code{\link[=summary.fastcpd]{summary.fastcpd()}} for summarizing the results.
 }

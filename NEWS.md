@@ -1,3 +1,7 @@
+# fastcpd 0.13.0
+
+*   Update all documentations.
+
 # fastcpd 0.12.4
 
 *   Customizable and pretty plots.

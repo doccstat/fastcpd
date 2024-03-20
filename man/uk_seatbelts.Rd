@@ -7,13 +7,13 @@
 \format{
 \code{uk_seatbelts} is a multiple time series, with columns
 \describe{
- \item{DriversKilled}{car drivers killed.}
- \item{front}{front-seat passengers killed or seriously injured.}
- \item{rear}{rear-seat passengers killed or seriously injured.}
- \item{kms}{distance driven.}
- \item{PetrolPrice}{petrol price.}
- \item{VanKilled}{number of van (‘light goods vehicle’) drivers.}
- \item{law}{0/1: was the law in effect that month?}
+\item{DriversKilled}{car drivers killed.}
+\item{front}{front-seat passengers killed or seriously injured.}
+\item{rear}{rear-seat passengers killed or seriously injured.}
+\item{kms}{distance driven.}
+\item{PetrolPrice}{petrol price.}
+\item{VanKilled}{number of van (‘light goods vehicle’) drivers.}
+\item{law}{0/1: was the law in effect that month?}
 }
 }
 \source{

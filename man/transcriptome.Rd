@@ -7,49 +7,49 @@
 \format{
 A data frame with 2215 rows and 43 variables:
 \describe{
-  \item{3}{Individual 3}
-  \item{4}{Individual 4}
-  \item{5}{Individual 5}
-  \item{6}{Individual 6}
-  \item{7}{Individual 7}
-  \item{8}{Individual 8}
-  \item{9}{Individual 9}
-  \item{10}{Individual 10}
-  \item{14}{Individual 14}
-  \item{15}{Individual 15}
-  \item{16}{Individual 16}
-  \item{17}{Individual 17}
-  \item{18}{Individual 18}
-  \item{19}{Individual 19}
-  \item{21}{Individual 21}
-  \item{22}{Individual 22}
-  \item{24}{Individual 24}
-  \item{26}{Individual 26}
-  \item{28}{Individual 28}
-  \item{30}{Individual 30}
-  \item{31}{Individual 31}
-  \item{33}{Individual 33}
-  \item{34}{Individual 34}
-  \item{35}{Individual 35}
-  \item{36}{Individual 36}
-  \item{37}{Individual 37}
-  \item{38}{Individual 38}
-  \item{39}{Individual 39}
-  \item{40}{Individual 40}
-  \item{41}{Individual 41}
-  \item{42}{Individual 42}
-  \item{43}{Individual 43}
-  \item{44}{Individual 44}
-  \item{45}{Individual 45}
-  \item{46}{Individual 46}
-  \item{47}{Individual 47}
-  \item{48}{Individual 48}
-  \item{49}{Individual 49}
-  \item{50}{Individual 50}
-  \item{51}{Individual 51}
-  \item{53}{Individual 53}
-  \item{54}{Individual 54}
-  \item{57}{Individual 57}
+\item{3}{Individual 3}
+\item{4}{Individual 4}
+\item{5}{Individual 5}
+\item{6}{Individual 6}
+\item{7}{Individual 7}
+\item{8}{Individual 8}
+\item{9}{Individual 9}
+\item{10}{Individual 10}
+\item{14}{Individual 14}
+\item{15}{Individual 15}
+\item{16}{Individual 16}
+\item{17}{Individual 17}
+\item{18}{Individual 18}
+\item{19}{Individual 19}
+\item{21}{Individual 21}
+\item{22}{Individual 22}
+\item{24}{Individual 24}
+\item{26}{Individual 26}
+\item{28}{Individual 28}
+\item{30}{Individual 30}
+\item{31}{Individual 31}
+\item{33}{Individual 33}
+\item{34}{Individual 34}
+\item{35}{Individual 35}
+\item{36}{Individual 36}
+\item{37}{Individual 37}
+\item{38}{Individual 38}
+\item{39}{Individual 39}
+\item{40}{Individual 40}
+\item{41}{Individual 41}
+\item{42}{Individual 42}
+\item{43}{Individual 43}
+\item{44}{Individual 44}
+\item{45}{Individual 45}
+\item{46}{Individual 46}
+\item{47}{Individual 47}
+\item{48}{Individual 48}
+\item{49}{Individual 49}
+\item{50}{Individual 50}
+\item{51}{Individual 51}
+\item{53}{Individual 53}
+\item{54}{Individual 54}
+\item{57}{Individual 57}
 }
 }
 \source{
@@ -61,8 +61,8 @@ A data frame with 2215 rows and 43 variables:
 transcriptome
 }
 \description{
-Transcriptome analysis of 57 bladder carcinomas on Affymetrix HG-U95A and
-HG-U95Av2 microarrays
+Transcriptome analysis of 57 bladder carcinomas on
+Affymetrix HG-U95A and HG-U95Av2 microarrays
 }
 \examples{
 \donttest{

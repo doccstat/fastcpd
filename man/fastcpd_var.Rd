@@ -3,7 +3,7 @@
 \name{fastcpd_var}
 \alias{fastcpd_var}
 \alias{fastcpd.var}
-\title{Find change points efficiently in VAR(p) models}
+\title{Find change points efficiently in VAR(\eqn{p}) models}
 \usage{
 fastcpd_var(data, order = 0, ...)
 
@@ -14,16 +14,16 @@ fastcpd.var(data, order = 0, ...)
 
 \item{order}{A positive integer specifying the order of the VAR model.}
 
-\item{...}{Other arguments passed to \code{\link{fastcpd}}, for example,
+\item{...}{Other arguments passed to \code{\link[=fastcpd]{fastcpd()}}, for example,
 \code{segment_count}.}
 }
 \value{
-A class \code{fastcpd} object.
+A \linkS4class{fastcpd} object.
 }
 \description{
-\code{fastcpd_var} and \code{fastcpd.var} are
-wrapper functions of \code{\link{fastcpd.ts}} to find change points in
-VAR(p) models. The function is similar to \code{\link{fastcpd.ts}}
+\code{\link[=fastcpd_var]{fastcpd_var()}} and \code{\link[=fastcpd.var]{fastcpd.var()}} are
+wrapper functions of \code{\link[=fastcpd_ts]{fastcpd_ts()}} to find change points in
+VAR(\eqn{p}) models. The function is similar to \code{\link[=fastcpd_ts]{fastcpd_ts()}}
 except that the data is by default a matrix with row as an observation
 and thus a formula is not required here.
 }
@@ -42,4 +42,7 @@ for (i in 201:n) {
 }
 result <- fastcpd.var(x, 2)
 summary(result)
+}
+\seealso{
+\code{\link[=fastcpd]{fastcpd()}}
 }

@@ -7,8 +7,8 @@
 \format{
 A data frame with 1354 rows and 2 variables:
 \describe{
-  \item{date}{POSIXct,POSIXt (TZ: "UTC") from 2019-01-02 to 2023-10-28}
-  \item{price}{The average USD market price across major bitcoin exchanges}
+\item{date}{POSIXct,POSIXt (TZ: "UTC") from 2019-01-02 to 2023-10-28}
+\item{price}{The average USD market price across major bitcoin exchanges}
 }
 }
 \source{

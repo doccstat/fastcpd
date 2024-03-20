@@ -1,12 +1,11 @@
-#' An S4 class to store the output created with \link{fastcpd}
-#'
-#' This S4 class stores the output from \link{fastcpd}. A fastcpd object consist
-#' of several slots including the call to \link{fastcpd}, the data used, the
+#' @title An S4 class to store the output created with [fastcpd()]
+#' @description This S4 class stores the output from [fastcpd()] and
+#' [fastcpd.family]. A fastcpd object consist
+#' of several slots including the call to [fastcpd()], the data used, the
 #' family of the model, the change points, the cost values, the residuals, the
 #' estimated parameters and a boolean indicating whether the model was fitted
 #' with only change points or with change points and parameters, which you can
 #' select using \code{@}.
-#'
 #' @slot call The call of the function.
 #' @slot data The data passed to the function.
 #' @slot order The order of the time series model.
@@ -14,12 +13,13 @@
 #' @slot cp_set The set of change points.
 #' @slot cost_values The cost function values for each segment.
 #' @slot residuals The residuals of the model with change points.
-#'   Used only for built-in families.
+#' Used only for built-in families.
 #' @slot thetas The estimated parameters for each segment. Used only for
-#'   built-in families.
-#' @slot cp_only A boolean indicating whether `fastcpd` was run to return
-#'   only the change points or the change points with the estimated parameters
-#'   and cost values for each segment.
+#' built-in families.
+#' @slot cp_only A boolean indicating whether [fastcpd()] was run to return
+#' only the change points or the change points with the estimated parameters
+#' and cost values for each segment.
+#' @md
 #' @export
 setClass(
   "fastcpd",
@@ -179,11 +179,10 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
   invisible()
 }
 
-#' Plot the data and the change points for a \code{fastcpd} object
-#' @example tests/testthat/examples/plot.R
-#' @param x \code{fastcpd} object.
+#' @title Plot the data and the change points for a [fastcpd-class] object
+#' @param x A [fastcpd-class] object.
 #' @param color_max_count Maximum number of colors to use for the plotting
-#'   of segments.
+#' of segments.
 #' @param data_point_alpha Alpha of the data points.
 #' @param data_point_linewidth Linewidth of the data points.
 #' @param data_point_size Size of the data points.
@@ -199,8 +198,10 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
 #' @param xlab Label for the x-axis.
 #' @param ylab Label for the y-axis.
 #' @param ... Ignored.
-#'
 #' @return No return value, called for plotting.
+#' @example tests/testthat/examples/plot.R
+#'
+#' @md
 #' @rdname plot
 #' @export
 setMethod("plot", signature(x = "fastcpd", y = "missing"), plot.fastcpd)
@@ -218,12 +219,13 @@ print.fastcpd <- function(x, ...) {
   invisible(x)
 }
 
-#' Print the call and the change points for a \code{fastcpd} object
-#' @param x \code{fastcpd} object.
+#' @title Print the call and the change points for a [fastcpd-class] object
+#' @param x A [fastcpd-class] object.
 #' @param ... Ignored.
+#' @return Return a (temporarily) invisible copy of the [fastcpd-class] object.
+#' Called primarily for printing the change points in the model.
 #'
-#' @return Return a (temporarily) invisible copy of the \code{fastcpd} object.
-#'   Called primarily for printing the change points in the model.
+#' @md
 #' @rdname print
 #' @export
 setMethod("print", "fastcpd", print.fastcpd)
@@ -241,11 +243,12 @@ show.fastcpd <- function(object) {
   print(object)
 }
 
-#' Show the available methods for a \code{fastcpd} object
-#' @param object \code{fastcpd} object.
-#'
+#' @title Show the available methods for a [fastcpd-class] object
+#' @param object A [fastcpd-class] object.
 #' @return No return value, called for showing a list of available methods
-#'   for a \code{fastcpd} object.
+#' for a [fastcpd-class] object.
+#'
+#' @md
 #' @rdname show
 #' @export
 setMethod("show", "fastcpd", show.fastcpd)
@@ -280,13 +283,14 @@ summary.fastcpd <- function(object, ...) {
   invisible(object)
 }
 
-#' Show the summary of a \code{fastcpd} object
-#' @param object \code{fastcpd} object.
+#' @title Show the summary of a [fastcpd-class] object
+#' @param object A [fastcpd-class] object.
 #' @param ... Ignored.
+#' @return Return a (temporarily) invisible copy of the [fastcpd-class] object.
+#' Called primarily for printing the summary of the model including the
+#' call, the change points, the cost values and the estimated parameters.
 #'
-#' @return Return a (temporarily) invisible copy of the \code{fastcpd} object.
-#'   Called primarily for printing the summary of the model including the
-#'   call, the change points, the cost values and the estimated parameters.
+#' @md
 #' @rdname summary
 #' @export
 setMethod("summary", "fastcpd", summary.fastcpd)
