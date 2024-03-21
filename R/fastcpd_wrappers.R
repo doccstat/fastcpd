@@ -280,7 +280,7 @@ fastcpd_mean <- function(data, ...) {
 #' @export
 fastcpd.mean <- fastcpd_mean  # nolint: Conventional R function style
 
-#' @title Find change points efficiently in variance change models
+#' @title Find change points efficiently in mean variance change models
 #' @param data A matrix, a data frame or a vector.
 #' @param ... Other arguments passed to [fastcpd()], for example,
 #' \code{segment_count}.
@@ -376,8 +376,9 @@ fastcpd.poisson <- fastcpd_poisson  # nolint: Conventional R function style
 #' @return A [fastcpd-class] object.
 #' @description [fastcpd_ts()] and [fastcpd.ts()] are wrapper functions for
 #' [fastcpd()] to find change points in time series data. The function is
-#' similar to [fastcpd()] except that the data is a time series data and the
-#' family is one of \code{"ar"}, \code{"var"}, \code{"arima"} or \code{"garch"}.
+#' similar to [fastcpd()] except that the data is a time series and the
+#' family is one of \code{"ar"}, \code{"var"}, \code{"arma"}, \code{"arima"} or
+#' \code{"garch"}.
 #' @example tests/testthat/examples/fastcpd_ts.txt
 #' @seealso [fastcpd()]
 #'

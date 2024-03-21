@@ -42,8 +42,9 @@ A \linkS4class{fastcpd} object.
 \description{
 \code{\link[=fastcpd_ts]{fastcpd_ts()}} and \code{\link[=fastcpd.ts]{fastcpd.ts()}} are wrapper functions for
 \code{\link[=fastcpd]{fastcpd()}} to find change points in time series data. The function is
-similar to \code{\link[=fastcpd]{fastcpd()}} except that the data is a time series data and the
-family is one of \code{"ar"}, \code{"var"}, \code{"arima"} or \code{"garch"}.
+similar to \code{\link[=fastcpd]{fastcpd()}} except that the data is a time series and the
+family is one of \code{"ar"}, \code{"var"}, \code{"arma"}, \code{"arima"} or
+\code{"garch"}.
 }
 \examples{
 \donttest{
