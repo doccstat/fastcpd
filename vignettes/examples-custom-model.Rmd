@@ -32,7 +32,7 @@ help of the **fastglm** package. The **fastglm** package
 utilizes the iteratively reweighted least squares with the step-halving approach
 to help safeguard against convergence issues. If a
 custom cost function is used with gradient descent, we should expect the results
-may not be the exact same as the built-in logistic regression model.
+will be similar to the built-in logistic regression model.
 
 Specifying the `cost`, `cost_gradient` and `cost_hessian`
 parameters below,

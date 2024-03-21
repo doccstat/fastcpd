@@ -7,8 +7,7 @@ Authors@R: c(
            role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0006-2493-0853")),
     person("Xianyang", "Zhang", , "zhangxiany@stat.tamu.edu",
-           role = c("aut", "cph")),
-    person("Trisha", "Dawn", , "trisha@stat.tamu.edu", role = c("aut", "cph"))
+           role = c("aut", "cph"))
   )
 Description: Implements fast change point detection algorithm based on the
     paper "Sequential Gradient Descent and Quasi-Newton's Method for

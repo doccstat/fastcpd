@@ -5,7 +5,7 @@
 \alias{fastcpd.meanvariance}
 \alias{fastcpd_mv}
 \alias{fastcpd.mv}
-\title{Find change points efficiently in variance change models}
+\title{Find change points efficiently in mean variance change models}
 \usage{
 fastcpd_meanvariance(data, ...)
 
