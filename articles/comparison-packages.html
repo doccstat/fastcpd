@@ -672,7 +672,7 @@ methods are plotted due to the un-retrievable change points.</p>
 <p>The true change points are 80, 200 and 320.</p>
 <div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span></span>
-<span><span class="co">#&gt; [1]  79 200 325</span></span></code></pre></div>
+<span><span class="co">#&gt; [1]  79 199 320</span></span></code></pre></div>
 <div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> lasso_data)<span class="sc">$</span>breakpoints,</span>
 <span id="cb63-2"><a href="#cb63-2" tabindex="-1"></a><span class="co">#&gt; [1]  80 200 321</span></span></code></pre></div>
 </div>
