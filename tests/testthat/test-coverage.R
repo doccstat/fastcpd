@@ -21,16 +21,20 @@ testthat::test_that(
     small_lasso_data <- cbind.data.frame(y, x)
     testthat::expect_equal(
       fastcpd.lasso(
-        small_lasso_data, beta = "BIC",
-        cost_adjustment = NULL
+        small_lasso_data,
+        beta = "BIC",
+        cost_adjustment = NULL,
+        convexity_coef = 0
       )@cp_set,
       c(79, 202, 325)
     )
     testthat::expect_equal(
       fastcpd.lasso(
-        small_lasso_data, beta = "BIC",
+        small_lasso_data,
+        beta = "BIC",
         cost_adjustment = NULL,
-        vanilla_percentage = 0.2
+        vanilla_percentage = 0.2,
+        convexity_coef = 0
       )@cp_set,
       c(80, 202, 320)
     )
