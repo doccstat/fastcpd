@@ -43,7 +43,6 @@ Suggests:
     CptNonPar,
     ecp,
     fpop,
-    gfpop,
     ggplot2,
     gridExtra,
     InspectChangepoint,
