@@ -1,3 +1,7 @@
+# fastcpd 0.13.1
+
+*   Default no pruning for `lasso`.
+
 # fastcpd 0.13.0
 
 *   Update all documentations.

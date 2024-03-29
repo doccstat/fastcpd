@@ -1,5 +1,9 @@
 ## Updates since last CRAN release (0.12.2)
 
+### fastcpd 0.13.1
+
+*   Default no pruning for `lasso`.
+
 ### fastcpd 0.13.0
 
 *   Update all documentations.
