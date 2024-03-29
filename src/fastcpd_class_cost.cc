@@ -1,5 +1,8 @@
 #include "fastcpd_classes.h"
 #include "fastcpd_constants.h"
+#include "fastcpd_functions.h"
+
+using ::fastcpd::functions::negative_log_likelihood_mean;
 
 namespace fastcpd::classes {
 
@@ -120,18 +123,7 @@ List Fastcpd::negative_log_likelihood_wo_theta(
                   Named("value") = -as<double>(out["loglik"]),
                   Named("residuals") = as<vec>(out["residuals"]));
   } else if (family == "mean") {
-    rowvec par = mean(data, 0);
-    return List::create(
-      Named("par") = par,
-      Named("value") = data.n_rows / 2.0 * (
-        std::log(2.0 * M_PI) * data.n_cols + log_det_sympd(variance_estimate) +
-          trace(solve(
-            variance_estimate,
-            (data.each_row() - par).t() * (data.each_row() - par)
-          )) / data.n_rows
-      ),
-      Named("residuals") = data.each_row() - par
-    );
+    return List(negative_log_likelihood_mean(data, variance_estimate));
   } else if (family == "variance") {
     mat residuals = data.each_row() - variance_data_mean;
     mat par = residuals.t() * residuals / data.n_rows;
