@@ -3,6 +3,7 @@
 ### fastcpd 0.13.1
 
 *   Default no pruning for `lasso`.
+*   Comment out `gfpop` due to https://github.com/doccstat/fastcpd/issues/10.
 
 ### fastcpd 0.13.0
 
