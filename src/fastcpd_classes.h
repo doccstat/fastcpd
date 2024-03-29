@@ -110,12 +110,9 @@ class Fastcpd {
   // @param data A data frame containing the data to be segmented.
   // @param theta Estimate of the parameters. If null, the function will
   //   estimate the parameters.
-  // @param family Family of the model.
   // @param lambda Lambda for L1 regularization. Only used for lasso.
   // @param cv Whether to perform cross-validation to find the best lambda.
   // @param start Starting point for the optimization for warm start.
-  // @param order Order of the time series models.
-  // @param variance_estimate Covariance matrix of the data,
   //   only used in mean change and lm.
   //
   // @return Negative log likelihood of the corresponding data with the given
@@ -351,6 +348,20 @@ class CostHessian {
   Function cost_hessian;
 };
 
-}  // namespace fastcpd::parameters
+struct CostResult {
+  rowvec par;
+  mat residuals;
+  double value;
+
+  operator List() const {
+    return List::create(
+      Named("par") = par,
+      Named("residuals") = residuals,
+      Named("value") = value
+    );
+  }
+};
+
+}  // namespace fastcpd::classes
 
 #endif  // FASTCPD_CLASSES_H_

@@ -48,6 +48,7 @@ using ::Rcpp::stop;
 using ::Rcpp::wrap;
 
 using ::arma::colvec;
+using ::arma::conv_to;
 using ::arma::cube;
 using ::arma::mat;
 using ::arma::rowvec;
