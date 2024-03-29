@@ -362,6 +362,34 @@ struct CostResult {
   }
 };
 
+struct CostResultMatPar {
+  mat par;
+  mat residuals;
+  double value;
+
+  operator List() const {
+    return List::create(
+      Named("par") = par,
+      Named("residuals") = residuals,
+      Named("value") = value
+    );
+  }
+};
+
+struct CostResultVecResiduals {
+  colvec par;
+  colvec residuals;
+  double value;
+
+  operator List() const {
+    return List::create(
+      Named("par") = par,
+      Named("residuals") = residuals,
+      Named("value") = value
+    );
+  }
+};
+
 }  // namespace fastcpd::classes
 
 #endif  // FASTCPD_CLASSES_H_

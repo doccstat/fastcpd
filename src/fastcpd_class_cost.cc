@@ -1,10 +1,11 @@
 #include "fastcpd_classes.h"
-#include "fastcpd_constants.h"
 #include "fastcpd_functions.h"
 
 using ::fastcpd::functions::negative_log_likelihood_lasso_cv;
+using ::fastcpd::functions::negative_log_likelihood_lasso_wo_cv;
 using ::fastcpd::functions::negative_log_likelihood_mean;
 using ::fastcpd::functions::negative_log_likelihood_meanvariance;
+using ::fastcpd::functions::negative_log_likelihood_variance;
 
 namespace fastcpd::classes {
 
@@ -37,31 +38,7 @@ List Fastcpd::negative_log_likelihood_wo_theta(
   if (family == "lasso" && cv) {
     return negative_log_likelihood_lasso_cv(data);
   } else if (family == "lasso" && !cv) {
-    Environment stats = Environment::namespace_env("stats"),
-              glmnet = Environment::namespace_env("glmnet");
-    Function deviance = stats["deviance"], glmnet_ = glmnet["glmnet"],
-      predict_glmnet = glmnet["predict.glmnet"];
-    List out = glmnet_(
-      data.cols(1, data.n_cols - 1), data.col(0),
-      Named("family") = "gaussian", Named("lambda") = lambda
-    );
-    S4 out_par = out["beta"];
-    vec par_i = as<vec>(out_par.slot("i"));
-    vec par_x = as<vec>(out_par.slot("x"));
-    vec par = zeros(data.n_cols - 1);
-    for (unsigned int i = 0; i < par_i.n_elem; i++) {
-      par(par_i(i)) = par_x(i);
-    }
-    double value = as<double>(deviance(out));
-    vec fitted_values = as<vec>(
-      predict_glmnet(out, data.cols(1, data.n_cols - 1), Named("s") = lambda)
-    );
-    vec residuals = data.col(0) - fitted_values;
-    return List::create(
-      Named("par") = par,
-      Named("value") = value / 2,
-      Named("residuals") = residuals
-    );
+    return negative_log_likelihood_lasso_wo_cv(data, lambda);
   } else if (
     family == "binomial" || family == "poisson" || family == "gaussian"
   ) {
@@ -103,17 +80,7 @@ List Fastcpd::negative_log_likelihood_wo_theta(
   } else if (family == "mean") {
     return negative_log_likelihood_mean(data, variance_estimate);
   } else if (family == "variance") {
-    mat residuals = data.each_row() - variance_data_mean;
-    mat par = residuals.t() * residuals / data.n_rows;
-    double value = data.n_rows * data.n_cols * (std::log(2.0 * M_PI) + 1) / 2.0;
-    if (data.n_rows >= data.n_cols) {
-      value += data.n_rows * log_det_sympd(par) / 2.0;
-    }
-    return List::create(
-      Named("par") = par,
-      Named("value") = value,
-      Named("residuals") = residuals
-    );
+    return negative_log_likelihood_variance(data, variance_data_mean);
   } else if (family == "meanvariance" || family == "mv") {
     return negative_log_likelihood_meanvariance(data, epsilon);
   } else if (family == "mgaussian") {
