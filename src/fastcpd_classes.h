@@ -349,8 +349,8 @@ class CostHessian {
 };
 
 struct CostResult {
-  rowvec par;
-  mat residuals;
+  colvec par;
+  colvec residuals;
   double value;
 
   operator List() const {
@@ -376,9 +376,9 @@ struct CostResultMatPar {
   }
 };
 
-struct CostResultVecResiduals {
-  colvec par;
-  colvec residuals;
+struct CostResultMatResiduals {
+  rowvec par;
+  mat residuals;
   double value;
 
   operator List() const {

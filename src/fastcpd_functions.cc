@@ -2,11 +2,52 @@
 
 using ::fastcpd::classes::CostResult;
 using ::fastcpd::classes::CostResultMatPar;
-using ::fastcpd::classes::CostResultVecResiduals;
+using ::fastcpd::classes::CostResultMatResiduals;
 
 namespace fastcpd::functions {
 
-CostResult negative_log_likelihood_lasso_cv(const mat data) {
+CostResult negative_log_likelihood_arma(
+  const mat data,
+  const colvec order
+) {
+  Environment stats = Environment::namespace_env("stats");
+  Function arima = stats["arima"];
+  List out = arima(
+    Named("x") = data.col(0),
+    Named("order") = NumericVector::create(order(0), 0, order(1)),
+    Named("include.mean") = false
+  );
+  colvec par = zeros(sum(order) + 1);
+  par.rows(0, sum(order) - 1) = as<colvec>(out["coef"]);
+  par(sum(order)) = as<double>(out["sigma2"]);
+
+  return CostResult{par, as<vec>(out["residuals"]), -as<double>(out["loglik"])};
+}
+
+CostResult negative_log_likelihood_glm(
+  const mat data,
+  Nullable<colvec> start,
+  const std::string family
+) {
+  vec y = data.col(0);
+  Environment fastglm = Environment::namespace_env("fastglm");
+  Function fastglm_ = fastglm["fastglm"];
+  List out;
+  if (start.isNull()) {
+    mat x = data.cols(1, data.n_cols - 1);
+    out = fastglm_(x, y, family);
+  } else {
+    colvec start_ = as<colvec>(start);
+    mat x = data.cols(1, data.n_cols - 1);
+    out = fastglm_(x, y, family, Named("start") = start_);
+  }
+  vec par = as<vec>(out["coefficients"]);
+  vec residuals = as<vec>(out["residuals"]);
+  double value = out["deviance"];
+  return CostResult{par, residuals, value / 2};
+}
+
+CostResultMatResiduals negative_log_likelihood_lasso_cv(const mat data) {
   Environment glmnet = Environment::namespace_env("glmnet"),
                stats = Environment::namespace_env("stats");
   Function cv_glmnet = glmnet["cv.glmnet"],
@@ -29,10 +70,10 @@ CostResult negative_log_likelihood_lasso_cv(const mat data) {
   for (unsigned int i = 1; i < glmnet_i.n_elem; i++) {
     par(glmnet_i(i) - 1) = glmnet_x(i);
   }
-  return CostResult{par.t(), mat(), values(index_vec(1) - 1)};
+  return CostResultMatResiduals{par.t(), mat(), values(index_vec(1) - 1)};
 }
 
-CostResultVecResiduals negative_log_likelihood_lasso_wo_cv(
+CostResult negative_log_likelihood_lasso_wo_cv(
   const mat data,
   const double lambda
 ) {
@@ -56,15 +97,15 @@ CostResultVecResiduals negative_log_likelihood_lasso_wo_cv(
     predict_glmnet(out, data.cols(1, data.n_cols - 1), Named("s") = lambda)
   );
   vec residuals = data.col(0) - fitted_values;
-  return CostResultVecResiduals{par, residuals, value / 2};
+  return CostResult{par, residuals, value / 2};
 }
 
-CostResult negative_log_likelihood_mean(
+CostResultMatResiduals negative_log_likelihood_mean(
   const mat data,
   const mat variance_estimate
 ) {
   rowvec par = mean(data, 0);
-  return CostResult{
+  return CostResultMatResiduals{
     par,
     data.each_row() - par,
     data.n_rows / 2.0 * (
@@ -77,7 +118,7 @@ CostResult negative_log_likelihood_mean(
   };
 }
 
-CostResult negative_log_likelihood_meanvariance(
+CostResultMatResiduals negative_log_likelihood_meanvariance(
   const mat data,
   const double epsilon
 ) {
@@ -96,7 +137,33 @@ CostResult negative_log_likelihood_meanvariance(
     covariance.reshape(data.n_cols * data.n_cols, 1);
   mat residuals = data.each_row() - par.rows(0, data.n_cols - 1).t();
 
-  return CostResult{par.t(), residuals, value};
+  return CostResultMatResiduals{par.t(), residuals, value};
+}
+
+CostResultMatPar negative_log_likelihood_mgaussian(
+  const mat data,
+  const unsigned int p_response,
+  const mat variance_estimate
+) {
+  mat x = data.cols(p_response, data.n_cols - 1);
+  mat y = data.cols(0, p_response - 1);
+  mat x_t_x;
+
+  if (data.n_rows <= data.n_cols - p_response + 1) {
+    x_t_x = eye<mat>(data.n_cols - p_response, data.n_cols - p_response);
+  } else {
+    x_t_x = x.t() * x;
+  }
+
+  mat par = solve(x_t_x, x.t()) * y;
+  DEBUG_RCOUT(par);
+  mat residuals = y - x * par;
+  double value =
+    p_response * std::log(2.0 * M_PI) + log_det_sympd(variance_estimate);
+  value *= data.n_rows;
+  value += trace(solve(variance_estimate, residuals.t() * residuals));
+  DEBUG_RCOUT(value);
+  return CostResultMatPar{par, residuals, value / 2};
 }
 
 CostResultMatPar negative_log_likelihood_variance(

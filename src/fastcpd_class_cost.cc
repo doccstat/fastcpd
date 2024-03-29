@@ -1,10 +1,13 @@
 #include "fastcpd_classes.h"
 #include "fastcpd_functions.h"
 
+using ::fastcpd::functions::negative_log_likelihood_arma;
+using ::fastcpd::functions::negative_log_likelihood_glm;
 using ::fastcpd::functions::negative_log_likelihood_lasso_cv;
 using ::fastcpd::functions::negative_log_likelihood_lasso_wo_cv;
 using ::fastcpd::functions::negative_log_likelihood_mean;
 using ::fastcpd::functions::negative_log_likelihood_meanvariance;
+using ::fastcpd::functions::negative_log_likelihood_mgaussian;
 using ::fastcpd::functions::negative_log_likelihood_variance;
 
 namespace fastcpd::classes {
@@ -42,41 +45,9 @@ List Fastcpd::negative_log_likelihood_wo_theta(
   } else if (
     family == "binomial" || family == "poisson" || family == "gaussian"
   ) {
-    vec y = data.col(0);
-    Environment fastglm = Environment::namespace_env("fastglm");
-    Function fastglm_ = fastglm["fastglm"];
-    List out;
-    if (start.isNull()) {
-      mat x = data.cols(1, data.n_cols - 1);
-      out = fastglm_(x, y, family);
-    } else {
-      colvec start_ = as<colvec>(start);
-      mat x = data.cols(1, data.n_cols - 1);
-      out = fastglm_(x, y, family, Named("start") = start_);
-    }
-    vec par = as<vec>(out["coefficients"]);
-    vec residuals = as<vec>(out["residuals"]);
-    double value = out["deviance"];
-    return List::create(
-      Named("par") = par,
-      Named("value") = value / 2,
-      Named("residuals") = residuals
-    );
+    return negative_log_likelihood_glm(data, start, family);
   } else if (family == "arma") {
-    Environment stats = Environment::namespace_env("stats");
-    Function arima = stats["arima"];
-    List out = arima(
-      Named("x") = data.col(0),
-      Named("order") = NumericVector::create(order(0), 0, order(1)),
-      Named("include.mean") = false
-    );
-    colvec par = zeros(sum(order) + 1);
-    par.rows(0, sum(order) - 1) = as<colvec>(out["coef"]);
-    par(sum(order)) = as<double>(out["sigma2"]);
-
-    return List::create(Named("par") = par,
-                  Named("value") = -as<double>(out["loglik"]),
-                  Named("residuals") = as<vec>(out["residuals"]));
+    return negative_log_likelihood_arma(data, order);
   } else if (family == "mean") {
     return negative_log_likelihood_mean(data, variance_estimate);
   } else if (family == "variance") {
@@ -84,28 +55,8 @@ List Fastcpd::negative_log_likelihood_wo_theta(
   } else if (family == "meanvariance" || family == "mv") {
     return negative_log_likelihood_meanvariance(data, epsilon);
   } else if (family == "mgaussian") {
-    mat x = data.cols(p_response, data.n_cols - 1);
-    mat y = data.cols(0, p_response - 1);
-    mat x_t_x;
-
-    if (data.n_rows <= data.n_cols - p_response + 1) {
-      x_t_x = eye<mat>(data.n_cols - p_response, data.n_cols - p_response);
-    } else {
-      x_t_x = x.t() * x;
-    }
-
-    mat par = solve(x_t_x, x.t()) * y;
-    DEBUG_RCOUT(par);
-    mat residuals = y - x * par;
-    double value =
-      p_response * std::log(2.0 * M_PI) + log_det_sympd(variance_estimate);
-    value *= data.n_rows;
-    value += trace(solve(variance_estimate, residuals.t() * residuals));
-    DEBUG_RCOUT(value);
-    return List::create(
-      Named("par") = par,
-      Named("value") = value / 2,
-      Named("residuals") = residuals
+    return negative_log_likelihood_mgaussian(
+      data, p_response, variance_estimate
     );
   } else {
     // # nocov start
