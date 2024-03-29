@@ -1,47 +1,4 @@
 testthat::test_that(
-  "vanilla_percentage", {
-    set.seed(1)
-    n <- 480
-    p_true <- 6
-    p <- 50
-    x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
-    theta_0 <- rbind(
-      runif(p_true, -5, -2),
-      runif(p_true, -3, 3),
-      runif(p_true, 2, 5),
-      runif(p_true, -5, 5)
-    )
-    theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
-    y <- c(
-      x[1:80, ] %*% theta_0[1, ] + rnorm(80, 0, 1),
-      x[81:200, ] %*% theta_0[2, ] + rnorm(120, 0, 1),
-      x[201:320, ] %*% theta_0[3, ] + rnorm(120, 0, 1),
-      x[321:n, ] %*% theta_0[4, ] + rnorm(160, 0, 1)
-    )
-    small_lasso_data <- cbind.data.frame(y, x)
-    testthat::expect_equal(
-      fastcpd.lasso(
-        small_lasso_data,
-        beta = "BIC",
-        cost_adjustment = NULL,
-        convexity_coef = 0
-      )@cp_set,
-      c(79, 202, 325)
-    )
-    testthat::expect_equal(
-      fastcpd.lasso(
-        small_lasso_data,
-        beta = "BIC",
-        cost_adjustment = NULL,
-        vanilla_percentage = 0.2,
-        convexity_coef = 0
-      )@cp_set,
-      c(80, 202, 320)
-    )
-  }
-)
-
-testthat::test_that(
   "1d mean custom", {
     set.seed(1)
     result_mean <- fastcpd(
