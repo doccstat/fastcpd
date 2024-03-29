@@ -77,7 +77,6 @@ class Fastcpd {
   void update_theta_sum(const unsigned int col, colvec new_theta_sum);
 
  private:
-
   // Adjust cost value for MBIC and MDL.
   double adjust_cost_value(double value, const unsigned int nrows);
 
