@@ -377,7 +377,7 @@ struct CostResultMatPar {
 };
 
 struct CostResultMatResiduals {
-  rowvec par;
+  colvec par;
   mat residuals;
   double value;
 
