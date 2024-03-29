@@ -97,15 +97,11 @@ double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
   return adjusted;
 }
 
-List Fastcpd::get_optimized_cost(const mat data_segment) {
+CostResult Fastcpd::get_optimized_cost(const mat data_segment) {
   Function cost_ = cost.get();
-  List cost_optim_result;
+  CostResult cost_result;
   if (cost_gradient.isNull() && cost_hessian.isNull()) {
-    cost_optim_result = List::create(
-      Named("par") = R_NilValue,
-      Named("value") = cost_(data_segment),
-      Named("residuals") = R_NilValue
-    );
+    cost_result = {colvec(), colvec(), as<double>(cost_(data_segment))};
   } else if (p == 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
@@ -125,14 +121,10 @@ List Fastcpd::get_optimized_cost(const mat data_segment) {
       Named("data") = data_segment,
       Named("cost") = cost_
     );
-    cost_optim_result = List::create(
-      Named("par") = std::log(
-        as<double>(optim_result["par"]) / (1 - as<double>(optim_result["par"]))
-      ),
-      Named("value") = exp(as<double>(optim_result["value"])) /
-        (1 + exp(as<double>(optim_result["value"]))),
-      Named("residuals") = R_NilValue
-    );
+    colvec par = as<colvec>(optim_result["par"]);
+    double value = as<double>(optim_result["value"]);
+    cost_result =
+      {log(par / (1 - par)), colvec(), exp(value) / (1 + exp(value))};
   } else if (p > 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
@@ -144,17 +136,14 @@ List Fastcpd::get_optimized_cost(const mat data_segment) {
       Named("lower") = lower,
       Named("upper") = upper
     );
-    cost_optim_result = List::create(
-      Named("par") = optim_result["par"],
-      Named("value") = optim_result["value"],
-      Named("residuals") = R_NilValue
-    );
+    cost_result =
+      {as<colvec>(optim_result["par"]), colvec(), optim_result["value"]};
   } else {
     // # nocov start
     stop("This branch should not be reached at classes.cc: 945.");
     // # nocov end
   }
-  return cost_optim_result;
+  return cost_result;
 }
 
 mat Fastcpd::get_theta_sum() {
@@ -280,13 +269,11 @@ void Fastcpd::create_segment_statistics() {
     mat data_segment = data.rows(segment_indices_);
     rowvec segment_theta;
     if (!contain(FASTCPD_FAMILIES, family)) {
-      segment_theta = as<rowvec>(get_optimized_cost(data_segment)["par"]);
+      segment_theta = get_optimized_cost(data_segment).par;
     } else {
-      segment_theta = as<rowvec>(
-        cost_function_wrapper(
-          data_segment, R_NilValue, 0, true, R_NilValue
-        )["par"]
-      );
+      segment_theta = cost_function_wrapper(
+        data_segment, R_NilValue, 0, true, R_NilValue
+      ).par;
     }
     DEBUG_RCOUT(segment_theta);
 
@@ -390,6 +377,8 @@ List Fastcpd::run() {
     create_segment_statistics();
   }
 
+  DEBUG_RCOUT(n);
+
   if (vanilla_percentage < 1) {
     create_gradients();
   }
@@ -413,10 +402,9 @@ List Fastcpd::run() {
       int s = index % (n + 1);
       int t = index / (n + 1);
       if (s > t) {
-        List cost_optim_result = negative_log_likelihood(
+        cval = cost_function_wrapper(
           data.rows(t, s - 1), R_NilValue, lambda, false, R_NilValue
-        );
-        cval = as<double>(cost_optim_result["value"]);
+        ).value;
       } else {
         cval = arma::datum::inf;
       }
@@ -468,40 +456,38 @@ List Fastcpd::run() {
           (family != "lasso" && t - tau >= p) ||
           (family == "lasso" && t - tau >= 3)
         ) {
-          List cost_result = cost_function_wrapper(
+          cval(i - 1) = cost_function_wrapper(
             data_segment, wrap(theta), lambda, false, R_NilValue
-          );
-          cval(i - 1) = as<double>(cost_result["value"]);
+          ).value;
         } else {
           // t - tau < p or for lasso t - tau < 3
         }
       } else {
         // vanilla PELT
-        List cost_optim_result;
+        CostResult cost_result;
         if (!contain(FASTCPD_FAMILIES, family)) {
-          cost_optim_result = get_optimized_cost(data_segment);
+          cost_result = get_optimized_cost(data_segment);
         } else {
           if (warm_start && t - tau >= 10 * p) {
-            cost_optim_result =
-              cost_function_wrapper(
-                data_segment, R_NilValue, lambda, false,
-                wrap(segment_theta_hat[segment_indices(t - 1) - 1])
-                // Or use `wrap(start.col(tau))` for warm start.
+            cost_result = cost_function_wrapper(
+              data_segment, R_NilValue, lambda, false,
+              wrap(segment_theta_hat[segment_indices(t - 1) - 1])
+              // Or use `wrap(start.col(tau))` for warm start.
             );
-            start.col(tau) = as<colvec>(cost_optim_result["par"]);
+            start.col(tau) = colvec(cost_result.par);
           } else {
-            cost_optim_result = cost_function_wrapper(
+            cost_result = cost_function_wrapper(
               data_segment, R_NilValue, lambda, false, R_NilValue
             );
           }
         }
-        cval(i - 1) = as<double>(cost_optim_result["value"]);
+        cval(i - 1) = cost_result.value;
 
         // If `vanilla_percentage` is not 1, then we need to keep track of
         // thetas for later `fastcpd` steps.
         if (vanilla_percentage < 1 && t <= vanilla_percentage * n) {
-          update_theta_hat(i - 1, as<colvec>(cost_optim_result["par"]));
-          update_theta_sum(i - 1, as<colvec>(cost_optim_result["par"]));
+          update_theta_hat(i - 1, cost_result.par);
+          update_theta_sum(i - 1, cost_result.par);
         }
       }
     }
@@ -629,25 +615,25 @@ List Fastcpd::run() {
         arma::conv_to<ucolvec>::from(std::move(segment_data_index_));
 
     mat data_segment = data.rows(segment_data_index);
-    List cost_optim_result;
+    CostResult cost_result;
     if (!contain(FASTCPD_FAMILIES, family)) {
-      cost_optim_result = get_optimized_cost(data_segment);
+      cost_result = get_optimized_cost(data_segment);
     } else {
-      cost_optim_result = cost_function_wrapper(
+      cost_result = cost_function_wrapper(
         data_segment, R_NilValue, lambda, false, R_NilValue
       );
     }
 
-    cost_values(i) = as<double>(cost_optim_result["value"]);
+    cost_values(i) = cost_result.value;
 
     // Parameters are not involved for PELT.
     if (vanilla_percentage < 1) {
-      thetas.col(i) = as<colvec>(cost_optim_result["par"]);
+      thetas.col(i) = colvec(cost_result.par);
     }
 
     // Residual is only calculated for built-in families.
     if (contain(FASTCPD_FAMILIES, family)) {
-      mat cost_optim_residual = as<mat>(cost_optim_result["residuals"]);
+      mat cost_optim_residual = cost_result.residuals;
       residual.rows(
         residual_next_start,
         residual_next_start + cost_optim_residual.n_rows - 1
@@ -762,7 +748,7 @@ void Fastcpd::update_cost_parameters_step(
       colvec theta_projected = arma::max(std::move(theta_upper_bound), lower);
       line_search_costs[line_search_index] = cost_function_wrapper(
         data, wrap(theta_projected), lambda, false, R_NilValue
-      )["value"];
+      ).value;
     }
   }
   best_learning_rate = line_search[line_search_costs.index_min()];

@@ -1,8 +1,6 @@
 #include "fastcpd_functions.h"
 
 using ::fastcpd::classes::CostResult;
-using ::fastcpd::classes::CostResultMatPar;
-using ::fastcpd::classes::CostResultMatResiduals;
 
 namespace fastcpd::functions {
 
@@ -47,7 +45,7 @@ CostResult negative_log_likelihood_glm(
   return {par, residuals, value / 2};
 }
 
-CostResultMatResiduals negative_log_likelihood_lasso_cv(const mat data) {
+CostResult negative_log_likelihood_lasso_cv(const mat data) {
   Environment glmnet = Environment::namespace_env("glmnet"),
                stats = Environment::namespace_env("stats");
   Function cv_glmnet = glmnet["cv.glmnet"],
@@ -100,7 +98,7 @@ CostResult negative_log_likelihood_lasso_wo_cv(
   return {par, residuals, value / 2};
 }
 
-CostResultMatResiduals negative_log_likelihood_mean(
+CostResult negative_log_likelihood_mean(
   const mat data,
   const mat variance_estimate
 ) {
@@ -118,7 +116,7 @@ CostResultMatResiduals negative_log_likelihood_mean(
   };
 }
 
-CostResultMatResiduals negative_log_likelihood_meanvariance(
+CostResult negative_log_likelihood_meanvariance(
   const mat data,
   const double epsilon
 ) {
@@ -140,7 +138,7 @@ CostResultMatResiduals negative_log_likelihood_meanvariance(
   return {par, residuals, value};
 }
 
-CostResultMatPar negative_log_likelihood_mgaussian(
+CostResult negative_log_likelihood_mgaussian(
   const mat data,
   const unsigned int p_response,
   const mat variance_estimate
@@ -166,7 +164,7 @@ CostResultMatPar negative_log_likelihood_mgaussian(
   return {par, residuals, value / 2};
 }
 
-CostResultMatPar negative_log_likelihood_variance(
+CostResult negative_log_likelihood_variance(
   const mat data,
   const rowvec variance_data_mean
 ) {

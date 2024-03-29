@@ -127,12 +127,13 @@ context("negative_log_likelihood_wo_theta Unit Test") {
     );
 
     const colvec data(kARMA32.data(), kARMA32.size());
-    const List out = fastcpd_class.negative_log_likelihood_wo_theta(
+    const fastcpd::classes::CostResult cost_result =
+    fastcpd_class.negative_log_likelihood_wo_theta(
       data, 0, false, R_NilValue
     );
-    const colvec par = out["par"];
-    const double value = out["value"];
-    const colvec residuals = out["residuals"];
+    const colvec par = cost_result.par;
+    const double value = cost_result.value;
+    const colvec residuals = cost_result.residuals;
 
     // Expected values obtained from the following R code
     // arima(x, order = c(3, 0, 2), include.mean = FALSE)

@@ -61,6 +61,7 @@ using ::Rcpp::Function;
 using ::Rcpp::InternalFunction;
 using ::Rcpp::List;
 using ::Rcpp::Nullable;
+using ::Rcpp::NumericMatrix;
 using ::Rcpp::NumericVector;
 using ::Rcpp::S4;
 using ::std::function;
