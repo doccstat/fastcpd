@@ -12,7 +12,7 @@ parameters and returns a fastcpd object."><meta property="og:image" content="htt
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -537,6 +537,174 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 -1.7973433  4.6422022</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.4842969 -0.1521062</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5  2.0797875  2.4047092</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"mvtnorm"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"mvtnorm"</span>, repos <span class="op">=</span> <span class="st">"https://cloud.r-project.org"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">480</span></span></span>
+<span class="r-in"><span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">6</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">50</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="op">-</span><span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">theta_0</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, ncol <span class="op">=</span> <span class="va">p</span> <span class="op">-</span> <span class="va">p_true</span>, nrow <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">80</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="fl">81</span><span class="op">:</span><span class="fl">200</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="fl">201</span><span class="op">:</span><span class="fl">320</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="fl">321</span><span class="op">:</span><span class="va">n</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">160</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">small_lasso_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result_no_vp</span> <span class="op">&lt;-</span> <span class="fu"><a href="fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">small_lasso_data</span>,</span></span>
+<span class="r-in"><span>  beta <span class="op">=</span> <span class="st">"BIC"</span>,</span></span>
+<span class="r-in"><span>  cost_adjustment <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>  convexity_coef <span class="op">=</span> <span class="fl">0</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_no_vp</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.lasso(data = small_lasso_data, beta = "BIC", cost_adjustment = NULL, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     convexity_coef = 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 79 202 325 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 185.7631 508.1195 337.1486 328.3755 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50 x 4 sparse Matrix of class "dgCMatrix"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       segment 1  segment 2 segment 3 segment 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -1.815974 -1.5964536  3.838563 -2.399833</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -1.692328 -1.2734980  3.287314  2.170296</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -3.340743  0.8558482  4.075844  2.853726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -4.075669  .          1.788200 -2.534484</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -3.972095  .          3.868924  2.308333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -3.203743 -1.6359700  2.388598  3.302757</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [12,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [14,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [15,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [16,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [18,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [21,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [22,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [23,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [24,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [25,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [26,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [27,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [28,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [29,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [30,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [31,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [32,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [33,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [34,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [35,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [36,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [37,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [38,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [40,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [41,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [42,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [43,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [44,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [45,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [46,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [47,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [48,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [49,]  .         .          .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [50,]  .         .          .         .       </span>
+<span class="r-in"><span><span class="va">result_20_vp</span> <span class="op">&lt;-</span> <span class="fu"><a href="fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">small_lasso_data</span>,</span></span>
+<span class="r-in"><span>  beta <span class="op">=</span> <span class="st">"BIC"</span>,</span></span>
+<span class="r-in"><span>  cost_adjustment <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>  vanilla_percentage <span class="op">=</span> <span class="fl">0.2</span>,</span></span>
+<span class="r-in"><span>  convexity_coef <span class="op">=</span> <span class="fl">0</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_20_vp</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.lasso(data = small_lasso_data, beta = "BIC", cost_adjustment = NULL, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     vanilla_percentage = 0.2, convexity_coef = 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 80 202 320 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 160.6977 475.3771 220.8915 284.7068 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50 x 4 sparse Matrix of class "dgCMatrix"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       segment 1 segment 2 segment 3 segment 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -1.927410 -1.717789  4.183616 -2.471043</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -1.782290 -1.381334  3.341444  2.317018</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -3.429856  0.918336  4.371277  2.948443</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -4.136226  .         1.783332 -2.529820</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -4.036367  .         3.876010  2.421696</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -3.279023 -1.707057  2.399470  3.452377</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [12,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [14,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [15,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [16,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [18,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [21,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [22,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [23,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [24,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [25,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [26,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [27,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [28,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [29,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [30,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [31,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [32,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [33,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [34,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [35,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [36,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [37,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [38,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [40,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [41,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [42,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [43,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [44,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [45,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [46,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [47,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [48,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [49,]  .         .         .         .       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [50,]  .         .         .         .       </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

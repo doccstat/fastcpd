@@ -37,7 +37,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -104,9 +104,9 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span></span>
 <span>  <span class="va">package</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="co"># "bcp",</span></span>
+<span>    <span class="co"># "bcp", "gfpop",</span></span>
 <span>    <span class="st">"ggplot2"</span>, <span class="st">"mvtnorm"</span>,</span>
-<span>    <span class="st">"breakfast"</span>, <span class="st">"changepoint"</span>, <span class="st">"cpm"</span>, <span class="st">"CptNonPar"</span>, <span class="st">"ecp"</span>, <span class="st">"fpop"</span>, <span class="st">"gfpop"</span>,</span>
+<span>    <span class="st">"breakfast"</span>, <span class="st">"changepoint"</span>, <span class="st">"cpm"</span>, <span class="st">"CptNonPar"</span>, <span class="st">"ecp"</span>, <span class="st">"fpop"</span>,</span>
 <span>    <span class="st">"InspectChangepoint"</span>, <span class="st">"jointseg"</span>, <span class="st">"mcp"</span>, <span class="st">"mosum"</span>, <span class="st">"not"</span>, <span class="st">"Rbeast"</span>,</span>
 <span>    <span class="st">"segmented"</span>, <span class="st">"stepR"</span>, <span class="st">"strucchange"</span>, <span class="st">"VARDetect"</span>, <span class="st">"wbs"</span></span>
 <span>  <span class="op">)</span></span>
@@ -380,15 +380,14 @@ to the un-retrievable change points.</p>
 <code class="sourceCode R"><span><span class="fu">fpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/fpop/man/Fpop.html" class="external-link">Fpop</a></span><span class="op">(</span><span class="va">mean_data_1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">t.est</span></span>
 <span><span class="co">#&gt; [1]  300  700 1000</span></span></code></pre></div>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/gfpop.html" class="external-link">gfpop</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">mean_data_1</span>,</span>
-<span>  mygraph <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/graph.html" class="external-link">graph</a></span><span class="op">(</span></span>
-<span>    penalty <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/sdDiff.html" class="external-link">sdDiff</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span> <span class="op">^</span> <span class="fl">2</span>,</span>
-<span>    type <span class="op">=</span> <span class="st">"updown"</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"mean"</span></span>
-<span><span class="op">)</span><span class="op">$</span><span class="va">changepoints</span></span>
-<span><span class="co">#&gt; [1]  300  700 1000</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># gfpop::gfpop(</span></span>
+<span><span class="co">#   data = mean_data_1,</span></span>
+<span><span class="co">#   mygraph = gfpop::graph(</span></span>
+<span><span class="co">#     penalty = 2 * log(nrow(mean_data_1)) * gfpop::sdDiff(mean_data_1) ^ 2,</span></span>
+<span><span class="co">#     type = "updown"</span></span>
+<span><span class="co">#   ),</span></span>
+<span><span class="co">#   type = "mean"</span></span>
+<span><span class="co"># )$changepoints</span></span></code></pre></div>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span></span>
@@ -771,14 +770,14 @@ un-retrievable change points.</p>
 <span>  wbs <span class="op">=</span> <span class="fu">wbs</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/wbs/man/wbs.html" class="external-link">wbs</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">$</span><span class="va">cpt</span><span class="op">$</span><span class="va">cpt.ic</span><span class="op">$</span><span class="va">mbic.penalty</span>,</span>
 <span>  mosum <span class="op">=</span> <span class="fu">mosum</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mosum/man/mosum.html" class="external-link">mosum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">$</span><span class="va">cpts.info</span><span class="op">$</span><span class="va">cpts</span>,</span>
 <span>  <span class="co"># fpop = fpop::Fpop(well_log, length(well_log))$t.est,  # meaningless</span></span>
-<span>  gfpop <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/gfpop.html" class="external-link">gfpop</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">well_log</span>,</span>
-<span>    mygraph <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/graph.html" class="external-link">graph</a></span><span class="op">(</span></span>
-<span>      penalty <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/sdDiff.html" class="external-link">sdDiff</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">^</span> <span class="fl">2</span>,</span>
-<span>      type <span class="op">=</span> <span class="st">"updown"</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    type <span class="op">=</span> <span class="st">"mean"</span></span>
-<span>  <span class="op">)</span><span class="op">$</span><span class="va">changepoints</span>,</span>
+<span>  <span class="co"># gfpop = gfpop::gfpop(</span></span>
+<span>  <span class="co">#   data = well_log,</span></span>
+<span>  <span class="co">#   mygraph = gfpop::graph(</span></span>
+<span>  <span class="co">#     penalty = 2 * log(length(well_log)) * gfpop::sdDiff(well_log) ^ 2,</span></span>
+<span>  <span class="co">#     type = "updown"</span></span>
+<span>  <span class="co">#   ),</span></span>
+<span>  <span class="co">#   type = "mean"</span></span>
+<span>  <span class="co"># )$changepoints,</span></span>
 <span>  InspectChangepoint <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/inspect.html" class="external-link">inspect</a></span><span class="op">(</span></span>
 <span>    <span class="va">well_log</span>,</span>
 <span>    threshold <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/compute.threshold.html" class="external-link">compute.threshold</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span></span>
@@ -871,14 +870,14 @@ un-retrievable change points.</p>
 <span>  wbs <span class="op">=</span> <span class="fu">wbs</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/wbs/man/wbs.html" class="external-link">wbs</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>,</span>
 <span>  mosum <span class="op">=</span> <span class="fu">mosum</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mosum/man/mosum.html" class="external-link">mosum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>,</span>
 <span>  fpop <span class="op">=</span> <span class="fu">fpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/fpop/man/Fpop.html" class="external-link">Fpop</a></span><span class="op">(</span><span class="va">well_log</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  gfpop <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/gfpop.html" class="external-link">gfpop</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">well_log</span>,</span>
-<span>    mygraph <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/graph.html" class="external-link">graph</a></span><span class="op">(</span></span>
-<span>      penalty <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/sdDiff.html" class="external-link">sdDiff</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">^</span> <span class="fl">2</span>,</span>
-<span>      type <span class="op">=</span> <span class="st">"updown"</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    type <span class="op">=</span> <span class="st">"mean"</span></span>
-<span>  <span class="op">)</span>,</span>
+<span>  <span class="co"># gfpop = gfpop::gfpop(</span></span>
+<span>  <span class="co">#   data = well_log,</span></span>
+<span>  <span class="co">#   mygraph = gfpop::graph(</span></span>
+<span>  <span class="co">#     penalty = 2 * log(length(well_log)) * gfpop::sdDiff(well_log) ^ 2,</span></span>
+<span>  <span class="co">#     type = "updown"</span></span>
+<span>  <span class="co">#   ),</span></span>
+<span>  <span class="co">#   type = "mean"</span></span>
+<span>  <span class="co"># ),</span></span>
 <span>  InspectChangepoint <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/inspect.html" class="external-link">inspect</a></span><span class="op">(</span></span>
 <span>    <span class="va">well_log</span>,</span>
 <span>    threshold <span class="op">=</span> <span class="fu">InspectChangepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/InspectChangepoint/man/compute.threshold.html" class="external-link">compute.threshold</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span></span>
@@ -929,9 +928,9 @@ un-retrievable change points.</p>
 <span id="cb77-4"><a href="#cb77-4" tabindex="-1"></a>)</span>
 <span id="cb77-5"><a href="#cb77-5" tabindex="-1"></a><span class="cf">for</span> (</span>
 <span id="cb77-6"><a href="#cb77-6" tabindex="-1"></a>  package <span class="cf">in</span> <span class="fu">c</span>(</span>
-<span id="cb77-7"><a href="#cb77-7" tabindex="-1"></a>    <span class="co"># "bcp",</span></span>
+<span id="cb77-7"><a href="#cb77-7" tabindex="-1"></a>    <span class="co"># "bcp", "gfpop",</span></span>
 <span id="cb77-8"><a href="#cb77-8" tabindex="-1"></a>    <span class="st">"ggplot2"</span>, <span class="st">"mvtnorm"</span>,</span>
-<span id="cb77-9"><a href="#cb77-9" tabindex="-1"></a>    <span class="st">"breakfast"</span>, <span class="st">"changepoint"</span>, <span class="st">"cpm"</span>, <span class="st">"CptNonPar"</span>, <span class="st">"ecp"</span>, <span class="st">"fpop"</span>, <span class="st">"gfpop"</span>,</span>
+<span id="cb77-9"><a href="#cb77-9" tabindex="-1"></a>    <span class="st">"breakfast"</span>, <span class="st">"changepoint"</span>, <span class="st">"cpm"</span>, <span class="st">"CptNonPar"</span>, <span class="st">"ecp"</span>, <span class="st">"fpop"</span>,</span>
 <span id="cb77-10"><a href="#cb77-10" tabindex="-1"></a>    <span class="st">"InspectChangepoint"</span>, <span class="st">"jointseg"</span>, <span class="st">"mcp"</span>, <span class="st">"mosum"</span>, <span class="st">"not"</span>, <span class="st">"Rbeast"</span>,</span>
 <span id="cb77-11"><a href="#cb77-11" tabindex="-1"></a>    <span class="st">"segmented"</span>, <span class="st">"stepR"</span>, <span class="st">"strucchange"</span>, <span class="st">"VARDetect"</span>, <span class="st">"wbs"</span></span>
 <span id="cb77-12"><a href="#cb77-12" tabindex="-1"></a>  )</span>
@@ -1112,14 +1111,14 @@ un-retrievable change points.</p>
 <span id="cb77-187"><a href="#cb77-187" tabindex="-1"></a>  mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(mean_data_1), <span class="at">G =</span> <span class="dv">40</span>)<span class="sc">$</span>cpts.info<span class="sc">$</span>cpts</span>
 <span id="cb77-188"><a href="#cb77-188" tabindex="-1"></a>}</span>
 <span id="cb77-189"><a href="#cb77-189" tabindex="-1"></a>fpop<span class="sc">::</span><span class="fu">Fpop</span>(mean_data_1, <span class="fu">nrow</span>(mean_data_1))<span class="sc">$</span>t.est</span>
-<span id="cb77-190"><a href="#cb77-190" tabindex="-1"></a>gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
-<span id="cb77-191"><a href="#cb77-191" tabindex="-1"></a>  <span class="at">data =</span> mean_data_1,</span>
-<span id="cb77-192"><a href="#cb77-192" tabindex="-1"></a>  <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
-<span id="cb77-193"><a href="#cb77-193" tabindex="-1"></a>    <span class="at">penalty =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">nrow</span>(mean_data_1)) <span class="sc">*</span> gfpop<span class="sc">::</span><span class="fu">sdDiff</span>(mean_data_1) <span class="sc">^</span> <span class="dv">2</span>,</span>
-<span id="cb77-194"><a href="#cb77-194" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"updown"</span></span>
-<span id="cb77-195"><a href="#cb77-195" tabindex="-1"></a>  ),</span>
-<span id="cb77-196"><a href="#cb77-196" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"mean"</span></span>
-<span id="cb77-197"><a href="#cb77-197" tabindex="-1"></a>)<span class="sc">$</span>changepoints</span>
+<span id="cb77-190"><a href="#cb77-190" tabindex="-1"></a><span class="co"># gfpop::gfpop(</span></span>
+<span id="cb77-191"><a href="#cb77-191" tabindex="-1"></a><span class="co">#   data = mean_data_1,</span></span>
+<span id="cb77-192"><a href="#cb77-192" tabindex="-1"></a><span class="co">#   mygraph = gfpop::graph(</span></span>
+<span id="cb77-193"><a href="#cb77-193" tabindex="-1"></a><span class="co">#     penalty = 2 * log(nrow(mean_data_1)) * gfpop::sdDiff(mean_data_1) ^ 2,</span></span>
+<span id="cb77-194"><a href="#cb77-194" tabindex="-1"></a><span class="co">#     type = "updown"</span></span>
+<span id="cb77-195"><a href="#cb77-195" tabindex="-1"></a><span class="co">#   ),</span></span>
+<span id="cb77-196"><a href="#cb77-196" tabindex="-1"></a><span class="co">#   type = "mean"</span></span>
+<span id="cb77-197"><a href="#cb77-197" tabindex="-1"></a><span class="co"># )$changepoints</span></span>
 <span id="cb77-198"><a href="#cb77-198" tabindex="-1"></a><span class="fu">invisible</span>(</span>
 <span id="cb77-199"><a href="#cb77-199" tabindex="-1"></a>  <span class="fu">suppressMessages</span>(</span>
 <span id="cb77-200"><a href="#cb77-200" tabindex="-1"></a>    <span class="fu">capture.output</span>(</span>
@@ -1303,14 +1302,14 @@ un-retrievable change points.</p>
 <span id="cb77-378"><a href="#cb77-378" tabindex="-1"></a>  <span class="at">wbs =</span> wbs<span class="sc">::</span><span class="fu">wbs</span>(well_log)<span class="sc">$</span>cpt<span class="sc">$</span>cpt.ic<span class="sc">$</span>mbic.penalty,</span>
 <span id="cb77-379"><a href="#cb77-379" tabindex="-1"></a>  <span class="at">mosum =</span> mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(well_log), <span class="at">G =</span> <span class="dv">40</span>)<span class="sc">$</span>cpts.info<span class="sc">$</span>cpts,</span>
 <span id="cb77-380"><a href="#cb77-380" tabindex="-1"></a>  <span class="co"># fpop = fpop::Fpop(well_log, length(well_log))$t.est,  # meaningless</span></span>
-<span id="cb77-381"><a href="#cb77-381" tabindex="-1"></a>  <span class="at">gfpop =</span> gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
-<span id="cb77-382"><a href="#cb77-382" tabindex="-1"></a>    <span class="at">data =</span> well_log,</span>
-<span id="cb77-383"><a href="#cb77-383" tabindex="-1"></a>    <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
-<span id="cb77-384"><a href="#cb77-384" tabindex="-1"></a>      <span class="at">penalty =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">length</span>(well_log)) <span class="sc">*</span> gfpop<span class="sc">::</span><span class="fu">sdDiff</span>(well_log) <span class="sc">^</span> <span class="dv">2</span>,</span>
-<span id="cb77-385"><a href="#cb77-385" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">"updown"</span></span>
-<span id="cb77-386"><a href="#cb77-386" tabindex="-1"></a>    ),</span>
-<span id="cb77-387"><a href="#cb77-387" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"mean"</span></span>
-<span id="cb77-388"><a href="#cb77-388" tabindex="-1"></a>  )<span class="sc">$</span>changepoints,</span>
+<span id="cb77-381"><a href="#cb77-381" tabindex="-1"></a>  <span class="co"># gfpop = gfpop::gfpop(</span></span>
+<span id="cb77-382"><a href="#cb77-382" tabindex="-1"></a>  <span class="co">#   data = well_log,</span></span>
+<span id="cb77-383"><a href="#cb77-383" tabindex="-1"></a>  <span class="co">#   mygraph = gfpop::graph(</span></span>
+<span id="cb77-384"><a href="#cb77-384" tabindex="-1"></a>  <span class="co">#     penalty = 2 * log(length(well_log)) * gfpop::sdDiff(well_log) ^ 2,</span></span>
+<span id="cb77-385"><a href="#cb77-385" tabindex="-1"></a>  <span class="co">#     type = "updown"</span></span>
+<span id="cb77-386"><a href="#cb77-386" tabindex="-1"></a>  <span class="co">#   ),</span></span>
+<span id="cb77-387"><a href="#cb77-387" tabindex="-1"></a>  <span class="co">#   type = "mean"</span></span>
+<span id="cb77-388"><a href="#cb77-388" tabindex="-1"></a>  <span class="co"># )$changepoints,</span></span>
 <span id="cb77-389"><a href="#cb77-389" tabindex="-1"></a>  <span class="at">InspectChangepoint =</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
 <span id="cb77-390"><a href="#cb77-390" tabindex="-1"></a>    well_log,</span>
 <span id="cb77-391"><a href="#cb77-391" tabindex="-1"></a>    <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(<span class="fu">length</span>(well_log), <span class="dv">1</span>)</span>
@@ -1393,14 +1392,14 @@ un-retrievable change points.</p>
 <span id="cb77-468"><a href="#cb77-468" tabindex="-1"></a>  <span class="at">wbs =</span> wbs<span class="sc">::</span><span class="fu">wbs</span>(well_log),</span>
 <span id="cb77-469"><a href="#cb77-469" tabindex="-1"></a>  <span class="at">mosum =</span> mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(well_log), <span class="at">G =</span> <span class="dv">40</span>),</span>
 <span id="cb77-470"><a href="#cb77-470" tabindex="-1"></a>  <span class="at">fpop =</span> fpop<span class="sc">::</span><span class="fu">Fpop</span>(well_log, <span class="fu">nrow</span>(well_log)),</span>
-<span id="cb77-471"><a href="#cb77-471" tabindex="-1"></a>  <span class="at">gfpop =</span> gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
-<span id="cb77-472"><a href="#cb77-472" tabindex="-1"></a>    <span class="at">data =</span> well_log,</span>
-<span id="cb77-473"><a href="#cb77-473" tabindex="-1"></a>    <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
-<span id="cb77-474"><a href="#cb77-474" tabindex="-1"></a>      <span class="at">penalty =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">length</span>(well_log)) <span class="sc">*</span> gfpop<span class="sc">::</span><span class="fu">sdDiff</span>(well_log) <span class="sc">^</span> <span class="dv">2</span>,</span>
-<span id="cb77-475"><a href="#cb77-475" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">"updown"</span></span>
-<span id="cb77-476"><a href="#cb77-476" tabindex="-1"></a>    ),</span>
-<span id="cb77-477"><a href="#cb77-477" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"mean"</span></span>
-<span id="cb77-478"><a href="#cb77-478" tabindex="-1"></a>  ),</span>
+<span id="cb77-471"><a href="#cb77-471" tabindex="-1"></a>  <span class="co"># gfpop = gfpop::gfpop(</span></span>
+<span id="cb77-472"><a href="#cb77-472" tabindex="-1"></a>  <span class="co">#   data = well_log,</span></span>
+<span id="cb77-473"><a href="#cb77-473" tabindex="-1"></a>  <span class="co">#   mygraph = gfpop::graph(</span></span>
+<span id="cb77-474"><a href="#cb77-474" tabindex="-1"></a>  <span class="co">#     penalty = 2 * log(length(well_log)) * gfpop::sdDiff(well_log) ^ 2,</span></span>
+<span id="cb77-475"><a href="#cb77-475" tabindex="-1"></a>  <span class="co">#     type = "updown"</span></span>
+<span id="cb77-476"><a href="#cb77-476" tabindex="-1"></a>  <span class="co">#   ),</span></span>
+<span id="cb77-477"><a href="#cb77-477" tabindex="-1"></a>  <span class="co">#   type = "mean"</span></span>
+<span id="cb77-478"><a href="#cb77-478" tabindex="-1"></a>  <span class="co"># ),</span></span>
 <span id="cb77-479"><a href="#cb77-479" tabindex="-1"></a>  <span class="at">InspectChangepoint =</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
 <span id="cb77-480"><a href="#cb77-480" tabindex="-1"></a>    well_log,</span>
 <span id="cb77-481"><a href="#cb77-481" tabindex="-1"></a>    <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(<span class="fu">length</span>(well_log), <span class="dv">1</span>)</span>
