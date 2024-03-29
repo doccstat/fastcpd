@@ -2,7 +2,9 @@
 #include "fastcpd_constants.h"
 #include "fastcpd_functions.h"
 
+using ::fastcpd::functions::negative_log_likelihood_lasso_cv;
 using ::fastcpd::functions::negative_log_likelihood_mean;
+using ::fastcpd::functions::negative_log_likelihood_meanvariance;
 
 namespace fastcpd::classes {
 
@@ -33,31 +35,7 @@ List Fastcpd::negative_log_likelihood_wo_theta(
     Nullable<colvec> start
 ) {
   if (family == "lasso" && cv) {
-    Environment glmnet = Environment::namespace_env("glmnet"),
-                stats = Environment::namespace_env("stats");
-    Function cv_glmnet = glmnet["cv.glmnet"],
-        predict_glmnet = glmnet["predict.glmnet"],
-              deviance = stats["deviance"];
-    List out = cv_glmnet(
-      data.cols(1, data.n_cols - 1), data.col(0), Named("family") = "gaussian"
-    );
-    colvec index_vec = as<colvec>(out["index"]),
-              values = as<colvec>(deviance(out["glmnet.fit"]));
-    S4 out_coef = predict_glmnet(
-      out["glmnet.fit"],
-      Named("s") = out["lambda.1se"],
-      Named("type") = "coefficients",
-      Named("exact") = false
-    );
-    vec glmnet_i = as<vec>(out_coef.slot("i"));
-    vec glmnet_x = as<vec>(out_coef.slot("x"));
-    vec par = zeros(data.n_cols - 1);
-    for (unsigned int i = 1; i < glmnet_i.n_elem; i++) {
-      par(glmnet_i(i) - 1) = glmnet_x(i);
-    }
-    return List::create(
-      Named("par") = par, Named("value") = values(index_vec(1) - 1)
-    );
+    return negative_log_likelihood_lasso_cv(data);
   } else if (family == "lasso" && !cv) {
     Environment stats = Environment::namespace_env("stats"),
               glmnet = Environment::namespace_env("glmnet");
@@ -123,7 +101,7 @@ List Fastcpd::negative_log_likelihood_wo_theta(
                   Named("value") = -as<double>(out["loglik"]),
                   Named("residuals") = as<vec>(out["residuals"]));
   } else if (family == "mean") {
-    return List(negative_log_likelihood_mean(data, variance_estimate));
+    return negative_log_likelihood_mean(data, variance_estimate);
   } else if (family == "variance") {
     mat residuals = data.each_row() - variance_data_mean;
     mat par = residuals.t() * residuals / data.n_rows;
@@ -137,26 +115,7 @@ List Fastcpd::negative_log_likelihood_wo_theta(
       Named("residuals") = residuals
     );
   } else if (family == "meanvariance" || family == "mv") {
-    mat covariance = cov(data);
-
-    double value = data.n_rows * data.n_cols * (std::log(2.0 * M_PI) + 1) / 2.0;
-    if (data.n_rows >= data.n_cols) {
-      value += data.n_rows * log_det_sympd(
-        covariance + epsilon * eye<mat>(data.n_cols, data.n_cols)
-      ) / 2.0;
-    }
-
-    colvec par = zeros(data.n_cols * data.n_cols + data.n_cols);
-    par.rows(0, data.n_cols - 1) = mean(data, 0).t();
-    par.rows(data.n_cols, par.n_rows - 1) =
-      covariance.reshape(data.n_cols * data.n_cols, 1);
-    mat residuals = data.each_row() - par.rows(0, data.n_cols - 1).t();
-
-    return List::create(
-      Named("par") = par,
-      Named("value") = value,
-      Named("residuals") = residuals
-    );
+    return negative_log_likelihood_meanvariance(data, epsilon);
   } else if (family == "mgaussian") {
     mat x = data.cols(p_response, data.n_cols - 1);
     mat y = data.cols(0, p_response - 1);
