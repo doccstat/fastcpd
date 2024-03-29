@@ -1,6 +1,8 @@
 #include "fastcpd_functions.h"
 
 using ::fastcpd::classes::CostResult;
+using ::fastcpd::classes::CostResultMatPar;
+using ::fastcpd::classes::CostResultVecResiduals;
 
 namespace fastcpd::functions {
 
@@ -28,6 +30,33 @@ CostResult negative_log_likelihood_lasso_cv(const mat data) {
     par(glmnet_i(i) - 1) = glmnet_x(i);
   }
   return CostResult{par.t(), mat(), values(index_vec(1) - 1)};
+}
+
+CostResultVecResiduals negative_log_likelihood_lasso_wo_cv(
+  const mat data,
+  const double lambda
+) {
+  Environment stats = Environment::namespace_env("stats"),
+             glmnet = Environment::namespace_env("glmnet");
+  Function deviance = stats["deviance"], glmnet_ = glmnet["glmnet"],
+     predict_glmnet = glmnet["predict.glmnet"];
+  List out = glmnet_(
+    data.cols(1, data.n_cols - 1), data.col(0),
+    Named("family") = "gaussian", Named("lambda") = lambda
+  );
+  S4 out_par = out["beta"];
+  vec par_i = as<vec>(out_par.slot("i"));
+  vec par_x = as<vec>(out_par.slot("x"));
+  vec par = zeros(data.n_cols - 1);
+  for (unsigned int i = 0; i < par_i.n_elem; i++) {
+    par(par_i(i)) = par_x(i);
+  }
+  double value = as<double>(deviance(out));
+  vec fitted_values = as<vec>(
+    predict_glmnet(out, data.cols(1, data.n_cols - 1), Named("s") = lambda)
+  );
+  vec residuals = data.col(0) - fitted_values;
+  return CostResultVecResiduals{par, residuals, value / 2};
 }
 
 CostResult negative_log_likelihood_mean(
@@ -68,6 +97,19 @@ CostResult negative_log_likelihood_meanvariance(
   mat residuals = data.each_row() - par.rows(0, data.n_cols - 1).t();
 
   return CostResult{par.t(), residuals, value};
+}
+
+CostResultMatPar negative_log_likelihood_variance(
+  const mat data,
+  const rowvec variance_data_mean
+) {
+  mat residuals = data.each_row() - variance_data_mean;
+  mat par = residuals.t() * residuals / data.n_rows;
+  double value = data.n_rows * data.n_cols * (std::log(2.0 * M_PI) + 1) / 2.0;
+  if (data.n_rows >= data.n_cols) {
+    value += data.n_rows * log_det_sympd(par) / 2.0;
+  }
+  return CostResultMatPar{par, residuals, value};
 }
 
 }  // namespace fastcpd::functions
