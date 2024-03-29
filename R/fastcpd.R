@@ -186,6 +186,7 @@
 #' @example tests/testthat/examples/fastcpd_1.R
 #' @example tests/testthat/examples/fastcpd_2.R
 #' @example tests/testthat/examples/fastcpd_3.txt
+#' @example tests/testthat/examples/fastcpd_4.txt
 #' @seealso [fastcpd.family] for the family-specific function;
 #' [plot.fastcpd()] for plotting the results,
 #' [summary.fastcpd()] for summarizing the results.
