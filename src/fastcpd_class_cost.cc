@@ -12,50 +12,52 @@ using ::fastcpd::functions::negative_log_likelihood_variance;
 
 namespace fastcpd::classes {
 
-List Fastcpd::negative_log_likelihood(
+CostResult Fastcpd::negative_log_likelihood(
     mat data,
     Nullable<colvec> theta,
     double lambda,
     bool cv,
     Nullable<colvec> start
 ) {
-  List result;
+  CostResult cost_result;
   if (theta.isNull()) {
-    result = negative_log_likelihood_wo_theta(data, lambda, cv, start);
+    cost_result = negative_log_likelihood_wo_theta(data, lambda, cv, start);
   } else {
-    result = List::create(
-      Named("value") =
-        negative_log_likelihood_wo_cv(data, as<colvec>(theta), lambda)
-    );
+    cost_result = CostResult{
+      colvec(),
+      colvec(),
+      negative_log_likelihood_wo_cv(data, as<colvec>(theta), lambda)
+    };
   }
-  result["value"] = adjust_cost_value(result["value"], data.n_rows);
-  return result;
+  cost_result.value = adjust_cost_value(cost_result.value, data.n_rows);
+  return cost_result;
 }
 
-List Fastcpd::negative_log_likelihood_wo_theta(
+CostResult Fastcpd::negative_log_likelihood_wo_theta(
     mat data,
     double lambda,
     bool cv,
     Nullable<colvec> start
 ) {
+  CostResult cost_result;
   if (family == "lasso" && cv) {
-    return negative_log_likelihood_lasso_cv(data);
+    cost_result = negative_log_likelihood_lasso_cv(data);
   } else if (family == "lasso" && !cv) {
-    return negative_log_likelihood_lasso_wo_cv(data, lambda);
+    cost_result = negative_log_likelihood_lasso_wo_cv(data, lambda);
   } else if (
     family == "binomial" || family == "poisson" || family == "gaussian"
   ) {
-    return negative_log_likelihood_glm(data, start, family);
+    cost_result = negative_log_likelihood_glm(data, start, family);
   } else if (family == "arma") {
-    return negative_log_likelihood_arma(data, order);
+    cost_result = negative_log_likelihood_arma(data, order);
   } else if (family == "mean") {
-    return negative_log_likelihood_mean(data, variance_estimate);
+    cost_result = negative_log_likelihood_mean(data, variance_estimate);
   } else if (family == "variance") {
-    return negative_log_likelihood_variance(data, variance_data_mean);
+    cost_result = negative_log_likelihood_variance(data, variance_data_mean);
   } else if (family == "meanvariance" || family == "mv") {
-    return negative_log_likelihood_meanvariance(data, epsilon);
+    cost_result = negative_log_likelihood_meanvariance(data, epsilon);
   } else if (family == "mgaussian") {
-    return negative_log_likelihood_mgaussian(
+    cost_result = negative_log_likelihood_mgaussian(
       data, p_response, variance_estimate
     );
   } else {
@@ -63,6 +65,7 @@ List Fastcpd::negative_log_likelihood_wo_theta(
     stop("This branch should not be reached at fastcpd_class_cost.cc: 193.");
     // # nocov end
   }
+  return cost_result;
 }
 
 double Fastcpd::negative_log_likelihood_wo_cv(

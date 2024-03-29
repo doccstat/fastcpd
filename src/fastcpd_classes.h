@@ -5,6 +5,30 @@
 
 namespace fastcpd::classes {
 
+struct ColMat {
+  mat data;
+
+  operator colvec() const {
+    // TODO(doccstat): Add a warning if the matrix has more than one column.
+    return data.as_col();
+  }
+
+  operator mat() const {
+    return data;
+  }
+
+  operator rowvec() const {
+    // TODO(doccstat): Add a warning if the matrix has more than one column.
+    return data.as_col().t();
+  }
+};
+
+struct CostResult {
+  ColMat par;
+  ColMat residuals;
+  double value;
+};
+
 class Fastcpd {
  public:
   Fastcpd(
@@ -58,7 +82,7 @@ class Fastcpd {
   // Get the value of \code{theta_sum}.
   mat get_theta_sum();
 
-  List negative_log_likelihood_wo_theta(
+  CostResult negative_log_likelihood_wo_theta(
       mat data,
       double lambda,
       bool cv,
@@ -102,7 +126,7 @@ class Fastcpd {
   //
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   and \code{hessian}.
-  List get_optimized_cost(const mat data_segment);
+  CostResult get_optimized_cost(const mat data_segment);
 
   // Solve logistic/poisson regression using Gradient Descent Extension to the
   // multivariate case
@@ -117,7 +141,7 @@ class Fastcpd {
   //
   // @return Negative log likelihood of the corresponding data with the given
   //   family.
-  List negative_log_likelihood(
+  CostResult negative_log_likelihood(
       mat data,
       Nullable<colvec> theta,
       double lambda,
@@ -217,7 +241,7 @@ class Fastcpd {
 
   // Cost function. If the cost function is provided in R, this will be a
   // wrapper of the R function.
-  function<List(
+  function<CostResult(
       mat data,
       Nullable<colvec> theta,
       double lambda,
@@ -316,7 +340,7 @@ class CostFunction {
  public:
   CostFunction(Function cost);
 
-  List operator()(
+  CostResult operator()(
       mat data,
       Nullable<colvec> theta,
       double lambda,  // UNUSED
@@ -346,48 +370,6 @@ class CostHessian {
 
  private:
   Function cost_hessian;
-};
-
-struct CostResult {
-  colvec par;
-  colvec residuals;
-  double value;
-
-  operator List() const {
-    return List::create(
-      Named("par") = par,
-      Named("residuals") = residuals,
-      Named("value") = value
-    );
-  }
-};
-
-struct CostResultMatPar {
-  mat par;
-  mat residuals;
-  double value;
-
-  operator List() const {
-    return List::create(
-      Named("par") = par,
-      Named("residuals") = residuals,
-      Named("value") = value
-    );
-  }
-};
-
-struct CostResultMatResiduals {
-  colvec par;
-  mat residuals;
-  double value;
-
-  operator List() const {
-    return List::create(
-      Named("par") = par,
-      Named("residuals") = residuals,
-      Named("value") = value
-    );
-  }
 };
 
 }  // namespace fastcpd::classes
