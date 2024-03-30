@@ -127,6 +127,22 @@ class Fastcpd {
     double lambda
   );
 
+  double get_cval_pelt(
+    const mat data_segment,
+    const unsigned int i,
+    const int t,
+    const int tau,
+    const double lambda
+  );
+
+  double get_cval_sen(
+    const mat data_segment,
+    const unsigned int i,
+    const int t,
+    const int tau,
+    const double lambda
+  );
+
   // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   //
   // @param data_segment A data frame containing a segment of the data.
