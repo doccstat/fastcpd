@@ -120,10 +120,9 @@ class Fastcpd {
 
   double get_cost_adjustment_value(const unsigned nrows);
 
-  List get_cval_for_r_t_set(
+  double get_cval_for_r_t_set(
     const ucolvec r_t_set,
     const unsigned int i,
-    mat start,
     const int t,
     double lambda
   );
@@ -218,6 +217,8 @@ class Fastcpd {
 
   // Update \code{hessian} for a specific slice.
   void update_hessian(const unsigned int slice, mat new_hessian);
+
+  void update_start(const unsigned int col, const colvec start_col);
 
   // Update \code{momentum}.
   void update_momentum(colvec new_momentum);
@@ -327,6 +328,9 @@ class Fastcpd {
   // Create a matrix to store the estimated coefficients in each segment,
   // where each row represents estimated coefficients for a segment.
   mat segment_theta_hat;
+
+  // Matrix storing the warm starts.
+  mat start;
 
   // `theta_hat` stores the estimated coefficients up to the current data point.
   mat theta_hat;

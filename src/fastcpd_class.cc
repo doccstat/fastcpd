@@ -58,6 +58,7 @@ Fastcpd::Fastcpd(
   segment_theta_hat = mat(segment_count, p);
   err_sd = vec(segment_count);
   act_num = vec(segment_count);
+  start = zeros<mat>(p, n);
   theta_hat = mat(p, 1);
   theta_sum = mat(p, 1);
   hessian = cube(p, p, 1);
@@ -315,6 +316,10 @@ void Fastcpd::update_hessian(ucolvec pruned_left) {
   hessian = hessian.slices(pruned_left);
 }
 
+void Fastcpd::update_start(const unsigned int col, const colvec start_col) {
+  start.col(col) = start_col;
+}
+
 void Fastcpd::update_theta_hat(colvec new_theta_hat) {
   theta_hat = join_rows(theta_hat, new_theta_hat);
 }
@@ -343,10 +348,9 @@ void Fastcpd::update_theta_sum(ucolvec pruned_left) {
   theta_sum = theta_sum.cols(pruned_left);
 }
 
-List Fastcpd::get_cval_for_r_t_set(
+double Fastcpd::get_cval_for_r_t_set(
   const ucolvec r_t_set,
   const unsigned int i,
-  mat start,
   const int t,
   double lambda
 ) {
@@ -390,7 +394,7 @@ List Fastcpd::get_cval_for_r_t_set(
           wrap(segment_theta_hat[segment_indices(t - 1) - 1])
           // Or use `wrap(start.col(tau))` for warm start.
         );
-        start.col(tau) = colvec(cost_result.par);
+        update_start(tau, colvec(cost_result.par));
       } else {
         cost_result = cost_function_wrapper(
           data_segment, R_NilValue, lambda, false, R_NilValue
@@ -407,7 +411,7 @@ List Fastcpd::get_cval_for_r_t_set(
     }
   }
 
-  return List::create(Named("cval") = cval, Named("start") = start.col(tau));
+  return cval;
 }
 
 List Fastcpd::process_cp_set(const colvec raw_cp_set, const double lambda) {
@@ -489,7 +493,6 @@ List Fastcpd::process_cp_set(const colvec raw_cp_set, const double lambda) {
 List Fastcpd::run() {
   // Set up the initial values.
   double lambda = 0;
-  mat start = zeros<mat>(p, n);
 
   ucolvec r_t_set = {0};
   DEBUG_RCOUT(r_t_set);
@@ -536,9 +539,7 @@ List Fastcpd::run() {
 
     // For tau in R_t \ {t-1}.
     for (unsigned int i = 1; i < r_t_count; i++) {
-      List r_t_set_result = get_cval_for_r_t_set(r_t_set, i, start, t, lambda);
-      cval(i - 1) = as<double>(r_t_set_result["cval"]);
-      start.col(r_t_set(i - 1)) = as<colvec>(r_t_set_result["start"]);
+      cval(i - 1) = get_cval_for_r_t_set(r_t_set, i, t, lambda);
     }
 
     DEBUG_RCOUT(cval);
