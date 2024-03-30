@@ -8,25 +8,51 @@ namespace fastcpd::classes {
 struct ColMat {
   mat data;
 
-  operator colvec() const {
-    // TODO(doccstat): Add a warning if the matrix has more than one column.
-    return data.as_col();
-  }
-
-  operator mat() const {
-    return data;
-  }
-
-  operator rowvec() const {
-    // TODO(doccstat): Add a warning if the matrix has more than one column.
-    return data.as_col().t();
-  }
+  operator colvec() const;
+  operator mat() const;
+  operator rowvec() const;
 };
 
 struct CostResult {
   ColMat par;
   ColMat residuals;
   double value;
+};
+
+class CostFunction {
+ public:
+  CostFunction(Function cost);
+
+  CostResult operator()(
+      mat data,
+      Nullable<colvec> theta,
+      double lambda,  // UNUSED
+      bool cv,  // UNUSED
+      Nullable<colvec> start  // UNUSED
+  );
+
+ private:
+  Function cost;
+};
+
+class CostGradient {
+ public:
+  CostGradient(Function cost_gradient);
+
+  colvec operator()(mat data, colvec theta);
+
+ private:
+  Function cost_gradient;
+};
+
+class CostHessian {
+ public:
+  CostHessian(Function cost_hessian);
+
+  mat operator()(mat data, colvec theta);
+
+ private:
+  Function cost_hessian;
 };
 
 class Fastcpd {
@@ -102,7 +128,7 @@ class Fastcpd {
 
  private:
   // Adjust cost value for MBIC and MDL.
-  double adjust_cost_value(double value, const unsigned int nrows);
+  double update_cost_value(double value, const unsigned int nrows);
 
   void create_cost_function_wrapper(Nullable<Function> cost);
   void create_cost_gradient_wrapper(Nullable<Function> cost_gradient);
@@ -164,7 +190,7 @@ class Fastcpd {
   //
   // @return Negative log likelihood of the corresponding data with the given
   //   family.
-  CostResult negative_log_likelihood(
+  CostResult get_cost_result(
       mat data,
       Nullable<colvec> theta,
       double lambda,
@@ -172,9 +198,9 @@ class Fastcpd {
       Nullable<colvec> start = R_NilValue
   );
 
-  List process_cp_set(const colvec raw_cp_set, const double lambda);
+  List get_cp_set(const colvec raw_cp_set, const double lambda);
 
-  colvec trim_cp_set(const colvec raw_cp_set);
+  colvec update_cp_set(const colvec raw_cp_set);
 
   void update_cost_parameters(
       const unsigned int t,
@@ -366,42 +392,6 @@ class Fastcpd {
   const mat variance_estimate;
 
   const bool warm_start;
-};
-
-class CostFunction {
- public:
-  CostFunction(Function cost);
-
-  CostResult operator()(
-      mat data,
-      Nullable<colvec> theta,
-      double lambda,  // UNUSED
-      bool cv,  // UNUSED
-      Nullable<colvec> start  // UNUSED
-  );
-
- private:
-  Function cost;
-};
-
-class CostGradient {
- public:
-  CostGradient(Function cost_gradient);
-
-  colvec operator()(mat data, colvec theta);
-
- private:
-  Function cost_gradient;
-};
-
-class CostHessian {
- public:
-  CostHessian(Function cost_hessian);
-
-  mat operator()(mat data, colvec theta);
-
- private:
-  Function cost_hessian;
 };
 
 }  // namespace fastcpd::classes
