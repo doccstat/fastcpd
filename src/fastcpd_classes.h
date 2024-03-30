@@ -120,6 +120,14 @@ class Fastcpd {
 
   double get_cost_adjustment_value(const unsigned nrows);
 
+  List get_cval_for_r_t_set(
+    const ucolvec r_t_set,
+    const unsigned int i,
+    mat start,
+    const int t,
+    double lambda
+  );
+
   // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   //
   // @param data_segment A data frame containing a segment of the data.
