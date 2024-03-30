@@ -151,6 +151,8 @@ class Fastcpd {
 
   List process_cp_set(const colvec raw_cp_set, const double lambda);
 
+  colvec trim_cp_set(const colvec raw_cp_set);
+
   void update_cost_parameters(
       const unsigned int t,
       const unsigned int tau,

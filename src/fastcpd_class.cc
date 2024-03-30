@@ -344,41 +344,7 @@ void Fastcpd::update_theta_sum(ucolvec pruned_left) {
 }
 
 List Fastcpd::process_cp_set(const colvec raw_cp_set, const double lambda) {
-  // Remove change points close to the boundaries.
-  colvec cp_set = raw_cp_set;
-  cp_set = cp_set(find(cp_set > trim * n));
-  cp_set = cp_set(find(cp_set < (1 - trim) * n));
-  colvec cp_set_ = zeros<vec>(cp_set.n_elem + 1);
-  if (cp_set.n_elem) {
-    cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
-  }
-  cp_set = sort(unique(std::move(cp_set_)));
-
-  // Remove change points close to each other.
-  ucolvec cp_set_too_close = find(diff(cp_set) <= trim * n);
-  if (cp_set_too_close.n_elem > 0) {
-    int rest_element_count = cp_set.n_elem - cp_set_too_close.n_elem;
-    colvec cp_set_rest_left = zeros<vec>(rest_element_count),
-          cp_set_rest_right = zeros<vec>(rest_element_count);
-    for (unsigned int i = 0, i_left = 0, i_right = 0; i < cp_set.n_elem; i++) {
-      if (
-        ucolvec left_find = find(cp_set_too_close == i);
-        left_find.n_elem == 0
-      ) {
-        cp_set_rest_left(i_left) = cp_set(i);
-        i_left++;
-      }
-      if (
-        ucolvec right_find = find(cp_set_too_close == i - 1);
-        right_find.n_elem == 0
-      ) {
-        cp_set_rest_right(i_right) = cp_set(i);
-        i_right++;
-      }
-    }
-    cp_set = floor((cp_set_rest_left + cp_set_rest_right) / 2);
-  }
-  cp_set = cp_set(find(cp_set > 0));
+  colvec cp_set = trim_cp_set(raw_cp_set);
 
   if (cp_only) {
     return List::create(
@@ -625,6 +591,44 @@ void Fastcpd::update_cost_parameters(
   create_theta_sum(i - 1, as<colvec>(cost_update_result[1]));
   update_hessian(i - 1, as<mat>(cost_update_result[2]));
   update_momentum(as<colvec>(cost_update_result[3]));
+}
+
+colvec Fastcpd::trim_cp_set(const colvec raw_cp_set) {
+  // Remove change points close to the boundaries.
+  colvec cp_set = raw_cp_set;
+  cp_set = cp_set(find(cp_set > trim * n));
+  cp_set = cp_set(find(cp_set < (1 - trim) * n));
+  colvec cp_set_ = zeros<vec>(cp_set.n_elem + 1);
+  if (cp_set.n_elem) {
+    cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
+  }
+  cp_set = sort(unique(std::move(cp_set_)));
+
+  // Remove change points close to each other.
+  ucolvec cp_set_too_close = find(diff(cp_set) <= trim * n);
+  if (cp_set_too_close.n_elem > 0) {
+    int rest_element_count = cp_set.n_elem - cp_set_too_close.n_elem;
+    colvec cp_set_rest_left = zeros<vec>(rest_element_count),
+          cp_set_rest_right = zeros<vec>(rest_element_count);
+    for (unsigned int i = 0, i_left = 0, i_right = 0; i < cp_set.n_elem; i++) {
+      if (
+        ucolvec left_find = find(cp_set_too_close == i);
+        left_find.n_elem == 0
+      ) {
+        cp_set_rest_left(i_left) = cp_set(i);
+        i_left++;
+      }
+      if (
+        ucolvec right_find = find(cp_set_too_close == i - 1);
+        right_find.n_elem == 0
+      ) {
+        cp_set_rest_right(i_right) = cp_set(i);
+        i_right++;
+      }
+    }
+    cp_set = floor((cp_set_rest_left + cp_set_rest_right) / 2);
+  }
+  return cp_set(find(cp_set > 0));
 }
 
 List Fastcpd::update_cost_parameters_steps(
