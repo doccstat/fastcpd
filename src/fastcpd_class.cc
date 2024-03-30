@@ -101,7 +101,7 @@ CostResult Fastcpd::get_optimized_cost(const mat data_segment) {
   Function cost_ = cost.get();
   CostResult cost_result;
   if (cost_gradient.isNull() && cost_hessian.isNull()) {
-    cost_result = {colvec(), colvec(), as<double>(cost_(data_segment))};
+    cost_result = {{colvec()}, {colvec()}, as<double>(cost_(data_segment))};
   } else if (p == 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
@@ -124,7 +124,7 @@ CostResult Fastcpd::get_optimized_cost(const mat data_segment) {
     colvec par = as<colvec>(optim_result["par"]);
     double value = as<double>(optim_result["value"]);
     cost_result =
-      {log(par / (1 - par)), colvec(), exp(value) / (1 + exp(value))};
+      {{log(par / (1 - par))}, {colvec()}, exp(value) / (1 + exp(value))};
   } else if (p > 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
@@ -137,7 +137,7 @@ CostResult Fastcpd::get_optimized_cost(const mat data_segment) {
       Named("upper") = upper
     );
     cost_result =
-      {as<colvec>(optim_result["par"]), colvec(), optim_result["value"]};
+      {{as<colvec>(optim_result["par"])}, {colvec()}, optim_result["value"]};
   } else {
     // # nocov start
     stop("This branch should not be reached at classes.cc: 945.");
@@ -587,6 +587,14 @@ List Fastcpd::run() {
     );
   }
 
+  return process_cp_set(cp_set, raw_cp_set, lambda);
+}
+
+List Fastcpd::process_cp_set(
+  const colvec cp_set,
+  const colvec raw_cp_set,
+  const double lambda
+) {
   colvec cp_loc_ = zeros<colvec>(cp_set.n_elem + 2);
   if (cp_set.n_elem) {
     cp_loc_.rows(1, cp_loc_.n_elem - 2) = cp_set;

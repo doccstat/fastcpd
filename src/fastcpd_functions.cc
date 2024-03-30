@@ -19,7 +19,7 @@ CostResult negative_log_likelihood_arma(
   par.rows(0, sum(order) - 1) = as<colvec>(out["coef"]);
   par(sum(order)) = as<double>(out["sigma2"]);
 
-  return {par, as<vec>(out["residuals"]), -as<double>(out["loglik"])};
+  return {{par}, {as<vec>(out["residuals"])}, -as<double>(out["loglik"])};
 }
 
 CostResult negative_log_likelihood_glm(
@@ -42,7 +42,7 @@ CostResult negative_log_likelihood_glm(
   vec par = as<vec>(out["coefficients"]);
   vec residuals = as<vec>(out["residuals"]);
   double value = out["deviance"];
-  return {par, residuals, value / 2};
+  return {{par}, {residuals}, value / 2};
 }
 
 CostResult negative_log_likelihood_lasso_cv(const mat data) {
@@ -68,7 +68,7 @@ CostResult negative_log_likelihood_lasso_cv(const mat data) {
   for (unsigned int i = 1; i < glmnet_i.n_elem; i++) {
     par(glmnet_i(i) - 1) = glmnet_x(i);
   }
-  return {par, mat(), values(index_vec(1) - 1)};
+  return {{par}, {mat()}, values(index_vec(1) - 1)};
 }
 
 CostResult negative_log_likelihood_lasso_wo_cv(
@@ -95,7 +95,7 @@ CostResult negative_log_likelihood_lasso_wo_cv(
     predict_glmnet(out, data.cols(1, data.n_cols - 1), Named("s") = lambda)
   );
   vec residuals = data.col(0) - fitted_values;
-  return {par, residuals, value / 2};
+  return {{par}, {residuals}, value / 2};
 }
 
 CostResult negative_log_likelihood_mean(
@@ -104,8 +104,8 @@ CostResult negative_log_likelihood_mean(
 ) {
   rowvec par = mean(data, 0);
   return {
-    par.t(),
-    data.each_row() - par,
+    {par.t()},  // # nocov
+    {data.each_row() - par},
     data.n_rows / 2.0 * (
       std::log(2.0 * M_PI) * data.n_cols + log_det_sympd(variance_estimate) +
         trace(solve(
@@ -135,7 +135,7 @@ CostResult negative_log_likelihood_meanvariance(
     covariance.reshape(data.n_cols * data.n_cols, 1);
   mat residuals = data.each_row() - par.rows(0, data.n_cols - 1).t();
 
-  return {par, residuals, value};
+  return {{par}, {residuals}, value};
 }
 
 CostResult negative_log_likelihood_mgaussian(
@@ -161,20 +161,20 @@ CostResult negative_log_likelihood_mgaussian(
   value *= data.n_rows;
   value += trace(solve(variance_estimate, residuals.t() * residuals));
   DEBUG_RCOUT(value);
-  return {par, residuals, value / 2};
+  return {{par}, {residuals}, value / 2};
 }
 
 CostResult negative_log_likelihood_variance(
   const mat data,
   const rowvec variance_data_mean
 ) {
-  mat residuals = data.each_row() - variance_data_mean;
+  mat residuals = data.each_row() - variance_data_mean;  // # nocov
   mat par = residuals.t() * residuals / data.n_rows;
   double value = data.n_rows * data.n_cols * (std::log(2.0 * M_PI) + 1) / 2.0;
   if (data.n_rows >= data.n_cols) {
     value += data.n_rows * log_det_sympd(par) / 2.0;
   }
-  return {par, residuals, value};
+  return {{par}, {residuals}, value};
 }
 
 }  // namespace fastcpd::functions

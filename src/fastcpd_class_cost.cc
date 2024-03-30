@@ -24,8 +24,8 @@ CostResult Fastcpd::negative_log_likelihood(
     cost_result = negative_log_likelihood_wo_theta(data, lambda, cv, start);
   } else {
     cost_result = CostResult{
-      colvec(),
-      colvec(),
+      {colvec()},
+      {colvec()},
       negative_log_likelihood_wo_cv(data, as<colvec>(theta), lambda)
     };
   }
