@@ -1,8 +1,3 @@
-#ifdef EXPERIMENT
-#include <algorithm>
-#include <execution>
-#endif
-
 #include "fastcpd_classes.h"
 #include "fastcpd_constants.h"
 #include "RProgress.h"
@@ -348,6 +343,116 @@ void Fastcpd::update_theta_sum(ucolvec pruned_left) {
   theta_sum = theta_sum.cols(pruned_left);
 }
 
+List Fastcpd::process_cp_set(const colvec raw_cp_set, const double lambda) {
+  // Remove change points close to the boundaries.
+  colvec cp_set = raw_cp_set;
+  cp_set = cp_set(find(cp_set > trim * n));
+  cp_set = cp_set(find(cp_set < (1 - trim) * n));
+  colvec cp_set_ = zeros<vec>(cp_set.n_elem + 1);
+  if (cp_set.n_elem) {
+    cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
+  }
+  cp_set = sort(unique(std::move(cp_set_)));
+
+  // Remove change points close to each other.
+  ucolvec cp_set_too_close = find(diff(cp_set) <= trim * n);
+  if (cp_set_too_close.n_elem > 0) {
+    int rest_element_count = cp_set.n_elem - cp_set_too_close.n_elem;
+    colvec cp_set_rest_left = zeros<vec>(rest_element_count),
+          cp_set_rest_right = zeros<vec>(rest_element_count);
+    for (unsigned int i = 0, i_left = 0, i_right = 0; i < cp_set.n_elem; i++) {
+      if (
+        ucolvec left_find = find(cp_set_too_close == i);
+        left_find.n_elem == 0
+      ) {
+        cp_set_rest_left(i_left) = cp_set(i);
+        i_left++;
+      }
+      if (
+        ucolvec right_find = find(cp_set_too_close == i - 1);
+        right_find.n_elem == 0
+      ) {
+        cp_set_rest_right(i_right) = cp_set(i);
+        i_right++;
+      }
+    }
+    cp_set = floor((cp_set_rest_left + cp_set_rest_right) / 2);
+  }
+  cp_set = cp_set(find(cp_set > 0));
+
+  if (cp_only) {
+    return List::create(
+      Named("raw_cp_set") = raw_cp_set,
+      Named("cp_set") = cp_set,
+      Named("cost_values") = R_NilValue,
+      Named("residual") = R_NilValue,
+      Named("thetas") = R_NilValue
+    );
+  }
+
+  colvec cp_loc_ = zeros<colvec>(cp_set.n_elem + 2);
+  if (cp_set.n_elem) {
+    cp_loc_.rows(1, cp_loc_.n_elem - 2) = cp_set;
+  }
+  cp_loc_(cp_loc_.n_elem - 1) = n;
+  colvec cp_loc = unique(std::move(cp_loc_));
+  colvec cost_values = zeros<vec>(cp_loc.n_elem - 1);
+  mat thetas = zeros<mat>(p, cp_loc.n_elem - 1);
+  mat residual;
+  if (
+    family == "mean" || family == "variance" ||
+    family == "meanvariance" || family == "mv"
+  ) {
+    residual = zeros<mat>(data.n_rows, data.n_cols);
+  } else if (family == "mgaussian") {
+    residual = zeros<mat>(data.n_rows, p_response);
+  } else {
+    residual = zeros<mat>(data.n_rows, 1);
+  }
+  unsigned int residual_next_start = 0;
+
+  for (unsigned int i = 0; i < cp_loc.n_elem - 1; i++) {
+    colvec segment_data_index_ =
+        linspace(cp_loc(i), cp_loc(i + 1) - 1, cp_loc(i + 1) - cp_loc(i));
+    ucolvec segment_data_index =
+        arma::conv_to<ucolvec>::from(std::move(segment_data_index_));
+
+    mat data_segment = data.rows(segment_data_index);
+    CostResult cost_result;
+    if (!contain(FASTCPD_FAMILIES, family)) {
+      cost_result = get_optimized_cost(data_segment);
+    } else {
+      cost_result = cost_function_wrapper(
+        data_segment, R_NilValue, lambda, false, R_NilValue
+      );
+    }
+
+    cost_values(i) = cost_result.value;
+
+    // Parameters are not involved for PELT.
+    if (vanilla_percentage < 1) {
+      thetas.col(i) = colvec(cost_result.par);
+    }
+
+    // Residual is only calculated for built-in families.
+    if (contain(FASTCPD_FAMILIES, family)) {
+      mat cost_optim_residual = cost_result.residuals;
+      residual.rows(
+        residual_next_start,
+        residual_next_start + cost_optim_residual.n_rows - 1
+      ) = cost_optim_residual;
+      residual_next_start += cost_optim_residual.n_rows;
+    }
+  }
+  return List::create(
+    Named("raw_cp_set") = raw_cp_set,
+    Named("cp_set") = cp_set,
+    Named("cost_values") = cost_values,
+    Named("residual") = residual,
+    Named("thetas") = thetas
+  );
+}
+
 List Fastcpd::run() {
   // Set up the initial values.
   double lambda = 0;
@@ -387,43 +492,6 @@ List Fastcpd::run() {
   if (r_progress) {
     rProgress.tick();
   }
-
-#ifdef EXPERIMENT
-
-  std::vector<double> cmat_vec((n + 1) * n, 0.0);
-  colvec tau_stars = zeros<vec>(n + 1);
-
-  std::for_each(
-    std::execution::par_unseq,
-    cmat_vec.begin(),
-    cmat_vec.end(),
-    [&](double& cval) {
-      int index = &cval - &cmat_vec[0];
-      int s = index % (n + 1);
-      int t = index / (n + 1);
-      if (s > t) {
-        cval = cost_function_wrapper(
-          data.rows(t, s - 1), R_NilValue, lambda, false, R_NilValue
-        ).value;
-      } else {
-        cval = arma::datum::inf;
-      }
-    }
-  );
-
-  arma::Mat<double> cmat(cmat_vec.data(), n + 1, n, /* copy_aux_mem */ false);
-
-  for (int t = 1; t <= n; t++) {
-    colvec new_fvec = fvec(t - 1) + cmat.col(t - 1) + beta;
-    ucolvec f_t_condition = find(new_fvec < fvec);
-    if (f_t_condition.n_elem > 0) {
-      fvec.rows(f_t_condition) = new_fvec.rows(f_t_condition);
-      tau_stars.rows(f_t_condition) = (t - 1) * ones<vec>(f_t_condition.n_elem);
-    }
-    cp_sets[t] = join_cols(cp_sets[tau_stars(t - 1)], colvec{tau_stars(t - 1)});
-  }
-
-#else
 
   for (int t = 1; t <= n; t++) {
     DEBUG_RCOUT(t);
@@ -538,124 +606,7 @@ List Fastcpd::run() {
     }
   }
 
-#endif  // EXPERIMENT
-
-  // Remove change points close to the boundaries.
-  colvec raw_cp_set = cp_sets[n],
-         cp_set = cp_sets[n];
-  cp_set = cp_set(find(cp_set > trim * n));
-  cp_set = cp_set(find(cp_set < (1 - trim) * n));
-  colvec cp_set_ = zeros<vec>(cp_set.n_elem + 1);
-  if (cp_set.n_elem) {
-    cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
-  }
-  cp_set = sort(unique(std::move(cp_set_)));
-
-  // Remove change points close to each other.
-  ucolvec cp_set_too_close = find(diff(cp_set) <= trim * n);
-  if (cp_set_too_close.n_elem > 0) {
-    int rest_element_count = cp_set.n_elem - cp_set_too_close.n_elem;
-    colvec cp_set_rest_left = zeros<vec>(rest_element_count),
-          cp_set_rest_right = zeros<vec>(rest_element_count);
-    for (unsigned int i = 0, i_left = 0, i_right = 0; i < cp_set.n_elem; i++) {
-      if (
-        ucolvec left_find = find(cp_set_too_close == i);
-        left_find.n_elem == 0
-      ) {
-        cp_set_rest_left(i_left) = cp_set(i);
-        i_left++;
-      }
-      if (
-        ucolvec right_find = find(cp_set_too_close == i - 1);
-        right_find.n_elem == 0
-      ) {
-        cp_set_rest_right(i_right) = cp_set(i);
-        i_right++;
-      }
-    }
-    cp_set = floor((cp_set_rest_left + cp_set_rest_right) / 2);
-  }
-  cp_set = cp_set(find(cp_set > 0));
-
-  if (cp_only) {
-    return List::create(
-      Named("raw_cp_set") = raw_cp_set,
-      Named("cp_set") = cp_set,
-      Named("cost_values") = R_NilValue,
-      Named("residual") = R_NilValue,
-      Named("thetas") = R_NilValue
-    );
-  }
-
-  return process_cp_set(cp_set, raw_cp_set, lambda);
-}
-
-List Fastcpd::process_cp_set(
-  const colvec cp_set,
-  const colvec raw_cp_set,
-  const double lambda
-) {
-  colvec cp_loc_ = zeros<colvec>(cp_set.n_elem + 2);
-  if (cp_set.n_elem) {
-    cp_loc_.rows(1, cp_loc_.n_elem - 2) = cp_set;
-  }
-  cp_loc_(cp_loc_.n_elem - 1) = n;
-  colvec cp_loc = unique(std::move(cp_loc_));
-  colvec cost_values = zeros<vec>(cp_loc.n_elem - 1);
-  mat thetas = zeros<mat>(p, cp_loc.n_elem - 1);
-  mat residual;
-  if (
-    family == "mean" || family == "variance" ||
-    family == "meanvariance" || family == "mv"
-  ) {
-    residual = zeros<mat>(data.n_rows, data.n_cols);
-  } else if (family == "mgaussian") {
-    residual = zeros<mat>(data.n_rows, p_response);
-  } else {
-    residual = zeros<mat>(data.n_rows, 1);
-  }
-  unsigned int residual_next_start = 0;
-
-  for (unsigned int i = 0; i < cp_loc.n_elem - 1; i++) {
-    colvec segment_data_index_ =
-        linspace(cp_loc(i), cp_loc(i + 1) - 1, cp_loc(i + 1) - cp_loc(i));
-    ucolvec segment_data_index =
-        arma::conv_to<ucolvec>::from(std::move(segment_data_index_));
-
-    mat data_segment = data.rows(segment_data_index);
-    CostResult cost_result;
-    if (!contain(FASTCPD_FAMILIES, family)) {
-      cost_result = get_optimized_cost(data_segment);
-    } else {
-      cost_result = cost_function_wrapper(
-        data_segment, R_NilValue, lambda, false, R_NilValue
-      );
-    }
-
-    cost_values(i) = cost_result.value;
-
-    // Parameters are not involved for PELT.
-    if (vanilla_percentage < 1) {
-      thetas.col(i) = colvec(cost_result.par);
-    }
-
-    // Residual is only calculated for built-in families.
-    if (contain(FASTCPD_FAMILIES, family)) {
-      mat cost_optim_residual = cost_result.residuals;
-      residual.rows(
-        residual_next_start,
-        residual_next_start + cost_optim_residual.n_rows - 1
-      ) = cost_optim_residual;
-      residual_next_start += cost_optim_residual.n_rows;
-    }
-  }
-  return List::create(
-    Named("raw_cp_set") = raw_cp_set,
-    Named("cp_set") = cp_set,
-    Named("cost_values") = cost_values,
-    Named("residual") = residual,
-    Named("thetas") = thetas
-  );
+  return process_cp_set(cp_sets[n], lambda);
 }
 
 void Fastcpd::update_cost_parameters(

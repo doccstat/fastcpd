@@ -149,11 +149,7 @@ class Fastcpd {
       Nullable<colvec> start = R_NilValue
   );
 
-  List process_cp_set(
-    const colvec cp_set,
-    const colvec raw_cp_set,
-    const double lambda
-  );
+  List process_cp_set(const colvec raw_cp_set, const double lambda);
 
   void update_cost_parameters(
       const unsigned int t,
