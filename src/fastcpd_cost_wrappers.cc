@@ -14,7 +14,7 @@ CostResult CostFunction::operator()(  // # nocov
   DEBUG_RCOUT(data.n_rows);
   SEXP value =
     theta.isNull() ? cost(data) : cost(data, as<colvec>(theta));  // # nocov
-  return {colvec(), colvec(), as<double>(value)};
+  return {{colvec()}, {colvec()}, as<double>(value)};  // # nocov
 }
 
 CostGradient::CostGradient(Function cost_gradient) :
