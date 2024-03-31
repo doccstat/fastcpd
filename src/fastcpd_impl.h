@@ -7,7 +7,6 @@
 //
 // @param data A data frame containing the data to be segmented.
 // @param beta Initial cost value.
-// @param convexity_coef The constant to satisfy the pruning condition.
 // @param cost_adjustment Adjustment for the cost function.
 // @param segment_count Number of segments for initial guess.
 // @param trim Trimming for the boundary change points.
@@ -41,6 +40,7 @@
 //   change and gaussian.
 // @param p_response Dimension of the response, used with multivariate
 //   response.
+// @param pruning_coef The constant to satisfy the pruning condition.
 // @param r_progress Whether to show progress bar.
 //
 // @return A list containing the change points and the cost values for each
@@ -49,7 +49,6 @@
 List fastcpd_impl(
     mat data,
     double beta,
-    const double convexity_coef,
     const string cost_adjustment,
     const int segment_count,
     const double trim,
@@ -70,6 +69,7 @@ List fastcpd_impl(
     colvec line_search,
     const mat variance_estimate,
     const unsigned int p_response,
+    const double pruning_coef,
     const bool r_progress
 );
 

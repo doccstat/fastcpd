@@ -59,7 +59,6 @@ class Fastcpd {
  public:
   Fastcpd(
     const double beta,
-    const double convexity_coef,
     Nullable<Function> cost,
     const string cost_adjustment,
     Nullable<Function> cost_gradient,
@@ -75,6 +74,7 @@ class Fastcpd {
     const colvec order,
     const int p,
     const unsigned int p_response,
+    const double pruning_coef,
     const bool r_progress,
     const int segment_count,
     const double trim,
@@ -286,8 +286,6 @@ class Fastcpd {
   // `beta` is the initial cost value.
   double beta;
 
-  const double convexity_coef;
-
   // `cost` is the cost function to be used.
   Nullable<Function> cost;
 
@@ -358,6 +356,8 @@ class Fastcpd {
 
   // Number of response variables in regression.
   const unsigned int p_response;
+
+  const double pruning_coef;
 
   const bool r_progress;
 

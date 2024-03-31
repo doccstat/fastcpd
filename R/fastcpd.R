@@ -43,8 +43,6 @@
 #' \code{"custom"} for user specified custom models. Omitting this parameter
 #' is the same as specifying the parameter to be \code{"custom"} or
 #' \code{NULL}, in which case, users must specify the custom cost function.
-#' @param convexity_coef Convexity coefficient used in the pruning condition.
-#' If set to be \code{-Inf}, no pruning will be performed.
 #' @param cost Cost function to be used. \code{cost}, \code{cost_gradient}, and
 #' \code{cost_hessian} should not be specified at the same time with
 #' \code{family} as built-in families have cost functions implemented in C++
@@ -98,6 +96,8 @@
 #' @param upper Upper bound for the parameters. Used to specify the domain of
 #' the parameters after each gradient descent step. If not specified, the
 #' upper bound will be set to be \code{Inf} for all parameters.
+#' @param pruning_coef Coefficient used in the pruning condition.
+#' If set to be \code{-Inf}, no pruning will be performed.
 #' @param segment_count An initial guess of the number of segments. If not
 #' specified, the initial guess of the number of segments is 10. The initial
 #' guess affects the initial estimates of the parameters in SeGD.
@@ -204,13 +204,13 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   beta = "MBIC",
   cost_adjustment = "MBIC",
   family = NULL,
-  convexity_coef = 0,
   cost = NULL,
   cost_gradient = NULL,
   cost_hessian = NULL,
   line_search = c(1),
   lower = rep(-Inf, p),
   upper = rep(Inf, p),
+  pruning_coef = 0,
   segment_count = 10,
   trim = 0.02,
   momentum_coef = 0,
@@ -331,9 +331,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   vanilla_percentage <-
     get_vanilla_percentage(vanilla_percentage, cost, fastcpd_family)
   beta <- get_beta(beta, p, nrow(data_), fastcpd_family, sigma_)
-  convexity_coef <- get_convexity_coef(
-    methods::hasArg("convexity_coef"),
-    convexity_coef,
+  pruning_coef <- get_pruning_coef(
+    methods::hasArg("pruning_coef"),
+    pruning_coef,
     cost_adjustment,
     fastcpd_family,
     nrow(data_),
@@ -341,10 +341,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   )
 
   result <- fastcpd_impl(
-    data_, beta, convexity_coef, cost_adjustment, segment_count, trim,
+    data_, beta, cost_adjustment, segment_count, trim,
     momentum_coef, multiple_epochs, fastcpd_family, epsilon, p, order,
     cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
-    lower, upper, line_search, sigma_, p_response, r_progress
+    lower, upper, line_search, sigma_, p_response, pruning_coef, r_progress
   )
 
   raw_cp_set <- c(result$raw_cp_set)
