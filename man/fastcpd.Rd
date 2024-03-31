@@ -10,13 +10,13 @@ fastcpd(
   beta = "MBIC",
   cost_adjustment = "MBIC",
   family = NULL,
-  convexity_coef = 0,
   cost = NULL,
   cost_gradient = NULL,
   cost_hessian = NULL,
   line_search = c(1),
   lower = rep(-Inf, p),
   upper = rep(Inf, p),
+  pruning_coef = 0,
   segment_count = 10,
   trim = 0.02,
   momentum_coef = 0,
@@ -80,9 +80,6 @@ penalized linear regression, \code{"ar"} for AR(\eqn{p}) models,
 is the same as specifying the parameter to be \code{"custom"} or
 \code{NULL}, in which case, users must specify the custom cost function.}
 
-\item{convexity_coef}{Convexity coefficient used in the pruning condition.
-If set to be \code{-Inf}, no pruning will be performed.}
-
 \item{cost}{Cost function to be used. \code{cost}, \code{cost_gradient}, and
 \code{cost_hessian} should not be specified at the same time with
 \code{family} as built-in families have cost functions implemented in C++
@@ -142,6 +139,9 @@ values, such as the noise variance.}
 \item{upper}{Upper bound for the parameters. Used to specify the domain of
 the parameters after each gradient descent step. If not specified, the
 upper bound will be set to be \code{Inf} for all parameters.}
+
+\item{pruning_coef}{Coefficient used in the pruning condition.
+If set to be \code{-Inf}, no pruning will be performed.}
 
 \item{segment_count}{An initial guess of the number of segments. If not
 specified, the initial guess of the number of segments is 10. The initial
@@ -416,7 +416,7 @@ result_no_vp <- fastcpd.lasso(
   small_lasso_data,
   beta = "BIC",
   cost_adjustment = NULL,
-  convexity_coef = 0
+  pruning_coef = 0
 )
 summary(result_no_vp)
 result_20_vp <- fastcpd.lasso(
@@ -424,7 +424,7 @@ result_20_vp <- fastcpd.lasso(
   beta = "BIC",
   cost_adjustment = NULL,
   vanilla_percentage = 0.2,
-  convexity_coef = 0
+  pruning_coef = 0
 )
 summary(result_20_vp)
 }

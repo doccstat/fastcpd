@@ -16,7 +16,6 @@ namespace fastcpd::classes {
 
 Fastcpd::Fastcpd(
     const double beta,
-    const double convexity_coef,
     Nullable<Function> cost,
     const string cost_adjustment,
     Nullable<Function> cost_gradient,
@@ -32,6 +31,7 @@ Fastcpd::Fastcpd(
     const colvec order,
     const int p,
     const unsigned int p_response,
+    const double pruning_coef,
     const bool r_progress,
     const int segment_count,
     const double trim,
@@ -40,7 +40,6 @@ Fastcpd::Fastcpd(
     const mat variance_estimate,
     const bool warm_start
 ) : beta(beta),
-    convexity_coef(convexity_coef),
     cost(cost),
     cost_adjustment(cost_adjustment),
     cost_gradient(cost_gradient),
@@ -56,6 +55,7 @@ Fastcpd::Fastcpd(
     order(order),
     p(p),
     p_response(p_response),
+    pruning_coef(pruning_coef),
     r_progress(r_progress),
     segment_count(segment_count),
     trim(trim),
@@ -415,7 +415,7 @@ List Fastcpd::run() {
 
     // Pruning step.
     ucolvec pruned_left =
-      find(cval + fvec.rows(r_t_set) + convexity_coef <= min_obj);
+      find(cval + fvec.rows(r_t_set) + pruning_coef <= min_obj);
     DEBUG_RCOUT(pruned_left);
     ucolvec pruned_r_t_set = zeros<ucolvec>(pruned_left.n_elem + 1);
     DEBUG_RCOUT(pruned_r_t_set);

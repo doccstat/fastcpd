@@ -6,7 +6,6 @@ context("negative_log_likelihood_wo_theta Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
-      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -22,6 +21,7 @@ context("negative_log_likelihood_wo_theta Unit Test") {
       /* order */ colvec({3, 2}),
       /* p */ 0,
       /* p_response */ 0,
+      /* pruning_coef */ 0,
       /* r_progress */ false,
       /* segment_count */ 0,
       /* trim */ 0,
@@ -58,7 +58,6 @@ context("negative_log_likelihood_wo_cv Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
-      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -74,6 +73,7 @@ context("negative_log_likelihood_wo_cv Unit Test") {
       /* order */ colvec({3, 2}),
       /* p */ 0,
       /* p_response */ 0,
+      /* pruning_coef */ 0,
       /* r_progress */ false,
       /* segment_count */ 0,
       /* trim */ 0,
@@ -96,7 +96,6 @@ context("cost_update_gradient Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
-      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -112,6 +111,7 @@ context("cost_update_gradient Unit Test") {
       /* order */ colvec({3, 2}),
       /* p */ 0,
       /* p_response */ 0,
+      /* pruning_coef */ 0,
       /* r_progress */ false,
       /* segment_count */ 0,
       /* trim */ 0,
@@ -134,7 +134,6 @@ context("cost_update_hessian Unit Test") {
   test_that("binomal is correct for a two dimensional data") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
-      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -150,6 +149,7 @@ context("cost_update_hessian Unit Test") {
       /* order */ colvec(),
       /* p */ 0,
       /* p_response */ 0,
+      /* pruning_coef */ 0,
       /* r_progress */ false,
       /* segment_count */ 0,
       /* trim */ 0,
@@ -170,7 +170,6 @@ context("cost_update_hessian Unit Test") {
   test_that("poisson is correct for a two dimensional data") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
-      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -186,6 +185,7 @@ context("cost_update_hessian Unit Test") {
       /* order */ colvec(),
       /* p */ 0,
       /* p_response */ 0,
+      /* pruning_coef */ 0,
       /* r_progress */ false,
       /* segment_count */ 0,
       /* trim */ 0,
@@ -206,7 +206,6 @@ context("cost_update_hessian Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
-      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -222,6 +221,7 @@ context("cost_update_hessian Unit Test") {
       /* order */ colvec({3, 2}),
       /* p */ 0,
       /* p_response */ 0,
+      /* pruning_coef */ 0,
       /* r_progress */ false,
       /* segment_count */ 0,
       /* trim */ 0,
@@ -250,7 +250,6 @@ context("update_theta_sum Unit Test") {
   test_that("update performs normally") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
-      /* convexity_coef */ 0,
       /* cost */ R_NilValue,
       /* cost_adjustment */ "MBIC",
       /* cost_gradient */ R_NilValue,
@@ -266,6 +265,7 @@ context("update_theta_sum Unit Test") {
       /* order */ colvec(),
       /* p */ 3,
       /* p_response */ 0,
+      /* pruning_coef */ 0,
       /* r_progress */ false,
       /* segment_count */ 0,
       /* trim */ 0,

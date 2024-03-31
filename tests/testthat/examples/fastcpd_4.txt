@@ -26,7 +26,7 @@ result_no_vp <- fastcpd.lasso(
   small_lasso_data,
   beta = "BIC",
   cost_adjustment = NULL,
-  convexity_coef = 0
+  pruning_coef = 0
 )
 summary(result_no_vp)
 result_20_vp <- fastcpd.lasso(
@@ -34,7 +34,7 @@ result_20_vp <- fastcpd.lasso(
   beta = "BIC",
   cost_adjustment = NULL,
   vanilla_percentage = 0.2,
-  convexity_coef = 0
+  pruning_coef = 0
 )
 summary(result_20_vp)
 }

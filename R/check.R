@@ -208,18 +208,18 @@ get_beta <- function(beta, p, n, fastcpd_family, sigma_) {
   }
 }
 
-get_convexity_coef <- function(
-  convexity_coef_is_set,
-  convexity_coef,
+get_pruning_coef <- function(
+  pruning_coef_is_set,
+  pruning_coef,
   cost_adjustment,
   fastcpd_family,
   n,
   p
 ) {
-  if (!convexity_coef_is_set && (fastcpd_family %in% c("mgaussian", "lasso"))) {
-    convexity_coef <- -Inf
+  if (!pruning_coef_is_set && (fastcpd_family %in% c("mgaussian", "lasso"))) {
+    pruning_coef <- -Inf
   }
-  convexity_coef
+  pruning_coef
 }
 
 get_p_response <- function(family, y, data) {
