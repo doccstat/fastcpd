@@ -349,12 +349,14 @@ List Fastcpd::run() {
   // Set up the initial values.
   double lambda = 0;
 
-  ucolvec r_t_set = {0};
+  ucolvec r_t_set = zeros<ucolvec>(n);
   DEBUG_RCOUT(r_t_set);
+  r_t_set(1) = 1;
+  unsigned int r_t_count = 2;
 
-  std::vector<colvec> cp_sets = {zeros<vec>(0)};
+  std::vector<colvec> cp_sets = {{0}};
   linspace(1, n, n).for_each([&](int i) {
-    cp_sets.push_back(zeros<vec>(1));
+    cp_sets.push_back({0});
   });
 
   colvec fvec = zeros<vec>(n + 1);
@@ -384,9 +386,8 @@ List Fastcpd::run() {
     rProgress.tick();
   }
 
-  for (int t = 1; t <= n; t++) {
+  for (int t = 2; t <= n; t++) {
     DEBUG_RCOUT(t);
-    unsigned int r_t_count = r_t_set.n_elem;
     DEBUG_RCOUT(r_t_count);
 
     // Number of cost values is the same as the number of elements in R_t.
@@ -405,26 +406,22 @@ List Fastcpd::run() {
     }
 
     // `beta` adjustment seems to work but there might be better choices.
-    colvec obj = cval + fvec.rows(r_t_set) + beta;
+    colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta;
     double min_obj = min(obj);
     double tau_star = r_t_set(index_min(obj));
 
-    // Step 4
     cp_sets[t] = join_cols(cp_sets[tau_star], colvec{tau_star});
     DEBUG_RCOUT(cp_sets[t]);
 
     // Pruning step.
     ucolvec pruned_left =
-      find(cval + fvec.rows(r_t_set) + pruning_coef <= min_obj);
-    DEBUG_RCOUT(pruned_left);
-    ucolvec pruned_r_t_set = zeros<ucolvec>(pruned_left.n_elem + 1);
-    DEBUG_RCOUT(pruned_r_t_set);
+      find(cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + pruning_coef <= min_obj);
+    r_t_count = pruned_left.n_elem + 1;
     if (pruned_left.n_elem) {
-      pruned_r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
+      r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
     }
     DEBUG_RCOUT(pruned_r_t_set);
-    pruned_r_t_set(pruned_left.n_elem) = t;
-    r_t_set = std::move(pruned_r_t_set);
+    r_t_set(pruned_left.n_elem) = t;
     DEBUG_RCOUT(r_t_set);
 
     if (vanilla_percentage != 1) {
