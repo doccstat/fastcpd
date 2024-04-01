@@ -414,8 +414,9 @@ List Fastcpd::run() {
     DEBUG_RCOUT(cp_sets[t]);
 
     // Pruning step.
-    ucolvec pruned_left =
-      find(cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + pruning_coef <= min_obj);
+    ucolvec pruned_left = find(
+      cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + pruning_coef <= min_obj
+    );
     r_t_count = pruned_left.n_elem + 1;
     if (pruned_left.n_elem) {
       r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
