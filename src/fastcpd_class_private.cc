@@ -160,7 +160,7 @@ double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
 }
 
 CostResult Fastcpd::get_cost_result(
-    const mat& data,
+    const mat& data_segment,
     Nullable<colvec> theta,
     double lambda,
     bool cv,
@@ -168,15 +168,17 @@ CostResult Fastcpd::get_cost_result(
 ) {
   CostResult cost_result;
   if (theta.isNull()) {
-    cost_result = negative_log_likelihood_wo_theta(data, lambda, cv, start);
+    cost_result = negative_log_likelihood_wo_theta(
+      data_segment, lambda, cv, start
+    );
   } else {
     cost_result = CostResult{
       {colvec()},
       {colvec()},
-      negative_log_likelihood_wo_cv(data, as<colvec>(theta), lambda)
+      negative_log_likelihood_wo_cv(data_segment, as<colvec>(theta), lambda)
     };
   }
-  cost_result.value = update_cost_value(cost_result.value, data.n_rows);
+  cost_result.value = update_cost_value(cost_result.value, data_segment.n_rows);
   return cost_result;
 }
 

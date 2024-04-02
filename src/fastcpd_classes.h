@@ -109,7 +109,7 @@ class Fastcpd {
   mat get_theta_sum();
 
   CostResult negative_log_likelihood_wo_theta(
-      const mat& data,
+      const mat& data_segment,
       double lambda,
       bool cv,
       Nullable<colvec> start
@@ -191,7 +191,7 @@ class Fastcpd {
   // @return Negative log likelihood of the corresponding data with the given
   //   family.
   CostResult get_cost_result(
-      const mat& data,
+      const mat& data_segment,
       Nullable<colvec> theta,
       double lambda,
       bool cv = false,
