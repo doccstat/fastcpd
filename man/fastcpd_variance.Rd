@@ -27,6 +27,10 @@ observation and thus a formula is not required here.
 }
 \examples{
 set.seed(1)
+data <- c(rnorm(300, 0, 1), rnorm(400, 0, 100), rnorm(300, 0, 1))
+result <- fastcpd.variance(data)
+summary(result)
+set.seed(1)
 p <- 3
 result <- fastcpd.variance(
   rbind(

@@ -49,6 +49,7 @@ data <- c(rnorm(10000), rnorm(10000, 1), rnorm(10000))
 ))
 result@cp_set
 }
+\donttest{
 set.seed(1)
 data <- c(rnorm(10000), rnorm(10000, 1), rnorm(10000))
 (result_time <- system.time(
@@ -58,6 +59,7 @@ data <- c(rnorm(10000), rnorm(10000, 1), rnorm(10000))
   )
 ))
 result@cp_set
+}
 }
 \seealso{
 \code{\link[=fastcpd]{fastcpd()}}

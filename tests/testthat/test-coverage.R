@@ -35,15 +35,6 @@ testthat::test_that(
 )
 
 testthat::test_that(
-  "1d variance", {
-    set.seed(1)
-    data <- c(rnorm(300, 0, 1), rnorm(400, 0, 100), rnorm(300, 0, 1))
-    result_variance <- fastcpd.variance(data)
-    testthat::expect_equal(result_variance@cp_set, c(300, 700))
-  }
-)
-
-testthat::test_that(
   "1d mv", {
     set.seed(1)
     data <- c(

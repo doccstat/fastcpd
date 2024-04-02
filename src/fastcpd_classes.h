@@ -388,7 +388,6 @@ class Fastcpd {
 
   const double vanilla_percentage;
 
-  rowvec variance_data_mean;
   const mat variance_estimate;
 
   const bool warm_start;

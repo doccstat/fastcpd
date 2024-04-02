@@ -73,7 +73,6 @@ Fastcpd::Fastcpd(
   theta_sum = mat(p, 1);
   hessian = cube(p, p, 1);
   momentum = vec(p);
-  variance_data_mean = mean(data, 0);
 
   create_cost_function_wrapper(cost);
   create_cost_gradient_wrapper(cost_gradient);
@@ -276,7 +275,7 @@ CostResult Fastcpd::negative_log_likelihood_wo_theta(
   } else if (family == "mean") {
     cost_result = negative_log_likelihood_mean(data, variance_estimate);
   } else if (family == "variance") {
-    cost_result = negative_log_likelihood_variance(data, variance_data_mean);
+    cost_result = negative_log_likelihood_variance(data);
   } else if (family == "meanvariance" || family == "mv") {
     cost_result = negative_log_likelihood_meanvariance(data, epsilon);
   } else if (family == "mgaussian") {
