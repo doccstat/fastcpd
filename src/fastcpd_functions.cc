@@ -166,17 +166,20 @@ CostResult negative_log_likelihood_mgaussian(
   return {{par}, {residuals}, value / 2};
 }
 
-CostResult negative_log_likelihood_variance(
-  const mat data,
-  const rowvec variance_data_mean
-) {
-  mat residuals = data.each_row() - variance_data_mean;  // # nocov
-  mat par = residuals.t() * residuals / data.n_rows;
-  double value = data.n_rows * data.n_cols * (std::log(2.0 * M_PI) + 1) / 2.0;
-  if (data.n_rows >= data.n_cols) {
-    value += data.n_rows * log_det_sympd(par) / 2.0;
+CostResult negative_log_likelihood_variance(const mat data) {
+  rowvec data_n = data.row(data.n_rows - 1);
+  rowvec data_1 = data.row(0);
+  const unsigned int p = sqrt(data.n_cols);
+  double det_value =
+    det(arma::reshape(data_n - data_1, p, p) / (data.n_rows - 1));
+  if (det_value <= 0) {
+    det_value = 1e-10;
   }
-  return {{par}, {residuals}, value};
+  return {
+    {zeros<mat>(p, p)},
+    {zeros<mat>(data.n_rows, p)},
+    (std::log(2.0 * M_PI) * p + p + log(det_value)) * (data.n_rows - 1) / 2.0
+  };
 }
 
 }  // namespace fastcpd::functions

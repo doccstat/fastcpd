@@ -238,7 +238,10 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
     }
 
     // Residual is only calculated for built-in families.
-    if (contain(FASTCPD_FAMILIES, family) && family != "mean") {
+    if (
+      contain(FASTCPD_FAMILIES, family) &&
+      !(family == "mean" || family == "variance")
+    ) {
       mat cost_optim_residual = cost_result.residuals;
       residual.rows(
         residual_next_start,
@@ -269,10 +272,13 @@ double Fastcpd::get_cval_for_r_t_set(
     lambda = mean(err_sd) * sqrt(2 * std::log(p) / (t - tau));
   }
   mat data_segment;
-  if (family == "mean" && tau == 0) {
-    data_segment = join_cols(zeros<rowvec>(data.n_cols), data.rows(tau, t - 1));
-  } else if (family == "mean") {
-    data_segment = data.rows(tau - 1, t - 1);
+  if (family == "mean" || family == "variance") {
+    if (tau == 0) {
+      data_segment =
+        join_cols(zeros<rowvec>(data.n_cols), data.rows(tau, t - 1));
+    } else {
+      data_segment = data.rows(tau - 1, t - 1);
+    }
   } else {
     data_segment = data.rows(tau, t - 1);
   }

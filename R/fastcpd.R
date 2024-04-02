@@ -345,6 +345,15 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     chol_upper <- chol(sigma_inv)
     data1 <- tcrossprod(data_, chol_upper)
     data_ <- apply(cbind(data1, rowSums(data1^2)), 2, cumsum)
+  } else if (fastcpd_family == "variance") {
+    data_ <- data_ - colMeans(data_)
+    data_ <- apply(data_, 1, tcrossprod)
+    if (p == 1) {
+      data_ <- matrix(data_)
+    } else {
+      data_ <- t(data_)
+    }
+    data_ <- apply(data_, 2, cumsum)
   }
 
   result <- fastcpd_impl(

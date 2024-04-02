@@ -42,10 +42,7 @@ CostResult negative_log_likelihood_mgaussian(
   const mat variance_estimate
 );
 
-CostResult negative_log_likelihood_variance(
-  const mat data,
-  const rowvec variance_data_mean
-);
+CostResult negative_log_likelihood_variance(const mat data);
 
 }  // namespace fastcpd::functions
 

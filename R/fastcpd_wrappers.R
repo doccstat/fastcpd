@@ -261,7 +261,7 @@ fastcpd.ma <- fastcpd_ma  # nolint: Conventional R function style
 #' @example tests/testthat/examples/fastcpd_mean.R
 #' @example tests/testthat/examples/fastcpd_mean-time_1.R
 #' @example tests/testthat/examples/fastcpd_mean-time_2.txt
-#' @example tests/testthat/examples/fastcpd_mean-time_3.R
+#' @example tests/testthat/examples/fastcpd_mean-time_3.txt
 #' @seealso [fastcpd()]
 #'
 #' @md
@@ -450,7 +450,8 @@ fastcpd.var <- fastcpd_var  # nolint: Conventional R function style
 #' function is similar to [fastcpd()] except that the data is by
 #' default a matrix or data frame or a vector with each row / element as an
 #' observation and thus a formula is not required here.
-#' @example tests/testthat/examples/fastcpd_variance.R
+#' @example tests/testthat/examples/fastcpd_variance_1.R
+#' @example tests/testthat/examples/fastcpd_variance_2.R
 #' @seealso [fastcpd()]
 #'
 #' @md
