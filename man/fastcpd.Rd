@@ -251,10 +251,6 @@ Proceedings of Machine Learning Research, 1129-1143.
 }
 
 \examples{
-if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
-  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
-)
-
 set.seed(1)
 n <- 200
 p <- 4
@@ -270,10 +266,6 @@ result_mlm <- fastcpd(
   cbind(y.1, y.2) ~ . - 1, cbind.data.frame(y = y, x = x), family = "lm"
 )
 summary(result_mlm)
-if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
-  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
-)
-
 set.seed(1)
 n <- 400 + 300 + 500
 p <- 5
@@ -330,10 +322,6 @@ huber_regression_result <- fastcpd(
 )
 summary(huber_regression_result)
 \donttest{
-if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
-  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
-)
-
 set.seed(1)
 p <- 5
 x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
@@ -389,10 +377,6 @@ result_custom_two_epochs <- fastcpd(
 summary(result_custom_two_epochs)
 }
 \donttest{
-if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
-  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
-)
-
 set.seed(1)
 n <- 480
 p_true <- 6

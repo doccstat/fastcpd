@@ -151,7 +151,7 @@ void Fastcpd::create_segment_statistics() {
 double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
   double adjusted = 0;
   if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
-    adjusted = data.n_cols * std::log(nrows) / 2;
+    adjusted = data.n_cols * std::log(nrows) / 2.0;
   }
   if (cost_adjustment == "MDL") {
     adjusted *= std::log2(M_E);
@@ -238,7 +238,7 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
     }
 
     // Residual is only calculated for built-in families.
-    if (contain(FASTCPD_FAMILIES, family)) {
+    if (contain(FASTCPD_FAMILIES, family) && family != "mean") {
       mat cost_optim_residual = cost_result.residuals;
       residual.rows(
         residual_next_start,
@@ -268,7 +268,14 @@ double Fastcpd::get_cval_for_r_t_set(
     // Mean of `err_sd` only works if error sd is unchanged.
     lambda = mean(err_sd) * sqrt(2 * std::log(p) / (t - tau));
   }
-  mat data_segment = data.rows(tau, t - 1);
+  mat data_segment;
+  if (family == "mean" && tau == 0) {
+    data_segment = join_cols(zeros<rowvec>(data.n_cols), data.rows(tau, t - 1));
+  } else if (family == "mean") {
+    data_segment = data.rows(tau - 1, t - 1);
+  } else {
+    data_segment = data.rows(tau, t - 1);
+  }
   DEBUG_RCOUT(data_segment);
   if (t > vanilla_percentage * n) {
     return get_cval_sen(data_segment, i, t, tau, lambda);

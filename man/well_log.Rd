@@ -20,29 +20,10 @@ papers obtained from Alan Turing Institute GitHub repository and licensed
 under the MIT license. Outliers with value less or equal to 1e5 are removed.
 }
 \examples{
-if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
-  "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
-)
-
 result <- fastcpd.mean(well_log, trim = 0.003)
 summary(result)
 plot(result)
-if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
-  "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
-)
-
-result <- fastcpd.mean(
-  well_log, beta = (1 + 2) * log(length(well_log)) / 2 * 6, trim = 0.002
-)
-summary(result)
-plot(result)
 \donttest{
-for (package in c("ggplot2", "matrixStats")) {
-  if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
-    package, repos = "https://cloud.r-project.org", quiet = TRUE
-  )
-}
-
 sigma2 <- variance.median(well_log)
 median_loss <- function(data) {
   sum(abs(data - matrixStats::colMedians(data))) / sqrt(sigma2) / 2
@@ -63,7 +44,7 @@ for (segment_index in seq_along(segment_starts)) {
   residual <- c(residual, segment - median(segment))
 }
 
-result@residuals <- residual
+result@residuals <- matrix(residual)
 result@family <- "mean"
 result@data <- data.frame(x = c(well_log))
 plot(result)

@@ -26,10 +26,6 @@ data frame or a vector with each row / element as an observation and thus a
 formula is not required here.
 }
 \examples{
-if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
-  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
-)
-
 set.seed(1)
 p <- 3
 data <- rbind(
@@ -39,12 +35,27 @@ data <- rbind(
 )
 result <- fastcpd.mean(data)
 summary(result)
-# Test `fastcpd.mean()` running time. The running time is expected to be less
-# than 1.5 seconds.
 set.seed(1)
 data <- c(rnorm(10000), rnorm(1000) + 1)
 (result_time <- system.time(
   result <- fastcpd.mean(data, r.progress = FALSE, cp_only = TRUE)
+))
+result@cp_set
+\donttest{
+set.seed(1)
+data <- c(rnorm(10000), rnorm(10000, 1), rnorm(10000))
+(result_time <- system.time(
+  result <- fastcpd.mean(data, r.progress = FALSE, cp_only = TRUE)
+))
+result@cp_set
+}
+set.seed(1)
+data <- c(rnorm(10000), rnorm(10000, 1), rnorm(10000))
+(result_time <- system.time(
+  result <- fastcpd.mean(
+    data, beta = "BIC", cost_adjustment = "BIC",
+    r.progress = FALSE, cp_only = TRUE
+  )
 ))
 result@cp_set
 }

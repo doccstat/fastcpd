@@ -340,6 +340,13 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     p
   )
 
+  if (fastcpd_family == "mean") {
+    sigma_inv <- solve(sigma_)
+    chol_upper <- chol(sigma_inv)
+    data1 <- tcrossprod(data_, chol_upper)
+    data_ <- apply(cbind(data1, rowSums(data1^2)), 2, cumsum)
+  }
+
   result <- fastcpd_impl(
     data_, beta, cost_adjustment, segment_count, trim,
     momentum_coef, multiple_epochs, fastcpd_family, epsilon, p, order,
@@ -372,72 +379,14 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     result$residual <- numeric(0)
   }
 
-  raw_residuals <- c(result$residual)
-
-  if (family == "mean" && p == 1) {
-    segments <- c(0, raw_cp_set, nrow(data))
-    for (segments_i in seq_len(length(segments) - 1)) {
-      segments_start <- segments[segments_i] + 1
-      segments_end <- segments[segments_i + 1]
-      segment_index <- segments_start:segments_end
-      raw_residuals[segment_index] <-
-        data[segment_index, 1] - mean(data[segment_index, 1])
-    }
-  }
+  residuals <- matrix(result$residual)
 
   if (!cp_only) {
     tryCatch(
       expr = if (family == "ar") {
-        raw_residuals <- c(rep(NA, p), raw_residuals)
+        residuals <- matrix(c(rep(NA, p), residuals))
       } else if (family == "ma" || family == "arima") {
-        raw_residuals <- rep(NA, nrow(data))
-        segments <- c(0, raw_cp_set, nrow(data))
-        for (segments_i in seq_len(length(segments) - 1)) {
-          segments_start <- segments[segments_i] + 1
-          segments_end <- segments[segments_i + 1]
-          raw_residuals[segments_start:segments_end] <- forecast::Arima(
-            c(data[segments_start:segments_end, 1]),
-            order = order,
-            method = "ML",
-            include.mean = include_mean
-          )$residuals
-        }
-      } else if (family == "garch") {
-        raw_residuals <- rep(NA, nrow(data))
-        segments <- c(0, raw_cp_set, nrow(data))
-        for (segments_i in seq_len(length(segments) - 1)) {
-          segments_start <- segments[segments_i] + 1
-          segments_end <- segments[segments_i + 1]
-          raw_residuals[segments_start:segments_end] <- tseries::garch(
-            data[segments_start:segments_end, 1],
-            order,
-            trace = FALSE
-          )$residuals
-        }
-      },
-      error = function(e) message("Residual calculation failed.")
-    )
-  }
-
-  residuals <- c(result$residual)
-
-  if (family == "mean" && p == 1) {
-    segments <- c(0, cp_set, nrow(data))
-    for (segments_i in seq_len(length(segments) - 1)) {
-      segments_start <- segments[segments_i] + 1
-      segments_end <- segments[segments_i + 1]
-      segment_index <- segments_start:segments_end
-      residuals[segment_index] <-
-        data[segment_index, 1] - mean(data[segment_index, 1])
-    }
-  }
-
-  if (!cp_only) {
-    tryCatch(
-      expr = if (family == "ar") {
-        residuals <- c(rep(NA, p), residuals)
-      } else if (family == "ma" || family == "arima") {
-        residuals <- rep(NA, nrow(data))
+        residuals <- matrix(NA, nrow(data))
         segments <- c(0, cp_set, nrow(data))
         for (segments_i in seq_len(length(segments) - 1)) {
           segments_start <- segments[segments_i] + 1
@@ -449,8 +398,19 @@ fastcpd <- function(  # nolint: cyclomatic complexity
             include.mean = include_mean
           )$residuals
         }
+      } else if (family == "mean") {
+        residuals <- matrix(NA, nrow(data), ncol(data))
+        segments <- c(0, cp_set, nrow(data))
+        for (segments_i in seq_len(length(segments) - 1)) {
+          segments_start <- segments[segments_i] + 1
+          segments_end <- segments[segments_i + 1]
+          sgmt_index <- segments_start:segments_end
+          residuals[sgmt_index, ] <- as.matrix(
+            data[sgmt_index, ] - colMeans(data[sgmt_index, , drop = FALSE])
+          )
+        }
       } else if (family == "garch") {
-        residuals <- rep(NA, nrow(data))
+        residuals <- matrix(NA, nrow(data))
         segments <- c(0, cp_set, nrow(data))
         for (segments_i in seq_len(length(segments) - 1)) {
           segments_start <- segments[segments_i] + 1

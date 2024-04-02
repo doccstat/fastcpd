@@ -4,6 +4,6 @@ testthat::test_that(
     testthat::skip_if_not_installed("mvtnorm")
 
     source("examples/plot.R")
-    testthat::expect_equal(result@cp_set, c(99, 200))
+    testthat::expect_equal(result@cp_set, c(99, 197))
   }
 )

@@ -219,6 +219,11 @@ get_pruning_coef <- function(
   if (!pruning_coef_is_set && (fastcpd_family %in% c("mgaussian", "lasso"))) {
     pruning_coef <- -Inf
   }
+  if (!pruning_coef_is_set && cost_adjustment == "MBIC") {
+    pruning_coef <- pruning_coef + p * log(2 / n) / 2
+  } else if (!pruning_coef_is_set && cost_adjustment == "MDL") {
+    pruning_coef <- pruning_coef + p * log2(2 / n) / 2
+  }
   pruning_coef
 }
 

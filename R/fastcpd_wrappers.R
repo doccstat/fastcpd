@@ -259,7 +259,9 @@ fastcpd.ma <- fastcpd_ma  # nolint: Conventional R function style
 #' data frame or a vector with each row / element as an observation and thus a
 #' formula is not required here.
 #' @example tests/testthat/examples/fastcpd_mean.R
-#' @example tests/testthat/examples/fastcpd_mean-time.R
+#' @example tests/testthat/examples/fastcpd_mean-time_1.R
+#' @example tests/testthat/examples/fastcpd_mean-time_2.txt
+#' @example tests/testthat/examples/fastcpd_mean-time_3.R
 #' @seealso [fastcpd()]
 #'
 #' @md

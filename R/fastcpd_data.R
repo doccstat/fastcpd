@@ -104,7 +104,6 @@
 #' @description This is the well-known well-log dataset used in many changepoint
 #' papers obtained from Alan Turing Institute GitHub repository and licensed
 #' under the MIT license. Outliers with value less or equal to 1e5 are removed.
-#' @example tests/testthat/examples/data-well_log_1.R
-#' @example tests/testthat/examples/data-well_log_2.R
+#' @example tests/testthat/examples/data-well_log.R
 #' @example tests/testthat/examples/data-well_log-quantile.txt
 "well_log"

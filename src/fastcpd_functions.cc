@@ -102,17 +102,19 @@ CostResult negative_log_likelihood_mean(
   const mat data,
   const mat variance_estimate
 ) {
-  rowvec par = mean(data, 0);
+  rowvec data_n = data.row(data.n_rows - 1);
+  rowvec data_1 = data.row(0);
+  unsigned int p = data.n_cols;
   return {
-    {par.t()},  // # nocov
-    {data.each_row() - par},
-    data.n_rows / 2.0 * (
-      std::log(2.0 * M_PI) * data.n_cols + log_det_sympd(variance_estimate) +
-        trace(solve(
-          variance_estimate,
-          (data.each_row() - par).t() * (data.each_row() - par)
-        )) / data.n_rows
-    )
+    {zeros<colvec>(p - 1)},  // # nocov
+    {zeros<mat>(data.n_rows, p - 1)},
+    std::log(2.0 * M_PI) * data.n_cols + log_det_sympd(variance_estimate) *
+      data.n_rows / 2.0 + (
+      data_n(p - 1) - data_1(p - 1) - dot(
+        data_n.subvec(0, p - 2) - data_1.subvec(0, p - 2),
+        data_n.subvec(0, p - 2) - data_1.subvec(0, p - 2)
+      ) / (data.n_rows - 1)
+    ) / 2.0
   };
 }
 

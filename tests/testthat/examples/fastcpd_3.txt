@@ -1,8 +1,4 @@
 \donttest{
-if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
-  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
-)
-
 set.seed(1)
 p <- 5
 x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
