@@ -109,7 +109,7 @@ class Fastcpd {
   mat get_theta_sum();
 
   CostResult negative_log_likelihood_wo_theta(
-      mat data,
+      const mat& data,
       double lambda,
       bool cv,
       Nullable<colvec> start
@@ -154,7 +154,7 @@ class Fastcpd {
   );
 
   double get_cval_pelt(
-    const mat data_segment,
+    const mat& data_segment,
     const unsigned int i,
     const int t,
     const int tau,
@@ -162,7 +162,7 @@ class Fastcpd {
   );
 
   double get_cval_sen(
-    const mat data_segment,
+    const mat& data_segment,
     const unsigned int i,
     const int t,
     const int tau,
@@ -175,7 +175,7 @@ class Fastcpd {
   //
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   and \code{hessian}.
-  CostResult get_optimized_cost(const mat data_segment);
+  CostResult get_optimized_cost(const mat& data_segment);
 
   // Solve logistic/poisson regression using Gradient Descent Extension to the
   // multivariate case
@@ -191,7 +191,7 @@ class Fastcpd {
   // @return Negative log likelihood of the corresponding data with the given
   //   family.
   CostResult get_cost_result(
-      mat data,
+      const mat& data,
       Nullable<colvec> theta,
       double lambda,
       bool cv = false,
@@ -208,16 +208,16 @@ class Fastcpd {
       const unsigned int i,
       Function k,
       const double lambda,
-      const colvec line_search
+      const colvec& line_search
   );
 
   void update_cost_parameters_step(
-    const mat data,
+    const mat& data,
     const int i,
     const int tau,
     const int j,
     const double lambda,
-    const colvec line_search
+    const colvec& line_search
   );
 
   // Update the cost values for the segmentation.
@@ -236,13 +236,13 @@ class Fastcpd {
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   \code{hessian}, and \code{momentum}.
   List update_cost_parameters_steps(
-    const mat data,
+    const mat& data,
     const int tau,
     const int i,
     Function k,
     colvec momentum,
     const double lambda,
-    colvec line_search
+    const colvec& line_search
   );
 
   // Update `err_sd` for a specific segment.
@@ -295,7 +295,7 @@ class Fastcpd {
   // Cost function. If the cost function is provided in R, this will be a
   // wrapper of the R function.
   function<CostResult(
-      mat data,
+      const mat& data,
       Nullable<colvec> theta,
       double lambda,
       bool cv,

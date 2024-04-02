@@ -160,7 +160,7 @@ double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
 }
 
 CostResult Fastcpd::get_cost_result(
-    mat data,
+    const mat& data,
     Nullable<colvec> theta,
     double lambda,
     bool cv,
@@ -291,7 +291,7 @@ double Fastcpd::get_cval_for_r_t_set(
 }
 
 double Fastcpd::get_cval_pelt(
-  const mat data_segment,
+  const mat& data_segment,
   const unsigned int i,
   const int t,
   const int tau,
@@ -327,7 +327,7 @@ double Fastcpd::get_cval_pelt(
 }
 
 double Fastcpd::get_cval_sen(
-  const mat data_segment,
+  const mat& data_segment,
   const unsigned int i,
   const int t,
   const int tau,
@@ -353,7 +353,7 @@ double Fastcpd::get_cval_sen(
   return cval;
 }
 
-CostResult Fastcpd::get_optimized_cost(const mat data_segment) {
+CostResult Fastcpd::get_optimized_cost(const mat& data_segment) {
   Function cost_ = cost.get();
   CostResult cost_result;
   if (cost_gradient.isNull() && cost_hessian.isNull()) {
@@ -408,7 +408,7 @@ void Fastcpd::update_cost_parameters(
   const unsigned int i,
   Function k,
   const double lambda,
-  const colvec line_search
+  const colvec& line_search
 ) {
   List cost_update_result = update_cost_parameters_steps(
     data.rows(0, t - 1), tau, i, k, momentum, lambda, line_search
@@ -421,12 +421,12 @@ void Fastcpd::update_cost_parameters(
 }
 
 void Fastcpd::update_cost_parameters_step(
-  const mat data,
+  const mat& data,
   const int i,
   const int data_start,
   const int data_end,
   const double lambda,
-  const colvec line_search
+  const colvec& line_search
 ) {
   DEBUG_RCOUT(data_start);
   mat hessian_i = hessian.slice(i - 1);
@@ -502,13 +502,13 @@ void Fastcpd::update_cost_parameters_step(
 }
 
 List Fastcpd::update_cost_parameters_steps(
-    const mat data,
+    const mat& data,
     const int tau,
     const int i,
     Function k,
     colvec momentum,
     const double lambda,
-    colvec line_search
+    const colvec& line_search
 ) {
   update_cost_parameters_step(data, i, 0, data.n_rows - 1, lambda, line_search);
 
