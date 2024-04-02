@@ -20,10 +20,6 @@ value representing the variance.
 Implement Rice estimator for variance in mean change models.
 }
 \examples{
-if (!requireNamespace("mvtnorm", quietly = TRUE)) utils::install.packages(
-  "mvtnorm", repos = "https://cloud.r-project.org", quiet = TRUE
-)
-
 set.seed(1)
 p <- 3
 data <- rbind(

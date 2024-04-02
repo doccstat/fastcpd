@@ -1,10 +1,4 @@
 \donttest{
-for (package in c("ggplot2", "matrixStats")) {
-  if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
-    package, repos = "https://cloud.r-project.org", quiet = TRUE
-  )
-}
-
 sigma2 <- variance.median(well_log)
 median_loss <- function(data) {
   sum(abs(data - matrixStats::colMedians(data))) / sqrt(sigma2) / 2
@@ -25,7 +19,7 @@ for (segment_index in seq_along(segment_starts)) {
   residual <- c(residual, segment - median(segment))
 }
 
-result@residuals <- residual
+result@residuals <- matrix(residual)
 result@family <- "mean"
 result@data <- data.frame(x = c(well_log))
 plot(result)

@@ -27,12 +27,6 @@ the data is by default a matrix or data frame with the response variable
 as the first column and thus a formula is not required here.
 }
 \examples{
-for (package in c("ggplot2", "mvtnorm")) {
-  if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
-    package, repos = "https://cloud.r-project.org", quiet = TRUE
-  )
-}
-
 set.seed(1)
 n <- 300
 p <- 4

@@ -88,12 +88,6 @@ No return value, called for plotting.
 Plot the data and the change points for a \linkS4class{fastcpd} object
 }
 \examples{
-for (package in c("ggplot2", "mvtnorm")) {
-  if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
-    package, repos = "https://cloud.r-project.org", quiet = TRUE
-  )
-}
-
 set.seed(1)
 p <- 1
 x <- mvtnorm::rmvnorm(300, rep(0, p), diag(p))

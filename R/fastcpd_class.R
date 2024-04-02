@@ -30,7 +30,7 @@ setClass(
     family = "character",
     cp_set = "numeric",
     cost_values = "numeric",
-    residuals = "numeric",
+    residuals = "matrix",
     thetas = "data.frame",
     cp_only = "logical"
   )

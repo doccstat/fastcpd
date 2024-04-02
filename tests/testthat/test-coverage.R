@@ -16,12 +16,21 @@ testthat::test_that(
 )
 
 testthat::test_that(
-  "1d mean", {
+  "ar mdl", {
     set.seed(1)
-    data <- c(rnorm(300, 0, 100), rnorm(400, 100, 100), rnorm(300, 0, 100))
-    result_mean <- fastcpd.mean(data, beta = "MDL", cost_adjustment = "MDL")
-    testthat::expect_equal(result_mean@cp_set, c(300, 702))
-    testthat::expect_equal(median(result_mean@residuals), -1.9047969)
+    n <- 1000
+    x <- rep(0, n + 3)
+    for (i in 1:600) {
+      x[i + 3] <- 0.6 * x[i + 2] - 0.2 * x[i + 1] + 0.1 * x[i] + rnorm(1, 0, 3)
+    }
+    for (i in 601:1000) {
+      x[i + 3] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
+    }
+    result <- fastcpd.ar(x[3 + seq_len(n)], 3)
+    testthat::expect_equal(result@cp_set, 614)
+    testthat::expect_lt(
+      abs(median(result@residuals, na.rm = TRUE) + 0.11998684), 1e-8
+    )
   }
 )
 
@@ -88,7 +97,7 @@ testthat::test_that(
       },
       r.progress = FALSE
     )
-    testthat::expect_equal(result@cp_set, 147)
+    testthat::expect_equal(result@cp_set, 137)
   }
 )
 

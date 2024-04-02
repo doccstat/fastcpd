@@ -1,0 +1,9 @@
+set.seed(1)
+data <- c(rnorm(10000), rnorm(10000, 1), rnorm(10000))
+(result_time <- system.time(
+  result <- fastcpd.mean(
+    data, beta = "BIC", cost_adjustment = "BIC",
+    r.progress = FALSE, cp_only = TRUE
+  )
+))
+result@cp_set

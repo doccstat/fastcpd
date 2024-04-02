@@ -22,24 +22,21 @@ The average USD market price across major bitcoin exchanges.
 }
 \examples{
 \donttest{
-if (!requireNamespace("ggplot2", quietly = TRUE)) utils::install.packages(
-  "ggplot2", repos = "https://cloud.r-project.org", quiet = TRUE
-)
-
 ggplot2::ggplot(bitcoin, ggplot2::aes(x = date, y = price)) +
   ggplot2::geom_line()
 
-result <- suppressWarnings(
-  fastcpd.garch(diff(log(bitcoin$price[200:500])), c(1, 1), beta = "BIC")
-)
+result <- suppressWarnings(fastcpd.garch(
+  diff(log(bitcoin$price[600:900])), c(1, 1),
+  beta = "BIC", cost_adjustment = "BIC"
+))
 summary(result)
-bitcoin$date[result@cp_set + 200]
+bitcoin$date[result@cp_set + 600]
 plot(result)
 
-cp_dates <- bitcoin[200 + result@cp_set + 1, "date"]
+cp_dates <- bitcoin[600 + result@cp_set + 1, "date"]
 ggplot2::ggplot(
   data = data.frame(
-    x = bitcoin$date[200:500], y = bitcoin$price[200:500]
+    x = bitcoin$date[600:900], y = bitcoin$price[600:900]
   ),
   ggplot2::aes(x = x, y = y)
 ) +
@@ -58,7 +55,7 @@ ggplot2::ggplot(
   ggplot2::annotate(
     "text",
     x = cp_dates,
-    y = 200,
+    y = 2000,
     label = as.character(cp_dates),
     color = "blue"
   ) +

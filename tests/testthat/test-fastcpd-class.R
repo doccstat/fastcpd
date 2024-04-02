@@ -13,7 +13,7 @@ testthat::test_that(
       family = "lasso",
       cp_set = 3,
       cost_values = c(9.5, 10.5),
-      residuals = rep(0, 4),
+      residuals = matrix(0, 4),
       thetas = thetas,
       cp_only = FALSE
     )
@@ -64,7 +64,7 @@ testthat::test_that(
       family = "lasso",
       cp_set = 3,
       cost_values = c(9.5, 10.5),
-      residuals = rep(0, 4),
+      residuals = matrix(0, 4),
       thetas = thetas,
       cp_only = FALSE
     )
@@ -145,7 +145,7 @@ testthat::test_that("output methods without change points", {
     family = "lasso",
     cp_set = numeric(0),
     cost_values = numeric(0),
-    residuals = numeric(0),
+    residuals = matrix(0),
     thetas = data.frame(matrix(NA, 0, 0)),
     cp_only = TRUE
   )
@@ -181,7 +181,7 @@ testthat::test_that("mean change p > 1", {
     family = "mean",
     cp_set = numeric(0),
     cost_values = numeric(0),
-    residuals = numeric(0),
+    residuals = matrix(0),
     thetas = data.frame(matrix(NA, 0, 0)),
     cp_only = FALSE
   )
