@@ -962,6 +962,10 @@ fastcpd.lasso(
 #> [1] 103 299 510 800 900
 ```
 
+# Notes
+
+The evaluation of this vignette is set to be `FALSE`.
+
 # Appendix: all code snippets
 
 ```{r ref.label = knitr::all_labels(), echo = TRUE}

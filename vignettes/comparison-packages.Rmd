@@ -16,33 +16,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-All `mosum` code is commented out due to
-[[#4](https://github.com/doccstat/fastcpd/issues/4)].
-
-All `mcp` code is commented out due to
-[link 1](https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531091)
-and
-[link 2](https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531284).
-
-All `bcp` code is commented out due to
-[[#5](https://github.com/doccstat/fastcpd/issues/5)]
-
-```{r package_installation}
-for (
-  package in c(
-    # "bcp", "gfpop",
-    "ggplot2", "mvtnorm",
-    "breakfast", "changepoint", "cpm", "CptNonPar", "ecp", "fpop",
-    "InspectChangepoint", "jointseg", "mcp", "mosum", "not", "Rbeast",
-    "segmented", "stepR", "strucchange", "VARDetect", "wbs"
-  )
-) {
-  if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
-    package, repos = "https://cloud.r-project.org", quiet = TRUE
-  )
-}
-```
-
 # Data setup
 
 ## Univariate mean change
@@ -263,11 +236,19 @@ The true change points are 300 and 700.
 Some methods are plotted due to the un-retrievable change points.
 
 ```{r univariate-mean-change-fastcpd}
-fastcpd::fastcpd.mean(mean_data_1, r.progress = FALSE)@cp_set
+(fastcpd_result <- fastcpd::fastcpd.mean(mean_data_1, r.progress = FALSE)@cp_set)
+```
+
+```{r univariate-mean-change-fastcpd-testthat, include = FALSE}
+testthat::expect_equal(fastcpd_result, c(300, 700))
 ```
 
 ```{r univariate-mean-change-CptNonPar}
-CptNonPar::np.mojo(mean_data_1, G = floor(length(mean_data_1) / 6))$cpts
+(CptNonPar_result <- CptNonPar::np.mojo(mean_data_1, G = floor(length(mean_data_1) / 6))$cpts)
+```
+
+```{r univariate-mean-change-CptNonPar-testthat, include = FALSE}
+testthat::expect_equal(CptNonPar_result, c(300, 700))
 ```
 
 ```{r univariate-mean-change-strucchange, eval = FALSE}
@@ -281,41 +262,55 @@ ecp::e.divisive(mean_data_1)$estimates
 ```
 
 ```{r univariate-mean-change-changepoint}
-# Data need to be processed
-changepoint::cpt.mean(c(mean_data_1))@cpts
+(changepoint_result <- changepoint::cpt.mean(c(mean_data_1))@cpts)
+```
+
+```{r univariate-mean-change-changepoint-testthat, include = FALSE}
+testthat::expect_equal(changepoint_result, c(300, 1000))
 ```
 
 ```{r univariate-mean-change-breakfast}
-breakfast::breakfast(mean_data_1)$cptmodel.list[[6]]$cpts
+(breakfast_result <- breakfast::breakfast(mean_data_1)$cptmodel.list[[6]]$cpts)
+```
+
+```{r univariate-mean-change-breakfast-testthat, include = FALSE}
+testthat::expect_equal(breakfast_result, c(300, 700))
 ```
 
 ```{r univariate-mean-change-wbs}
-wbs::wbs(mean_data_1)$cpt$cpt.ic$mbic.penalty
+(wbs_result <- wbs::wbs(mean_data_1)$cpt$cpt.ic$mbic.penalty)
 ```
 
-```{r univariate-mean-change-mosum}
-# Data need to be processed. `G` is selected based on the example
-if (interactive()) {
-  mosum::mosum(c(mean_data_1), G = 40)$cpts.info$cpts
-}
+```{r univariate-mean-change-wbs-testthat, include = FALSE}
+testthat::expect_equal(wbs_result, c(300, 700))
+```
+
+```{r univariate-mean-change-mosum, eval = FALSE}
+mosum::mosum(c(mean_data_1), G = 40)$cpts.info$cpts
+#> [1] 300 700
 ```
 
 ```{r univariate-mean-change-fpop}
-fpop::Fpop(mean_data_1, nrow(mean_data_1))$t.est
+(fpop_result <- fpop::Fpop(mean_data_1, nrow(mean_data_1))$t.est)
 ```
 
-```{r univariate-mean-change-gfpop}
-# gfpop::gfpop(
-#   data = mean_data_1,
-#   mygraph = gfpop::graph(
-#     penalty = 2 * log(nrow(mean_data_1)) * gfpop::sdDiff(mean_data_1) ^ 2,
-#     type = "updown"
-#   ),
-#   type = "mean"
-# )$changepoints
+```{r univariate-mean-change-fpop-testthat, include = FALSE}
+testthat::expect_equal(fpop_result, c(300, 700, 1000))
 ```
 
-```{r univariate-mean-change-InspectChangepoint}
+```{r univariate-mean-change-gfpop, eval = FALSE}
+gfpop::gfpop(
+  data = mean_data_1,
+  mygraph = gfpop::graph(
+    penalty = 2 * log(nrow(mean_data_1)) * gfpop::sdDiff(mean_data_1) ^ 2,
+    type = "updown"
+  ),
+  type = "mean"
+)$changepoints
+#> [1]  300  700 1000
+```
+
+```{r univariate-mean-change-InspectChangepoint, eval = FALSE}
 invisible(
   suppressMessages(
     capture.output(
@@ -329,52 +324,72 @@ invisible(
   )
 )
 result_InspectChangepoint$changepoints[, "location"]
+#> [1] 300 700
 ```
 
 ```{r univariate-mean-change-jointseg}
-jointseg::jointSeg(mean_data_1, K = 2)$bestBkp
+(jointseg_result <- jointseg::jointSeg(mean_data_1, K = 2)$bestBkp)
 ```
 
-```{r univariate-mean-change-Rbeast}
-# Rbeast::beast(
-#   mean_data_1, season = "none", print.progress = FALSE, quiet = TRUE
-# )$trend$cp
+```{r univariate-mean-change-jointseg-testthat, include = FALSE}
+testthat::expect_equal(jointseg_result, c(300, 700))
+```
+
+```{r univariate-mean-change-Rbeast, eval = FALSE}
+Rbeast::beast(
+  mean_data_1, season = "none", print.progress = FALSE, quiet = TRUE
+)$trend$cp
+#>  [1] 701 301 NaN NaN NaN NaN NaN NaN NaN NaN
 ```
 
 ```{r univariate-mean-change-stepR}
-stepR::stepFit(mean_data_1, alpha = 0.5)$rightEnd
+(stepR_result <- stepR::stepFit(mean_data_1, alpha = 0.5)$rightEnd)
+```
+
+```{r univariate-mean-change-stepR-testthat, include = FALSE}
+testthat::expect_equal(stepR_result, c(300, 700, 1000))
 ```
 
 ```{r univariate-mean-change-cpm}
-cpm::processStream(mean_data_1, cpmType = "Student")$changePoints
+(cpm_result <- cpm::processStream(mean_data_1, cpmType = "Student")$changePoints)
+```
+
+```{r univariate-mean-change-cpm-testthat, include = FALSE}
+testthat::expect_equal(cpm_result, c(299, 699))
 ```
 
 ```{r univariate-mean-change-segmented}
-segmented::segmented(
+(segmented_result <- segmented::segmented(
   lm(y ~ 1 + x, data.frame(y = mean_data_1, x = seq_len(nrow(mean_data_1)))),
   seg.Z = ~ x
-)$psi[, "Est."]
+)$psi[, "Est."])
 ```
 
-```{r univariate-mean-change-mcp}
-if (interactive()) {
-  plot(
-    mcp::mcp(
-      list(y ~ 1, ~ 1, ~ 1),
-      data = data.frame(y = mean_data_1, x = seq_len(nrow(mean_data_1))),
-      par_x = "x"
-    )
-  )
-}
+```{r univariate-mean-change-segmented-testthat, include = FALSE}
+testthat::expect_equal(segmented_result, c(495))
 ```
+
+```{r univariate-mean-change-mcp, eval = FALSE}
+plot(
+  mcp::mcp(
+    list(y ~ 1, ~ 1, ~ 1),
+    data = data.frame(y = mean_data_1, x = seq_len(nrow(mean_data_1))),
+    par_x = "x"
+  )
+)
+```
+
+![`mcp` plot for univariate mean change](comparison-packages-mean_data_1-mcp.svg)
 
 ```{r univariate-mean-change-not}
 plot(not::not(mean_data_1, contrast = "pcwsConstMean"))
 ```
 
-```{r univariate-mean-change-bcp}
-# plot(bcp::bcp(mean_data_1))
+```{r univariate-mean-change-bcp, eval = FALSE}
+plot(bcp::bcp(mean_data_1))
 ```
+
+![`bcp` plot for univariate mean change](comparison-packages-mean_data_1-bcp.svg)
 
 # Univariate mean and/or variance change
 
@@ -382,7 +397,11 @@ The true change points are 300, 700, 1000, 1300 and 1700.
 Some methods are plotted due to the un-retrievable change points.
 
 ```{r univariate-mean-and-or-variance-change-fastcpd}
-fastcpd::fastcpd.mv(mv_data_1, r.progress = FALSE)@cp_set
+(fastcpd_result <- fastcpd::fastcpd.mv(mv_data_1, r.progress = FALSE)@cp_set)
+```
+
+```{r univariate-mean-and-or-variance-change-fastcpd-testthat, include = FALSE}
+testthat::expect_equal(fastcpd_result, c(300, 700, 1000, 1300, 1700))
 ```
 
 ```{r univariate-mean-and-or-variance-change-ecp, eval = FALSE}
@@ -391,19 +410,30 @@ ecp::e.divisive(mv_data_1)$estimates
 ```
 
 ```{r univariate-mean-and-or-variance-change-changepoint}
-# Data need to be processed
-changepoint::cpt.meanvar(c(mv_data_1))@cpts
+(changepoint_result <- changepoint::cpt.meanvar(c(mv_data_1))@cpts)
+```
+
+```{r univariate-mean-and-or-variance-change-changepoint-testthat, include = FALSE}
+testthat::expect_equal(changepoint_result, c(300, 2000))
 ```
 
 ```{r univariate-mean-and-or-variance-change-CptNonPar}
-CptNonPar::np.mojo(mv_data_1, G = floor(length(mv_data_1) / 6))$cpts
+(CptNonPar_result <- CptNonPar::np.mojo(mv_data_1, G = floor(length(mv_data_1) / 6))$cpts)
+```
+
+```{r univariate-mean-and-or-variance-change-CptNonPar-testthat, include = FALSE}
+testthat::expect_equal(CptNonPar_result, c(333, 700, 1300))
 ```
 
 ```{r univariate-mean-and-or-variance-change-cpm}
-cpm::processStream(mv_data_1, cpmType = "GLR")$changePoints
+(cpm_result <- cpm::processStream(mv_data_1, cpmType = "GLR")$changePoints)
 ```
 
-```{r univariate-mean-and-or-variance-change-InspectChangepoint}
+```{r univariate-mean-and-or-variance-change-cpm-testthat, include = FALSE}
+testthat::expect_equal(cpm_result, c(293, 300, 403, 408, 618, 621, 696, 1000, 1021, 1024, 1293, 1300, 1417, 1693, 1981))
+```
+
+```{r univariate-mean-and-or-variance-change-InspectChangepoint, eval = FALSE}
 invisible(
   suppressMessages(
     capture.output(
@@ -417,25 +447,41 @@ invisible(
   )
 )
 result_InspectChangepoint$changepoints[, "location"]
+#>   [1]  300  700  702  704  708  712  715  716  717  718  721  722  723  726  727
+#>  [16]  732  734  736  740  742  744  746  748  750  753  755  756  757  759  764
+#>  [31]  765  768  771  772  774  791  794  798  799  801  802  803  807  809  810
+#>  [46]  813  815  817  819  826  827  828  829  831  833  835  836  837  838  840
+#>  [61]  841  842  843  845  848  849  852  854  860  862  864  866  868  870  872
+#>  [76]  875  879  881  884  886  887  888  889  896  897  898  899  901  912  913
+#>  [91]  915  919  922  923  927  932  934  936  940  944  945  947  948  949  958
+#> [106]  959  961  962  963  964  966  967  968  972  974  976  978  979 1300 1700
+#> [121] 1702 1703 1704 1708 1710 1712 1714 1716 1717 1718 1721 1723 1725 1726 1731
+#> [136] 1733 1735 1736 1737 1739 1742 1745 1752 1754 1756 1758 1759 1768 1770 1771
+#> [151] 1778 1785 1790 1793 1795 1796 1797 1799 1800 1805 1806 1807 1808 1821 1828
+#> [166] 1833 1835 1837 1840 1841 1842 1848 1851 1852 1854 1855 1857 1876 1879 1880
+#> [181] 1882 1883 1884 1887 1889 1894 1898 1899 1905 1906 1907 1908 1909 1912 1919
+#> [196] 1926 1927 1930 1933 1934 1935 1936 1940 1952 1955 1956 1960 1962 1963 1966
+#> [211] 1967 1969 1970 1976 1977 1978 1980 1985 1987 1990
 ```
 
-```{r univariate-mean-and-or-variance-change-Rbeast}
-# Rbeast::beast(
-#   mv_data_1, season = "none", print.progress = FALSE, quiet = TRUE
-# )$trend$cp
+```{r univariate-mean-and-or-variance-change-Rbeast, eval = FALSE}
+Rbeast::beast(
+  mv_data_1, season = "none", print.progress = FALSE, quiet = TRUE
+)$trend$cp
+#>  [1] 1301  301 1855 1794  701 1986 1981 1769 1859 1834
 ```
 
-```{r univariate-mean-and-or-variance-change-mcp}
-if (interactive()) {
-  plot(
-    mcp::mcp(
-      list(y ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1),
-      data = data.frame(y = mv_data_1, x = seq_len(nrow(mv_data_1))),
-      par_x = "x"
-    )
+```{r univariate-mean-and-or-variance-change-mcp, eval = FALSE}
+plot(
+  mcp::mcp(
+    list(y ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1),
+    data = data.frame(y = mv_data_1, x = seq_len(nrow(mv_data_1))),
+    par_x = "x"
   )
-}
+)
 ```
+
+![`mcp` plot for univariate mean and/or variance change](comparison-packages-mv_data_1-mcp.svg)
 
 ```{r univariate-mean-and-or-variance-change-not}
 plot(not::not(mv_data_1, contrast = "pcwsConstMeanVar"))
@@ -447,14 +493,22 @@ The true change points are 300 and 700.
 Some methods are plotted due to the un-retrievable change points.
 
 ```{r multivariate-mean-change-fastcpd}
-fastcpd::fastcpd.mean(mean_data_3, r.progress = FALSE)@cp_set
+(fastcpd_result <- fastcpd::fastcpd.mean(mean_data_3, r.progress = FALSE)@cp_set)
+```
+
+```{r multivariate-mean-change-fastcpd-testthat, include = FALSE}
+testthat::expect_equal(fastcpd_result, c(300, 700))
 ```
 
 ```{r multivariate-mean-change-CptNonPar}
-CptNonPar::np.mojo(mean_data_3, G = floor(nrow(mean_data_3) / 6))$cpts
+(CptNonPar_result <- CptNonPar::np.mojo(mean_data_3, G = floor(nrow(mean_data_3) / 6))$cpts)
 ```
 
-```{r multivariate-mean-change-InspectChangepoint}
+```{r multivariate-mean-change-CptNonPar-testthat, include = FALSE}
+testthat::expect_equal(CptNonPar_result, c(300, 700))
+```
+
+```{r multivariate-mean-change-InspectChangepoint, eval = FALSE}
 invisible(
   suppressMessages(
     capture.output(
@@ -468,23 +522,42 @@ invisible(
   )
 )
 result_InspectChangepoint$changepoints[, "location"]
+#> [1] 300 700
 ```
 
 ```{r multivariate-mean-change-jointseg}
-jointseg::jointSeg(mean_data_3, K = 2)$bestBkp
+(jointseg_result <- jointseg::jointSeg(mean_data_3, K = 2)$bestBkp)
 ```
 
-```{r multivariate-mean-change-Rbeast}
-# invisible(
-#   capture.output(
-#     result_Rbeast <- Rbeast::beast123(
-#       mean_data_3,
-#       metadata = list(whichDimIsTime = 1),
-#       season = "none"
-#     )
-#   )
-# )
-# result_Rbeast$trend$cp
+```{r multivariate-mean-change-jointseg-testthat, include = FALSE}
+testthat::expect_equal(jointseg_result, c(300, 700))
+```
+
+```{r multivariate-mean-change-Rbeast, eval = FALSE}
+invisible(
+  capture.output(
+    result_Rbeast <- Rbeast::beast123(
+      mean_data_3,
+      metadata = list(whichDimIsTime = 1),
+      season = "none"
+    )
+  )
+)
+result_Rbeast$trend$cp
+#> Warning message:
+#> In Rbeast::beast123(mean_data_3, metadata = list(whichDimIsTime = 1),  :
+#>   WARNING: If the input data is regular and ordered in time,the times of individual datapoints are determined fully by 'metadata$startTime' and 'metadata$deltaTime'. But startTime and deltaTime are missing and a default value 1 is used for both!
+#>       [,1] [,2] [,3]
+#>  [1,]  301  301  701
+#>  [2,]  701  701  301
+#>  [3,]  NaN  225  NaN
+#>  [4,]  NaN  684  NaN
+#>  [5,]  NaN  NaN  NaN
+#>  [6,]  NaN  NaN  NaN
+#>  [7,]  NaN  NaN  NaN
+#>  [8,]  NaN  NaN  NaN
+#>  [9,]  NaN  NaN  NaN
+#> [10,]  NaN  NaN  NaN
 ```
 
 ```{r multivariate-mean-change-strucchange, eval = FALSE}
@@ -499,9 +572,11 @@ ecp::e.divisive(mean_data_3)$estimates
 #> [1]    1  301  701 1001
 ```
 
-```{r multivariate-mean-change-bcp}
-# plot(bcp::bcp(mean_data_3))
+```{r multivariate-mean-change-bcp, eval = FALSE}
+plot(bcp::bcp(mean_data_3))
 ```
+
+![`bcp` plot for multivariate mean change](comparison-packages-mean_data_3-bcp.svg)
 
 # Multivariate mean and/or variance change
 
@@ -509,7 +584,11 @@ The true change points are 300, 700, 1000, 1300 and 1700.
 Some methods are plotted due to the un-retrievable change points.
 
 ```{r multivariate-mean-and-or-variance-change-fastcpd}
-fastcpd::fastcpd.mv(mv_data_3, r.progress = FALSE)@cp_set
+(fastcpd_result <- fastcpd::fastcpd.mv(mv_data_3, r.progress = FALSE)@cp_set)
+```
+
+```{r multivariate-mean-and-or-variance-change-fastcpd-testthat, include = FALSE}
+testthat::expect_equal(fastcpd_result, c(300, 700, 1000, 1300, 1700))
 ```
 
 ```{r multivariate-mean-and-or-variance-change-ecp, eval = FALSE}
@@ -517,7 +596,7 @@ ecp::e.divisive(mv_data_3)$estimates
 #> [1]    1  301  701 1001 1301 1701 2001
 ```
 
-```{r multivariate-mean-and-or-variance-change-InspectChangepoint}
+```{r multivariate-mean-and-or-variance-change-InspectChangepoint, eval = FALSE}
 invisible(
   suppressMessages(
     capture.output(
@@ -531,19 +610,60 @@ invisible(
   )
 )
 result_InspectChangepoint$changepoints[, "location"]
+#>   [1]  300  700  701  703  704  705  707  708  710  711  712  714  715  716  717
+#>  [16]  719  721  722  723  725  726  728  729  730  731  732  734  735  736  738
+#>  [31]  739  740  741  742  744  745  747  748  749  752  753  754  756  757  759
+#>  [46]  761  762  763  764  766  768  769  770  772  773  774  776  777  778  780
+#>  [61]  781  783  784  786  788  789  791  793  795  797  799  800  801  803  805
+#>  [76]  806  808  809  811  813  814  816  817  819  821  822  824  825  826  828
+#>  [91]  829  830  831  832  834  835  837  838  839  841  842  843  845  846  847
+#> [106]  852  853  855  857  860  861  862  864  865  866  868  869  870  871  873
+#> [121]  876  877  878  880  882  883  884  886  888  891  893  895  896  898  900
+#> [136]  901  903  904  905  906  908  909  910  911  914  915  916  919  920  921
+#> [151]  923  924  926  927  928  930  931  933  934  936  938  939  940  942  944
+#> [166]  945  946  948  949  951  952  954  956  957  959  960  961  962  964  965
+#> [181]  966  968  969  970  971  973  974  976  977  979  980  982  983  984  985
+#> [196]  986  988  989  990  992  993  995  996  998 1000 1300 1700 1701 1702 1705
+#> [211] 1708 1710 1711 1712 1713 1715 1716 1717 1718 1720 1721 1724 1725 1726 1728
+#> [226] 1729 1730 1731 1733 1734 1735 1737 1738 1740 1742 1743 1745 1747 1749 1750
+#> [241] 1752 1753 1754 1755 1756 1758 1759 1760 1762 1763 1764 1766 1767 1769 1770
+#> [256] 1771 1773 1774 1776 1777 1779 1780 1782 1783 1785 1787 1788 1790 1791 1792
+#> [271] 1793 1794 1796 1798 1800 1801 1803 1805 1809 1811 1812 1813 1814 1816 1817
+#> [286] 1819 1820 1821 1823 1824 1826 1828 1830 1832 1833 1834 1836 1838 1839 1841
+#> [301] 1842 1843 1846 1847 1850 1851 1853 1854 1856 1857 1859 1861 1862 1864 1865
+#> [316] 1866 1869 1870 1872 1874 1876 1878 1879 1881 1882 1883 1885 1887 1888 1889
+#> [331] 1890 1892 1894 1896 1898 1899 1900 1902 1904 1905 1907 1908 1909 1911 1913
+#> [346] 1914 1916 1918 1919 1920 1922 1923 1925 1926 1928 1930 1931 1933 1935 1936
+#> [361] 1937 1939 1940 1942 1943 1945 1947 1948 1950 1951 1952 1953 1955 1956 1957
+#> [376] 1959 1960 1961 1963 1964 1966 1967 1968 1970 1972 1974 1976 1977 1978 1979
+#> [391] 1982 1983 1985 1987 1990 1992 1993 1994 1996 1997
 ```
 
-```{r multivariate-mean-and-or-variance-change-Rbeast}
-# invisible(
-#   capture.output(
-#     result_Rbeast <- Rbeast::beast123(
-#       mv_data_3,
-#       metadata = list(whichDimIsTime = 1),
-#       season = "none"
-#     )
-#   )
-# )
-# result_Rbeast$trend$cp
+```{r multivariate-mean-and-or-variance-change-Rbeast, eval = FALSE}
+invisible(
+  capture.output(
+    result_Rbeast <- Rbeast::beast123(
+      mv_data_3,
+      metadata = list(whichDimIsTime = 1),
+      season = "none"
+    )
+  )
+)
+result_Rbeast$trend$cp
+#> Warning message:
+#> In Rbeast::beast123(mv_data_3, metadata = list(whichDimIsTime = 1),  :
+#>   WARNING: If the input data is regular and ordered in time,the times of individual datapoints are determined fully by 'metadata$startTime' and 'metadata$deltaTime'. But startTime and deltaTime are missing and a default value 1 is used for both!
+#>       [,1] [,2] [,3]
+#>  [1,] 1301  701  301
+#>  [2,]  301  301 1301
+#>  [3,]  701 1301  702
+#>  [4,]  877  830 1924
+#>  [5,] 1994  887 1880
+#>  [6,] 1905  881 1971
+#>  [7,] 1934  869  776
+#>  [8,] 1929  807  831
+#>  [9,] 1978 1960  845
+#> [10,]  861 1947  760
 ```
 
 # Linear regression
@@ -551,7 +671,11 @@ result_InspectChangepoint$changepoints[, "location"]
 The true change points are 100 and 200.
 
 ```{r linear-regression-fastcpd}
-fastcpd::fastcpd.lm(lm_data, r.progress = FALSE)@cp_set
+(fastcpd_result <- fastcpd::fastcpd.lm(lm_data, r.progress = FALSE)@cp_set)
+```
+
+```{r linear-regression-fastcpd-testthat, include = FALSE}
+testthat::expect_equal(fastcpd_result, c(99, 201))
 ```
 
 ```{r linear-regression-strucchange, eval = FALSE}
@@ -560,13 +684,17 @@ strucchange::breakpoints(y ~ . - 1, data = lm_data)$breakpoints
 ```
 
 ```{r linear-regression-segmented}
-segmented::segmented(
+(segmented_result <- segmented::segmented(
   lm(
     y ~ . - 1,
     data.frame(y = lm_data$y, x = lm_data[, -1], index = seq_len(nrow(lm_data)))
   ),
   seg.Z = ~ index
-)$psi[, "Est."]
+)$psi[, "Est."])
+```
+
+```{r linear-regression-segmented-testthat, include = FALSE}
+testthat::expect_equal(segmented_result, c(233.00003))
 ```
 
 # Logistic regression
@@ -574,7 +702,11 @@ segmented::segmented(
 The true change point is 300.
 
 ```{r logistic-regression-fastcpd}
-fastcpd::fastcpd.binomial(binomial_data, r.progress = FALSE)@cp_set
+(fastcpd_result <- fastcpd::fastcpd.binomial(binomial_data, r.progress = FALSE)@cp_set)
+```
+
+```{r logistic-regression-fastcpd-testthat, include = FALSE}
+testthat::expect_equal(fastcpd_result, c(300))
 ```
 
 ```{r logistic-regression-strucchange, eval = FALSE}
@@ -587,7 +719,11 @@ strucchange::breakpoints(y ~ . - 1, data = binomial_data)$breakpoints
 The true change points are 500, 800 and 1000.
 
 ```{r poisson-regression-fastcpd}
-fastcpd::fastcpd.poisson(poisson_data, r.progress = FALSE)@cp_set
+(fastcpd_result <- fastcpd::fastcpd.poisson(poisson_data, r.progress = FALSE)@cp_set)
+```
+
+```{r poisson-regression-fastcpd-testthat, include = FALSE}
+testthat::expect_equal(fastcpd_result, c(498, 800, 1003))
 ```
 
 ```{r poisson-regression-strucchange, eval = FALSE}
@@ -600,7 +736,11 @@ strucchange::breakpoints(y ~ . - 1, data = poisson_data)$breakpoints
 The true change points are 80, 200 and 320.
 
 ```{r lasso-fastcpd}
-fastcpd::fastcpd.lasso(lasso_data, r.progress = FALSE)@cp_set
+(fastcpd_result <- fastcpd::fastcpd.lasso(lasso_data, r.progress = FALSE)@cp_set)
+```
+
+```{r lasso-fastcpd-testthat, include = FALSE}
+testthat::expect_equal(fastcpd_result, c(79, 199, 320))
 ```
 
 ```{r lasso-strucchange, eval = FALSE}
@@ -614,44 +754,64 @@ The true change point is 600.
 Some methods are plotted due to the un-retrievable change points.
 
 ```{r ar3-fastcpd}
-fastcpd::fastcpd.ar(ar_data, 3, r.progress = FALSE)@cp_set
+(fastcpd_result <- fastcpd::fastcpd.ar(ar_data, 3, r.progress = FALSE)@cp_set)
+```
+
+```{r ar3-fastcpd-testthat, include = FALSE}
+testthat::expect_equal(fastcpd_result, c(614))
 ```
 
 ```{r ar3-CptNonPar}
-CptNonPar::np.mojo(ar_data, G = floor(length(ar_data) / 6))$cpts
+(CptNonPar_result <- CptNonPar::np.mojo(ar_data, G = floor(length(ar_data) / 6))$cpts)
+```
+
+```{r ar3-CptNonPar-testthat, include = FALSE}
+testthat::expect_equal(CptNonPar_result, numeric(0))
 ```
 
 ```{r ar3-segmented}
-segmented::segmented(
+(segmented_result <- segmented::segmented(
   lm(
     y ~ x + 1, data.frame(y = ar_data, x = seq_along(ar_data))
   ),
   seg.Z = ~ x
-)$psi[, "Est."]
+)$psi[, "Est."])
 ```
 
-```{r ar3-mcp}
-if (interactive()) {
-  plot(
-    mcp::mcp(
-      list(y ~ 1 + ar(3), ~ 0 + ar(3)),
-      data = data.frame(y = ar_data, x = seq_along(ar_data)),
-      par_x = "x"
-    )
-  )
-}
+```{r ar3-segmented-testthat, include = FALSE}
+testthat::expect_equal(segmented_result, c(690))
 ```
+
+```{r ar3-mcp, eval = FALSE}
+plot(
+  mcp::mcp(
+    list(y ~ 1 + ar(3), ~ 0 + ar(3)),
+    data = data.frame(y = ar_data, x = seq_along(ar_data)),
+    par_x = "x"
+  )
+)
+```
+
+![`mcp` plot for AR(3)](comparison-packages-ar_data-mcp.svg)
 
 # GARCH(1, 1)
 
 The true change point is 200.
 
 ```{r garch11-fastcpd}
-fastcpd::fastcpd.garch(garch_data, c(1, 1), r.progress = FALSE)@cp_set
+(fastcpd_result <- fastcpd::fastcpd.garch(garch_data, c(1, 1), r.progress = FALSE)@cp_set)
+```
+
+```{r garch11-fastcpd-testthat, include = FALSE}
+testthat::expect_equal(fastcpd_result, c(205))
 ```
 
 ```{r garch11-CptNonPar}
-CptNonPar::np.mojo(garch_data, G = floor(length(garch_data) / 6))$cpts
+(CptNonPar_result <- CptNonPar::np.mojo(garch_data, G = floor(length(garch_data) / 6))$cpts)
+```
+
+```{r garch11-CptNonPar-testthat, include = FALSE}
+testthat::expect_equal(CptNonPar_result, c(206))
 ```
 
 ```{r garch11-strucchange, eval = FALSE}
@@ -664,13 +824,21 @@ strucchange::breakpoints(x ~ 1, data = data.frame(x = garch_data))$breakpoints
 The true change points is 500.
 
 ```{r var2-fastcpd}
-fastcpd::fastcpd.var(
+(fastcpd_result <- fastcpd::fastcpd.var(
   var_data, 2, cost_adjustment = NULL, r.progress = FALSE
-)@cp_set
+)@cp_set)
+```
+
+```{r var2-fastcpd-testthat, include = FALSE}
+testthat::expect_equal(fastcpd_result, c(500))
 ```
 
 ```{r var2-VARDetect}
-VARDetect::tbss(var_data)
+(VARDetect_result <- VARDetect::tbss(var_data)$cp)
+```
+
+```{r var2-VARDetect-testthat, include = FALSE}
+testthat::expect_equal(VARDetect_result, c(501))
 ```
 
 # Detection comparison using `well_log`
@@ -688,15 +856,15 @@ result <- list(
   breakfast = breakfast::breakfast(well_log)$cptmodel.list[[6]]$cpts,
   wbs = wbs::wbs(well_log)$cpt$cpt.ic$mbic.penalty,
   mosum = mosum::mosum(c(well_log), G = 40)$cpts.info$cpts,
-  # fpop = fpop::Fpop(well_log, length(well_log))$t.est,  # meaningless
-  # gfpop = gfpop::gfpop(
-  #   data = well_log,
-  #   mygraph = gfpop::graph(
-  #     penalty = 2 * log(length(well_log)) * gfpop::sdDiff(well_log) ^ 2,
-  #     type = "updown"
-  #   ),
-  #   type = "mean"
-  # )$changepoints,
+  fpop = fpop::Fpop(well_log, length(well_log))$t.est,  # meaningless
+  gfpop = gfpop::gfpop(
+    data = well_log,
+    mygraph = gfpop::graph(
+      penalty = 2 * log(length(well_log)) * gfpop::sdDiff(well_log) ^ 2,
+      type = "updown"
+    ),
+    type = "mean"
+  )$changepoints,
   InspectChangepoint = InspectChangepoint::inspect(
     well_log,
     threshold = InspectChangepoint::compute.threshold(length(well_log), 1)
@@ -789,14 +957,14 @@ microbenchmark_result <- microbenchmark::microbenchmark(
   wbs = wbs::wbs(well_log),
   mosum = mosum::mosum(c(well_log), G = 40),
   fpop = fpop::Fpop(well_log, nrow(well_log)),
-  # gfpop = gfpop::gfpop(
-  #   data = well_log,
-  #   mygraph = gfpop::graph(
-  #     penalty = 2 * log(length(well_log)) * gfpop::sdDiff(well_log) ^ 2,
-  #     type = "updown"
-  #   ),
-  #   type = "mean"
-  # ),
+  gfpop = gfpop::gfpop(
+    data = well_log,
+    mygraph = gfpop::graph(
+      penalty = 2 * log(length(well_log)) * gfpop::sdDiff(well_log) ^ 2,
+      type = "updown"
+    ),
+    type = "mean"
+  ),
   InspectChangepoint = InspectChangepoint::inspect(
     well_log,
     threshold = InspectChangepoint::compute.threshold(length(well_log), 1)
@@ -806,31 +974,26 @@ microbenchmark_result <- microbenchmark::microbenchmark(
     well_log, season = "none", print.progress = FALSE, quiet = TRUE
   ),
   stepR = stepR::stepFit(well_log, alpha = 0.5),
-  # mcp = mcp::mcp(
-  #   list(y ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1),
-  #   data = data.frame(y = well_log, x = seq_along(well_log)),
-  #   par_x = "x"
-  # ),
   not = not::not(well_log, contrast = "pcwsConstMean"),
   times = 10
 )
 #> Unit: milliseconds
 #>                expr          min           lq         mean       median           uq          max neval
-#>             fastcpd 4.010279e+02 4.129134e+02 4.171979e+02 4.148564e+02 4.196057e+02 4.350300e+02    10
-#>         changepoint 3.195488e+01 3.230887e+01 3.743290e+01 3.352390e+01 4.418598e+01 4.980063e+01    10
-#>           CptNonPar 1.809139e+04 1.867986e+04 1.904000e+04 1.876936e+04 1.947816e+04 2.076009e+04    10
-#>         strucchange 5.813672e+04 5.831023e+04 5.963604e+04 5.952739e+04 6.139957e+04 6.173251e+04    10
-#>                 ecp 7.534981e+05 7.642983e+05 7.742041e+05 7.661485e+05 7.880130e+05 8.003981e+05    10
-#>           breakfast 9.231426e+03 9.261763e+03 9.514283e+03 9.492325e+03 9.630395e+03 1.001344e+04    10
-#>                 wbs 1.133042e+02 1.168601e+02 1.189637e+02 1.187244e+02 1.201765e+02 1.281057e+02    10
-#>               mosum 1.082397e+00 1.167387e+00 1.213233e+00 1.209105e+00 1.286479e+00 1.320333e+00    10
-#>                fpop 2.407630e+00 2.481348e+00 2.641625e+00 2.551970e+00 2.618455e+00 3.328585e+00    10
-#>               gfpop 5.918783e+01 5.959448e+01 6.081621e+01 6.006626e+01 6.048699e+01 6.725864e+01    10
-#>  InspectChangepoint 1.550181e+02 1.885944e+02 2.103973e+02 2.030795e+02 2.262247e+02 3.025476e+02    10
-#>            jointseg 1.082510e+01 1.082948e+01 1.174498e+01 1.110779e+01 1.221183e+01 1.424236e+01    10
-#>              Rbeast 6.311987e+02 6.634019e+02 6.702594e+02 6.680217e+02 6.846772e+02 7.048629e+02    10
-#>               stepR 2.812109e+01 2.836331e+01 2.864408e+01 2.862293e+01 2.897236e+01 2.933441e+01    10
-#>                 not 9.350182e+01 9.469137e+01 9.684097e+01 9.647117e+01 9.763828e+01 1.031233e+02    10
+#>             fastcpd 8.411284e+01 8.692226e+01 1.011440e+02 1.044509e+02 1.089672e+02    118.05842    10
+#>         changepoint 3.206773e+01 3.377081e+01 6.843465e+01 3.857181e+01 5.243834e+01    244.76672    10
+#>           CptNonPar 1.827381e+04 1.901094e+04 2.002752e+04 1.985180e+04 2.076803e+04  22511.59316    10
+#>         strucchange 5.955079e+04 6.059315e+04 6.185727e+04 6.131291e+04 6.312073e+04  64638.93090    10
+#>                 ecp 7.590543e+05 7.707573e+05 7.859080e+05 7.830752e+05 8.093015e+05 810339.52140    10
+#>           breakfast 9.170992e+03 9.344041e+03 9.628236e+03 9.382078e+03 9.628663e+03  11073.79318    10
+#>                 wbs 1.139078e+02 1.145472e+02 1.178167e+02 1.166746e+02 1.201676e+02    127.27064    10
+#>               mosum 1.172847e+00 1.231747e+00 1.740727e+01 1.416854e+00 1.919586e+00    160.76997    10
+#>                fpop 2.588228e+00 2.630407e+00 4.587742e+00 2.832556e+00 3.312986e+00     18.52067    10
+#>               gfpop 5.971245e+01 6.072684e+01 6.533492e+01 6.172578e+01 6.839653e+01     87.89407    10
+#>  InspectChangepoint 1.698673e+02 1.909034e+02 2.392539e+02 2.117010e+02 3.004474e+02    329.87724    10
+#>            jointseg 2.000894e+01 2.136878e+01 2.551210e+01 2.167757e+01 2.403593e+01     47.98397    10
+#>              Rbeast 6.533998e+02 6.625203e+02 6.783586e+02 6.792646e+02 6.875840e+02    723.45376    10
+#>               stepR 2.793709e+01 2.902084e+01 4.380857e+01 3.068416e+01 3.227125e+01    164.81082    10
+#>                 not 9.599763e+01 9.701856e+01 1.028601e+02 1.012292e+02 1.049974e+02    120.73529    10
 ```
 
 ```{r time-comparison-well-log-plot, eval = FALSE}
@@ -838,6 +1001,14 @@ ggplot2::autoplot(microbenchmark_result)
 ```
 
 ![Plot of the running time using `well_log` data](comparison-packages-well_log-time.svg)
+
+# Related issues
+
+-   `mosum`: [[#4](https://github.com/doccstat/fastcpd/issues/4)].
+-   `mcp`: [link 1](https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531091)
+    and [link 2](https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531284).
+-   `bcp`: [[#5](https://github.com/doccstat/fastcpd/issues/5)].
+-   `gfpop`: [[#10](https://github.com/doccstat/fastcpd/issues/10)].
 
 # Appendix: all code snippets
 

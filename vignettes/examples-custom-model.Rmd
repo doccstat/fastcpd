@@ -15,14 +15,6 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
 library(fastcpd)
 ```
 
-```{r package_installation}
-for (package in c("ggplot2", "mvtnorm")) {
-  if (!requireNamespace(package, quietly = TRUE)) utils::install.packages(
-    package, repos = "https://cloud.r-project.org", quiet = TRUE
-  )
-}
-```
-
 We try to reproduce the logistic regression models with
 custom cost functions and show that the results are similar to the built-in
 logistic regression models.
@@ -128,6 +120,10 @@ already provided in the package.
 The detailed discussion of several advanced usages of the package can be found
 in
 [Advanced examples](examples-advanced.html).
+
+# Notes
+
+The evaluation of this vignette is set to be `FALSE`.
 
 # Appendix: all code snippets
 
