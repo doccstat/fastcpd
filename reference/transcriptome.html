@@ -12,7 +12,7 @@ Affymetrix HG-U95A and HG-U95Av2 microarrays"><meta property="og:image" content=
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -210,12 +210,6 @@ Affymetrix HG-U95A and HG-U95Av2 microarrays</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">package</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ggplot2"</span>, <span class="st">"gridExtra"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="va">package</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">package</span>, repos <span class="op">=</span> <span class="st">"https://cloud.r-project.org"</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">transcriptome</span><span class="op">$</span><span class="st">"10"</span>, trim <span class="op">=</span> <span class="fl">0.005</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -223,10 +217,10 @@ Affymetrix HG-U95A and HG-U95Av2 microarrays</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.mean(data = transcriptome$"10", trim = 0.005)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 177 264 394 534 579 656 788 811 869 934 960 1051 1141 1286 1319 1368 1568 1657 1724 1906 1972 1994 2041 2058 2146 2200 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 177 264 393 534 578 656 788 811 869 934 960 1051 1141 1286 1319 1367 1560 1657 1724 1906 1972 1996 2041 2141 2200 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -150.0608 -74.94586 -97.42742 -72.38886 113.286 -81.74779 -112.9846 -26.82538 -50.77711 -35.38739 2.809858 -55.11852 -59.57469 -97.52339 -35.94149 -16.56248 -190.1474 25.1781 202.9368 -159.4619 -33.35084 12.65955 10.59738 -9.050017 -76.02135 -55.56151 -6.661788 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -308.0877 -148.9997 -252.0021 -197.1081 71.32877 -148.867 -230.2362 -42.78675 -98.3807 -89.66511 -18.47626 -132.8995 -136.3956 -224.627 -60.92342 -74.1695 -354.7879 -67.95791 61.31499 -324.3721 -90.40763 -5.655343 -66.47911 -167.7101 -110.3476 -15.46845 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="transcriptome-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
