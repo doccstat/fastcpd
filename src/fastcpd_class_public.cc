@@ -256,7 +256,7 @@ mat Fastcpd::get_theta_sum() {
 }
 
 CostResult Fastcpd::negative_log_likelihood_wo_theta(
-    mat data,
+    const mat& data,
     double lambda,
     bool cv,
     Nullable<colvec> start
