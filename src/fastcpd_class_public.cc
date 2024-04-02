@@ -256,31 +256,31 @@ mat Fastcpd::get_theta_sum() {
 }
 
 CostResult Fastcpd::negative_log_likelihood_wo_theta(
-    const mat& data,
+    const mat& data_segment,
     double lambda,
     bool cv,
     Nullable<colvec> start
 ) {
   CostResult cost_result;
   if (family == "lasso" && cv) {
-    cost_result = negative_log_likelihood_lasso_cv(data);
+    cost_result = negative_log_likelihood_lasso_cv(data_segment);
   } else if (family == "lasso" && !cv) {
-    cost_result = negative_log_likelihood_lasso_wo_cv(data, lambda);
+    cost_result = negative_log_likelihood_lasso_wo_cv(data_segment, lambda);
   } else if (
     family == "binomial" || family == "poisson" || family == "gaussian"
   ) {
-    cost_result = negative_log_likelihood_glm(data, start, family);
+    cost_result = negative_log_likelihood_glm(data_segment, start, family);
   } else if (family == "arma") {
-    cost_result = negative_log_likelihood_arma(data, order);
+    cost_result = negative_log_likelihood_arma(data_segment, order);
   } else if (family == "mean") {
-    cost_result = negative_log_likelihood_mean(data, variance_estimate);
+    cost_result = negative_log_likelihood_mean(data_segment, variance_estimate);
   } else if (family == "variance") {
-    cost_result = negative_log_likelihood_variance(data);
+    cost_result = negative_log_likelihood_variance(data_segment);
   } else if (family == "meanvariance" || family == "mv") {
-    cost_result = negative_log_likelihood_meanvariance(data, epsilon);
+    cost_result = negative_log_likelihood_meanvariance(data_segment, epsilon);
   } else if (family == "mgaussian") {
     cost_result = negative_log_likelihood_mgaussian(
-      data, p_response, variance_estimate
+      data_segment, p_response, variance_estimate
     );
   } else {
     // # nocov start
