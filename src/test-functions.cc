@@ -2,7 +2,7 @@
 #include "fastcpd_test_constants.h"
 #include "testthat.h"
 
-context("negative_log_likelihood_wo_theta Unit Test") {
+context("get_nll_wo_theta Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
@@ -34,7 +34,7 @@ context("negative_log_likelihood_wo_theta Unit Test") {
 
     const colvec data(kARMA32.data(), kARMA32.size());
     const fastcpd::classes::CostResult cost_result =
-    fastcpd_class.negative_log_likelihood_wo_theta(
+    fastcpd_class.get_nll_wo_theta(
       data, 0, false, R_NilValue
     );
     const colvec par = cost_result.par;
@@ -55,7 +55,7 @@ context("negative_log_likelihood_wo_theta Unit Test") {
   }
 }
 
-context("negative_log_likelihood_wo_cv Unit Test") {
+context("get_nll_wo_cv Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
@@ -88,7 +88,7 @@ context("negative_log_likelihood_wo_cv Unit Test") {
     const colvec data(kARMA32.data(), kARMA32.size());
     const colvec theta = 0.1 * ones<colvec>(6);
     const double value =
-      fastcpd_class.negative_log_likelihood_wo_cv(data, theta, 0.0);
+      fastcpd_class.get_nll_wo_cv(data, theta, 0.0);
     const double expected_value = 1363.288;
     expect_true(abs(value -  expected_value) < 0.001);
   }
