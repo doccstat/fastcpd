@@ -11,7 +11,7 @@ context("get_nll_wo_theta Unit Test") {
       /* cost_gradient */ R_NilValue,
       /* cost_hessian */ R_NilValue,
       /* cp_only */ true,
-      /* data */ mat(),
+      /* data */ colvec(kARMA32.data(), kARMA32.size()),
       /* epsilon */ 0.0,
       /* family */ "arma",
       /* k */ R_NilValue,
@@ -32,10 +32,9 @@ context("get_nll_wo_theta Unit Test") {
       /* warm_start */ false
     );
 
-    const colvec data(kARMA32.data(), kARMA32.size());
     const fastcpd::classes::CostResult cost_result =
     fastcpd_class.get_nll_wo_theta(
-      data, 0, false, R_NilValue
+      0, 199, 0, false, R_NilValue
     );
     const colvec par = cost_result.par;
     const double value = cost_result.value;
@@ -57,6 +56,7 @@ context("get_nll_wo_theta Unit Test") {
 
 context("get_nll_wo_cv Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
+    const colvec data(kARMA32.data(), kARMA32.size());
     fastcpd::classes::Fastcpd fastcpd_class(
       /* beta */ 0,
       /* cost */ R_NilValue,
@@ -64,7 +64,7 @@ context("get_nll_wo_cv Unit Test") {
       /* cost_gradient */ R_NilValue,
       /* cost_hessian */ R_NilValue,
       /* cp_only */ true,
-      /* data */ mat(),
+      /* data */ data,
       /* epsilon */ 0.0,
       /* family */ "arma",
       /* k */ R_NilValue,
@@ -85,10 +85,9 @@ context("get_nll_wo_cv Unit Test") {
       /* warm_start */ false
     );
 
-    const colvec data(kARMA32.data(), kARMA32.size());
     const colvec theta = 0.1 * ones<colvec>(6);
     const double value =
-      fastcpd_class.get_nll_wo_cv(data, theta, 0.0);
+      fastcpd_class.get_nll_wo_cv(0, 199, theta, 0.0);
     const double expected_value = 1363.288;
     expect_true(abs(value -  expected_value) < 0.001);
   }
@@ -103,7 +102,7 @@ context("cost_update_gradient Unit Test") {
       /* cost_gradient */ R_NilValue,
       /* cost_hessian */ R_NilValue,
       /* cp_only */ true,
-      /* data */ mat(),
+      /* data */ colvec(kARMA32.data(), kARMA32.size()),
       /* epsilon */ 0.0,
       /* family */ "arma",
       /* k */ R_NilValue,
@@ -124,9 +123,8 @@ context("cost_update_gradient Unit Test") {
       /* warm_start */ false
     );
 
-    const colvec data(kARMA32.data(), kARMA32.size());
     const colvec theta = 0.1 * ones<colvec>(6);
-    const colvec gradient = fastcpd_class.cost_update_gradient(data, theta);
+    const colvec gradient = fastcpd_class.cost_update_gradient(0, 199, theta);
     const colvec expected_gradient =
       {4.401258, 6.600128, -7.591818, 4.151778, 7.503752, -2.806806};
     expect_true(norm(gradient - expected_gradient, "fro") < 1e-6);
@@ -142,7 +140,7 @@ context("cost_update_hessian Unit Test") {
       /* cost_gradient */ R_NilValue,
       /* cost_hessian */ R_NilValue,
       /* cp_only */ true,
-      /* data */ mat(),
+      /* data */ {{1, 1, 0.2}},
       /* epsilon */ 0.0,
       /* family */ "binomial",
       /* k */ R_NilValue,
@@ -163,9 +161,8 @@ context("cost_update_hessian Unit Test") {
       /* warm_start */ false
     );
 
-    const mat data = {{1, 1, 0.2}};
     const colvec theta = {-0.5, 0.3};
-    const mat hessian = fastcpd_class.cost_update_hessian(data, theta);
+    const mat hessian = fastcpd_class.cost_update_hessian(0, 0, theta);
     const mat expected_hessian =
         {{0.238'28, 0.047'656}, {0.047'656, 0.009'531'2}};
     expect_true(norm(hessian - expected_hessian, "fro") < 0.000'001);
@@ -179,7 +176,7 @@ context("cost_update_hessian Unit Test") {
       /* cost_gradient */ R_NilValue,
       /* cost_hessian */ R_NilValue,
       /* cp_only */ true,
-      /* data */ mat(),
+      /* data */ {{4, 1, 0.2}},
       /* epsilon */ 0.0,
       /* family */ "poisson",
       /* k */ R_NilValue,
@@ -200,9 +197,8 @@ context("cost_update_hessian Unit Test") {
       /* warm_start */ false
     );
 
-    const mat data = {{4, 1, 0.2}};
     const colvec theta = {-0.5, 0.3};
-    const mat hessian = fastcpd_class.cost_update_hessian(data, theta);
+    const mat hessian = fastcpd_class.cost_update_hessian(0, 0, theta);
     const mat expected_hessian =
         {{0.644'036'4, 0.128'807}, {0.128'807, 0.025'761'6}};
     expect_true(norm(hessian - expected_hessian, "fro") < 0.000'001);
@@ -216,7 +212,7 @@ context("cost_update_hessian Unit Test") {
       /* cost_gradient */ R_NilValue,
       /* cost_hessian */ R_NilValue,
       /* cp_only */ true,
-      /* data */ mat(),
+      /* data */ colvec(kARMA32.data(), kARMA32.size()),
       /* epsilon */ 0.0,
       /* family */ "arma",
       /* k */ R_NilValue,
@@ -237,9 +233,8 @@ context("cost_update_hessian Unit Test") {
       /* warm_start */ false
     );
 
-    const colvec data(kARMA32.data(), kARMA32.size());
     const colvec theta = 0.1 * ones<colvec>(6);
-    const mat hessian = fastcpd_class.cost_update_hessian(data, theta);
+    const mat hessian = fastcpd_class.cost_update_hessian(0, 199, theta);
     const mat expected_hessian = {
       { 12.406525,  18.60483, -21.40027,   4.743794,  28.98263, -44.01258},
       { 18.604831,  27.89981, -32.09185,  25.380851,  27.48253, -66.00128},

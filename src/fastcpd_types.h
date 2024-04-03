@@ -22,6 +22,7 @@ using ::arma::dot;
 using ::arma::find;
 using ::arma::eye;
 using ::arma::floor;
+using ::arma::index_max;
 using ::arma::index_min;
 using ::arma::join_cols;
 using ::arma::join_rows;

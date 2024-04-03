@@ -19,40 +19,43 @@ struct CostResult {
   double value;
 };
 
-class CostFunction {
- public:
-  CostFunction(Function cost);
+struct CostFunction {
+  const Function cost;
+  const mat& data;
 
-  CostResult operator()(
-      mat data,
-      Nullable<colvec> theta,
-      double lambda,  // UNUSED
-      bool cv,  // UNUSED
-      Nullable<colvec> start  // UNUSED
-  );
-
- private:
-  Function cost;
+  CostFunction(const Function& cost, const mat& data);
+  CostResult operator() (
+      const unsigned int segment_start,
+      const unsigned int segment_end,
+      const Nullable<colvec>& theta,
+      const double lambda,  // UNUSED
+      const bool cv,  // UNUSED
+      const Nullable<colvec>& start  // UNUSED
+  ) const;
 };
 
-class CostGradient {
- public:
-  CostGradient(Function cost_gradient);
+struct CostGradient {
+  const Function cost_gradient;
+  const mat& data;
 
-  colvec operator()(mat data, colvec theta);
-
- private:
-  Function cost_gradient;
+  CostGradient(const Function& cost_gradient, const mat& data);
+  const colvec operator() (
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  ) const;
 };
 
-class CostHessian {
- public:
-  CostHessian(Function cost_hessian);
+struct CostHessian {
+  const Function cost_hessian;
+  const mat& data;
 
-  mat operator()(mat data, colvec theta);
-
- private:
-  Function cost_hessian;
+  CostHessian(const Function& cost_hessian, const mat& data);
+  const mat operator() (
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  ) const;
 };
 
 class Fastcpd {
@@ -93,7 +96,11 @@ class Fastcpd {
   // @param order Order of the time series models.
   //
   // @return Gradient at the current data.
-  colvec cost_update_gradient(mat data, colvec theta);
+  colvec cost_update_gradient(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
 
   // Function to calculate the Hessian matrix at the current data.
   //
@@ -101,7 +108,11 @@ class Fastcpd {
   // @param theta Estimated theta from the previous iteration.
   //
   // @return Hessian at the current data.
-  mat cost_update_hessian(mat data, colvec theta);
+  mat cost_update_hessian(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
 
   // Set \code{theta_sum} for a specific column.
   void create_theta_sum(const unsigned int col, colvec new_theta_sum);
@@ -110,14 +121,16 @@ class Fastcpd {
   mat get_theta_sum();
 
   CostResult get_nll_wo_theta(
-      const mat& data_segment,
+      const unsigned int segment_start,
+      const unsigned int segment_end,
       double lambda,
       bool cv,
       Nullable<colvec> start
   );
 
   double get_nll_wo_cv(
-      mat data,
+      const unsigned int segment_start,
+      const unsigned int segment_end,
       colvec theta,
       double lambda
   );
@@ -143,10 +156,11 @@ class Fastcpd {
   // Cost function. If the cost function is provided in R, this will be a
   // wrapper of the R function.
   function<CostResult(
-      const mat& data,
+      const unsigned int segment_start,
+      const unsigned int segment_end,
       Nullable<colvec> theta,
-      double lambda,
-      bool cv,
+      const double lambda,
+      const bool cv,
       Nullable<colvec> start
   )> cost_function_wrapper;
 
@@ -155,14 +169,22 @@ class Fastcpd {
 
   // Gradient of the cost function. If the cost function is provided in R, this
   // will be a wrapper of the R function.
-  function<colvec(mat data, colvec theta)> cost_gradient_wrapper;
+  function<colvec(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  )> cost_gradient_wrapper;
 
   // `cost_hessian` is the Hessian of the cost function to be used.
   Nullable<Function> cost_hessian;
 
   // Hessian of the cost function. If the cost function is provided in R, this
   // will be a wrapper of the R function.
-  function<mat(mat data, colvec theta)> cost_hessian_wrapper;
+  function<mat(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  )> cost_hessian_wrapper;
 
   const bool cp_only;
 
@@ -200,7 +222,7 @@ class Fastcpd {
   const colvec order;
 
   // `p` is the number of parameters to be estimated.
-  const int p;
+  const unsigned int p;
 
   // Number of response variables in regression.
   const unsigned int p_response;
@@ -250,10 +272,6 @@ class Fastcpd {
   // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   void create_gradients();
 
-  // Segment the whole data set evenly based on the number of segments
-  // specified in the `segment_count` parameter.
-  void create_segment_indices();
-
   // Initialize theta_hat_t_t to be the estimate in the segment.
   void create_segment_statistics();
 
@@ -273,10 +291,11 @@ class Fastcpd {
   // @return Negative log likelihood of the corresponding data with the given
   //   family.
   CostResult get_cost_result(
-      const mat& data_segment,
+      const unsigned int segment_start,
+      const unsigned int segment_end,
       Nullable<colvec> theta,
-      double lambda,
-      bool cv = false,
+      const double lambda,
+      const bool cv = false,
       Nullable<colvec> start = R_NilValue
   );
 
@@ -290,56 +309,60 @@ class Fastcpd {
   );
 
   double get_cval_pelt(
-    const mat& data_segment,
+    const unsigned int segment_start,
+    const unsigned int segment_end,
     const unsigned int i,
-    const int t,
-    const int tau,
     const double lambda
   );
 
   double get_cval_sen(
-    const mat& data_segment,
+    const unsigned int segment_start,
+    const unsigned int segment_end,
     const unsigned int i,
-    const int t,
-    const int tau,
     const double lambda
   );
 
   CostResult get_nll_arma(
-    const mat& data,
-    const colvec& order
+    const unsigned int segment_start,
+    const unsigned int segment_end
   );
 
   CostResult get_nll_glm(
-    const mat& data,
-    Nullable<colvec> start,
-    const std::string& family
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    Nullable<colvec> start
   );
 
-  CostResult get_nll_lasso_cv(const mat& data);
+  CostResult get_nll_lasso_cv(
+    const unsigned int segment_start,
+    const unsigned int segment_end
+  );
 
   CostResult get_nll_lasso_wo_cv(
-    const mat& data,
+    const unsigned int segment_start,
+    const unsigned int segment_end,
     const double lambda
   );
 
   CostResult get_nll_mean(
-    const mat& data,
-    const mat& variance_estimate
+    const unsigned int segment_start,
+    const unsigned int segment_end
   );
 
   CostResult get_nll_meanvariance(
-    const mat& data,
-    const double epsilon
+    const unsigned int segment_start,
+    const unsigned int segment_end
   );
 
   CostResult get_nll_mgaussian(
-    const mat& data,
-    const unsigned int p_response,
-    const mat& variance_estimate
+    const unsigned int segment_start,
+    const unsigned int segment_end
   );
 
-  CostResult get_nll_variance(const mat& data);
+  CostResult get_nll_variance(
+    const unsigned int segment_start,
+    const unsigned int segment_end
+  );
 
   // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   //
@@ -347,7 +370,10 @@ class Fastcpd {
   //
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   and \code{hessian}.
-  CostResult get_optimized_cost(const mat& data_segment);
+  CostResult get_optimized_cost(
+    const unsigned int segment_start,
+    const unsigned int segment_end
+  );
 
   void update_cost_parameters(
       const unsigned int t,
@@ -359,7 +385,8 @@ class Fastcpd {
   );
 
   void update_cost_parameters_step(
-    const mat& data,
+    const unsigned int segment_start,
+    const unsigned int segment_end,
     const int i,
     const int tau,
     const int j,
@@ -383,7 +410,8 @@ class Fastcpd {
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   \code{hessian}, and \code{momentum}.
   List update_cost_parameters_steps(
-    const mat& data,
+    const unsigned int segment_start,
+    const unsigned int segment_end,
     const int tau,
     const int i,
     Function k,
