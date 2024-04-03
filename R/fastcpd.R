@@ -356,7 +356,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   } else if (fastcpd_family == "variance") {
     data_ <- data_ - colMeans(data_)
     data_ <- apply(data_, 1, tcrossprod)
-    if (p == 1) {
+    if (ncol(data) == 1) {
       data_ <- matrix(data_)
     } else {
       data_ <- t(data_)
