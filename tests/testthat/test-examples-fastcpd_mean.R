@@ -3,6 +3,6 @@ testthat::test_that(
     testthat::skip_if_not_installed("mvtnorm")
 
     source("examples/fastcpd_mean.R")
-    testthat::expect_equal(result@cp_set, c(300, 701))
+    testthat::expect_equal(result@cp_set, c(300, 700))
   }
 )
