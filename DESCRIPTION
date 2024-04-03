@@ -64,6 +64,7 @@ LinkingTo:
     progress,
     Rcpp,
     RcppArmadillo,
+    RcppClock,
     testthat
 VignetteBuilder:
     knitr

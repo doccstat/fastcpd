@@ -1,6 +1,7 @@
 #include "fastcpd_classes.h"
 #include "fastcpd_constants.h"
 #include "fastcpd_functions.h"
+#include "RcppClock.h"
 #include "RProgress.h"
 
 using ::fastcpd::functions::negative_log_likelihood_arma;
@@ -32,6 +33,7 @@ Fastcpd::Fastcpd(
     const int p,
     const unsigned int p_response,
     const double pruning_coef,
+    const bool r_clock,
     const bool r_progress,
     const int segment_count,
     const double trim,
@@ -56,6 +58,7 @@ Fastcpd::Fastcpd(
     p(p),
     p_response(p_response),
     pruning_coef(pruning_coef),
+    r_clock(r_clock),
     r_progress(r_progress),
     segment_count(segment_count),
     trim(trim),
@@ -73,6 +76,7 @@ Fastcpd::Fastcpd(
   theta_sum = mat(p, 1);
   hessian = cube(p, p, 1);
   momentum = vec(p);
+  zero_data = join_cols(zeros<rowvec>(data.n_cols), data);
 
   create_cost_function_wrapper(cost);
   create_cost_gradient_wrapper(cost_gradient);
@@ -363,6 +367,7 @@ List Fastcpd::run() {
   fvec(0) = -beta;
   DEBUG_RCOUT(fvec(0));
 
+  Rcpp::Clock clock;
   RProgress::RProgress rProgress("[:bar] :current/:total in :elapsed", n);
 
   if (r_progress) {
@@ -392,9 +397,16 @@ List Fastcpd::run() {
     // Number of cost values is the same as the number of elements in R_t.
     colvec cval = zeros<vec>(r_t_count);
 
+    if (r_clock) {
+      clock.tick("r_t_set_for_loop");
+    }
     // For tau in R_t \ {t-1}.
     for (unsigned int i = 1; i < r_t_count; i++) {
       cval(i - 1) = get_cval_for_r_t_set(r_t_set, i, t, lambda);
+    }
+    if (r_clock) {
+      clock.tock("r_t_set_for_loop");
+      clock.tick("pruning");
     }
 
     DEBUG_RCOUT(cval);
@@ -420,7 +432,6 @@ List Fastcpd::run() {
     if (pruned_left.n_elem) {
       r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
     }
-    DEBUG_RCOUT(pruned_r_t_set);
     r_t_set(pruned_left.n_elem) = t;
     DEBUG_RCOUT(r_t_set);
 
@@ -438,6 +449,13 @@ List Fastcpd::run() {
     if (r_progress) {
       rProgress.tick();
     }
+    if (r_clock) {
+      clock.tock("pruning");
+    }
+  }
+
+  if (r_clock) {
+    clock.stop("fastcpd_profiler");
   }
 
   return get_cp_set(cp_sets[n], lambda);
