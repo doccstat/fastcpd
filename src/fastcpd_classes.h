@@ -75,6 +75,7 @@ class Fastcpd {
     const int p,
     const unsigned int p_response,
     const double pruning_coef,
+    const bool r_clock,
     const bool r_progress,
     const int segment_count,
     const double trim,
@@ -359,6 +360,7 @@ class Fastcpd {
 
   const double pruning_coef;
 
+  const bool r_clock;
   const bool r_progress;
 
   // `segment_count` is the number of segments for initial guess.
@@ -391,6 +393,8 @@ class Fastcpd {
   const mat variance_estimate;
 
   const bool warm_start;
+
+  mat zero_data;
 };
 
 }  // namespace fastcpd::classes
