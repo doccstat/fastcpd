@@ -148,7 +148,7 @@ class Fastcpd {
   double get_cost_adjustment_value(const unsigned nrows);
 
   double get_cval_for_r_t_set(
-    const ucolvec r_t_set,
+    const int tau,
     const unsigned int i,
     const int t,
     double lambda
