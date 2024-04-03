@@ -262,13 +262,12 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
 }
 
 double Fastcpd::get_cval_for_r_t_set(
-  const ucolvec r_t_set,
+  const int tau,
   const unsigned int i,
   const int t,
   double lambda
 ) {
   DEBUG_RCOUT(i);
-  int tau = r_t_set(i - 1);
   if (family == "lasso") {
     // Mean of `err_sd` only works if error sd is unchanged.
     lambda = mean(err_sd) * sqrt(2 * std::log(p) / (t - tau));
