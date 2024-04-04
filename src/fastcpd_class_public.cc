@@ -491,7 +491,7 @@ List Fastcpd::run() {
     rProgress.tick();
   }
 
-  for (int t = 2; t <= data_n_rows; t++) {
+  for (unsigned int t = 2; t <= data_n_rows; t++) {
     DEBUG_RCOUT(t);
     DEBUG_RCOUT(r_t_count);
 
