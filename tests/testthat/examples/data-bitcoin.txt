@@ -17,7 +17,7 @@ ggplot2::ggplot(
   ),
   ggplot2::aes(x = x, y = y)
 ) +
-  ggplot2::geom_line(color = "blue") +
+  ggplot2::geom_line(color = "steelblue") +
   ggplot2::geom_vline(
     xintercept = cp_dates,
     color = "red",
@@ -34,7 +34,7 @@ ggplot2::ggplot(
     x = cp_dates,
     y = 2000,
     label = as.character(cp_dates),
-    color = "blue"
+    color = "steelblue"
   ) +
   ggplot2::theme_bw()
 }
