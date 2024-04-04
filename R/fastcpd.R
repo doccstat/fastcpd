@@ -362,6 +362,14 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       data_ <- t(data_)
     }
     data_ <- apply(data_, 2, cumsum)
+  } else if (fastcpd_family == "meanvariance") {
+    data2 <- apply(data_, 1, tcrossprod)
+    if (ncol(data) == 1) {
+      data2 <- matrix(data2)
+    } else {
+      data2 <- t(data2)
+    }
+    data_ <- apply(cbind(data_, data2), 2, cumsum)
   }
 
   result <- fastcpd_impl(

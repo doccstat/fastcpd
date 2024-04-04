@@ -40,6 +40,25 @@ result <- fastcpd.variance(
   )
 )
 summary(result)
+\donttest{
+set.seed(1)
+data <- c(rnorm(3000, 0, 1), rnorm(3000, 0, 2), rnorm(3000, 0, 1))
+(result_time <- system.time(
+  result <- fastcpd.variance(data, r.progress = FALSE, cp_only = TRUE)
+))
+result@cp_set
+}
+\donttest{
+set.seed(1)
+data <- c(rnorm(3000, 0, 1), rnorm(3000, 0, 2), rnorm(3000, 0, 1))
+(result_time <- system.time(
+  result <- fastcpd.variance(
+    data, beta = "BIC", cost_adjustment = "BIC",
+    r.progress = FALSE, cp_only = TRUE
+  )
+))
+result@cp_set
+}
 }
 \seealso{
 \code{\link[=fastcpd]{fastcpd()}}

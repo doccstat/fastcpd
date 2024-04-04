@@ -229,7 +229,7 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
     // Residual is only calculated for built-in families.
     if (
       contain(FASTCPD_FAMILIES, family) &&
-      !(family == "mean" || family == "variance")
+      !(family == "mean" || family == "variance" || family == "meanvariance")
     ) {
       mat cost_optim_residual = cost_result.residuals;
       residual.rows(
@@ -517,24 +517,26 @@ CostResult Fastcpd::get_nll_meanvariance(
   const unsigned int segment_start,
   const unsigned int segment_end
 ) {
+  const rowvec data_diff =
+    zero_data.row(segment_end + 1) - zero_data.row(segment_start);
+  const unsigned int d = (unsigned int) sqrt(zero_data.n_cols);
+  const unsigned int p = zero_data.n_cols;
   const unsigned int segment_length = segment_end - segment_start + 1;
-  const mat data_segment = data.rows(segment_start, segment_end);
-  const unsigned int p = data_segment.n_cols;
-  mat covariance = cov(data_segment);
 
-  double value = segment_length * p * (std::log(2.0 * M_PI) + 1) / 2.0;
-  if (segment_length >= p) {
-    value += segment_length *
-      log_det_sympd(covariance + epsilon * eye<mat>(p, p)) / 2.0;
+  double det_value = det((
+    reshape(data_diff.subvec(d, p - 1), d, d) - (
+      data_diff.subvec(0, d - 1)).t() * (data_diff.subvec(0, d - 1)
+    ) / segment_length
+  ) / segment_length);
+  if (det_value <= 0) {
+    det_value = 1e-10;
   }
 
-  colvec par = zeros(p * p + p);
-  par.rows(0, p - 1) = mean(data_segment, 0).t();
-  par.rows(p, par.n_rows - 1) =
-    covariance.reshape(p * p, 1);
-  mat residuals = data_segment.each_row() - par.rows(0, p - 1).t();
-
-  return {{par}, {residuals}, value};
+  return {
+    {zeros<colvec>(p)},
+    {mat()},
+    (d * std::log(2.0 * M_PI) + d + log(det_value)) * (segment_length) / 2.0
+  };
 }
 
 CostResult Fastcpd::get_nll_mgaussian(

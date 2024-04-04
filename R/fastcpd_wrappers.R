@@ -452,6 +452,8 @@ fastcpd.var <- fastcpd_var  # nolint: Conventional R function style
 #' observation and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_variance_1.R
 #' @example tests/testthat/examples/fastcpd_variance_2.R
+#' @example tests/testthat/examples/fastcpd_variance-time_1.txt
+#' @example tests/testthat/examples/fastcpd_variance-time_2.txt
 #' @seealso [fastcpd()]
 #'
 #' @md
