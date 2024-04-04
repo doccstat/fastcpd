@@ -280,7 +280,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   # Check the parameters passed in the ellipsis.
   include_mean <- TRUE
-  p_response <- get_p_response(family, y, data)
+  p_response <- get_p_response(family, y, data_)
   r_progress <- TRUE
   r_clock <- FALSE
   if (methods::hasArg("include.mean")) {
@@ -298,30 +298,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   p <- get_p(data_, family, p_response, order, include_mean)
 
-  if (family == "ar") {
-    y <- data_[p + seq_len(nrow(data_) - p), ]
-    x <- matrix(NA, nrow(data_) - p, p)
-    for (p_i in seq_len(p)) {
-      x[, p_i] <- data_[(p - p_i) + seq_len(nrow(data_) - p), ]
-    }
-    data_ <- cbind(y, x)
-  } else if (family == "var") {
-    y <- data_[order + seq_len(nrow(data_) - order), ]
-    x <- matrix(NA, nrow(data_) - order, order * ncol(data_))
-    for (p_i in seq_len(order)) {
-      x[, (p_i - 1) * ncol(data_) + seq_len(ncol(data_))] <-
-        data_[(order - p_i) + seq_len(nrow(data_) - order), ]
-    }
-    data_ <- cbind(y, x)
-  } else if (family == "garch") {
-    cost <- function(data) {
-      tryCatch(
-        expr = tseries::garch(data, order, trace = FALSE)$n.likeli,
-        error = function(e) 0
-      )
-    }
-  }
-
+  # Define the cost functions for ARIMA and GARCH models.
   if (family == "arima") {
     cost <- function(data) {
       tryCatch(
@@ -331,13 +308,38 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         error = function(e) 0
       )
     }
+  } else if (family == "garch") {
+    cost <- function(data) {
+      tryCatch(
+        expr = tseries::garch(data, order, trace = FALSE)$n.likeli,
+        error = function(e) 0
+      )
+    }
   }
 
+  # Get dimension of the data.
+  d <- get_d(data_, family)
+
+  # Estimate the variance / covariance matrix and pre-process the data for
+  # mean, variance, meanvariance, ar and var models.
+  sigma_data <- get_sigma_data(data_, family, order, p, p_response)
+  sigma_ <- sigma_data$sigma
+  data_ <- sigma_data$data
+
+  # Assign families as "gaussian" for "lm" and "ar" or "mgaussian" for
+  # "mlm" and "var".
   fastcpd_family <- get_fastcpd_family(family, p_response)
-  sigma_ <- get_variance_estimation(data_, family, p_response)
+
+  # Use vanilla PELT for
+  # "mean", "variance", "meanvariance", "arima", "garch", "mgaussian".
   vanilla_percentage <-
     get_vanilla_percentage(vanilla_percentage, cost, fastcpd_family)
+
+  # Adjust the penalty for "lm".
   beta <- get_beta(beta, p, nrow(data_), fastcpd_family, sigma_)
+
+  # No pruning for "lasso" and "mgaussian". Adjust the pruning coefficient for
+  # "MBIC" and "MDL".
   pruning_coef <- get_pruning_coef(
     methods::hasArg("pruning_coef"),
     pruning_coef,
@@ -347,32 +349,8 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     p
   )
 
-  if (fastcpd_family == "mean") {
-    sigma_inv <- solve(sigma_)
-    chol_upper <- chol(sigma_inv)
-    data1 <- tcrossprod(data_, chol_upper)
-    data_ <- apply(cbind(data1, rowSums(data1^2)), 2, cumsum)
-  } else if (fastcpd_family == "variance") {
-    data_ <- data_ - colMeans(data_)
-    data_ <- apply(data_, 1, tcrossprod)
-    if (ncol(data) == 1) {
-      data_ <- matrix(data_)
-    } else {
-      data_ <- t(data_)
-    }
-    data_ <- apply(data_, 2, cumsum)
-  } else if (fastcpd_family == "meanvariance") {
-    data2 <- apply(data_, 1, tcrossprod)
-    if (ncol(data) == 1) {
-      data2 <- matrix(data2)
-    } else {
-      data2 <- t(data2)
-    }
-    data_ <- apply(cbind(data_, data2), 2, cumsum)
-  }
-
   result <- fastcpd_impl(
-    data_, beta, cost_adjustment, segment_count, trim, momentum_coef,
+    data_, beta, cost_adjustment,  d, segment_count, trim, momentum_coef,
     multiple_epochs, fastcpd_family, epsilon, p, order, cost, cost_gradient,
     cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper,
     line_search, sigma_, p_response, pruning_coef, r_clock, r_progress
