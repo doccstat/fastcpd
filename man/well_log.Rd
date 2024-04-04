@@ -6,7 +6,7 @@
 \title{Well-log Dataset from Numerical Bayesian Methods Applied to
 Signal Processing}
 \format{
-A Time-Series of length 3989.
+A Time-Series of length 4050.
 }
 \source{
 <https://github.com/alan-turing-institute/TCPD>
@@ -17,10 +17,10 @@ well_log
 \description{
 This is the well-known well-log dataset used in many changepoint
 papers obtained from Alan Turing Institute GitHub repository and licensed
-under the MIT license. Outliers with value less or equal to 1e5 are removed.
+under the MIT license.
 }
 \examples{
-result <- fastcpd.mean(well_log, trim = 0.003)
+result <- fastcpd.mean(well_log, trim = 0.001)
 summary(result)
 plot(result)
 \donttest{
