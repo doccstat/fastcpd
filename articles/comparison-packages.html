@@ -789,7 +789,9 @@ un-retrievable change points.</p>
 <h2 id="detection-comparison-using-well_log">Detection comparison using <code>well_log</code><a class="anchor" aria-label="anchor" href="#detection-comparison-using-well_log"></a>
 </h2>
 <div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">well_log</span> <span class="op">&lt;-</span> <span class="va">well_log</span><span class="op">[</span><span class="va">well_log</span> <span class="op">&gt;</span> <span class="fl">1e5</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  fastcpd <span class="op">=</span> <span class="fu"><a href="../reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">well_log</span>, trim <span class="op">=</span> <span class="fl">0.003</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span>,</span>
 <span>  changepoint <span class="op">=</span> <span class="fu">changepoint</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/changepoint/man/cpt.mean.html" class="external-link">cpt.mean</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">@</span><span class="va">cpts</span>,</span>
 <span>  CptNonPar <span class="op">=</span></span>
@@ -1420,147 +1422,149 @@ un-retrievable change points.</p>
 <span id="cb76-453"><a href="#cb76-453" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">500</span>))</span>
 <span id="cb76-454"><a href="#cb76-454" tabindex="-1"></a>(VARDetect_result <span class="ot">&lt;-</span> VARDetect<span class="sc">::</span><span class="fu">tbss</span>(var_data)<span class="sc">$</span>cp)</span>
 <span id="cb76-455"><a href="#cb76-455" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(VARDetect_result, <span class="fu">c</span>(<span class="dv">501</span>))</span>
-<span id="cb76-456"><a href="#cb76-456" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb76-457"><a href="#cb76-457" tabindex="-1"></a>  <span class="at">fastcpd =</span> <span class="fu">fastcpd.mean</span>(well_log, <span class="at">trim =</span> <span class="fl">0.003</span>)<span class="sc">@</span>cp_set,</span>
-<span id="cb76-458"><a href="#cb76-458" tabindex="-1"></a>  <span class="at">changepoint =</span> changepoint<span class="sc">::</span><span class="fu">cpt.mean</span>(well_log)<span class="sc">@</span>cpts,</span>
-<span id="cb76-459"><a href="#cb76-459" tabindex="-1"></a>  <span class="at">CptNonPar =</span></span>
-<span id="cb76-460"><a href="#cb76-460" tabindex="-1"></a>    CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(well_log, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(well_log) <span class="sc">/</span> <span class="dv">6</span>))<span class="sc">$</span>cpts,</span>
-<span id="cb76-461"><a href="#cb76-461" tabindex="-1"></a>  <span class="at">strucchange =</span> strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(</span>
-<span id="cb76-462"><a href="#cb76-462" tabindex="-1"></a>    y <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> well_log)</span>
-<span id="cb76-463"><a href="#cb76-463" tabindex="-1"></a>  )<span class="sc">$</span>breakpoints,</span>
-<span id="cb76-464"><a href="#cb76-464" tabindex="-1"></a>  <span class="at">ecp =</span> ecp<span class="sc">::</span><span class="fu">e.divisive</span>(<span class="fu">matrix</span>(well_log))<span class="sc">$</span>estimates,</span>
-<span id="cb76-465"><a href="#cb76-465" tabindex="-1"></a>  <span class="at">breakfast =</span> breakfast<span class="sc">::</span><span class="fu">breakfast</span>(well_log)<span class="sc">$</span>cptmodel.list[[<span class="dv">6</span>]]<span class="sc">$</span>cpts,</span>
-<span id="cb76-466"><a href="#cb76-466" tabindex="-1"></a>  <span class="at">wbs =</span> wbs<span class="sc">::</span><span class="fu">wbs</span>(well_log)<span class="sc">$</span>cpt<span class="sc">$</span>cpt.ic<span class="sc">$</span>mbic.penalty,</span>
-<span id="cb76-467"><a href="#cb76-467" tabindex="-1"></a>  <span class="at">mosum =</span> mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(well_log), <span class="at">G =</span> <span class="dv">40</span>)<span class="sc">$</span>cpts.info<span class="sc">$</span>cpts,</span>
-<span id="cb76-468"><a href="#cb76-468" tabindex="-1"></a>  <span class="at">fpop =</span> fpop<span class="sc">::</span><span class="fu">Fpop</span>(well_log, <span class="fu">length</span>(well_log))<span class="sc">$</span>t.est,  <span class="co"># meaningless</span></span>
-<span id="cb76-469"><a href="#cb76-469" tabindex="-1"></a>  <span class="at">gfpop =</span> gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
-<span id="cb76-470"><a href="#cb76-470" tabindex="-1"></a>    <span class="at">data =</span> well_log,</span>
-<span id="cb76-471"><a href="#cb76-471" tabindex="-1"></a>    <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
-<span id="cb76-472"><a href="#cb76-472" tabindex="-1"></a>      <span class="at">penalty =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">length</span>(well_log)) <span class="sc">*</span> gfpop<span class="sc">::</span><span class="fu">sdDiff</span>(well_log) <span class="sc">^</span> <span class="dv">2</span>,</span>
-<span id="cb76-473"><a href="#cb76-473" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">"updown"</span></span>
-<span id="cb76-474"><a href="#cb76-474" tabindex="-1"></a>    ),</span>
-<span id="cb76-475"><a href="#cb76-475" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"mean"</span></span>
-<span id="cb76-476"><a href="#cb76-476" tabindex="-1"></a>  )<span class="sc">$</span>changepoints,</span>
-<span id="cb76-477"><a href="#cb76-477" tabindex="-1"></a>  <span class="at">InspectChangepoint =</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
-<span id="cb76-478"><a href="#cb76-478" tabindex="-1"></a>    well_log,</span>
-<span id="cb76-479"><a href="#cb76-479" tabindex="-1"></a>    <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(<span class="fu">length</span>(well_log), <span class="dv">1</span>)</span>
-<span id="cb76-480"><a href="#cb76-480" tabindex="-1"></a>  )<span class="sc">$</span>changepoints[, <span class="st">"location"</span>],</span>
-<span id="cb76-481"><a href="#cb76-481" tabindex="-1"></a>  <span class="at">jointseg =</span> jointseg<span class="sc">::</span><span class="fu">jointSeg</span>(well_log, <span class="at">K =</span> <span class="dv">12</span>)<span class="sc">$</span>bestBkp,</span>
-<span id="cb76-482"><a href="#cb76-482" tabindex="-1"></a>  <span class="at">Rbeast =</span> Rbeast<span class="sc">::</span><span class="fu">beast</span>(</span>
-<span id="cb76-483"><a href="#cb76-483" tabindex="-1"></a>    well_log, <span class="at">season =</span> <span class="st">"none"</span>, <span class="at">print.progress =</span> <span class="cn">FALSE</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
-<span id="cb76-484"><a href="#cb76-484" tabindex="-1"></a>  )<span class="sc">$</span>trend<span class="sc">$</span>cp,</span>
-<span id="cb76-485"><a href="#cb76-485" tabindex="-1"></a>  <span class="at">stepR =</span> stepR<span class="sc">::</span><span class="fu">stepFit</span>(well_log, <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">$</span>rightEnd</span>
-<span id="cb76-486"><a href="#cb76-486" tabindex="-1"></a>)</span>
-<span id="cb76-487"><a href="#cb76-487" tabindex="-1"></a></span>
-<span id="cb76-488"><a href="#cb76-488" tabindex="-1"></a>package_list <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">names</span>(result), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb76-489"><a href="#cb76-489" tabindex="-1"></a>comparison_table <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb76-490"><a href="#cb76-490" tabindex="-1"></a><span class="cf">for</span> (package_index <span class="cf">in</span> <span class="fu">seq_along</span>(package_list)) {</span>
-<span id="cb76-491"><a href="#cb76-491" tabindex="-1"></a>  package <span class="ot">&lt;-</span> package_list[[package_index]]</span>
-<span id="cb76-492"><a href="#cb76-492" tabindex="-1"></a>  comparison_table <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
-<span id="cb76-493"><a href="#cb76-493" tabindex="-1"></a>    comparison_table,</span>
-<span id="cb76-494"><a href="#cb76-494" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
-<span id="cb76-495"><a href="#cb76-495" tabindex="-1"></a>      <span class="at">change_point =</span> result[[package]],</span>
-<span id="cb76-496"><a href="#cb76-496" tabindex="-1"></a>      <span class="at">package =</span> package,</span>
-<span id="cb76-497"><a href="#cb76-497" tabindex="-1"></a>      <span class="at">y_offset =</span> (package_index <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">400</span></span>
-<span id="cb76-498"><a href="#cb76-498" tabindex="-1"></a>    )</span>
-<span id="cb76-499"><a href="#cb76-499" tabindex="-1"></a>  )</span>
-<span id="cb76-500"><a href="#cb76-500" tabindex="-1"></a>}</span>
-<span id="cb76-501"><a href="#cb76-501" tabindex="-1"></a></span>
-<span id="cb76-502"><a href="#cb76-502" tabindex="-1"></a>most_selected <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">table</span>(comparison_table<span class="sc">$</span>change_point), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb76-503"><a href="#cb76-503" tabindex="-1"></a>most_selected <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">as.numeric</span>(<span class="fu">names</span>(most_selected[most_selected <span class="sc">&gt;=</span> <span class="dv">4</span>])))</span>
-<span id="cb76-504"><a href="#cb76-504" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">length</span>(most_selected) <span class="sc">-</span> <span class="dv">1</span>)) {</span>
-<span id="cb76-505"><a href="#cb76-505" tabindex="-1"></a>  <span class="cf">if</span> (most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">-</span> most_selected[i] <span class="sc">&lt;</span> <span class="dv">2</span>) {</span>
-<span id="cb76-506"><a href="#cb76-506" tabindex="-1"></a>    most_selected[i] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb76-507"><a href="#cb76-507" tabindex="-1"></a>    most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">-</span> <span class="fl">0.5</span></span>
-<span id="cb76-508"><a href="#cb76-508" tabindex="-1"></a>  }</span>
-<span id="cb76-509"><a href="#cb76-509" tabindex="-1"></a>}</span>
-<span id="cb76-510"><a href="#cb76-510" tabindex="-1"></a>(most_selected <span class="ot">&lt;-</span> most_selected[<span class="sc">!</span><span class="fu">is.na</span>(most_selected)])</span>
-<span id="cb76-511"><a href="#cb76-511" tabindex="-1"></a><span class="co">#&gt;  [1]    6.0  314.0  434.0  704.0  776.0 1021.0 1057.0 1347.0 1405.0 1502.0 1661.0 1842.0 2023.0 2202.0</span></span>
-<span id="cb76-512"><a href="#cb76-512" tabindex="-1"></a><span class="co">#&gt; [15] 2384.5 2445.0 2507.0 2567.5 2738.0 2921.0 3094.0 3251.0 3464.0 3499.0 3622.0 3709.0 3820.0 3976.0</span></span>
-<span id="cb76-513"><a href="#cb76-513" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb76-514"><a href="#cb76-514" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(</span>
-<span id="cb76-515"><a href="#cb76-515" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">seq_along</span>(well_log), <span class="at">y =</span> <span class="fu">c</span>(well_log)),</span>
-<span id="cb76-516"><a href="#cb76-516" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
-<span id="cb76-517"><a href="#cb76-517" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-518"><a href="#cb76-518" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_vline</span>(</span>
-<span id="cb76-519"><a href="#cb76-519" tabindex="-1"></a>    <span class="at">xintercept =</span> most_selected,</span>
-<span id="cb76-520"><a href="#cb76-520" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span>,</span>
-<span id="cb76-521"><a href="#cb76-521" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
-<span id="cb76-522"><a href="#cb76-522" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span></span>
-<span id="cb76-523"><a href="#cb76-523" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-524"><a href="#cb76-524" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(</span>
-<span id="cb76-525"><a href="#cb76-525" tabindex="-1"></a>    <span class="at">data =</span> comparison_table,</span>
-<span id="cb76-526"><a href="#cb76-526" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> change_point, <span class="at">y =</span> <span class="dv">95000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
-<span id="cb76-527"><a href="#cb76-527" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">17</span>,</span>
-<span id="cb76-528"><a href="#cb76-528" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">1.75</span></span>
-<span id="cb76-529"><a href="#cb76-529" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-530"><a href="#cb76-530" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(</span>
-<span id="cb76-531"><a href="#cb76-531" tabindex="-1"></a>    <span class="at">data =</span> comparison_table,</span>
-<span id="cb76-532"><a href="#cb76-532" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="dv">95000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
-<span id="cb76-533"><a href="#cb76-533" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
-<span id="cb76-534"><a href="#cb76-534" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.1</span></span>
-<span id="cb76-535"><a href="#cb76-535" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-536"><a href="#cb76-536" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">coord_cartesian</span>(</span>
-<span id="cb76-537"><a href="#cb76-537" tabindex="-1"></a>    <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">95000</span> <span class="sc">-</span> <span class="dv">500</span>, <span class="fu">max</span>(well_log) <span class="sc">+</span> <span class="dv">1000</span>),</span>
-<span id="cb76-538"><a href="#cb76-538" tabindex="-1"></a>    <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">200</span>, <span class="fu">length</span>(well_log) <span class="sc">+</span> <span class="dv">200</span>),</span>
-<span id="cb76-539"><a href="#cb76-539" tabindex="-1"></a>    <span class="at">expand =</span> <span class="cn">FALSE</span></span>
-<span id="cb76-540"><a href="#cb76-540" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-541"><a href="#cb76-541" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
-<span id="cb76-542"><a href="#cb76-542" tabindex="-1"></a>    <span class="at">panel.background =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
-<span id="cb76-543"><a href="#cb76-543" tabindex="-1"></a>    <span class="at">panel.border =</span> ggplot2<span class="sc">::</span><span class="fu">element_rect</span>(<span class="at">colour =</span> <span class="st">"black"</span>, <span class="at">fill =</span> <span class="cn">NA</span>),</span>
-<span id="cb76-544"><a href="#cb76-544" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
-<span id="cb76-545"><a href="#cb76-545" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>()</span>
-<span id="cb76-546"><a href="#cb76-546" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-547"><a href="#cb76-547" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">xlab</span>(<span class="cn">NULL</span>) <span class="sc">+</span> ggplot2<span class="sc">::</span><span class="fu">ylab</span>(<span class="cn">NULL</span>)</span>
-<span id="cb76-548"><a href="#cb76-548" tabindex="-1"></a>microbenchmark_result <span class="ot">&lt;-</span> microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
-<span id="cb76-549"><a href="#cb76-549" tabindex="-1"></a>  <span class="at">fastcpd =</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.mean</span>(well_log, <span class="at">trim =</span> <span class="fl">0.003</span>, <span class="at">r.progress =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb76-550"><a href="#cb76-550" tabindex="-1"></a>  <span class="at">changepoint =</span> changepoint<span class="sc">::</span><span class="fu">cpt.mean</span>(well_log, <span class="at">method =</span> <span class="st">"PELT"</span>),</span>
-<span id="cb76-551"><a href="#cb76-551" tabindex="-1"></a>  <span class="at">CptNonPar =</span> CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(well_log, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(well_log) <span class="sc">/</span> <span class="dv">6</span>)),</span>
-<span id="cb76-552"><a href="#cb76-552" tabindex="-1"></a>  <span class="at">strucchange =</span></span>
-<span id="cb76-553"><a href="#cb76-553" tabindex="-1"></a>    strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> well_log)),</span>
-<span id="cb76-554"><a href="#cb76-554" tabindex="-1"></a>  <span class="at">ecp =</span> ecp<span class="sc">::</span><span class="fu">e.divisive</span>(<span class="fu">matrix</span>(well_log)),</span>
-<span id="cb76-555"><a href="#cb76-555" tabindex="-1"></a>  <span class="at">breakfast =</span> breakfast<span class="sc">::</span><span class="fu">breakfast</span>(well_log),</span>
-<span id="cb76-556"><a href="#cb76-556" tabindex="-1"></a>  <span class="at">wbs =</span> wbs<span class="sc">::</span><span class="fu">wbs</span>(well_log),</span>
-<span id="cb76-557"><a href="#cb76-557" tabindex="-1"></a>  <span class="at">mosum =</span> mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(well_log), <span class="at">G =</span> <span class="dv">40</span>),</span>
-<span id="cb76-558"><a href="#cb76-558" tabindex="-1"></a>  <span class="at">fpop =</span> fpop<span class="sc">::</span><span class="fu">Fpop</span>(well_log, <span class="fu">nrow</span>(well_log)),</span>
-<span id="cb76-559"><a href="#cb76-559" tabindex="-1"></a>  <span class="at">gfpop =</span> gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
-<span id="cb76-560"><a href="#cb76-560" tabindex="-1"></a>    <span class="at">data =</span> well_log,</span>
-<span id="cb76-561"><a href="#cb76-561" tabindex="-1"></a>    <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
-<span id="cb76-562"><a href="#cb76-562" tabindex="-1"></a>      <span class="at">penalty =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">length</span>(well_log)) <span class="sc">*</span> gfpop<span class="sc">::</span><span class="fu">sdDiff</span>(well_log) <span class="sc">^</span> <span class="dv">2</span>,</span>
-<span id="cb76-563"><a href="#cb76-563" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">"updown"</span></span>
-<span id="cb76-564"><a href="#cb76-564" tabindex="-1"></a>    ),</span>
-<span id="cb76-565"><a href="#cb76-565" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"mean"</span></span>
-<span id="cb76-566"><a href="#cb76-566" tabindex="-1"></a>  ),</span>
-<span id="cb76-567"><a href="#cb76-567" tabindex="-1"></a>  <span class="at">InspectChangepoint =</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
-<span id="cb76-568"><a href="#cb76-568" tabindex="-1"></a>    well_log,</span>
-<span id="cb76-569"><a href="#cb76-569" tabindex="-1"></a>    <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(<span class="fu">length</span>(well_log), <span class="dv">1</span>)</span>
-<span id="cb76-570"><a href="#cb76-570" tabindex="-1"></a>  ),</span>
-<span id="cb76-571"><a href="#cb76-571" tabindex="-1"></a>  <span class="at">jointseg =</span> jointseg<span class="sc">::</span><span class="fu">jointSeg</span>(well_log, <span class="at">K =</span> <span class="dv">12</span>),</span>
-<span id="cb76-572"><a href="#cb76-572" tabindex="-1"></a>  <span class="at">Rbeast =</span> Rbeast<span class="sc">::</span><span class="fu">beast</span>(</span>
-<span id="cb76-573"><a href="#cb76-573" tabindex="-1"></a>    well_log, <span class="at">season =</span> <span class="st">"none"</span>, <span class="at">print.progress =</span> <span class="cn">FALSE</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
-<span id="cb76-574"><a href="#cb76-574" tabindex="-1"></a>  ),</span>
-<span id="cb76-575"><a href="#cb76-575" tabindex="-1"></a>  <span class="at">stepR =</span> stepR<span class="sc">::</span><span class="fu">stepFit</span>(well_log, <span class="at">alpha =</span> <span class="fl">0.5</span>),</span>
-<span id="cb76-576"><a href="#cb76-576" tabindex="-1"></a>  <span class="at">not =</span> not<span class="sc">::</span><span class="fu">not</span>(well_log, <span class="at">contrast =</span> <span class="st">"pcwsConstMean"</span>),</span>
-<span id="cb76-577"><a href="#cb76-577" tabindex="-1"></a>  <span class="at">times =</span> <span class="dv">10</span></span>
-<span id="cb76-578"><a href="#cb76-578" tabindex="-1"></a>)</span>
-<span id="cb76-579"><a href="#cb76-579" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb76-580"><a href="#cb76-580" tabindex="-1"></a><span class="co">#&gt;                expr          min           lq         mean       median           uq          max neval</span></span>
-<span id="cb76-581"><a href="#cb76-581" tabindex="-1"></a><span class="co">#&gt;             fastcpd 8.411284e+01 8.692226e+01 1.011440e+02 1.044509e+02 1.089672e+02    118.05842    10</span></span>
-<span id="cb76-582"><a href="#cb76-582" tabindex="-1"></a><span class="co">#&gt;         changepoint 3.206773e+01 3.377081e+01 6.843465e+01 3.857181e+01 5.243834e+01    244.76672    10</span></span>
-<span id="cb76-583"><a href="#cb76-583" tabindex="-1"></a><span class="co">#&gt;           CptNonPar 1.827381e+04 1.901094e+04 2.002752e+04 1.985180e+04 2.076803e+04  22511.59316    10</span></span>
-<span id="cb76-584"><a href="#cb76-584" tabindex="-1"></a><span class="co">#&gt;         strucchange 5.955079e+04 6.059315e+04 6.185727e+04 6.131291e+04 6.312073e+04  64638.93090    10</span></span>
-<span id="cb76-585"><a href="#cb76-585" tabindex="-1"></a><span class="co">#&gt;                 ecp 7.590543e+05 7.707573e+05 7.859080e+05 7.830752e+05 8.093015e+05 810339.52140    10</span></span>
-<span id="cb76-586"><a href="#cb76-586" tabindex="-1"></a><span class="co">#&gt;           breakfast 9.170992e+03 9.344041e+03 9.628236e+03 9.382078e+03 9.628663e+03  11073.79318    10</span></span>
-<span id="cb76-587"><a href="#cb76-587" tabindex="-1"></a><span class="co">#&gt;                 wbs 1.139078e+02 1.145472e+02 1.178167e+02 1.166746e+02 1.201676e+02    127.27064    10</span></span>
-<span id="cb76-588"><a href="#cb76-588" tabindex="-1"></a><span class="co">#&gt;               mosum 1.172847e+00 1.231747e+00 1.740727e+01 1.416854e+00 1.919586e+00    160.76997    10</span></span>
-<span id="cb76-589"><a href="#cb76-589" tabindex="-1"></a><span class="co">#&gt;                fpop 2.588228e+00 2.630407e+00 4.587742e+00 2.832556e+00 3.312986e+00     18.52067    10</span></span>
-<span id="cb76-590"><a href="#cb76-590" tabindex="-1"></a><span class="co">#&gt;               gfpop 5.971245e+01 6.072684e+01 6.533492e+01 6.172578e+01 6.839653e+01     87.89407    10</span></span>
-<span id="cb76-591"><a href="#cb76-591" tabindex="-1"></a><span class="co">#&gt;  InspectChangepoint 1.698673e+02 1.909034e+02 2.392539e+02 2.117010e+02 3.004474e+02    329.87724    10</span></span>
-<span id="cb76-592"><a href="#cb76-592" tabindex="-1"></a><span class="co">#&gt;            jointseg 2.000894e+01 2.136878e+01 2.551210e+01 2.167757e+01 2.403593e+01     47.98397    10</span></span>
-<span id="cb76-593"><a href="#cb76-593" tabindex="-1"></a><span class="co">#&gt;              Rbeast 6.533998e+02 6.625203e+02 6.783586e+02 6.792646e+02 6.875840e+02    723.45376    10</span></span>
-<span id="cb76-594"><a href="#cb76-594" tabindex="-1"></a><span class="co">#&gt;               stepR 2.793709e+01 2.902084e+01 4.380857e+01 3.068416e+01 3.227125e+01    164.81082    10</span></span>
-<span id="cb76-595"><a href="#cb76-595" tabindex="-1"></a><span class="co">#&gt;                 not 9.599763e+01 9.701856e+01 1.028601e+02 1.012292e+02 1.049974e+02    120.73529    10</span></span>
-<span id="cb76-596"><a href="#cb76-596" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">autoplot</span>(microbenchmark_result)</span></code></pre></div>
+<span id="cb76-456"><a href="#cb76-456" tabindex="-1"></a>well_log <span class="ot">&lt;-</span> well_log[well_log <span class="sc">&gt;</span> <span class="fl">1e5</span>]</span>
+<span id="cb76-457"><a href="#cb76-457" tabindex="-1"></a></span>
+<span id="cb76-458"><a href="#cb76-458" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb76-459"><a href="#cb76-459" tabindex="-1"></a>  <span class="at">fastcpd =</span> <span class="fu">fastcpd.mean</span>(well_log, <span class="at">trim =</span> <span class="fl">0.003</span>)<span class="sc">@</span>cp_set,</span>
+<span id="cb76-460"><a href="#cb76-460" tabindex="-1"></a>  <span class="at">changepoint =</span> changepoint<span class="sc">::</span><span class="fu">cpt.mean</span>(well_log)<span class="sc">@</span>cpts,</span>
+<span id="cb76-461"><a href="#cb76-461" tabindex="-1"></a>  <span class="at">CptNonPar =</span></span>
+<span id="cb76-462"><a href="#cb76-462" tabindex="-1"></a>    CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(well_log, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(well_log) <span class="sc">/</span> <span class="dv">6</span>))<span class="sc">$</span>cpts,</span>
+<span id="cb76-463"><a href="#cb76-463" tabindex="-1"></a>  <span class="at">strucchange =</span> strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(</span>
+<span id="cb76-464"><a href="#cb76-464" tabindex="-1"></a>    y <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> well_log)</span>
+<span id="cb76-465"><a href="#cb76-465" tabindex="-1"></a>  )<span class="sc">$</span>breakpoints,</span>
+<span id="cb76-466"><a href="#cb76-466" tabindex="-1"></a>  <span class="at">ecp =</span> ecp<span class="sc">::</span><span class="fu">e.divisive</span>(<span class="fu">matrix</span>(well_log))<span class="sc">$</span>estimates,</span>
+<span id="cb76-467"><a href="#cb76-467" tabindex="-1"></a>  <span class="at">breakfast =</span> breakfast<span class="sc">::</span><span class="fu">breakfast</span>(well_log)<span class="sc">$</span>cptmodel.list[[<span class="dv">6</span>]]<span class="sc">$</span>cpts,</span>
+<span id="cb76-468"><a href="#cb76-468" tabindex="-1"></a>  <span class="at">wbs =</span> wbs<span class="sc">::</span><span class="fu">wbs</span>(well_log)<span class="sc">$</span>cpt<span class="sc">$</span>cpt.ic<span class="sc">$</span>mbic.penalty,</span>
+<span id="cb76-469"><a href="#cb76-469" tabindex="-1"></a>  <span class="at">mosum =</span> mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(well_log), <span class="at">G =</span> <span class="dv">40</span>)<span class="sc">$</span>cpts.info<span class="sc">$</span>cpts,</span>
+<span id="cb76-470"><a href="#cb76-470" tabindex="-1"></a>  <span class="at">fpop =</span> fpop<span class="sc">::</span><span class="fu">Fpop</span>(well_log, <span class="fu">length</span>(well_log))<span class="sc">$</span>t.est,  <span class="co"># meaningless</span></span>
+<span id="cb76-471"><a href="#cb76-471" tabindex="-1"></a>  <span class="at">gfpop =</span> gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
+<span id="cb76-472"><a href="#cb76-472" tabindex="-1"></a>    <span class="at">data =</span> well_log,</span>
+<span id="cb76-473"><a href="#cb76-473" tabindex="-1"></a>    <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
+<span id="cb76-474"><a href="#cb76-474" tabindex="-1"></a>      <span class="at">penalty =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">length</span>(well_log)) <span class="sc">*</span> gfpop<span class="sc">::</span><span class="fu">sdDiff</span>(well_log) <span class="sc">^</span> <span class="dv">2</span>,</span>
+<span id="cb76-475"><a href="#cb76-475" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">"updown"</span></span>
+<span id="cb76-476"><a href="#cb76-476" tabindex="-1"></a>    ),</span>
+<span id="cb76-477"><a href="#cb76-477" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"mean"</span></span>
+<span id="cb76-478"><a href="#cb76-478" tabindex="-1"></a>  )<span class="sc">$</span>changepoints,</span>
+<span id="cb76-479"><a href="#cb76-479" tabindex="-1"></a>  <span class="at">InspectChangepoint =</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
+<span id="cb76-480"><a href="#cb76-480" tabindex="-1"></a>    well_log,</span>
+<span id="cb76-481"><a href="#cb76-481" tabindex="-1"></a>    <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(<span class="fu">length</span>(well_log), <span class="dv">1</span>)</span>
+<span id="cb76-482"><a href="#cb76-482" tabindex="-1"></a>  )<span class="sc">$</span>changepoints[, <span class="st">"location"</span>],</span>
+<span id="cb76-483"><a href="#cb76-483" tabindex="-1"></a>  <span class="at">jointseg =</span> jointseg<span class="sc">::</span><span class="fu">jointSeg</span>(well_log, <span class="at">K =</span> <span class="dv">12</span>)<span class="sc">$</span>bestBkp,</span>
+<span id="cb76-484"><a href="#cb76-484" tabindex="-1"></a>  <span class="at">Rbeast =</span> Rbeast<span class="sc">::</span><span class="fu">beast</span>(</span>
+<span id="cb76-485"><a href="#cb76-485" tabindex="-1"></a>    well_log, <span class="at">season =</span> <span class="st">"none"</span>, <span class="at">print.progress =</span> <span class="cn">FALSE</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb76-486"><a href="#cb76-486" tabindex="-1"></a>  )<span class="sc">$</span>trend<span class="sc">$</span>cp,</span>
+<span id="cb76-487"><a href="#cb76-487" tabindex="-1"></a>  <span class="at">stepR =</span> stepR<span class="sc">::</span><span class="fu">stepFit</span>(well_log, <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">$</span>rightEnd</span>
+<span id="cb76-488"><a href="#cb76-488" tabindex="-1"></a>)</span>
+<span id="cb76-489"><a href="#cb76-489" tabindex="-1"></a></span>
+<span id="cb76-490"><a href="#cb76-490" tabindex="-1"></a>package_list <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">names</span>(result), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb76-491"><a href="#cb76-491" tabindex="-1"></a>comparison_table <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb76-492"><a href="#cb76-492" tabindex="-1"></a><span class="cf">for</span> (package_index <span class="cf">in</span> <span class="fu">seq_along</span>(package_list)) {</span>
+<span id="cb76-493"><a href="#cb76-493" tabindex="-1"></a>  package <span class="ot">&lt;-</span> package_list[[package_index]]</span>
+<span id="cb76-494"><a href="#cb76-494" tabindex="-1"></a>  comparison_table <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb76-495"><a href="#cb76-495" tabindex="-1"></a>    comparison_table,</span>
+<span id="cb76-496"><a href="#cb76-496" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb76-497"><a href="#cb76-497" tabindex="-1"></a>      <span class="at">change_point =</span> result[[package]],</span>
+<span id="cb76-498"><a href="#cb76-498" tabindex="-1"></a>      <span class="at">package =</span> package,</span>
+<span id="cb76-499"><a href="#cb76-499" tabindex="-1"></a>      <span class="at">y_offset =</span> (package_index <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">400</span></span>
+<span id="cb76-500"><a href="#cb76-500" tabindex="-1"></a>    )</span>
+<span id="cb76-501"><a href="#cb76-501" tabindex="-1"></a>  )</span>
+<span id="cb76-502"><a href="#cb76-502" tabindex="-1"></a>}</span>
+<span id="cb76-503"><a href="#cb76-503" tabindex="-1"></a></span>
+<span id="cb76-504"><a href="#cb76-504" tabindex="-1"></a>most_selected <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">table</span>(comparison_table<span class="sc">$</span>change_point), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb76-505"><a href="#cb76-505" tabindex="-1"></a>most_selected <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">as.numeric</span>(<span class="fu">names</span>(most_selected[most_selected <span class="sc">&gt;=</span> <span class="dv">4</span>])))</span>
+<span id="cb76-506"><a href="#cb76-506" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">length</span>(most_selected) <span class="sc">-</span> <span class="dv">1</span>)) {</span>
+<span id="cb76-507"><a href="#cb76-507" tabindex="-1"></a>  <span class="cf">if</span> (most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">-</span> most_selected[i] <span class="sc">&lt;</span> <span class="dv">2</span>) {</span>
+<span id="cb76-508"><a href="#cb76-508" tabindex="-1"></a>    most_selected[i] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb76-509"><a href="#cb76-509" tabindex="-1"></a>    most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">-</span> <span class="fl">0.5</span></span>
+<span id="cb76-510"><a href="#cb76-510" tabindex="-1"></a>  }</span>
+<span id="cb76-511"><a href="#cb76-511" tabindex="-1"></a>}</span>
+<span id="cb76-512"><a href="#cb76-512" tabindex="-1"></a>(most_selected <span class="ot">&lt;-</span> most_selected[<span class="sc">!</span><span class="fu">is.na</span>(most_selected)])</span>
+<span id="cb76-513"><a href="#cb76-513" tabindex="-1"></a><span class="co">#&gt;  [1]    6.0  314.0  434.0  704.0  776.0 1021.0 1057.0 1347.0 1405.0 1502.0 1661.0 1842.0 2023.0 2202.0</span></span>
+<span id="cb76-514"><a href="#cb76-514" tabindex="-1"></a><span class="co">#&gt; [15] 2384.5 2445.0 2507.0 2567.5 2738.0 2921.0 3094.0 3251.0 3464.0 3499.0 3622.0 3709.0 3820.0 3976.0</span></span>
+<span id="cb76-515"><a href="#cb76-515" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb76-516"><a href="#cb76-516" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(</span>
+<span id="cb76-517"><a href="#cb76-517" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">seq_along</span>(well_log), <span class="at">y =</span> <span class="fu">c</span>(well_log)),</span>
+<span id="cb76-518"><a href="#cb76-518" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
+<span id="cb76-519"><a href="#cb76-519" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb76-520"><a href="#cb76-520" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_vline</span>(</span>
+<span id="cb76-521"><a href="#cb76-521" tabindex="-1"></a>    <span class="at">xintercept =</span> most_selected,</span>
+<span id="cb76-522"><a href="#cb76-522" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb76-523"><a href="#cb76-523" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
+<span id="cb76-524"><a href="#cb76-524" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span></span>
+<span id="cb76-525"><a href="#cb76-525" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb76-526"><a href="#cb76-526" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(</span>
+<span id="cb76-527"><a href="#cb76-527" tabindex="-1"></a>    <span class="at">data =</span> comparison_table,</span>
+<span id="cb76-528"><a href="#cb76-528" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> change_point, <span class="at">y =</span> <span class="dv">95000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
+<span id="cb76-529"><a href="#cb76-529" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">17</span>,</span>
+<span id="cb76-530"><a href="#cb76-530" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">1.75</span></span>
+<span id="cb76-531"><a href="#cb76-531" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb76-532"><a href="#cb76-532" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(</span>
+<span id="cb76-533"><a href="#cb76-533" tabindex="-1"></a>    <span class="at">data =</span> comparison_table,</span>
+<span id="cb76-534"><a href="#cb76-534" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="dv">95000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
+<span id="cb76-535"><a href="#cb76-535" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
+<span id="cb76-536"><a href="#cb76-536" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.1</span></span>
+<span id="cb76-537"><a href="#cb76-537" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb76-538"><a href="#cb76-538" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">coord_cartesian</span>(</span>
+<span id="cb76-539"><a href="#cb76-539" tabindex="-1"></a>    <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">95000</span> <span class="sc">-</span> <span class="dv">500</span>, <span class="fu">max</span>(well_log) <span class="sc">+</span> <span class="dv">1000</span>),</span>
+<span id="cb76-540"><a href="#cb76-540" tabindex="-1"></a>    <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">200</span>, <span class="fu">length</span>(well_log) <span class="sc">+</span> <span class="dv">200</span>),</span>
+<span id="cb76-541"><a href="#cb76-541" tabindex="-1"></a>    <span class="at">expand =</span> <span class="cn">FALSE</span></span>
+<span id="cb76-542"><a href="#cb76-542" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb76-543"><a href="#cb76-543" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
+<span id="cb76-544"><a href="#cb76-544" tabindex="-1"></a>    <span class="at">panel.background =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
+<span id="cb76-545"><a href="#cb76-545" tabindex="-1"></a>    <span class="at">panel.border =</span> ggplot2<span class="sc">::</span><span class="fu">element_rect</span>(<span class="at">colour =</span> <span class="st">"black"</span>, <span class="at">fill =</span> <span class="cn">NA</span>),</span>
+<span id="cb76-546"><a href="#cb76-546" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
+<span id="cb76-547"><a href="#cb76-547" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>()</span>
+<span id="cb76-548"><a href="#cb76-548" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb76-549"><a href="#cb76-549" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">xlab</span>(<span class="cn">NULL</span>) <span class="sc">+</span> ggplot2<span class="sc">::</span><span class="fu">ylab</span>(<span class="cn">NULL</span>)</span>
+<span id="cb76-550"><a href="#cb76-550" tabindex="-1"></a>microbenchmark_result <span class="ot">&lt;-</span> microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
+<span id="cb76-551"><a href="#cb76-551" tabindex="-1"></a>  <span class="at">fastcpd =</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.mean</span>(well_log, <span class="at">trim =</span> <span class="fl">0.003</span>, <span class="at">r.progress =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb76-552"><a href="#cb76-552" tabindex="-1"></a>  <span class="at">changepoint =</span> changepoint<span class="sc">::</span><span class="fu">cpt.mean</span>(well_log, <span class="at">method =</span> <span class="st">"PELT"</span>),</span>
+<span id="cb76-553"><a href="#cb76-553" tabindex="-1"></a>  <span class="at">CptNonPar =</span> CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(well_log, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(well_log) <span class="sc">/</span> <span class="dv">6</span>)),</span>
+<span id="cb76-554"><a href="#cb76-554" tabindex="-1"></a>  <span class="at">strucchange =</span></span>
+<span id="cb76-555"><a href="#cb76-555" tabindex="-1"></a>    strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> well_log)),</span>
+<span id="cb76-556"><a href="#cb76-556" tabindex="-1"></a>  <span class="at">ecp =</span> ecp<span class="sc">::</span><span class="fu">e.divisive</span>(<span class="fu">matrix</span>(well_log)),</span>
+<span id="cb76-557"><a href="#cb76-557" tabindex="-1"></a>  <span class="at">breakfast =</span> breakfast<span class="sc">::</span><span class="fu">breakfast</span>(well_log),</span>
+<span id="cb76-558"><a href="#cb76-558" tabindex="-1"></a>  <span class="at">wbs =</span> wbs<span class="sc">::</span><span class="fu">wbs</span>(well_log),</span>
+<span id="cb76-559"><a href="#cb76-559" tabindex="-1"></a>  <span class="at">mosum =</span> mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(well_log), <span class="at">G =</span> <span class="dv">40</span>),</span>
+<span id="cb76-560"><a href="#cb76-560" tabindex="-1"></a>  <span class="at">fpop =</span> fpop<span class="sc">::</span><span class="fu">Fpop</span>(well_log, <span class="fu">nrow</span>(well_log)),</span>
+<span id="cb76-561"><a href="#cb76-561" tabindex="-1"></a>  <span class="at">gfpop =</span> gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
+<span id="cb76-562"><a href="#cb76-562" tabindex="-1"></a>    <span class="at">data =</span> well_log,</span>
+<span id="cb76-563"><a href="#cb76-563" tabindex="-1"></a>    <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
+<span id="cb76-564"><a href="#cb76-564" tabindex="-1"></a>      <span class="at">penalty =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">length</span>(well_log)) <span class="sc">*</span> gfpop<span class="sc">::</span><span class="fu">sdDiff</span>(well_log) <span class="sc">^</span> <span class="dv">2</span>,</span>
+<span id="cb76-565"><a href="#cb76-565" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">"updown"</span></span>
+<span id="cb76-566"><a href="#cb76-566" tabindex="-1"></a>    ),</span>
+<span id="cb76-567"><a href="#cb76-567" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"mean"</span></span>
+<span id="cb76-568"><a href="#cb76-568" tabindex="-1"></a>  ),</span>
+<span id="cb76-569"><a href="#cb76-569" tabindex="-1"></a>  <span class="at">InspectChangepoint =</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
+<span id="cb76-570"><a href="#cb76-570" tabindex="-1"></a>    well_log,</span>
+<span id="cb76-571"><a href="#cb76-571" tabindex="-1"></a>    <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(<span class="fu">length</span>(well_log), <span class="dv">1</span>)</span>
+<span id="cb76-572"><a href="#cb76-572" tabindex="-1"></a>  ),</span>
+<span id="cb76-573"><a href="#cb76-573" tabindex="-1"></a>  <span class="at">jointseg =</span> jointseg<span class="sc">::</span><span class="fu">jointSeg</span>(well_log, <span class="at">K =</span> <span class="dv">12</span>),</span>
+<span id="cb76-574"><a href="#cb76-574" tabindex="-1"></a>  <span class="at">Rbeast =</span> Rbeast<span class="sc">::</span><span class="fu">beast</span>(</span>
+<span id="cb76-575"><a href="#cb76-575" tabindex="-1"></a>    well_log, <span class="at">season =</span> <span class="st">"none"</span>, <span class="at">print.progress =</span> <span class="cn">FALSE</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb76-576"><a href="#cb76-576" tabindex="-1"></a>  ),</span>
+<span id="cb76-577"><a href="#cb76-577" tabindex="-1"></a>  <span class="at">stepR =</span> stepR<span class="sc">::</span><span class="fu">stepFit</span>(well_log, <span class="at">alpha =</span> <span class="fl">0.5</span>),</span>
+<span id="cb76-578"><a href="#cb76-578" tabindex="-1"></a>  <span class="at">not =</span> not<span class="sc">::</span><span class="fu">not</span>(well_log, <span class="at">contrast =</span> <span class="st">"pcwsConstMean"</span>),</span>
+<span id="cb76-579"><a href="#cb76-579" tabindex="-1"></a>  <span class="at">times =</span> <span class="dv">10</span></span>
+<span id="cb76-580"><a href="#cb76-580" tabindex="-1"></a>)</span>
+<span id="cb76-581"><a href="#cb76-581" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
+<span id="cb76-582"><a href="#cb76-582" tabindex="-1"></a><span class="co">#&gt;                expr          min           lq         mean       median           uq          max neval</span></span>
+<span id="cb76-583"><a href="#cb76-583" tabindex="-1"></a><span class="co">#&gt;             fastcpd 8.411284e+01 8.692226e+01 1.011440e+02 1.044509e+02 1.089672e+02    118.05842    10</span></span>
+<span id="cb76-584"><a href="#cb76-584" tabindex="-1"></a><span class="co">#&gt;         changepoint 3.206773e+01 3.377081e+01 6.843465e+01 3.857181e+01 5.243834e+01    244.76672    10</span></span>
+<span id="cb76-585"><a href="#cb76-585" tabindex="-1"></a><span class="co">#&gt;           CptNonPar 1.827381e+04 1.901094e+04 2.002752e+04 1.985180e+04 2.076803e+04  22511.59316    10</span></span>
+<span id="cb76-586"><a href="#cb76-586" tabindex="-1"></a><span class="co">#&gt;         strucchange 5.955079e+04 6.059315e+04 6.185727e+04 6.131291e+04 6.312073e+04  64638.93090    10</span></span>
+<span id="cb76-587"><a href="#cb76-587" tabindex="-1"></a><span class="co">#&gt;                 ecp 7.590543e+05 7.707573e+05 7.859080e+05 7.830752e+05 8.093015e+05 810339.52140    10</span></span>
+<span id="cb76-588"><a href="#cb76-588" tabindex="-1"></a><span class="co">#&gt;           breakfast 9.170992e+03 9.344041e+03 9.628236e+03 9.382078e+03 9.628663e+03  11073.79318    10</span></span>
+<span id="cb76-589"><a href="#cb76-589" tabindex="-1"></a><span class="co">#&gt;                 wbs 1.139078e+02 1.145472e+02 1.178167e+02 1.166746e+02 1.201676e+02    127.27064    10</span></span>
+<span id="cb76-590"><a href="#cb76-590" tabindex="-1"></a><span class="co">#&gt;               mosum 1.172847e+00 1.231747e+00 1.740727e+01 1.416854e+00 1.919586e+00    160.76997    10</span></span>
+<span id="cb76-591"><a href="#cb76-591" tabindex="-1"></a><span class="co">#&gt;                fpop 2.588228e+00 2.630407e+00 4.587742e+00 2.832556e+00 3.312986e+00     18.52067    10</span></span>
+<span id="cb76-592"><a href="#cb76-592" tabindex="-1"></a><span class="co">#&gt;               gfpop 5.971245e+01 6.072684e+01 6.533492e+01 6.172578e+01 6.839653e+01     87.89407    10</span></span>
+<span id="cb76-593"><a href="#cb76-593" tabindex="-1"></a><span class="co">#&gt;  InspectChangepoint 1.698673e+02 1.909034e+02 2.392539e+02 2.117010e+02 3.004474e+02    329.87724    10</span></span>
+<span id="cb76-594"><a href="#cb76-594" tabindex="-1"></a><span class="co">#&gt;            jointseg 2.000894e+01 2.136878e+01 2.551210e+01 2.167757e+01 2.403593e+01     47.98397    10</span></span>
+<span id="cb76-595"><a href="#cb76-595" tabindex="-1"></a><span class="co">#&gt;              Rbeast 6.533998e+02 6.625203e+02 6.783586e+02 6.792646e+02 6.875840e+02    723.45376    10</span></span>
+<span id="cb76-596"><a href="#cb76-596" tabindex="-1"></a><span class="co">#&gt;               stepR 2.793709e+01 2.902084e+01 4.380857e+01 3.068416e+01 3.227125e+01    164.81082    10</span></span>
+<span id="cb76-597"><a href="#cb76-597" tabindex="-1"></a><span class="co">#&gt;                 not 9.599763e+01 9.701856e+01 1.028601e+02 1.012292e+02 1.049974e+02    120.73529    10</span></span>
+<span id="cb76-598"><a href="#cb76-598" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">autoplot</span>(microbenchmark_result)</span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
