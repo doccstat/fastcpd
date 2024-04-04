@@ -123,10 +123,10 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="va">mv_data_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">400</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">50</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">50</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">400</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">50</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -158,10 +158,10 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
 <span><span class="va">mv_data_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">400</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">50</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">50</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">400</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">10</span>, <span class="va">p</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">50</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -445,7 +445,8 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="co">#&gt; [1]  333  700 1300</span></span></code></pre></div>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">cpm_result</span> <span class="op">&lt;-</span> <span class="fu">cpm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/cpm/man/processStream.html" class="external-link">processStream</a></span><span class="op">(</span><span class="va">mv_data_1</span>, cpmType <span class="op">=</span> <span class="st">"GLR"</span><span class="op">)</span><span class="op">$</span><span class="va">changePoints</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1]  293  300  403  408  618  621  696 1000 1021 1024 1293 1300 1417 1693 1981</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1]  293  300  403  408  618  621  695  700 1000 1021 1024 1293 1300 1417 1693</span></span>
+<span><span class="co">#&gt; [16] 1981</span></span></code></pre></div>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span></span>
@@ -460,26 +461,30 @@ methods are plotted due to the un-retrievable change points.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">result_InspectChangepoint</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   [1]  300  700  702  704  708  712  715  716  717  718  721  722  723  726  727</span></span>
-<span><span class="co">#&gt;  [16]  732  734  736  740  742  744  746  748  750  753  755  756  757  759  764</span></span>
-<span><span class="co">#&gt;  [31]  765  768  771  772  774  791  794  798  799  801  802  803  807  809  810</span></span>
-<span><span class="co">#&gt;  [46]  813  815  817  819  826  827  828  829  831  833  835  836  837  838  840</span></span>
-<span><span class="co">#&gt;  [61]  841  842  843  845  848  849  852  854  860  862  864  866  868  870  872</span></span>
-<span><span class="co">#&gt;  [76]  875  879  881  884  886  887  888  889  896  897  898  899  901  912  913</span></span>
-<span><span class="co">#&gt;  [91]  915  919  922  923  927  932  934  936  940  944  945  947  948  949  958</span></span>
-<span><span class="co">#&gt; [106]  959  961  962  963  964  966  967  968  972  974  976  978  979 1300 1700</span></span>
-<span><span class="co">#&gt; [121] 1702 1703 1704 1708 1710 1712 1714 1716 1717 1718 1721 1723 1725 1726 1731</span></span>
-<span><span class="co">#&gt; [136] 1733 1735 1736 1737 1739 1742 1745 1752 1754 1756 1758 1759 1768 1770 1771</span></span>
-<span><span class="co">#&gt; [151] 1778 1785 1790 1793 1795 1796 1797 1799 1800 1805 1806 1807 1808 1821 1828</span></span>
-<span><span class="co">#&gt; [166] 1833 1835 1837 1840 1841 1842 1848 1851 1852 1854 1855 1857 1876 1879 1880</span></span>
-<span><span class="co">#&gt; [181] 1882 1883 1884 1887 1889 1894 1898 1899 1905 1906 1907 1908 1909 1912 1919</span></span>
-<span><span class="co">#&gt; [196] 1926 1927 1930 1933 1934 1935 1936 1940 1952 1955 1956 1960 1962 1963 1966</span></span>
-<span><span class="co">#&gt; [211] 1967 1969 1970 1976 1977 1978 1980 1985 1987 1990</span></span></code></pre></div>
+<span><span class="co">#&gt;   [1]  300  700  701  702  704  707  708  712  715  716  717  718  721  722</span></span>
+<span><span class="co">#&gt;  [15]  723  726  727  732  734  736  740  742  744  746  748  750  753  755</span></span>
+<span><span class="co">#&gt;  [29]  756  757  759  760  762  764  765  768  771  772  774  776  777  785</span></span>
+<span><span class="co">#&gt;  [43]  786  789  791  794  798  799  801  802  803  807  809  810  813  815</span></span>
+<span><span class="co">#&gt;  [57]  817  819  826  827  828  829  831  833  835  836  837  838  840  841</span></span>
+<span><span class="co">#&gt;  [71]  842  843  845  848  849  852  854  860  862  864  866  868  870  872</span></span>
+<span><span class="co">#&gt;  [85]  875  879  881  884  886  887  888  889  896  897  898  899  901  903</span></span>
+<span><span class="co">#&gt;  [99]  904  905  906  909  912  913  915  917  919  921  922  923  927  928</span></span>
+<span><span class="co">#&gt; [113]  932  934  936  937  940  944  945  947  948  949  958  959  961  962</span></span>
+<span><span class="co">#&gt; [127]  963  964  966  967  968  972  974  976  978  979 1300 1700 1702 1703</span></span>
+<span><span class="co">#&gt; [141] 1704 1705 1708 1710 1712 1714 1716 1717 1718 1721 1723 1725 1726 1731</span></span>
+<span><span class="co">#&gt; [155] 1733 1735 1736 1737 1739 1742 1745 1747 1748 1752 1754 1756 1758 1759</span></span>
+<span><span class="co">#&gt; [169] 1768 1770 1771 1778 1785 1790 1793 1795 1796 1797 1799 1800 1803 1804</span></span>
+<span><span class="co">#&gt; [183] 1805 1806 1807 1808 1821 1828 1829 1833 1835 1837 1840 1841 1842 1848</span></span>
+<span><span class="co">#&gt; [197] 1849 1851 1852 1854 1855 1857 1862 1863 1865 1867 1868 1876 1878 1879</span></span>
+<span><span class="co">#&gt; [211] 1880 1882 1883 1884 1887 1889 1894 1898 1899 1905 1906 1907 1908 1909</span></span>
+<span><span class="co">#&gt; [225] 1912 1919 1926 1927 1928 1930 1933 1934 1935 1936 1938 1940 1952 1955</span></span>
+<span><span class="co">#&gt; [239] 1956 1960 1962 1963 1966 1967 1969 1970 1974 1976 1977 1978 1980 1985</span></span>
+<span><span class="co">#&gt; [253] 1987 1990 1997 1998</span></span></code></pre></div>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Rbeast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rbeast/man/beast.html" class="external-link">beast</a></span><span class="op">(</span></span>
 <span>  <span class="va">mv_data_1</span>, season <span class="op">=</span> <span class="st">"none"</span>, print.progress <span class="op">=</span> <span class="cn">FALSE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">trend</span><span class="op">$</span><span class="va">cp</span></span>
-<span><span class="co">#&gt;  [1] 1301  301 1855 1794  701 1986 1981 1769 1859 1834</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] 1301  301  701 1986 1794 1855 1981 1769 1859 1779</span></span></code></pre></div>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="fu">mcp</span><span class="fu">::</span><span class="fu"><a href="https://lindeloev.github.io/mcp/reference/mcp.html" class="external-link">mcp</a></span><span class="op">(</span></span>
@@ -594,33 +599,35 @@ methods are plotted due to the un-retrievable change points.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">result_InspectChangepoint</span><span class="op">$</span><span class="va">changepoints</span><span class="op">[</span>, <span class="st">"location"</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   [1]  300  700  701  703  704  705  707  708  710  711  712  714  715  716  717</span></span>
-<span><span class="co">#&gt;  [16]  719  721  722  723  725  726  728  729  730  731  732  734  735  736  738</span></span>
-<span><span class="co">#&gt;  [31]  739  740  741  742  744  745  747  748  749  752  753  754  756  757  759</span></span>
-<span><span class="co">#&gt;  [46]  761  762  763  764  766  768  769  770  772  773  774  776  777  778  780</span></span>
-<span><span class="co">#&gt;  [61]  781  783  784  786  788  789  791  793  795  797  799  800  801  803  805</span></span>
-<span><span class="co">#&gt;  [76]  806  808  809  811  813  814  816  817  819  821  822  824  825  826  828</span></span>
-<span><span class="co">#&gt;  [91]  829  830  831  832  834  835  837  838  839  841  842  843  845  846  847</span></span>
-<span><span class="co">#&gt; [106]  852  853  855  857  860  861  862  864  865  866  868  869  870  871  873</span></span>
-<span><span class="co">#&gt; [121]  876  877  878  880  882  883  884  886  888  891  893  895  896  898  900</span></span>
-<span><span class="co">#&gt; [136]  901  903  904  905  906  908  909  910  911  914  915  916  919  920  921</span></span>
-<span><span class="co">#&gt; [151]  923  924  926  927  928  930  931  933  934  936  938  939  940  942  944</span></span>
-<span><span class="co">#&gt; [166]  945  946  948  949  951  952  954  956  957  959  960  961  962  964  965</span></span>
-<span><span class="co">#&gt; [181]  966  968  969  970  971  973  974  976  977  979  980  982  983  984  985</span></span>
-<span><span class="co">#&gt; [196]  986  988  989  990  992  993  995  996  998 1000 1300 1700 1701 1702 1705</span></span>
-<span><span class="co">#&gt; [211] 1708 1710 1711 1712 1713 1715 1716 1717 1718 1720 1721 1724 1725 1726 1728</span></span>
-<span><span class="co">#&gt; [226] 1729 1730 1731 1733 1734 1735 1737 1738 1740 1742 1743 1745 1747 1749 1750</span></span>
-<span><span class="co">#&gt; [241] 1752 1753 1754 1755 1756 1758 1759 1760 1762 1763 1764 1766 1767 1769 1770</span></span>
-<span><span class="co">#&gt; [256] 1771 1773 1774 1776 1777 1779 1780 1782 1783 1785 1787 1788 1790 1791 1792</span></span>
-<span><span class="co">#&gt; [271] 1793 1794 1796 1798 1800 1801 1803 1805 1809 1811 1812 1813 1814 1816 1817</span></span>
-<span><span class="co">#&gt; [286] 1819 1820 1821 1823 1824 1826 1828 1830 1832 1833 1834 1836 1838 1839 1841</span></span>
-<span><span class="co">#&gt; [301] 1842 1843 1846 1847 1850 1851 1853 1854 1856 1857 1859 1861 1862 1864 1865</span></span>
-<span><span class="co">#&gt; [316] 1866 1869 1870 1872 1874 1876 1878 1879 1881 1882 1883 1885 1887 1888 1889</span></span>
-<span><span class="co">#&gt; [331] 1890 1892 1894 1896 1898 1899 1900 1902 1904 1905 1907 1908 1909 1911 1913</span></span>
-<span><span class="co">#&gt; [346] 1914 1916 1918 1919 1920 1922 1923 1925 1926 1928 1930 1931 1933 1935 1936</span></span>
-<span><span class="co">#&gt; [361] 1937 1939 1940 1942 1943 1945 1947 1948 1950 1951 1952 1953 1955 1956 1957</span></span>
-<span><span class="co">#&gt; [376] 1959 1960 1961 1963 1964 1966 1967 1968 1970 1972 1974 1976 1977 1978 1979</span></span>
-<span><span class="co">#&gt; [391] 1982 1983 1985 1987 1990 1992 1993 1994 1996 1997</span></span></code></pre></div>
+<span><span class="co">#&gt;   [1]  300  700  701  703  704  705  707  708  710  711  712  714  715  716</span></span>
+<span><span class="co">#&gt;  [15]  717  719  721  722  723  725  726  730  731  732  734  735  736  738</span></span>
+<span><span class="co">#&gt;  [29]  739  740  741  742  744  745  747  748  749  752  753  754  756  757</span></span>
+<span><span class="co">#&gt;  [43]  759  761  762  763  764  766  768  769  770  772  773  774  776  777</span></span>
+<span><span class="co">#&gt;  [57]  778  780  781  783  784  786  788  789  791  793  795  797  799  800</span></span>
+<span><span class="co">#&gt;  [71]  801  803  805  806  808  809  811  813  814  816  817  819  821  822</span></span>
+<span><span class="co">#&gt;  [85]  824  825  826  829  830  831  832  834  835  837  838  839  841  842</span></span>
+<span><span class="co">#&gt;  [99]  843  845  846  847  852  853  855  857  860  861  862  864  865  866</span></span>
+<span><span class="co">#&gt; [113]  868  869  870  871  873  876  877  878  880  882  883  884  886  888</span></span>
+<span><span class="co">#&gt; [127]  891  893  895  896  898  900  901  903  904  905  906  908  909  910</span></span>
+<span><span class="co">#&gt; [141]  911  914  915  916  919  920  921  923  924  926  927  928  930  931</span></span>
+<span><span class="co">#&gt; [155]  933  934  936  938  939  940  942  944  945  946  948  949  951  952</span></span>
+<span><span class="co">#&gt; [169]  954  956  957  959  960  961  962  964  965  966  968  969  970  971</span></span>
+<span><span class="co">#&gt; [183]  973  974  976  977  979  980  982  983  984  985  986  988  989  990</span></span>
+<span><span class="co">#&gt; [197]  992  993  995  996  998 1000 1300 1700 1701 1702 1705 1708 1710 1711</span></span>
+<span><span class="co">#&gt; [211] 1712 1713 1715 1716 1717 1718 1720 1721 1724 1725 1726 1728 1729 1730</span></span>
+<span><span class="co">#&gt; [225] 1731 1733 1734 1735 1737 1738 1740 1742 1743 1745 1747 1749 1750 1752</span></span>
+<span><span class="co">#&gt; [239] 1753 1754 1755 1756 1758 1759 1760 1762 1763 1764 1766 1767 1769 1770</span></span>
+<span><span class="co">#&gt; [253] 1771 1773 1774 1776 1777 1779 1780 1782 1783 1785 1787 1788 1791 1792</span></span>
+<span><span class="co">#&gt; [267] 1793 1794 1796 1798 1800 1801 1803 1805 1809 1811 1812 1813 1814 1816</span></span>
+<span><span class="co">#&gt; [281] 1817 1819 1820 1821 1823 1824 1826 1828 1830 1832 1833 1834 1836 1838</span></span>
+<span><span class="co">#&gt; [295] 1839 1841 1842 1843 1846 1847 1850 1851 1853 1854 1856 1857 1859 1861</span></span>
+<span><span class="co">#&gt; [309] 1862 1864 1865 1866 1869 1870 1872 1874 1876 1878 1879 1881 1882 1883</span></span>
+<span><span class="co">#&gt; [323] 1885 1887 1888 1889 1890 1892 1894 1896 1898 1899 1900 1902 1904 1905</span></span>
+<span><span class="co">#&gt; [337] 1907 1908 1909 1911 1913 1916 1918 1919 1920 1922 1923 1925 1926 1928</span></span>
+<span><span class="co">#&gt; [351] 1930 1931 1933 1935 1936 1937 1939 1940 1942 1943 1945 1947 1948 1950</span></span>
+<span><span class="co">#&gt; [365] 1951 1952 1953 1955 1956 1957 1959 1960 1961 1963 1964 1966 1967 1968</span></span>
+<span><span class="co">#&gt; [379] 1970 1972 1974 1976 1977 1978 1982 1983 1985 1987 1990 1992 1993 1994</span></span>
+<span><span class="co">#&gt; [393] 1996 1997</span></span></code></pre></div>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span></span>
@@ -636,16 +643,16 @@ methods are plotted due to the un-retrievable change points.</p>
 <span><span class="co">#&gt; In Rbeast::beast123(mv_data_3, metadata = list(whichDimIsTime = 1),  :</span></span>
 <span><span class="co">#&gt;   WARNING: If the input data is regular and ordered in time,the times of individual datapoints are determined fully by 'metadata$startTime' and 'metadata$deltaTime'. But startTime and deltaTime are missing and a default value 1 is used for both!</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt;  [1,] 1301  701  301</span></span>
-<span><span class="co">#&gt;  [2,]  301  301 1301</span></span>
-<span><span class="co">#&gt;  [3,]  701 1301  702</span></span>
-<span><span class="co">#&gt;  [4,]  877  830 1924</span></span>
-<span><span class="co">#&gt;  [5,] 1994  887 1880</span></span>
-<span><span class="co">#&gt;  [6,] 1905  881 1971</span></span>
-<span><span class="co">#&gt;  [7,] 1934  869  776</span></span>
-<span><span class="co">#&gt;  [8,] 1929  807  831</span></span>
-<span><span class="co">#&gt;  [9,] 1978 1960  845</span></span>
-<span><span class="co">#&gt; [10,]  861 1947  760</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1,]  701  301  301</span></span>
+<span><span class="co">#&gt;  [2,]  301  701 1301</span></span>
+<span><span class="co">#&gt;  [3,] 1301 1301  702</span></span>
+<span><span class="co">#&gt;  [4,] 1994  830 1924</span></span>
+<span><span class="co">#&gt;  [5,] 1978  807 1919</span></span>
+<span><span class="co">#&gt;  [6,] 1905  881  760</span></span>
+<span><span class="co">#&gt;  [7,] 1912  887  756</span></span>
+<span><span class="co">#&gt;  [8,] 1972  821  769</span></span>
+<span><span class="co">#&gt;  [9,] 1788  874 1880</span></span>
+<span><span class="co">#&gt; [10,]  820  989 1761</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="linear-regression-1">Linear regression<a class="anchor" aria-label="anchor" href="#linear-regression-1"></a>
@@ -976,10 +983,10 @@ un-retrievable change points.</p>
 <span id="cb76-16"><a href="#cb76-16" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
 <span id="cb76-17"><a href="#cb76-17" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb76-18"><a href="#cb76-18" tabindex="-1"></a>mv_data_1 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
-<span id="cb76-19"><a href="#cb76-19" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">0</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
+<span id="cb76-19"><a href="#cb76-19" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
 <span id="cb76-20"><a href="#cb76-20" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">400</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
-<span id="cb76-21"><a href="#cb76-21" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">0</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">50</span>, p)),</span>
-<span id="cb76-22"><a href="#cb76-22" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">0</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
+<span id="cb76-21"><a href="#cb76-21" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">50</span>, p)),</span>
+<span id="cb76-22"><a href="#cb76-22" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
 <span id="cb76-23"><a href="#cb76-23" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">400</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
 <span id="cb76-24"><a href="#cb76-24" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">50</span>, p))</span>
 <span id="cb76-25"><a href="#cb76-25" tabindex="-1"></a>)</span>
@@ -999,10 +1006,10 @@ un-retrievable change points.</p>
 <span id="cb76-39"><a href="#cb76-39" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
 <span id="cb76-40"><a href="#cb76-40" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">3</span></span>
 <span id="cb76-41"><a href="#cb76-41" tabindex="-1"></a>mv_data_3 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
-<span id="cb76-42"><a href="#cb76-42" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">0</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
+<span id="cb76-42"><a href="#cb76-42" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
 <span id="cb76-43"><a href="#cb76-43" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">400</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
-<span id="cb76-44"><a href="#cb76-44" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">0</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">50</span>, p)),</span>
-<span id="cb76-45"><a href="#cb76-45" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">0</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
+<span id="cb76-44"><a href="#cb76-44" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">50</span>, p)),</span>
+<span id="cb76-45"><a href="#cb76-45" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
 <span id="cb76-46"><a href="#cb76-46" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">400</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">1</span>, p)),</span>
 <span id="cb76-47"><a href="#cb76-47" tabindex="-1"></a>  mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">300</span>, <span class="at">mean =</span> <span class="fu">rep</span>(<span class="dv">10</span>, p), <span class="at">sigma =</span> <span class="fu">diag</span>(<span class="dv">50</span>, p))</span>
 <span id="cb76-48"><a href="#cb76-48" tabindex="-1"></a>)</span>
@@ -1193,7 +1200,7 @@ un-retrievable change points.</p>
 <span id="cb76-233"><a href="#cb76-233" tabindex="-1"></a>(CptNonPar_result <span class="ot">&lt;-</span> CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(mv_data_1, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(mv_data_1) <span class="sc">/</span> <span class="dv">6</span>))<span class="sc">$</span>cpts)</span>
 <span id="cb76-234"><a href="#cb76-234" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(CptNonPar_result, <span class="fu">c</span>(<span class="dv">333</span>, <span class="dv">700</span>, <span class="dv">1300</span>))</span>
 <span id="cb76-235"><a href="#cb76-235" tabindex="-1"></a>(cpm_result <span class="ot">&lt;-</span> cpm<span class="sc">::</span><span class="fu">processStream</span>(mv_data_1, <span class="at">cpmType =</span> <span class="st">"GLR"</span>)<span class="sc">$</span>changePoints)</span>
-<span id="cb76-236"><a href="#cb76-236" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(cpm_result, <span class="fu">c</span>(<span class="dv">293</span>, <span class="dv">300</span>, <span class="dv">403</span>, <span class="dv">408</span>, <span class="dv">618</span>, <span class="dv">621</span>, <span class="dv">696</span>, <span class="dv">1000</span>, <span class="dv">1021</span>, <span class="dv">1024</span>, <span class="dv">1293</span>, <span class="dv">1300</span>, <span class="dv">1417</span>, <span class="dv">1693</span>, <span class="dv">1981</span>))</span>
+<span id="cb76-236"><a href="#cb76-236" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(cpm_result, <span class="fu">c</span>(<span class="dv">293</span>, <span class="dv">300</span>, <span class="dv">403</span>, <span class="dv">408</span>, <span class="dv">618</span>, <span class="dv">621</span>, <span class="dv">695</span>, <span class="dv">700</span>, <span class="dv">1000</span>, <span class="dv">1021</span>, <span class="dv">1024</span>, <span class="dv">1293</span>, <span class="dv">1300</span>, <span class="dv">1417</span>, <span class="dv">1693</span>, <span class="dv">1981</span>))</span>
 <span id="cb76-237"><a href="#cb76-237" tabindex="-1"></a><span class="fu">invisible</span>(</span>
 <span id="cb76-238"><a href="#cb76-238" tabindex="-1"></a>  <span class="fu">suppressMessages</span>(</span>
 <span id="cb76-239"><a href="#cb76-239" tabindex="-1"></a>    <span class="fu">capture.output</span>(</span>
@@ -1207,347 +1214,353 @@ un-retrievable change points.</p>
 <span id="cb76-247"><a href="#cb76-247" tabindex="-1"></a>  )</span>
 <span id="cb76-248"><a href="#cb76-248" tabindex="-1"></a>)</span>
 <span id="cb76-249"><a href="#cb76-249" tabindex="-1"></a>result_InspectChangepoint<span class="sc">$</span>changepoints[, <span class="st">"location"</span>]</span>
-<span id="cb76-250"><a href="#cb76-250" tabindex="-1"></a><span class="co">#&gt;   [1]  300  700  702  704  708  712  715  716  717  718  721  722  723  726  727</span></span>
-<span id="cb76-251"><a href="#cb76-251" tabindex="-1"></a><span class="co">#&gt;  [16]  732  734  736  740  742  744  746  748  750  753  755  756  757  759  764</span></span>
-<span id="cb76-252"><a href="#cb76-252" tabindex="-1"></a><span class="co">#&gt;  [31]  765  768  771  772  774  791  794  798  799  801  802  803  807  809  810</span></span>
-<span id="cb76-253"><a href="#cb76-253" tabindex="-1"></a><span class="co">#&gt;  [46]  813  815  817  819  826  827  828  829  831  833  835  836  837  838  840</span></span>
-<span id="cb76-254"><a href="#cb76-254" tabindex="-1"></a><span class="co">#&gt;  [61]  841  842  843  845  848  849  852  854  860  862  864  866  868  870  872</span></span>
-<span id="cb76-255"><a href="#cb76-255" tabindex="-1"></a><span class="co">#&gt;  [76]  875  879  881  884  886  887  888  889  896  897  898  899  901  912  913</span></span>
-<span id="cb76-256"><a href="#cb76-256" tabindex="-1"></a><span class="co">#&gt;  [91]  915  919  922  923  927  932  934  936  940  944  945  947  948  949  958</span></span>
-<span id="cb76-257"><a href="#cb76-257" tabindex="-1"></a><span class="co">#&gt; [106]  959  961  962  963  964  966  967  968  972  974  976  978  979 1300 1700</span></span>
-<span id="cb76-258"><a href="#cb76-258" tabindex="-1"></a><span class="co">#&gt; [121] 1702 1703 1704 1708 1710 1712 1714 1716 1717 1718 1721 1723 1725 1726 1731</span></span>
-<span id="cb76-259"><a href="#cb76-259" tabindex="-1"></a><span class="co">#&gt; [136] 1733 1735 1736 1737 1739 1742 1745 1752 1754 1756 1758 1759 1768 1770 1771</span></span>
-<span id="cb76-260"><a href="#cb76-260" tabindex="-1"></a><span class="co">#&gt; [151] 1778 1785 1790 1793 1795 1796 1797 1799 1800 1805 1806 1807 1808 1821 1828</span></span>
-<span id="cb76-261"><a href="#cb76-261" tabindex="-1"></a><span class="co">#&gt; [166] 1833 1835 1837 1840 1841 1842 1848 1851 1852 1854 1855 1857 1876 1879 1880</span></span>
-<span id="cb76-262"><a href="#cb76-262" tabindex="-1"></a><span class="co">#&gt; [181] 1882 1883 1884 1887 1889 1894 1898 1899 1905 1906 1907 1908 1909 1912 1919</span></span>
-<span id="cb76-263"><a href="#cb76-263" tabindex="-1"></a><span class="co">#&gt; [196] 1926 1927 1930 1933 1934 1935 1936 1940 1952 1955 1956 1960 1962 1963 1966</span></span>
-<span id="cb76-264"><a href="#cb76-264" tabindex="-1"></a><span class="co">#&gt; [211] 1967 1969 1970 1976 1977 1978 1980 1985 1987 1990</span></span>
-<span id="cb76-265"><a href="#cb76-265" tabindex="-1"></a>Rbeast<span class="sc">::</span><span class="fu">beast</span>(</span>
-<span id="cb76-266"><a href="#cb76-266" tabindex="-1"></a>  mv_data_1, <span class="at">season =</span> <span class="st">"none"</span>, <span class="at">print.progress =</span> <span class="cn">FALSE</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
-<span id="cb76-267"><a href="#cb76-267" tabindex="-1"></a>)<span class="sc">$</span>trend<span class="sc">$</span>cp</span>
-<span id="cb76-268"><a href="#cb76-268" tabindex="-1"></a><span class="co">#&gt;  [1] 1301  301 1855 1794  701 1986 1981 1769 1859 1834</span></span>
-<span id="cb76-269"><a href="#cb76-269" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb76-270"><a href="#cb76-270" tabindex="-1"></a>  mcp<span class="sc">::</span><span class="fu">mcp</span>(</span>
-<span id="cb76-271"><a href="#cb76-271" tabindex="-1"></a>    <span class="fu">list</span>(y <span class="sc">~</span> <span class="dv">1</span>, <span class="sc">~</span> <span class="dv">1</span>, <span class="sc">~</span> <span class="dv">1</span>, <span class="sc">~</span> <span class="dv">1</span>, <span class="sc">~</span> <span class="dv">1</span>, <span class="sc">~</span> <span class="dv">1</span>),</span>
-<span id="cb76-272"><a href="#cb76-272" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> mv_data_1, <span class="at">x =</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(mv_data_1))),</span>
-<span id="cb76-273"><a href="#cb76-273" tabindex="-1"></a>    <span class="at">par_x =</span> <span class="st">"x"</span></span>
-<span id="cb76-274"><a href="#cb76-274" tabindex="-1"></a>  )</span>
-<span id="cb76-275"><a href="#cb76-275" tabindex="-1"></a>)</span>
-<span id="cb76-276"><a href="#cb76-276" tabindex="-1"></a><span class="fu">plot</span>(not<span class="sc">::</span><span class="fu">not</span>(mv_data_1, <span class="at">contrast =</span> <span class="st">"pcwsConstMeanVar"</span>))</span>
-<span id="cb76-277"><a href="#cb76-277" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.mean</span>(mean_data_3, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
-<span id="cb76-278"><a href="#cb76-278" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">300</span>, <span class="dv">700</span>))</span>
-<span id="cb76-279"><a href="#cb76-279" tabindex="-1"></a>(CptNonPar_result <span class="ot">&lt;-</span> CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(mean_data_3, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">nrow</span>(mean_data_3) <span class="sc">/</span> <span class="dv">6</span>))<span class="sc">$</span>cpts)</span>
-<span id="cb76-280"><a href="#cb76-280" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(CptNonPar_result, <span class="fu">c</span>(<span class="dv">300</span>, <span class="dv">700</span>))</span>
-<span id="cb76-281"><a href="#cb76-281" tabindex="-1"></a><span class="fu">invisible</span>(</span>
-<span id="cb76-282"><a href="#cb76-282" tabindex="-1"></a>  <span class="fu">suppressMessages</span>(</span>
-<span id="cb76-283"><a href="#cb76-283" tabindex="-1"></a>    <span class="fu">capture.output</span>(</span>
-<span id="cb76-284"><a href="#cb76-284" tabindex="-1"></a>      result_InspectChangepoint <span class="ot">&lt;-</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
-<span id="cb76-285"><a href="#cb76-285" tabindex="-1"></a>        <span class="fu">t</span>(mean_data_3),</span>
-<span id="cb76-286"><a href="#cb76-286" tabindex="-1"></a>        <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(</span>
-<span id="cb76-287"><a href="#cb76-287" tabindex="-1"></a>          <span class="fu">nrow</span>(mean_data_3), <span class="fu">ncol</span>(mean_data_3)</span>
-<span id="cb76-288"><a href="#cb76-288" tabindex="-1"></a>        )</span>
-<span id="cb76-289"><a href="#cb76-289" tabindex="-1"></a>      )</span>
-<span id="cb76-290"><a href="#cb76-290" tabindex="-1"></a>    )</span>
-<span id="cb76-291"><a href="#cb76-291" tabindex="-1"></a>  )</span>
-<span id="cb76-292"><a href="#cb76-292" tabindex="-1"></a>)</span>
-<span id="cb76-293"><a href="#cb76-293" tabindex="-1"></a>result_InspectChangepoint<span class="sc">$</span>changepoints[, <span class="st">"location"</span>]</span>
-<span id="cb76-294"><a href="#cb76-294" tabindex="-1"></a><span class="co">#&gt; [1] 300 700</span></span>
-<span id="cb76-295"><a href="#cb76-295" tabindex="-1"></a>(jointseg_result <span class="ot">&lt;-</span> jointseg<span class="sc">::</span><span class="fu">jointSeg</span>(mean_data_3, <span class="at">K =</span> <span class="dv">2</span>)<span class="sc">$</span>bestBkp)</span>
-<span id="cb76-296"><a href="#cb76-296" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(jointseg_result, <span class="fu">c</span>(<span class="dv">300</span>, <span class="dv">700</span>))</span>
-<span id="cb76-297"><a href="#cb76-297" tabindex="-1"></a><span class="fu">invisible</span>(</span>
-<span id="cb76-298"><a href="#cb76-298" tabindex="-1"></a>  <span class="fu">capture.output</span>(</span>
-<span id="cb76-299"><a href="#cb76-299" tabindex="-1"></a>    result_Rbeast <span class="ot">&lt;-</span> Rbeast<span class="sc">::</span><span class="fu">beast123</span>(</span>
-<span id="cb76-300"><a href="#cb76-300" tabindex="-1"></a>      mean_data_3,</span>
-<span id="cb76-301"><a href="#cb76-301" tabindex="-1"></a>      <span class="at">metadata =</span> <span class="fu">list</span>(<span class="at">whichDimIsTime =</span> <span class="dv">1</span>),</span>
-<span id="cb76-302"><a href="#cb76-302" tabindex="-1"></a>      <span class="at">season =</span> <span class="st">"none"</span></span>
-<span id="cb76-303"><a href="#cb76-303" tabindex="-1"></a>    )</span>
-<span id="cb76-304"><a href="#cb76-304" tabindex="-1"></a>  )</span>
-<span id="cb76-305"><a href="#cb76-305" tabindex="-1"></a>)</span>
-<span id="cb76-306"><a href="#cb76-306" tabindex="-1"></a>result_Rbeast<span class="sc">$</span>trend<span class="sc">$</span>cp</span>
-<span id="cb76-307"><a href="#cb76-307" tabindex="-1"></a><span class="co">#&gt; Warning message:</span></span>
-<span id="cb76-308"><a href="#cb76-308" tabindex="-1"></a><span class="co">#&gt; In Rbeast::beast123(mean_data_3, metadata = list(whichDimIsTime = 1),  :</span></span>
-<span id="cb76-309"><a href="#cb76-309" tabindex="-1"></a><span class="co">#&gt;   </span><span class="al">WARNING</span><span class="co">: If the input data is regular and ordered in time,the times of individual datapoints are determined fully by 'metadata$startTime' and 'metadata$deltaTime'. But startTime and deltaTime are missing and a default value 1 is used for both!</span></span>
-<span id="cb76-310"><a href="#cb76-310" tabindex="-1"></a><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span id="cb76-311"><a href="#cb76-311" tabindex="-1"></a><span class="co">#&gt;  [1,]  301  301  701</span></span>
-<span id="cb76-312"><a href="#cb76-312" tabindex="-1"></a><span class="co">#&gt;  [2,]  701  701  301</span></span>
-<span id="cb76-313"><a href="#cb76-313" tabindex="-1"></a><span class="co">#&gt;  [3,]  NaN  225  NaN</span></span>
-<span id="cb76-314"><a href="#cb76-314" tabindex="-1"></a><span class="co">#&gt;  [4,]  NaN  684  NaN</span></span>
-<span id="cb76-315"><a href="#cb76-315" tabindex="-1"></a><span class="co">#&gt;  [5,]  NaN  NaN  NaN</span></span>
-<span id="cb76-316"><a href="#cb76-316" tabindex="-1"></a><span class="co">#&gt;  [6,]  NaN  NaN  NaN</span></span>
-<span id="cb76-317"><a href="#cb76-317" tabindex="-1"></a><span class="co">#&gt;  [7,]  NaN  NaN  NaN</span></span>
-<span id="cb76-318"><a href="#cb76-318" tabindex="-1"></a><span class="co">#&gt;  [8,]  NaN  NaN  NaN</span></span>
-<span id="cb76-319"><a href="#cb76-319" tabindex="-1"></a><span class="co">#&gt;  [9,]  NaN  NaN  NaN</span></span>
-<span id="cb76-320"><a href="#cb76-320" tabindex="-1"></a><span class="co">#&gt; [10,]  NaN  NaN  NaN</span></span>
-<span id="cb76-321"><a href="#cb76-321" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(</span>
-<span id="cb76-322"><a href="#cb76-322" tabindex="-1"></a>  <span class="fu">cbind</span>(y<span class="fl">.1</span>, y<span class="fl">.2</span>, y<span class="fl">.3</span>) <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> mean_data_3)</span>
-<span id="cb76-323"><a href="#cb76-323" tabindex="-1"></a>)<span class="sc">$</span>breakpoints</span>
-<span id="cb76-324"><a href="#cb76-324" tabindex="-1"></a><span class="co">#&gt; [1] 300 700</span></span>
-<span id="cb76-325"><a href="#cb76-325" tabindex="-1"></a>ecp<span class="sc">::</span><span class="fu">e.divisive</span>(mean_data_3)<span class="sc">$</span>estimates</span>
-<span id="cb76-326"><a href="#cb76-326" tabindex="-1"></a><span class="co">#&gt; [1]    1  301  701 1001</span></span>
-<span id="cb76-327"><a href="#cb76-327" tabindex="-1"></a><span class="fu">plot</span>(bcp<span class="sc">::</span><span class="fu">bcp</span>(mean_data_3))</span>
-<span id="cb76-328"><a href="#cb76-328" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.mv</span>(mv_data_3, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
-<span id="cb76-329"><a href="#cb76-329" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">300</span>, <span class="dv">700</span>, <span class="dv">1000</span>, <span class="dv">1300</span>, <span class="dv">1700</span>))</span>
-<span id="cb76-330"><a href="#cb76-330" tabindex="-1"></a>ecp<span class="sc">::</span><span class="fu">e.divisive</span>(mv_data_3)<span class="sc">$</span>estimates</span>
-<span id="cb76-331"><a href="#cb76-331" tabindex="-1"></a><span class="co">#&gt; [1]    1  301  701 1001 1301 1701 2001</span></span>
-<span id="cb76-332"><a href="#cb76-332" tabindex="-1"></a><span class="fu">invisible</span>(</span>
-<span id="cb76-333"><a href="#cb76-333" tabindex="-1"></a>  <span class="fu">suppressMessages</span>(</span>
-<span id="cb76-334"><a href="#cb76-334" tabindex="-1"></a>    <span class="fu">capture.output</span>(</span>
-<span id="cb76-335"><a href="#cb76-335" tabindex="-1"></a>      result_InspectChangepoint <span class="ot">&lt;-</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
-<span id="cb76-336"><a href="#cb76-336" tabindex="-1"></a>        <span class="fu">t</span>(mv_data_3),</span>
-<span id="cb76-337"><a href="#cb76-337" tabindex="-1"></a>        <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(</span>
-<span id="cb76-338"><a href="#cb76-338" tabindex="-1"></a>          <span class="fu">nrow</span>(mv_data_3), <span class="fu">ncol</span>(mv_data_3)</span>
-<span id="cb76-339"><a href="#cb76-339" tabindex="-1"></a>        )</span>
-<span id="cb76-340"><a href="#cb76-340" tabindex="-1"></a>      )</span>
-<span id="cb76-341"><a href="#cb76-341" tabindex="-1"></a>    )</span>
-<span id="cb76-342"><a href="#cb76-342" tabindex="-1"></a>  )</span>
-<span id="cb76-343"><a href="#cb76-343" tabindex="-1"></a>)</span>
-<span id="cb76-344"><a href="#cb76-344" tabindex="-1"></a>result_InspectChangepoint<span class="sc">$</span>changepoints[, <span class="st">"location"</span>]</span>
-<span id="cb76-345"><a href="#cb76-345" tabindex="-1"></a><span class="co">#&gt;   [1]  300  700  701  703  704  705  707  708  710  711  712  714  715  716  717</span></span>
-<span id="cb76-346"><a href="#cb76-346" tabindex="-1"></a><span class="co">#&gt;  [16]  719  721  722  723  725  726  728  729  730  731  732  734  735  736  738</span></span>
-<span id="cb76-347"><a href="#cb76-347" tabindex="-1"></a><span class="co">#&gt;  [31]  739  740  741  742  744  745  747  748  749  752  753  754  756  757  759</span></span>
-<span id="cb76-348"><a href="#cb76-348" tabindex="-1"></a><span class="co">#&gt;  [46]  761  762  763  764  766  768  769  770  772  773  774  776  777  778  780</span></span>
-<span id="cb76-349"><a href="#cb76-349" tabindex="-1"></a><span class="co">#&gt;  [61]  781  783  784  786  788  789  791  793  795  797  799  800  801  803  805</span></span>
-<span id="cb76-350"><a href="#cb76-350" tabindex="-1"></a><span class="co">#&gt;  [76]  806  808  809  811  813  814  816  817  819  821  822  824  825  826  828</span></span>
-<span id="cb76-351"><a href="#cb76-351" tabindex="-1"></a><span class="co">#&gt;  [91]  829  830  831  832  834  835  837  838  839  841  842  843  845  846  847</span></span>
-<span id="cb76-352"><a href="#cb76-352" tabindex="-1"></a><span class="co">#&gt; [106]  852  853  855  857  860  861  862  864  865  866  868  869  870  871  873</span></span>
-<span id="cb76-353"><a href="#cb76-353" tabindex="-1"></a><span class="co">#&gt; [121]  876  877  878  880  882  883  884  886  888  891  893  895  896  898  900</span></span>
-<span id="cb76-354"><a href="#cb76-354" tabindex="-1"></a><span class="co">#&gt; [136]  901  903  904  905  906  908  909  910  911  914  915  916  919  920  921</span></span>
-<span id="cb76-355"><a href="#cb76-355" tabindex="-1"></a><span class="co">#&gt; [151]  923  924  926  927  928  930  931  933  934  936  938  939  940  942  944</span></span>
-<span id="cb76-356"><a href="#cb76-356" tabindex="-1"></a><span class="co">#&gt; [166]  945  946  948  949  951  952  954  956  957  959  960  961  962  964  965</span></span>
-<span id="cb76-357"><a href="#cb76-357" tabindex="-1"></a><span class="co">#&gt; [181]  966  968  969  970  971  973  974  976  977  979  980  982  983  984  985</span></span>
-<span id="cb76-358"><a href="#cb76-358" tabindex="-1"></a><span class="co">#&gt; [196]  986  988  989  990  992  993  995  996  998 1000 1300 1700 1701 1702 1705</span></span>
-<span id="cb76-359"><a href="#cb76-359" tabindex="-1"></a><span class="co">#&gt; [211] 1708 1710 1711 1712 1713 1715 1716 1717 1718 1720 1721 1724 1725 1726 1728</span></span>
-<span id="cb76-360"><a href="#cb76-360" tabindex="-1"></a><span class="co">#&gt; [226] 1729 1730 1731 1733 1734 1735 1737 1738 1740 1742 1743 1745 1747 1749 1750</span></span>
-<span id="cb76-361"><a href="#cb76-361" tabindex="-1"></a><span class="co">#&gt; [241] 1752 1753 1754 1755 1756 1758 1759 1760 1762 1763 1764 1766 1767 1769 1770</span></span>
-<span id="cb76-362"><a href="#cb76-362" tabindex="-1"></a><span class="co">#&gt; [256] 1771 1773 1774 1776 1777 1779 1780 1782 1783 1785 1787 1788 1790 1791 1792</span></span>
-<span id="cb76-363"><a href="#cb76-363" tabindex="-1"></a><span class="co">#&gt; [271] 1793 1794 1796 1798 1800 1801 1803 1805 1809 1811 1812 1813 1814 1816 1817</span></span>
-<span id="cb76-364"><a href="#cb76-364" tabindex="-1"></a><span class="co">#&gt; [286] 1819 1820 1821 1823 1824 1826 1828 1830 1832 1833 1834 1836 1838 1839 1841</span></span>
-<span id="cb76-365"><a href="#cb76-365" tabindex="-1"></a><span class="co">#&gt; [301] 1842 1843 1846 1847 1850 1851 1853 1854 1856 1857 1859 1861 1862 1864 1865</span></span>
-<span id="cb76-366"><a href="#cb76-366" tabindex="-1"></a><span class="co">#&gt; [316] 1866 1869 1870 1872 1874 1876 1878 1879 1881 1882 1883 1885 1887 1888 1889</span></span>
-<span id="cb76-367"><a href="#cb76-367" tabindex="-1"></a><span class="co">#&gt; [331] 1890 1892 1894 1896 1898 1899 1900 1902 1904 1905 1907 1908 1909 1911 1913</span></span>
-<span id="cb76-368"><a href="#cb76-368" tabindex="-1"></a><span class="co">#&gt; [346] 1914 1916 1918 1919 1920 1922 1923 1925 1926 1928 1930 1931 1933 1935 1936</span></span>
-<span id="cb76-369"><a href="#cb76-369" tabindex="-1"></a><span class="co">#&gt; [361] 1937 1939 1940 1942 1943 1945 1947 1948 1950 1951 1952 1953 1955 1956 1957</span></span>
-<span id="cb76-370"><a href="#cb76-370" tabindex="-1"></a><span class="co">#&gt; [376] 1959 1960 1961 1963 1964 1966 1967 1968 1970 1972 1974 1976 1977 1978 1979</span></span>
-<span id="cb76-371"><a href="#cb76-371" tabindex="-1"></a><span class="co">#&gt; [391] 1982 1983 1985 1987 1990 1992 1993 1994 1996 1997</span></span>
-<span id="cb76-372"><a href="#cb76-372" tabindex="-1"></a><span class="fu">invisible</span>(</span>
-<span id="cb76-373"><a href="#cb76-373" tabindex="-1"></a>  <span class="fu">capture.output</span>(</span>
-<span id="cb76-374"><a href="#cb76-374" tabindex="-1"></a>    result_Rbeast <span class="ot">&lt;-</span> Rbeast<span class="sc">::</span><span class="fu">beast123</span>(</span>
-<span id="cb76-375"><a href="#cb76-375" tabindex="-1"></a>      mv_data_3,</span>
-<span id="cb76-376"><a href="#cb76-376" tabindex="-1"></a>      <span class="at">metadata =</span> <span class="fu">list</span>(<span class="at">whichDimIsTime =</span> <span class="dv">1</span>),</span>
-<span id="cb76-377"><a href="#cb76-377" tabindex="-1"></a>      <span class="at">season =</span> <span class="st">"none"</span></span>
-<span id="cb76-378"><a href="#cb76-378" tabindex="-1"></a>    )</span>
-<span id="cb76-379"><a href="#cb76-379" tabindex="-1"></a>  )</span>
-<span id="cb76-380"><a href="#cb76-380" tabindex="-1"></a>)</span>
-<span id="cb76-381"><a href="#cb76-381" tabindex="-1"></a>result_Rbeast<span class="sc">$</span>trend<span class="sc">$</span>cp</span>
-<span id="cb76-382"><a href="#cb76-382" tabindex="-1"></a><span class="co">#&gt; Warning message:</span></span>
-<span id="cb76-383"><a href="#cb76-383" tabindex="-1"></a><span class="co">#&gt; In Rbeast::beast123(mv_data_3, metadata = list(whichDimIsTime = 1),  :</span></span>
-<span id="cb76-384"><a href="#cb76-384" tabindex="-1"></a><span class="co">#&gt;   </span><span class="al">WARNING</span><span class="co">: If the input data is regular and ordered in time,the times of individual datapoints are determined fully by 'metadata$startTime' and 'metadata$deltaTime'. But startTime and deltaTime are missing and a default value 1 is used for both!</span></span>
-<span id="cb76-385"><a href="#cb76-385" tabindex="-1"></a><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
-<span id="cb76-386"><a href="#cb76-386" tabindex="-1"></a><span class="co">#&gt;  [1,] 1301  701  301</span></span>
-<span id="cb76-387"><a href="#cb76-387" tabindex="-1"></a><span class="co">#&gt;  [2,]  301  301 1301</span></span>
-<span id="cb76-388"><a href="#cb76-388" tabindex="-1"></a><span class="co">#&gt;  [3,]  701 1301  702</span></span>
-<span id="cb76-389"><a href="#cb76-389" tabindex="-1"></a><span class="co">#&gt;  [4,]  877  830 1924</span></span>
-<span id="cb76-390"><a href="#cb76-390" tabindex="-1"></a><span class="co">#&gt;  [5,] 1994  887 1880</span></span>
-<span id="cb76-391"><a href="#cb76-391" tabindex="-1"></a><span class="co">#&gt;  [6,] 1905  881 1971</span></span>
-<span id="cb76-392"><a href="#cb76-392" tabindex="-1"></a><span class="co">#&gt;  [7,] 1934  869  776</span></span>
-<span id="cb76-393"><a href="#cb76-393" tabindex="-1"></a><span class="co">#&gt;  [8,] 1929  807  831</span></span>
-<span id="cb76-394"><a href="#cb76-394" tabindex="-1"></a><span class="co">#&gt;  [9,] 1978 1960  845</span></span>
-<span id="cb76-395"><a href="#cb76-395" tabindex="-1"></a><span class="co">#&gt; [10,]  861 1947  760</span></span>
-<span id="cb76-396"><a href="#cb76-396" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.lm</span>(lm_data, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
-<span id="cb76-397"><a href="#cb76-397" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">99</span>, <span class="dv">201</span>))</span>
-<span id="cb76-398"><a href="#cb76-398" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> lm_data)<span class="sc">$</span>breakpoints</span>
-<span id="cb76-399"><a href="#cb76-399" tabindex="-1"></a><span class="co">#&gt; [1] 100 201</span></span>
-<span id="cb76-400"><a href="#cb76-400" tabindex="-1"></a>(segmented_result <span class="ot">&lt;-</span> segmented<span class="sc">::</span><span class="fu">segmented</span>(</span>
-<span id="cb76-401"><a href="#cb76-401" tabindex="-1"></a>  <span class="fu">lm</span>(</span>
-<span id="cb76-402"><a href="#cb76-402" tabindex="-1"></a>    y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>,</span>
-<span id="cb76-403"><a href="#cb76-403" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">y =</span> lm_data<span class="sc">$</span>y, <span class="at">x =</span> lm_data[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">index =</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(lm_data)))</span>
-<span id="cb76-404"><a href="#cb76-404" tabindex="-1"></a>  ),</span>
-<span id="cb76-405"><a href="#cb76-405" tabindex="-1"></a>  <span class="at">seg.Z =</span> <span class="sc">~</span> index</span>
-<span id="cb76-406"><a href="#cb76-406" tabindex="-1"></a>)<span class="sc">$</span>psi[, <span class="st">"Est."</span>])</span>
-<span id="cb76-407"><a href="#cb76-407" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_lt</span>(segmented_result <span class="sc">-</span> <span class="dv">233</span>, <span class="dv">1</span>)</span>
-<span id="cb76-408"><a href="#cb76-408" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.binomial</span>(binomial_data, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
-<span id="cb76-409"><a href="#cb76-409" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">300</span>))</span>
-<span id="cb76-410"><a href="#cb76-410" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> binomial_data)<span class="sc">$</span>breakpoints</span>
-<span id="cb76-411"><a href="#cb76-411" tabindex="-1"></a><span class="co">#&gt; [1] 297</span></span>
-<span id="cb76-412"><a href="#cb76-412" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.poisson</span>(poisson_data, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
-<span id="cb76-413"><a href="#cb76-413" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">498</span>, <span class="dv">800</span>, <span class="dv">1003</span>))</span>
-<span id="cb76-414"><a href="#cb76-414" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> poisson_data)<span class="sc">$</span>breakpoints</span>
-<span id="cb76-415"><a href="#cb76-415" tabindex="-1"></a><span class="co">#&gt; [1] 935</span></span>
-<span id="cb76-416"><a href="#cb76-416" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.lasso</span>(lasso_data, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
-<span id="cb76-417"><a href="#cb76-417" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">79</span>, <span class="dv">199</span>, <span class="dv">320</span>))</span>
-<span id="cb76-418"><a href="#cb76-418" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> lasso_data)<span class="sc">$</span>breakpoints,</span>
-<span id="cb76-419"><a href="#cb76-419" tabindex="-1"></a><span class="co">#&gt; [1]  80 200 321</span></span>
-<span id="cb76-420"><a href="#cb76-420" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.ar</span>(ar_data, <span class="dv">3</span>, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
-<span id="cb76-421"><a href="#cb76-421" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">614</span>))</span>
-<span id="cb76-422"><a href="#cb76-422" tabindex="-1"></a>(CptNonPar_result <span class="ot">&lt;-</span> CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(ar_data, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(ar_data) <span class="sc">/</span> <span class="dv">6</span>))<span class="sc">$</span>cpts)</span>
-<span id="cb76-423"><a href="#cb76-423" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(CptNonPar_result, <span class="fu">numeric</span>(<span class="dv">0</span>))</span>
-<span id="cb76-424"><a href="#cb76-424" tabindex="-1"></a>(segmented_result <span class="ot">&lt;-</span> segmented<span class="sc">::</span><span class="fu">segmented</span>(</span>
-<span id="cb76-425"><a href="#cb76-425" tabindex="-1"></a>  <span class="fu">lm</span>(</span>
-<span id="cb76-426"><a href="#cb76-426" tabindex="-1"></a>    y <span class="sc">~</span> x <span class="sc">+</span> <span class="dv">1</span>, <span class="fu">data.frame</span>(<span class="at">y =</span> ar_data, <span class="at">x =</span> <span class="fu">seq_along</span>(ar_data))</span>
-<span id="cb76-427"><a href="#cb76-427" tabindex="-1"></a>  ),</span>
-<span id="cb76-428"><a href="#cb76-428" tabindex="-1"></a>  <span class="at">seg.Z =</span> <span class="sc">~</span> x</span>
-<span id="cb76-429"><a href="#cb76-429" tabindex="-1"></a>)<span class="sc">$</span>psi[, <span class="st">"Est."</span>])</span>
-<span id="cb76-430"><a href="#cb76-430" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(segmented_result, <span class="fu">c</span>(<span class="dv">690</span>))</span>
-<span id="cb76-431"><a href="#cb76-431" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb76-432"><a href="#cb76-432" tabindex="-1"></a>  mcp<span class="sc">::</span><span class="fu">mcp</span>(</span>
-<span id="cb76-433"><a href="#cb76-433" tabindex="-1"></a>    <span class="fu">list</span>(y <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fu">ar</span>(<span class="dv">3</span>), <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> <span class="fu">ar</span>(<span class="dv">3</span>)),</span>
-<span id="cb76-434"><a href="#cb76-434" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> ar_data, <span class="at">x =</span> <span class="fu">seq_along</span>(ar_data)),</span>
-<span id="cb76-435"><a href="#cb76-435" tabindex="-1"></a>    <span class="at">par_x =</span> <span class="st">"x"</span></span>
-<span id="cb76-436"><a href="#cb76-436" tabindex="-1"></a>  )</span>
-<span id="cb76-437"><a href="#cb76-437" tabindex="-1"></a>)</span>
-<span id="cb76-438"><a href="#cb76-438" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.garch</span>(garch_data, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
-<span id="cb76-439"><a href="#cb76-439" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">205</span>))</span>
-<span id="cb76-440"><a href="#cb76-440" tabindex="-1"></a>(CptNonPar_result <span class="ot">&lt;-</span> CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(garch_data, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(garch_data) <span class="sc">/</span> <span class="dv">6</span>))<span class="sc">$</span>cpts)</span>
-<span id="cb76-441"><a href="#cb76-441" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(CptNonPar_result, <span class="fu">c</span>(<span class="dv">206</span>))</span>
-<span id="cb76-442"><a href="#cb76-442" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(x <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> garch_data))<span class="sc">$</span>breakpoints</span>
-<span id="cb76-443"><a href="#cb76-443" tabindex="-1"></a><span class="co">#&gt; [1] NA</span></span>
-<span id="cb76-444"><a href="#cb76-444" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.var</span>(</span>
-<span id="cb76-445"><a href="#cb76-445" tabindex="-1"></a>  var_data, <span class="dv">2</span>, <span class="at">cost_adjustment =</span> <span class="cn">NULL</span>, <span class="at">r.progress =</span> <span class="cn">FALSE</span></span>
-<span id="cb76-446"><a href="#cb76-446" tabindex="-1"></a>)<span class="sc">@</span>cp_set)</span>
-<span id="cb76-447"><a href="#cb76-447" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">500</span>))</span>
-<span id="cb76-448"><a href="#cb76-448" tabindex="-1"></a>(VARDetect_result <span class="ot">&lt;-</span> VARDetect<span class="sc">::</span><span class="fu">tbss</span>(var_data)<span class="sc">$</span>cp)</span>
-<span id="cb76-449"><a href="#cb76-449" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(VARDetect_result, <span class="fu">c</span>(<span class="dv">501</span>))</span>
-<span id="cb76-450"><a href="#cb76-450" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb76-451"><a href="#cb76-451" tabindex="-1"></a>  <span class="at">fastcpd =</span> <span class="fu">fastcpd.mean</span>(well_log, <span class="at">trim =</span> <span class="fl">0.003</span>)<span class="sc">@</span>cp_set,</span>
-<span id="cb76-452"><a href="#cb76-452" tabindex="-1"></a>  <span class="at">changepoint =</span> changepoint<span class="sc">::</span><span class="fu">cpt.mean</span>(well_log)<span class="sc">@</span>cpts,</span>
-<span id="cb76-453"><a href="#cb76-453" tabindex="-1"></a>  <span class="at">CptNonPar =</span></span>
-<span id="cb76-454"><a href="#cb76-454" tabindex="-1"></a>    CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(well_log, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(well_log) <span class="sc">/</span> <span class="dv">6</span>))<span class="sc">$</span>cpts,</span>
-<span id="cb76-455"><a href="#cb76-455" tabindex="-1"></a>  <span class="at">strucchange =</span> strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(</span>
-<span id="cb76-456"><a href="#cb76-456" tabindex="-1"></a>    y <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> well_log)</span>
-<span id="cb76-457"><a href="#cb76-457" tabindex="-1"></a>  )<span class="sc">$</span>breakpoints,</span>
-<span id="cb76-458"><a href="#cb76-458" tabindex="-1"></a>  <span class="at">ecp =</span> ecp<span class="sc">::</span><span class="fu">e.divisive</span>(<span class="fu">matrix</span>(well_log))<span class="sc">$</span>estimates,</span>
-<span id="cb76-459"><a href="#cb76-459" tabindex="-1"></a>  <span class="at">breakfast =</span> breakfast<span class="sc">::</span><span class="fu">breakfast</span>(well_log)<span class="sc">$</span>cptmodel.list[[<span class="dv">6</span>]]<span class="sc">$</span>cpts,</span>
-<span id="cb76-460"><a href="#cb76-460" tabindex="-1"></a>  <span class="at">wbs =</span> wbs<span class="sc">::</span><span class="fu">wbs</span>(well_log)<span class="sc">$</span>cpt<span class="sc">$</span>cpt.ic<span class="sc">$</span>mbic.penalty,</span>
-<span id="cb76-461"><a href="#cb76-461" tabindex="-1"></a>  <span class="at">mosum =</span> mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(well_log), <span class="at">G =</span> <span class="dv">40</span>)<span class="sc">$</span>cpts.info<span class="sc">$</span>cpts,</span>
-<span id="cb76-462"><a href="#cb76-462" tabindex="-1"></a>  <span class="at">fpop =</span> fpop<span class="sc">::</span><span class="fu">Fpop</span>(well_log, <span class="fu">length</span>(well_log))<span class="sc">$</span>t.est,  <span class="co"># meaningless</span></span>
-<span id="cb76-463"><a href="#cb76-463" tabindex="-1"></a>  <span class="at">gfpop =</span> gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
-<span id="cb76-464"><a href="#cb76-464" tabindex="-1"></a>    <span class="at">data =</span> well_log,</span>
-<span id="cb76-465"><a href="#cb76-465" tabindex="-1"></a>    <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
-<span id="cb76-466"><a href="#cb76-466" tabindex="-1"></a>      <span class="at">penalty =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">length</span>(well_log)) <span class="sc">*</span> gfpop<span class="sc">::</span><span class="fu">sdDiff</span>(well_log) <span class="sc">^</span> <span class="dv">2</span>,</span>
-<span id="cb76-467"><a href="#cb76-467" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">"updown"</span></span>
-<span id="cb76-468"><a href="#cb76-468" tabindex="-1"></a>    ),</span>
-<span id="cb76-469"><a href="#cb76-469" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"mean"</span></span>
-<span id="cb76-470"><a href="#cb76-470" tabindex="-1"></a>  )<span class="sc">$</span>changepoints,</span>
-<span id="cb76-471"><a href="#cb76-471" tabindex="-1"></a>  <span class="at">InspectChangepoint =</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
-<span id="cb76-472"><a href="#cb76-472" tabindex="-1"></a>    well_log,</span>
-<span id="cb76-473"><a href="#cb76-473" tabindex="-1"></a>    <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(<span class="fu">length</span>(well_log), <span class="dv">1</span>)</span>
-<span id="cb76-474"><a href="#cb76-474" tabindex="-1"></a>  )<span class="sc">$</span>changepoints[, <span class="st">"location"</span>],</span>
-<span id="cb76-475"><a href="#cb76-475" tabindex="-1"></a>  <span class="at">jointseg =</span> jointseg<span class="sc">::</span><span class="fu">jointSeg</span>(well_log, <span class="at">K =</span> <span class="dv">12</span>)<span class="sc">$</span>bestBkp,</span>
-<span id="cb76-476"><a href="#cb76-476" tabindex="-1"></a>  <span class="at">Rbeast =</span> Rbeast<span class="sc">::</span><span class="fu">beast</span>(</span>
-<span id="cb76-477"><a href="#cb76-477" tabindex="-1"></a>    well_log, <span class="at">season =</span> <span class="st">"none"</span>, <span class="at">print.progress =</span> <span class="cn">FALSE</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
-<span id="cb76-478"><a href="#cb76-478" tabindex="-1"></a>  )<span class="sc">$</span>trend<span class="sc">$</span>cp,</span>
-<span id="cb76-479"><a href="#cb76-479" tabindex="-1"></a>  <span class="at">stepR =</span> stepR<span class="sc">::</span><span class="fu">stepFit</span>(well_log, <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">$</span>rightEnd</span>
-<span id="cb76-480"><a href="#cb76-480" tabindex="-1"></a>)</span>
-<span id="cb76-481"><a href="#cb76-481" tabindex="-1"></a></span>
-<span id="cb76-482"><a href="#cb76-482" tabindex="-1"></a>package_list <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">names</span>(result), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb76-483"><a href="#cb76-483" tabindex="-1"></a>comparison_table <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb76-484"><a href="#cb76-484" tabindex="-1"></a><span class="cf">for</span> (package_index <span class="cf">in</span> <span class="fu">seq_along</span>(package_list)) {</span>
-<span id="cb76-485"><a href="#cb76-485" tabindex="-1"></a>  package <span class="ot">&lt;-</span> package_list[[package_index]]</span>
-<span id="cb76-486"><a href="#cb76-486" tabindex="-1"></a>  comparison_table <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
-<span id="cb76-487"><a href="#cb76-487" tabindex="-1"></a>    comparison_table,</span>
-<span id="cb76-488"><a href="#cb76-488" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
-<span id="cb76-489"><a href="#cb76-489" tabindex="-1"></a>      <span class="at">change_point =</span> result[[package]],</span>
-<span id="cb76-490"><a href="#cb76-490" tabindex="-1"></a>      <span class="at">package =</span> package,</span>
-<span id="cb76-491"><a href="#cb76-491" tabindex="-1"></a>      <span class="at">y_offset =</span> (package_index <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">400</span></span>
-<span id="cb76-492"><a href="#cb76-492" tabindex="-1"></a>    )</span>
-<span id="cb76-493"><a href="#cb76-493" tabindex="-1"></a>  )</span>
-<span id="cb76-494"><a href="#cb76-494" tabindex="-1"></a>}</span>
-<span id="cb76-495"><a href="#cb76-495" tabindex="-1"></a></span>
-<span id="cb76-496"><a href="#cb76-496" tabindex="-1"></a>most_selected <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">table</span>(comparison_table<span class="sc">$</span>change_point), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb76-497"><a href="#cb76-497" tabindex="-1"></a>most_selected <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">as.numeric</span>(<span class="fu">names</span>(most_selected[most_selected <span class="sc">&gt;=</span> <span class="dv">4</span>])))</span>
-<span id="cb76-498"><a href="#cb76-498" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">length</span>(most_selected) <span class="sc">-</span> <span class="dv">1</span>)) {</span>
-<span id="cb76-499"><a href="#cb76-499" tabindex="-1"></a>  <span class="cf">if</span> (most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">-</span> most_selected[i] <span class="sc">&lt;</span> <span class="dv">2</span>) {</span>
-<span id="cb76-500"><a href="#cb76-500" tabindex="-1"></a>    most_selected[i] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb76-501"><a href="#cb76-501" tabindex="-1"></a>    most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">-</span> <span class="fl">0.5</span></span>
-<span id="cb76-502"><a href="#cb76-502" tabindex="-1"></a>  }</span>
-<span id="cb76-503"><a href="#cb76-503" tabindex="-1"></a>}</span>
-<span id="cb76-504"><a href="#cb76-504" tabindex="-1"></a>(most_selected <span class="ot">&lt;-</span> most_selected[<span class="sc">!</span><span class="fu">is.na</span>(most_selected)])</span>
-<span id="cb76-505"><a href="#cb76-505" tabindex="-1"></a><span class="co">#&gt;  [1]    6.0  314.0  434.0  704.0  776.0 1021.0 1057.0 1347.0 1405.0 1502.0 1661.0 1842.0 2023.0 2202.0</span></span>
-<span id="cb76-506"><a href="#cb76-506" tabindex="-1"></a><span class="co">#&gt; [15] 2384.5 2445.0 2507.0 2567.5 2738.0 2921.0 3094.0 3251.0 3464.0 3499.0 3622.0 3709.0 3820.0 3976.0</span></span>
-<span id="cb76-507"><a href="#cb76-507" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb76-508"><a href="#cb76-508" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(</span>
-<span id="cb76-509"><a href="#cb76-509" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">seq_along</span>(well_log), <span class="at">y =</span> <span class="fu">c</span>(well_log)),</span>
-<span id="cb76-510"><a href="#cb76-510" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
-<span id="cb76-511"><a href="#cb76-511" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-512"><a href="#cb76-512" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_vline</span>(</span>
-<span id="cb76-513"><a href="#cb76-513" tabindex="-1"></a>    <span class="at">xintercept =</span> most_selected,</span>
-<span id="cb76-514"><a href="#cb76-514" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span>,</span>
-<span id="cb76-515"><a href="#cb76-515" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
-<span id="cb76-516"><a href="#cb76-516" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span></span>
+<span id="cb76-250"><a href="#cb76-250" tabindex="-1"></a><span class="co">#&gt;   [1]  300  700  701  702  704  707  708  712  715  716  717  718  721  722</span></span>
+<span id="cb76-251"><a href="#cb76-251" tabindex="-1"></a><span class="co">#&gt;  [15]  723  726  727  732  734  736  740  742  744  746  748  750  753  755</span></span>
+<span id="cb76-252"><a href="#cb76-252" tabindex="-1"></a><span class="co">#&gt;  [29]  756  757  759  760  762  764  765  768  771  772  774  776  777  785</span></span>
+<span id="cb76-253"><a href="#cb76-253" tabindex="-1"></a><span class="co">#&gt;  [43]  786  789  791  794  798  799  801  802  803  807  809  810  813  815</span></span>
+<span id="cb76-254"><a href="#cb76-254" tabindex="-1"></a><span class="co">#&gt;  [57]  817  819  826  827  828  829  831  833  835  836  837  838  840  841</span></span>
+<span id="cb76-255"><a href="#cb76-255" tabindex="-1"></a><span class="co">#&gt;  [71]  842  843  845  848  849  852  854  860  862  864  866  868  870  872</span></span>
+<span id="cb76-256"><a href="#cb76-256" tabindex="-1"></a><span class="co">#&gt;  [85]  875  879  881  884  886  887  888  889  896  897  898  899  901  903</span></span>
+<span id="cb76-257"><a href="#cb76-257" tabindex="-1"></a><span class="co">#&gt;  [99]  904  905  906  909  912  913  915  917  919  921  922  923  927  928</span></span>
+<span id="cb76-258"><a href="#cb76-258" tabindex="-1"></a><span class="co">#&gt; [113]  932  934  936  937  940  944  945  947  948  949  958  959  961  962</span></span>
+<span id="cb76-259"><a href="#cb76-259" tabindex="-1"></a><span class="co">#&gt; [127]  963  964  966  967  968  972  974  976  978  979 1300 1700 1702 1703</span></span>
+<span id="cb76-260"><a href="#cb76-260" tabindex="-1"></a><span class="co">#&gt; [141] 1704 1705 1708 1710 1712 1714 1716 1717 1718 1721 1723 1725 1726 1731</span></span>
+<span id="cb76-261"><a href="#cb76-261" tabindex="-1"></a><span class="co">#&gt; [155] 1733 1735 1736 1737 1739 1742 1745 1747 1748 1752 1754 1756 1758 1759</span></span>
+<span id="cb76-262"><a href="#cb76-262" tabindex="-1"></a><span class="co">#&gt; [169] 1768 1770 1771 1778 1785 1790 1793 1795 1796 1797 1799 1800 1803 1804</span></span>
+<span id="cb76-263"><a href="#cb76-263" tabindex="-1"></a><span class="co">#&gt; [183] 1805 1806 1807 1808 1821 1828 1829 1833 1835 1837 1840 1841 1842 1848</span></span>
+<span id="cb76-264"><a href="#cb76-264" tabindex="-1"></a><span class="co">#&gt; [197] 1849 1851 1852 1854 1855 1857 1862 1863 1865 1867 1868 1876 1878 1879</span></span>
+<span id="cb76-265"><a href="#cb76-265" tabindex="-1"></a><span class="co">#&gt; [211] 1880 1882 1883 1884 1887 1889 1894 1898 1899 1905 1906 1907 1908 1909</span></span>
+<span id="cb76-266"><a href="#cb76-266" tabindex="-1"></a><span class="co">#&gt; [225] 1912 1919 1926 1927 1928 1930 1933 1934 1935 1936 1938 1940 1952 1955</span></span>
+<span id="cb76-267"><a href="#cb76-267" tabindex="-1"></a><span class="co">#&gt; [239] 1956 1960 1962 1963 1966 1967 1969 1970 1974 1976 1977 1978 1980 1985</span></span>
+<span id="cb76-268"><a href="#cb76-268" tabindex="-1"></a><span class="co">#&gt; [253] 1987 1990 1997 1998</span></span>
+<span id="cb76-269"><a href="#cb76-269" tabindex="-1"></a>Rbeast<span class="sc">::</span><span class="fu">beast</span>(</span>
+<span id="cb76-270"><a href="#cb76-270" tabindex="-1"></a>  mv_data_1, <span class="at">season =</span> <span class="st">"none"</span>, <span class="at">print.progress =</span> <span class="cn">FALSE</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb76-271"><a href="#cb76-271" tabindex="-1"></a>)<span class="sc">$</span>trend<span class="sc">$</span>cp</span>
+<span id="cb76-272"><a href="#cb76-272" tabindex="-1"></a><span class="co">#&gt;  [1] 1301  301  701 1986 1794 1855 1981 1769 1859 1779</span></span>
+<span id="cb76-273"><a href="#cb76-273" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb76-274"><a href="#cb76-274" tabindex="-1"></a>  mcp<span class="sc">::</span><span class="fu">mcp</span>(</span>
+<span id="cb76-275"><a href="#cb76-275" tabindex="-1"></a>    <span class="fu">list</span>(y <span class="sc">~</span> <span class="dv">1</span>, <span class="sc">~</span> <span class="dv">1</span>, <span class="sc">~</span> <span class="dv">1</span>, <span class="sc">~</span> <span class="dv">1</span>, <span class="sc">~</span> <span class="dv">1</span>, <span class="sc">~</span> <span class="dv">1</span>),</span>
+<span id="cb76-276"><a href="#cb76-276" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> mv_data_1, <span class="at">x =</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(mv_data_1))),</span>
+<span id="cb76-277"><a href="#cb76-277" tabindex="-1"></a>    <span class="at">par_x =</span> <span class="st">"x"</span></span>
+<span id="cb76-278"><a href="#cb76-278" tabindex="-1"></a>  )</span>
+<span id="cb76-279"><a href="#cb76-279" tabindex="-1"></a>)</span>
+<span id="cb76-280"><a href="#cb76-280" tabindex="-1"></a><span class="fu">plot</span>(not<span class="sc">::</span><span class="fu">not</span>(mv_data_1, <span class="at">contrast =</span> <span class="st">"pcwsConstMeanVar"</span>))</span>
+<span id="cb76-281"><a href="#cb76-281" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.mean</span>(mean_data_3, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
+<span id="cb76-282"><a href="#cb76-282" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">300</span>, <span class="dv">700</span>))</span>
+<span id="cb76-283"><a href="#cb76-283" tabindex="-1"></a>(CptNonPar_result <span class="ot">&lt;-</span> CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(mean_data_3, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">nrow</span>(mean_data_3) <span class="sc">/</span> <span class="dv">6</span>))<span class="sc">$</span>cpts)</span>
+<span id="cb76-284"><a href="#cb76-284" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(CptNonPar_result, <span class="fu">c</span>(<span class="dv">300</span>, <span class="dv">700</span>))</span>
+<span id="cb76-285"><a href="#cb76-285" tabindex="-1"></a><span class="fu">invisible</span>(</span>
+<span id="cb76-286"><a href="#cb76-286" tabindex="-1"></a>  <span class="fu">suppressMessages</span>(</span>
+<span id="cb76-287"><a href="#cb76-287" tabindex="-1"></a>    <span class="fu">capture.output</span>(</span>
+<span id="cb76-288"><a href="#cb76-288" tabindex="-1"></a>      result_InspectChangepoint <span class="ot">&lt;-</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
+<span id="cb76-289"><a href="#cb76-289" tabindex="-1"></a>        <span class="fu">t</span>(mean_data_3),</span>
+<span id="cb76-290"><a href="#cb76-290" tabindex="-1"></a>        <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(</span>
+<span id="cb76-291"><a href="#cb76-291" tabindex="-1"></a>          <span class="fu">nrow</span>(mean_data_3), <span class="fu">ncol</span>(mean_data_3)</span>
+<span id="cb76-292"><a href="#cb76-292" tabindex="-1"></a>        )</span>
+<span id="cb76-293"><a href="#cb76-293" tabindex="-1"></a>      )</span>
+<span id="cb76-294"><a href="#cb76-294" tabindex="-1"></a>    )</span>
+<span id="cb76-295"><a href="#cb76-295" tabindex="-1"></a>  )</span>
+<span id="cb76-296"><a href="#cb76-296" tabindex="-1"></a>)</span>
+<span id="cb76-297"><a href="#cb76-297" tabindex="-1"></a>result_InspectChangepoint<span class="sc">$</span>changepoints[, <span class="st">"location"</span>]</span>
+<span id="cb76-298"><a href="#cb76-298" tabindex="-1"></a><span class="co">#&gt; [1] 300 700</span></span>
+<span id="cb76-299"><a href="#cb76-299" tabindex="-1"></a>(jointseg_result <span class="ot">&lt;-</span> jointseg<span class="sc">::</span><span class="fu">jointSeg</span>(mean_data_3, <span class="at">K =</span> <span class="dv">2</span>)<span class="sc">$</span>bestBkp)</span>
+<span id="cb76-300"><a href="#cb76-300" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(jointseg_result, <span class="fu">c</span>(<span class="dv">300</span>, <span class="dv">700</span>))</span>
+<span id="cb76-301"><a href="#cb76-301" tabindex="-1"></a><span class="fu">invisible</span>(</span>
+<span id="cb76-302"><a href="#cb76-302" tabindex="-1"></a>  <span class="fu">capture.output</span>(</span>
+<span id="cb76-303"><a href="#cb76-303" tabindex="-1"></a>    result_Rbeast <span class="ot">&lt;-</span> Rbeast<span class="sc">::</span><span class="fu">beast123</span>(</span>
+<span id="cb76-304"><a href="#cb76-304" tabindex="-1"></a>      mean_data_3,</span>
+<span id="cb76-305"><a href="#cb76-305" tabindex="-1"></a>      <span class="at">metadata =</span> <span class="fu">list</span>(<span class="at">whichDimIsTime =</span> <span class="dv">1</span>),</span>
+<span id="cb76-306"><a href="#cb76-306" tabindex="-1"></a>      <span class="at">season =</span> <span class="st">"none"</span></span>
+<span id="cb76-307"><a href="#cb76-307" tabindex="-1"></a>    )</span>
+<span id="cb76-308"><a href="#cb76-308" tabindex="-1"></a>  )</span>
+<span id="cb76-309"><a href="#cb76-309" tabindex="-1"></a>)</span>
+<span id="cb76-310"><a href="#cb76-310" tabindex="-1"></a>result_Rbeast<span class="sc">$</span>trend<span class="sc">$</span>cp</span>
+<span id="cb76-311"><a href="#cb76-311" tabindex="-1"></a><span class="co">#&gt; Warning message:</span></span>
+<span id="cb76-312"><a href="#cb76-312" tabindex="-1"></a><span class="co">#&gt; In Rbeast::beast123(mean_data_3, metadata = list(whichDimIsTime = 1),  :</span></span>
+<span id="cb76-313"><a href="#cb76-313" tabindex="-1"></a><span class="co">#&gt;   </span><span class="al">WARNING</span><span class="co">: If the input data is regular and ordered in time,the times of individual datapoints are determined fully by 'metadata$startTime' and 'metadata$deltaTime'. But startTime and deltaTime are missing and a default value 1 is used for both!</span></span>
+<span id="cb76-314"><a href="#cb76-314" tabindex="-1"></a><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
+<span id="cb76-315"><a href="#cb76-315" tabindex="-1"></a><span class="co">#&gt;  [1,]  301  301  701</span></span>
+<span id="cb76-316"><a href="#cb76-316" tabindex="-1"></a><span class="co">#&gt;  [2,]  701  701  301</span></span>
+<span id="cb76-317"><a href="#cb76-317" tabindex="-1"></a><span class="co">#&gt;  [3,]  NaN  225  NaN</span></span>
+<span id="cb76-318"><a href="#cb76-318" tabindex="-1"></a><span class="co">#&gt;  [4,]  NaN  684  NaN</span></span>
+<span id="cb76-319"><a href="#cb76-319" tabindex="-1"></a><span class="co">#&gt;  [5,]  NaN  NaN  NaN</span></span>
+<span id="cb76-320"><a href="#cb76-320" tabindex="-1"></a><span class="co">#&gt;  [6,]  NaN  NaN  NaN</span></span>
+<span id="cb76-321"><a href="#cb76-321" tabindex="-1"></a><span class="co">#&gt;  [7,]  NaN  NaN  NaN</span></span>
+<span id="cb76-322"><a href="#cb76-322" tabindex="-1"></a><span class="co">#&gt;  [8,]  NaN  NaN  NaN</span></span>
+<span id="cb76-323"><a href="#cb76-323" tabindex="-1"></a><span class="co">#&gt;  [9,]  NaN  NaN  NaN</span></span>
+<span id="cb76-324"><a href="#cb76-324" tabindex="-1"></a><span class="co">#&gt; [10,]  NaN  NaN  NaN</span></span>
+<span id="cb76-325"><a href="#cb76-325" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(</span>
+<span id="cb76-326"><a href="#cb76-326" tabindex="-1"></a>  <span class="fu">cbind</span>(y<span class="fl">.1</span>, y<span class="fl">.2</span>, y<span class="fl">.3</span>) <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> mean_data_3)</span>
+<span id="cb76-327"><a href="#cb76-327" tabindex="-1"></a>)<span class="sc">$</span>breakpoints</span>
+<span id="cb76-328"><a href="#cb76-328" tabindex="-1"></a><span class="co">#&gt; [1] 300 700</span></span>
+<span id="cb76-329"><a href="#cb76-329" tabindex="-1"></a>ecp<span class="sc">::</span><span class="fu">e.divisive</span>(mean_data_3)<span class="sc">$</span>estimates</span>
+<span id="cb76-330"><a href="#cb76-330" tabindex="-1"></a><span class="co">#&gt; [1]    1  301  701 1001</span></span>
+<span id="cb76-331"><a href="#cb76-331" tabindex="-1"></a><span class="fu">plot</span>(bcp<span class="sc">::</span><span class="fu">bcp</span>(mean_data_3))</span>
+<span id="cb76-332"><a href="#cb76-332" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.mv</span>(mv_data_3, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
+<span id="cb76-333"><a href="#cb76-333" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">300</span>, <span class="dv">700</span>, <span class="dv">1000</span>, <span class="dv">1300</span>, <span class="dv">1700</span>))</span>
+<span id="cb76-334"><a href="#cb76-334" tabindex="-1"></a>ecp<span class="sc">::</span><span class="fu">e.divisive</span>(mv_data_3)<span class="sc">$</span>estimates</span>
+<span id="cb76-335"><a href="#cb76-335" tabindex="-1"></a><span class="co">#&gt; [1]    1  301  701 1001 1301 1701 2001</span></span>
+<span id="cb76-336"><a href="#cb76-336" tabindex="-1"></a><span class="fu">invisible</span>(</span>
+<span id="cb76-337"><a href="#cb76-337" tabindex="-1"></a>  <span class="fu">suppressMessages</span>(</span>
+<span id="cb76-338"><a href="#cb76-338" tabindex="-1"></a>    <span class="fu">capture.output</span>(</span>
+<span id="cb76-339"><a href="#cb76-339" tabindex="-1"></a>      result_InspectChangepoint <span class="ot">&lt;-</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
+<span id="cb76-340"><a href="#cb76-340" tabindex="-1"></a>        <span class="fu">t</span>(mv_data_3),</span>
+<span id="cb76-341"><a href="#cb76-341" tabindex="-1"></a>        <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(</span>
+<span id="cb76-342"><a href="#cb76-342" tabindex="-1"></a>          <span class="fu">nrow</span>(mv_data_3), <span class="fu">ncol</span>(mv_data_3)</span>
+<span id="cb76-343"><a href="#cb76-343" tabindex="-1"></a>        )</span>
+<span id="cb76-344"><a href="#cb76-344" tabindex="-1"></a>      )</span>
+<span id="cb76-345"><a href="#cb76-345" tabindex="-1"></a>    )</span>
+<span id="cb76-346"><a href="#cb76-346" tabindex="-1"></a>  )</span>
+<span id="cb76-347"><a href="#cb76-347" tabindex="-1"></a>)</span>
+<span id="cb76-348"><a href="#cb76-348" tabindex="-1"></a>result_InspectChangepoint<span class="sc">$</span>changepoints[, <span class="st">"location"</span>]</span>
+<span id="cb76-349"><a href="#cb76-349" tabindex="-1"></a><span class="co">#&gt;   [1]  300  700  701  703  704  705  707  708  710  711  712  714  715  716</span></span>
+<span id="cb76-350"><a href="#cb76-350" tabindex="-1"></a><span class="co">#&gt;  [15]  717  719  721  722  723  725  726  730  731  732  734  735  736  738</span></span>
+<span id="cb76-351"><a href="#cb76-351" tabindex="-1"></a><span class="co">#&gt;  [29]  739  740  741  742  744  745  747  748  749  752  753  754  756  757</span></span>
+<span id="cb76-352"><a href="#cb76-352" tabindex="-1"></a><span class="co">#&gt;  [43]  759  761  762  763  764  766  768  769  770  772  773  774  776  777</span></span>
+<span id="cb76-353"><a href="#cb76-353" tabindex="-1"></a><span class="co">#&gt;  [57]  778  780  781  783  784  786  788  789  791  793  795  797  799  800</span></span>
+<span id="cb76-354"><a href="#cb76-354" tabindex="-1"></a><span class="co">#&gt;  [71]  801  803  805  806  808  809  811  813  814  816  817  819  821  822</span></span>
+<span id="cb76-355"><a href="#cb76-355" tabindex="-1"></a><span class="co">#&gt;  [85]  824  825  826  829  830  831  832  834  835  837  838  839  841  842</span></span>
+<span id="cb76-356"><a href="#cb76-356" tabindex="-1"></a><span class="co">#&gt;  [99]  843  845  846  847  852  853  855  857  860  861  862  864  865  866</span></span>
+<span id="cb76-357"><a href="#cb76-357" tabindex="-1"></a><span class="co">#&gt; [113]  868  869  870  871  873  876  877  878  880  882  883  884  886  888</span></span>
+<span id="cb76-358"><a href="#cb76-358" tabindex="-1"></a><span class="co">#&gt; [127]  891  893  895  896  898  900  901  903  904  905  906  908  909  910</span></span>
+<span id="cb76-359"><a href="#cb76-359" tabindex="-1"></a><span class="co">#&gt; [141]  911  914  915  916  919  920  921  923  924  926  927  928  930  931</span></span>
+<span id="cb76-360"><a href="#cb76-360" tabindex="-1"></a><span class="co">#&gt; [155]  933  934  936  938  939  940  942  944  945  946  948  949  951  952</span></span>
+<span id="cb76-361"><a href="#cb76-361" tabindex="-1"></a><span class="co">#&gt; [169]  954  956  957  959  960  961  962  964  965  966  968  969  970  971</span></span>
+<span id="cb76-362"><a href="#cb76-362" tabindex="-1"></a><span class="co">#&gt; [183]  973  974  976  977  979  980  982  983  984  985  986  988  989  990</span></span>
+<span id="cb76-363"><a href="#cb76-363" tabindex="-1"></a><span class="co">#&gt; [197]  992  993  995  996  998 1000 1300 1700 1701 1702 1705 1708 1710 1711</span></span>
+<span id="cb76-364"><a href="#cb76-364" tabindex="-1"></a><span class="co">#&gt; [211] 1712 1713 1715 1716 1717 1718 1720 1721 1724 1725 1726 1728 1729 1730</span></span>
+<span id="cb76-365"><a href="#cb76-365" tabindex="-1"></a><span class="co">#&gt; [225] 1731 1733 1734 1735 1737 1738 1740 1742 1743 1745 1747 1749 1750 1752</span></span>
+<span id="cb76-366"><a href="#cb76-366" tabindex="-1"></a><span class="co">#&gt; [239] 1753 1754 1755 1756 1758 1759 1760 1762 1763 1764 1766 1767 1769 1770</span></span>
+<span id="cb76-367"><a href="#cb76-367" tabindex="-1"></a><span class="co">#&gt; [253] 1771 1773 1774 1776 1777 1779 1780 1782 1783 1785 1787 1788 1791 1792</span></span>
+<span id="cb76-368"><a href="#cb76-368" tabindex="-1"></a><span class="co">#&gt; [267] 1793 1794 1796 1798 1800 1801 1803 1805 1809 1811 1812 1813 1814 1816</span></span>
+<span id="cb76-369"><a href="#cb76-369" tabindex="-1"></a><span class="co">#&gt; [281] 1817 1819 1820 1821 1823 1824 1826 1828 1830 1832 1833 1834 1836 1838</span></span>
+<span id="cb76-370"><a href="#cb76-370" tabindex="-1"></a><span class="co">#&gt; [295] 1839 1841 1842 1843 1846 1847 1850 1851 1853 1854 1856 1857 1859 1861</span></span>
+<span id="cb76-371"><a href="#cb76-371" tabindex="-1"></a><span class="co">#&gt; [309] 1862 1864 1865 1866 1869 1870 1872 1874 1876 1878 1879 1881 1882 1883</span></span>
+<span id="cb76-372"><a href="#cb76-372" tabindex="-1"></a><span class="co">#&gt; [323] 1885 1887 1888 1889 1890 1892 1894 1896 1898 1899 1900 1902 1904 1905</span></span>
+<span id="cb76-373"><a href="#cb76-373" tabindex="-1"></a><span class="co">#&gt; [337] 1907 1908 1909 1911 1913 1916 1918 1919 1920 1922 1923 1925 1926 1928</span></span>
+<span id="cb76-374"><a href="#cb76-374" tabindex="-1"></a><span class="co">#&gt; [351] 1930 1931 1933 1935 1936 1937 1939 1940 1942 1943 1945 1947 1948 1950</span></span>
+<span id="cb76-375"><a href="#cb76-375" tabindex="-1"></a><span class="co">#&gt; [365] 1951 1952 1953 1955 1956 1957 1959 1960 1961 1963 1964 1966 1967 1968</span></span>
+<span id="cb76-376"><a href="#cb76-376" tabindex="-1"></a><span class="co">#&gt; [379] 1970 1972 1974 1976 1977 1978 1982 1983 1985 1987 1990 1992 1993 1994</span></span>
+<span id="cb76-377"><a href="#cb76-377" tabindex="-1"></a><span class="co">#&gt; [393] 1996 1997</span></span>
+<span id="cb76-378"><a href="#cb76-378" tabindex="-1"></a><span class="fu">invisible</span>(</span>
+<span id="cb76-379"><a href="#cb76-379" tabindex="-1"></a>  <span class="fu">capture.output</span>(</span>
+<span id="cb76-380"><a href="#cb76-380" tabindex="-1"></a>    result_Rbeast <span class="ot">&lt;-</span> Rbeast<span class="sc">::</span><span class="fu">beast123</span>(</span>
+<span id="cb76-381"><a href="#cb76-381" tabindex="-1"></a>      mv_data_3,</span>
+<span id="cb76-382"><a href="#cb76-382" tabindex="-1"></a>      <span class="at">metadata =</span> <span class="fu">list</span>(<span class="at">whichDimIsTime =</span> <span class="dv">1</span>),</span>
+<span id="cb76-383"><a href="#cb76-383" tabindex="-1"></a>      <span class="at">season =</span> <span class="st">"none"</span></span>
+<span id="cb76-384"><a href="#cb76-384" tabindex="-1"></a>    )</span>
+<span id="cb76-385"><a href="#cb76-385" tabindex="-1"></a>  )</span>
+<span id="cb76-386"><a href="#cb76-386" tabindex="-1"></a>)</span>
+<span id="cb76-387"><a href="#cb76-387" tabindex="-1"></a>result_Rbeast<span class="sc">$</span>trend<span class="sc">$</span>cp</span>
+<span id="cb76-388"><a href="#cb76-388" tabindex="-1"></a><span class="co">#&gt; Warning message:</span></span>
+<span id="cb76-389"><a href="#cb76-389" tabindex="-1"></a><span class="co">#&gt; In Rbeast::beast123(mv_data_3, metadata = list(whichDimIsTime = 1),  :</span></span>
+<span id="cb76-390"><a href="#cb76-390" tabindex="-1"></a><span class="co">#&gt;   </span><span class="al">WARNING</span><span class="co">: If the input data is regular and ordered in time,the times of individual datapoints are determined fully by 'metadata$startTime' and 'metadata$deltaTime'. But startTime and deltaTime are missing and a default value 1 is used for both!</span></span>
+<span id="cb76-391"><a href="#cb76-391" tabindex="-1"></a><span class="co">#&gt;       [,1] [,2] [,3]</span></span>
+<span id="cb76-392"><a href="#cb76-392" tabindex="-1"></a><span class="co">#&gt;  [1,]  701  301  301</span></span>
+<span id="cb76-393"><a href="#cb76-393" tabindex="-1"></a><span class="co">#&gt;  [2,]  301  701 1301</span></span>
+<span id="cb76-394"><a href="#cb76-394" tabindex="-1"></a><span class="co">#&gt;  [3,] 1301 1301  702</span></span>
+<span id="cb76-395"><a href="#cb76-395" tabindex="-1"></a><span class="co">#&gt;  [4,] 1994  830 1924</span></span>
+<span id="cb76-396"><a href="#cb76-396" tabindex="-1"></a><span class="co">#&gt;  [5,] 1978  807 1919</span></span>
+<span id="cb76-397"><a href="#cb76-397" tabindex="-1"></a><span class="co">#&gt;  [6,] 1905  881  760</span></span>
+<span id="cb76-398"><a href="#cb76-398" tabindex="-1"></a><span class="co">#&gt;  [7,] 1912  887  756</span></span>
+<span id="cb76-399"><a href="#cb76-399" tabindex="-1"></a><span class="co">#&gt;  [8,] 1972  821  769</span></span>
+<span id="cb76-400"><a href="#cb76-400" tabindex="-1"></a><span class="co">#&gt;  [9,] 1788  874 1880</span></span>
+<span id="cb76-401"><a href="#cb76-401" tabindex="-1"></a><span class="co">#&gt; [10,]  820  989 1761</span></span>
+<span id="cb76-402"><a href="#cb76-402" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.lm</span>(lm_data, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
+<span id="cb76-403"><a href="#cb76-403" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">99</span>, <span class="dv">201</span>))</span>
+<span id="cb76-404"><a href="#cb76-404" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> lm_data)<span class="sc">$</span>breakpoints</span>
+<span id="cb76-405"><a href="#cb76-405" tabindex="-1"></a><span class="co">#&gt; [1] 100 201</span></span>
+<span id="cb76-406"><a href="#cb76-406" tabindex="-1"></a>(segmented_result <span class="ot">&lt;-</span> segmented<span class="sc">::</span><span class="fu">segmented</span>(</span>
+<span id="cb76-407"><a href="#cb76-407" tabindex="-1"></a>  <span class="fu">lm</span>(</span>
+<span id="cb76-408"><a href="#cb76-408" tabindex="-1"></a>    y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb76-409"><a href="#cb76-409" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">y =</span> lm_data<span class="sc">$</span>y, <span class="at">x =</span> lm_data[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">index =</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(lm_data)))</span>
+<span id="cb76-410"><a href="#cb76-410" tabindex="-1"></a>  ),</span>
+<span id="cb76-411"><a href="#cb76-411" tabindex="-1"></a>  <span class="at">seg.Z =</span> <span class="sc">~</span> index</span>
+<span id="cb76-412"><a href="#cb76-412" tabindex="-1"></a>)<span class="sc">$</span>psi[, <span class="st">"Est."</span>])</span>
+<span id="cb76-413"><a href="#cb76-413" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_lt</span>(segmented_result <span class="sc">-</span> <span class="dv">233</span>, <span class="dv">1</span>)</span>
+<span id="cb76-414"><a href="#cb76-414" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.binomial</span>(binomial_data, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
+<span id="cb76-415"><a href="#cb76-415" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">300</span>))</span>
+<span id="cb76-416"><a href="#cb76-416" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> binomial_data)<span class="sc">$</span>breakpoints</span>
+<span id="cb76-417"><a href="#cb76-417" tabindex="-1"></a><span class="co">#&gt; [1] 297</span></span>
+<span id="cb76-418"><a href="#cb76-418" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.poisson</span>(poisson_data, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
+<span id="cb76-419"><a href="#cb76-419" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">498</span>, <span class="dv">800</span>, <span class="dv">1003</span>))</span>
+<span id="cb76-420"><a href="#cb76-420" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> poisson_data)<span class="sc">$</span>breakpoints</span>
+<span id="cb76-421"><a href="#cb76-421" tabindex="-1"></a><span class="co">#&gt; [1] 935</span></span>
+<span id="cb76-422"><a href="#cb76-422" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.lasso</span>(lasso_data, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
+<span id="cb76-423"><a href="#cb76-423" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">79</span>, <span class="dv">199</span>, <span class="dv">320</span>))</span>
+<span id="cb76-424"><a href="#cb76-424" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> lasso_data)<span class="sc">$</span>breakpoints,</span>
+<span id="cb76-425"><a href="#cb76-425" tabindex="-1"></a><span class="co">#&gt; [1]  80 200 321</span></span>
+<span id="cb76-426"><a href="#cb76-426" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.ar</span>(ar_data, <span class="dv">3</span>, <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
+<span id="cb76-427"><a href="#cb76-427" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">614</span>))</span>
+<span id="cb76-428"><a href="#cb76-428" tabindex="-1"></a>(CptNonPar_result <span class="ot">&lt;-</span> CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(ar_data, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(ar_data) <span class="sc">/</span> <span class="dv">6</span>))<span class="sc">$</span>cpts)</span>
+<span id="cb76-429"><a href="#cb76-429" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(CptNonPar_result, <span class="fu">numeric</span>(<span class="dv">0</span>))</span>
+<span id="cb76-430"><a href="#cb76-430" tabindex="-1"></a>(segmented_result <span class="ot">&lt;-</span> segmented<span class="sc">::</span><span class="fu">segmented</span>(</span>
+<span id="cb76-431"><a href="#cb76-431" tabindex="-1"></a>  <span class="fu">lm</span>(</span>
+<span id="cb76-432"><a href="#cb76-432" tabindex="-1"></a>    y <span class="sc">~</span> x <span class="sc">+</span> <span class="dv">1</span>, <span class="fu">data.frame</span>(<span class="at">y =</span> ar_data, <span class="at">x =</span> <span class="fu">seq_along</span>(ar_data))</span>
+<span id="cb76-433"><a href="#cb76-433" tabindex="-1"></a>  ),</span>
+<span id="cb76-434"><a href="#cb76-434" tabindex="-1"></a>  <span class="at">seg.Z =</span> <span class="sc">~</span> x</span>
+<span id="cb76-435"><a href="#cb76-435" tabindex="-1"></a>)<span class="sc">$</span>psi[, <span class="st">"Est."</span>])</span>
+<span id="cb76-436"><a href="#cb76-436" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(segmented_result, <span class="fu">c</span>(<span class="dv">690</span>))</span>
+<span id="cb76-437"><a href="#cb76-437" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb76-438"><a href="#cb76-438" tabindex="-1"></a>  mcp<span class="sc">::</span><span class="fu">mcp</span>(</span>
+<span id="cb76-439"><a href="#cb76-439" tabindex="-1"></a>    <span class="fu">list</span>(y <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fu">ar</span>(<span class="dv">3</span>), <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> <span class="fu">ar</span>(<span class="dv">3</span>)),</span>
+<span id="cb76-440"><a href="#cb76-440" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> ar_data, <span class="at">x =</span> <span class="fu">seq_along</span>(ar_data)),</span>
+<span id="cb76-441"><a href="#cb76-441" tabindex="-1"></a>    <span class="at">par_x =</span> <span class="st">"x"</span></span>
+<span id="cb76-442"><a href="#cb76-442" tabindex="-1"></a>  )</span>
+<span id="cb76-443"><a href="#cb76-443" tabindex="-1"></a>)</span>
+<span id="cb76-444"><a href="#cb76-444" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.garch</span>(garch_data, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="at">r.progress =</span> <span class="cn">FALSE</span>)<span class="sc">@</span>cp_set)</span>
+<span id="cb76-445"><a href="#cb76-445" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">205</span>))</span>
+<span id="cb76-446"><a href="#cb76-446" tabindex="-1"></a>(CptNonPar_result <span class="ot">&lt;-</span> CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(garch_data, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(garch_data) <span class="sc">/</span> <span class="dv">6</span>))<span class="sc">$</span>cpts)</span>
+<span id="cb76-447"><a href="#cb76-447" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(CptNonPar_result, <span class="fu">c</span>(<span class="dv">206</span>))</span>
+<span id="cb76-448"><a href="#cb76-448" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(x <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> garch_data))<span class="sc">$</span>breakpoints</span>
+<span id="cb76-449"><a href="#cb76-449" tabindex="-1"></a><span class="co">#&gt; [1] NA</span></span>
+<span id="cb76-450"><a href="#cb76-450" tabindex="-1"></a>(fastcpd_result <span class="ot">&lt;-</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.var</span>(</span>
+<span id="cb76-451"><a href="#cb76-451" tabindex="-1"></a>  var_data, <span class="dv">2</span>, <span class="at">cost_adjustment =</span> <span class="cn">NULL</span>, <span class="at">r.progress =</span> <span class="cn">FALSE</span></span>
+<span id="cb76-452"><a href="#cb76-452" tabindex="-1"></a>)<span class="sc">@</span>cp_set)</span>
+<span id="cb76-453"><a href="#cb76-453" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(fastcpd_result, <span class="fu">c</span>(<span class="dv">500</span>))</span>
+<span id="cb76-454"><a href="#cb76-454" tabindex="-1"></a>(VARDetect_result <span class="ot">&lt;-</span> VARDetect<span class="sc">::</span><span class="fu">tbss</span>(var_data)<span class="sc">$</span>cp)</span>
+<span id="cb76-455"><a href="#cb76-455" tabindex="-1"></a>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(VARDetect_result, <span class="fu">c</span>(<span class="dv">501</span>))</span>
+<span id="cb76-456"><a href="#cb76-456" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb76-457"><a href="#cb76-457" tabindex="-1"></a>  <span class="at">fastcpd =</span> <span class="fu">fastcpd.mean</span>(well_log, <span class="at">trim =</span> <span class="fl">0.003</span>)<span class="sc">@</span>cp_set,</span>
+<span id="cb76-458"><a href="#cb76-458" tabindex="-1"></a>  <span class="at">changepoint =</span> changepoint<span class="sc">::</span><span class="fu">cpt.mean</span>(well_log)<span class="sc">@</span>cpts,</span>
+<span id="cb76-459"><a href="#cb76-459" tabindex="-1"></a>  <span class="at">CptNonPar =</span></span>
+<span id="cb76-460"><a href="#cb76-460" tabindex="-1"></a>    CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(well_log, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(well_log) <span class="sc">/</span> <span class="dv">6</span>))<span class="sc">$</span>cpts,</span>
+<span id="cb76-461"><a href="#cb76-461" tabindex="-1"></a>  <span class="at">strucchange =</span> strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(</span>
+<span id="cb76-462"><a href="#cb76-462" tabindex="-1"></a>    y <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> well_log)</span>
+<span id="cb76-463"><a href="#cb76-463" tabindex="-1"></a>  )<span class="sc">$</span>breakpoints,</span>
+<span id="cb76-464"><a href="#cb76-464" tabindex="-1"></a>  <span class="at">ecp =</span> ecp<span class="sc">::</span><span class="fu">e.divisive</span>(<span class="fu">matrix</span>(well_log))<span class="sc">$</span>estimates,</span>
+<span id="cb76-465"><a href="#cb76-465" tabindex="-1"></a>  <span class="at">breakfast =</span> breakfast<span class="sc">::</span><span class="fu">breakfast</span>(well_log)<span class="sc">$</span>cptmodel.list[[<span class="dv">6</span>]]<span class="sc">$</span>cpts,</span>
+<span id="cb76-466"><a href="#cb76-466" tabindex="-1"></a>  <span class="at">wbs =</span> wbs<span class="sc">::</span><span class="fu">wbs</span>(well_log)<span class="sc">$</span>cpt<span class="sc">$</span>cpt.ic<span class="sc">$</span>mbic.penalty,</span>
+<span id="cb76-467"><a href="#cb76-467" tabindex="-1"></a>  <span class="at">mosum =</span> mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(well_log), <span class="at">G =</span> <span class="dv">40</span>)<span class="sc">$</span>cpts.info<span class="sc">$</span>cpts,</span>
+<span id="cb76-468"><a href="#cb76-468" tabindex="-1"></a>  <span class="at">fpop =</span> fpop<span class="sc">::</span><span class="fu">Fpop</span>(well_log, <span class="fu">length</span>(well_log))<span class="sc">$</span>t.est,  <span class="co"># meaningless</span></span>
+<span id="cb76-469"><a href="#cb76-469" tabindex="-1"></a>  <span class="at">gfpop =</span> gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
+<span id="cb76-470"><a href="#cb76-470" tabindex="-1"></a>    <span class="at">data =</span> well_log,</span>
+<span id="cb76-471"><a href="#cb76-471" tabindex="-1"></a>    <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
+<span id="cb76-472"><a href="#cb76-472" tabindex="-1"></a>      <span class="at">penalty =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">length</span>(well_log)) <span class="sc">*</span> gfpop<span class="sc">::</span><span class="fu">sdDiff</span>(well_log) <span class="sc">^</span> <span class="dv">2</span>,</span>
+<span id="cb76-473"><a href="#cb76-473" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">"updown"</span></span>
+<span id="cb76-474"><a href="#cb76-474" tabindex="-1"></a>    ),</span>
+<span id="cb76-475"><a href="#cb76-475" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"mean"</span></span>
+<span id="cb76-476"><a href="#cb76-476" tabindex="-1"></a>  )<span class="sc">$</span>changepoints,</span>
+<span id="cb76-477"><a href="#cb76-477" tabindex="-1"></a>  <span class="at">InspectChangepoint =</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
+<span id="cb76-478"><a href="#cb76-478" tabindex="-1"></a>    well_log,</span>
+<span id="cb76-479"><a href="#cb76-479" tabindex="-1"></a>    <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(<span class="fu">length</span>(well_log), <span class="dv">1</span>)</span>
+<span id="cb76-480"><a href="#cb76-480" tabindex="-1"></a>  )<span class="sc">$</span>changepoints[, <span class="st">"location"</span>],</span>
+<span id="cb76-481"><a href="#cb76-481" tabindex="-1"></a>  <span class="at">jointseg =</span> jointseg<span class="sc">::</span><span class="fu">jointSeg</span>(well_log, <span class="at">K =</span> <span class="dv">12</span>)<span class="sc">$</span>bestBkp,</span>
+<span id="cb76-482"><a href="#cb76-482" tabindex="-1"></a>  <span class="at">Rbeast =</span> Rbeast<span class="sc">::</span><span class="fu">beast</span>(</span>
+<span id="cb76-483"><a href="#cb76-483" tabindex="-1"></a>    well_log, <span class="at">season =</span> <span class="st">"none"</span>, <span class="at">print.progress =</span> <span class="cn">FALSE</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb76-484"><a href="#cb76-484" tabindex="-1"></a>  )<span class="sc">$</span>trend<span class="sc">$</span>cp,</span>
+<span id="cb76-485"><a href="#cb76-485" tabindex="-1"></a>  <span class="at">stepR =</span> stepR<span class="sc">::</span><span class="fu">stepFit</span>(well_log, <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">$</span>rightEnd</span>
+<span id="cb76-486"><a href="#cb76-486" tabindex="-1"></a>)</span>
+<span id="cb76-487"><a href="#cb76-487" tabindex="-1"></a></span>
+<span id="cb76-488"><a href="#cb76-488" tabindex="-1"></a>package_list <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">names</span>(result), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb76-489"><a href="#cb76-489" tabindex="-1"></a>comparison_table <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb76-490"><a href="#cb76-490" tabindex="-1"></a><span class="cf">for</span> (package_index <span class="cf">in</span> <span class="fu">seq_along</span>(package_list)) {</span>
+<span id="cb76-491"><a href="#cb76-491" tabindex="-1"></a>  package <span class="ot">&lt;-</span> package_list[[package_index]]</span>
+<span id="cb76-492"><a href="#cb76-492" tabindex="-1"></a>  comparison_table <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb76-493"><a href="#cb76-493" tabindex="-1"></a>    comparison_table,</span>
+<span id="cb76-494"><a href="#cb76-494" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb76-495"><a href="#cb76-495" tabindex="-1"></a>      <span class="at">change_point =</span> result[[package]],</span>
+<span id="cb76-496"><a href="#cb76-496" tabindex="-1"></a>      <span class="at">package =</span> package,</span>
+<span id="cb76-497"><a href="#cb76-497" tabindex="-1"></a>      <span class="at">y_offset =</span> (package_index <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">400</span></span>
+<span id="cb76-498"><a href="#cb76-498" tabindex="-1"></a>    )</span>
+<span id="cb76-499"><a href="#cb76-499" tabindex="-1"></a>  )</span>
+<span id="cb76-500"><a href="#cb76-500" tabindex="-1"></a>}</span>
+<span id="cb76-501"><a href="#cb76-501" tabindex="-1"></a></span>
+<span id="cb76-502"><a href="#cb76-502" tabindex="-1"></a>most_selected <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">table</span>(comparison_table<span class="sc">$</span>change_point), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb76-503"><a href="#cb76-503" tabindex="-1"></a>most_selected <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">as.numeric</span>(<span class="fu">names</span>(most_selected[most_selected <span class="sc">&gt;=</span> <span class="dv">4</span>])))</span>
+<span id="cb76-504"><a href="#cb76-504" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">length</span>(most_selected) <span class="sc">-</span> <span class="dv">1</span>)) {</span>
+<span id="cb76-505"><a href="#cb76-505" tabindex="-1"></a>  <span class="cf">if</span> (most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">-</span> most_selected[i] <span class="sc">&lt;</span> <span class="dv">2</span>) {</span>
+<span id="cb76-506"><a href="#cb76-506" tabindex="-1"></a>    most_selected[i] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb76-507"><a href="#cb76-507" tabindex="-1"></a>    most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> most_selected[i <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">-</span> <span class="fl">0.5</span></span>
+<span id="cb76-508"><a href="#cb76-508" tabindex="-1"></a>  }</span>
+<span id="cb76-509"><a href="#cb76-509" tabindex="-1"></a>}</span>
+<span id="cb76-510"><a href="#cb76-510" tabindex="-1"></a>(most_selected <span class="ot">&lt;-</span> most_selected[<span class="sc">!</span><span class="fu">is.na</span>(most_selected)])</span>
+<span id="cb76-511"><a href="#cb76-511" tabindex="-1"></a><span class="co">#&gt;  [1]    6.0  314.0  434.0  704.0  776.0 1021.0 1057.0 1347.0 1405.0 1502.0 1661.0 1842.0 2023.0 2202.0</span></span>
+<span id="cb76-512"><a href="#cb76-512" tabindex="-1"></a><span class="co">#&gt; [15] 2384.5 2445.0 2507.0 2567.5 2738.0 2921.0 3094.0 3251.0 3464.0 3499.0 3622.0 3709.0 3820.0 3976.0</span></span>
+<span id="cb76-513"><a href="#cb76-513" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb76-514"><a href="#cb76-514" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(</span>
+<span id="cb76-515"><a href="#cb76-515" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">seq_along</span>(well_log), <span class="at">y =</span> <span class="fu">c</span>(well_log)),</span>
+<span id="cb76-516"><a href="#cb76-516" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
 <span id="cb76-517"><a href="#cb76-517" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-518"><a href="#cb76-518" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(</span>
-<span id="cb76-519"><a href="#cb76-519" tabindex="-1"></a>    <span class="at">data =</span> comparison_table,</span>
-<span id="cb76-520"><a href="#cb76-520" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> change_point, <span class="at">y =</span> <span class="dv">95000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
-<span id="cb76-521"><a href="#cb76-521" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">17</span>,</span>
-<span id="cb76-522"><a href="#cb76-522" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">1.75</span></span>
+<span id="cb76-518"><a href="#cb76-518" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_vline</span>(</span>
+<span id="cb76-519"><a href="#cb76-519" tabindex="-1"></a>    <span class="at">xintercept =</span> most_selected,</span>
+<span id="cb76-520"><a href="#cb76-520" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb76-521"><a href="#cb76-521" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
+<span id="cb76-522"><a href="#cb76-522" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span></span>
 <span id="cb76-523"><a href="#cb76-523" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-524"><a href="#cb76-524" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(</span>
+<span id="cb76-524"><a href="#cb76-524" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(</span>
 <span id="cb76-525"><a href="#cb76-525" tabindex="-1"></a>    <span class="at">data =</span> comparison_table,</span>
-<span id="cb76-526"><a href="#cb76-526" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="dv">95000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
-<span id="cb76-527"><a href="#cb76-527" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
-<span id="cb76-528"><a href="#cb76-528" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.1</span></span>
+<span id="cb76-526"><a href="#cb76-526" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> change_point, <span class="at">y =</span> <span class="dv">95000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
+<span id="cb76-527"><a href="#cb76-527" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">17</span>,</span>
+<span id="cb76-528"><a href="#cb76-528" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">1.75</span></span>
 <span id="cb76-529"><a href="#cb76-529" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-530"><a href="#cb76-530" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">coord_cartesian</span>(</span>
-<span id="cb76-531"><a href="#cb76-531" tabindex="-1"></a>    <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">95000</span> <span class="sc">-</span> <span class="dv">500</span>, <span class="fu">max</span>(well_log) <span class="sc">+</span> <span class="dv">1000</span>),</span>
-<span id="cb76-532"><a href="#cb76-532" tabindex="-1"></a>    <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">200</span>, <span class="fu">length</span>(well_log) <span class="sc">+</span> <span class="dv">200</span>),</span>
-<span id="cb76-533"><a href="#cb76-533" tabindex="-1"></a>    <span class="at">expand =</span> <span class="cn">FALSE</span></span>
-<span id="cb76-534"><a href="#cb76-534" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-535"><a href="#cb76-535" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
-<span id="cb76-536"><a href="#cb76-536" tabindex="-1"></a>    <span class="at">panel.background =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
-<span id="cb76-537"><a href="#cb76-537" tabindex="-1"></a>    <span class="at">panel.border =</span> ggplot2<span class="sc">::</span><span class="fu">element_rect</span>(<span class="at">colour =</span> <span class="st">"black"</span>, <span class="at">fill =</span> <span class="cn">NA</span>),</span>
-<span id="cb76-538"><a href="#cb76-538" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
-<span id="cb76-539"><a href="#cb76-539" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>()</span>
+<span id="cb76-530"><a href="#cb76-530" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(</span>
+<span id="cb76-531"><a href="#cb76-531" tabindex="-1"></a>    <span class="at">data =</span> comparison_table,</span>
+<span id="cb76-532"><a href="#cb76-532" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="dv">95000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
+<span id="cb76-533"><a href="#cb76-533" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
+<span id="cb76-534"><a href="#cb76-534" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.1</span></span>
+<span id="cb76-535"><a href="#cb76-535" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb76-536"><a href="#cb76-536" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">coord_cartesian</span>(</span>
+<span id="cb76-537"><a href="#cb76-537" tabindex="-1"></a>    <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">95000</span> <span class="sc">-</span> <span class="dv">500</span>, <span class="fu">max</span>(well_log) <span class="sc">+</span> <span class="dv">1000</span>),</span>
+<span id="cb76-538"><a href="#cb76-538" tabindex="-1"></a>    <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">200</span>, <span class="fu">length</span>(well_log) <span class="sc">+</span> <span class="dv">200</span>),</span>
+<span id="cb76-539"><a href="#cb76-539" tabindex="-1"></a>    <span class="at">expand =</span> <span class="cn">FALSE</span></span>
 <span id="cb76-540"><a href="#cb76-540" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb76-541"><a href="#cb76-541" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">xlab</span>(<span class="cn">NULL</span>) <span class="sc">+</span> ggplot2<span class="sc">::</span><span class="fu">ylab</span>(<span class="cn">NULL</span>)</span>
-<span id="cb76-542"><a href="#cb76-542" tabindex="-1"></a>microbenchmark_result <span class="ot">&lt;-</span> microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
-<span id="cb76-543"><a href="#cb76-543" tabindex="-1"></a>  <span class="at">fastcpd =</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.mean</span>(well_log, <span class="at">trim =</span> <span class="fl">0.003</span>, <span class="at">r.progress =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb76-544"><a href="#cb76-544" tabindex="-1"></a>  <span class="at">changepoint =</span> changepoint<span class="sc">::</span><span class="fu">cpt.mean</span>(well_log, <span class="at">method =</span> <span class="st">"PELT"</span>),</span>
-<span id="cb76-545"><a href="#cb76-545" tabindex="-1"></a>  <span class="at">CptNonPar =</span> CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(well_log, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(well_log) <span class="sc">/</span> <span class="dv">6</span>)),</span>
-<span id="cb76-546"><a href="#cb76-546" tabindex="-1"></a>  <span class="at">strucchange =</span></span>
-<span id="cb76-547"><a href="#cb76-547" tabindex="-1"></a>    strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> well_log)),</span>
-<span id="cb76-548"><a href="#cb76-548" tabindex="-1"></a>  <span class="at">ecp =</span> ecp<span class="sc">::</span><span class="fu">e.divisive</span>(<span class="fu">matrix</span>(well_log)),</span>
-<span id="cb76-549"><a href="#cb76-549" tabindex="-1"></a>  <span class="at">breakfast =</span> breakfast<span class="sc">::</span><span class="fu">breakfast</span>(well_log),</span>
-<span id="cb76-550"><a href="#cb76-550" tabindex="-1"></a>  <span class="at">wbs =</span> wbs<span class="sc">::</span><span class="fu">wbs</span>(well_log),</span>
-<span id="cb76-551"><a href="#cb76-551" tabindex="-1"></a>  <span class="at">mosum =</span> mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(well_log), <span class="at">G =</span> <span class="dv">40</span>),</span>
-<span id="cb76-552"><a href="#cb76-552" tabindex="-1"></a>  <span class="at">fpop =</span> fpop<span class="sc">::</span><span class="fu">Fpop</span>(well_log, <span class="fu">nrow</span>(well_log)),</span>
-<span id="cb76-553"><a href="#cb76-553" tabindex="-1"></a>  <span class="at">gfpop =</span> gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
-<span id="cb76-554"><a href="#cb76-554" tabindex="-1"></a>    <span class="at">data =</span> well_log,</span>
-<span id="cb76-555"><a href="#cb76-555" tabindex="-1"></a>    <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
-<span id="cb76-556"><a href="#cb76-556" tabindex="-1"></a>      <span class="at">penalty =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">length</span>(well_log)) <span class="sc">*</span> gfpop<span class="sc">::</span><span class="fu">sdDiff</span>(well_log) <span class="sc">^</span> <span class="dv">2</span>,</span>
-<span id="cb76-557"><a href="#cb76-557" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">"updown"</span></span>
-<span id="cb76-558"><a href="#cb76-558" tabindex="-1"></a>    ),</span>
-<span id="cb76-559"><a href="#cb76-559" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"mean"</span></span>
-<span id="cb76-560"><a href="#cb76-560" tabindex="-1"></a>  ),</span>
-<span id="cb76-561"><a href="#cb76-561" tabindex="-1"></a>  <span class="at">InspectChangepoint =</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
-<span id="cb76-562"><a href="#cb76-562" tabindex="-1"></a>    well_log,</span>
-<span id="cb76-563"><a href="#cb76-563" tabindex="-1"></a>    <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(<span class="fu">length</span>(well_log), <span class="dv">1</span>)</span>
-<span id="cb76-564"><a href="#cb76-564" tabindex="-1"></a>  ),</span>
-<span id="cb76-565"><a href="#cb76-565" tabindex="-1"></a>  <span class="at">jointseg =</span> jointseg<span class="sc">::</span><span class="fu">jointSeg</span>(well_log, <span class="at">K =</span> <span class="dv">12</span>),</span>
-<span id="cb76-566"><a href="#cb76-566" tabindex="-1"></a>  <span class="at">Rbeast =</span> Rbeast<span class="sc">::</span><span class="fu">beast</span>(</span>
-<span id="cb76-567"><a href="#cb76-567" tabindex="-1"></a>    well_log, <span class="at">season =</span> <span class="st">"none"</span>, <span class="at">print.progress =</span> <span class="cn">FALSE</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
-<span id="cb76-568"><a href="#cb76-568" tabindex="-1"></a>  ),</span>
-<span id="cb76-569"><a href="#cb76-569" tabindex="-1"></a>  <span class="at">stepR =</span> stepR<span class="sc">::</span><span class="fu">stepFit</span>(well_log, <span class="at">alpha =</span> <span class="fl">0.5</span>),</span>
-<span id="cb76-570"><a href="#cb76-570" tabindex="-1"></a>  <span class="at">not =</span> not<span class="sc">::</span><span class="fu">not</span>(well_log, <span class="at">contrast =</span> <span class="st">"pcwsConstMean"</span>),</span>
-<span id="cb76-571"><a href="#cb76-571" tabindex="-1"></a>  <span class="at">times =</span> <span class="dv">10</span></span>
-<span id="cb76-572"><a href="#cb76-572" tabindex="-1"></a>)</span>
-<span id="cb76-573"><a href="#cb76-573" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb76-574"><a href="#cb76-574" tabindex="-1"></a><span class="co">#&gt;                expr          min           lq         mean       median           uq          max neval</span></span>
-<span id="cb76-575"><a href="#cb76-575" tabindex="-1"></a><span class="co">#&gt;             fastcpd 8.411284e+01 8.692226e+01 1.011440e+02 1.044509e+02 1.089672e+02    118.05842    10</span></span>
-<span id="cb76-576"><a href="#cb76-576" tabindex="-1"></a><span class="co">#&gt;         changepoint 3.206773e+01 3.377081e+01 6.843465e+01 3.857181e+01 5.243834e+01    244.76672    10</span></span>
-<span id="cb76-577"><a href="#cb76-577" tabindex="-1"></a><span class="co">#&gt;           CptNonPar 1.827381e+04 1.901094e+04 2.002752e+04 1.985180e+04 2.076803e+04  22511.59316    10</span></span>
-<span id="cb76-578"><a href="#cb76-578" tabindex="-1"></a><span class="co">#&gt;         strucchange 5.955079e+04 6.059315e+04 6.185727e+04 6.131291e+04 6.312073e+04  64638.93090    10</span></span>
-<span id="cb76-579"><a href="#cb76-579" tabindex="-1"></a><span class="co">#&gt;                 ecp 7.590543e+05 7.707573e+05 7.859080e+05 7.830752e+05 8.093015e+05 810339.52140    10</span></span>
-<span id="cb76-580"><a href="#cb76-580" tabindex="-1"></a><span class="co">#&gt;           breakfast 9.170992e+03 9.344041e+03 9.628236e+03 9.382078e+03 9.628663e+03  11073.79318    10</span></span>
-<span id="cb76-581"><a href="#cb76-581" tabindex="-1"></a><span class="co">#&gt;                 wbs 1.139078e+02 1.145472e+02 1.178167e+02 1.166746e+02 1.201676e+02    127.27064    10</span></span>
-<span id="cb76-582"><a href="#cb76-582" tabindex="-1"></a><span class="co">#&gt;               mosum 1.172847e+00 1.231747e+00 1.740727e+01 1.416854e+00 1.919586e+00    160.76997    10</span></span>
-<span id="cb76-583"><a href="#cb76-583" tabindex="-1"></a><span class="co">#&gt;                fpop 2.588228e+00 2.630407e+00 4.587742e+00 2.832556e+00 3.312986e+00     18.52067    10</span></span>
-<span id="cb76-584"><a href="#cb76-584" tabindex="-1"></a><span class="co">#&gt;               gfpop 5.971245e+01 6.072684e+01 6.533492e+01 6.172578e+01 6.839653e+01     87.89407    10</span></span>
-<span id="cb76-585"><a href="#cb76-585" tabindex="-1"></a><span class="co">#&gt;  InspectChangepoint 1.698673e+02 1.909034e+02 2.392539e+02 2.117010e+02 3.004474e+02    329.87724    10</span></span>
-<span id="cb76-586"><a href="#cb76-586" tabindex="-1"></a><span class="co">#&gt;            jointseg 2.000894e+01 2.136878e+01 2.551210e+01 2.167757e+01 2.403593e+01     47.98397    10</span></span>
-<span id="cb76-587"><a href="#cb76-587" tabindex="-1"></a><span class="co">#&gt;              Rbeast 6.533998e+02 6.625203e+02 6.783586e+02 6.792646e+02 6.875840e+02    723.45376    10</span></span>
-<span id="cb76-588"><a href="#cb76-588" tabindex="-1"></a><span class="co">#&gt;               stepR 2.793709e+01 2.902084e+01 4.380857e+01 3.068416e+01 3.227125e+01    164.81082    10</span></span>
-<span id="cb76-589"><a href="#cb76-589" tabindex="-1"></a><span class="co">#&gt;                 not 9.599763e+01 9.701856e+01 1.028601e+02 1.012292e+02 1.049974e+02    120.73529    10</span></span>
-<span id="cb76-590"><a href="#cb76-590" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">autoplot</span>(microbenchmark_result)</span></code></pre></div>
+<span id="cb76-541"><a href="#cb76-541" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
+<span id="cb76-542"><a href="#cb76-542" tabindex="-1"></a>    <span class="at">panel.background =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
+<span id="cb76-543"><a href="#cb76-543" tabindex="-1"></a>    <span class="at">panel.border =</span> ggplot2<span class="sc">::</span><span class="fu">element_rect</span>(<span class="at">colour =</span> <span class="st">"black"</span>, <span class="at">fill =</span> <span class="cn">NA</span>),</span>
+<span id="cb76-544"><a href="#cb76-544" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>(),</span>
+<span id="cb76-545"><a href="#cb76-545" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> ggplot2<span class="sc">::</span><span class="fu">element_blank</span>()</span>
+<span id="cb76-546"><a href="#cb76-546" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb76-547"><a href="#cb76-547" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">xlab</span>(<span class="cn">NULL</span>) <span class="sc">+</span> ggplot2<span class="sc">::</span><span class="fu">ylab</span>(<span class="cn">NULL</span>)</span>
+<span id="cb76-548"><a href="#cb76-548" tabindex="-1"></a>microbenchmark_result <span class="ot">&lt;-</span> microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
+<span id="cb76-549"><a href="#cb76-549" tabindex="-1"></a>  <span class="at">fastcpd =</span> fastcpd<span class="sc">::</span><span class="fu">fastcpd.mean</span>(well_log, <span class="at">trim =</span> <span class="fl">0.003</span>, <span class="at">r.progress =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb76-550"><a href="#cb76-550" tabindex="-1"></a>  <span class="at">changepoint =</span> changepoint<span class="sc">::</span><span class="fu">cpt.mean</span>(well_log, <span class="at">method =</span> <span class="st">"PELT"</span>),</span>
+<span id="cb76-551"><a href="#cb76-551" tabindex="-1"></a>  <span class="at">CptNonPar =</span> CptNonPar<span class="sc">::</span><span class="fu">np.mojo</span>(well_log, <span class="at">G =</span> <span class="fu">floor</span>(<span class="fu">length</span>(well_log) <span class="sc">/</span> <span class="dv">6</span>)),</span>
+<span id="cb76-552"><a href="#cb76-552" tabindex="-1"></a>  <span class="at">strucchange =</span></span>
+<span id="cb76-553"><a href="#cb76-553" tabindex="-1"></a>    strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">y =</span> well_log)),</span>
+<span id="cb76-554"><a href="#cb76-554" tabindex="-1"></a>  <span class="at">ecp =</span> ecp<span class="sc">::</span><span class="fu">e.divisive</span>(<span class="fu">matrix</span>(well_log)),</span>
+<span id="cb76-555"><a href="#cb76-555" tabindex="-1"></a>  <span class="at">breakfast =</span> breakfast<span class="sc">::</span><span class="fu">breakfast</span>(well_log),</span>
+<span id="cb76-556"><a href="#cb76-556" tabindex="-1"></a>  <span class="at">wbs =</span> wbs<span class="sc">::</span><span class="fu">wbs</span>(well_log),</span>
+<span id="cb76-557"><a href="#cb76-557" tabindex="-1"></a>  <span class="at">mosum =</span> mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(well_log), <span class="at">G =</span> <span class="dv">40</span>),</span>
+<span id="cb76-558"><a href="#cb76-558" tabindex="-1"></a>  <span class="at">fpop =</span> fpop<span class="sc">::</span><span class="fu">Fpop</span>(well_log, <span class="fu">nrow</span>(well_log)),</span>
+<span id="cb76-559"><a href="#cb76-559" tabindex="-1"></a>  <span class="at">gfpop =</span> gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
+<span id="cb76-560"><a href="#cb76-560" tabindex="-1"></a>    <span class="at">data =</span> well_log,</span>
+<span id="cb76-561"><a href="#cb76-561" tabindex="-1"></a>    <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
+<span id="cb76-562"><a href="#cb76-562" tabindex="-1"></a>      <span class="at">penalty =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">length</span>(well_log)) <span class="sc">*</span> gfpop<span class="sc">::</span><span class="fu">sdDiff</span>(well_log) <span class="sc">^</span> <span class="dv">2</span>,</span>
+<span id="cb76-563"><a href="#cb76-563" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">"updown"</span></span>
+<span id="cb76-564"><a href="#cb76-564" tabindex="-1"></a>    ),</span>
+<span id="cb76-565"><a href="#cb76-565" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"mean"</span></span>
+<span id="cb76-566"><a href="#cb76-566" tabindex="-1"></a>  ),</span>
+<span id="cb76-567"><a href="#cb76-567" tabindex="-1"></a>  <span class="at">InspectChangepoint =</span> InspectChangepoint<span class="sc">::</span><span class="fu">inspect</span>(</span>
+<span id="cb76-568"><a href="#cb76-568" tabindex="-1"></a>    well_log,</span>
+<span id="cb76-569"><a href="#cb76-569" tabindex="-1"></a>    <span class="at">threshold =</span> InspectChangepoint<span class="sc">::</span><span class="fu">compute.threshold</span>(<span class="fu">length</span>(well_log), <span class="dv">1</span>)</span>
+<span id="cb76-570"><a href="#cb76-570" tabindex="-1"></a>  ),</span>
+<span id="cb76-571"><a href="#cb76-571" tabindex="-1"></a>  <span class="at">jointseg =</span> jointseg<span class="sc">::</span><span class="fu">jointSeg</span>(well_log, <span class="at">K =</span> <span class="dv">12</span>),</span>
+<span id="cb76-572"><a href="#cb76-572" tabindex="-1"></a>  <span class="at">Rbeast =</span> Rbeast<span class="sc">::</span><span class="fu">beast</span>(</span>
+<span id="cb76-573"><a href="#cb76-573" tabindex="-1"></a>    well_log, <span class="at">season =</span> <span class="st">"none"</span>, <span class="at">print.progress =</span> <span class="cn">FALSE</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb76-574"><a href="#cb76-574" tabindex="-1"></a>  ),</span>
+<span id="cb76-575"><a href="#cb76-575" tabindex="-1"></a>  <span class="at">stepR =</span> stepR<span class="sc">::</span><span class="fu">stepFit</span>(well_log, <span class="at">alpha =</span> <span class="fl">0.5</span>),</span>
+<span id="cb76-576"><a href="#cb76-576" tabindex="-1"></a>  <span class="at">not =</span> not<span class="sc">::</span><span class="fu">not</span>(well_log, <span class="at">contrast =</span> <span class="st">"pcwsConstMean"</span>),</span>
+<span id="cb76-577"><a href="#cb76-577" tabindex="-1"></a>  <span class="at">times =</span> <span class="dv">10</span></span>
+<span id="cb76-578"><a href="#cb76-578" tabindex="-1"></a>)</span>
+<span id="cb76-579"><a href="#cb76-579" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
+<span id="cb76-580"><a href="#cb76-580" tabindex="-1"></a><span class="co">#&gt;                expr          min           lq         mean       median           uq          max neval</span></span>
+<span id="cb76-581"><a href="#cb76-581" tabindex="-1"></a><span class="co">#&gt;             fastcpd 8.411284e+01 8.692226e+01 1.011440e+02 1.044509e+02 1.089672e+02    118.05842    10</span></span>
+<span id="cb76-582"><a href="#cb76-582" tabindex="-1"></a><span class="co">#&gt;         changepoint 3.206773e+01 3.377081e+01 6.843465e+01 3.857181e+01 5.243834e+01    244.76672    10</span></span>
+<span id="cb76-583"><a href="#cb76-583" tabindex="-1"></a><span class="co">#&gt;           CptNonPar 1.827381e+04 1.901094e+04 2.002752e+04 1.985180e+04 2.076803e+04  22511.59316    10</span></span>
+<span id="cb76-584"><a href="#cb76-584" tabindex="-1"></a><span class="co">#&gt;         strucchange 5.955079e+04 6.059315e+04 6.185727e+04 6.131291e+04 6.312073e+04  64638.93090    10</span></span>
+<span id="cb76-585"><a href="#cb76-585" tabindex="-1"></a><span class="co">#&gt;                 ecp 7.590543e+05 7.707573e+05 7.859080e+05 7.830752e+05 8.093015e+05 810339.52140    10</span></span>
+<span id="cb76-586"><a href="#cb76-586" tabindex="-1"></a><span class="co">#&gt;           breakfast 9.170992e+03 9.344041e+03 9.628236e+03 9.382078e+03 9.628663e+03  11073.79318    10</span></span>
+<span id="cb76-587"><a href="#cb76-587" tabindex="-1"></a><span class="co">#&gt;                 wbs 1.139078e+02 1.145472e+02 1.178167e+02 1.166746e+02 1.201676e+02    127.27064    10</span></span>
+<span id="cb76-588"><a href="#cb76-588" tabindex="-1"></a><span class="co">#&gt;               mosum 1.172847e+00 1.231747e+00 1.740727e+01 1.416854e+00 1.919586e+00    160.76997    10</span></span>
+<span id="cb76-589"><a href="#cb76-589" tabindex="-1"></a><span class="co">#&gt;                fpop 2.588228e+00 2.630407e+00 4.587742e+00 2.832556e+00 3.312986e+00     18.52067    10</span></span>
+<span id="cb76-590"><a href="#cb76-590" tabindex="-1"></a><span class="co">#&gt;               gfpop 5.971245e+01 6.072684e+01 6.533492e+01 6.172578e+01 6.839653e+01     87.89407    10</span></span>
+<span id="cb76-591"><a href="#cb76-591" tabindex="-1"></a><span class="co">#&gt;  InspectChangepoint 1.698673e+02 1.909034e+02 2.392539e+02 2.117010e+02 3.004474e+02    329.87724    10</span></span>
+<span id="cb76-592"><a href="#cb76-592" tabindex="-1"></a><span class="co">#&gt;            jointseg 2.000894e+01 2.136878e+01 2.551210e+01 2.167757e+01 2.403593e+01     47.98397    10</span></span>
+<span id="cb76-593"><a href="#cb76-593" tabindex="-1"></a><span class="co">#&gt;              Rbeast 6.533998e+02 6.625203e+02 6.783586e+02 6.792646e+02 6.875840e+02    723.45376    10</span></span>
+<span id="cb76-594"><a href="#cb76-594" tabindex="-1"></a><span class="co">#&gt;               stepR 2.793709e+01 2.902084e+01 4.380857e+01 3.068416e+01 3.227125e+01    164.81082    10</span></span>
+<span id="cb76-595"><a href="#cb76-595" tabindex="-1"></a><span class="co">#&gt;                 not 9.599763e+01 9.701856e+01 1.028601e+02 1.012292e+02 1.049974e+02    120.73529    10</span></span>
+<span id="cb76-596"><a href="#cb76-596" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">autoplot</span>(microbenchmark_result)</span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
