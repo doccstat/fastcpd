@@ -296,8 +296,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     r_clock <- eval.parent(match.call()[["r.clock"]])
   }
 
-  p <- get_p(data_, family, p_response, order, include_mean)
-
   # Define the cost functions for ARIMA and GARCH models.
   if (family == "arima") {
     cost <- function(data) {
@@ -320,15 +318,18 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   # Get dimension of the data.
   d <- get_d(data_, family)
 
+  # Get the number of paramters for the model to calculate the penalty.
+  p <- get_p(data_, family, p_response, order, include_mean)
+
+  # Assign families as "gaussian" for "lm" and "ar" or "mgaussian" for
+  # "mlm" and "var".
+  fastcpd_family <- get_fastcpd_family(family, p_response)
+
   # Estimate the variance / covariance matrix and pre-process the data for
   # mean, variance, meanvariance, ar and var models.
   sigma_data <- get_sigma_data(data_, family, order, p, p_response)
   sigma_ <- sigma_data$sigma
   data_ <- sigma_data$data
-
-  # Assign families as "gaussian" for "lm" and "ar" or "mgaussian" for
-  # "mlm" and "var".
-  fastcpd_family <- get_fastcpd_family(family, p_response)
 
   # Use vanilla PELT for
   # "mean", "variance", "meanvariance", "arima", "garch", "mgaussian".
