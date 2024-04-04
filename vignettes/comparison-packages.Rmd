@@ -850,6 +850,8 @@ testthat::expect_equal(VARDetect_result, c(501))
 # Detection comparison using `well_log`
 
 ```{r detection-comparison-well-log, eval = FALSE}
+well_log <- well_log[well_log > 1e5]
+
 result <- list(
   fastcpd = fastcpd.mean(well_log, trim = 0.003)@cp_set,
   changepoint = changepoint::cpt.mean(well_log)@cpts,

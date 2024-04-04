@@ -99,11 +99,11 @@
 
 #' @title Well-log Dataset from Numerical Bayesian Methods Applied to
 #' Signal Processing
-#' @format A Time-Series of length 3989.
+#' @format A Time-Series of length 4050.
 #' @source <https://github.com/alan-turing-institute/TCPD>
 #' @description This is the well-known well-log dataset used in many changepoint
 #' papers obtained from Alan Turing Institute GitHub repository and licensed
-#' under the MIT license. Outliers with value less or equal to 1e5 are removed.
+#' under the MIT license.
 #' @example tests/testthat/examples/data-well_log.R
 #' @example tests/testthat/examples/data-well_log-quantile.txt
 "well_log"
