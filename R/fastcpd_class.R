@@ -94,10 +94,10 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
       )
 
     # Draw lines for time series data and points for other data.
-    if (family %in% c("ar", "ma", "arma", "arima", "garch")) {
+    if (family %in% c("ar", "arma", "arima", "garch")) {
       y_label <-
         paste0(toupper(family), "(", paste0(x@order, collapse = ", "), ")")
-    } else if (family %in% c("mean", "variance", "meanvariance", "mv")) {
+    } else if (family %in% c("mean", "variance", "meanvariance")) {
       y_label <- "data"
     } else {
       y_label <- "response"
@@ -120,7 +120,7 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
     )
     aesthetic_mapping <- ggplot2::aes(x = x, y = y, color = color)
 
-    if (family %in% c("ar", "ma", "arma", "arima", "garch")) {
+    if (family %in% c("ar", "arma", "arima", "garch")) {
       p <- p + ggplot2::geom_line(
         data = data_label_color, aesthetic_mapping, alpha = data_point_alpha,
         linewidth = data_point_linewidth

@@ -41,7 +41,6 @@ server <- function(input, output) {
             "variance" = fastcpd::fastcpd_variance,
             "meanvariance" = fastcpd::fastcpd_meanvariance,
             "ar" = fastcpd::fastcpd_ar,
-            "ma" = fastcpd::fastcpd_ma,
             "arma" = fastcpd::fastcpd_arma,
             "arima" = fastcpd::fastcpd_arima,
             "garch" = fastcpd::fastcpd_garch,

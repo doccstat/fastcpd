@@ -23,7 +23,6 @@ ui <- fluidPage(
       ),
       `Time Series` = list(
         "AR(p)" = "ar",
-        "MA(p)" = "ma",
         "ARMA(p, q)" = "arma",
         "ARIMA(p, d, q)" = "arima",
         "GARCH(p, q)" = "garch",

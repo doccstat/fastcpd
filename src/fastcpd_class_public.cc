@@ -92,7 +92,34 @@ colvec Fastcpd::cost_update_gradient(
     gradient = - (y - exp(as_scalar(x * theta))) * x.t();
   } else if (family == "lasso" || family == "gaussian") {
     gradient = - (y - as_scalar(x * theta)) * x.t();
-  } else if (family == "arma") {
+  } else if (family == "arma" && order(0) == 0) {
+    const unsigned int q = order(1);
+    mat reversed_data = reverse(data_segment, 0);
+    colvec reversed_theta = reverse(theta);
+    if (segment_length < q + 1) {
+      return ones(theta.n_elem);
+    }
+    colvec variance_term = zeros(segment_length);
+    for (unsigned int i = q; i < segment_length; i++) {
+      variance_term(i) = data_segment(i, 0) -
+        dot(reversed_theta.rows(1, q), variance_term.rows(i - q, i - 1));
+    }
+    colvec reversed_variance_term = reverse(variance_term);
+    mat psi_coefficient = zeros(segment_length, q);
+    for (unsigned int i = q; i < segment_length; i++) {
+      psi_coefficient.row(i) = -reversed_variance_term.rows(
+          segment_length - i, segment_length - i + q - 1
+        ).t() - reversed_theta.rows(1, q).t() *
+        psi_coefficient.rows(i - q, i - 1);
+    }
+    gradient = zeros(q + 1);
+    gradient.rows(0, q - 1) =
+      psi_coefficient.row(segment_length - 1).t() *
+      variance_term(segment_length - 1) / theta(q);
+    gradient(q) = 1.0 / 2.0 / theta(q) -
+      std::pow(variance_term(segment_length - 1), 2) / 2.0 /
+      std::pow(theta(q), 2);
+  } else if (family == "arma" && order(0) > 0) {
     mat reversed_data = reverse(data_segment, 0);
     colvec reversed_theta = reverse(theta);
     if (segment_length < max(order) + 1) {
@@ -160,7 +187,58 @@ mat Fastcpd::cost_update_hessian(
     hessian = (x.t() * x) * std::min(as_scalar(prob), 1e10);
   } else if (family == "lasso" || family == "gaussian") {
     hessian = x.t() * x;
-  } else if (family == "arma") {
+  } else if (family == "arma" && order(0) == 0) {
+    const unsigned int q = order(1);
+    // TODO(doccstat): Maybe we can store all these computations
+    mat reversed_data = reverse(data_segment, 0);
+    colvec reversed_theta = reverse(theta);
+    if (segment_length < q + 1) {
+      return eye(theta.n_elem, theta.n_elem);
+    }
+    colvec variance_term = zeros(segment_length);
+    for (unsigned int i = q; i < segment_length; i++) {
+      variance_term(i) = data_segment(i, 0) - dot(
+        reversed_theta.rows(1, q), variance_term.rows(i - q, i - 1)
+      );
+    }
+    colvec reversed_variance_term = reverse(variance_term);
+    mat psi_coefficient = zeros(segment_length, q);
+    for (unsigned int i = q; i < segment_length; i++) {
+      psi_coefficient.row(i) = -reversed_variance_term.rows(
+          segment_length - i, segment_length - i + q - 1
+        ).t() - reversed_theta.rows(1, q).t() *
+        psi_coefficient.rows(i - q, i - 1);
+    }
+    mat reversed_coef_psi = reverse(psi_coefficient, 0);
+    cube psi_psi_coefficient = zeros(q, q, segment_length);
+    for (unsigned int i = q; i < segment_length; i++) {
+      mat psi_psi_coefficient_part = zeros(q, q);
+      for (unsigned int j = 1; j <= q; j++) {
+        psi_psi_coefficient_part +=
+          psi_psi_coefficient.slice(i - j) * theta(j - 1);
+      }
+      psi_psi_coefficient.slice(i) = -reversed_coef_psi.rows(
+          segment_length - i, segment_length - i + q - 1
+        ) - reversed_coef_psi.rows(
+          segment_length - i, segment_length - i + q - 1
+        ).t() - psi_psi_coefficient_part;
+    }
+    hessian = zeros(q + 1, q + 1);
+    hessian.submat(0, 0, q - 1, q - 1) = (
+      psi_coefficient.row(segment_length - 1).t() *
+      psi_coefficient.row(segment_length - 1) +
+      psi_psi_coefficient.slice(segment_length - 1) *
+      variance_term(segment_length - 1)
+    ) / theta(q);
+    hessian.submat(0, q, q - 1, q) =
+      -psi_coefficient.row(segment_length - 1).t() *
+      variance_term(segment_length - 1) / theta(q) / theta(q);
+    hessian.submat(q, 0, q, q - 1) = hessian.submat(0, q, q - 1, q).t();
+    hessian(q, q) =
+      std::pow(variance_term(segment_length - 1), 2) /
+      std::pow(theta(q), 3) -
+      1.0 / 2.0 / std::pow(theta(q), 2);
+  } else if (family == "arma" && order(0) > 0) {
     // TODO(doccstat): Maybe we can store all these computations
     mat reversed_data = reverse(data_segment, 0);
     colvec reversed_theta = reverse(theta);
@@ -284,7 +362,7 @@ CostResult Fastcpd::get_nll_wo_theta(
     cost_result = get_nll_mean(segment_start, segment_end);
   } else if (family == "variance") {
     cost_result = get_nll_variance(segment_start, segment_end);
-  } else if (family == "meanvariance" || family == "mv") {
+  } else if (family == "meanvariance") {
     cost_result = get_nll_meanvariance(segment_start, segment_end);
   } else if (family == "mgaussian") {
     cost_result = get_nll_mgaussian(segment_start, segment_end);
@@ -327,7 +405,22 @@ double Fastcpd::get_nll_wo_cv(
     }
 
     return accu(-y % u + exp(u) + y_factorial);
-  } else if (family == "arma") {
+  } else if (family == "arma" && order(0) == 0) {
+    const unsigned int q = order(1);
+    colvec reversed_theta = reverse(theta);
+    if (data_segment.n_rows < q + 1) {
+      return 0;
+    }
+    colvec variance_term = zeros(data_segment.n_rows);
+    for (unsigned int i = q; i < data_segment.n_rows; i++) {
+      variance_term(i) = data_segment(i, 0) - dot(
+          reversed_theta.rows(1, q), variance_term.rows(i - q, i - 1)
+        );
+    }
+    return (std::log(2.0 * M_PI) +
+      std::log(theta(q))) * (data_segment.n_rows - 2) / 2.0 +
+      dot(variance_term, variance_term) / 2.0 / theta(q);
+  } else if (family == "arma" && order(0) > 0) {
     colvec reversed_theta = reverse(theta);
     if (data_segment.n_rows < max(order) + 1) {
       return 0;

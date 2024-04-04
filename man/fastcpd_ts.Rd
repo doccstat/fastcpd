@@ -22,9 +22,6 @@ specifying the order of the time series. Possible combinations with
 \itemize{
 \item \code{"ar"}, NUMERIC(1): AR(\eqn{p}) model using linear regression.
 \item \code{"var"}, NUMERIC(1): VAR(\eqn{p}) model using linear regression.
-\item \code{"ma"}, NUMERIC(1): MA(\eqn{q}) model using \code{\link[forecast:Arima]{forecast::Arima()}}.
-\item \code{"ma"}, NUMERIC(3): ARIMA(0, 0, \eqn{q}) model using
-\code{\link[forecast:Arima]{forecast::Arima()}}, where \eqn{q} is the third element of the vector.
 \item \code{"arima"}, NUMERIC(3): ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model
 using \code{\link[forecast:Arima]{forecast::Arima()}}.
 \item \code{"garch"}, NUMERIC(2): GARCH(\eqn{p}, \eqn{q}) model using
@@ -49,21 +46,25 @@ family is one of \code{"ar"}, \code{"var"}, \code{"arma"}, \code{"arima"} or
 \examples{
 \donttest{
 set.seed(1)
-n <- 250
-x <- rep(0, n + 1)
-for (i in 1:180) {
-  x[i + 1] <- 0.8 * x[i] + rnorm(1, 0, 2)
+n <- 400
+w <- rnorm(n + 4, 0, 0.1)
+x <- rep(NA, n)
+for (i in 1:200) {
+  x[i] <- w[i + 4] - 5 / 3 * w[i + 3] + 11 / 12 * w[i + 2] - 5 / 12 * w[i + 1] +
+    1 / 6 * w[i]
 }
-for (i in 181:n) {
-  x[i + 1] <- 0.1 * x[i] + rnorm(1, 0, 2)
+for (i in 201:n) {
+  x[i] <- w[i + 4] - 4 / 3 * w[i + 3] + 7 / 9 * w[i + 2] - 16 / 27 * w[i + 1] +
+    4 / 27 * w[i]
 }
 result <- fastcpd.ts(
-  x[1 + seq_len(n)],
-  "arima",
-  c(1, 0, 0),
-  include.mean = FALSE,
-  trim = 0,
-  beta = (1 + 1 + 1) * log(n) / 2 * 3
+  x,
+  "arma",
+  c(0, 4),
+  lower = c(-2, -2, -2, -2, 1e-10),
+  upper = c(2, 2, 2, 2, Inf),
+  line_search = c(1, 0.1, 1e-2),
+  trim = 0.04
 )
 summary(result)
 plot(result)

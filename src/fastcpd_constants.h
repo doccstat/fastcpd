@@ -13,7 +13,7 @@ bool contain(C&& c, T e) {
 constexpr std::array FASTCPD_FAMILIES = {
   "gaussian", "binomial", "poisson", "lasso", "mgaussian",
   "arma",
-  "mean", "variance", "meanvariance", "mv"
+  "mean", "variance", "meanvariance"
 };
 
 #else
@@ -26,7 +26,7 @@ inline bool contain(std::vector<std::string> c, std::string e) {
 const std::vector<std::string> FASTCPD_FAMILIES = {
   "gaussian", "binomial", "poisson", "lasso", "mgaussian",
   "arma",
-  "mean", "variance", "meanvariance", "mv"
+  "mean", "variance", "meanvariance"
 };
 
 #endif  // defined(__cplusplus) && __cplusplus >= 201703L

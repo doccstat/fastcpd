@@ -7,8 +7,8 @@
 #' [fastcpd.meanvariance()] for basic statistics change models;
 #' [fastcpd.lm()], [fastcpd.binomial()], [fastcpd.poisson()],
 #' [fastcpd.lasso()] for regression coefficients change models;
-#' [fastcpd.ar()], [fastcpd.var()], [fastcpd.ma()], [fastcpd.arima()],
-#' [fastcpd.arma()], [fastcpd.garch()] for change in time series models.
+#' [fastcpd.ar()], [fastcpd.var()], [fastcpd.arima()], [fastcpd.arma()],
+#' [fastcpd.garch()] for change in time series models.
 #'
 #' @md
 #' @keywords internal
@@ -218,36 +218,6 @@ fastcpd_lm <- function(data, ...) {
 #' @export
 fastcpd.lm <- fastcpd_lm  # nolint: Conventional R function style
 
-#' @title Find change points efficiently in MA(\eqn{q}) models
-#' @param data A numeric vector, a matrix, a data frame or a time series object.
-#' @param order A positive integer or a vector of length three with the first
-#' two elements being zeros specifying the order of the MA model.
-#' @param ... Other arguments passed to [fastcpd()], for example,
-#' \code{segment_count}. One special argument can be passed here is
-#' \code{include.mean}, which is a logical value indicating whether the
-#' mean should be included in the model. The default value is \code{TRUE}.
-#' @return A [fastcpd-class] object.
-#' @description [fastcpd_ma()] and [fastcpd.ma()] are
-#' wrapper functions of [fastcpd()] to find change points in
-#' MA(\eqn{q}) models. The function is similar to [fastcpd()]
-#' except that the data is by default a one-column matrix or univariate vector
-#' and thus a formula is not required here.
-#' @example tests/testthat/examples/fastcpd_ma.txt
-#' @seealso [fastcpd()]
-#'
-#' @md
-#' @rdname fastcpd_ma
-#' @export
-fastcpd_ma <- function(data, order = 0, ...) {
-  result <- fastcpd.ts(c(data), "ma", order, ...)
-  result@call <- match.call()
-  result
-}
-
-#' @rdname fastcpd_ma
-#' @export
-fastcpd.ma <- fastcpd_ma  # nolint: Conventional R function style
-
 #' @title Find change points efficiently in mean change models
 #' @param data A matrix, a data frame or a vector.
 #' @param ... Other arguments passed to [fastcpd()], for example,
@@ -363,9 +333,6 @@ fastcpd.poisson <- fastcpd_poisson  # nolint: Conventional R function style
 #' \itemize{
 #' \item \code{"ar"}, NUMERIC(1): AR(\eqn{p}) model using linear regression.
 #' \item \code{"var"}, NUMERIC(1): VAR(\eqn{p}) model using linear regression.
-#' \item \code{"ma"}, NUMERIC(1): MA(\eqn{q}) model using [forecast::Arima()].
-#' \item \code{"ma"}, NUMERIC(3): ARIMA(0, 0, \eqn{q}) model using
-#'   [forecast::Arima()], where \eqn{q} is the third element of the vector.
 #' \item \code{"arima"}, NUMERIC(3): ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model
 #'   using [forecast::Arima()].
 #' \item \code{"garch"}, NUMERIC(2): GARCH(\eqn{p}, \eqn{q}) model using
@@ -392,9 +359,7 @@ fastcpd_ts <- function(data, family = NULL, order = c(0, 0, 0), ...) {
     family <- tolower(family)
   }
 
-  stopifnot(
-    check_family(family, c("ar", "var", "ma", "arima", "arma", "garch"))
-  )
+  check_family(family, c("ar", "var", "arima", "arma", "garch"))
   stopifnot(check_order(order, family))
 
   # TODO(doccstat): Deal with different data types.

@@ -8,8 +8,6 @@ check_family <- function(family, allowed_families) {
     stop(error_message)
   } else if (!(family %in% allowed_families)) {
     stop(paste0(error_message, "\nThe provided family is \"", family, "\"."))
-  } else {
-    TRUE
   }
 }
 

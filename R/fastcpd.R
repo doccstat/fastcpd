@@ -31,11 +31,10 @@
 #' function. Details can in found in the references.
 #' @param family Family class of the change point model. It can be \code{"mean"}
 #' for mean change, \code{"variance"} for variance change,
-#' \code{"meanvariance"} or \code{"mv"}, for mean and/or variance change,
+#' \code{"meanvariance"} for mean and/or variance change,
 #' \code{"lm"} for linear regression, \code{"binomial"} for logistic
 #' regression, \code{"poisson"} for Poisson regression, \code{"lasso"} for
 #' penalized linear regression, \code{"ar"} for AR(\eqn{p}) models,
-#' \code{"ma"} for MA(\eqn{q}) models,
 #' \code{"arma"} for ARMA(\eqn{p}, \eqn{q}) models,
 #' \code{"arima"} for ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models,
 #' \code{"garch"} for GARCH(\eqn{p}, \eqn{q}) models,
@@ -228,20 +227,27 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   ...
 ) {
   # Check the validity of the `family` parameter.
-  family <- ifelse(is.null(family), "custom", tolower(family))
-  stopifnot(
-    check_family(
-      family,
-      c(
-        "lm", "binomial", "poisson", "lasso", "mlasso", "mean", "variance",
-        "meanvariance", "mv", "arma", "ar", "var", "ma", "arima", "garch",
-        "custom"
-      )
+  check_family(
+    family <- ifelse(is.null(family), "custom", tolower(family)),
+    c(
+      "lm",  # -> "gaussian"
+      "binomial",  # -> "binomial"
+      "poisson",  # -> "poisson"
+      "lasso",  # -> "lasso"
+      "mean",  # -> "mean"
+      "variance",  # -> "variance"
+      "meanvariance",  # -> "meanvariance"
+      "arma",  # -> "arma"
+      "ar",  # -> "gaussian"
+      "var",  # -> "mgaussian"
+      "arima",  # -> "custom"
+      "garch",  # -> "custom"
+      "custom"  # -> "custom"
     )
   )
 
   # Check the validity of the `cost` parameter.
-  stopifnot(check_cost(cost, cost_gradient, cost_hessian, family))
+  check_cost(cost, cost_gradient, cost_hessian, family)
 
   # Check the validity of the `cost_adjustment` parameter.
   if (is.null(cost_adjustment)) {
@@ -258,6 +264,19 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   match_formula <- eval(match_formula, parent.frame())
   y <- stats::model.response(match_formula, "numeric")
   data_ <- cbind(y, stats::model.matrix(formula, data = data))
+
+  if (family == "ar") {
+    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
+    stopifnot(check_ar_order(order))
+  } else if (family == "var") {
+    stopifnot(check_var_order(order))
+  } else if (family == "garch") {
+    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
+    stopifnot(check_garch_order(order))
+  } else if (family == "arima") {
+    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
+    stopifnot(check_arima_order(order))
+  }
 
   # Check the parameters passed in the ellipsis.
   include_mean <- TRUE
@@ -280,22 +299,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   p <- get_p(data_, family, p_response, order, include_mean)
 
   if (family == "ar") {
-    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
-    stopifnot(check_ar_order(order))
-  } else if (family == "var") {
-    stopifnot(check_var_order(order))
-  } else if (family == "ma") {
-    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
-    stopifnot(check_ma_order(order))
-  } else if (family == "garch") {
-    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
-    stopifnot(check_garch_order(order))
-  } else if (family == "arima") {
-    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
-    stopifnot(check_arima_order(order))
-  }
-
-  if (family == "ar") {
     y <- data_[p + seq_len(nrow(data_) - p), ]
     x <- matrix(NA, nrow(data_) - p, p)
     for (p_i in seq_len(p)) {
@@ -310,10 +313,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         data_[(order - p_i) + seq_len(nrow(data_) - order), ]
     }
     data_ <- cbind(y, x)
-  } else if (family == "ma") {
-    # TODO(doccstat): Deprecate MA model.
-    family <- "arima"
-    order <- c(rep(0, 3 - length(order)), order)
   } else if (family == "garch") {
     cost <- function(data) {
       tryCatch(
@@ -410,7 +409,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     tryCatch(
       expr = if (family == "ar") {
         residuals <- matrix(c(rep(NA, p), residuals))
-      } else if (family == "ma" || family == "arima") {
+      } else if (family == "arima") {
         residuals <- matrix(NA, nrow(data))
         segments <- c(0, cp_set, nrow(data))
         for (segments_i in seq_len(length(segments) - 1)) {
