@@ -69,25 +69,20 @@ void Fastcpd::create_gradients() {
   if (family == "binomial") {
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     theta_hat.col(0) = segment_theta_hat.row(0).t();
-    const double prob = 1 / (1 + exp(
-      -as_scalar(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
-    ));
-    hessian.slice(0) = (
-      data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
-    ) * as_scalar(prob * (1 - prob));
+    const double prob = 1 / (1 + exp(-dot(theta_hat, data.row(0).tail(p))));
+    hessian.slice(0) = (data.row(0).tail(p).t() * data.row(0).tail(p)) *
+      prob * (1 - prob);
   } else if (family == "poisson") {
     theta_hat.col(0) = segment_theta_hat.row(0).t();
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian.slice(0) = (
-      data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1)
-    ) * as_scalar(
-      exp(theta_hat.t() * data.row(0).tail(data.n_cols - 1).t())
-    );
+      data.row(0).tail(p).t() * data.row(0).tail(p)
+    ) * exp(dot(theta_hat, data.row(0).tail(p)));
   } else if (family == "lasso" || family == "gaussian") {
     theta_hat.col(0) = segment_theta_hat.row(0).t();
     theta_sum.col(0) = segment_theta_hat.row(0).t();
-    hessian.slice(0) = epsilon * eye<mat>(p, p) +
-      data.row(0).tail(data.n_cols - 1).t() * data.row(0).tail(data.n_cols - 1);
+    hessian.slice(0) = data.row(0).tail(p).t() * data.row(0).tail(p) +
+      epsilon * eye<mat>(p, p);
   } else if (!contain(FASTCPD_FAMILIES, family)) {
     theta_hat.col(0) = segment_theta_hat.row(0).t();
     theta_sum.col(0) = segment_theta_hat.row(0).t();
@@ -200,11 +195,11 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
   if (
     family == "mean" || family == "variance" || family == "meanvariance"
   ) {
-    residual = zeros<mat>(data.n_rows, data.n_cols);
+    residual = zeros<mat>(data_n_rows, data_n_cols);
   } else if (family == "mgaussian") {
-    residual = zeros<mat>(data.n_rows, p_response);
+    residual = zeros<mat>(data_n_rows, p_response);
   } else {
-    residual = zeros<mat>(data.n_rows, 1);
+    residual = zeros<mat>(data_n_rows, 1);
   }
   unsigned int residual_next_start = 0;
 
@@ -573,19 +568,18 @@ CostResult Fastcpd::get_nll_variance(
   const unsigned int segment_end
 ) {
   const unsigned int segment_length = segment_end - segment_start + 1;
-  const unsigned int p = sqrt(data.n_cols);
 
   double det_value = det(arma::reshape(
-    zero_data.row(segment_end + 1) - zero_data.row(segment_start), p, p
+    zero_data.row(segment_end + 1) - zero_data.row(segment_start), d, d
   ) / segment_length);
   if (det_value <= 0) {
     det_value = 1e-10;
   }
 
   return {
-    {zeros<mat>(p, p)},
+    {zeros<mat>(d, d)},
     {mat()},
-    (std::log(2.0 * M_PI) * p + p + log(det_value)) * segment_length / 2.0
+    (std::log(2.0 * M_PI) * d + d + log(det_value)) * segment_length / 2.0
   };
 }
 
@@ -787,24 +781,21 @@ void Fastcpd::update_err_sd(
 }
 
 void Fastcpd::update_fastcpd_parameters(const unsigned int t) {
-  // for tau = t-1
-  rowvec new_data = data.row(t - 1).tail(data.n_cols - 1);
-  DEBUG_RCOUT(new_data);
   const int segment_index = index_max(find(segment_indices <= t - 1));
   rowvec cum_coef_add = segment_theta_hat.row(segment_index),
              coef_add = segment_theta_hat.row(segment_index);
   mat hessian_new;
   if (family == "binomial") {
-    const double prob = 1 / (1 + exp(-as_scalar(coef_add * new_data.t())));
-    hessian_new = (new_data.t() * new_data) * as_scalar(prob * (1 - prob));
+    const rowvec x = data.row(t - 1).tail(p);
+    const double prob = 1 / (1 + exp(-dot(coef_add, x)));
+    hessian_new = (x.t() * x) * prob * (1 - prob);
   } else if (family == "poisson") {
+    const rowvec x = data.row(t - 1).tail(p);
     cum_coef_add = coef_add;
-    hessian_new =
-        (new_data.t() * new_data) * as_scalar(
-          exp(coef_add * new_data.t())
-        );
+    hessian_new = (x.t() * x) * exp(dot(coef_add, x));
   } else if (family == "lasso" || family == "gaussian") {
-    hessian_new = new_data.t() * new_data + epsilon * eye<mat>(p, p);
+    const rowvec x = data.row(t - 1).tail(p);
+    hessian_new = x.t() * x + epsilon * eye<mat>(p, p);
   } else if (family == "arma") {
     hessian_new = cost_update_hessian(0, t - 1, coef_add.t());
   } else if (!contain(FASTCPD_FAMILIES, family)) {
