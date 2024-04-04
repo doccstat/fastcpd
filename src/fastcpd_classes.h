@@ -67,6 +67,7 @@ class Fastcpd {
     Nullable<Function> cost_gradient,
     Nullable<Function> cost_hessian,
     const bool cp_only,
+    const unsigned int d,
     mat data,
     const double epsilon,
     const string family,
@@ -188,8 +189,17 @@ class Fastcpd {
 
   const bool cp_only;
 
+  // Dimension of the data.
+  const unsigned int d;
+
   // `data` is the data set to be segmented.
   mat data;
+
+  // The number of data points.
+  const unsigned int data_n_rows;
+
+  // The number of data columns.
+  const unsigned int data_n_cols;
 
   // `epsilon` is the epsilon to avoid numerical issues. Only used for binomial
   // and poisson.
@@ -215,9 +225,6 @@ class Fastcpd {
   colvec momentum;
 
   const double momentum_coef;
-
-  // `n` is the number of data points.
-  int n;
 
   const colvec order;
 

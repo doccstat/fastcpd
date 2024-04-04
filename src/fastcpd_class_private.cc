@@ -192,7 +192,7 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
   if (cp_set.n_elem) {
     cp_loc_.rows(1, cp_loc_.n_elem - 2) = cp_set;
   }
-  cp_loc_(cp_loc_.n_elem - 1) = n;
+  cp_loc_(cp_loc_.n_elem - 1) = data_n_rows;
   colvec cp_loc = unique(std::move(cp_loc_));
   colvec cost_values = zeros<vec>(cp_loc.n_elem - 1);
   mat thetas = zeros<mat>(p, cp_loc.n_elem - 1);
@@ -258,7 +258,7 @@ double Fastcpd::get_cval_for_r_t_set(
     // Mean of `err_sd` only works if error sd is unchanged.
     lambda = mean(err_sd) * sqrt(2 * std::log(p) / (t - tau));
   }
-  if (t > vanilla_percentage * n) {
+  if (t > vanilla_percentage * data_n_rows) {
     return get_cval_sen(tau, t - 1, i, lambda);
   } else {
     return get_cval_pelt(tau, t - 1, i, lambda);
@@ -295,7 +295,9 @@ double Fastcpd::get_cval_pelt(
 
   // If `vanilla_percentage` is not 1, then we need to keep track of
   // thetas for later `fastcpd` steps.
-  if (vanilla_percentage < 1 && segment_end < vanilla_percentage * n) {
+  if (
+    vanilla_percentage < 1 && segment_end < vanilla_percentage * data_n_rows
+  ) {
     update_theta_hat(i - 1, cost_result.par);
     update_theta_sum(i - 1, cost_result.par);
   }
@@ -743,8 +745,8 @@ double Fastcpd::update_cost_value(
 colvec Fastcpd::update_cp_set(const colvec raw_cp_set) {
   // Remove change points close to the boundaries.
   colvec cp_set = raw_cp_set;
-  cp_set = cp_set(find(cp_set > trim * n));
-  cp_set = cp_set(find(cp_set < (1 - trim) * n));
+  cp_set = cp_set(find(cp_set > trim * data_n_rows));
+  cp_set = cp_set(find(cp_set < (1 - trim) * data_n_rows));
   colvec cp_set_ = zeros<vec>(cp_set.n_elem + 1);
   if (cp_set.n_elem) {
     cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
@@ -752,7 +754,7 @@ colvec Fastcpd::update_cp_set(const colvec raw_cp_set) {
   cp_set = sort(unique(std::move(cp_set_)));
 
   // Remove change points close to each other.
-  ucolvec cp_set_too_close = find(diff(cp_set) <= trim * n);
+  ucolvec cp_set_too_close = find(diff(cp_set) <= trim * data_n_rows);
   if (cp_set_too_close.n_elem > 0) {
     int rest_element_count = cp_set.n_elem - cp_set_too_close.n_elem;
     colvec cp_set_rest_left = zeros<vec>(rest_element_count),

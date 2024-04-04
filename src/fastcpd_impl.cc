@@ -5,6 +5,7 @@ List fastcpd_impl(
     mat data,
     double beta,
     const string cost_adjustment,
+    const unsigned int d,
     const int segment_count,
     const double trim,
     const double momentum_coef,
@@ -30,8 +31,8 @@ List fastcpd_impl(
 ) {
   DEBUG_RCOUT(beta);
   fastcpd::classes::Fastcpd fastcpd_class(
-    beta, cost, cost_adjustment, cost_gradient, cost_hessian,
-    cp_only, data, epsilon, family, k, line_search, lower, momentum_coef, order,
+    beta, cost, cost_adjustment, cost_gradient, cost_hessian, cp_only, d, data,
+    epsilon, family, k, line_search, lower, momentum_coef, order,
     p, p_response, pruning_coef, r_clock, r_progress, segment_count, trim,
     upper, vanilla_percentage, variance_estimate, warm_start
   );

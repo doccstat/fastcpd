@@ -12,6 +12,7 @@ Fastcpd::Fastcpd(
     Nullable<Function> cost_gradient,
     Nullable<Function> cost_hessian,
     const bool cp_only,
+    const unsigned int d,
     mat data,
     const double epsilon,
     const string family,
@@ -31,18 +32,25 @@ Fastcpd::Fastcpd(
     const double vanilla_percentage,
     const mat variance_estimate,
     const bool warm_start
-) : beta(beta),
+) : act_num(colvec(segment_count)),
+    beta(beta),
     cost(cost),
     cost_adjustment(cost_adjustment),
     cost_gradient(cost_gradient),
     cost_hessian(cost_hessian),
     cp_only(cp_only),
+    d(d),
     data(data),
+    data_n_rows(data.n_rows),
+    data_n_cols(data.n_cols),
     epsilon(epsilon),
+    err_sd(colvec(segment_count)),
     family(family),
+    hessian(cube(p, p, 1)),
     k(k),
     line_search(line_search),
     lower(lower),
+    momentum(vec(p)),
     momentum_coef(momentum_coef),
     order(order),
     p(p),
@@ -51,22 +59,17 @@ Fastcpd::Fastcpd(
     r_clock(r_clock),
     r_progress(r_progress),
     segment_count(segment_count),
+    segment_indices(round(linspace(0, data_n_rows, segment_count + 1))),
+    segment_theta_hat(mat(segment_count, p)),
+    start(zeros<mat>(p, data_n_rows)),
+    theta_hat(mat(p, 1)),
+    theta_sum(mat(p, 1)),
     trim(trim),
     upper(upper),
     vanilla_percentage(vanilla_percentage),
     variance_estimate(variance_estimate),
-    warm_start(warm_start) {
-  n = data.n_rows;
-  segment_indices = round(linspace(0, n, segment_count + 1));
-  segment_theta_hat = mat(segment_count, p);
-  err_sd = vec(segment_count);
-  act_num = vec(segment_count);
-  start = zeros<mat>(p, n);
-  theta_hat = mat(p, 1);
-  theta_sum = mat(p, 1);
-  hessian = cube(p, p, 1);
-  momentum = vec(p);
-  zero_data = join_cols(zeros<rowvec>(data.n_cols), data);
+    warm_start(warm_start),
+    zero_data(join_cols(zeros<rowvec>(data_n_cols), data)) {
 
   create_cost_function_wrapper(cost);
   create_cost_gradient_wrapper(cost_gradient);
@@ -449,23 +452,25 @@ List Fastcpd::run() {
   // Set up the initial values.
   double lambda = 0;
 
-  ucolvec r_t_set = zeros<ucolvec>(n);
+  ucolvec r_t_set = zeros<ucolvec>(data_n_rows);
   DEBUG_RCOUT(r_t_set);
   r_t_set(1) = 1;
   unsigned int r_t_count = 2;
 
   std::vector<colvec> cp_sets = {{0}};
-  linspace(1, n, n).for_each([&](int i) {
+  linspace(1, data_n_rows, data_n_rows).for_each([&](int i) {
     cp_sets.push_back({0});
   });
 
-  colvec fvec = zeros<vec>(n + 1);
+  colvec fvec = zeros<vec>(data_n_rows + 1);
   fvec.fill(arma::datum::inf);
   fvec(0) = -beta;
   DEBUG_RCOUT(fvec(0));
 
   Rcpp::Clock clock;
-  RProgress::RProgress rProgress("[:bar] :current/:total in :elapsed", n);
+  RProgress::RProgress rProgress(
+    "[:bar] :current/:total in :elapsed", data_n_rows
+  );
 
   if (r_progress) {
     rProgress.tick(0);
@@ -475,7 +480,7 @@ List Fastcpd::run() {
     create_segment_statistics();
   }
 
-  DEBUG_RCOUT(n);
+  DEBUG_RCOUT(data_n_rows);
 
   if (vanilla_percentage < 1) {
     create_gradients();
@@ -486,7 +491,7 @@ List Fastcpd::run() {
     rProgress.tick();
   }
 
-  for (int t = 2; t <= n; t++) {
+  for (int t = 2; t <= data_n_rows; t++) {
     DEBUG_RCOUT(t);
     DEBUG_RCOUT(r_t_count);
 
@@ -557,7 +562,7 @@ List Fastcpd::run() {
     clock.stop("fastcpd_profiler");
   }
 
-  return get_cp_set(cp_sets[n], lambda);
+  return get_cp_set(cp_sets[data_n_rows], lambda);
 }
 
 void Fastcpd::update_theta_sum(

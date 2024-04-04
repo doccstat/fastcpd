@@ -137,27 +137,78 @@ check_cost <- function(cost, cost_gradient, cost_hessian, family) {  # nolint
     error_message[2] <-
       "specify the Hessian function if the gradient function is available."
     stop(paste(error_message, collapse = " "))
-  } else {
-    TRUE
   }
 }
 
-get_variance_estimation <- function(data, family, p_response) {
-  if (family == "mean") {
-    variance.mean(data)
+get_d <- function(data_, family) {
+  if (family %in% c(
+    "mean", "variance", "meanvariance", "ar", "arma", "arima", "garch", "var"
+  )) {
+    ncol(data_)
+  } else {
+    ncol(data_) - 1
+  }
+}
+
+get_sigma_data <- function(data_, family, order, p, p_response) {  # nolint
+  if (family == "ar") {
+    y <- data_[p + seq_len(nrow(data_) - p), ]
+    x <- matrix(NA, nrow(data_) - p, p)
+    for (p_i in seq_len(p)) {
+      x[, p_i] <- data_[(p - p_i) + seq_len(nrow(data_) - p), ]
+    }
+    data_ <- cbind(y, x)
+  } else if (family == "var") {
+    y <- data_[order + seq_len(nrow(data_) - order), ]
+    x <- matrix(NA, nrow(data_) - order, order * ncol(data_))
+    for (p_i in seq_len(order)) {
+      x[, (p_i - 1) * ncol(data_) + seq_len(ncol(data_))] <-
+        data_[(order - p_i) + seq_len(nrow(data_) - order), ]
+    }
+    data_ <- cbind(y, x)
+  }
+
+  sigma_ <- if (family == "mean") {
+    variance.mean(data_)
   } else if (family == "var" || family == "lm" && p_response > 1) {
-    as.matrix(Matrix::nearPD(variance.lm(data, p_response))$mat)
+    as.matrix(Matrix::nearPD(variance.lm(data_, p_response))$mat)
   } else if (family == "lm" || family == "ar") {
-    as.matrix(variance.lm(data))
+    as.matrix(variance.lm(data_))
   } else {
     diag(1)
   }
+
+  if (family == "mean") {
+    sigma_inv <- solve(sigma_)
+    chol_upper <- chol(sigma_inv)
+    data1 <- tcrossprod(data_, chol_upper)
+    data_ <- apply(cbind(data1, rowSums(data1^2)), 2, cumsum)
+  } else if (family == "variance") {
+    data_ <- data_ - colMeans(data_)
+    data_ <- apply(data_, 1, tcrossprod)
+    if (is.null(dim(data_)) || ncol(data_) == 1) {
+      data_ <- matrix(data_)
+    } else {
+      data_ <- t(data_)
+    }
+    data_ <- apply(data_, 2, cumsum)
+  } else if (family == "meanvariance") {
+    data2 <- apply(data_, 1, tcrossprod)
+    if (is.null(dim(data_)) || ncol(data_) == 1) {
+      data2 <- matrix(data2)
+    } else {
+      data2 <- t(data2)
+    }
+    data_ <- apply(cbind(data_, data2), 2, cumsum)
+  }
+
+  list(sigma = sigma_, data = data_)
 }
 
 get_fastcpd_family <- function(family, p_response) {
   if (family %in% c(
     "binomial", "poisson", "lasso",
-    "mean", "variance", "meanvariance", "mv", "arma"
+    "mean", "variance", "meanvariance", "arma"
   )) {
     family
   } else if (family == "lm" && p_response == 1 || family == "ar") {
@@ -171,7 +222,7 @@ get_fastcpd_family <- function(family, p_response) {
 
 get_vanilla_percentage <- function(vanilla_percentage, cost, fastcpd_family) {
   if (!is.null(cost) && length(formals(cost)) == 1 || fastcpd_family %in% c(
-    "mean", "variance", "meanvariance", "mv", "arima", "garch", "mgaussian"
+    "mean", "variance", "meanvariance", "arima", "garch", "mgaussian"
   )) {
     1
   } else {
@@ -227,7 +278,7 @@ get_pruning_coef <- function(
 
 get_p_response <- function(family, y, data) {
   if (family %in% c(
-    "mean", "variance", "meanvariance", "mv", "ma", "arma", "arima", "garch"
+    "mean", "variance", "meanvariance", "arma", "arima", "garch"
   )) {
     0
   } else if (family == "var") {
@@ -244,7 +295,7 @@ get_p <- function(data_, family, p_response, order, include_mean) {
     ncol(data_)
   } else if (family == "variance") {
     ncol(data_)^2
-  } else if (family == "meanvariance" || family == "mv") {
+  } else if (family == "meanvariance") {
     ncol(data_)^2 + ncol(data_)
   } else if (family == "ar") {
     order
