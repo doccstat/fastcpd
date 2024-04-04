@@ -198,8 +198,7 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
   mat thetas = zeros<mat>(p, cp_loc.n_elem - 1);
   mat residual;
   if (
-    family == "mean" || family == "variance" ||
-    family == "meanvariance" || family == "mv"
+    family == "mean" || family == "variance" || family == "meanvariance"
   ) {
     residual = zeros<mat>(data.n_rows, data.n_cols);
   } else if (family == "mgaussian") {
@@ -617,6 +616,7 @@ void Fastcpd::update_cost_parameters_step(
 ) {
   DEBUG_RCOUT(data_start);
   mat hessian_i = hessian.slice(i - 1);
+  DEBUG_RCOUT(hessian_i);
   colvec gradient;
 
   if (!contain(FASTCPD_FAMILIES, family)) {
@@ -634,6 +634,7 @@ void Fastcpd::update_cost_parameters_step(
     hessian_i += cost_update_hessian(
       segment_start + data_start, segment_start + data_end, theta_hat.col(i - 1)
     );
+    DEBUG_RCOUT(hessian_i);
     gradient = cost_update_gradient(
       segment_start + data_start, segment_start + data_end, theta_hat.col(i - 1)
     );

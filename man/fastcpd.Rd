@@ -67,11 +67,10 @@ function. Details can in found in the references.}
 
 \item{family}{Family class of the change point model. It can be \code{"mean"}
 for mean change, \code{"variance"} for variance change,
-\code{"meanvariance"} or \code{"mv"}, for mean and/or variance change,
+\code{"meanvariance"} for mean and/or variance change,
 \code{"lm"} for linear regression, \code{"binomial"} for logistic
 regression, \code{"poisson"} for Poisson regression, \code{"lasso"} for
 penalized linear regression, \code{"ar"} for AR(\eqn{p}) models,
-\code{"ma"} for MA(\eqn{q}) models,
 \code{"arma"} for ARMA(\eqn{p}, \eqn{q}) models,
 \code{"arima"} for ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models,
 \code{"garch"} for GARCH(\eqn{p}, \eqn{q}) models,

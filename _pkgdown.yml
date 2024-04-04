@@ -30,7 +30,6 @@ reference:
       - fastcpd.arima
       - fastcpd.arma
       - fastcpd.garch
-      - fastcpd.ma
       - fastcpd.ts
       - fastcpd.var
 

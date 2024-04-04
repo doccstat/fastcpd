@@ -3,7 +3,7 @@ testthat::test_that(
     testthat::expect_error(
       fastcpd.ts(),
       paste0(
-        "The family should be one of \"ar\", \"var\", \"ma\", \"arima\", ",
+        "The family should be one of \"ar\", \"var\", \"arima\", ",
         "\"arma\", \"garch\"."
       )
     )
@@ -11,7 +11,7 @@ testthat::test_that(
     testthat::expect_error(
       fastcpd.ts(family = "at"),
       paste0(
-        "The family should be one of \"ar\", \"var\", \"ma\", \"arima\", ",
+        "The family should be one of \"ar\", \"var\", \"arima\", ",
         "\"arma\", \"garch\".\n",
         "The provided family is \"at\"."
       )
@@ -91,9 +91,9 @@ testthat::test_that(
       ),
       paste0(
         "The family should be one of \"lm\", \"binomial\", \"poisson\", ",
-        "\"lasso\", \"mlasso\", ",
-        "\"mean\", \"variance\", \"meanvariance\", \"mv\", ",
-        "\"arma\", \"ar\", \"var\", \"ma\", \"arima\", \"garch\", \"custom\".",
+        "\"lasso\", ",
+        "\"mean\", \"variance\", \"meanvariance\", ",
+        "\"arma\", \"ar\", \"var\", \"arima\", \"garch\", \"custom\".",
         "\nThe provided family is \"bin0mial\"."
       )
     )
@@ -213,52 +213,6 @@ testthat::test_that(
         order = c(1, 0)
       ),
       "The order should be specified as a vector of length 3."
-    )
-
-    testthat::expect_error(
-      fastcpd(
-        formula = ~ x - 1,
-        data = data.frame(x = 0),
-        family = "ma",
-        order = c(1, 0)
-      ),
-      paste0(
-        "The order should be specified as a vector of length 1 or 3 ",
-        "for MA family."
-      )
-    )
-
-    testthat::expect_error(
-      fastcpd(
-        formula = ~ x - 1,
-        data = data.frame(x = 0),
-        family = "ma",
-        order = 0
-      ),
-      "The order should be a positive integer for MA family."
-    )
-
-    testthat::expect_error(
-      fastcpd(
-        formula = ~ x - 1,
-        data = data.frame(x = 0),
-        family = "ma",
-        order = c(0, 0, -1)
-      ),
-      paste0(
-        "The third element of the order should be a positive integer ",
-        "for MA family."
-      )
-    )
-
-    testthat::expect_error(
-      fastcpd(
-        formula = ~ x - 1,
-        data = data.frame(x = 0),
-        family = "ma",
-        order = c(1, 0, 1)
-      ),
-      "The first and second elements of the order should be 0 for MA family."
     )
 
     testthat::expect_error(

@@ -13,7 +13,7 @@ models.
 \code{\link[=fastcpd.meanvariance]{fastcpd.meanvariance()}} for basic statistics change models;
 \code{\link[=fastcpd.lm]{fastcpd.lm()}}, \code{\link[=fastcpd.binomial]{fastcpd.binomial()}}, \code{\link[=fastcpd.poisson]{fastcpd.poisson()}},
 \code{\link[=fastcpd.lasso]{fastcpd.lasso()}} for regression coefficients change models;
-\code{\link[=fastcpd.ar]{fastcpd.ar()}}, \code{\link[=fastcpd.var]{fastcpd.var()}}, \code{\link[=fastcpd.ma]{fastcpd.ma()}}, \code{\link[=fastcpd.arima]{fastcpd.arima()}},
-\code{\link[=fastcpd.arma]{fastcpd.arma()}}, \code{\link[=fastcpd.garch]{fastcpd.garch()}} for change in time series models.
+\code{\link[=fastcpd.ar]{fastcpd.ar()}}, \code{\link[=fastcpd.var]{fastcpd.var()}}, \code{\link[=fastcpd.arima]{fastcpd.arima()}}, \code{\link[=fastcpd.arma]{fastcpd.arma()}},
+\code{\link[=fastcpd.garch]{fastcpd.garch()}} for change in time series models.
 }
 \keyword{internal}
