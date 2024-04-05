@@ -1,7 +1,5 @@
 #include "fastcpd_classes.h"
 #include "fastcpd_constants.h"
-#include "RcppClock.h"
-#include "RProgress.h"
 
 namespace fastcpd::classes {
 
@@ -70,6 +68,10 @@ Fastcpd::Fastcpd(
     variance_estimate(variance_estimate),
     warm_start(warm_start),
     zero_data(join_cols(zeros<rowvec>(data_n_cols), data)) {
+
+  rProgress = std::make_unique<RProgress::RProgress>(
+    "[:bar] :current/:total in :elapsed", data_n_rows
+  );
 
   create_cost_function_wrapper(cost);
   create_cost_gradient_wrapper(cost_gradient);
@@ -453,7 +455,6 @@ List Fastcpd::run() {
   double lambda = 0;
 
   ucolvec r_t_set = zeros<ucolvec>(data_n_rows);
-  DEBUG_RCOUT(r_t_set);
   r_t_set(1) = 1;
   unsigned int r_t_count = 2;
 
@@ -465,60 +466,34 @@ List Fastcpd::run() {
   colvec fvec = zeros<vec>(data_n_rows + 1);
   fvec.fill(arma::datum::inf);
   fvec(0) = -beta;
-  DEBUG_RCOUT(fvec(0));
 
-  Rcpp::Clock clock;
-  RProgress::RProgress rProgress(
-    "[:bar] :current/:total in :elapsed", data_n_rows
-  );
-
-  if (r_progress) {
-    rProgress.tick(0);
-  }
-
-  if (contain(FASTCPD_FAMILIES, family) || vanilla_percentage < 1) {
-    create_segment_statistics();
-  }
-
-  DEBUG_RCOUT(data_n_rows);
-
-  if (vanilla_percentage < 1) {
-    create_gradients();
-  }
+  create_segment_statistics();
+  create_gradients();
 
   checkUserInterrupt();
-  if (r_progress) {
-    rProgress.tick();
-  }
+  update_r_progress_start();
+  update_r_progress_tick();
 
   for (unsigned int t = 2; t <= data_n_rows; t++) {
     DEBUG_RCOUT(t);
     DEBUG_RCOUT(r_t_count);
 
-    // Number of cost values is the same as the number of elements in R_t.
     colvec cval = zeros<vec>(r_t_count);
 
-    if (r_clock) {
-      clock.tick("r_t_set_for_loop");
-    }
-    // For tau in R_t \ {t-1}.
+    update_r_clock_tick("r_t_set_for_loop");
     for (unsigned int i = 0; i < r_t_count - 1; i++) {
       cval(i) = get_cval_for_r_t_set(r_t_set(i), i, t, lambda);
     }
-    if (r_clock) {
-      clock.tock("r_t_set_for_loop");
-      clock.tick("pruning");
-    }
+    update_r_clock_tock("r_t_set_for_loop");
+    update_r_clock_tick("pruning");
 
     DEBUG_RCOUT(cval);
     cval(r_t_count - 1) = 0;
-    DEBUG_RCOUT(cval);
 
     if (vanilla_percentage != 1) {
       update_fastcpd_parameters(t);
     }
 
-    // `beta` adjustment seems to work but there might be better choices.
     colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta;
     DEBUG_RCOUT(obj);
     double min_obj = min(obj);
@@ -528,7 +503,6 @@ List Fastcpd::run() {
     cp_sets[t] = join_cols(cp_sets[tau_star], colvec{tau_star});
     DEBUG_RCOUT(cp_sets[t]);
 
-    // Pruning step.
     ucolvec pruned_left = find(
       cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + pruning_coef <= min_obj
     );
@@ -550,17 +524,11 @@ List Fastcpd::run() {
     DEBUG_RCOUT(fvec.rows(0, t));
 
     checkUserInterrupt();
-    if (r_progress) {
-      rProgress.tick();
-    }
-    if (r_clock) {
-      clock.tock("pruning");
-    }
+    update_r_progress_tick();
+    update_r_clock_tock("pruning");
   }
 
-  if (r_clock) {
-    clock.stop("fastcpd_profiler");
-  }
+  create_clock_in_r("fastcpd_profiler");
 
   return get_cp_set(cp_sets[data_n_rows], lambda);
 }

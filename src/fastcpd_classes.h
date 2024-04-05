@@ -2,6 +2,8 @@
 #define FASTCPD_CLASSES_H_
 
 #include "fastcpd_types.h"
+#include "RcppClock.h"
+#include "RProgress.h"
 
 namespace fastcpd::classes {
 
@@ -239,6 +241,9 @@ class Fastcpd {
   const bool r_clock;
   const bool r_progress;
 
+  Rcpp::Clock rClock;
+  std::unique_ptr<RProgress::RProgress> rProgress;
+
   // `segment_count` is the number of segments for initial guess.
   const int segment_count;
 
@@ -271,6 +276,9 @@ class Fastcpd {
   const bool warm_start;
 
   mat zero_data;
+
+  // Stop the clock and create an R object with `name`.
+  void create_clock_in_r(const std::string name);
 
   void create_cost_function_wrapper(Nullable<Function> cost);
   void create_cost_gradient_wrapper(Nullable<Function> cost_gradient);
@@ -449,6 +457,15 @@ class Fastcpd {
 
   // Update \code{momentum}.
   void update_momentum(colvec new_momentum);
+
+  // Start the clock tick for `name`.
+  void update_r_clock_tick(const std::string name);
+
+  // Stop the clock tick for `name`.
+  void update_r_clock_tock(const std::string name);
+
+  void update_r_progress_start();
+  void update_r_progress_tick();
 
   void update_start(const unsigned int col, const colvec start_col);
 
