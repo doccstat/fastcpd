@@ -128,7 +128,9 @@ model.</p></dd>
 <span class="r-in"><span>    segment_count <span class="op">=</span> <span class="fl">3</span>,</span></span>
 <span class="r-in"><span>    lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">3</span> <span class="op">+</span> <span class="fl">2</span><span class="op">)</span>, <span class="fl">1e-10</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span> <span class="op">+</span> <span class="fl">2</span><span class="op">)</span>, <span class="cn">Inf</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    line_search <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.1</span>, <span class="fl">1e-2</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    line_search <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.1</span>, <span class="fl">1e-2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    beta <span class="op">=</span> <span class="st">"BIC"</span>,</span></span>
+<span class="r-in"><span>    cost_adjustment <span class="op">=</span> <span class="st">"BIC"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
@@ -136,13 +138,13 @@ model.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.arma(data = x[3 + seq_len(n)], order = c(3, 2), segment_count = 3, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     lower = c(rep(-1, 3 + 2), 1e-10), upper = c(rep(1, 3 + 2), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Inf), line_search = c(1, 0.1, 0.01))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Inf), line_search = c(1, 0.1, 0.01), beta = "BIC", cost_adjustment = "BIC")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 200 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 494.3396 253.7842 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 491.6904 251.4816 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      segment 1   segment 2</span>

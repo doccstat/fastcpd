@@ -96,9 +96,6 @@ The value should be one of <code>"ar"</code>, <code>"var"</code>, <code>"arima"<
 specifying the order of the time series. Possible combinations with
 <code>family</code> are:</p><ul><li><p><code>"ar"</code>, NUMERIC(1): AR(\(p\)) model using linear regression.</p></li>
 <li><p><code>"var"</code>, NUMERIC(1): VAR(\(p\)) model using linear regression.</p></li>
-<li><p><code>"ma"</code>, NUMERIC(1): MA(\(q\)) model using <code><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">forecast::Arima()</a></code>.</p></li>
-<li><p><code>"ma"</code>, NUMERIC(3): ARIMA(0, 0, \(q\)) model using
-<code><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">forecast::Arima()</a></code>, where \(q\) is the third element of the vector.</p></li>
 <li><p><code>"arima"</code>, NUMERIC(3): ARIMA(\(p\), \(d\), \(q\)) model
 using <code><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">forecast::Arima()</a></code>.</p></li>
 <li><p><code>"garch"</code>, NUMERIC(2): GARCH(\(p\), \(q\)) model using
@@ -128,34 +125,46 @@ mean should be included in the model. The default value is <code>TRUE</code>.</p
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">250</span></span></span>
-<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">180</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="va">x</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">400</span></span></span>
+<span class="r-in"><span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">+</span> <span class="fl">4</span>, <span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">n</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">200</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">w</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">4</span><span class="op">]</span> <span class="op">-</span> <span class="fl">5</span> <span class="op">/</span> <span class="fl">3</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">3</span><span class="op">]</span> <span class="op">+</span> <span class="fl">11</span> <span class="op">/</span> <span class="fl">12</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="fl">5</span> <span class="op">/</span> <span class="fl">12</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fl">1</span> <span class="op">/</span> <span class="fl">6</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">181</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0.1</span> <span class="op">*</span> <span class="va">x</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">201</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">w</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">4</span><span class="op">]</span> <span class="op">-</span> <span class="fl">4</span> <span class="op">/</span> <span class="fl">3</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">3</span><span class="op">]</span> <span class="op">+</span> <span class="fl">7</span> <span class="op">/</span> <span class="fl">9</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="fl">16</span> <span class="op">/</span> <span class="fl">27</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fl">4</span> <span class="op">/</span> <span class="fl">27</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.ts</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">x</span><span class="op">[</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"arima"</span>,</span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  include.mean <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>  trim <span class="op">=</span> <span class="fl">0</span>,</span></span>
-<span class="r-in"><span>  beta <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fl">1</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span> <span class="op">*</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span>  <span class="va">x</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"arma"</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">1e-10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="cn">Inf</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  line_search <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.1</span>, <span class="fl">1e-2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  trim <span class="op">=</span> <span class="fl">0.04</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.ts(data = x[1 + seq_len(n)], family = "arima", order = c(1, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     0, 0), include.mean = FALSE, trim = 0, beta = (1 + 1 + 1) * </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     log(n)/2 * 3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.ts(data = x, family = "arma", order = c(0, 4), lower = c(-2, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     -2, -2, -2, 1e-10), upper = c(2, 2, 2, 2, Inf), line_search = c(1, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     0.1, 0.01), trim = 0.04)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 180 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 367.4777 149.2238 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -168.6356 -160.691 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      segment 1    segment 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -1.670860649 -1.383177201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.938633334  0.875761649</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.461341072 -0.689538189</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.194080878  0.196956146</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.009236056  0.009889142</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fastcpd_ts-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
