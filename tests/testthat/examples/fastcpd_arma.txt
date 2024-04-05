@@ -18,7 +18,9 @@ result <- suppressWarnings(
     segment_count = 3,
     lower = c(rep(-1, 3 + 2), 1e-10),
     upper = c(rep(1, 3 + 2), Inf),
-    line_search = c(1, 0.1, 1e-2)
+    line_search = c(1, 0.1, 1e-2),
+    beta = "BIC",
+    cost_adjustment = "BIC"
   )
 )
 summary(result)
