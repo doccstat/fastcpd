@@ -502,8 +502,8 @@ List Fastcpd::run() {
       clock.tick("r_t_set_for_loop");
     }
     // For tau in R_t \ {t-1}.
-    for (unsigned int i = 1; i < r_t_count; i++) {
-      cval(i - 1) = get_cval_for_r_t_set(r_t_set(i - 1), i, t, lambda);
+    for (unsigned int i = 0; i < r_t_count - 1; i++) {
+      cval(i) = get_cval_for_r_t_set(r_t_set(i), i, t, lambda);
     }
     if (r_clock) {
       clock.tock("r_t_set_for_loop");
