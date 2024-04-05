@@ -293,8 +293,8 @@ double Fastcpd::get_cval_pelt(
   if (
     vanilla_percentage < 1 && segment_end < vanilla_percentage * data_n_rows
   ) {
-    update_theta_hat(i - 1, cost_result.par);
-    update_theta_sum(i - 1, cost_result.par);
+    update_theta_hat(i, cost_result.par);
+    update_theta_sum(i, cost_result.par);
   }
   return cval;
 }
@@ -310,7 +310,7 @@ double Fastcpd::get_cval_sen(
   update_cost_parameters(
     segment_end + 1, segment_start, i, k.get(), lambda, line_search
   );
-  colvec theta = theta_sum.col(i - 1) / segment_length;
+  colvec theta = theta_sum.col(i) / segment_length;
   DEBUG_RCOUT(theta);
   if (!contain(FASTCPD_FAMILIES, family)) {
     Function cost_non_null = cost.get();
@@ -592,9 +592,9 @@ void Fastcpd::update_cost_parameters(
     0, t - 1, tau, i, k, momentum, lambda, line_search
   );
   DEBUG_RCOUT(line_search);
-  update_theta_hat(i - 1, as<colvec>(cost_update_result[0]));
-  create_theta_sum(i - 1, as<colvec>(cost_update_result[1]));
-  update_hessian(i - 1, as<mat>(cost_update_result[2]));
+  update_theta_hat(i, as<colvec>(cost_update_result[0]));
+  create_theta_sum(i, as<colvec>(cost_update_result[1]));
+  update_hessian(i, as<mat>(cost_update_result[2]));
   update_momentum(as<colvec>(cost_update_result[3]));
 }
 
@@ -608,28 +608,28 @@ void Fastcpd::update_cost_parameters_step(
   const colvec& line_search
 ) {
   DEBUG_RCOUT(data_start);
-  mat hessian_i = hessian.slice(i - 1);
+  mat hessian_i = hessian.slice(i);
   DEBUG_RCOUT(hessian_i);
   colvec gradient;
 
   if (!contain(FASTCPD_FAMILIES, family)) {
     mat cost_hessian_result = cost_hessian_wrapper(
-      segment_start + data_start, segment_start + data_end, theta_hat.col(i - 1)
+      segment_start + data_start, segment_start + data_end, theta_hat.col(i)
     );
     DEBUG_RCOUT(cost_hessian_result);
     hessian_i += cost_hessian_result;
     colvec cost_gradient_result = cost_gradient_wrapper(
-      segment_start + data_start, segment_start + data_end, theta_hat.col(i - 1)
+      segment_start + data_start, segment_start + data_end, theta_hat.col(i)
     );
     gradient = cost_gradient_result;
     DEBUG_RCOUT(gradient);
   } else {
     hessian_i += cost_update_hessian(
-      segment_start + data_start, segment_start + data_end, theta_hat.col(i - 1)
+      segment_start + data_start, segment_start + data_end, theta_hat.col(i)
     );
     DEBUG_RCOUT(hessian_i);
     gradient = cost_update_gradient(
-      segment_start + data_start, segment_start + data_end, theta_hat.col(i - 1)
+      segment_start + data_start, segment_start + data_end, theta_hat.col(i)
     );
   }
 
@@ -652,7 +652,7 @@ void Fastcpd::update_cost_parameters_step(
       line_search_index++
     ) {
       colvec theta_candidate =
-        theta_hat.col(i - 1) + line_search[line_search_index] * momentum;
+        theta_hat.col(i) + line_search[line_search_index] * momentum;
       DEBUG_RCOUT(theta_candidate);
       colvec theta_upper_bound = arma::min(std::move(theta_candidate), upper);
       colvec theta_projected = arma::max(std::move(theta_upper_bound), lower);
@@ -670,21 +670,21 @@ void Fastcpd::update_cost_parameters_step(
   DEBUG_RCOUT(best_learning_rate);
 
   // Update theta_hat with momentum
-  theta_hat.col(i - 1) += best_learning_rate * momentum;
+  theta_hat.col(i) += best_learning_rate * momentum;
 
-  theta_hat.col(i - 1) = arma::min(theta_hat.col(i - 1), upper);
-  theta_hat.col(i - 1) = arma::max(theta_hat.col(i - 1), lower);
+  theta_hat.col(i) = arma::min(theta_hat.col(i), upper);
+  theta_hat.col(i) = arma::max(theta_hat.col(i), lower);
 
   if (family == "lasso" || family == "gaussian") {
     // Update theta_hat with L1 penalty
     double hessian_norm = norm(hessian_i, "fro");
-    vec normd = abs(theta_hat.col(i - 1)) - lambda / hessian_norm;
-    theta_hat.col(i - 1) = sign(theta_hat.col(i - 1)) % arma::max(
+    vec normd = abs(theta_hat.col(i)) - lambda / hessian_norm;
+    theta_hat.col(i) = sign(theta_hat.col(i)) % arma::max(
       normd, zeros<colvec>(normd.n_elem)
     );
   }
 
-  hessian.slice(i - 1) = std::move(hessian_i);
+  hessian.slice(i) = std::move(hessian_i);
 }
 
 List Fastcpd::update_cost_parameters_steps(
@@ -717,9 +717,9 @@ List Fastcpd::update_cost_parameters_steps(
     }
   }
 
-  theta_sum.col(i - 1) += theta_hat.col(i - 1);
+  theta_sum.col(i) += theta_hat.col(i);
   return List::create(
-    theta_hat.col(i - 1), theta_sum.col(i - 1), hessian.slice(i - 1), momentum
+    theta_hat.col(i), theta_sum.col(i), hessian.slice(i), momentum
   );
 }
 
