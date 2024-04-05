@@ -136,7 +136,7 @@ void Fastcpd::create_segment_statistics() {
 double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
   double adjusted = 0;
   if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
-    adjusted = data.n_cols * std::log(nrows) / 2.0;
+    adjusted = d * std::log(nrows) / 2.0;
   }
   if (cost_adjustment == "MDL") {
     adjusted *= std::log2(M_E);
@@ -195,7 +195,7 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
   if (
     family == "mean" || family == "variance" || family == "meanvariance"
   ) {
-    residual = zeros<mat>(data_n_rows, data_n_cols);
+    residual = zeros<mat>(data_n_rows, d);
   } else if (family == "mgaussian") {
     residual = zeros<mat>(data_n_rows, p_response);
   } else {
