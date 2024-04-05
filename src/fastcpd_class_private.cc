@@ -136,7 +136,7 @@ void Fastcpd::create_segment_statistics() {
 double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
   double adjusted = 0;
   if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
-    adjusted = d * std::log(nrows) / 2.0;
+    adjusted = p * std::log(nrows) / 2.0;
   }
   if (cost_adjustment == "MDL") {
     adjusted *= std::log2(M_E);
@@ -496,14 +496,13 @@ CostResult Fastcpd::get_nll_mean(
   const rowvec data_diff =
     zero_data.row(segment_end + 1) - zero_data.row(segment_start);
   const unsigned int segment_length = segment_end - segment_start + 1;
-  const unsigned int p = zero_data.n_cols;
   return {
-    {zeros<colvec>(p - 1)},  // # nocov
-    {zeros<mat>(segment_length, p - 1)},
+    {zeros<colvec>(p)},  // # nocov
+    {zeros<mat>(segment_length, p)},
     std::log(2.0 * M_PI) * zero_data.n_cols + log_det_sympd(variance_estimate) *
       (segment_length) / 2.0 + (
-      data_diff(p - 1) - dot(
-        data_diff.subvec(0, p - 2), data_diff.subvec(0, p - 2)
+      data_diff(p) - dot(
+        data_diff.subvec(0, p - 1), data_diff.subvec(0, p - 1)
       ) / segment_length
     ) / 2.0
   };
@@ -515,8 +514,6 @@ CostResult Fastcpd::get_nll_meanvariance(
 ) {
   const rowvec data_diff =
     zero_data.row(segment_end + 1) - zero_data.row(segment_start);
-  const unsigned int d = (unsigned int) sqrt(zero_data.n_cols);
-  const unsigned int p = zero_data.n_cols;
   const unsigned int segment_length = segment_end - segment_start + 1;
 
   double det_value = det((
