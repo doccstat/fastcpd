@@ -30,7 +30,6 @@ CostResult CostFunction::operator() (  // # nocov
     const bool cv,  // UNUSED
     const Nullable<colvec>& start  // UNUSED
 ) const {
-  DEBUG_RCOUT(data.n_rows);
   SEXP value = theta.isNull() ?
     cost(data.rows(segment_start, segment_end)) :
     cost(data.rows(segment_start, segment_end), as<colvec>(theta));  // # nocov

@@ -29,7 +29,6 @@ List fastcpd_impl(
     const bool r_clock,
     const bool r_progress
 ) {
-  DEBUG_RCOUT(beta);
   fastcpd::classes::Fastcpd fastcpd_class(
     beta, cost, cost_adjustment, cost_gradient, cost_hessian, cp_only, d, data,
     epsilon, family, k, line_search, lower, momentum_coef, order,

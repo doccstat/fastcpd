@@ -4,6 +4,12 @@
 
 namespace fastcpd::classes {
 
+void Fastcpd::create_clock_in_r(const std::string name) {
+  if (r_clock) {
+    rClock.stop(name);
+  }
+}
+
 void Fastcpd::create_cost_function_wrapper(Nullable<Function> cost) {
   DEBUG_RCOUT(family);
   if (contain(FASTCPD_FAMILIES, family)) {
@@ -66,6 +72,7 @@ void Fastcpd::create_cost_hessian_wrapper(Nullable<Function> cost_hessian) {
 }
 
 void Fastcpd::create_gradients() {
+  if (vanilla_percentage == 1) return;
   if (family == "binomial") {
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     theta_hat.col(0) = segment_theta_hat.row(0).t();
@@ -93,10 +100,10 @@ void Fastcpd::create_gradients() {
 // TODO(doccstat): Use `segment_theta` as warm start.
 
 void Fastcpd::create_segment_statistics() {
+  if (!contain(FASTCPD_FAMILIES, family) && vanilla_percentage == 1) return;
   for (
     int segment_index = 0; segment_index < segment_count; ++segment_index
   ) {
-    DEBUG_RCOUT(segment_index);
     rowvec segment_theta;
     if (!contain(FASTCPD_FAMILIES, family)) {
       segment_theta = get_optimized_cost(
@@ -111,7 +118,6 @@ void Fastcpd::create_segment_statistics() {
         R_NilValue
       ).par;
     }
-    DEBUG_RCOUT(segment_theta);
 
     // Initialize the estimated coefficients for each segment to be the
     // estimated coefficients in the segment.
@@ -124,7 +130,6 @@ void Fastcpd::create_segment_statistics() {
         data_segment.cols(1, data_segment.n_cols - 1) * segment_theta.t();
       double err_var = as_scalar(mean(square(segment_residual)));
       update_err_sd(segment_index, err_var);
-      DEBUG_RCOUT(err_sd);
       act_num(segment_index) = accu(abs(segment_theta) > 0);
     }
   }
@@ -550,13 +555,11 @@ CostResult Fastcpd::get_nll_mgaussian(
   }
 
   mat par = solve(x_t_x, x.t()) * y;
-  DEBUG_RCOUT(par);
   mat residuals = y - x * par;
   double value =
     p_response * std::log(2.0 * M_PI) + log_det_sympd(variance_estimate);
   value *= data_segment.n_rows;
   value += trace(solve(variance_estimate, residuals.t() * residuals));
-  DEBUG_RCOUT(value);
   return {{par}, {residuals}, value / 2};
 }
 
@@ -607,27 +610,22 @@ void Fastcpd::update_cost_parameters_step(
   const double lambda,
   const colvec& line_search
 ) {
-  DEBUG_RCOUT(data_start);
   mat hessian_i = hessian.slice(i);
-  DEBUG_RCOUT(hessian_i);
   colvec gradient;
 
   if (!contain(FASTCPD_FAMILIES, family)) {
     mat cost_hessian_result = cost_hessian_wrapper(
       segment_start + data_start, segment_start + data_end, theta_hat.col(i)
     );
-    DEBUG_RCOUT(cost_hessian_result);
     hessian_i += cost_hessian_result;
     colvec cost_gradient_result = cost_gradient_wrapper(
       segment_start + data_start, segment_start + data_end, theta_hat.col(i)
     );
     gradient = cost_gradient_result;
-    DEBUG_RCOUT(gradient);
   } else {
     hessian_i += cost_update_hessian(
       segment_start + data_start, segment_start + data_end, theta_hat.col(i)
     );
-    DEBUG_RCOUT(hessian_i);
     gradient = cost_update_gradient(
       segment_start + data_start, segment_start + data_end, theta_hat.col(i)
     );
@@ -639,7 +637,6 @@ void Fastcpd::update_cost_parameters_step(
 
   // Calculate momentum step
   momentum = momentum_coef * momentum - solve(hessian_psd, gradient);
-  DEBUG_RCOUT(momentum);
 
   double best_learning_rate = 1;
   colvec line_search_costs = zeros<colvec>(line_search.n_elem);
@@ -653,7 +650,6 @@ void Fastcpd::update_cost_parameters_step(
     ) {
       colvec theta_candidate =
         theta_hat.col(i) + line_search[line_search_index] * momentum;
-      DEBUG_RCOUT(theta_candidate);
       colvec theta_upper_bound = arma::min(std::move(theta_candidate), upper);
       colvec theta_projected = arma::max(std::move(theta_upper_bound), lower);
       line_search_costs[line_search_index] = cost_function_wrapper(
@@ -667,7 +663,6 @@ void Fastcpd::update_cost_parameters_step(
     }
   }
   best_learning_rate = line_search[line_search_costs.index_min()];
-  DEBUG_RCOUT(best_learning_rate);
 
   // Update theta_hat with momentum
   theta_hat.col(i) += best_learning_rate * momentum;
@@ -820,6 +815,30 @@ void Fastcpd::update_hessian(ucolvec pruned_left) {
 
 void Fastcpd::update_momentum(colvec new_momentum) {
   momentum = new_momentum;
+}
+
+void Fastcpd::update_r_clock_tick(const std::string name) {
+  if (r_clock) {
+    rClock.tick(name);
+  }
+}
+
+void Fastcpd::update_r_clock_tock(const std::string name) {
+  if (r_clock) {
+    rClock.tock(name);
+  }
+}
+
+void Fastcpd::update_r_progress_start() {
+  if (r_progress) {
+    rProgress->tick(0);
+  }
+}
+
+void Fastcpd::update_r_progress_tick() {
+  if (r_progress) {
+    rProgress->tick();
+  }
 }
 
 void Fastcpd::update_start(const unsigned int col, const colvec start_col) {
