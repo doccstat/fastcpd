@@ -488,7 +488,6 @@ List Fastcpd::run() {
     update_r_clock_tick("pruning");
 
     DEBUG_RCOUT(cval);
-    cval(r_t_count - 1) = 0;
 
     if (vanilla_percentage != 1) {
       update_fastcpd_parameters(t);
