@@ -247,6 +247,8 @@ expected to see the progress bar when running the code by default.
 
 ### Utility functions
 
+#### Variance estimation
+
 - Variance estimation in ARMA models:
   [`variance_arma`](https://fastcpd.xingchi.li/reference/variance_arma.html)
 - Variance estimation in linear models:
@@ -255,6 +257,9 @@ expected to see the progress bar when running the code by default.
   [`variance_mean`](https://fastcpd.xingchi.li/reference/variance_mean.html)
 - Variance estimation in median change models:
   [`variance_median`](https://fastcpd.xingchi.li/reference/variance_median.html)
+
+#### Class methods
+
 - Plot: [`plot`](https://fastcpd.xingchi.li/reference/plot.html)
 - Print: [`print`](https://fastcpd.xingchi.li/reference/print.html)
 - Show: [`show`](https://fastcpd.xingchi.li/reference/show.html)
