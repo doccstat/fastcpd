@@ -1,6 +1,8 @@
 #ifndef FASTCPD_CLASSES_H_
 #define FASTCPD_CLASSES_H_
 
+#include <memory>
+
 #include "fastcpd_types.h"
 #include "RcppClock.h"
 #include "RProgress.h"
