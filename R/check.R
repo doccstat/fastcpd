@@ -18,7 +18,6 @@ check_order <- function(order, family) {
   switch(family,
     ar = check_ar_order(order),
     var = check_var_order(order),
-    ma = check_ma_order(order),
     arima = check_arima_order(order),
     arma = check_arima_order(c(order[1], 0, order[2])),
     garch = check_garch_order(order)
@@ -54,28 +53,6 @@ check_var_order <- function(order) {
     stop(paste(error_message, collapse = " "))
   } else if (order <= 0 || order != floor(order)) {
     error_message[2] <- "order should be a positive integer"
-    stop(paste(error_message, collapse = " "))
-  } else {
-    TRUE
-  }
-}
-
-check_ma_order <- function(order) {  # nolint: cyclomatic complexity
-  error_message <- c("The", "", "for MA family.")
-  if (length(order) != 1 && length(order) != 3) {
-    error_message[2] <- "order should be specified as a vector of length 1 or 3"
-    stop(paste(error_message, collapse = " "))
-  } else if (length(order) == 1 && (order <= 0 || order != floor(order))) {
-    error_message[2] <- "order should be a positive integer"
-    stop(paste(error_message, collapse = " "))
-  } else if (
-    length(order) == 3 && (order[3] <= 0 || order[3] != floor(order[3]))
-  ) {
-    error_message[2] <-
-      "third element of the order should be a positive integer"
-    stop(paste(error_message, collapse = " "))
-  } else if (length(order) == 3 && (order[1] != 0 || order[2] != 0)) {
-    error_message[2] <- "first and second elements of the order should be 0"
     stop(paste(error_message, collapse = " "))
   } else {
     TRUE
