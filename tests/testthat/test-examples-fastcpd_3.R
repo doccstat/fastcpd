@@ -9,8 +9,8 @@ testthat::test_that(
       collapse = "\n"
     )))
 
-    testthat::expect_equal(result_builtin@cp_set, 200)
-    testthat::expect_equal(result_custom@cp_set, 199)
-    testthat::expect_equal(result_custom_two_epochs@cp_set, 200)
+    testthat::expect_equal(result_builtin@cp_set, 202)
+    testthat::expect_equal(result_custom@cp_set, 202)
+    testthat::expect_equal(result_custom_two_epochs@cp_set, 202)
   }
 )

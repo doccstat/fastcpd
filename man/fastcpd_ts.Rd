@@ -64,7 +64,7 @@ result <- fastcpd.ts(
   lower = c(-2, -2, -2, -2, 1e-10),
   upper = c(2, 2, 2, 2, Inf),
   line_search = c(1, 0.1, 1e-2),
-  trim = 0.04
+  trim = 0.05
 )
 summary(result)
 plot(result)

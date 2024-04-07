@@ -141,7 +141,7 @@ void Fastcpd::create_segment_statistics() {
 double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
   double adjusted = 0;
   if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
-    adjusted = p * std::log(nrows) / 2.0;
+    adjusted = p * std::log((double) nrows / data_n_rows) / 2.0;
   }
   if (cost_adjustment == "MDL") {
     adjusted *= std::log2(M_E);
@@ -517,7 +517,7 @@ CostResult Fastcpd::get_nll_meanvariance(
   const unsigned int segment_start,
   const unsigned int segment_end
 ) {
-  const rowvec data_diff =
+  rowvec data_diff =
     zero_data.row(segment_end + 1) - zero_data.row(segment_start);
   const unsigned int segment_length = segment_end - segment_start + 1;
 
@@ -526,8 +526,26 @@ CostResult Fastcpd::get_nll_meanvariance(
       data_diff.subvec(0, d - 1)).t() * (data_diff.subvec(0, d - 1)
     ) / segment_length
   ) / segment_length);
-  if (det_value <= 0) {
-    det_value = 1e-10;
+  if (segment_length <= d) {
+    unsigned int approximate_segment_start;
+    unsigned int approximate_segment_end;
+    if (segment_start >= d) {
+      approximate_segment_start = segment_start - d;
+    } else {
+      approximate_segment_start = 0;
+    }
+    if (segment_end < data_n_rows - d) {
+      approximate_segment_end = segment_end + d;
+    } else {
+      approximate_segment_end = data_n_rows - 1;
+    }
+    data_diff = zero_data.row(approximate_segment_end + 1) -
+      zero_data.row(approximate_segment_start);
+    det_value = det((
+    reshape(data_diff.subvec(d, p - 1), d, d) - (
+      data_diff.subvec(0, d - 1)).t() * (data_diff.subvec(0, d - 1)
+    ) / (approximate_segment_end - approximate_segment_start + 1)
+  ) / (approximate_segment_end - approximate_segment_start + 1));
   }
 
   return {
@@ -572,8 +590,23 @@ CostResult Fastcpd::get_nll_variance(
   double det_value = det(arma::reshape(
     zero_data.row(segment_end + 1) - zero_data.row(segment_start), d, d
   ) / segment_length);
-  if (det_value <= 0) {
-    det_value = 1e-10;
+  if (segment_length < d) {
+    unsigned int approximate_segment_start;
+    unsigned int approximate_segment_end;
+    if (segment_start >= d) {
+      approximate_segment_start = segment_start - d;
+    } else {
+      approximate_segment_start = 0;
+    }
+    if (segment_end < data_n_rows - d) {
+      approximate_segment_end = segment_end + d;
+    } else {
+      approximate_segment_end = data_n_rows - 1;
+    }
+    det_value = det(arma::reshape(
+      zero_data.row(approximate_segment_end + 1) -
+        zero_data.row(approximate_segment_start), d, d
+    ) / (approximate_segment_end - approximate_segment_start + 1));
   }
 
   return {

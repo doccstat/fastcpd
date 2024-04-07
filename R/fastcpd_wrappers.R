@@ -263,7 +263,8 @@ fastcpd.mean <- fastcpd_mean  # nolint: Conventional R function style
 #' function is similar to [fastcpd()] except that the data is by
 #' default a matrix or data frame or a vector with each row / element as an
 #' observation and thus a formula is not required here.
-#' @example tests/testthat/examples/fastcpd_meanvariance.R
+#' @example tests/testthat/examples/fastcpd_meanvariance_1.R
+#' @example tests/testthat/examples/fastcpd_meanvariance_2.R
 #' @seealso [fastcpd()]
 #'
 #' @md

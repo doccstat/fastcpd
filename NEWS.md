@@ -1,3 +1,7 @@
+# fastcpd 0.14.0
+
+*   Correct mBIC.
+
 # fastcpd 0.13.2
 
 *   Remove package check in examples.

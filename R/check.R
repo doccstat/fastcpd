@@ -269,9 +269,9 @@ get_pruning_coef <- function(
     pruning_coef <- -Inf
   }
   if (!pruning_coef_is_set && cost_adjustment == "MBIC") {
-    pruning_coef <- pruning_coef + p * log(4 / n) / 2
+    pruning_coef <- pruning_coef + p * log(2)
   } else if (!pruning_coef_is_set && cost_adjustment == "MDL") {
-    pruning_coef <- pruning_coef + p * log2(4 / n) / 2
+    pruning_coef <- pruning_coef + p * log2(2)
   }
   pruning_coef
 }
