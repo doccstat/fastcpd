@@ -221,9 +221,9 @@ current segment. This parameter is only used for the \code{"glm"} families.}
 should be included in the ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) or
 GARCH(\eqn{p}, \eqn{q}) models.
 \item \code{r.clock} is used to create an \code{RcppClock} object to record
-the time spent in the C++ code. Default is \code{FALSE}. If set to
-\code{TRUE}, an object called \code{fastcpd_profiler} will be created.
-Usage: \code{library(RcppClock); plot(fastcpd_profiler)}.
+the time spent in the C++ code. Default is an empty string. If set to
+any non-empty string, an object with specified name will be created.
+Usage: \code{RcppClock:::plot.RcppClock(VARIABLE_NAME)}.
 \item \code{r.progress} is used to control the progress bar. By default the
 progress bar will be shown. To disable it, set \code{r.progress = FALSE}.
 \item \code{p.response} is used to specify the number of response variables.
