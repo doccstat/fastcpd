@@ -18,7 +18,7 @@ family is one of "ar", "var", "arma", "arima" or
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.14.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -143,28 +143,28 @@ mean should be included in the model. The default value is <code>TRUE</code>.</p
 <span class="r-in"><span>  lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">1e-10</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="cn">Inf</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  line_search <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.1</span>, <span class="fl">1e-2</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  trim <span class="op">=</span> <span class="fl">0.04</span></span></span>
+<span class="r-in"><span>  trim <span class="op">=</span> <span class="fl">0.05</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.ts(data = x, family = "arma", order = c(0, 4), lower = c(-2, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     -2, -2, -2, 1e-10), upper = c(2, 2, 2, 2, Inf), line_search = c(1, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     0.1, 0.01), trim = 0.04)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     0.1, 0.01), trim = 0.05)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 201 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 209 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -168.6356 -160.691 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -188.7341 -168.4595 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      segment 1    segment 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -1.670860649 -1.383177201</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.938633334  0.875761649</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.461341072 -0.689538189</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.194080878  0.196956146</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.009236056  0.009889142</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -1.626949633 -1.366413227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.925842329  0.850647424</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.472212640 -0.677337192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.181290578  0.193108171</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.009523233  0.009914231</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fastcpd_ts-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

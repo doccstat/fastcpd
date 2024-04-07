@@ -18,7 +18,7 @@ observation and thus a formula is not required here."><meta property="og:image" 
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.14.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -115,7 +115,7 @@ observation and thus a formula is not required here.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 300 700 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 706.8293 2433.783 709.0651 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 703.3755 2430.33 705.6112 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.variance</span><span class="op">(</span></span></span>
@@ -137,7 +137,7 @@ observation and thus a formula is not required here.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 300 700 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 784.7208 1737.229 1311.692 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 753.6359 1706.144 1280.607 </span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">3000</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">3000</span>, <span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">3000</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -145,7 +145,7 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.variance</span><span class="op">(</span><span class="va">data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   3.600   0.001   3.601 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3.692   0.001   3.693 </span>
 <span class="r-in"><span><span class="va">result</span><span class="op">@</span><span class="va">cp_set</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2997 5989</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
@@ -159,7 +159,7 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   3.560   0.001   3.560 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3.585   0.000   3.586 </span>
 <span class="r-in"><span><span class="va">result</span><span class="op">@</span><span class="va">cp_set</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2997 5989</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

@@ -12,7 +12,7 @@ parameters and returns a fastcpd object."><meta property="og:image" content="htt
     
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.14.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -385,7 +385,7 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-out co"><span class="r-pr">#&gt;</span> 125 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 522.26 317.5959 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 501.0668 296.4026 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">400</span> <span class="op">+</span> <span class="fl">300</span> <span class="op">+</span> <span class="fl">500</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">5</span></span></span>
@@ -447,15 +447,15 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-out co"><span class="r-pr">#&gt;</span>     cost = huber_loss, cost_gradient = huber_loss_gradient, cost_hessian = huber_loss_hessian)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 401 726 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 418 726 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     segment 1   segment 2    segment 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.52615415  2.77991463  8.744706508</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -1.02443443  5.06390528  9.506534878</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.09220421  0.01647923 -0.008908851</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.01326592 -0.08103008 -0.047909865</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.02526703  0.01329142  0.025171681</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      segment 1    segment 2    segment 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.464532607  2.760546489  8.744706508</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.995964940  5.059690163  9.506534878</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.093877079  0.023321737 -0.008908851</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.002000477 -0.090091843 -0.047909865</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.009364910 -0.009543696  0.025171681</span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">5</span></span></span>
@@ -500,8 +500,8 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-in"><span>  <span class="va">result_custom</span><span class="op">@</span><span class="va">cp_set</span>, <span class="st">"\n"</span>,</span></span>
 <span class="r-in"><span>  sep <span class="op">=</span> <span class="st">""</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Change points detected by built-in logistic regression model: 200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Change points detected by custom logistic regression model: 199</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points detected by built-in logistic regression model: 202</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points detected by custom logistic regression model: 202</span>
 <span class="r-in"><span><span class="va">result_custom_two_epochs</span> <span class="op">&lt;-</span> <span class="fu">fastcpd</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">data</span>,</span></span>
@@ -519,15 +519,15 @@ Proceedings of Machine Learning Research, 1129-1143.
 <span class="r-out co"><span class="r-pr">#&gt;</span>     multiple_epochs = function(segment_length) 1, epsilon = 1e-05)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 200 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    segment 1  segment 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.6235240  2.0066479</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -1.6767614  1.6278889</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -1.7973433  4.6422022</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.4842969 -0.1521062</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  2.0797875  2.4047092</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.4884741  1.9829469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -1.5637585  1.6145734</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -1.6874162  4.6191745</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.4192355 -0.1568114</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  2.0315690  2.3956803</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
