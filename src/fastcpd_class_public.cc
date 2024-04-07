@@ -68,7 +68,6 @@ Fastcpd::Fastcpd(
     variance_estimate(variance_estimate),
     warm_start(warm_start),
     zero_data(join_cols(zeros<rowvec>(data_n_cols), data)) {
-
   rProgress = std::make_unique<RProgress::RProgress>(
     "[:bar] :current/:total in :elapsed", data_n_rows
   );
