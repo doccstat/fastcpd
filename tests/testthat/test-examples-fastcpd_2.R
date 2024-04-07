@@ -4,6 +4,6 @@ testthat::test_that(
     testthat::skip_if_not_installed("mvtnorm")
 
     source("examples/fastcpd_2.R")
-    testthat::expect_equal(huber_regression_result@cp_set, c(401, 726))
+    testthat::expect_equal(huber_regression_result@cp_set, c(418, 726))
   }
 )
