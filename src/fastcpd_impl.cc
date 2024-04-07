@@ -26,7 +26,7 @@ List fastcpd_impl(
     const mat variance_estimate,
     const unsigned int p_response,
     const double pruning_coef,
-    const bool r_clock,
+    const string r_clock,
     const bool r_progress
 ) {
   fastcpd::classes::Fastcpd fastcpd_class(

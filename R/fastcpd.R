@@ -282,7 +282,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   include_mean <- TRUE
   p_response <- get_p_response(family, y, data_)
   r_progress <- TRUE
-  r_clock <- FALSE
+  r_clock <- ""
   if (methods::hasArg("include.mean")) {
     include_mean <- eval.parent(match.call()[["include.mean"]])
   }

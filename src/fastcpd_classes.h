@@ -83,7 +83,7 @@ class Fastcpd {
     const int p,
     const unsigned int p_response,
     const double pruning_coef,
-    const bool r_clock,
+    const string r_clock,
     const bool r_progress,
     const int segment_count,
     const double trim,
@@ -240,7 +240,7 @@ class Fastcpd {
 
   const double pruning_coef;
 
-  const bool r_clock;
+  const string r_clock;
   const bool r_progress;
 
   Rcpp::Clock rClock;
