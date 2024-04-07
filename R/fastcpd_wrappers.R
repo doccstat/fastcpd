@@ -265,6 +265,8 @@ fastcpd.mean <- fastcpd_mean  # nolint: Conventional R function style
 #' observation and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_meanvariance_1.R
 #' @example tests/testthat/examples/fastcpd_meanvariance_2.R
+#' @example tests/testthat/examples/fastcpd_meanvariance-time_1.txt
+#' @example tests/testthat/examples/fastcpd_meanvariance-time_2.txt
 #' @seealso [fastcpd()]
 #'
 #' @md
