@@ -1,5 +1,4 @@
 #include "fastcpd_classes.h"
-#include "fastcpd_constants.h"
 
 namespace fastcpd::classes {
 
@@ -22,7 +21,7 @@ Fastcpd::Fastcpd(
     const int p,
     const unsigned int p_response,
     const double pruning_coef,
-    const bool r_clock,
+    const string r_clock,
     const bool r_progress,
     const int segment_count,
     const double trim,
@@ -526,7 +525,7 @@ List Fastcpd::run() {
     update_r_clock_tock("pruning");
   }
 
-  create_clock_in_r("fastcpd_profiler");
+  create_clock_in_r(r_clock);
 
   return get_cp_set(cp_sets[data_n_rows], lambda);
 }

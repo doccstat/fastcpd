@@ -5,7 +5,7 @@
 namespace fastcpd::classes {
 
 void Fastcpd::create_clock_in_r(const std::string name) {
-  if (r_clock) {
+  if (!r_clock.empty()) {
     rClock.stop(name);
   }
 }
@@ -851,13 +851,13 @@ void Fastcpd::update_momentum(colvec new_momentum) {
 }
 
 void Fastcpd::update_r_clock_tick(const std::string name) {
-  if (r_clock) {
+  if (!r_clock.empty()) {
     rClock.tick(name);
   }
 }
 
 void Fastcpd::update_r_clock_tock(const std::string name) {
-  if (r_clock) {
+  if (!r_clock.empty()) {
     rClock.tock(name);
   }
 }

@@ -42,7 +42,8 @@
 // @param p_response Dimension of the response, used with multivariate
 //   response.
 // @param pruning_coef The constant to satisfy the pruning condition.
-// @param r_clock Whether to profile the program using `RcppClock`.
+// @param r_clock String indicating whether to profile the program using
+//   `RcppClock`. Empty string means no profiling.
 // @param r_progress Whether to show progress bar.
 //
 // @return A list containing the change points and the cost values for each
@@ -73,7 +74,7 @@ List fastcpd_impl(
     const mat variance_estimate,
     const unsigned int p_response,
     const double pruning_coef,
-    const bool r_clock,
+    const string r_clock,
     const bool r_progress
 );
 
