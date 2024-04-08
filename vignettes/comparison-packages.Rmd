@@ -866,7 +866,7 @@ result <- list(
   breakfast = breakfast::breakfast(well_log)$cptmodel.list[[6]]$cpts,
   wbs = wbs::wbs(well_log)$cpt$cpt.ic$mbic.penalty,
   mosum = mosum::mosum(c(well_log), G = 40)$cpts.info$cpts,
-  fpop = fpop::Fpop(well_log, length(well_log))$t.est,  # meaningless
+  # fpop = fpop::Fpop(well_log, length(well_log))$t.est,  # meaningless
   gfpop = gfpop::gfpop(
     data = well_log,
     mygraph = gfpop::graph(
@@ -895,7 +895,7 @@ for (package_index in seq_along(package_list)) {
     data.frame(
       change_point = result[[package]],
       package = package,
-      y_offset = (package_index - 1) * 400
+      y_offset = (package_index - 1) * 1000
     )
   )
 }
@@ -927,18 +927,18 @@ ggplot2::ggplot() +
   ) +
   ggplot2::geom_point(
     data = comparison_table,
-    ggplot2::aes(x = change_point, y = 95000 + y_offset, color = package),
+    ggplot2::aes(x = change_point, y = 50000 + y_offset, color = package),
     shape = 17,
-    size = 1.75
+    size = 1.9
   ) +
   ggplot2::geom_hline(
     data = comparison_table,
-    ggplot2::aes(yintercept = 95000 + y_offset, color = package),
+    ggplot2::aes(yintercept = 50000 + y_offset, color = package),
     linetype = "dashed",
     alpha = 0.1
   ) +
   ggplot2::coord_cartesian(
-    ylim = c(95000 - 500, max(well_log) + 1000),
+    ylim = c(50000 - 500, max(well_log) + 1000),
     xlim = c(-200, length(well_log) + 200),
     expand = FALSE
   ) +
