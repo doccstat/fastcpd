@@ -102,13 +102,12 @@
 #' the parameters after each gradient descent step. If not specified, the upper
 #' bound is set to be \code{Inf} for all parameters.
 #' @param pruning_coef Pruning coefficient $c_0$ used in the pruning step of the
-#' PELT algorithm in Eq~\eqref{pruning} with the default value 0. If
-#' \code{cost_adjustment} is specified as \code{"MBIC"}, an adjustment term
-#' \eqn{p\log(2)}{p * log(2)} will be added to the pruning coefficient. If
-#' \code{cost_adjustment} is specified as \code{"MDL"}, an adjustment term
-#' \eqn{p\log_2(2)}{p * log2(2)} will be added to the pruning coefficient.
-#' Detailed discussion about the pruning coefficient can be found in
-#' the references.
+#' PELT algorithm with the default value 0. If \code{cost_adjustment} is
+#' specified as \code{"MBIC"}, an adjustment term \eqn{p\log(2)}{p * log(2)}
+#' will be added to the pruning coefficient. If \code{cost_adjustment} is
+#' specified as \code{"MDL"}, an adjustment term \eqn{p\log_2(2)}{p * log2(2)}
+#' will be added to the pruning coefficient. Detailed discussion about the
+#' pruning coefficient can be found in the references.
 #' @param segment_count An initial guess of the number of segments. If not
 #' specified, the initial guess of the number of segments is 10. The initial
 #' guess affects the initial estimates of the parameters in SeGD.
