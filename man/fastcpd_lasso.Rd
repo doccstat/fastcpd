@@ -30,7 +30,7 @@ variable as the first column and thus a formula is not required here.
 \donttest{
 set.seed(1)
 n <- 480
-p_true <- 6
+p_true <- 5
 p <- 50
 x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
 theta_0 <- rbind(
@@ -52,6 +52,32 @@ result <- fastcpd.lasso(
 )
 summary(result)
 plot(result)
+
+thetas <- result@thetas
+thetas <- cbind.data.frame(thetas, t(theta_0))
+names(thetas) <- c(
+  "segment 1", "segment 2", "segment 3", "segment 4",
+  "segment 1 truth", "segment 2 truth", "segment 3 truth", "segment 4 truth"
+)
+thetas$coordinate <- c(seq_len(p_true), rep("rest", p - p_true))
+molten <- reshape2::melt(thetas, id.vars = "coordinate")
+molten <- dplyr::mutate(
+  molten,
+  segment = gsub("segment ", "", variable),
+  segment = gsub(" truth", "", segment),
+  height = as.numeric(gsub("segment.*", "", segment)) +
+    0.2 * as.numeric(grepl("truth", variable)),
+  parameter = ifelse(grepl("truth", variable), "truth", "estimated")
+)
+ggplot2::ggplot() +
+  ggplot2::geom_point(
+    data = molten,
+    ggplot2::aes(x = value, y = height, shape = coordinate, color = parameter),
+    size = 4
+  ) +
+  ggplot2::ylim(0.8, 4.4) +
+  ggplot2::ylab("segment") +
+  ggplot2::theme_bw()
 }
 }
 \seealso{
