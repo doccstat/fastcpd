@@ -354,7 +354,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     pruning_coef,
     cost_adjustment,
     fastcpd_family,
-    nrow(data_),
     p
   )
 
