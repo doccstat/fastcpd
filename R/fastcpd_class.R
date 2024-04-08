@@ -100,7 +100,7 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
     } else if (family %in% c("mean", "variance", "meanvariance")) {
       y_label <- "data"
     } else {
-      y_label <- "response"
+      y_label <- "data response"
     }
 
     data_label_color <- data.frame(
