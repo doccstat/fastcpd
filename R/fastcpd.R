@@ -1,15 +1,15 @@
 #' @title Find change points efficiently
 #' @param formula A formula object specifying the model to be fitted. The
 #' (optional) response variable should be on the LHS of the formula, while the
-#' covariates should be on the RHS. The naming of variables used in the
-#' formula should be consistent with the column names in the data frame
-#' provided in \code{data}. The intercept term should be removed from the
-#' formula. The response variable is not needed for mean/variance change
-#' models and time series models. By default, an intercept column will be
-#' added to the data, similar to the [lm()] function.
+#' covariates should be on the RHS. The naming of variables used in the formula
+#' should be consistent with the column names in the data frame provided in
+#' \code{data}. The intercept term should be removed from the formula.
+#' The response variable is not needed for mean/variance change models and time
+#' series models. By default, an intercept column will be added to the data,
+#' similar to the [lm()] function.
 #' Thus, it is suggested that users should remove the intercept term by
-#' appending \code{- 1} to the formula. Note that the [fastcpd.family]
-#' functions do not require a formula input.
+#' appending \code{- 1} to the formula. Note that the [fastcpd.family] functions
+#' do not require a formula input.
 #' @param data A data frame of dimension \eqn{T \times d}{T * d} containing the
 #' data to be segmented (where each row denotes a data point
 #' \eqn{z_t \in \mathbb{R}^d}{z_t in R^d} for \eqn{t = 1, \ldots, T}) is
@@ -17,93 +17,105 @@
 #' accepted in the [fastcpd.family] functions.
 #' @param beta Penalty criterion for the number of change points. This parameter
 #' takes a string value of \code{"BIC"}, \code{"MBIC"}, \code{"MDL"} or a
-#' numeric value. If a numeric value is provided, the value will be used as
-#' the penalty. By default, the mBIC criterion is used, where
-#' \eqn{\beta = (d + 2) \log(T) / 2}{\beta = (d + 2) log(T) / 2}. This
-#' parameter usage should be paired with \code{cost_adjustment} described
+#' numeric value.
+#' If a numeric value is provided, the value will be used as the penalty.
+#' By default, the mBIC criterion is used, where
+#' \eqn{\beta = (p + 2) \log(T) / 2}{\beta = (p + 2) log(T) / 2}.
+#' This parameter usage should be paired with \code{cost_adjustment} described
 #' below. Discussions about the penalty criterion can be found in the
 #' references.
-#' @param cost_adjustment Cost adjustment criterion. It can be \code{"BIC"},
-#' \code{"MBIC"}, \code{"MDL"} or \code{NULL}. By default, the cost adjustment
-#' criterion is set to be \code{"MBIC"}. The \code{"MBIC"} and \code{"MDL"}
-#' criteria modify the cost function by adding a negative adjustment term to
-#' the cost function. \code{"BIC"} or \code{NULL} does not modify the cost
-#' function. Details can in found in the references.
-#' @param family Family class of the change point model. It can be \code{"mean"}
-#' for mean change, \code{"variance"} for variance change,
+#' @param cost_adjustment Cost adjustment criterion.
+#' It can be \code{"BIC"}, \code{"MBIC"}, \code{"MDL"} or \code{NULL}.
+#' By default, the cost adjustment criterion is set to be \code{"MBIC"}.
+#' The \code{"MBIC"} and \code{"MDL"} criteria modify the cost function by
+#' adding a negative adjustment term to the cost function.
+#' \code{"BIC"} or \code{NULL} does not modify the cost function.
+#' Details can in found in the references.
+#' @param family Family class of the change point model. It can be
+#' \code{"mean"} for mean change,
+#' \code{"variance"} for variance change,
 #' \code{"meanvariance"} for mean and/or variance change,
-#' \code{"lm"} for linear regression, \code{"binomial"} for logistic
-#' regression, \code{"poisson"} for Poisson regression, \code{"lasso"} for
-#' penalized linear regression, \code{"ar"} for AR(\eqn{p}) models,
+#' \code{"lm"} for linear regression,
+#' \code{"binomial"} for logistic regression,
+#' \code{"poisson"} for Poisson regression,
+#' \code{"lasso"} for penalized linear regression,
+#' \code{"ar"} for AR(\eqn{p}) models,
 #' \code{"arma"} for ARMA(\eqn{p}, \eqn{q}) models,
 #' \code{"arima"} for ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models,
 #' \code{"garch"} for GARCH(\eqn{p}, \eqn{q}) models,
 #' \code{"var"} for VAR(\eqn{p}) models and
-#' \code{"custom"} for user specified custom models. Omitting this parameter
-#' is the same as specifying the parameter to be \code{"custom"} or
-#' \code{NULL}, in which case, users must specify the custom cost function.
+#' \code{"custom"} for user-specified custom models.
+#' Omitting this parameter is the same as specifying the parameter to be
+#' \code{"custom"} or \code{NULL}, in which case, users must specify the
+#' custom cost function.
 #' @param cost Cost function to be used. \code{cost}, \code{cost_gradient}, and
 #' \code{cost_hessian} should not be specified at the same time with
 #' \code{family} as built-in families have cost functions implemented in C++
-#' to provide better performance. If not specified, the default is the
-#' negative log-likelihood for the corresponding family. Custom cost functions
-#' can be provided in the following two formats:
+#' to provide better performance. If not specified, the default is the negative
+#' log-likelihood for the corresponding family. Custom cost functions can be
+#' provided in the following two formats:
 #' \itemize{
 #' \item \code{cost = function(data) \{...\}}
 #' \item \code{cost = function(data, theta) \{...\}}
 #' }
 #' Users can specify a loss function using the second format that will be used
 #' to calculate the cost value. In both formats, the input data is a subset of
-#' the original data frame in the form of a matrix (matrix with a single
-#' column in the case of a univariate data set). In the first format, the
-#' specified cost function directly calculates the cost value. [fastcpd()]
-#' performs the vanilla PELT algorithm, and \code{cost_gradient} and
-#' \code{cost_hessian} should not be provided since no parameter updating is
-#' necessary for vanilla PELT. In the second format, the loss function
-#' \eqn{\sum_{i = s}^t l(z_i, \theta)}{sum_{i = s}^t l(z_i, \theta)}
-#' is provided, which has to be optimized over the parameter \eqn{\theta} to
+#' the original data frame in the form of a matrix
+#' (a matrix with a single column in the case of a univariate data set).
+#' In the first format, the specified cost function directly calculates the cost
+#' value. [fastcpd()] performs the vanilla PELT algorithm, and
+#' \code{cost_gradient} and \code{cost_hessian} should not be provided since no
+#' parameter updating is necessary for vanilla PELT.
+#' In the second format, the loss function
+#' \eqn{\sum_{i = s}^t l(z_i, \theta)}{sum_{i = s}^t l(z_i, \theta)} is
+#' provided, which has to be optimized over the parameter \eqn{\theta} to
 #' obtain the cost value. A detailed discussion about the custom cost function
 #' usage can be found in the references.
 #' @param cost_gradient Gradient of the custom cost function. Example usage:
-#' Example usage:
 #' ```r
 #' cost_gradient = function(data, theta) {
 #'   ...
 #'   return(gradient)
 #' }
 #' ```
-#' The gradient function takes two inputs, the first being a matrix
-#' representing a segment of the data, similar to the format used in the
-#' \code{cost} function, and the second being the parameter that needs to be
-#' optimized. The gradient function returns the value of the gradient of the
-#' loss function, i.e.,
+#' The gradient function takes two inputs, the first being a matrix representing
+#' a segment of the data, similar to the format used in the \code{cost}
+#' function, and the second being the parameter that needs to be optimized.
+#' The gradient function returns the value of the gradient of the loss function,
+#' i.e.,
 #' \eqn{\sum_{i = s}^t \nabla l(z_i, \theta)}{sum_{i = s}^t l'(z_i, \theta)}.
 #' @param cost_hessian Hessian of the custom loss function. The Hessian function
 #' takes two inputs, the first being a matrix representing a segment of the
-#' data, similar to the format used in the \code{cost} function, and the
-#' second being the parameter that needs to be optimized. The gradient
-#' function returns the Hessian of the loss function, i.e.,
+#' data, similar to the format used in the \code{cost} function, and the second
+#' being the parameter that needs to be optimized. The gradient function returns
+#' the Hessian of the loss function, i.e.,
 #' \eqn{\sum_{i = s}^t \nabla^2 l(z_i, \theta)}{sum_{i = s}^t l''(z_i, \theta)}.
 #' @param line_search If a vector of numeric values is provided, a line search
 #' will be performed to find the optimal step size for each update. Detailed
 #' usage of \code{line_search} can be found in the references.
 #' @param lower Lower bound for the parameters. Used to specify the domain of
-#' the parameters after each gradient descent step. If not specified, the
-#' lower bound will be set to be \code{-Inf} for all parameters. \code{lower}
-#' is especially useful when the estimated parameters take only positive
-#' values, such as the noise variance.
+#' the parameters after each gradient descent step. If not specified, the lower
+#' bound is set to be \code{-Inf} for all parameters. \code{lower} is especially
+#' useful when the estimated parameters take only positive values, such as the
+#' noise variance.
 #' @param upper Upper bound for the parameters. Used to specify the domain of
-#' the parameters after each gradient descent step. If not specified, the
-#' upper bound will be set to be \code{Inf} for all parameters.
-#' @param pruning_coef Coefficient used in the pruning condition.
-#' If set to be \code{-Inf}, no pruning will be performed.
+#' the parameters after each gradient descent step. If not specified, the upper
+#' bound is set to be \code{Inf} for all parameters.
+#' @param pruning_coef Pruning coefficient $c_0$ used in the pruning step of the
+#' PELT algorithm in Eq~\eqref{pruning} with the default value 0. If
+#' \code{cost_adjustment} is specified as \code{"MBIC"}, an adjustment term
+#' \eqn{p\log(2)}{p * log(2)} will be added to the pruning coefficient. If
+#' \code{cost_adjustment} is specified as \code{"MDL"}, an adjustment term
+#' \eqn{p\log_2(2)}{p * log2(2)} will be added to the pruning coefficient.
+#' Detailed discussion about the pruning coefficient can be found in
+#' the references.
 #' @param segment_count An initial guess of the number of segments. If not
 #' specified, the initial guess of the number of segments is 10. The initial
 #' guess affects the initial estimates of the parameters in SeGD.
 #' @param trim Trimming for the boundary change points so that a change point
 #' close to the boundary will not be counted as a change point. This
 #' parameter also specifies the minimum distance between two change points.
-#' If.   several change points have mutual distances smaller than
+#' If several change points have mutual distances smaller than
 #' \code{trim * nrow(data)}, those change points will be merged into one
 #' single change point. The value of this parameter should be between
 #' 0 and 1.
@@ -114,22 +126,19 @@
 #' @param multiple_epochs A function can be specified such that an adaptive
 #' number of multiple epochs can be utilized to improve the algorithm's
 #' performance. \code{multiple_epochs} is a function of the length of the data
-#' segment. The function returns an integer indicating how many epochs should
-#' be performed apart from the default update. By default, the function
-#' returns zero, meaning no multiple epochs will be used to update the
-#' parameters. Example usage:
+#' segment. The function returns an integer indicating how many epochs should be
+#' performed apart from the default update. By default, the function returns
+#' zero, meaning no multiple epochs will be used to update the parameters.
+#' Example usage:
 #' ```r
 #' multiple_epochs = function(segment_length) {
-#'   if (segment_length < n / segment_count / 4 * 1) 3
-#'   else if (segment_length < n / segment_count / 4 * 2) 2
-#'   else if (segment_length < n / segment_count / 4 * 3) 1
+#'   if (segment_length < 100) 1
 #'   else 0
 #' }
 #' ```
-#' This function will perform three epochs for the first quarter of the data,
-#' two epochs for the second quarter of the data, one epoch for the third
-#' quarter of the data, and no additional epoch for the last quarter of the
-#' data.
+#' This function will let SeGD perform parameter updates with an additional
+#' epoch for each segment with a length less than 100 and no additional epoch
+#' for segments with lengths greater or equal to 100.
 #' @param epsilon Epsilon to avoid numerical issues. Only used for the Hessian
 #' computation in Logistic Regression and Poisson Regression.
 #' @param order Order of the AR(\eqn{p}), VAR(\eqn{p}) or
@@ -148,13 +157,12 @@
 #' interested in the change points, setting \code{cp_only} to be \code{TRUE}
 #' will help with the computational cost.
 #' @param vanilla_percentage The parameter \eqn{v} is between zero and one.
-#' For each segment, when its length is no more than \eqn{vT}, the cost
-#' value will be computed by performing an exact minimization of the loss
-#' function over the parameter. When its length is greater than
-#' \eqn{vT}, the cost value is approximated through SeGD.
-#' Therefore, this parameter induces an algorithm that can be interpreted as
-#' an interpolation between dynamic programming with SeGD (\eqn{v = 0}) and
-#' the vanilla PELT (\eqn{v = 1}).
+#' For each segment, when its length is no more than \eqn{vT}, the cost value
+#' will be computed by performing an exact minimization of the loss function
+#' over the parameter. When its length is greater than \eqn{vT}, the cost value
+#' is approximated through SeGD. Therefore, this parameter induces an algorithm
+#' that can be interpreted as an interpolation between dynamic programming with
+#' SeGD (\eqn{v = 0}) and the vanilla PELT (\eqn{v = 1}).
 #' The readers are referred to the references for more details.
 #' @param warm_start If \code{TRUE}, the algorithm will use the estimated
 #' parameters from the previous segment as the initial value for the
