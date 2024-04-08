@@ -805,7 +805,7 @@ un-retrievable change points.</p>
 <span>  breakfast <span class="op">=</span> <span class="fu">breakfast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/breakfast/man/breakfast.html" class="external-link">breakfast</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">$</span><span class="va">cptmodel.list</span><span class="op">[[</span><span class="fl">6</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">cpts</span>,</span>
 <span>  wbs <span class="op">=</span> <span class="fu">wbs</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/wbs/man/wbs.html" class="external-link">wbs</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">$</span><span class="va">cpt</span><span class="op">$</span><span class="va">cpt.ic</span><span class="op">$</span><span class="va">mbic.penalty</span>,</span>
 <span>  mosum <span class="op">=</span> <span class="fu">mosum</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mosum/man/mosum.html" class="external-link">mosum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">$</span><span class="va">cpts.info</span><span class="op">$</span><span class="va">cpts</span>,</span>
-<span>  fpop <span class="op">=</span> <span class="fu">fpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/fpop/man/Fpop.html" class="external-link">Fpop</a></span><span class="op">(</span><span class="va">well_log</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">t.est</span>,  <span class="co"># meaningless</span></span>
+<span>  <span class="co"># fpop = fpop::Fpop(well_log, length(well_log))$t.est,  # meaningless</span></span>
 <span>  gfpop <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/gfpop.html" class="external-link">gfpop</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">well_log</span>,</span>
 <span>    mygraph <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gfpop/man/graph.html" class="external-link">graph</a></span><span class="op">(</span></span>
@@ -834,7 +834,7 @@ un-retrievable change points.</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>      change_point <span class="op">=</span> <span class="va">result</span><span class="op">[[</span><span class="va">package</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>      package <span class="op">=</span> <span class="va">package</span>,</span>
-<span>      y_offset <span class="op">=</span> <span class="op">(</span><span class="va">package_index</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">400</span></span>
+<span>      y_offset <span class="op">=</span> <span class="op">(</span><span class="va">package_index</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">1000</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
@@ -864,18 +864,18 @@ un-retrievable change points.</p>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">comparison_table</span>,</span>
-<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">change_point</span>, y <span class="op">=</span> <span class="fl">95000</span> <span class="op">+</span> <span class="va">y_offset</span>, color <span class="op">=</span> <span class="va">package</span><span class="op">)</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">change_point</span>, y <span class="op">=</span> <span class="fl">50000</span> <span class="op">+</span> <span class="va">y_offset</span>, color <span class="op">=</span> <span class="va">package</span><span class="op">)</span>,</span>
 <span>    shape <span class="op">=</span> <span class="fl">17</span>,</span>
-<span>    size <span class="op">=</span> <span class="fl">1.75</span></span>
+<span>    size <span class="op">=</span> <span class="fl">1.9</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">comparison_table</span>,</span>
-<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">95000</span> <span class="op">+</span> <span class="va">y_offset</span>, color <span class="op">=</span> <span class="va">package</span><span class="op">)</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">50000</span> <span class="op">+</span> <span class="va">y_offset</span>, color <span class="op">=</span> <span class="va">package</span><span class="op">)</span>,</span>
 <span>    linetype <span class="op">=</span> <span class="st">"dashed"</span>,</span>
 <span>    alpha <span class="op">=</span> <span class="fl">0.1</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span></span>
-<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">95000</span> <span class="op">-</span> <span class="fl">500</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1000</span><span class="op">)</span>,</span>
+<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50000</span> <span class="op">-</span> <span class="fl">500</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1000</span><span class="op">)</span>,</span>
 <span>    xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">well_log</span><span class="op">)</span> <span class="op">+</span> <span class="fl">200</span><span class="op">)</span>,</span>
 <span>    expand <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
@@ -1440,7 +1440,7 @@ un-retrievable change points.</p>
 <span id="cb76-469"><a href="#cb76-469" tabindex="-1"></a>  <span class="at">breakfast =</span> breakfast<span class="sc">::</span><span class="fu">breakfast</span>(well_log)<span class="sc">$</span>cptmodel.list[[<span class="dv">6</span>]]<span class="sc">$</span>cpts,</span>
 <span id="cb76-470"><a href="#cb76-470" tabindex="-1"></a>  <span class="at">wbs =</span> wbs<span class="sc">::</span><span class="fu">wbs</span>(well_log)<span class="sc">$</span>cpt<span class="sc">$</span>cpt.ic<span class="sc">$</span>mbic.penalty,</span>
 <span id="cb76-471"><a href="#cb76-471" tabindex="-1"></a>  <span class="at">mosum =</span> mosum<span class="sc">::</span><span class="fu">mosum</span>(<span class="fu">c</span>(well_log), <span class="at">G =</span> <span class="dv">40</span>)<span class="sc">$</span>cpts.info<span class="sc">$</span>cpts,</span>
-<span id="cb76-472"><a href="#cb76-472" tabindex="-1"></a>  <span class="at">fpop =</span> fpop<span class="sc">::</span><span class="fu">Fpop</span>(well_log, <span class="fu">length</span>(well_log))<span class="sc">$</span>t.est,  <span class="co"># meaningless</span></span>
+<span id="cb76-472"><a href="#cb76-472" tabindex="-1"></a>  <span class="co"># fpop = fpop::Fpop(well_log, length(well_log))$t.est,  # meaningless</span></span>
 <span id="cb76-473"><a href="#cb76-473" tabindex="-1"></a>  <span class="at">gfpop =</span> gfpop<span class="sc">::</span><span class="fu">gfpop</span>(</span>
 <span id="cb76-474"><a href="#cb76-474" tabindex="-1"></a>    <span class="at">data =</span> well_log,</span>
 <span id="cb76-475"><a href="#cb76-475" tabindex="-1"></a>    <span class="at">mygraph =</span> gfpop<span class="sc">::</span><span class="fu">graph</span>(</span>
@@ -1469,7 +1469,7 @@ un-retrievable change points.</p>
 <span id="cb76-498"><a href="#cb76-498" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
 <span id="cb76-499"><a href="#cb76-499" tabindex="-1"></a>      <span class="at">change_point =</span> result[[package]],</span>
 <span id="cb76-500"><a href="#cb76-500" tabindex="-1"></a>      <span class="at">package =</span> package,</span>
-<span id="cb76-501"><a href="#cb76-501" tabindex="-1"></a>      <span class="at">y_offset =</span> (package_index <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">400</span></span>
+<span id="cb76-501"><a href="#cb76-501" tabindex="-1"></a>      <span class="at">y_offset =</span> (package_index <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">1000</span></span>
 <span id="cb76-502"><a href="#cb76-502" tabindex="-1"></a>    )</span>
 <span id="cb76-503"><a href="#cb76-503" tabindex="-1"></a>  )</span>
 <span id="cb76-504"><a href="#cb76-504" tabindex="-1"></a>}</span>
@@ -1498,18 +1498,18 @@ un-retrievable change points.</p>
 <span id="cb76-527"><a href="#cb76-527" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb76-528"><a href="#cb76-528" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_point</span>(</span>
 <span id="cb76-529"><a href="#cb76-529" tabindex="-1"></a>    <span class="at">data =</span> comparison_table,</span>
-<span id="cb76-530"><a href="#cb76-530" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> change_point, <span class="at">y =</span> <span class="dv">95000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
+<span id="cb76-530"><a href="#cb76-530" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> change_point, <span class="at">y =</span> <span class="dv">50000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
 <span id="cb76-531"><a href="#cb76-531" tabindex="-1"></a>    <span class="at">shape =</span> <span class="dv">17</span>,</span>
-<span id="cb76-532"><a href="#cb76-532" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">1.75</span></span>
+<span id="cb76-532"><a href="#cb76-532" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">1.9</span></span>
 <span id="cb76-533"><a href="#cb76-533" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb76-534"><a href="#cb76-534" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">geom_hline</span>(</span>
 <span id="cb76-535"><a href="#cb76-535" tabindex="-1"></a>    <span class="at">data =</span> comparison_table,</span>
-<span id="cb76-536"><a href="#cb76-536" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="dv">95000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
+<span id="cb76-536"><a href="#cb76-536" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="dv">50000</span> <span class="sc">+</span> y_offset, <span class="at">color =</span> package),</span>
 <span id="cb76-537"><a href="#cb76-537" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
 <span id="cb76-538"><a href="#cb76-538" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.1</span></span>
 <span id="cb76-539"><a href="#cb76-539" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb76-540"><a href="#cb76-540" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">coord_cartesian</span>(</span>
-<span id="cb76-541"><a href="#cb76-541" tabindex="-1"></a>    <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">95000</span> <span class="sc">-</span> <span class="dv">500</span>, <span class="fu">max</span>(well_log) <span class="sc">+</span> <span class="dv">1000</span>),</span>
+<span id="cb76-541"><a href="#cb76-541" tabindex="-1"></a>    <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">50000</span> <span class="sc">-</span> <span class="dv">500</span>, <span class="fu">max</span>(well_log) <span class="sc">+</span> <span class="dv">1000</span>),</span>
 <span id="cb76-542"><a href="#cb76-542" tabindex="-1"></a>    <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">200</span>, <span class="fu">length</span>(well_log) <span class="sc">+</span> <span class="dv">200</span>),</span>
 <span id="cb76-543"><a href="#cb76-543" tabindex="-1"></a>    <span class="at">expand =</span> <span class="cn">FALSE</span></span>
 <span id="cb76-544"><a href="#cb76-544" tabindex="-1"></a>  ) <span class="sc">+</span></span>
