@@ -239,7 +239,6 @@ get_pruning_coef <- function(
   pruning_coef,
   cost_adjustment,
   fastcpd_family,
-  n,
   p
 ) {
   if (!pruning_coef_is_set && (fastcpd_family %in% c("mgaussian", "lasso"))) {
