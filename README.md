@@ -24,6 +24,8 @@ user specified cost function apart from the built-in cost functions.
 
 To learn more behind the algorithms:
 
+- [fastcpd: Fast Change Point Detection in
+  R](https://doi.org/10.48550/arXiv.2404.05933)
 - [Sequential Gradient Descent and Quasi-Newton’s Method for
   Change-Point
   Analysis](https://proceedings.mlr.press/v206/zhang23b.html)

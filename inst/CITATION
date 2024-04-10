@@ -1,14 +1,10 @@
 bibentry(
-  bibtype  = "Manual",
-  title    = "fastcpd: Fast Change Point Detection via Sequential Gradient Descent",
-  author   = c(
-    person("Xingchi", "Li", , "anthony.li@stat.tamu.edu", role = c("aut", "cre", "cph"),
-           comment = c(ORCID = "0009-0006-2493-0853")),
-    person("Xianyang", "Zhang", , "zhangxiany@stat.tamu.edu", role = c("aut", "cph"))
-  ),
-  year     = 2023,
-  note     = sprintf("R package version %s", meta$Version),
-  url      = "https://CRAN.R-project.org/package=fastcpd"
+  bibtype   = "Misc",
+  title     = "fastcpd: Fast Change Point Detection in R",
+  author    = "Xingchi Li, Xianyang Zhang",
+  year      = "2024",
+  doi       = "10.48550/arXiv.2404.05933",
+  publisher = "arXiv"
 )
 
 bibentry(
