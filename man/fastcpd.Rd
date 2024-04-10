@@ -252,14 +252,14 @@ parameters and returns a \linkS4class{fastcpd} object.
 
 \section{References}{
 
+Xingchi Li, Xianyang Zhang (2024). ``fastcpd: Fast Change Point Detection
+in R.'' \emph{arXiv:2404.05933}, \url{https://arxiv.org/abs/2404.05933}.
+
 Xianyang Zhang, Trisha Dawn (2023). ``Sequential Gradient Descent and
 Quasi-Newton's Method for Change-Point Analysis.'' In Ruiz, Francisco,
 Dy, Jennifer, van de Meent, Jan-Willem (eds.), \emph{Proceedings of The 26th
 International Conference on Artificial Intelligence and Statistics},
 volume 206 series Proceedings of Machine Learning Research, 1129-1143.
-
-Xingchi Li, Xianyang Zhang (2024). ``fastcpd: Fast Change Point Detection
-in R.'' \emph{arXiv:2404.05933}, \url{https://arxiv.org/abs/2404.05933}.
 }
 
 \examples{
