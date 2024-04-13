@@ -3,6 +3,7 @@
 ### fastcpd 0.14.0
 
 *   Correct mBIC.
+*   Add citation.
 
 ### fastcpd 0.13.2
 

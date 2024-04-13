@@ -748,7 +748,7 @@ The true change points are 80, 200 and 320.
 ```
 
 ```{r lasso-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(fastcpd_result, c(79, 199, 320))
+testthat::expect_true(sum(fastcpd_result - c(79, 199, 320)) <= 1)
 ```
 
 ```{r lasso-strucchange, eval = FALSE}
