@@ -66,116 +66,105 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
     stop("Can not plot mean change points with p > 1.")
   }
   if (!require_namespace("ggplot2")) {
-    if (utils_menu() == 1) {
-      tryCatch(
-        expr = install_packages("ggplot2"),
-        error = function(e) {
-          stop("ggplot2 could not be installed.")
-        }
-      )
-    } else {
-      stop("ggplot2 is not installed. No plot is made.")
-    }
+    stop("ggplot2 is not installed. No plot is made.")
   }
-  if (require_namespace("ggplot2")) {
-    n <- nrow(x@data)
-    family <- x@family
-    change_points <- sort(c(0, x@cp_set, n))
-    color <- rep(seq_along(change_points[-1]), diff(change_points))
-    color <- as.factor(color %% color_max_count)
+  n <- nrow(x@data)
+  family <- x@family
+  change_points <- sort(c(0, x@cp_set, n))
+  color <- rep(seq_along(change_points[-1]), diff(change_points))
+  color <- as.factor(color %% color_max_count)
 
-    y <- x@data[, 1]
-    p <- ggplot2::ggplot() +
-      ggplot2::geom_vline(
-        xintercept = x@cp_set,
-        color = segment_separator_color,
-        linetype = segment_separator_linetype,
-        alpha = segment_separator_alpha
+  y <- x@data[, 1]
+  p <- ggplot2::ggplot() +
+    ggplot2::geom_vline(
+      xintercept = x@cp_set,
+      color = segment_separator_color,
+      linetype = segment_separator_linetype,
+      alpha = segment_separator_alpha
+    )
+
+  # Draw lines for time series data and points for other data.
+  if (family %in% c("ar", "arma", "arima", "garch")) {
+    y_label <-
+      paste0(toupper(family), "(", paste0(x@order, collapse = ", "), ")")
+  } else if (family %in% c("mean", "variance", "meanvariance")) {
+    y_label <- "data"
+  } else {
+    y_label <- "data response"
+  }
+
+  data_label_color <- data.frame(
+    x = seq_len(n), y = y, label = y_label, color = color
+  )
+  residual_label_color <- data.frame(
+    x = seq_len(n),
+    y = x@residuals,
+    label = "residual",
+    color = color
+  )
+  covariate_label_color <- data.frame(
+    x = seq_len(n),
+    y = x@data[, ncol(x@data)],
+    label = "covariate",
+    color = color
+  )
+  aesthetic_mapping <- ggplot2::aes(x = x, y = y, color = color)
+
+  if (family %in% c("ar", "arma", "arima", "garch")) {
+    p <- p + ggplot2::geom_line(
+      data = data_label_color, aesthetic_mapping, alpha = data_point_alpha,
+      linewidth = data_point_linewidth
+    )
+  } else {
+    p <- p + ggplot2::geom_point(
+      data = data_label_color, aesthetic_mapping, alpha = data_point_alpha,
+      size = data_point_size
+    )
+  }
+
+  if (family != "var" && !x@cp_only) {
+    p <- p + ggplot2::geom_point(
+      data = residual_label_color,
+      aesthetic_mapping,
+      na.rm = TRUE,
+      alpha = data_point_alpha,
+      size = data_point_size
+    )
+    if (ncol(x@data) == 2 || (family == "ar" && nrow(x@thetas) == 1)) {
+      xend <- c(x@cp_set, n)
+      yend <- as.numeric(x@thetas)
+
+      coefficient_label <- data.frame(
+        x = c(1, x@cp_set),
+        y = yend,
+        xend = xend,
+        yend = yend,
+        label = "coefficient"
       )
 
-    # Draw lines for time series data and points for other data.
-    if (family %in% c("ar", "arma", "arima", "garch")) {
-      y_label <-
-        paste0(toupper(family), "(", paste0(x@order, collapse = ", "), ")")
-    } else if (family %in% c("mean", "variance", "meanvariance")) {
-      y_label <- "data"
-    } else {
-      y_label <- "data response"
-    }
-
-    data_label_color <- data.frame(
-      x = seq_len(n), y = y, label = y_label, color = color
-    )
-    residual_label_color <- data.frame(
-      x = seq_len(n),
-      y = x@residuals,
-      label = "residual",
-      color = color
-    )
-    covariate_label_color <- data.frame(
-      x = seq_len(n),
-      y = x@data[, ncol(x@data)],
-      label = "covariate",
-      color = color
-    )
-    aesthetic_mapping <- ggplot2::aes(x = x, y = y, color = color)
-
-    if (family %in% c("ar", "arma", "arima", "garch")) {
-      p <- p + ggplot2::geom_line(
-        data = data_label_color, aesthetic_mapping, alpha = data_point_alpha,
-        linewidth = data_point_linewidth
-      )
-    } else {
       p <- p + ggplot2::geom_point(
-        data = data_label_color, aesthetic_mapping, alpha = data_point_alpha,
-        size = data_point_size
-      )
-    }
-
-    if (family != "var" && !x@cp_only) {
-      p <- p + ggplot2::geom_point(
-        data = residual_label_color,
+        data = covariate_label_color,
         aesthetic_mapping,
-        na.rm = TRUE,
-        alpha = data_point_alpha,
         size = data_point_size
       )
-      if (ncol(x@data) == 2 || (family == "ar" && nrow(x@thetas) == 1)) {
-        xend <- c(x@cp_set, n)
-        yend <- as.numeric(x@thetas)
-
-        coefficient_label <- data.frame(
-          x = c(1, x@cp_set),
-          y = yend,
-          xend = xend,
-          yend = yend,
-          label = "coefficient"
-        )
-
-        p <- p + ggplot2::geom_point(
-          data = covariate_label_color,
-          aesthetic_mapping,
-          size = data_point_size
-        )
-        p <- p + ggplot2::geom_segment(
-          data = coefficient_label,
-          ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
-          col = "blue"
-        )
-      }
-      p <- p + ggplot2::facet_wrap("label", nrow = 2, scales = "free_y")
+      p <- p + ggplot2::geom_segment(
+        data = coefficient_label,
+        ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+        col = "blue"
+      )
     }
-    p <- p + ggplot2::theme(
-      legend.position = legend_position,
-      panel.background = panel_background,
-      panel.border = panel_border,
-      panel.grid.major = panel_grid_major,
-      panel.grid.minor = panel_grid_minor,
-      strip.background = strip_background,
-    )
-    p <- p + ggplot2::xlab(xlab) + ggplot2::ylab(ylab)
-    print(p)
+    p <- p + ggplot2::facet_wrap("label", nrow = 2, scales = "free_y")
   }
+  p <- p + ggplot2::theme(
+    legend.position = legend_position,
+    panel.background = panel_background,
+    panel.border = panel_border,
+    panel.grid.major = panel_grid_major,
+    panel.grid.minor = panel_grid_minor,
+    strip.background = strip_background,
+  )
+  p <- p + ggplot2::xlab(xlab) + ggplot2::ylab(ylab)
+  print(p)
   invisible()
 }
 

@@ -21,31 +21,9 @@ testthat::test_that(
     testthat::expect_error(
       mockthat::with_mock(
         `require_namespace` = function(...) FALSE,
-        `utils_menu` = function(...) 2,
         plot(class_instance)
       ),
       "ggplot2 is not installed. No plot is made."
-    )
-
-    testthat::expect_no_error(
-      mockthat::with_mock(
-        `require_namespace` = function(...) FALSE,
-        `utils_menu` = function(...) 1,
-        `install_packages` = function(...) TRUE,
-        plot(class_instance)
-      )
-    )
-
-    testthat::expect_error(
-      mockthat::with_mock(
-        `require_namespace` = function(...) FALSE,
-        `utils_menu` = function(...) 1,
-        `install_packages` = function(...) {
-          stop("ggplot2 could not be installed.")
-        },
-        plot(class_instance)
-      ),
-      "ggplot2 could not be installed."
     )
   }
 )
