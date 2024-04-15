@@ -1,3 +1,7 @@
+require_namespace <- function(package_name) {
+  requireNamespace(package_name, quietly = TRUE)
+}
+
 check_family <- function(family, allowed_families) {
   error_message <- paste0(
     "The family should be one of ",
