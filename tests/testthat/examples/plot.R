@@ -10,4 +10,6 @@ y <- c(
 result <- fastcpd.lm(cbind(y, x), r.clock = "fastcpd_profiler")
 summary(result)
 plot(result)
-RcppClock:::plot.RcppClock(fastcpd_profiler)
+
+library(RcppClock)
+plot(fastcpd_profiler)
