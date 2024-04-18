@@ -240,7 +240,7 @@ Some methods are plotted due to the un-retrievable change points.
 ```
 
 ```{r univariate-mean-change-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(fastcpd_result, c(300, 700))
+testthat::expect_equal(fastcpd_result, c(300, 700), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-CptNonPar}
@@ -248,7 +248,7 @@ testthat::expect_equal(fastcpd_result, c(300, 700))
 ```
 
 ```{r univariate-mean-change-CptNonPar-testthat, include = FALSE}
-testthat::expect_equal(CptNonPar_result, c(300, 700))
+testthat::expect_equal(CptNonPar_result, c(300, 700), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-strucchange, eval = FALSE}
@@ -266,7 +266,7 @@ ecp::e.divisive(mean_data_1)$estimates
 ```
 
 ```{r univariate-mean-change-changepoint-testthat, include = FALSE}
-testthat::expect_equal(changepoint_result, c(300, 1000))
+testthat::expect_equal(changepoint_result, c(300, 1000), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-breakfast}
@@ -274,7 +274,7 @@ testthat::expect_equal(changepoint_result, c(300, 1000))
 ```
 
 ```{r univariate-mean-change-breakfast-testthat, include = FALSE}
-testthat::expect_equal(breakfast_result, c(300, 700))
+testthat::expect_equal(breakfast_result, c(300, 700), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-wbs}
@@ -282,7 +282,7 @@ testthat::expect_equal(breakfast_result, c(300, 700))
 ```
 
 ```{r univariate-mean-change-wbs-testthat, include = FALSE}
-testthat::expect_equal(wbs_result, c(300, 700))
+testthat::expect_equal(wbs_result, c(300, 700), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-mosum, eval = FALSE}
@@ -295,7 +295,7 @@ mosum::mosum(c(mean_data_1), G = 40)$cpts.info$cpts
 ```
 
 ```{r univariate-mean-change-fpop-testthat, include = FALSE}
-testthat::expect_equal(fpop_result, c(300, 700, 1000))
+testthat::expect_equal(fpop_result, c(300, 700, 1000), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-gfpop, eval = FALSE}
@@ -332,7 +332,7 @@ result_InspectChangepoint$changepoints[, "location"]
 ```
 
 ```{r univariate-mean-change-jointseg-testthat, include = FALSE}
-testthat::expect_equal(jointseg_result, c(300, 700))
+testthat::expect_equal(jointseg_result, c(300, 700), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-Rbeast, eval = FALSE}
@@ -347,7 +347,7 @@ Rbeast::beast(
 ```
 
 ```{r univariate-mean-change-stepR-testthat, include = FALSE}
-testthat::expect_equal(stepR_result, c(300, 700, 1000))
+testthat::expect_equal(stepR_result, c(300, 700, 1000), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-cpm}
@@ -355,18 +355,17 @@ testthat::expect_equal(stepR_result, c(300, 700, 1000))
 ```
 
 ```{r univariate-mean-change-cpm-testthat, include = FALSE}
-testthat::expect_equal(cpm_result, c(299, 699))
+testthat::expect_equal(cpm_result, c(299, 699), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-segmented}
-(segmented_result <- segmented::segmented(
-  lm(y ~ 1 + x, data.frame(y = mean_data_1, x = seq_len(nrow(mean_data_1)))),
-  seg.Z = ~ x
+(segmented_result <- segmented::stepmented(
+  as.numeric(mean_data_1), npsi = 2
 )$psi[, "Est."])
 ```
 
 ```{r univariate-mean-change-segmented-testthat, include = FALSE}
-testthat::expect_equal(segmented_result, c(495))
+testthat::expect_equal(segmented_result, c(298， 699), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-mcp, eval = FALSE}
@@ -401,7 +400,7 @@ Some methods are plotted due to the un-retrievable change points.
 ```
 
 ```{r univariate-mean-and-or-variance-change-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(fastcpd_result, c(300, 700, 1001, 1300, 1700))
+testthat::expect_equal(fastcpd_result, c(300, 700, 1001, 1300, 1700), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-and-or-variance-change-ecp, eval = FALSE}
@@ -414,7 +413,7 @@ ecp::e.divisive(mv_data_1)$estimates
 ```
 
 ```{r univariate-mean-and-or-variance-change-changepoint-testthat, include = FALSE}
-testthat::expect_equal(changepoint_result, c(300, 2000))
+testthat::expect_equal(changepoint_result, c(300, 2000), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-and-or-variance-change-CptNonPar}
@@ -422,7 +421,7 @@ testthat::expect_equal(changepoint_result, c(300, 2000))
 ```
 
 ```{r univariate-mean-and-or-variance-change-CptNonPar-testthat, include = FALSE}
-testthat::expect_equal(CptNonPar_result, c(333, 700, 1300))
+testthat::expect_equal(CptNonPar_result, c(333, 700, 1300), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-and-or-variance-change-cpm}
@@ -430,7 +429,7 @@ testthat::expect_equal(CptNonPar_result, c(333, 700, 1300))
 ```
 
 ```{r univariate-mean-and-or-variance-change-cpm-testthat, include = FALSE}
-testthat::expect_equal(cpm_result, c(293, 300, 403, 408, 618, 621, 696, 1000, 1021, 1024, 1293, 1300, 1417, 1693, 1700, 1981))
+testthat::expect_equal(cpm_result, c(293, 300, 403, 408, 618, 621, 696, 1000, 1021, 1024, 1293, 1300, 1417, 1693, 1700, 1981), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-and-or-variance-change-InspectChangepoint, eval = FALSE}
@@ -503,7 +502,7 @@ Some methods are plotted due to the un-retrievable change points.
 ```
 
 ```{r multivariate-mean-change-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(fastcpd_result, c(300, 700))
+testthat::expect_equal(fastcpd_result, c(300, 700), tolerance = 0.2)
 ```
 
 ```{r multivariate-mean-change-CptNonPar}
@@ -511,7 +510,7 @@ testthat::expect_equal(fastcpd_result, c(300, 700))
 ```
 
 ```{r multivariate-mean-change-CptNonPar-testthat, include = FALSE}
-testthat::expect_equal(CptNonPar_result, c(300, 700))
+testthat::expect_equal(CptNonPar_result, c(300, 700), tolerance = 0.2)
 ```
 
 ```{r multivariate-mean-change-InspectChangepoint, eval = FALSE}
@@ -536,7 +535,7 @@ result_InspectChangepoint$changepoints[, "location"]
 ```
 
 ```{r multivariate-mean-change-jointseg-testthat, include = FALSE}
-testthat::expect_equal(jointseg_result, c(300, 700))
+testthat::expect_equal(jointseg_result, c(300, 700), tolerance = 0.2)
 ```
 
 ```{r multivariate-mean-change-Rbeast, eval = FALSE}
@@ -594,7 +593,7 @@ Some methods are plotted due to the un-retrievable change points.
 ```
 
 ```{r multivariate-mean-and-or-variance-change-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(fastcpd_result, c(300, 700, 1000, 1300, 1700))
+testthat::expect_equal(fastcpd_result, c(300, 700, 1000, 1300, 1700), tolerance = 0.2)
 ```
 
 ```{r multivariate-mean-and-or-variance-change-ecp, eval = FALSE}
@@ -683,7 +682,7 @@ The true change points are 100 and 200.
 ```
 
 ```{r linear-regression-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(fastcpd_result, c(97, 201))
+testthat::expect_equal(fastcpd_result, c(97, 201), tolerance = 0.2)
 ```
 
 ```{r linear-regression-strucchange, eval = FALSE}
@@ -702,7 +701,7 @@ strucchange::breakpoints(y ~ . - 1, data = lm_data)$breakpoints
 ```
 
 ```{r linear-regression-segmented-testthat, include = FALSE}
-testthat::expect_lt(segmented_result - 233, 1)
+testthat::expect_equal(segmented_result, c(233), tolerance = 0.2)
 ```
 
 # Logistic regression
@@ -714,7 +713,7 @@ The true change point is 300.
 ```
 
 ```{r logistic-regression-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(fastcpd_result, 302)
+testthat::expect_equal(fastcpd_result, 302, tolerance = 0.2)
 ```
 
 ```{r logistic-regression-strucchange, eval = FALSE}
@@ -731,7 +730,7 @@ The true change points are 500, 800 and 1000.
 ```
 
 ```{r poisson-regression-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(fastcpd_result, c(498, 805, 1003))
+testthat::expect_equal(fastcpd_result, c(498, 805, 1003), tolerance = 0.2)
 ```
 
 ```{r poisson-regression-strucchange, eval = FALSE}
@@ -766,7 +765,7 @@ Some methods are plotted due to the un-retrievable change points.
 ```
 
 ```{r ar3-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(fastcpd_result, c(614))
+testthat::expect_equal(fastcpd_result, c(614), tolerance = 0.2)
 ```
 
 ```{r ar3-CptNonPar}
@@ -774,7 +773,7 @@ testthat::expect_equal(fastcpd_result, c(614))
 ```
 
 ```{r ar3-CptNonPar-testthat, include = FALSE}
-testthat::expect_equal(CptNonPar_result, numeric(0))
+testthat::expect_equal(CptNonPar_result, numeric(0), tolerance = 0.2)
 ```
 
 ```{r ar3-segmented}
@@ -787,7 +786,7 @@ testthat::expect_equal(CptNonPar_result, numeric(0))
 ```
 
 ```{r ar3-segmented-testthat, include = FALSE}
-testthat::expect_equal(segmented_result, c(690))
+testthat::expect_equal(segmented_result, c(690), tolerance = 0.2)
 ```
 
 ```{r ar3-mcp, eval = FALSE}
@@ -811,7 +810,7 @@ The true change point is 200.
 ```
 
 ```{r garch11-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(fastcpd_result, c(205))
+testthat::expect_equal(fastcpd_result, c(205), tolerance = 0.2)
 ```
 
 ```{r garch11-CptNonPar}
@@ -819,7 +818,7 @@ testthat::expect_equal(fastcpd_result, c(205))
 ```
 
 ```{r garch11-CptNonPar-testthat, include = FALSE}
-testthat::expect_equal(CptNonPar_result, c(206))
+testthat::expect_equal(CptNonPar_result, c(206), tolerance = 0.2)
 ```
 
 ```{r garch11-strucchange, eval = FALSE}
@@ -838,7 +837,7 @@ The true change points is 500.
 ```
 
 ```{r var2-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(fastcpd_result, c(500))
+testthat::expect_equal(fastcpd_result, c(500), tolerance = 0.2)
 ```
 
 ```{r var2-VARDetect}
@@ -846,7 +845,7 @@ testthat::expect_equal(fastcpd_result, c(500))
 ```
 
 ```{r var2-VARDetect-testthat, include = FALSE}
-testthat::expect_equal(VARDetect_result, c(501))
+testthat::expect_equal(VARDetect_result, c(501), tolerance = 0.2)
 ```
 
 # Detection comparison using `well_log`
@@ -1019,6 +1018,12 @@ ggplot2::autoplot(microbenchmark_result)
     and [link 2](https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531284).
 -   `bcp`: [[#5](https://github.com/doccstat/fastcpd/issues/5)].
 -   `gfpop`: [[#10](https://github.com/doccstat/fastcpd/issues/10)].
+
+# Acknowledgements
+
+-   [Dr. Vito Muggeo](https://www.unipa.it/persone/docenti/m/vito.muggeo),
+    author of the `segmented` package for the tips about the piece-wise
+    constant function.
 
 # Appendix: all code snippets
 

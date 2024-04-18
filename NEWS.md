@@ -1,3 +1,7 @@
+# fastcpd 0.14.1
+
+*   Fix possible numeric issues on CRAN breaking updates of other packages.
+
 # fastcpd 0.14.0
 
 *   Correct mBIC.
