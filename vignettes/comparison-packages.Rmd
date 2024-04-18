@@ -365,7 +365,7 @@ testthat::expect_equal(cpm_result, c(299, 699), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-segmented-testthat, include = FALSE}
-testthat::expect_equal(segmented_result, c(298， 699), tolerance = 0.2)
+testthat::expect_equal(segmented_result, c(298, 699), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-mcp, eval = FALSE}
