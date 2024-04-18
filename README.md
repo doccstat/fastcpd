@@ -221,8 +221,6 @@ expected to see the progress bar when running the code by default.
   [`fastcpd_arma`](https://fastcpd.xingchi.li/reference/fastcpd_arma.html)
 - GARCH(p, q):
   [`fastcpd_garch`](https://fastcpd.xingchi.li/reference/fastcpd_garch.html)
-- MA(q):
-  [`fastcpd_ma`](https://fastcpd.xingchi.li/reference/fastcpd_ma.html)
 - VAR(p):
   [`fastcpd_var`](https://fastcpd.xingchi.li/reference/fastcpd_var.html)
 - General time series:
