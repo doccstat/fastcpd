@@ -365,7 +365,7 @@ testthat::expect_equal(cpm_result, c(299, 699), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-segmented-testthat, include = FALSE}
-testthat::expect_equal(segmented_result, c(298, 699), tolerance = 0.2)
+testthat::expect_equivalent(segmented_result, c(298, 699), tolerance = 0.2)
 ```
 
 ```{r univariate-mean-change-mcp, eval = FALSE}
@@ -701,7 +701,7 @@ strucchange::breakpoints(y ~ . - 1, data = lm_data)$breakpoints
 ```
 
 ```{r linear-regression-segmented-testthat, include = FALSE}
-testthat::expect_equal(segmented_result, c(233), tolerance = 0.2)
+testthat::expect_equivalent(segmented_result, c(233), tolerance = 0.2)
 ```
 
 # Logistic regression
@@ -786,7 +786,7 @@ testthat::expect_equal(CptNonPar_result, numeric(0), tolerance = 0.2)
 ```
 
 ```{r ar3-segmented-testthat, include = FALSE}
-testthat::expect_equal(segmented_result, c(690), tolerance = 0.2)
+testthat::expect_equivalent(segmented_result, c(690), tolerance = 0.2)
 ```
 
 ```{r ar3-mcp, eval = FALSE}
