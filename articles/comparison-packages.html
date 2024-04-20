@@ -20,7 +20,7 @@
 <link href="../deps/Source_Code_Pro-0.4.9/font.css" rel="stylesheet">
 <!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Comparison with other R packages">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Comparison with other R packages">
 <meta property="og:description" content="Speed and result comparison with other R packages.
 ">
 <meta property="og:image" content="https://fastcpd.xingchi.li/logo.svg">
@@ -401,7 +401,7 @@ to the un-retrievable change points.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">mean_data_1</span><span class="op">)</span>, npsi <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">psi</span><span class="op">[</span>, <span class="st">"Est."</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; psi1.index psi2.index </span></span>
-<span><span class="co">#&gt;   300.0046   700.9342</span></span></code></pre></div>
+<span><span class="co">#&gt;   300.0813   700.1513</span></span></code></pre></div>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="fu">mcp</span><span class="fu">::</span><span class="fu"><a href="https://lindeloev.github.io/mcp/reference/mcp.html" class="external-link">mcp</a></span><span class="op">(</span></span>
@@ -674,7 +674,7 @@ methods are plotted due to the un-retrievable change points.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  seg.Z <span class="op">=</span> <span class="op">~</span> <span class="va">index</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">psi</span><span class="op">[</span>, <span class="st">"Est."</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 233</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 233.0006</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="logistic-regression-1">Logistic regression<a class="anchor" aria-label="anchor" href="#logistic-regression-1"></a>
@@ -704,7 +704,7 @@ methods are plotted due to the un-retrievable change points.</p>
 <p>The true change points are 80, 200 and 320.</p>
 <div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">fastcpd_result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">@</span><span class="va">cp_set</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]  79 199 320</span></span></code></pre></div>
+<span><span class="co">#&gt; [1]  79 199 321</span></span></code></pre></div>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a>strucchange<span class="sc">::</span><span class="fu">breakpoints</span>(y <span class="sc">~</span> . <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> lasso_data)<span class="sc">$</span>breakpoints,</span>
 <span id="cb62-2"><a href="#cb62-2" tabindex="-1"></a><span class="co">#&gt; [1]  80 200 321</span></span></code></pre></div>
 </div>
@@ -718,7 +718,7 @@ un-retrievable change points.</p>
 <span><span class="co">#&gt; [1] 614</span></span></code></pre></div>
 <div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">CptNonPar_result</span> <span class="op">&lt;-</span> <span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/CptNonPar/man/np.mojo.html" class="external-link">np.mojo</a></span><span class="op">(</span><span class="va">ar_data</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">ar_data</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">cpts</span><span class="op">)</span></span>
-<span><span class="co">#&gt; integer(0)</span></span></code></pre></div>
+<span><span class="co">#&gt; numeric(0)</span></span></code></pre></div>
 <div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">segmented_result</span> <span class="op">&lt;-</span> <span class="fu">segmented</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/segmented/man/segmented.html" class="external-link">segmented</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span>
@@ -1586,13 +1586,11 @@ about the piece-wise constant function.</li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p>
-<p>Developed by <a href="https://www.xingchi.li" class="external-link">Xingchi Li</a>, <a href="https://zhangxiany-tamu.github.io" class="external-link">Xianyang Zhang</a>.</p>
+  <p>Developed by <a href="https://www.xingchi.li" class="external-link">Xingchi Li</a>, <a href="https://zhangxiany-tamu.github.io" class="external-link">Xianyang Zhang</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
     </footer>
