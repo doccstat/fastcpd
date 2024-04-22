@@ -22,44 +22,46 @@ The average USD market price across major bitcoin exchanges.
 }
 \examples{
 \donttest{
-ggplot2::ggplot(bitcoin, ggplot2::aes(x = date, y = price)) +
-  ggplot2::geom_line()
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  ggplot2::ggplot(bitcoin, ggplot2::aes(x = date, y = price)) +
+    ggplot2::geom_line()
 
-result <- suppressWarnings(fastcpd.garch(
-  diff(log(bitcoin$price[600:900])), c(1, 1),
-  beta = "BIC", cost_adjustment = "BIC"
-))
-summary(result)
-bitcoin$date[result@cp_set + 600]
-plot(result)
+  result <- suppressWarnings(fastcpd.garch(
+    diff(log(bitcoin$price[600:900])), c(1, 1),
+    beta = "BIC", cost_adjustment = "BIC"
+  ))
+  summary(result)
+  bitcoin$date[result@cp_set + 600]
+  plot(result)
 
-cp_dates <- bitcoin[600 + result@cp_set + 1, "date"]
-ggplot2::ggplot(
-  data = data.frame(
-    x = bitcoin$date[600:900], y = bitcoin$price[600:900]
-  ),
-  ggplot2::aes(x = x, y = y)
-) +
-  ggplot2::geom_line(color = "steelblue") +
-  ggplot2::geom_vline(
-    xintercept = cp_dates,
-    color = "red",
-    linetype = "dotted",
-    linewidth = 0.5,
-    alpha = 0.7
+  cp_dates <- bitcoin[600 + result@cp_set + 1, "date"]
+  ggplot2::ggplot(
+    data = data.frame(
+      x = bitcoin$date[600:900], y = bitcoin$price[600:900]
+    ),
+    ggplot2::aes(x = x, y = y)
   ) +
-  ggplot2::labs(
-    x = "Year",
-    y = "Bitcoin price in USD"
-  ) +
-  ggplot2::annotate(
-    "text",
-    x = cp_dates,
-    y = 2000,
-    label = as.character(cp_dates),
-    color = "steelblue"
-  ) +
-  ggplot2::theme_bw()
+    ggplot2::geom_line(color = "steelblue") +
+    ggplot2::geom_vline(
+      xintercept = cp_dates,
+      color = "red",
+      linetype = "dotted",
+      linewidth = 0.5,
+      alpha = 0.7
+    ) +
+    ggplot2::labs(
+      x = "Year",
+      y = "Bitcoin price in USD"
+    ) +
+    ggplot2::annotate(
+      "text",
+      x = cp_dates,
+      y = 2000,
+      label = as.character(cp_dates),
+      color = "steelblue"
+    ) +
+    ggplot2::theme_bw()
+}
 }
 }
 \keyword{datasets}

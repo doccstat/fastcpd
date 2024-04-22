@@ -58,15 +58,16 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
   ylab = NULL,
   ...
 ) {
-  # Plot the built in families only.
-  stopifnot(
-    "Built-in plot only works for built-in families." = x@family != "custom"
-  )
+  if (x@family == "custom") {
+    warning("Built-in plot should only work for built-in families.")
+  }
   if (x@family == "mean" && ncol(x@data) > 1) {
-    stop("Can not plot mean change points with p > 1.")
+    warning("Can not plot mean change points with p > 1.")
+    return()
   }
   if (!require_namespace("ggplot2")) {
-    stop("ggplot2 is not installed. No plot is made.")
+    warning("ggplot2 is not installed. No plot is made.")
+    return()
   }
   n <- nrow(x@data)
   family <- x@family

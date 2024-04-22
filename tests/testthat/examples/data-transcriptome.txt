@@ -1,33 +1,38 @@
 \donttest{
-result <- fastcpd.mean(transcriptome$"10", trim = 0.005)
-summary(result)
-plot(result)
+if (
+  requireNamespace("ggplot2", quietly = TRUE) &&
+    requireNamespace("gridExtra", quietly = TRUE)
+) {
+  result <- fastcpd.mean(transcriptome$"10", trim = 0.005)
+  summary(result)
+  plot(result)
 
-result_all <- fastcpd.mean(
-  transcriptome,
-  beta = (ncol(transcriptome) + 1) * log(nrow(transcriptome)) / 2 * 5,
-  trim = 0
-)
+  result_all <- fastcpd.mean(
+    transcriptome,
+    beta = (ncol(transcriptome) + 1) * log(nrow(transcriptome)) / 2 * 5,
+    trim = 0
+  )
 
-plots <- lapply(
-  seq_len(ncol(transcriptome)), function(i) {
-    ggplot2::ggplot(
-      data = data.frame(
-        x = seq_along(transcriptome[, i]), y = transcriptome[, i]
-      ),
-      ggplot2::aes(x = x, y = y)
-    ) +
-      ggplot2::geom_line(color = "steelblue") +
-      ggplot2::geom_vline(
-        xintercept = result_all@cp_set,
-        color = "red",
-        linetype = "dotted",
-        linewidth = 0.5,
-        alpha = 0.7
+  plots <- lapply(
+    seq_len(ncol(transcriptome)), function(i) {
+      ggplot2::ggplot(
+        data = data.frame(
+          x = seq_along(transcriptome[, i]), y = transcriptome[, i]
+        ),
+        ggplot2::aes(x = x, y = y)
       ) +
-      ggplot2::theme_void()
-  }
-)
+        ggplot2::geom_line(color = "steelblue") +
+        ggplot2::geom_vline(
+          xintercept = result_all@cp_set,
+          color = "red",
+          linetype = "dotted",
+          linewidth = 0.5,
+          alpha = 0.7
+        ) +
+        ggplot2::theme_void()
+    }
+  )
 
-gridExtra::grid.arrange(grobs = plots, ncol = 1, nrow = ncol(transcriptome))
+  gridExtra::grid.arrange(grobs = plots, ncol = 1, nrow = ncol(transcriptome))
+}
 }

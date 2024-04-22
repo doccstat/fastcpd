@@ -30,16 +30,24 @@ set.seed(1)
 data <- c(rnorm(300, 0, 1), rnorm(400, 0, 100), rnorm(300, 0, 1))
 result <- fastcpd.variance(data)
 summary(result)
-set.seed(1)
-p <- 3
-result <- fastcpd.variance(
-  rbind(
-    mvtnorm::rmvnorm(300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))),
-    mvtnorm::rmvnorm(400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))),
-    mvtnorm::rmvnorm(300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p)))
+if (requireNamespace("mvtnorm", quietly = TRUE)) {
+  set.seed(1)
+  p <- 3
+  result <- fastcpd.variance(
+    rbind(
+      mvtnorm::rmvnorm(
+        300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+      ),
+      mvtnorm::rmvnorm(
+        400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+      ),
+      mvtnorm::rmvnorm(
+        300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+      )
+    )
   )
-)
-summary(result)
+  summary(result)
+}
 \donttest{
 set.seed(1)
 data <- c(rnorm(3000, 0, 1), rnorm(3000, 0, 2), rnorm(3000, 0, 1))

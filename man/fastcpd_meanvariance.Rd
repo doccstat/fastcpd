@@ -33,32 +33,36 @@ default a matrix or data frame or a vector with each row / element as an
 observation and thus a formula is not required here.
 }
 \examples{
-set.seed(1)
-p <- 1
-result <- fastcpd.mv(
-  rbind(
-    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-    mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
-    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-    mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-    mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(100, p))
+if (requireNamespace("mvtnorm", quietly = TRUE)) {
+  set.seed(1)
+  p <- 1
+  result <- fastcpd.mv(
+    rbind(
+      mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+      mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
+      mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
+      mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+      mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
+      mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(100, p))
+    )
   )
-)
-summary(result)
-set.seed(1)
-p <- 4
-result <- fastcpd.mv(
-  rbind(
-    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-    mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
-    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-    mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-    mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(100, p))
+  summary(result)
+}
+if (requireNamespace("mvtnorm", quietly = TRUE)) {
+  set.seed(1)
+  p <- 4
+  result <- fastcpd.mv(
+    rbind(
+      mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+      mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
+      mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
+      mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
+      mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
+      mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(100, p))
+    )
   )
-)
-summary(result)
+  summary(result)
+}
 \donttest{
 set.seed(1)
 data <- c(rnorm(2000, 0, 1), rnorm(2000, 1, 1), rnorm(2000, 1, 2))

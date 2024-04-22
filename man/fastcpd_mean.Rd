@@ -26,15 +26,17 @@ data frame or a vector with each row / element as an observation and thus a
 formula is not required here.
 }
 \examples{
-set.seed(1)
-p <- 3
-data <- rbind(
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
-  mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
-  mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
-)
-result <- fastcpd.mean(data)
-summary(result)
+if (requireNamespace("mvtnorm", quietly = TRUE)) {
+  set.seed(1)
+  p <- 3
+  data <- rbind(
+    mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
+    mvtnorm::rmvnorm(400, mean = rep(50, p), sigma = diag(100, p)),
+    mvtnorm::rmvnorm(300, mean = rep(2, p), sigma = diag(100, p))
+  )
+  result <- fastcpd.mean(data)
+  summary(result)
+}
 set.seed(1)
 data <- c(rnorm(10000), rnorm(1000) + 1)
 (result_time <- system.time(

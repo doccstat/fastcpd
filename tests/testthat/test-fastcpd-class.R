@@ -18,7 +18,7 @@ testthat::test_that(
       cp_only = FALSE
     )
 
-    testthat::expect_error(
+    testthat::expect_warning(
       mockthat::with_mock(
         `require_namespace` = function(...) FALSE,
         plot(class_instance)
@@ -164,7 +164,7 @@ testthat::test_that("mean change p > 1", {
     cp_only = FALSE
   )
 
-  testthat::expect_error(
+  testthat::expect_warning(
     plot(class_instance),
     "Can not plot mean change points with p > 1."
   )
