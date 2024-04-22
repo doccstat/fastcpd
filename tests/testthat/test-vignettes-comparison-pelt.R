@@ -1,7 +1,7 @@
 # Everything in this script is provided as is. The purpose of this script is to
 # do a sanity check on the C++ implementation of `fastcpd`.
 
-testthat::skip("Skip due to time limit on CRAN.")
+testthat::skip_on_cran()
 
 # nolint start: script provided as is
 
@@ -44,7 +44,7 @@ testthat::test_that("logistic regression", {
     rep(c(
       "fit_glm: algorithm did not converge",
       "fit_glm: fitted probabilities numerically 0 or 1 occurred"
-    ), c(6, 3984))
+    ), c(6, 3983))
   )
 
   testthat::expect_equal(change_points_binomial_fastcpd_vanilla, 125)
@@ -186,7 +186,8 @@ testthat::test_that("penalized linear regression", {
     cbind(data[, d + 1], data[, 1:d]),
     epsilon = 1e-5,
     beta = beta,
-    cost_adjustment = "BIC"
+    cost_adjustment = "BIC",
+    pruning_coef = 0
   )@cp_set
 
   testthat::expect_equal(
@@ -199,7 +200,8 @@ testthat::test_that("penalized linear regression", {
     vanilla_percentage = 1,
     epsilon = 1e-5,
     beta = beta,
-    cost_adjustment = "BIC"
+    cost_adjustment = "BIC",
+    pruning_coef = 0
   )@cp_set
 
   testthat::expect_equal(
