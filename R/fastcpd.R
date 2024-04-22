@@ -409,7 +409,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
             include.mean = include_mean
           )$residuals
         }
-      } else if (family == "mean") {
+      } else if (family %in% c("mean", "variance", "meanvariance")) {
         residuals <- matrix(NA, nrow(data), ncol(data))
         segments <- c(0, cp_set, nrow(data))
         for (segments_i in seq_len(length(segments) - 1)) {
