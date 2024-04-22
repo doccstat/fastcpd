@@ -1,26 +1,29 @@
 \donttest{
-sigma2 <- variance.median(well_log)
-median_loss <- function(data) {
-  sum(abs(data - matrixStats::colMedians(data))) / sqrt(sigma2) / 2
-}
-result <- fastcpd(
-  formula = ~ x - 1,
-  data = cbind.data.frame(x = well_log),
-  cost = median_loss,
-  trim = 0.002
-)
-summary(result)
+if (requireNamespace("matrixStats", quietly = TRUE)) {
+  sigma2 <- variance.median(well_log)
+  median_loss <- function(data) {
+    sum(abs(data - matrixStats::colMedians(data))) / sqrt(sigma2) / 2
+  }
+  result <- fastcpd(
+    formula = ~ x - 1,
+    data = cbind.data.frame(x = well_log),
+    cost = median_loss,
+    trim = 0.002
+  )
+  summary(result)
 
-segment_starts <- c(1, result@cp_set)
-segment_ends <- c(result@cp_set - 1, length(well_log))
-residual <- NULL
-for (segment_index in seq_along(segment_starts)) {
-  segment <- well_log[segment_starts[segment_index]:segment_ends[segment_index]]
-  residual <- c(residual, segment - median(segment))
-}
+  segment_starts <- c(1, result@cp_set)
+  segment_ends <- c(result@cp_set - 1, length(well_log))
+  residual <- NULL
+  for (segment_index in seq_along(segment_starts)) {
+    segment <-
+      well_log[segment_starts[segment_index]:segment_ends[segment_index]]
+    residual <- c(residual, segment - median(segment))
+  }
 
-result@residuals <- matrix(residual)
-result@family <- "mean"
-result@data <- data.frame(x = c(well_log))
-plot(result)
+  result@residuals <- matrix(residual)
+  result@family <- "mean"
+  result@data <- data.frame(x = c(well_log))
+  plot(result)
+}
 }

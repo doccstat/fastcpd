@@ -28,21 +28,23 @@ variable as the first column and thus a formula is not required here.
 }
 \examples{
 \donttest{
-set.seed(1)
-n <- 1100
-p <- 3
-x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
-delta <- rnorm(p)
-theta_0 <- c(1, 0.3, -1)
-y <- c(
-  rpois(500, exp(x[1:500, ] \%*\% theta_0)),
-  rpois(300, exp(x[501:800, ] \%*\% (theta_0 + delta))),
-  rpois(200, exp(x[801:1000, ] \%*\% theta_0)),
-  rpois(100, exp(x[1001:1100, ] \%*\% (theta_0 - delta)))
-)
-result <- fastcpd.poisson(cbind(y, x))
-summary(result)
-plot(result)
+if (requireNamespace("mvtnorm", quietly = TRUE)) {
+  set.seed(1)
+  n <- 1100
+  p <- 3
+  x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+  delta <- rnorm(p)
+  theta_0 <- c(1, 0.3, -1)
+  y <- c(
+    rpois(500, exp(x[1:500, ] \%*\% theta_0)),
+    rpois(300, exp(x[501:800, ] \%*\% (theta_0 + delta))),
+    rpois(200, exp(x[801:1000, ] \%*\% theta_0)),
+    rpois(100, exp(x[1001:1100, ] \%*\% (theta_0 - delta)))
+  )
+  result <- fastcpd.poisson(cbind(y, x))
+  summary(result)
+  plot(result)
+}
 }
 }
 \seealso{

@@ -263,76 +263,83 @@ volume 206 series Proceedings of Machine Learning Research, 1129-1143.
 }
 
 \examples{
-set.seed(1)
-n <- 200
-p <- 4
-d <- 2
-x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
-theta_1 <- matrix(runif(8, -3, -1), nrow = p)
-theta_2 <- matrix(runif(8, -1, 3), nrow = p)
-y <- rbind(
-  x[1:125, ] \%*\% theta_1 + mvtnorm::rmvnorm(125, rep(0, d), 3 * diag(d)),
-  x[126:n, ] \%*\% theta_2 + mvtnorm::rmvnorm(75, rep(0, d), 3 * diag(d))
-)
-result_mlm <- fastcpd(
-  cbind(y.1, y.2) ~ . - 1, cbind.data.frame(y = y, x = x), family = "lm"
-)
-summary(result_mlm)
-set.seed(1)
-n <- 400 + 300 + 500
-p <- 5
-x <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(p))
-theta <- rbind(
-  mvtnorm::rmvnorm(1, mean = rep(0, p - 3), sigma = diag(p - 3)),
-  mvtnorm::rmvnorm(1, mean = rep(5, p - 3), sigma = diag(p - 3)),
-  mvtnorm::rmvnorm(1, mean = rep(9, p - 3), sigma = diag(p - 3))
-)
-theta <- cbind(theta, matrix(0, 3, 3))
-theta <- theta[rep(seq_len(3), c(400, 300, 500)), ]
-y_true <- rowSums(x * theta)
-factor <- c(
-  2 * stats::rbinom(400, size = 1, prob = 0.95) - 1,
-  2 * stats::rbinom(300, size = 1, prob = 0.95) - 1,
-  2 * stats::rbinom(500, size = 1, prob = 0.95) - 1
-)
-y <- factor * y_true + stats::rnorm(n)
-data <- cbind.data.frame(y, x)
-huber_threshold <- 1
-huber_loss <- function(data, theta) {
-  residual <- data[, 1] - data[, -1, drop = FALSE] \%*\% theta
-  indicator <- abs(residual) <= huber_threshold
-  sum(
-    residual^2 / 2 * indicator +
-      huber_threshold * (
-        abs(residual) - huber_threshold / 2
-      ) * (1 - indicator)
+if (requireNamespace("mvtnorm", quietly = TRUE)) {
+  set.seed(1)
+  n <- 200
+  p <- 4
+  d <- 2
+  x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+  theta_1 <- matrix(runif(8, -3, -1), nrow = p)
+  theta_2 <- matrix(runif(8, -1, 3), nrow = p)
+  y <- rbind(
+    x[1:125, ] \%*\% theta_1 + mvtnorm::rmvnorm(125, rep(0, d), 3 * diag(d)),
+    x[126:n, ] \%*\% theta_2 + mvtnorm::rmvnorm(75, rep(0, d), 3 * diag(d))
   )
+  result_mlm <- fastcpd(
+    cbind(y.1, y.2) ~ . - 1, cbind.data.frame(y = y, x = x), family = "lm"
+  )
+  summary(result_mlm)
 }
-huber_loss_gradient <- function(data, theta) {
-  residual <- c(data[nrow(data), 1] - data[nrow(data), -1] \%*\% theta)
-  if (abs(residual) <= huber_threshold) {
-    -residual * data[nrow(data), -1]
-  } else {
-    -huber_threshold * sign(residual) * data[nrow(data), -1]
+if (
+  requireNamespace("mvtnorm", quietly = TRUE) &&
+    requireNamespace("stats", quietly = TRUE)
+) {
+  set.seed(1)
+  n <- 400 + 300 + 500
+  p <- 5
+  x <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(p))
+  theta <- rbind(
+    mvtnorm::rmvnorm(1, mean = rep(0, p - 3), sigma = diag(p - 3)),
+    mvtnorm::rmvnorm(1, mean = rep(5, p - 3), sigma = diag(p - 3)),
+    mvtnorm::rmvnorm(1, mean = rep(9, p - 3), sigma = diag(p - 3))
+  )
+  theta <- cbind(theta, matrix(0, 3, 3))
+  theta <- theta[rep(seq_len(3), c(400, 300, 500)), ]
+  y_true <- rowSums(x * theta)
+  factor <- c(
+    2 * stats::rbinom(400, size = 1, prob = 0.95) - 1,
+    2 * stats::rbinom(300, size = 1, prob = 0.95) - 1,
+    2 * stats::rbinom(500, size = 1, prob = 0.95) - 1
+  )
+  y <- factor * y_true + stats::rnorm(n)
+  data <- cbind.data.frame(y, x)
+  huber_threshold <- 1
+  huber_loss <- function(data, theta) {
+    residual <- data[, 1] - data[, -1, drop = FALSE] \%*\% theta
+    indicator <- abs(residual) <= huber_threshold
+    sum(
+      residual^2 / 2 * indicator +
+        huber_threshold * (
+          abs(residual) - huber_threshold / 2
+        ) * (1 - indicator)
+    )
   }
-}
-huber_loss_hessian <- function(data, theta) {
-  residual <- c(data[nrow(data), 1] - data[nrow(data), -1] \%*\% theta)
-  if (abs(residual) <= huber_threshold) {
-    outer(data[nrow(data), -1], data[nrow(data), -1])
-  } else {
-    0.01 * diag(length(theta))
+  huber_loss_gradient <- function(data, theta) {
+    residual <- c(data[nrow(data), 1] - data[nrow(data), -1] \%*\% theta)
+    if (abs(residual) <= huber_threshold) {
+      -residual * data[nrow(data), -1]
+    } else {
+      -huber_threshold * sign(residual) * data[nrow(data), -1]
+    }
   }
+  huber_loss_hessian <- function(data, theta) {
+    residual <- c(data[nrow(data), 1] - data[nrow(data), -1] \%*\% theta)
+    if (abs(residual) <= huber_threshold) {
+      outer(data[nrow(data), -1], data[nrow(data), -1])
+    } else {
+      0.01 * diag(length(theta))
+    }
+  }
+  huber_regression_result <- fastcpd(
+    formula = y ~ . - 1,
+    data = data,
+    beta = (p + 1) * log(n) / 2,
+    cost = huber_loss,
+    cost_gradient = huber_loss_gradient,
+    cost_hessian = huber_loss_hessian
+  )
+  summary(huber_regression_result)
 }
-huber_regression_result <- fastcpd(
-  formula = y ~ . - 1,
-  data = data,
-  beta = (p + 1) * log(n) / 2,
-  cost = huber_loss,
-  cost_gradient = huber_loss_gradient,
-  cost_hessian = huber_loss_hessian
-)
-summary(huber_regression_result)
 \donttest{
 set.seed(1)
 p <- 5
@@ -389,40 +396,42 @@ result_custom_two_epochs <- fastcpd(
 summary(result_custom_two_epochs)
 }
 \donttest{
-set.seed(1)
-n <- 480
-p_true <- 6
-p <- 50
-x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
-theta_0 <- rbind(
-  runif(p_true, -5, -2),
-  runif(p_true, -3, 3),
-  runif(p_true, 2, 5),
-  runif(p_true, -5, 5)
-)
-theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
-y <- c(
-  x[1:80, ] \%*\% theta_0[1, ] + rnorm(80, 0, 1),
-  x[81:200, ] \%*\% theta_0[2, ] + rnorm(120, 0, 1),
-  x[201:320, ] \%*\% theta_0[3, ] + rnorm(120, 0, 1),
-  x[321:n, ] \%*\% theta_0[4, ] + rnorm(160, 0, 1)
-)
-small_lasso_data <- cbind.data.frame(y, x)
-result_no_vp <- fastcpd.lasso(
-  small_lasso_data,
-  beta = "BIC",
-  cost_adjustment = NULL,
-  pruning_coef = 0
-)
-summary(result_no_vp)
-result_20_vp <- fastcpd.lasso(
-  small_lasso_data,
-  beta = "BIC",
-  cost_adjustment = NULL,
-  vanilla_percentage = 0.2,
-  pruning_coef = 0
-)
-summary(result_20_vp)
+if (requireNamespace("mvtnorm", quietly = TRUE)) {
+  set.seed(1)
+  n <- 480
+  p_true <- 6
+  p <- 50
+  x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+  theta_0 <- rbind(
+    runif(p_true, -5, -2),
+    runif(p_true, -3, 3),
+    runif(p_true, 2, 5),
+    runif(p_true, -5, 5)
+  )
+  theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+  y <- c(
+    x[1:80, ] \%*\% theta_0[1, ] + rnorm(80, 0, 1),
+    x[81:200, ] \%*\% theta_0[2, ] + rnorm(120, 0, 1),
+    x[201:320, ] \%*\% theta_0[3, ] + rnorm(120, 0, 1),
+    x[321:n, ] \%*\% theta_0[4, ] + rnorm(160, 0, 1)
+  )
+  small_lasso_data <- cbind.data.frame(y, x)
+  result_no_vp <- fastcpd.lasso(
+    small_lasso_data,
+    beta = "BIC",
+    cost_adjustment = NULL,
+    pruning_coef = 0
+  )
+  summary(result_no_vp)
+  result_20_vp <- fastcpd.lasso(
+    small_lasso_data,
+    beta = "BIC",
+    cost_adjustment = NULL,
+    vanilla_percentage = 0.2,
+    pruning_coef = 0
+  )
+  summary(result_20_vp)
+}
 }
 }
 \seealso{
