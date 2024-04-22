@@ -934,6 +934,7 @@ fastcpd.lasso(
   epsilon = 1e-5,
   beta = beta,
   cost_adjustment = "BIC",
+  pruning_coef = 0,
   r.progress = FALSE
 )@cp_set
 #> [1] 100 300 520 800 901
@@ -957,6 +958,7 @@ fastcpd.lasso(
   epsilon = 1e-5,
   beta = beta,
   cost_adjustment = "BIC",
+  pruning_coef = 0,
   r.progress = FALSE
 )@cp_set
 #> [1] 103 299 510 800 900

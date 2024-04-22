@@ -1,5 +1,7 @@
 testthat::test_that(
   "examples/fastcpd_variance-time_1.txt", {
+    testthat::skip_on_cran()
+
     examples_variance_time <- readLines("examples/fastcpd_variance-time_1.txt")
     source(textConnection(paste(
       examples_variance_time[seq_len(length(examples_variance_time) - 2) + 1],
