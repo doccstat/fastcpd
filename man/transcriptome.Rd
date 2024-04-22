@@ -66,10 +66,7 @@ Affymetrix HG-U95A and HG-U95Av2 microarrays
 }
 \examples{
 \donttest{
-if (
-  requireNamespace("ggplot2", quietly = TRUE) &&
-    requireNamespace("gridExtra", quietly = TRUE)
-) {
+if (requireNamespace("ggplot2", quietly = TRUE)) {
   result <- fastcpd.mean(transcriptome$"10", trim = 0.005)
   summary(result)
   plot(result)
@@ -100,7 +97,9 @@ if (
     }
   )
 
-  gridExtra::grid.arrange(grobs = plots, ncol = 1, nrow = ncol(transcriptome))
+  if (requireNamespace("gridExtra", quietly = TRUE)) {
+    gridExtra::grid.arrange(grobs = plots, ncol = 1, nrow = ncol(transcriptome))
+  }
 }
 }
 }

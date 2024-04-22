@@ -23,8 +23,9 @@ The average USD market price across major bitcoin exchanges.
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  ggplot2::ggplot(bitcoin, ggplot2::aes(x = date, y = price)) +
+  p <- ggplot2::ggplot(bitcoin, ggplot2::aes(x = date, y = price)) +
     ggplot2::geom_line()
+  print(p)
 
   result <- suppressWarnings(fastcpd.garch(
     diff(log(bitcoin$price[600:900])), c(1, 1),

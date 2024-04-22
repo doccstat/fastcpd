@@ -12,4 +12,5 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     )
   )
   summary(result)
+  plot(result)
 }
