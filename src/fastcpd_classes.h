@@ -339,6 +339,12 @@ class Fastcpd {
     const double lambda
   );
 
+  mat get_hessian_arma(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
   CostResult get_nll_arma(
     const unsigned int segment_start,
     const unsigned int segment_end

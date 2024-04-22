@@ -22,7 +22,7 @@ CostFunction::CostFunction(
 ) : cost(cost),
     data(data) {}
 
-CostResult CostFunction::operator() (  // # nocov
+CostResult CostFunction::operator() (
     const unsigned int segment_start,
     const unsigned int segment_end,
     const Nullable<colvec>& theta,
@@ -32,8 +32,8 @@ CostResult CostFunction::operator() (  // # nocov
 ) const {
   SEXP value = theta.isNull() ?
     cost(data.rows(segment_start, segment_end)) :
-    cost(data.rows(segment_start, segment_end), as<colvec>(theta));  // # nocov
-  return {{colvec()}, {colvec()}, as<double>(value)};  // # nocov
+    cost(data.rows(segment_start, segment_end), as<colvec>(theta));
+  return {{colvec()}, {colvec()}, as<double>(value)};
 }
 
 CostGradient::CostGradient(
