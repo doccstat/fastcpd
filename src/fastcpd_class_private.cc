@@ -32,7 +32,7 @@ void Fastcpd::create_cost_function_wrapper(Nullable<Function> cost) {
 void Fastcpd::create_cost_gradient_wrapper(Nullable<Function> cost_gradient) {
   if (contain(FASTCPD_FAMILIES, family)) {
     cost_gradient_wrapper = std::bind(  // # nocov start
-      &Fastcpd::cost_update_gradient,  // # nocov end
+      get_gradient,  // # nocov end
       this,
       std::placeholders::_1,
       std::placeholders::_2,
@@ -53,7 +53,7 @@ void Fastcpd::create_cost_gradient_wrapper(Nullable<Function> cost_gradient) {
 void Fastcpd::create_cost_hessian_wrapper(Nullable<Function> cost_hessian) {
   if (contain(FASTCPD_FAMILIES, family)) {
     cost_hessian_wrapper = std::bind(  // # nocov start
-      &Fastcpd::cost_update_hessian,  // # nocov end
+      get_hessian,  // # nocov end
       this,
       std::placeholders::_1,
       std::placeholders::_2,
@@ -335,103 +335,6 @@ double Fastcpd::get_cval_sen(
   return cval;
 }
 
-mat Fastcpd::get_hessian_arma(
-  const unsigned int segment_start,
-  const unsigned int segment_end,
-  const colvec& theta
-) {
-  const mat data_segment = data.rows(segment_start, segment_end);
-  const unsigned int segment_length = segment_end - segment_start + 1;
-  // TODO(doccstat): Maybe we can store all these computations
-  mat reversed_data = reverse(data_segment, 0);
-  colvec reversed_theta = reverse(theta);
-  if (segment_length < max(order) + 1) {
-    return eye(theta.n_elem, theta.n_elem);
-  }
-  colvec variance_term = zeros(segment_length);
-  for (unsigned int i = max(order); i < segment_length; i++) {
-    variance_term(i) = data_segment(i, 0) - dot(
-        reversed_theta.rows(order(1) + 1, sum(order)),
-        data_segment.rows(i - order(0), i - 1)
-      ) - dot(
-        reversed_theta.rows(1, order(1)),
-        variance_term.rows(i - order(1), i - 1)
-      );
-  }
-  colvec reversed_variance_term = reverse(variance_term);
-  mat phi_coefficient = zeros(segment_length, order(0)),
-      psi_coefficient = zeros(segment_length, order(1));
-  for (unsigned int i = max(order); i < segment_length; i++) {
-    phi_coefficient.row(i) = -reversed_data.rows(
-      segment_length - i, segment_length - i + order(0) - 1
-    ).t() - reversed_theta.rows(1, order(1)).t() *
-    phi_coefficient.rows(i - order(1), i - 1);
-  }
-  for (unsigned int i = order(1); i < segment_length; i++) {
-    psi_coefficient.row(i) = -reversed_variance_term.rows(
-        segment_length - i, segment_length - i + order(1) - 1
-      ).t() - reversed_theta.rows(1, order(1)).t() *
-      psi_coefficient.rows(i - order(1), i - 1);
-  }
-  mat reversed_coef_phi = reverse(phi_coefficient, 0),
-      reversed_coef_psi = reverse(psi_coefficient, 0);
-  cube phi_psi_coefficient = zeros(order(1), order(0), segment_length),
-        psi_psi_coefficient = zeros(order(1), order(1), segment_length);
-  for (unsigned int i = order(1); i < segment_length; i++) {
-    mat phi_psi_coefficient_part = zeros(order(1), order(0)),
-        psi_psi_coefficient_part = zeros(order(1), order(1));
-    for (unsigned int j = 1; j <= order(1); j++) {
-      phi_psi_coefficient_part +=
-        phi_psi_coefficient.slice(i - j) * theta(order(0) - 1 + j);
-    }
-    phi_psi_coefficient.slice(i) = -reversed_coef_phi.rows(
-      segment_length - i, segment_length - i + order(1) - 1
-    ) - phi_psi_coefficient_part;
-    for (unsigned int j = 1; j <= order(1); j++) {
-      psi_psi_coefficient_part +=
-        psi_psi_coefficient.slice(i - j) * theta(order(0) - 1 + j);
-    }
-    psi_psi_coefficient.slice(i) = -reversed_coef_psi.rows(
-        segment_length - i, segment_length - i + order(1) - 1
-      ) - reversed_coef_psi.rows(
-        segment_length - i, segment_length - i + order(1) - 1
-      ).t() - psi_psi_coefficient_part;
-  }
-  mat hessian = zeros(sum(order) + 1, sum(order) + 1);
-  hessian.submat(0, 0, order(0) - 1, order(0) - 1) =
-    phi_coefficient.row(segment_length - 1).t() *
-    phi_coefficient.row(segment_length - 1) / theta(sum(order));
-  hessian.submat(0, order(0), order(0) - 1, sum(order) - 1) = (
-    phi_psi_coefficient.slice(segment_length - 1).t() *
-      variance_term(segment_length - 1) +
-      phi_coefficient.row(segment_length - 1).t() *
-      psi_coefficient.row(segment_length - 1)
-  ) / theta(sum(order));
-  hessian.submat(order(0), 0, sum(order) - 1, order(0) - 1) =
-    hessian.submat(0, order(0), order(0) - 1, sum(order) - 1).t();
-  hessian.submat(0, sum(order), order(0) - 1, sum(order)) =
-    -phi_coefficient.row(segment_length - 1).t() *
-    variance_term(segment_length - 1) / theta(sum(order)) / theta(sum(order));
-  hessian.submat(sum(order), 0, sum(order), order(0) - 1) =
-    hessian.submat(0, sum(order), order(0) - 1, sum(order)).t();
-  hessian.submat(order(0), order(0), sum(order) - 1, sum(order) - 1) = (
-    psi_coefficient.row(segment_length - 1).t() *
-    psi_coefficient.row(segment_length - 1) +
-    psi_psi_coefficient.slice(segment_length - 1) *
-    variance_term(segment_length - 1)
-  ) / theta(sum(order));
-  hessian.submat(order(0), sum(order), sum(order) - 1, sum(order)) =
-    -psi_coefficient.row(segment_length - 1).t() *
-    variance_term(segment_length - 1) / theta(sum(order)) / theta(sum(order));
-  hessian.submat(sum(order), order(0), sum(order), sum(order) - 1) =
-    hessian.submat(order(0), sum(order), sum(order) - 1, sum(order)).t();
-  hessian(sum(order), sum(order)) =
-    std::pow(variance_term(segment_length - 1), 2) /
-    std::pow(theta(sum(order)), 3) -
-    1.0 / 2.0 / std::pow(theta(sum(order)), 2);
-  return hessian;
-}
-
 CostResult Fastcpd::get_optimized_cost(
   const unsigned int segment_start,
   const unsigned int segment_end
@@ -525,10 +428,10 @@ void Fastcpd::update_cost_parameters_step(
     );
     gradient = cost_gradient_result;
   } else {
-    hessian_i += cost_update_hessian(
+    hessian_i += (this->*get_hessian)(
       segment_start + data_start, segment_start + data_end, theta_hat.col(i)
     );
-    gradient = cost_update_gradient(
+    gradient = (this->*get_gradient)(
       segment_start + data_start, segment_start + data_end, theta_hat.col(i)
     );
   }
@@ -691,7 +594,7 @@ void Fastcpd::update_fastcpd_parameters(const unsigned int t) {
     const rowvec x = data.row(t - 1).tail(p);
     hessian_new = x.t() * x + epsilon * eye<mat>(p, p);
   } else if (family == "arma") {
-    hessian_new = cost_update_hessian(0, t - 1, coef_add.t());
+    hessian_new = (this->*get_hessian)(0, t - 1, coef_add.t());
   } else if (!contain(FASTCPD_FAMILIES, family)) {
     hessian_new = zeros<mat>(p, p);
   }

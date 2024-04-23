@@ -93,32 +93,6 @@ class Fastcpd {
     const bool warm_start
   );
 
-  // Function to calculate the gradient at the current data.
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param theta Estimated theta from the previous iteration.
-  // @param family Family of the model.
-  // @param order Order of the time series models.
-  //
-  // @return Gradient at the current data.
-  colvec cost_update_gradient(
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  );
-
-  // Function to calculate the Hessian matrix at the current data.
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param theta Estimated theta from the previous iteration.
-  //
-  // @return Hessian at the current data.
-  mat cost_update_hessian(
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  );
-
   // Set \code{theta_sum} for a specific column.
   void create_theta_sum(const unsigned int col, colvec new_theta_sum);
 
@@ -144,6 +118,32 @@ class Fastcpd {
 
   // Update \code{theta_sum} for a specific column by adding to that column.
   void update_theta_sum(const unsigned int col, colvec new_theta_sum);
+
+  // Function to calculate the gradient at the current data.
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param theta Estimated theta from the previous iteration.
+  // @param family Family of the model.
+  // @param order Order of the time series models.
+  //
+  // @return Gradient at the current data.
+  colvec (Fastcpd::*get_gradient)(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  // Function to calculate the Hessian matrix at the current data.
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param theta Estimated theta from the previous iteration.
+  //
+  // @return Hessian at the current data.
+  mat (Fastcpd::*get_hessian)(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
 
  private:
   // `act_num` is used in Lasso and Gaussian families only.
@@ -339,7 +339,61 @@ class Fastcpd {
     const double lambda
   );
 
+  colvec get_gradient_arma(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  colvec get_gradient_binomial(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  colvec get_gradient_lm(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  colvec get_gradient_ma(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  colvec get_gradient_poisson(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
   mat get_hessian_arma(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  mat get_hessian_binomial(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  mat get_hessian_lm(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  mat get_hessian_ma(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  mat get_hessian_poisson(
     const unsigned int segment_start,
     const unsigned int segment_end,
     const colvec& theta
