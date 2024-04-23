@@ -71,180 +71,39 @@ Fastcpd::Fastcpd(
     "[:bar] :current/:total in :elapsed", data_n_rows
   );
 
+  if (family.compare("binomial") == 0) {
+    get_gradient = &Fastcpd::get_gradient_binomial;
+  } else if (family.compare("poisson") == 0) {
+    get_gradient = &Fastcpd::get_gradient_poisson;
+  } else if (family == "lasso" || family == "gaussian") {
+    get_gradient = &Fastcpd::get_gradient_lm;
+  } else if (family == "arma" && order(0) == 0) {
+    get_gradient = &Fastcpd::get_gradient_ma;
+  } else if (family == "arma" && order(0) > 0) {
+    get_gradient = &Fastcpd::get_gradient_arma;
+  } else {
+    ERROR("Invalid family.");
+  }
+
+  if (family.compare("binomial") == 0) {
+    get_hessian = &Fastcpd::get_hessian_binomial;
+  } else if (family.compare("poisson") == 0) {
+    get_hessian = &Fastcpd::get_hessian_poisson;
+  } else if (family == "lasso" || family == "gaussian") {
+    get_hessian = &Fastcpd::get_hessian_lm;
+  } else if (family == "arma" && order(0) == 0) {
+    get_hessian = &Fastcpd::get_hessian_ma;
+  } else if (family == "arma" && order(0) > 0) {
+    get_hessian = &Fastcpd::get_hessian_arma;
+  } else {
+    ERROR("Invalid family.");
+  }
+
   create_cost_function_wrapper(cost);
   create_cost_gradient_wrapper(cost_gradient);
   create_cost_hessian_wrapper(cost_hessian);
 
   // TODO(doccstat): Store environment functions from R.
-}
-
-colvec Fastcpd::cost_update_gradient(
-  const unsigned int segment_start,
-  const unsigned int segment_end,
-  const colvec& theta
-) {
-  const unsigned int segment_length = segment_end - segment_start + 1;
-  const mat data_segment = data.rows(segment_start, segment_end);
-  rowvec new_data = data_segment.row(segment_length - 1);
-  rowvec x = new_data.tail(new_data.n_elem - 1);
-  double y = new_data(0);
-  colvec gradient;
-  if (family.compare("binomial") == 0) {
-    gradient = - (y - 1 / (1 + exp(-as_scalar(x * theta)))) * x.t();
-  } else if (family.compare("poisson") == 0) {
-    gradient = - (y - exp(as_scalar(x * theta))) * x.t();
-  } else if (family == "lasso" || family == "gaussian") {
-    gradient = - (y - as_scalar(x * theta)) * x.t();
-  } else if (family == "arma" && order(0) == 0) {
-    const unsigned int q = order(1);
-    mat reversed_data = reverse(data_segment, 0);
-    colvec reversed_theta = reverse(theta);
-    if (segment_length < q + 1) {
-      return ones(theta.n_elem);
-    }
-    colvec variance_term = zeros(segment_length);
-    for (unsigned int i = q; i < segment_length; i++) {
-      variance_term(i) = data_segment(i, 0) -
-        dot(reversed_theta.rows(1, q), variance_term.rows(i - q, i - 1));
-    }
-    colvec reversed_variance_term = reverse(variance_term);
-    mat psi_coefficient = zeros(segment_length, q);
-    for (unsigned int i = q; i < segment_length; i++) {
-      psi_coefficient.row(i) = -reversed_variance_term.rows(
-          segment_length - i, segment_length - i + q - 1
-        ).t() - reversed_theta.rows(1, q).t() *
-        psi_coefficient.rows(i - q, i - 1);
-    }
-    gradient = zeros(q + 1);
-    gradient.rows(0, q - 1) =
-      psi_coefficient.row(segment_length - 1).t() *
-      variance_term(segment_length - 1) / theta(q);
-    gradient(q) = 1.0 / 2.0 / theta(q) -
-      std::pow(variance_term(segment_length - 1), 2) / 2.0 /
-      std::pow(theta(q), 2);
-  } else if (family == "arma" && order(0) > 0) {
-    mat reversed_data = reverse(data_segment, 0);
-    colvec reversed_theta = reverse(theta);
-    if (segment_length < max(order) + 1) {
-      return ones(theta.n_elem);
-    }
-    colvec variance_term = zeros(segment_length);
-    for (unsigned int i = max(order); i < segment_length; i++) {
-      variance_term(i) = data_segment(i, 0) - dot(
-          reversed_theta.rows(order(1) + 1, sum(order)),
-          data_segment.rows(i - order(0), i - 1)
-        ) - dot(
-          reversed_theta.rows(1, order(1)),
-          variance_term.rows(i - order(1), i - 1)
-        );
-    }
-    colvec reversed_variance_term = reverse(variance_term);
-    mat phi_coefficient = zeros(segment_length, order(0)),
-        psi_coefficient = zeros(segment_length, order(1));
-    for (unsigned int i = max(order); i < segment_length; i++) {
-      phi_coefficient.row(i) = -reversed_data.rows(
-        segment_length - i, segment_length - i + order(0) - 1
-      ).t() - reversed_theta.rows(1, order(1)).t() *
-      phi_coefficient.rows(i - order(1), i - 1);
-    }
-    for (unsigned int i = order(1); i < segment_length; i++) {
-      psi_coefficient.row(i) = -reversed_variance_term.rows(
-          segment_length - i, segment_length - i + order(1) - 1
-        ).t() - reversed_theta.rows(1, order(1)).t() *
-        psi_coefficient.rows(i - order(1), i - 1);
-    }
-    gradient = zeros(sum(order) + 1);
-    gradient.rows(0, order(0) - 1) =
-      phi_coefficient.row(segment_length - 1).t() *
-      variance_term(segment_length - 1) / theta(sum(order));
-    gradient.rows(order(0), sum(order) - 1) =
-      psi_coefficient.row(segment_length - 1).t() *
-      variance_term(segment_length - 1) / theta(sum(order));
-    gradient(sum(order)) = 1.0 / 2.0 / theta(sum(order)) -
-      std::pow(variance_term(segment_length - 1), 2) / 2.0 /
-      std::pow(theta(sum(order)), 2);
-  } else {
-    // # nocov start
-    stop("This branch should not be reached at functions.cc: 188.");
-    // # nocov end
-  }
-  return gradient;
-}
-
-mat Fastcpd::cost_update_hessian(
-  const unsigned int segment_start,
-  const unsigned int segment_end,
-  const colvec& theta
-) {
-  const mat data_segment = data.rows(segment_start, segment_end);
-  const unsigned int segment_length = segment_end - segment_start + 1;
-  rowvec new_data = data_segment.row(segment_length - 1);
-  rowvec x = new_data.tail(new_data.n_elem - 1);
-  mat hessian;
-  if (family.compare("binomial") == 0) {
-    double prob = 1 / (1 + exp(-as_scalar(x * theta)));
-    hessian = (x.t() * x) * as_scalar((1 - prob) * prob);
-  } else if (family.compare("poisson") == 0) {
-    double prob = exp(as_scalar(x * theta));
-    // Prevent numerical issues if `prob` is too large.
-    hessian = (x.t() * x) * std::min(as_scalar(prob), 1e10);
-  } else if (family == "lasso" || family == "gaussian") {
-    hessian = x.t() * x;
-  } else if (family == "arma" && order(0) == 0) {
-    const unsigned int q = order(1);
-    // TODO(doccstat): Maybe we can store all these computations
-    mat reversed_data = reverse(data_segment, 0);
-    colvec reversed_theta = reverse(theta);
-    if (segment_length < q + 1) {
-      return eye(theta.n_elem, theta.n_elem);
-    }
-    colvec variance_term = zeros(segment_length);
-    for (unsigned int i = q; i < segment_length; i++) {
-      variance_term(i) = data_segment(i, 0) - dot(
-        reversed_theta.rows(1, q), variance_term.rows(i - q, i - 1)
-      );
-    }
-    colvec reversed_variance_term = reverse(variance_term);
-    mat psi_coefficient = zeros(segment_length, q);
-    for (unsigned int i = q; i < segment_length; i++) {
-      psi_coefficient.row(i) = -reversed_variance_term.rows(
-          segment_length - i, segment_length - i + q - 1
-        ).t() - reversed_theta.rows(1, q).t() *
-        psi_coefficient.rows(i - q, i - 1);
-    }
-    mat reversed_coef_psi = reverse(psi_coefficient, 0);
-    cube psi_psi_coefficient = zeros(q, q, segment_length);
-    for (unsigned int i = q; i < segment_length; i++) {
-      mat psi_psi_coefficient_part = zeros(q, q);
-      for (unsigned int j = 1; j <= q; j++) {
-        psi_psi_coefficient_part +=
-          psi_psi_coefficient.slice(i - j) * theta(j - 1);
-      }
-      psi_psi_coefficient.slice(i) = -reversed_coef_psi.rows(
-          segment_length - i, segment_length - i + q - 1
-        ) - reversed_coef_psi.rows(
-          segment_length - i, segment_length - i + q - 1
-        ).t() - psi_psi_coefficient_part;
-    }
-    hessian = zeros(q + 1, q + 1);
-    hessian.submat(0, 0, q - 1, q - 1) = (
-      psi_coefficient.row(segment_length - 1).t() *
-      psi_coefficient.row(segment_length - 1) +
-      psi_psi_coefficient.slice(segment_length - 1) *
-      variance_term(segment_length - 1)
-    ) / theta(q);
-    hessian.submat(0, q, q - 1, q) =
-      -psi_coefficient.row(segment_length - 1).t() *
-      variance_term(segment_length - 1) / theta(q) / theta(q);
-    hessian.submat(q, 0, q, q - 1) = hessian.submat(0, q, q - 1, q).t();
-    hessian(q, q) =
-      std::pow(variance_term(segment_length - 1), 2) /
-      std::pow(theta(q), 3) -
-      1.0 / 2.0 / std::pow(theta(q), 2);
-  } else if (family == "arma" && order(0) > 0) {
-    return get_hessian_arma(segment_start, segment_end, theta);
-  }
-  return hessian;
 }
 
 void Fastcpd::create_theta_sum(
