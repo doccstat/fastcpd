@@ -1,6 +1,9 @@
-#include "fastcpd_classes.h"
+#include "fastcpd_class.h"
+#include "fastcpd_test.h"
 
-namespace fastcpd::classes {
+using ::fastcpd::classes::Fastcpd;
+
+namespace fastcpd::test {
 
 colvec FastcpdTest::get_gradient_arma(
   const mat& data,
@@ -267,4 +270,4 @@ mat FastcpdTest::update_theta_sum(
   return fastcpd_class.theta_sum;
 }
 
-}  // namespace fastcpd::classes
+}  // namespace fastcpd::test
