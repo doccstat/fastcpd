@@ -1,13 +1,13 @@
-#include "fastcpd_classes.h"
+#include "fastcpd_test.h"
 #include "fastcpd_test_constants.h"
 #include "testthat.h"
 
-using ::fastcpd::classes::FastcpdTest;
+using ::fastcpd::classes::CostResult;
+using ::fastcpd::test::FastcpdTest;
 
 context("get_nll_wo_theta Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
-    const fastcpd::classes::CostResult cost_result =
-    FastcpdTest::get_nll_wo_theta(
+    const CostResult cost_result = FastcpdTest::get_nll_wo_theta(
       colvec(kARMA32.data(), kARMA32.size()), 0, 199, 0, false, R_NilValue
     );
     const colvec par = cost_result.par;
@@ -91,6 +91,8 @@ context("update_theta_sum Unit Test") {
     expect_true(theta_sum.n_cols == 1);
     colvec theta_sum_col = theta_sum.col(0);
     colvec expected_theta_sum = {5, 7, 9};
-    expect_true(approx_equal(theta_sum_col, expected_theta_sum, "absdiff", 1e-6));
+    expect_true(
+      approx_equal(theta_sum_col, expected_theta_sum, "absdiff", 1e-6)
+    );
   }
 }

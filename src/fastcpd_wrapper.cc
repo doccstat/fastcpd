@@ -1,4 +1,4 @@
-#include "fastcpd_classes.h"
+#include "fastcpd_wrapper.h"
 
 namespace fastcpd::classes {
 

@@ -1,4 +1,4 @@
-#include "fastcpd_classes.h"
+#include "fastcpd_class.h"
 #include "fastcpd_constants.h"
 #include "RProgress.h"
 

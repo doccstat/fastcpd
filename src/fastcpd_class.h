@@ -1,120 +1,17 @@
-#ifndef FASTCPD_CLASSES_H_
-#define FASTCPD_CLASSES_H_
+#ifndef FASTCPD_CLASS_H_
+#define FASTCPD_CLASS_H_
 
 #include <memory>
 
+#include "fastcpd_test.h"
 #include "fastcpd_types.h"
+#include "fastcpd_wrapper.h"
 #include "RcppClock.h"
 #include "RProgress.h"
 
+using ::fastcpd::test::FastcpdTest;
+
 namespace fastcpd::classes {
-
-struct ColMat {
-  mat data;
-
-  operator colvec() const;
-  operator mat() const;
-  operator rowvec() const;
-};
-
-struct CostResult {
-  ColMat par;
-  ColMat residuals;
-  double value;
-};
-
-struct CostFunction {
-  const Function cost;
-  const mat& data;
-
-  CostFunction(const Function& cost, const mat& data);
-  CostResult operator() (
-      const unsigned int segment_start,
-      const unsigned int segment_end,
-      const Nullable<colvec>& theta,
-      const double lambda,  // UNUSED
-      const bool cv,  // UNUSED
-      const Nullable<colvec>& start  // UNUSED
-  ) const;
-};
-
-struct CostGradient {
-  const Function cost_gradient;
-  const mat& data;
-
-  CostGradient(const Function& cost_gradient, const mat& data);
-  const colvec operator() (
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  ) const;
-};
-
-struct CostHessian {
-  const Function cost_hessian;
-  const mat& data;
-
-  CostHessian(const Function& cost_hessian, const mat& data);
-  const mat operator() (
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  ) const;
-};
-
-class FastcpdTest {
- public:
-  static colvec get_gradient_arma(
-    const mat& data,
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  );
-
-  static mat get_hessian_arma(
-    const mat& data,
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  );
-
-  static mat get_hessian_binomial(
-    const mat& data,
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  );
-
-  static mat get_hessian_poisson(
-    const mat& data,
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  );
-
-  static double get_nll_wo_cv(
-    const mat& data,
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    colvec theta,
-    double lambda
-  );
-
-  static CostResult get_nll_wo_theta(
-    const mat& data,
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    double lambda,
-    bool cv,
-    Nullable<colvec> start
-  );
-
-  static mat update_theta_sum(
-    const unsigned int col,
-    colvec old_theta_sum,
-    colvec new_theta_sum
-  );
-};
 
 class Fastcpd {
  public:
@@ -605,4 +502,4 @@ class Fastcpd {
 
 }  // namespace fastcpd::classes
 
-#endif  // FASTCPD_CLASSES_H_
+#endif  // FASTCPD_CLASS_H_
