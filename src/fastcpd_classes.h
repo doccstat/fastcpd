@@ -62,6 +62,60 @@ struct CostHessian {
   ) const;
 };
 
+class FastcpdTest {
+ public:
+  static colvec get_gradient_arma(
+    const mat& data,
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  static mat get_hessian_arma(
+    const mat& data,
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  static mat get_hessian_binomial(
+    const mat& data,
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  static mat get_hessian_poisson(
+    const mat& data,
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  static double get_nll_wo_cv(
+    const mat& data,
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    colvec theta,
+    double lambda
+  );
+
+  static CostResult get_nll_wo_theta(
+    const mat& data,
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    double lambda,
+    bool cv,
+    Nullable<colvec> start
+  );
+
+  static mat update_theta_sum(
+    const unsigned int col,
+    colvec old_theta_sum,
+    colvec new_theta_sum
+  );
+};
+
 class Fastcpd {
  public:
   Fastcpd(
@@ -93,57 +147,7 @@ class Fastcpd {
     const bool warm_start
   );
 
-  // Set \code{theta_sum} for a specific column.
-  void create_theta_sum(const unsigned int col, colvec new_theta_sum);
-
-  // Get the value of \code{theta_sum}.
-  mat get_theta_sum();
-
-  CostResult get_nll_wo_theta(
-      const unsigned int segment_start,
-      const unsigned int segment_end,
-      double lambda,
-      bool cv,
-      Nullable<colvec> start
-  );
-
-  double get_nll_wo_cv(
-      const unsigned int segment_start,
-      const unsigned int segment_end,
-      colvec theta,
-      double lambda
-  );
-
   List run();
-
-  // Update \code{theta_sum} for a specific column by adding to that column.
-  void update_theta_sum(const unsigned int col, colvec new_theta_sum);
-
-  // Function to calculate the gradient at the current data.
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param theta Estimated theta from the previous iteration.
-  // @param family Family of the model.
-  // @param order Order of the time series models.
-  //
-  // @return Gradient at the current data.
-  colvec (Fastcpd::*get_gradient)(
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  );
-
-  // Function to calculate the Hessian matrix at the current data.
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param theta Estimated theta from the previous iteration.
-  //
-  // @return Hessian at the current data.
-  mat (Fastcpd::*get_hessian)(
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  );
 
  private:
   // `act_num` is used in Lasso and Gaussian families only.
@@ -292,6 +296,9 @@ class Fastcpd {
   // Initialize theta_hat_t_t to be the estimate in the segment.
   void create_segment_statistics();
 
+  // Set \code{theta_sum} for a specific column.
+  void create_theta_sum(const unsigned int col, colvec new_theta_sum);
+
   double get_cost_adjustment_value(const unsigned nrows);
 
   // Solve logistic/poisson regression using Gradient Descent Extension to the
@@ -339,6 +346,20 @@ class Fastcpd {
     const double lambda
   );
 
+  // Function to calculate the gradient at the current data.
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param theta Estimated theta from the previous iteration.
+  // @param family Family of the model.
+  // @param order Order of the time series models.
+  //
+  // @return Gradient at the current data.
+  colvec (Fastcpd::*get_gradient)(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
   colvec get_gradient_arma(
     const unsigned int segment_start,
     const unsigned int segment_end,
@@ -364,6 +385,18 @@ class Fastcpd {
   );
 
   colvec get_gradient_poisson(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  // Function to calculate the Hessian matrix at the current data.
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param theta Estimated theta from the previous iteration.
+  //
+  // @return Hessian at the current data.
+  mat (Fastcpd::*get_hessian)(
     const unsigned int segment_start,
     const unsigned int segment_end,
     const colvec& theta
@@ -441,6 +474,21 @@ class Fastcpd {
     const unsigned int segment_end
   );
 
+  double get_nll_wo_cv(
+      const unsigned int segment_start,
+      const unsigned int segment_end,
+      colvec theta,
+      double lambda
+  );
+
+  CostResult get_nll_wo_theta(
+      const unsigned int segment_start,
+      const unsigned int segment_end,
+      double lambda,
+      bool cv,
+      Nullable<colvec> start
+  );
+
   // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   //
   // @param data_segment A data frame containing a segment of the data.
@@ -451,6 +499,9 @@ class Fastcpd {
     const unsigned int segment_start,
     const unsigned int segment_end
   );
+
+  // Get the value of \code{theta_sum}.
+  mat get_theta_sum();
 
   void update_cost_parameters(
       const unsigned int t,
@@ -545,6 +596,11 @@ class Fastcpd {
 
   // Prune the columns of \code{theta_sum}.
   void update_theta_sum(ucolvec pruned_left);
+
+  // Update \code{theta_sum} for a specific column by adding to that column.
+  void update_theta_sum(const unsigned int col, colvec new_theta_sum);
+
+  friend FastcpdTest;
 };
 
 }  // namespace fastcpd::classes
