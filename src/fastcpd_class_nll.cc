@@ -1,5 +1,19 @@
 #include "fastcpd_class.h"
 
+using ::arma::as_scalar;
+using ::arma::eye;
+using ::arma::log_det_sympd;
+using ::arma::ones;
+using ::arma::reverse;
+using ::arma::trace;
+using ::arma::zeros;
+using ::Rcpp::as;
+using ::Rcpp::Named;
+
+using ::Rcpp::Environment;
+using ::Rcpp::NumericVector;
+using ::Rcpp::S4;
+
 namespace fastcpd::classes {
 
 colvec Fastcpd::get_gradient_arma(
@@ -362,7 +376,7 @@ CostResult Fastcpd::get_nll_pelt_arma(
   par.rows(0, sum(order) - 1) = as<colvec>(out["coef"]);
   par(sum(order)) = as<double>(out["sigma2"]);
 
-  return {{par}, {as<vec>(out["residuals"])}, -as<double>(out["loglik"])};
+  return {{par}, {as<colvec>(out["residuals"])}, -as<double>(out["loglik"])};
 }
 
 CostResult Fastcpd::get_nll_pelt_custom(
@@ -391,7 +405,7 @@ CostResult Fastcpd::get_nll_pelt_glm(
   const Nullable<colvec>& start
 ) {
   const mat data_segment = data.rows(segment_start, segment_end);
-  vec y = data_segment.col(0);
+  colvec y = data_segment.col(0);
   Environment fastglm = Environment::namespace_env("fastglm");
   Function fastglm_ = fastglm["fastglm"];
   List out;
@@ -403,8 +417,8 @@ CostResult Fastcpd::get_nll_pelt_glm(
     mat x = data_segment.cols(1, data_segment.n_cols - 1);
     out = fastglm_(x, y, family, Named("start") = start_);
   }
-  vec par = as<vec>(out["coefficients"]);
-  vec residuals = as<vec>(out["residuals"]);
+  colvec par = as<colvec>(out["coefficients"]);
+  colvec residuals = as<colvec>(out["residuals"]);
   double value = out["deviance"];
   return {{par}, {residuals}, value / 2};
 }
@@ -436,9 +450,9 @@ CostResult Fastcpd::get_nll_pelt_lasso(
       Named("type") = "coefficients",
       Named("exact") = false
     );
-    vec glmnet_i = as<vec>(out_coef.slot("i"));
-    vec glmnet_x = as<vec>(out_coef.slot("x"));
-    vec par = zeros(data_segment.n_cols - 1);
+    colvec glmnet_i = as<colvec>(out_coef.slot("i"));
+    colvec glmnet_x = as<colvec>(out_coef.slot("x"));
+    colvec par = zeros(data_segment.n_cols - 1);
     for (unsigned int i = 1; i < glmnet_i.n_elem; i++) {
       par(glmnet_i(i) - 1) = glmnet_x(i);
     }
@@ -454,19 +468,19 @@ CostResult Fastcpd::get_nll_pelt_lasso(
       Named("family") = "gaussian", Named("lambda") = lambda
     );
     S4 out_par = out["beta"];
-    vec par_i = as<vec>(out_par.slot("i"));
-    vec par_x = as<vec>(out_par.slot("x"));
-    vec par = zeros(data_segment.n_cols - 1);
+    colvec par_i = as<colvec>(out_par.slot("i"));
+    colvec par_x = as<colvec>(out_par.slot("x"));
+    colvec par = zeros(data_segment.n_cols - 1);
     for (unsigned int i = 0; i < par_i.n_elem; i++) {
       par(par_i(i)) = par_x(i);
     }
     double value = as<double>(deviance(out));
-    vec fitted_values = as<vec>(
+    colvec fitted_values = as<colvec>(
       predict_glmnet(
         out, data_segment.cols(1, data_segment.n_cols - 1), Named("s") = lambda
       )
     );
-    vec residuals = data_segment.col(0) - fitted_values;
+    colvec residuals = data_segment.col(0) - fitted_values;
     return {{par}, {residuals}, value / 2};
   }
 }
@@ -638,7 +652,7 @@ double Fastcpd::get_nll_sen_binomial(
   double lambda
 ) {
   mat data_segment = data.rows(segment_start, segment_end);
-  vec y = data_segment.col(0);
+  colvec y = data_segment.col(0);
   // Calculate negative log likelihood in binomial family
   mat x = data_segment.cols(1, data_segment.n_cols - 1);
   colvec u = x * theta;
@@ -663,7 +677,7 @@ double Fastcpd::get_nll_sen_lm(
   double lambda
 ) {
   mat data_segment = data.rows(segment_start, segment_end);
-  vec y = data_segment.col(0);
+  colvec y = data_segment.col(0);
   // Calculate negative log likelihood in gaussian family
   double penalty = lambda * accu(abs(theta));
   mat x = data_segment.cols(1, data_segment.n_cols - 1);
@@ -700,7 +714,7 @@ double Fastcpd::get_nll_sen_poisson(
   double lambda
 ) {
   mat data_segment = data.rows(segment_start, segment_end);
-  vec y = data_segment.col(0);
+  colvec y = data_segment.col(0);
   mat x = data_segment.cols(1, data_segment.n_cols - 1);
   colvec u = x * theta;
   colvec y_factorial(y.n_elem);

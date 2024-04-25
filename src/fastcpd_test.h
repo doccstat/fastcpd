@@ -1,10 +1,10 @@
 #ifndef FASTCPD_TEST_H_
 #define FASTCPD_TEST_H_
 
-#include "fastcpd_types.h"
 #include "fastcpd_wrapper.h"
 
 using ::fastcpd::classes::CostResult;
+using ::Rcpp::Nullable;
 
 namespace fastcpd::test {
 

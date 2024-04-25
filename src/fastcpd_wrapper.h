@@ -1,7 +1,11 @@
 #ifndef FASTCPD_WRAPPER_H_
 #define FASTCPD_WRAPPER_H_
 
-#include "fastcpd_types.h"
+#include "RcppArmadillo.h"
+
+using ::arma::colvec;
+using ::arma::mat;
+using ::arma::rowvec;
 
 namespace fastcpd::classes {
 
