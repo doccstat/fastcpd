@@ -35,10 +35,7 @@ Fastcpd::Fastcpd(
     const bool warm_start
 ) : act_num(colvec(segment_count)),
     beta(beta),
-    cost(cost),
     cost_adjustment(cost_adjustment),
-    cost_gradient(cost_gradient),
-    cost_hessian(cost_hessian),
     cp_only(cp_only),
     d(d),
     data(data),
@@ -48,7 +45,6 @@ Fastcpd::Fastcpd(
     err_sd(colvec(segment_count)),
     family(family),
     hessian(cube(p, p, 1)),
-    k(k),
     line_search(line_search),
     lower(lower),
     momentum(vec(p)),
@@ -74,6 +70,10 @@ Fastcpd::Fastcpd(
   rProgress = std::make_unique<RProgress::RProgress>(
     "[:bar] :current/:total in :elapsed", data_n_rows
   );
+
+  if (k.isNotNull()) {
+    this->k = std::make_unique<Function>(k);
+  }
 
   if (family == "arma" && order(0) > 0) {
     get_gradient = &Fastcpd::get_gradient_arma;
@@ -114,6 +114,11 @@ Fastcpd::Fastcpd(
   } else if (family == "variance") {
     get_nll_pelt = &Fastcpd::get_nll_pelt_variance;
   } else {
+    this->cost = std::make_unique<Function>(cost);
+    if (cost_gradient.isNotNull() || cost_hessian.isNotNull()) {
+      this->cost_gradient = std::make_unique<Function>(cost_gradient);
+      this->cost_hessian = std::make_unique<Function>(cost_hessian);
+    }
     get_gradient = &Fastcpd::get_gradient_custom;
     get_hessian = &Fastcpd::get_hessian_custom;
     get_nll_sen = &Fastcpd::get_nll_sen_custom;
@@ -438,7 +443,7 @@ double Fastcpd::get_cval_sen(
   const unsigned int segment_length = segment_end - segment_start + 1;
   double cval = 0;
   update_cost_parameters(
-    segment_end + 1, segment_start, i, k.get(), lambda, line_search
+    segment_end + 1, segment_start, i, lambda, line_search
   );
   colvec theta = theta_sum.col(i) / segment_length;
   if (family == "custom") {
@@ -461,19 +466,18 @@ CostResult Fastcpd::get_optimized_cost(
   const unsigned int segment_start,
   const unsigned int segment_end
 ) {
-  Function cost_ = cost.get();
   CostResult cost_result;
   const mat data_segment = data.rows(segment_start, segment_end);
-  if (cost_gradient.isNull() && cost_hessian.isNull()) {
-    cost_result = {{colvec()}, {colvec()}, as<double>(cost_(data_segment))};
+  if (!(cost_gradient || cost_hessian)) {
+    cost_result = {{colvec()}, {colvec()}, as<double>((*cost)(data_segment))};
   } else if (p == 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result = optim(
       Named("par") = 0,
       Named("fn") = InternalFunction(
-        +[](double theta, mat data, Function cost_) {
-          return cost_(
+        +[](double theta, mat data, Function cost) {
+          return cost(
             Named("data") = data,
             Named("theta") = std::log(theta / (1 - theta))
           );
@@ -483,7 +487,7 @@ CostResult Fastcpd::get_optimized_cost(
       Named("lower") = 0,
       Named("upper") = 1,
       Named("data") = data_segment,
-      Named("cost") = cost_
+      Named("cost") = *cost
     );
     colvec par = as<colvec>(optim_result["par"]);
     double value = as<double>(optim_result["value"]);
@@ -494,7 +498,7 @@ CostResult Fastcpd::get_optimized_cost(
     Function optim = stats["optim"];
     List optim_result = optim(
       Named("par") = zeros<vec>(p),
-      Named("fn") = cost_,
+      Named("fn") = *cost,
       Named("method") = "L-BFGS-B",
       Named("data") = data_segment,
       Named("lower") = lower,
@@ -514,12 +518,11 @@ void Fastcpd::update_cost_parameters(
   const unsigned int t,
   const unsigned int tau,
   const unsigned int i,
-  Function k,
   const double lambda,
   const colvec& line_search
 ) {
   List cost_update_result = update_cost_parameters_steps(
-    0, t - 1, tau, i, k, momentum, lambda, line_search
+    0, t - 1, tau, i, momentum, lambda, line_search
   );
   update_theta_hat(i, as<colvec>(cost_update_result[0]));
   create_theta_sum(i, as<colvec>(cost_update_result[1]));
@@ -597,7 +600,6 @@ List Fastcpd::update_cost_parameters_steps(
     const unsigned int segment_end,
     const int tau,
     const int i,
-    Function k,
     colvec momentum,
     const double lambda,
     const colvec& line_search
@@ -614,7 +616,7 @@ List Fastcpd::update_cost_parameters_steps(
 
   const unsigned int segment_length = segment_end - segment_start + 1;
 
-  for (int kk = 1; kk <= as<int>(k(segment_length - tau)); kk++) {
+  for (int kk = 1; kk <= as<int>((*k)(segment_length - tau)); kk++) {
     for (unsigned j = tau + 1; j <= segment_length; j++) {
       update_cost_parameters_step(
         segment_start, segment_end, i, tau, j - 1, lambda, line_search
