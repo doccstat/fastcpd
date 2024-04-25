@@ -70,9 +70,8 @@ colvec Fastcpd::get_gradient_custom(
   const unsigned int segment_end,
   const colvec& theta
 ) {
-  Function cost_gradient_ = cost_gradient.get();
   return as<colvec>(
-    cost_gradient_(data.rows(segment_start, segment_end), theta)
+    (*cost_gradient)(data.rows(segment_start, segment_end), theta)
   );
 }
 
@@ -253,9 +252,8 @@ mat Fastcpd::get_hessian_custom(
   const unsigned int segment_end,
   const colvec& theta
 ) {
-  Function cost_hessian_ = cost_hessian.get();
   return as<mat>(
-    cost_hessian_(data.rows(segment_start, segment_end), theta)
+    (*cost_hessian)(data.rows(segment_start, segment_end), theta)
   );
 }
 
@@ -374,15 +372,14 @@ CostResult Fastcpd::get_nll_pelt_custom(
   const bool cv,
   const Nullable<colvec>& start
 ) {
-  if (cost_gradient.isNull() || cost_hessian.isNull()) {
-    Function cost_ = cost.get();
+  if (cost_gradient || cost_hessian) {
+    return get_optimized_cost(segment_start, segment_end);
+  } else {
     return {
       {colvec()},
       {colvec()},
-      as<double>(cost_(data.rows(segment_start, segment_end)))
+      as<double>((*cost)(data.rows(segment_start, segment_end)))
     };
-  } else {
-    return get_optimized_cost(segment_start, segment_end);
   }
 }
 
@@ -654,9 +651,8 @@ double Fastcpd::get_nll_sen_custom(
   colvec theta,
   double lambda
 ) {
-  Function cost_ = cost.get();
   return as<double>(
-    cost_(data.rows(segment_start, segment_end), theta)
+    (*cost)(data.rows(segment_start, segment_end), theta)
   );
 }
 

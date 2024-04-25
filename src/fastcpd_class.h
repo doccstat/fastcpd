@@ -54,16 +54,16 @@ class Fastcpd {
   double beta;
 
   // `cost` is the cost function to be used.
-  Nullable<Function> cost;
+  std::unique_ptr<Function> cost;
 
   // Adjustment to the cost function.
   const string cost_adjustment;
 
   // `cost_gradient` is the gradient of the cost function to be used.
-  Nullable<Function> cost_gradient;
+  std::unique_ptr<Function> cost_gradient;
 
   // `cost_hessian` is the Hessian of the cost function to be used.
-  Nullable<Function> cost_hessian;
+  std::unique_ptr<Function> cost_hessian;
 
   const bool cp_only;
 
@@ -133,7 +133,7 @@ class Fastcpd {
   // `hessian` stores the Hessian matrix up to the current data point.
   cube hessian;
 
-  Nullable<Function> k;
+  std::unique_ptr<Function> k;
 
   colvec line_search;
 
@@ -445,7 +445,6 @@ class Fastcpd {
       const unsigned int t,
       const unsigned int tau,
       const unsigned int i,
-      Function k,
       const double lambda,
       const colvec& line_search
   );
@@ -480,7 +479,6 @@ class Fastcpd {
     const unsigned int segment_end,
     const int tau,
     const int i,
-    Function k,
     colvec momentum,
     const double lambda,
     const colvec& line_search
