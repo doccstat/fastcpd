@@ -1,8 +1,6 @@
 #ifndef FASTCPD_TYPES_H_
 #define FASTCPD_TYPES_H_
 
-#define ARMA_64BIT_WORD
-
 #include "RcppArmadillo.h"
 
 using ::arma::abs;
