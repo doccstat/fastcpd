@@ -116,6 +116,47 @@ class Fastcpd {
   // `family` is the family of the model.
   const string family;
 
+  // Function to calculate the gradient at the current data.
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param theta Estimated theta from the previous iteration.
+  // @param family Family of the model.
+  // @param order Order of the time series models.
+  //
+  // @return Gradient at the current data.
+  colvec (Fastcpd::*get_gradient)(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  // Function to calculate the Hessian matrix at the current data.
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param theta Estimated theta from the previous iteration.
+  //
+  // @return Hessian at the current data.
+  mat (Fastcpd::*get_hessian)(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
+  CostResult (Fastcpd::*get_nll_pelt)(
+      const unsigned int segment_start,
+      const unsigned int segment_end,
+      const double lambda,
+      const bool cv,
+      const Nullable<colvec>& start
+  );
+
+  double (Fastcpd::*get_nll_sen)(
+      const unsigned int segment_start,
+      const unsigned int segment_end,
+      colvec theta,
+      double lambda
+  );
+
   // `hessian` stores the Hessian matrix up to the current data point.
   cube hessian;
 
@@ -243,20 +284,6 @@ class Fastcpd {
     const double lambda
   );
 
-  // Function to calculate the gradient at the current data.
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param theta Estimated theta from the previous iteration.
-  // @param family Family of the model.
-  // @param order Order of the time series models.
-  //
-  // @return Gradient at the current data.
-  colvec (Fastcpd::*get_gradient)(
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  );
-
   colvec get_gradient_arma(
     const unsigned int segment_start,
     const unsigned int segment_end,
@@ -282,18 +309,6 @@ class Fastcpd {
   );
 
   colvec get_gradient_poisson(
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  );
-
-  // Function to calculate the Hessian matrix at the current data.
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param theta Estimated theta from the previous iteration.
-  //
-  // @return Hessian at the current data.
-  mat (Fastcpd::*get_hessian)(
     const unsigned int segment_start,
     const unsigned int segment_end,
     const colvec& theta
@@ -329,61 +344,94 @@ class Fastcpd {
     const colvec& theta
   );
 
-  CostResult get_nll_arma(
-    const unsigned int segment_start,
-    const unsigned int segment_end
-  );
-
-  CostResult get_nll_glm(
+  CostResult get_nll_pelt_arma(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    Nullable<colvec> start
+    const double lambda,
+    const bool cv,
+    const Nullable<colvec>& start
   );
 
-  CostResult get_nll_lasso_cv(
-    const unsigned int segment_start,
-    const unsigned int segment_end
-  );
-
-  CostResult get_nll_lasso_wo_cv(
+  CostResult get_nll_pelt_glm(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const double lambda
+    const double lambda,
+    const bool cv,
+    const Nullable<colvec>& start
   );
 
-  CostResult get_nll_mean(
+  CostResult get_nll_pelt_lasso(
     const unsigned int segment_start,
-    const unsigned int segment_end
+    const unsigned int segment_end,
+    const double lambda,
+    const bool cv,
+    const Nullable<colvec>& start
   );
-
-  CostResult get_nll_meanvariance(
+  CostResult get_nll_pelt_mean(
     const unsigned int segment_start,
-    const unsigned int segment_end
+    const unsigned int segment_end,
+    const double lambda,
+    const bool cv,
+    const Nullable<colvec>& start
   );
 
-  CostResult get_nll_mgaussian(
+  CostResult get_nll_pelt_meanvariance(
     const unsigned int segment_start,
-    const unsigned int segment_end
+    const unsigned int segment_end,
+    const double lambda,
+    const bool cv,
+    const Nullable<colvec>& start
   );
 
-  CostResult get_nll_variance(
+  CostResult get_nll_pelt_mgaussian(
     const unsigned int segment_start,
-    const unsigned int segment_end
+    const unsigned int segment_end,
+    const double lambda,
+    const bool cv,
+    const Nullable<colvec>& start
   );
 
-  double get_nll_wo_cv(
-      const unsigned int segment_start,
-      const unsigned int segment_end,
-      colvec theta,
-      double lambda
+  CostResult get_nll_pelt_variance(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const double lambda,
+    const bool cv,
+    const Nullable<colvec>& start
   );
 
-  CostResult get_nll_wo_theta(
-      const unsigned int segment_start,
-      const unsigned int segment_end,
-      double lambda,
-      bool cv,
-      Nullable<colvec> start
+  double get_nll_sen_arma(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    colvec theta,
+    double lambda
+  );
+
+  double get_nll_sen_binomial(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    colvec theta,
+    double lambda
+  );
+
+  double get_nll_sen_lm(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    colvec theta,
+    double lambda
+  );
+
+  double get_nll_sen_ma(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    colvec theta,
+    double lambda
+  );
+
+  double get_nll_sen_poisson(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    colvec theta,
+    double lambda
   );
 
   // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.

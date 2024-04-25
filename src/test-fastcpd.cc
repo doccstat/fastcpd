@@ -5,9 +5,9 @@
 using ::fastcpd::classes::CostResult;
 using ::fastcpd::test::FastcpdTest;
 
-context("get_nll_wo_theta Unit Test") {
+context("get_nll_pelt Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
-    const CostResult cost_result = FastcpdTest::get_nll_wo_theta(
+    const CostResult cost_result = FastcpdTest::get_nll_pelt(
       colvec(kARMA32.data(), kARMA32.size()), 0, 199, 0, false, R_NilValue
     );
     const colvec par = cost_result.par;
@@ -28,9 +28,9 @@ context("get_nll_wo_theta Unit Test") {
   }
 }
 
-context("get_nll_wo_cv Unit Test") {
+context("get_nll_sen Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
-    const double value = FastcpdTest::get_nll_wo_cv(
+    const double value = FastcpdTest::get_nll_sen(
       colvec(kARMA32.data(), kARMA32.size()), 0, 199, 0.1 * ones<colvec>(6), 0.0
     );
     const double expected_value = 1363.288;

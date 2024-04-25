@@ -75,30 +75,46 @@ Fastcpd::Fastcpd(
 
   if (family.compare("binomial") == 0) {
     get_gradient = &Fastcpd::get_gradient_binomial;
+    get_hessian = &Fastcpd::get_hessian_binomial;
+    get_nll_sen = &Fastcpd::get_nll_sen_binomial;
   } else if (family.compare("poisson") == 0) {
     get_gradient = &Fastcpd::get_gradient_poisson;
+    get_hessian = &Fastcpd::get_hessian_poisson;
+    get_nll_sen = &Fastcpd::get_nll_sen_poisson;
   } else if (family == "lasso" || family == "gaussian") {
     get_gradient = &Fastcpd::get_gradient_lm;
+    get_hessian = &Fastcpd::get_hessian_lm;
+    get_nll_sen = &Fastcpd::get_nll_sen_lm;
   } else if (family == "arma" && order(0) == 0) {
     get_gradient = &Fastcpd::get_gradient_ma;
+    get_hessian = &Fastcpd::get_hessian_ma;
+    get_nll_sen = &Fastcpd::get_nll_sen_ma;
   } else if (family == "arma" && order(0) > 0) {
     get_gradient = &Fastcpd::get_gradient_arma;
+    get_hessian = &Fastcpd::get_hessian_arma;
+    get_nll_sen = &Fastcpd::get_nll_sen_arma;
   } else {
-    ERROR("Invalid family.");
+    // No sequential gradient performed.
   }
 
-  if (family.compare("binomial") == 0) {
-    get_hessian = &Fastcpd::get_hessian_binomial;
-  } else if (family.compare("poisson") == 0) {
-    get_hessian = &Fastcpd::get_hessian_poisson;
-  } else if (family == "lasso" || family == "gaussian") {
-    get_hessian = &Fastcpd::get_hessian_lm;
-  } else if (family == "arma" && order(0) == 0) {
-    get_hessian = &Fastcpd::get_hessian_ma;
-  } else if (family == "arma" && order(0) > 0) {
-    get_hessian = &Fastcpd::get_hessian_arma;
+  if (family == "lasso") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_lasso;
+  } else if (
+    family == "binomial" || family == "poisson" || family == "gaussian"
+  ) {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
+  } else if (family == "arma") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
+  } else if (family == "mean") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_mean;
+  } else if (family == "variance") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_variance;
+  } else if (family == "meanvariance") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_meanvariance;
+  } else if (family == "mgaussian") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_mgaussian;
   } else {
-    ERROR("Invalid family.");
+    // Not a built-in family.
   }
 
   create_cost_function_wrapper(cost);
@@ -351,14 +367,16 @@ CostResult Fastcpd::get_cost_result(
 ) {
   CostResult cost_result;
   if (theta.isNull()) {
-    cost_result = get_nll_wo_theta(
+    cost_result = (this->*get_nll_pelt)(
       segment_start, segment_end, lambda, cv, start
     );
   } else {
     cost_result = CostResult{
       {colvec()},
       {colvec()},
-      get_nll_wo_cv(segment_start, segment_end, as<colvec>(theta), lambda)
+      (this->*get_nll_sen)(
+        segment_start, segment_end, as<colvec>(theta), lambda
+      )
     };
   }
   cost_result.value = update_cost_value(
@@ -525,111 +543,6 @@ double Fastcpd::get_cval_sen(
   }
   // else segment_length < p or for lasso segment_length < 3
   return cval;
-}
-
-double Fastcpd::get_nll_wo_cv(
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    colvec theta,
-    double lambda
-) {
-  mat data_segment = data.rows(segment_start, segment_end);
-  vec y = data_segment.col(0);
-  if (family == "lasso" || family == "gaussian") {
-    // Calculate negative log likelihood in gaussian family
-    double penalty = lambda * accu(abs(theta));
-    mat x = data_segment.cols(1, data_segment.n_cols - 1);
-    return accu(square(y - x * theta)) / 2 + penalty;
-  } else if (family == "binomial") {
-    // Calculate negative log likelihood in binomial family
-    mat x = data_segment.cols(1, data_segment.n_cols - 1);
-    colvec u = x * theta;
-    return accu(-y % u + arma::log(1 + exp(u)));
-  } else if (family == "poisson") {
-    mat x = data_segment.cols(1, data_segment.n_cols - 1);
-    colvec u = x * theta;
-    colvec y_factorial(y.n_elem);
-    for (unsigned int i = 0; i < y.n_elem; i++) {
-      double log_factorial = 0;
-      for (int j = 1; j <= y(i); ++j) {
-        log_factorial += std::log(j);
-      }
-      y_factorial(i) = log_factorial;
-    }
-
-    return accu(-y % u + exp(u) + y_factorial);
-  } else if (family == "arma" && order(0) == 0) {
-    const unsigned int q = order(1);
-    colvec reversed_theta = reverse(theta);
-    if (data_segment.n_rows < q + 1) {
-      return 0;
-    }
-    colvec variance_term = zeros(data_segment.n_rows);
-    for (unsigned int i = q; i < data_segment.n_rows; i++) {
-      variance_term(i) = data_segment(i, 0) - dot(
-          reversed_theta.rows(1, q), variance_term.rows(i - q, i - 1)
-        );
-    }
-    return (std::log(2.0 * M_PI) +
-      std::log(theta(q))) * (data_segment.n_rows - 2) / 2.0 +
-      dot(variance_term, variance_term) / 2.0 / theta(q);
-  } else if (family == "arma" && order(0) > 0) {
-    colvec reversed_theta = reverse(theta);
-    if (data_segment.n_rows < max(order) + 1) {
-      return 0;
-    }
-    colvec variance_term = zeros(data_segment.n_rows);
-    for (unsigned int i = max(order); i < data_segment.n_rows; i++) {
-      variance_term(i) = data_segment(i, 0) - dot(
-          reversed_theta.rows(order(1) + 1, sum(order)),
-          data_segment.rows(i - order(0), i - 1)
-        ) - dot(
-          reversed_theta.rows(1, order(1)),
-          variance_term.rows(i - order(1), i - 1)
-        );
-    }
-    return (std::log(2.0 * M_PI) +
-      std::log(theta(sum(order)))) * (data_segment.n_rows - 2) / 2.0 +
-      dot(variance_term, variance_term) / 2.0 / theta(sum(order));
-  } else {
-    // # nocov start
-    stop("This branch should not be reached at functions.cc: 248.");
-    // # nocov end
-  }
-}
-
-CostResult Fastcpd::get_nll_wo_theta(
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    double lambda,
-    bool cv,
-    Nullable<colvec> start
-) {
-  CostResult cost_result;
-  if (family == "lasso" && cv) {
-    cost_result = get_nll_lasso_cv(segment_start, segment_end);
-  } else if (family == "lasso" && !cv) {
-    cost_result = get_nll_lasso_wo_cv(segment_start, segment_end, lambda);
-  } else if (
-    family == "binomial" || family == "poisson" || family == "gaussian"
-  ) {
-    cost_result = get_nll_glm(segment_start, segment_end, start);
-  } else if (family == "arma") {
-    cost_result = get_nll_arma(segment_start, segment_end);
-  } else if (family == "mean") {
-    cost_result = get_nll_mean(segment_start, segment_end);
-  } else if (family == "variance") {
-    cost_result = get_nll_variance(segment_start, segment_end);
-  } else if (family == "meanvariance") {
-    cost_result = get_nll_meanvariance(segment_start, segment_end);
-  } else if (family == "mgaussian") {
-    cost_result = get_nll_mgaussian(segment_start, segment_end);
-  } else {
-    // # nocov start
-    stop("This branch should not be reached at fastcpd_class_cost.cc: 193.");
-    // # nocov end
-  }
-  return cost_result;
 }
 
 CostResult Fastcpd::get_optimized_cost(
