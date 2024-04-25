@@ -75,49 +75,48 @@ Fastcpd::Fastcpd(
     "[:bar] :current/:total in :elapsed", data_n_rows
   );
 
-  if (family.compare("binomial") == 0) {
+  if (family == "arma" && order(0) > 0) {
+    get_gradient = &Fastcpd::get_gradient_arma;
+    get_hessian = &Fastcpd::get_hessian_arma;
+    get_nll_sen = &Fastcpd::get_nll_sen_arma;
+    get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
+  } else if (family.compare("binomial") == 0) {
     get_gradient = &Fastcpd::get_gradient_binomial;
     get_hessian = &Fastcpd::get_hessian_binomial;
     get_nll_sen = &Fastcpd::get_nll_sen_binomial;
-  } else if (family.compare("poisson") == 0) {
-    get_gradient = &Fastcpd::get_gradient_poisson;
-    get_hessian = &Fastcpd::get_hessian_poisson;
-    get_nll_sen = &Fastcpd::get_nll_sen_poisson;
-  } else if (family == "lasso" || family == "gaussian") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
+  } else if (family == "gaussian") {
     get_gradient = &Fastcpd::get_gradient_lm;
     get_hessian = &Fastcpd::get_hessian_lm;
     get_nll_sen = &Fastcpd::get_nll_sen_lm;
+    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
+  } else if (family == "lasso") {
+    get_gradient = &Fastcpd::get_gradient_lm;
+    get_hessian = &Fastcpd::get_hessian_lm;
+    get_nll_sen = &Fastcpd::get_nll_sen_lm;
+    get_nll_pelt = &Fastcpd::get_nll_pelt_lasso;
   } else if (family == "arma" && order(0) == 0) {
     get_gradient = &Fastcpd::get_gradient_ma;
     get_hessian = &Fastcpd::get_hessian_ma;
     get_nll_sen = &Fastcpd::get_nll_sen_ma;
-  } else if (family == "arma" && order(0) > 0) {
-    get_gradient = &Fastcpd::get_gradient_arma;
-    get_hessian = &Fastcpd::get_hessian_arma;
-    get_nll_sen = &Fastcpd::get_nll_sen_arma;
-  } else {
-    get_gradient = &Fastcpd::get_gradient_custom;
-    get_hessian = &Fastcpd::get_hessian_custom;
-    get_nll_sen = &Fastcpd::get_nll_sen_custom;
-  }
-
-  if (family == "lasso") {
-    get_nll_pelt = &Fastcpd::get_nll_pelt_lasso;
-  } else if (
-    family == "binomial" || family == "poisson" || family == "gaussian"
-  ) {
-    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
-  } else if (family == "arma") {
     get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
   } else if (family == "mean") {
     get_nll_pelt = &Fastcpd::get_nll_pelt_mean;
-  } else if (family == "variance") {
-    get_nll_pelt = &Fastcpd::get_nll_pelt_variance;
   } else if (family == "meanvariance") {
     get_nll_pelt = &Fastcpd::get_nll_pelt_meanvariance;
   } else if (family == "mgaussian") {
     get_nll_pelt = &Fastcpd::get_nll_pelt_mgaussian;
+  } else if (family.compare("poisson") == 0) {
+    get_gradient = &Fastcpd::get_gradient_poisson;
+    get_hessian = &Fastcpd::get_hessian_poisson;
+    get_nll_sen = &Fastcpd::get_nll_sen_poisson;
+    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
+  } else if (family == "variance") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_variance;
   } else {
+    get_gradient = &Fastcpd::get_gradient_custom;
+    get_hessian = &Fastcpd::get_hessian_custom;
+    get_nll_sen = &Fastcpd::get_nll_sen_custom;
     get_nll_pelt = &Fastcpd::get_nll_pelt_custom;
   }
 
