@@ -65,6 +65,17 @@ colvec Fastcpd::get_gradient_binomial(
   return - (y - 1 / (1 + exp(-as_scalar(x * theta)))) * x.t();
 }
 
+colvec Fastcpd::get_gradient_custom(
+  const unsigned int segment_start,
+  const unsigned int segment_end,
+  const colvec& theta
+) {
+  Function cost_gradient_ = cost_gradient.get();
+  return as<colvec>(
+    cost_gradient_(data.rows(segment_start, segment_end), theta)
+  );
+}
+
 colvec Fastcpd::get_gradient_lm(
   const unsigned int segment_start,
   const unsigned int segment_end,
@@ -237,6 +248,17 @@ mat Fastcpd::get_hessian_binomial(
   return (x.t() * x) * ((1 - prob) * prob);
 }
 
+mat Fastcpd::get_hessian_custom(
+  const unsigned int segment_start,
+  const unsigned int segment_end,
+  const colvec& theta
+) {
+  Function cost_hessian_ = cost_hessian.get();
+  return as<mat>(
+    cost_hessian_(data.rows(segment_start, segment_end), theta)
+  );
+}
+
 mat Fastcpd::get_hessian_lm(
   const unsigned int segment_start,
   const unsigned int segment_end,
@@ -343,6 +365,25 @@ CostResult Fastcpd::get_nll_pelt_arma(
   par(sum(order)) = as<double>(out["sigma2"]);
 
   return {{par}, {as<vec>(out["residuals"])}, -as<double>(out["loglik"])};
+}
+
+CostResult Fastcpd::get_nll_pelt_custom(
+  const unsigned int segment_start,
+  const unsigned int segment_end,
+  const double lambda,
+  const bool cv,
+  const Nullable<colvec>& start
+) {
+  if (cost_gradient.isNull() || cost_hessian.isNull()) {
+    Function cost_ = cost.get();
+    return {
+      {colvec()},
+      {colvec()},
+      as<double>(cost_(data.rows(segment_start, segment_end)))
+    };
+  } else {
+    return get_optimized_cost(segment_start, segment_end);
+  }
 }
 
 CostResult Fastcpd::get_nll_pelt_glm(
@@ -605,6 +646,18 @@ double Fastcpd::get_nll_sen_binomial(
   mat x = data_segment.cols(1, data_segment.n_cols - 1);
   colvec u = x * theta;
   return accu(-y % u + arma::log(1 + exp(u)));
+}
+
+double Fastcpd::get_nll_sen_custom(
+  const unsigned int segment_start,
+  const unsigned int segment_end,
+  colvec theta,
+  double lambda
+) {
+  Function cost_ = cost.get();
+  return as<double>(
+    cost_(data.rows(segment_start, segment_end), theta)
+  );
 }
 
 double Fastcpd::get_nll_sen_lm(

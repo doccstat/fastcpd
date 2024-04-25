@@ -59,38 +59,11 @@ class Fastcpd {
   // Adjustment to the cost function.
   const string cost_adjustment;
 
-  // Cost function. If the cost function is provided in R, this will be a
-  // wrapper of the R function.
-  function<CostResult(
-      const unsigned int segment_start,
-      const unsigned int segment_end,
-      Nullable<colvec> theta,
-      const double lambda,
-      const bool cv,
-      Nullable<colvec> start
-  )> cost_function_wrapper;
-
   // `cost_gradient` is the gradient of the cost function to be used.
   Nullable<Function> cost_gradient;
 
-  // Gradient of the cost function. If the cost function is provided in R, this
-  // will be a wrapper of the R function.
-  function<colvec(
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  )> cost_gradient_wrapper;
-
   // `cost_hessian` is the Hessian of the cost function to be used.
   Nullable<Function> cost_hessian;
-
-  // Hessian of the cost function. If the cost function is provided in R, this
-  // will be a wrapper of the R function.
-  function<mat(
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const colvec& theta
-  )> cost_hessian_wrapper;
 
   const bool cp_only;
 
@@ -224,10 +197,6 @@ class Fastcpd {
   // Stop the clock and create an R object with `name`.
   void create_clock_in_r(const std::string name);
 
-  void create_cost_function_wrapper(Nullable<Function> cost);
-  void create_cost_gradient_wrapper(Nullable<Function> cost_gradient);
-  void create_cost_hessian_wrapper(Nullable<Function> cost_hessian);
-
   // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   void create_gradients();
 
@@ -296,6 +265,12 @@ class Fastcpd {
     const colvec& theta
   );
 
+  colvec get_gradient_custom(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
   colvec get_gradient_lm(
     const unsigned int segment_start,
     const unsigned int segment_end,
@@ -326,6 +301,12 @@ class Fastcpd {
     const colvec& theta
   );
 
+  mat get_hessian_custom(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const colvec& theta
+  );
+
   mat get_hessian_lm(
     const unsigned int segment_start,
     const unsigned int segment_end,
@@ -345,6 +326,14 @@ class Fastcpd {
   );
 
   CostResult get_nll_pelt_arma(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const double lambda,
+    const bool cv,
+    const Nullable<colvec>& start
+  );
+
+  CostResult get_nll_pelt_custom(
     const unsigned int segment_start,
     const unsigned int segment_end,
     const double lambda,
@@ -413,6 +402,13 @@ class Fastcpd {
     double lambda
   );
 
+  double get_nll_sen_custom(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    colvec theta,
+    double lambda
+  );
+
   double get_nll_sen_lm(
     const unsigned int segment_start,
     const unsigned int segment_end,
@@ -444,9 +440,6 @@ class Fastcpd {
     const unsigned int segment_start,
     const unsigned int segment_end
   );
-
-  // Get the value of \code{theta_sum}.
-  mat get_theta_sum();
 
   void update_cost_parameters(
       const unsigned int t,
