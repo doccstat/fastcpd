@@ -153,7 +153,7 @@ mat FastcpdTest::get_hessian_poisson(
   return fastcpd_class.get_hessian_poisson(segment_start, segment_end, theta);
 }
 
-double FastcpdTest::get_nll_wo_cv(
+double FastcpdTest::get_nll_sen(
     const mat& data,
     const unsigned int segment_start,
     const unsigned int segment_end,
@@ -188,16 +188,18 @@ double FastcpdTest::get_nll_wo_cv(
     /* variance_estimate */ mat(),
     /* warm_start */ false
   );
-  return fastcpd_class.get_nll_wo_cv(segment_start, segment_end, theta, lambda);
+  return (fastcpd_class.*fastcpd_class.get_nll_sen)(
+    segment_start, segment_end, theta, lambda
+  );
 }
 
-CostResult FastcpdTest::get_nll_wo_theta(
+CostResult FastcpdTest::get_nll_pelt(
   const mat& data,
   const unsigned int segment_start,
   const unsigned int segment_end,
-  double lambda,
-  bool cv,
-  Nullable<colvec> start
+  const double lambda,
+  const bool cv,
+  const Nullable<colvec>& start
 ) {
   Fastcpd fastcpd_class(
     /* beta */ 0,
@@ -227,7 +229,7 @@ CostResult FastcpdTest::get_nll_wo_theta(
     /* variance_estimate */ mat(),
     /* warm_start */ false
   );
-  return fastcpd_class.get_nll_wo_theta(
+  return (fastcpd_class.*fastcpd_class.get_nll_pelt)(
     segment_start, segment_end, lambda, cv, start
   );
 }

@@ -38,7 +38,7 @@ class FastcpdTest {
     const colvec& theta
   );
 
-  static double get_nll_wo_cv(
+  static double get_nll_sen(
     const mat& data,
     const unsigned int segment_start,
     const unsigned int segment_end,
@@ -46,13 +46,13 @@ class FastcpdTest {
     double lambda
   );
 
-  static CostResult get_nll_wo_theta(
+  static CostResult get_nll_pelt(
     const mat& data,
     const unsigned int segment_start,
     const unsigned int segment_end,
-    double lambda,
-    bool cv,
-    Nullable<colvec> start
+    const double lambda,
+    const bool cv,
+    const Nullable<colvec>& start
   );
 
   static mat update_theta_sum(
