@@ -1,6 +1,41 @@
 #include "fastcpd_class.h"
 #include "RProgress.h"
 
+using ::arma::abs;
+using ::arma::accu;
+using ::arma::as_scalar;
+using ::arma::diff;
+using ::arma::dot;
+using ::arma::find;
+using ::arma::eye;
+using ::arma::floor;
+using ::arma::index_max;
+using ::arma::index_min;
+using ::arma::join_cols;
+using ::arma::join_rows;
+using ::arma::join_slices;
+using ::arma::linspace;
+using ::arma::max;
+using ::arma::mean;
+using ::arma::min;
+using ::arma::norm;
+using ::arma::sign;
+using ::arma::solve;
+using ::arma::sort;
+using ::arma::square;
+using ::arma::unique;
+using ::arma::zeros;
+using ::Rcpp::as;
+using ::Rcpp::checkUserInterrupt;
+using ::Rcpp::Named;
+using ::Rcpp::wrap;
+
+using ::arma::vec;
+using ::Rcpp::Environment;
+using ::Rcpp::InternalFunction;
+
+using ::Rcpp::Rcout;
+
 #define ERROR(msg) \
   Rcout << "error: " << __FILE__ << ":" << __LINE__ << ": " << msg << std::endl
 
@@ -187,7 +222,6 @@ List Fastcpd::run() {
       update_hessian(pruned_left);
     }
 
-    // Objective function F(t).
     fvec(t) = min_obj;
 
     checkUserInterrupt();

@@ -3,63 +3,12 @@
 
 #include "RcppArmadillo.h"
 
-using ::arma::abs;
-using ::arma::accu;
-using ::arma::approx_equal;
-using ::arma::as_scalar;
-using ::arma::clamp;
-using ::arma::cov;
-using ::arma::diff;
-using ::arma::dot;
-using ::arma::find;
-using ::arma::eye;
-using ::arma::floor;
-using ::arma::index_max;
-using ::arma::index_min;
-using ::arma::join_cols;
-using ::arma::join_rows;
-using ::arma::join_slices;
-using ::arma::linspace;
-using ::arma::log_det_sympd;
-using ::arma::max;
-using ::arma::mean;
-using ::arma::min;
-using ::arma::norm;
-using ::arma::ones;
-using ::arma::reverse;
-using ::arma::sign;
-using ::arma::solve;
-using ::arma::sort;
-using ::arma::square;
-using ::arma::trace;
-using ::arma::unique;
-using ::arma::zeros;
-using ::Rcpp::as;
-using ::Rcpp::checkUserInterrupt;
-using ::Rcpp::Named;
-using ::Rcpp::stop;
-using ::Rcpp::wrap;
-
 using ::arma::colvec;
-using ::arma::conv_to;
-using ::arma::cube;
 using ::arma::mat;
-using ::arma::rowvec;
-using ::arma::span;
-using ::arma::ucolvec;
-using ::arma::uvec;
-using ::arma::vec;
-using ::Rcpp::Environment;
 using ::Rcpp::Function;
-using ::Rcpp::InternalFunction;
 using ::Rcpp::List;
 using ::Rcpp::Nullable;
-using ::Rcpp::NumericMatrix;
-using ::Rcpp::NumericVector;
-using ::Rcpp::S4;
 using ::std::function;
 using ::std::string;
-
-using ::Rcpp::Rcout;
 
 #endif  // FASTCPD_TYPES_H_

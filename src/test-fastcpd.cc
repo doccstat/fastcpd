@@ -2,6 +2,9 @@
 #include "fastcpd_test_constants.h"
 #include "testthat.h"
 
+using ::arma::approx_equal;
+using ::arma::ones;
+
 using ::fastcpd::classes::CostResult;
 using ::fastcpd::test::FastcpdTest;
 

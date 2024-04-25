@@ -4,10 +4,14 @@
 #include <memory>
 
 #include "fastcpd_test.h"
-#include "fastcpd_types.h"
-#include "fastcpd_wrapper.h"
 #include "RcppClock.h"
 #include "RProgress.h"
+
+using ::arma::cube;
+using ::arma::ucolvec;
+using ::Rcpp::Function;
+using ::Rcpp::List;
+using ::std::string;
 
 using ::fastcpd::test::FastcpdTest;
 
