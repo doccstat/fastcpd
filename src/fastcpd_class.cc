@@ -1,6 +1,9 @@
 #include "fastcpd_class.h"
 #include "RProgress.h"
 
+#define ERROR(msg) \
+  Rcout << "error: " << __FILE__ << ":" << __LINE__ << ": " << msg << std::endl
+
 namespace fastcpd::classes {
 
 Fastcpd::Fastcpd(
@@ -146,9 +149,6 @@ List Fastcpd::run() {
   update_r_progress_tick();
 
   for (unsigned int t = 2; t <= data_n_rows; t++) {
-    DEBUG_RCOUT(t);
-    DEBUG_RCOUT(r_t_count);
-
     colvec cval = zeros<vec>(r_t_count);
 
     update_r_clock_tick("r_t_set_for_loop");
@@ -158,20 +158,15 @@ List Fastcpd::run() {
     update_r_clock_tock("r_t_set_for_loop");
     update_r_clock_tick("pruning");
 
-    DEBUG_RCOUT(cval);
-
     if (vanilla_percentage != 1) {
       update_fastcpd_parameters(t);
     }
 
     colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta;
-    DEBUG_RCOUT(obj);
     double min_obj = min(obj);
     double tau_star = r_t_set(index_min(obj));
-    DEBUG_RCOUT(tau_star);
 
     cp_sets[t] = join_cols(cp_sets[tau_star], colvec{tau_star});
-    DEBUG_RCOUT(cp_sets[t]);
 
     ucolvec pruned_left = find(
       cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + pruning_coef <= min_obj
@@ -181,7 +176,6 @@ List Fastcpd::run() {
       r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
     }
     r_t_set(pruned_left.n_elem) = t;
-    DEBUG_RCOUT(r_t_set);
 
     if (vanilla_percentage != 1) {
       update_theta_hat(pruned_left);
@@ -191,7 +185,6 @@ List Fastcpd::run() {
 
     // Objective function F(t).
     fvec(t) = min_obj;
-    DEBUG_RCOUT(fvec.rows(0, t));
 
     checkUserInterrupt();
     update_r_progress_tick();
@@ -388,7 +381,6 @@ double Fastcpd::get_cval_for_r_t_set(
   const int t,
   double lambda
 ) {
-  DEBUG_RCOUT(i);
   if (family == "lasso") {
     // Mean of `err_sd` only works if error sd is unchanged.
     lambda = mean(err_sd) * sqrt(2 * std::log(p) / (t - tau));
@@ -450,7 +442,6 @@ double Fastcpd::get_cval_sen(
     segment_end + 1, segment_start, i, k.get(), lambda, line_search
   );
   colvec theta = theta_sum.col(i) / segment_length;
-  DEBUG_RCOUT(theta);
   if (family == "custom") {
     cval = (this->*get_nll_sen)(
       segment_start, segment_end, theta, lambda
@@ -514,7 +505,7 @@ CostResult Fastcpd::get_optimized_cost(
       {{as<colvec>(optim_result["par"])}, {colvec()}, optim_result["value"]};
   } else {
     // # nocov start
-    stop("This branch should not be reached at classes.cc: 945.");
+    ERROR("This branch should not be reached.");
     // # nocov end
   }
   return cost_result;
@@ -531,7 +522,6 @@ void Fastcpd::update_cost_parameters(
   List cost_update_result = update_cost_parameters_steps(
     0, t - 1, tau, i, k, momentum, lambda, line_search
   );
-  DEBUG_RCOUT(line_search);
   update_theta_hat(i, as<colvec>(cost_update_result[0]));
   create_theta_sum(i, as<colvec>(cost_update_result[1]));
   update_hessian(i, as<mat>(cost_update_result[2]));
