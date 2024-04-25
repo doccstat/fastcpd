@@ -5,17 +5,6 @@
 
 #include "RcppArmadillo.h"
 
-#define ERROR(msg) \
-  Rcout << "error: " << __FILE__ << ":" << __LINE__ << ": " << msg << std::endl
-#ifdef DEBUG
-#define DEBUG_RCOUT(x) Rcout << #x << ": " << x << std::endl
-#define INFO(msg) \
-  Rcout << "info: " << __FILE__ << ":" << __LINE__ << ": " << msg << std::endl
-#else
-#define DEBUG_RCOUT(x) do {} while (0)
-#define INFO(msg) do {} while (0)
-#endif
-
 using ::arma::abs;
 using ::arma::accu;
 using ::arma::approx_equal;
