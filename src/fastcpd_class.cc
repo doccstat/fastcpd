@@ -1,5 +1,4 @@
 #include "fastcpd_class.h"
-#include "fastcpd_constants.h"
 #include "RProgress.h"
 
 namespace fastcpd::classes {
@@ -214,7 +213,7 @@ void Fastcpd::create_clock_in_r(const std::string name) {
 
 void Fastcpd::create_cost_function_wrapper(Nullable<Function> cost) {
   DEBUG_RCOUT(family);
-  if (contain(FASTCPD_FAMILIES, family)) {
+  if (family != "custom") {
     cost_function_wrapper = std::bind(  // # nocov start
       &Fastcpd::get_cost_result,  // # nocov end
       this,
@@ -232,7 +231,7 @@ void Fastcpd::create_cost_function_wrapper(Nullable<Function> cost) {
 }
 
 void Fastcpd::create_cost_gradient_wrapper(Nullable<Function> cost_gradient) {
-  if (contain(FASTCPD_FAMILIES, family)) {
+  if (family != "custom") {
     cost_gradient_wrapper = std::bind(  // # nocov start
       get_gradient,  // # nocov end
       this,
@@ -253,7 +252,7 @@ void Fastcpd::create_cost_gradient_wrapper(Nullable<Function> cost_gradient) {
 }
 
 void Fastcpd::create_cost_hessian_wrapper(Nullable<Function> cost_hessian) {
-  if (contain(FASTCPD_FAMILIES, family)) {
+  if (family != "custom") {
     cost_hessian_wrapper = std::bind(  // # nocov start
       get_hessian,  // # nocov end
       this,
@@ -292,7 +291,7 @@ void Fastcpd::create_gradients() {
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian.slice(0) = data.row(0).tail(p).t() * data.row(0).tail(p) +
       epsilon * eye<mat>(p, p);
-  } else if (!contain(FASTCPD_FAMILIES, family)) {
+  } else if (family == "custom") {
     theta_hat.col(0) = segment_theta_hat.row(0).t();
     theta_sum.col(0) = segment_theta_hat.row(0).t();
     hessian.slice(0) = zeros<mat>(p, p);
@@ -302,12 +301,12 @@ void Fastcpd::create_gradients() {
 // TODO(doccstat): Use `segment_theta` as warm start.
 
 void Fastcpd::create_segment_statistics() {
-  if (!contain(FASTCPD_FAMILIES, family) && vanilla_percentage == 1) return;
+  if (family == "custom" && vanilla_percentage == 1) return;
   for (
     int segment_index = 0; segment_index < segment_count; ++segment_index
   ) {
     rowvec segment_theta;
-    if (!contain(FASTCPD_FAMILIES, family)) {
+    if (family == "custom") {
       segment_theta = get_optimized_cost(
         segment_indices(segment_index), segment_indices(segment_index + 1) - 1
       ).par;
@@ -315,7 +314,8 @@ void Fastcpd::create_segment_statistics() {
       segment_theta = get_cost_result(
         segment_indices(segment_index),
         segment_indices(segment_index + 1) - 1,
-        R_NilValue, 0,
+        R_NilValue,
+        0,
         true,
         R_NilValue
       ).par;
@@ -420,7 +420,7 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
 
   for (unsigned int i = 0; i < cp_loc.n_elem - 1; i++) {
     CostResult cost_result;
-    if (!contain(FASTCPD_FAMILIES, family)) {
+    if (family == "custom") {
       cost_result = get_optimized_cost(cp_loc(i), cp_loc(i + 1) - 1);
     } else {
       cost_result = get_cost_result(
@@ -437,7 +437,7 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
 
     // Residual is only calculated for built-in families.
     if (
-      contain(FASTCPD_FAMILIES, family) &&
+      family != "custom" &&
       !(family == "mean" || family == "variance" || family == "meanvariance")
     ) {
       mat cost_optim_residual = cost_result.residuals;
@@ -483,7 +483,7 @@ double Fastcpd::get_cval_pelt(
 ) {
   double cval = 0;
   CostResult cost_result;
-  if (!contain(FASTCPD_FAMILIES, family)) {
+  if (family == "custom") {
     cost_result = get_optimized_cost(segment_start, segment_end);
   } else {
     if (warm_start && segment_end + 1 - segment_start >= 10 * p) {
@@ -527,7 +527,7 @@ double Fastcpd::get_cval_sen(
   );
   colvec theta = theta_sum.col(i) / segment_length;
   DEBUG_RCOUT(theta);
-  if (!contain(FASTCPD_FAMILIES, family)) {
+  if (family == "custom") {
     Function cost_non_null = cost.get();
     SEXP cost_result = cost_non_null(
       data.rows(segment_start, segment_end), theta
@@ -632,7 +632,7 @@ void Fastcpd::update_cost_parameters_step(
   mat hessian_i = hessian.slice(i);
   colvec gradient;
 
-  if (!contain(FASTCPD_FAMILIES, family)) {
+  if (family == "custom") {
     mat cost_hessian_result = cost_hessian_wrapper(
       segment_start + data_start, segment_start + data_end, theta_hat.col(i)
     );
@@ -809,7 +809,7 @@ void Fastcpd::update_fastcpd_parameters(const unsigned int t) {
     hessian_new = x.t() * x + epsilon * eye<mat>(p, p);
   } else if (family == "arma") {
     hessian_new = (this->*get_hessian)(0, t - 1, coef_add.t());
-  } else if (!contain(FASTCPD_FAMILIES, family)) {
+  } else if (family == "custom") {
     hessian_new = zeros<mat>(p, p);
   }
 
