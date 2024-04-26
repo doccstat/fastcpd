@@ -106,6 +106,8 @@ observation and thus a formula is not required here.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">300</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">0</span>, <span class="fl">100</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">300</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.variance</span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> error: fastcpd_class_public.cc:85: Invalid family.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> error: fastcpd_class_public.cc:99: Invalid family.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
@@ -134,6 +136,8 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> error: fastcpd_class_public.cc:85: Invalid family.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> error: fastcpd_class_public.cc:99: Invalid family.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.variance(data = rbind(mvtnorm::rmvnorm(300, rep(0, p), </span>
@@ -152,8 +156,10 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span><span class="op">(</span><span class="va">result_time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.variance</span><span class="op">(</span><span class="va">data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> error: fastcpd_class_public.cc:85: Invalid family.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> error: fastcpd_class_public.cc:99: Invalid family.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1.930   0.000   1.929 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3.631   0.003   3.634 </span>
 <span class="r-in"><span><span class="va">result</span><span class="op">@</span><span class="va">cp_set</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2997 5989</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
@@ -166,8 +172,10 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span>    r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> error: fastcpd_class_public.cc:85: Invalid family.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> error: fastcpd_class_public.cc:99: Invalid family.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1.876   0.000   1.876 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3.539   0.001   3.540 </span>
 <span class="r-in"><span><span class="va">result</span><span class="op">@</span><span class="va">cp_set</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2997 5989</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
