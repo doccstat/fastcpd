@@ -1,9 +1,6 @@
-## Updates since last CRAN release (0.14.1)
+## Updates since last CRAN release (0.14.3)
 
-# fastcpd 0.14.3
+### fastcpd 0.14.4
 
-*   Skip certain tests on CRAN.
-
-### fastcpd 0.14.2
-
-*   Fix CRAN noSuggests error.
+*   Simplify code.
+*   Expose `fastcpd_impl` API for use in other packages.

@@ -12,8 +12,12 @@ using ::arma::ucolvec;
 using ::Rcpp::Function;
 using ::Rcpp::List;
 using ::std::string;
+using ::std::string_view;
+using ::std::unique_ptr;
 
 using ::fastcpd::test::FastcpdTest;
+
+constexpr char kRProgress[] = "[:bar] :current/:total in :elapsed";
 
 namespace fastcpd::classes {
 
@@ -58,16 +62,16 @@ class Fastcpd {
   double beta;
 
   // `cost` is the cost function to be used.
-  std::unique_ptr<Function> cost;
+  unique_ptr<Function> cost;
 
   // Adjustment to the cost function.
   const string cost_adjustment;
 
   // `cost_gradient` is the gradient of the cost function to be used.
-  std::unique_ptr<Function> cost_gradient;
+  unique_ptr<Function> cost_gradient;
 
   // `cost_hessian` is the Hessian of the cost function to be used.
-  std::unique_ptr<Function> cost_hessian;
+  unique_ptr<Function> cost_hessian;
 
   const bool cp_only;
 
@@ -137,7 +141,7 @@ class Fastcpd {
   // `hessian` stores the Hessian matrix up to the current data point.
   cube hessian;
 
-  std::unique_ptr<Function> k;
+  unique_ptr<Function> k;
 
   colvec line_search;
 
@@ -163,7 +167,7 @@ class Fastcpd {
   const bool r_progress;
 
   Rcpp::Clock rClock;
-  std::unique_ptr<RProgress::RProgress> rProgress;
+  unique_ptr<RProgress::RProgress> rProgress;
 
   // `segment_count` is the number of segments for initial guess.
   const int segment_count;
