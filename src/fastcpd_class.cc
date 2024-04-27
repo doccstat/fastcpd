@@ -29,6 +29,7 @@ using ::Rcpp::as;
 using ::Rcpp::checkUserInterrupt;
 using ::Rcpp::Named;
 using ::Rcpp::wrap;
+using ::std::make_unique;
 
 using ::arma::vec;
 using ::Rcpp::Environment;
@@ -90,6 +91,7 @@ Fastcpd::Fastcpd(
     pruning_coef(pruning_coef),
     r_clock(r_clock),
     r_progress(r_progress),
+    rProgress(make_unique<RProgress::RProgress>(kRProgress, data_n_rows)),
     segment_count(segment_count),
     segment_indices(round(linspace(0, data_n_rows, segment_count + 1))),
     segment_theta_hat(mat(segment_count, p)),
@@ -102,10 +104,6 @@ Fastcpd::Fastcpd(
     variance_estimate(variance_estimate),
     warm_start(warm_start),
     zero_data(join_cols(zeros<rowvec>(data_n_cols), data)) {
-  rProgress = std::make_unique<RProgress::RProgress>(
-    "[:bar] :current/:total in :elapsed", data_n_rows
-  );
-
   if (k.isNotNull()) {
     this->k = std::make_unique<Function>(k);
   }
@@ -149,10 +147,10 @@ Fastcpd::Fastcpd(
   } else if (family == "variance") {
     get_nll_pelt = &Fastcpd::get_nll_pelt_variance;
   } else {
-    this->cost = std::make_unique<Function>(cost);
+    this->cost = make_unique<Function>(cost);
     if (cost_gradient.isNotNull() || cost_hessian.isNotNull()) {
-      this->cost_gradient = std::make_unique<Function>(cost_gradient);
-      this->cost_hessian = std::make_unique<Function>(cost_hessian);
+      this->cost_gradient = make_unique<Function>(cost_gradient);
+      this->cost_hessian = make_unique<Function>(cost_hessian);
     }
     get_gradient = &Fastcpd::get_gradient_custom;
     get_hessian = &Fastcpd::get_hessian_custom;

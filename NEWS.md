@@ -1,3 +1,8 @@
+# fastcpd 0.14.4
+
+*   Simplify code.
+*   Expose `fastcpd_impl` API for use in other packages.
+
 # fastcpd 0.14.3
 
 *   Skip certain tests on CRAN.
