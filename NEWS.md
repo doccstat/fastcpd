@@ -1,3 +1,7 @@
+# fastcpd 0.14.5
+
+*   Add pre-compiled vignettes.
+
 # fastcpd 0.14.4
 
 *   Simplify code.
