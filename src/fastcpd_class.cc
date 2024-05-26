@@ -38,7 +38,12 @@ using ::Rcpp::InternalFunction;
 using ::Rcpp::Rcout;
 
 #define ERROR(msg) \
-  Rcout << "error: " << __FILE__ << ":" << __LINE__ << ": " << msg << std::endl
+  Rcout << "error: " << __FILE__ << ": " << \
+                        __LINE__ << ": " << msg << std::endl
+#define FATAL(msg) \
+  Rcout << "fatal: " << __FILE__ << ": " << \
+                        __LINE__ << ": " << msg << std::endl; \
+  throw std::runtime_error(msg)
 
 namespace fastcpd::classes {
 
@@ -108,57 +113,7 @@ Fastcpd::Fastcpd(
     this->k = std::make_unique<Function>(k);
   }
 
-  if (family == "arma" && order(0) > 0) {
-    get_gradient = &Fastcpd::get_gradient_arma;
-    get_hessian = &Fastcpd::get_hessian_arma;
-    get_nll_sen = &Fastcpd::get_nll_sen_arma;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
-  } else if (family.compare("binomial") == 0) {
-    get_gradient = &Fastcpd::get_gradient_binomial;
-    get_hessian = &Fastcpd::get_hessian_binomial;
-    get_nll_sen = &Fastcpd::get_nll_sen_binomial;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
-  } else if (family == "gaussian") {
-    get_gradient = &Fastcpd::get_gradient_lm;
-    get_hessian = &Fastcpd::get_hessian_lm;
-    get_nll_sen = &Fastcpd::get_nll_sen_lm;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
-  } else if (family == "lasso") {
-    get_gradient = &Fastcpd::get_gradient_lm;
-    get_hessian = &Fastcpd::get_hessian_lm;
-    get_nll_sen = &Fastcpd::get_nll_sen_lm;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_lasso;
-  } else if (family == "arma" && order(0) == 0) {
-    get_gradient = &Fastcpd::get_gradient_ma;
-    get_hessian = &Fastcpd::get_hessian_ma;
-    get_nll_sen = &Fastcpd::get_nll_sen_ma;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
-  } else if (family == "mean") {
-    get_nll_pelt = &Fastcpd::get_nll_pelt_mean;
-  } else if (family == "meanvariance") {
-    get_nll_pelt = &Fastcpd::get_nll_pelt_meanvariance;
-  } else if (family == "mgaussian") {
-    get_nll_pelt = &Fastcpd::get_nll_pelt_mgaussian;
-  } else if (family.compare("poisson") == 0) {
-    get_gradient = &Fastcpd::get_gradient_poisson;
-    get_hessian = &Fastcpd::get_hessian_poisson;
-    get_nll_sen = &Fastcpd::get_nll_sen_poisson;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
-  } else if (family == "variance") {
-    get_nll_pelt = &Fastcpd::get_nll_pelt_variance;
-  } else {
-    this->cost = make_unique<Function>(cost);
-    if (cost_gradient.isNotNull() || cost_hessian.isNotNull()) {
-      this->cost_gradient = make_unique<Function>(cost_gradient);
-      this->cost_hessian = make_unique<Function>(cost_hessian);
-    }
-    get_gradient = &Fastcpd::get_gradient_custom;
-    get_hessian = &Fastcpd::get_hessian_custom;
-    get_nll_sen = &Fastcpd::get_nll_sen_custom;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_custom;
-  }
-
-  // TODO(doccstat): Store environment functions from R.
+  create_gets(cost, cost_gradient, cost_hessian);
 }
 
 List Fastcpd::run() {
@@ -229,13 +184,73 @@ List Fastcpd::run() {
 
   create_clock_in_r(r_clock);
 
-  return get_cp_set(cp_sets[data_n_rows], lambda);
+  List result = get_cp_set(cp_sets[data_n_rows], lambda);
+
+  return result;
 }
 
 void Fastcpd::create_clock_in_r(const std::string name) {
   if (!r_clock.empty()) {
     rClock.stop(name);
   }
+}
+
+void Fastcpd::create_gets(
+  Nullable<Function>& cost,
+  Nullable<Function>& cost_gradient,
+  Nullable<Function>& cost_hessian
+) {
+  if (family == "arma" && order(0) > 0) {
+    get_gradient = &Fastcpd::get_gradient_arma;
+    get_hessian = &Fastcpd::get_hessian_arma;
+    get_nll_sen = &Fastcpd::get_nll_sen_arma;
+    get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
+  } else if (family.compare("binomial") == 0) {
+    get_gradient = &Fastcpd::get_gradient_binomial;
+    get_hessian = &Fastcpd::get_hessian_binomial;
+    get_nll_sen = &Fastcpd::get_nll_sen_binomial;
+    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
+  } else if (family == "gaussian") {
+    get_gradient = &Fastcpd::get_gradient_lm;
+    get_hessian = &Fastcpd::get_hessian_lm;
+    get_nll_sen = &Fastcpd::get_nll_sen_lm;
+    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
+  } else if (family == "lasso") {
+    get_gradient = &Fastcpd::get_gradient_lm;
+    get_hessian = &Fastcpd::get_hessian_lm;
+    get_nll_sen = &Fastcpd::get_nll_sen_lm;
+    get_nll_pelt = &Fastcpd::get_nll_pelt_lasso;
+  } else if (family == "arma" && order(0) == 0) {
+    get_gradient = &Fastcpd::get_gradient_ma;
+    get_hessian = &Fastcpd::get_hessian_ma;
+    get_nll_sen = &Fastcpd::get_nll_sen_ma;
+    get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
+  } else if (family == "mean") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_mean;
+  } else if (family == "meanvariance") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_meanvariance;
+  } else if (family == "mgaussian") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_mgaussian;
+  } else if (family.compare("poisson") == 0) {
+    get_gradient = &Fastcpd::get_gradient_poisson;
+    get_hessian = &Fastcpd::get_hessian_poisson;
+    get_nll_sen = &Fastcpd::get_nll_sen_poisson;
+    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
+  } else if (family == "variance") {
+    get_nll_pelt = &Fastcpd::get_nll_pelt_variance;
+  } else {
+    this->cost = make_unique<Function>(cost);
+    if (cost_gradient.isNotNull() || cost_hessian.isNotNull()) {
+      this->cost_gradient = make_unique<Function>(cost_gradient);
+      this->cost_hessian = make_unique<Function>(cost_hessian);
+    }
+    get_gradient = &Fastcpd::get_gradient_custom;
+    get_hessian = &Fastcpd::get_hessian_custom;
+    get_nll_sen = &Fastcpd::get_nll_sen_custom;
+    get_nll_pelt = &Fastcpd::get_nll_pelt_custom;
+  }
+
+  // TODO(doccstat): Store environment functions from R.
 }
 
 void Fastcpd::create_gradients() {
