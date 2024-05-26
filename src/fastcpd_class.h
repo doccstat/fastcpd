@@ -205,6 +205,12 @@ class Fastcpd {
   // Stop the clock and create an R object with `name`.
   void create_clock_in_r(const std::string name);
 
+  void create_gets(
+    Nullable<Function>& cost,
+    Nullable<Function>& cost_gradient,
+    Nullable<Function>& cost_hessian
+  );
+
   // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   void create_gradients();
 
