@@ -113,6 +113,31 @@ Fastcpd::Fastcpd(
     this->k = std::make_unique<Function>(k);
   }
 
+  zero_data_c = (double **)malloc((data_n_rows + 1) * sizeof(double *));
+  if (zero_data_c == NULL) {
+    FATAL("Memory allocation failed.");
+  }
+  unsigned int i = 0;
+  while (i < data_n_rows + 1) {
+    zero_data_c[i] = (double *)malloc(data_n_cols * sizeof(double));
+    if (zero_data_c[i] == NULL) {
+      break;
+    }
+    i++;
+  }
+  if (i < data_n_rows + 1) {
+    for (unsigned int j = 0; j < i; j++) {
+      free(zero_data_c[j]);
+    }
+    free(zero_data_c);
+    FATAL("Memory allocation failed.");
+  }
+  for (unsigned int i = 0; i < data_n_rows + 1; i++) {
+    for (unsigned int j = 0; j < data_n_cols; j++) {
+      zero_data_c[i][j] = zero_data(i, j);
+    }
+  }
+
   create_gets(cost, cost_gradient, cost_hessian);
 }
 
@@ -185,6 +210,11 @@ List Fastcpd::run() {
   create_clock_in_r(r_clock);
 
   List result = get_cp_set(cp_sets[data_n_rows], lambda);
+
+  for (unsigned int i = 0; i < data_n_rows + 1; i++) {
+    free(zero_data_c[i]);
+  }
+  free(zero_data_c);
 
   return result;
 }

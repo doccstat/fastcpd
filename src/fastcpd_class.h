@@ -202,6 +202,8 @@ class Fastcpd {
 
   mat zero_data;
 
+  double** zero_data_c;
+
   // Stop the clock and create an R object with `name`.
   void create_clock_in_r(const std::string name);
 

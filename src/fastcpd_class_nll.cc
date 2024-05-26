@@ -9,6 +9,7 @@ using ::arma::trace;
 using ::arma::zeros;
 using ::Rcpp::as;
 using ::Rcpp::Named;
+using ::std::pow;
 
 using ::Rcpp::Environment;
 using ::Rcpp::NumericVector;
@@ -61,8 +62,7 @@ colvec Fastcpd::get_gradient_arma(
     psi_coefficient.row(segment_length - 1).t() *
     variance_term(segment_length - 1) / theta(sum(order));
   gradient(sum(order)) = 1.0 / 2.0 / theta(sum(order)) -
-    std::pow(variance_term(segment_length - 1), 2) / 2.0 /
-    std::pow(theta(sum(order)), 2);
+    pow(variance_term(segment_length - 1), 2) / 2.0 / pow(theta(sum(order)), 2);
   return gradient;
 }
 
@@ -133,8 +133,7 @@ colvec Fastcpd::get_gradient_ma(
     psi_coefficient.row(segment_length - 1).t() *
     variance_term(segment_length - 1) / theta(q);
   gradient(q) = 1.0 / 2.0 / theta(q) -
-    std::pow(variance_term(segment_length - 1), 2) / 2.0 /
-    std::pow(theta(q), 2);
+    pow(variance_term(segment_length - 1), 2) / 2.0 / pow(theta(q), 2);
   return gradient;
 }
 
@@ -242,9 +241,8 @@ mat Fastcpd::get_hessian_arma(
   hessian.submat(sum(order), order(0), sum(order), sum(order) - 1) =
     hessian.submat(order(0), sum(order), sum(order) - 1, sum(order)).t();
   hessian(sum(order), sum(order)) =
-    std::pow(variance_term(segment_length - 1), 2) /
-    std::pow(theta(sum(order)), 3) -
-    1.0 / 2.0 / std::pow(theta(sum(order)), 2);
+    pow(variance_term(segment_length - 1), 2) / pow(theta(sum(order)), 3) -
+    1.0 / 2.0 / pow(theta(sum(order)), 2);
   return hessian;
 }
 
@@ -337,9 +335,8 @@ mat Fastcpd::get_hessian_ma(
     variance_term(segment_length - 1) / theta(q) / theta(q);
   hessian.submat(q, 0, q, q - 1) = hessian.submat(0, q, q - 1, q).t();
   hessian(q, q) =
-    std::pow(variance_term(segment_length - 1), 2) /
-    std::pow(theta(q), 3) -
-    1.0 / 2.0 / std::pow(theta(q), 2);
+    pow(variance_term(segment_length - 1), 2) / pow(theta(q), 3) -
+    1.0 / 2.0 / pow(theta(q), 2);
   return hessian;
 }
 
@@ -492,17 +489,20 @@ CostResult Fastcpd::get_nll_pelt_mean(
   const bool cv,
   const Nullable<colvec>& start
 ) {
-  const rowvec data_diff =
-    zero_data.row(segment_end + 1) - zero_data.row(segment_start);
+  double two_norm = 0;
+  for (unsigned int i = 0; i < p; i++) {
+    two_norm +=
+      (zero_data_c[segment_end + 1][i] - zero_data_c[segment_start][i]) *
+      (zero_data_c[segment_end + 1][i] - zero_data_c[segment_start][i]);
+  }
   const unsigned int segment_length = segment_end - segment_start + 1;
   return {
     {zeros<colvec>(p)},  // # nocov
     {zeros<mat>(segment_length, p)},
-    std::log(2.0 * M_PI) * zero_data.n_cols + log_det_sympd(variance_estimate) *
+    std::log(2.0 * M_PI) * data_n_cols + log_det_sympd(variance_estimate) *
       (segment_length) / 2.0 + (
-      data_diff(p) - dot(
-        data_diff.subvec(0, p - 1), data_diff.subvec(0, p - 1)
-      ) / segment_length
+      (zero_data_c[segment_end + 1][p] - zero_data_c[segment_start][p]) -
+      two_norm / segment_length
     ) / 2.0
   };
 }
@@ -516,13 +516,7 @@ CostResult Fastcpd::get_nll_pelt_meanvariance(
 ) {
   rowvec data_diff =
     zero_data.row(segment_end + 1) - zero_data.row(segment_start);
-  const unsigned int segment_length = segment_end - segment_start + 1;
-
-  double det_value = det((
-    reshape(data_diff.subvec(d, p - 1), d, d) - (
-      data_diff.subvec(0, d - 1)).t() * (data_diff.subvec(0, d - 1)
-    ) / segment_length
-  ) / segment_length);
+  unsigned int segment_length = segment_end - segment_start + 1;
   if (segment_length <= d) {
     unsigned int approximate_segment_start;
     unsigned int approximate_segment_end;
@@ -538,17 +532,19 @@ CostResult Fastcpd::get_nll_pelt_meanvariance(
     }
     data_diff = zero_data.row(approximate_segment_end + 1) -
       zero_data.row(approximate_segment_start);
-    det_value = det((
-    reshape(data_diff.subvec(d, p - 1), d, d) - (
-      data_diff.subvec(0, d - 1)).t() * (data_diff.subvec(0, d - 1)
-    ) / (approximate_segment_end - approximate_segment_start + 1)
-  ) / (approximate_segment_end - approximate_segment_start + 1));
+    segment_length = approximate_segment_end - approximate_segment_start + 1;
   }
 
   return {
     {zeros<colvec>(p)},
     {mat()},
-    (d * std::log(2.0 * M_PI) + d + log(det_value)) * (segment_length) / 2.0
+    (d * std::log(2.0 * M_PI) + d + log_det_sympd(
+      (
+        reshape(data_diff.subvec(d, p - 1), d, d) - (
+          data_diff.subvec(0, d - 1)).t() * (data_diff.subvec(0, d - 1)
+        ) / segment_length
+      ) / segment_length
+    )) * (segment_length) / 2.0
   };
 }
 
@@ -588,11 +584,10 @@ CostResult Fastcpd::get_nll_pelt_variance(
   const bool cv,
   const Nullable<colvec>& start
 ) {
-  const unsigned int segment_length = segment_end - segment_start + 1;
+  rowvec data_diff =
+    zero_data.row(segment_end + 1) - zero_data.row(segment_start);
+  unsigned int segment_length = segment_end - segment_start + 1;
 
-  double det_value = det(arma::reshape(
-    zero_data.row(segment_end + 1) - zero_data.row(segment_start), d, d
-  ) / segment_length);
   if (segment_length < d) {
     unsigned int approximate_segment_start;
     unsigned int approximate_segment_end;
@@ -606,16 +601,17 @@ CostResult Fastcpd::get_nll_pelt_variance(
     } else {
       approximate_segment_end = data_n_rows - 1;
     }
-    det_value = det(arma::reshape(
-      zero_data.row(approximate_segment_end + 1) -
-        zero_data.row(approximate_segment_start), d, d
-    ) / (approximate_segment_end - approximate_segment_start + 1));
+    data_diff = zero_data.row(approximate_segment_end + 1) -
+      zero_data.row(approximate_segment_start);
+    segment_length = approximate_segment_end - approximate_segment_start + 1;
   }
 
   return {
     {zeros<mat>(d, d)},
     {mat()},
-    (std::log(2.0 * M_PI) * d + d + log(det_value)) * segment_length / 2.0
+    (std::log(2.0 * M_PI) * d + d + log_det_sympd(
+      arma::reshape(data_diff, d, d) / segment_length
+    )) * segment_length / 2.0
   };
 }
 
