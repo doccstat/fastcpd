@@ -436,7 +436,7 @@ CostResult Fastcpd::get_nll_pelt_lasso(
               deviance = stats["deviance"];
     List out = cv_glmnet(
       data_segment.cols(1, data_segment.n_cols - 1),
-      data_segment.col(0),
+      data_segment.col(0),  // # nocov
       Named("family") = "gaussian"
     );
     colvec index_vec = as<colvec>(out["index"]),
@@ -546,9 +546,9 @@ CostResult Fastcpd::get_nll_pelt_meanvariance(
   }
 
   return {
-    {zeros<colvec>(p)},
+    {zeros<colvec>(p)},  // # nocov
     {mat()},
-    (d * std::log(2.0 * M_PI) + d + log(det_value)) * (segment_length) / 2.0
+    (d * std::log(2.0 * M_PI) + d + log(det_value)) * segment_length / 2.0
   };
 }
 
