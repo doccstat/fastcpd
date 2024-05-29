@@ -27,7 +27,8 @@ NULL
 #' AR(\eqn{p}) models. The function is similar to [fastcpd()] except that
 #' the data is by default a one-column matrix or univariate vector
 #' and thus a formula is not required here.
-#' @example tests/testthat/examples/fastcpd_ar.R
+#' @example tests/testthat/examples/fastcpd_ar_1.R
+#' @example tests/testthat/examples/fastcpd_ar_2.R
 #' @seealso [fastcpd()]
 #'
 #' @md
