@@ -59,7 +59,7 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
   ...
 ) {
   if (x@family == "custom") {
-    warning("Built-in plot should only work for built-in families.")
+    message("Built-in plot should only work for built-in families.")
   }
   if (x@family == "mean" && ncol(x@data) > 1) {
     warning("Can not plot mean change points with p > 1.")

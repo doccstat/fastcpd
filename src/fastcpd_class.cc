@@ -115,22 +115,22 @@ Fastcpd::Fastcpd(
 
   zero_data_c = (double **)malloc((data_n_rows + 1) * sizeof(double *));
   if (zero_data_c == NULL) {
-    FATAL("Memory allocation failed.");
+    FATAL("Memory allocation failed.");  // # nocov
   }
   unsigned int i = 0;
   while (i < data_n_rows + 1) {
     zero_data_c[i] = (double *)malloc(data_n_cols * sizeof(double));
     if (zero_data_c[i] == NULL) {
-      break;
+      break;  // # nocov
     }
     i++;
   }
   if (i < data_n_rows + 1) {
-    for (unsigned int j = 0; j < i; j++) {
+    for (unsigned int j = 0; j < i; j++) {  // # nocov start
       free(zero_data_c[j]);
     }
     free(zero_data_c);
-    FATAL("Memory allocation failed.");
+    FATAL("Memory allocation failed.");  // # nocov end
   }
   for (unsigned int i = 0; i < data_n_rows + 1; i++) {
     for (unsigned int j = 0; j < data_n_cols; j++) {
@@ -545,9 +545,7 @@ CostResult Fastcpd::get_optimized_cost(
 ) {
   CostResult cost_result;
   const mat data_segment = data.rows(segment_start, segment_end);
-  if (!(cost_gradient || cost_hessian)) {
-    cost_result = {{colvec()}, {colvec()}, as<double>((*cost)(data_segment))};
-  } else if (p == 1) {
+  if (p == 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result = optim(
@@ -570,7 +568,7 @@ CostResult Fastcpd::get_optimized_cost(
     double value = as<double>(optim_result["value"]);
     cost_result =
       {{log(par / (1 - par))}, {colvec()}, exp(value) / (1 + exp(value))};
-  } else if (p > 1) {
+  } else {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result = optim(
@@ -583,10 +581,6 @@ CostResult Fastcpd::get_optimized_cost(
     );
     cost_result =
       {{as<colvec>(optim_result["par"])}, {colvec()}, optim_result["value"]};
-  } else {
-    // # nocov start
-    ERROR("This branch should not be reached.");
-    // # nocov end
   }
   return cost_result;
 }

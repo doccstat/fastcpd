@@ -22,7 +22,6 @@ if (requireNamespace("matrixStats", quietly = TRUE)) {
   }
 
   result@residuals <- matrix(residual)
-  result@family <- "mean"
   result@data <- data.frame(x = c(well_log))
   plot(result)
 }
