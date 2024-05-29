@@ -2,6 +2,7 @@
 # do a sanity check on the C++ implementation of `fastcpd`.
 
 testthat::skip_on_cran()
+testthat::skip_if_not_installed("mvtnorm")
 
 # nolint start: script provided as is
 
