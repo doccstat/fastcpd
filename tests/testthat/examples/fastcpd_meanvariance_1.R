@@ -1,16 +1,12 @@
-if (requireNamespace("mvtnorm", quietly = TRUE)) {
-  set.seed(1)
-  p <- 1
-  result <- fastcpd.mv(
-    rbind(
-      mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-      mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-      mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
-      mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-      mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-      mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(100, p))
-    )
-  )
-  summary(result)
-  plot(result)
-}
+set.seed(1)
+p <- 1
+result <- fastcpd.meanvariance(c(
+  rnorm(300, 0, 1),
+  rnorm(400, 10, 1),
+  rnorm(300, 0, 10),
+  rnorm(300, 0, 1),
+  rnorm(400, 10, 1),
+  rnorm(300, 10, 10)
+))
+summary(result)
+plot(result)
