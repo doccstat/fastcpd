@@ -342,17 +342,17 @@ if (
 }
 \donttest{
 set.seed(1)
-p <- 5
+p <- 1
 x <- matrix(rnorm(375 * p, 0, 1), ncol = p)
 theta <- rbind(rnorm(p, 0, 1), rnorm(p, 2, 1))
 y <- c(
-  rbinom(200, 1, 1 / (1 + exp(-x[1:200, ] \%*\% theta[1, ]))),
-  rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] \%*\% theta[2, ])))
+  rbinom(200, 1, 1 / (1 + exp(-x[1:200, ] \%*\% theta[1, , drop = FALSE]))),
+  rbinom(175, 1, 1 / (1 + exp(-x[201:375, ] \%*\% theta[2, , drop = FALSE])))
 )
 data <- data.frame(y = y, x = x)
 result_builtin <- suppressWarnings(fastcpd.binomial(data))
 logistic_loss <- function(data, theta) {
-  x <- data[, -1]
+  x <- data[, -1, drop = FALSE]
   y <- data[, 1]
   u <- x \%*\% theta
   nll <- -y * u + log(1 + exp(u))
@@ -360,7 +360,7 @@ logistic_loss <- function(data, theta) {
   sum(nll)
 }
 logistic_loss_gradient <- function(data, theta) {
-  x <- data[nrow(data), -1]
+  x <- data[nrow(data), -1, drop = FALSE]
   y <- data[nrow(data), 1]
   c(-(y - 1 / (1 + exp(-x \%*\% theta)))) * x
 }
@@ -377,23 +377,8 @@ result_custom <- fastcpd(
   cost_gradient = logistic_loss_gradient,
   cost_hessian = logistic_loss_hessian
 )
-cat(
-  "Change points detected by built-in logistic regression model: ",
-  result_builtin@cp_set, "\n",
-  "Change points detected by custom logistic regression model: ",
-  result_custom@cp_set, "\n",
-  sep = ""
-)
-result_custom_two_epochs <- fastcpd(
-  formula = y ~ . - 1,
-  data = data,
-  multiple_epochs = function(segment_length) 1,
-  epsilon = 1e-5,
-  cost = logistic_loss,
-  cost_gradient = logistic_loss_gradient,
-  cost_hessian = logistic_loss_hessian
-)
-summary(result_custom_two_epochs)
+result_builtin@cp_set
+result_custom@cp_set
 }
 \donttest{
 if (requireNamespace("mvtnorm", quietly = TRUE)) {
