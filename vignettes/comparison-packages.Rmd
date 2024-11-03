@@ -326,13 +326,13 @@ results[["mean_data_1"]][["ecp"]]
 
 ```r
 results[["mean_data_1"]][["changepoint"]] <-
-  changepoint::cpt.mean(c(mean_data_1))@cpts
+  cpts(changepoint::cpt.mean(c(mean_data_1)/mad(mean_data_1)))
 ```
 
 
 ```r
 results[["mean_data_1"]][["changepoint"]]
-#> [1]  300 1000
+#> [1]  300 700
 ```
 
 
@@ -589,13 +589,13 @@ results[["mv_data_1"]][["ecp"]]
 
 ```r
 results[["mv_data_1"]][["changepoint"]] <-
-  changepoint::cpt.meanvar(c(mv_data_1))@cpts
+  cpts(changepoint::cpt.meanvar(c(mv_data_1)))
 ```
 
 
 ```r
 results[["mv_data_1"]][["changepoint"]]
-#> [1]  300 2000
+#> [1]  300  700 1000 1300 1700
 ```
 
 
@@ -1270,7 +1270,7 @@ well_log <- well_log[well_log > 1e5]
 
 results[["well_log"]] <- list(
   fastcpd = fastcpd.mean(well_log, trim = 0.003)@cp_set,
-  changepoint = changepoint::cpt.mean(well_log)@cpts,
+  changepoint = cpts(changepoint::cpt.mean(well_log/mad(well_log))),
   CptNonPar =
     CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6))$cpts,
   strucchange = strucchange::breakpoints(
@@ -1309,7 +1309,8 @@ results[["well_log"]]
 #> [16] 2445 2507 2567 2749 2926 3094 3107 3509 3622 3709 3820 3976
 #> 
 #> $changepoint
-#> [1] 2738 3989
+#> [1] 7   19 1038 1070 1212 1220 1426 1431 1526 1685 1866 2047 2409 2469 2531
+#> [16] 2591 2772 2779 3944 3963
 #> 
 #> $CptNonPar
 #> [1] 1021 1681 2022 2738
@@ -1439,7 +1440,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 ```r
 results[["microbenchmark"]] <- microbenchmark::microbenchmark(
   fastcpd = fastcpd::fastcpd.mean(well_log, trim = 0.003, r.progress = FALSE),
-  changepoint = changepoint::cpt.mean(well_log, method = "PELT"),
+  changepoint = changepoint::cpt.mean(well_log/mad(well_log), method = "PELT"),
   CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
   strucchange =
     strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),
@@ -1733,9 +1734,9 @@ results[["mean_data_1"]][["ecp"]] <- ecp::e.divisive(mean_data_1)$estimates
 results[["mean_data_1"]][["ecp"]]
 testthat::expect_equal(results[["mean_data_1"]][["ecp"]], c(1, 301, 701, 1001), tolerance = 0.2)
 results[["mean_data_1"]][["changepoint"]] <-
-  changepoint::cpt.mean(c(mean_data_1))@cpts
+  cpts(changepoint::cpt.mean(c(mean_data_1)/mad(mean_data_1)))
 results[["mean_data_1"]][["changepoint"]]
-testthat::expect_equal(results[["mean_data_1"]][["changepoint"]], c(300, 1000), tolerance = 0.2)
+testthat::expect_equal(results[["mean_data_1"]][["changepoint"]], c(300, 700), tolerance = 0.2)
 results[["mean_data_1"]][["breakfast"]] <-
   breakfast::breakfast(mean_data_1)$cptmodel.list[[6]]$cpts
 results[["mean_data_1"]][["breakfast"]]
@@ -1820,9 +1821,9 @@ results[["mv_data_1"]][["ecp"]] <- ecp::e.divisive(mv_data_1)$estimates
 results[["mv_data_1"]][["ecp"]]
 testthat::expect_equal(results[["mv_data_1"]][["ecp"]], c(1, 301, 701, 1001, 1301, 1701, 2001), tolerance = 0.2)
 results[["mv_data_1"]][["changepoint"]] <-
-  changepoint::cpt.meanvar(c(mv_data_1))@cpts
+  cpts(changepoint::cpt.meanvar(c(mv_data_1)))
 results[["mv_data_1"]][["changepoint"]]
-testthat::expect_equal(results[["mv_data_1"]][["changepoint"]], c(300, 2000), tolerance = 0.2)
+testthat::expect_equal(results[["mv_data_1"]][["changepoint"]], c(300,700, 1000, 1300, 1700), tolerance = 0.2)
 results[["mv_data_1"]][["CptNonPar"]] <-
   CptNonPar::np.mojo(mv_data_1, G = floor(length(mv_data_1) / 6))$cpts
 results[["mv_data_1"]][["CptNonPar"]]
@@ -2097,7 +2098,7 @@ well_log <- well_log[well_log > 1e5]
 
 results[["well_log"]] <- list(
   fastcpd = fastcpd.mean(well_log, trim = 0.003)@cp_set,
-  changepoint = changepoint::cpt.mean(well_log)@cpts,
+  changepoint = cpts(changepoint::cpt.mean(well_log/mad(well_log))),
   CptNonPar =
     CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6))$cpts,
   strucchange = strucchange::breakpoints(
@@ -2189,7 +2190,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 }
 results[["microbenchmark"]] <- microbenchmark::microbenchmark(
   fastcpd = fastcpd::fastcpd.mean(well_log, trim = 0.003, r.progress = FALSE),
-  changepoint = changepoint::cpt.mean(well_log, method = "PELT"),
+  changepoint = changepoint::cpt.mean(well_log/mad(well_log), method = "PELT"),
   CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
   strucchange =
     strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),
