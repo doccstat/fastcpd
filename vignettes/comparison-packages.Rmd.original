@@ -1118,6 +1118,8 @@ R -e 'knitr::knit("vignettes/comparison-packages.Rmd.original", output = "vignet
 -   [Dr. Vito Muggeo](https://www.unipa.it/persone/docenti/m/vito.muggeo),
     author of the `segmented` package for the tips about the piece-wise
     constant function.
+-   [Dr. Rebecca Killick](https://www.lancaster.ac.uk/maths/people/rebecca-killick),
+    author of the `changepoint` package for the tips about the package update.
 
 # Appendix: all code snippets
 

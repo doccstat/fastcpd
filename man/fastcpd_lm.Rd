@@ -41,7 +41,8 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
   result_lm <- fastcpd.lm(cbind(y, x))
   summary(result_lm)
   plot(result_lm)
-
+}
+if (requireNamespace("mvtnorm", quietly = TRUE)) {
   set.seed(1)
   n <- 600
   p <- 4
