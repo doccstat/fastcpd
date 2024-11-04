@@ -1,3 +1,7 @@
+# fastcpd 0.14.6
+
+*   Update package comparison and remove packages breaking seed setting.
+
 # fastcpd 0.14.5
 
 *   Add pre-compiled vignettes.
