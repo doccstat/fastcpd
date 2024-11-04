@@ -29,7 +29,7 @@ mean_data_1 <- rbind(
 plot.ts(mean_data_1)
 ```
 
-![plot of chunk data-setup-univariate-mean-change](figure/data-setup-univariate-mean-change-1.png)
+![plot of chunk data-setup-univariate-mean-change](comparison-packages/data-setup-univariate-mean-change-1.png)
 
 ## Univariate mean and/or variance change
 
@@ -50,7 +50,7 @@ mv_data_1 <- rbind(
 plot.ts(mv_data_1)
 ```
 
-![plot of chunk data-setup-univariate-mean-and-or-variance-change](figure/data-setup-univariate-mean-and-or-variance-change-1.png)
+![plot of chunk data-setup-univariate-mean-and-or-variance-change](comparison-packages/data-setup-univariate-mean-and-or-variance-change-1.png)
 
 ## Multivariate mean change
 
@@ -68,7 +68,7 @@ mean_data_3 <- rbind(
 plot.ts(mean_data_3)
 ```
 
-![plot of chunk data-setup-multivariate-mean-change](figure/data-setup-multivariate-mean-change-1.png)
+![plot of chunk data-setup-multivariate-mean-change](comparison-packages/data-setup-multivariate-mean-change-1.png)
 
 ## Multivariate mean and/or variance change
 
@@ -89,7 +89,7 @@ mv_data_3 <- rbind(
 plot.ts(mv_data_3)
 ```
 
-![plot of chunk data-setup-multivariate-mean-and-or-variance-change](figure/data-setup-multivariate-mean-and-or-variance-change-1.png)
+![plot of chunk data-setup-multivariate-mean-and-or-variance-change](comparison-packages/data-setup-multivariate-mean-and-or-variance-change-1.png)
 
 ## Linear regression
 
@@ -111,7 +111,7 @@ lm_data <- data.frame(y = y, x = x)
 plot.ts(lm_data)
 ```
 
-![plot of chunk data-setup-linear-regression](figure/data-setup-linear-regression-1.png)
+![plot of chunk data-setup-linear-regression](comparison-packages/data-setup-linear-regression-1.png)
 
 ## Logistic regression
 
@@ -132,7 +132,7 @@ binomial_data <- data.frame(y = y, x = x)
 plot.ts(binomial_data)
 ```
 
-![plot of chunk data-setup-logistic-regression](figure/data-setup-logistic-regression-1.png)
+![plot of chunk data-setup-logistic-regression](comparison-packages/data-setup-logistic-regression-1.png)
 
 ## Poisson regression
 
@@ -156,13 +156,13 @@ poisson_data <- data.frame(y = y, x = x)
 plot.ts(log(poisson_data$y))
 ```
 
-![plot of chunk data-setup-poisson-regression](figure/data-setup-poisson-regression-1.png)
+![plot of chunk data-setup-poisson-regression](comparison-packages/data-setup-poisson-regression-1.png)
 
 ``` r
 plot.ts(poisson_data[, -1])
 ```
 
-![plot of chunk data-setup-poisson-regression](figure/data-setup-poisson-regression-2.png)
+![plot of chunk data-setup-poisson-regression](comparison-packages/data-setup-poisson-regression-2.png)
 
 ## Lasso
 
@@ -192,7 +192,7 @@ lasso_data <- data.frame(y = y, x = x)
 plot.ts(lasso_data[, seq_len(p_true + 1)])
 ```
 
-![plot of chunk data-setup-lasso](figure/data-setup-lasso-1.png)
+![plot of chunk data-setup-lasso](comparison-packages/data-setup-lasso-1.png)
 
 ## AR(3)
 
@@ -213,7 +213,7 @@ ar_data <- x[-seq_len(3)]
 plot.ts(ar_data)
 ```
 
-![plot of chunk data-setup-ar3](figure/data-setup-ar3-1.png)
+![plot of chunk data-setup-ar3](comparison-packages/data-setup-ar3-1.png)
 
 ## GARCH(1, 1)
 
@@ -237,7 +237,7 @@ garch_data <- x[-1]
 plot.ts(garch_data)
 ```
 
-![plot of chunk data-setup-garch11](figure/data-setup-garch11-1.png)
+![plot of chunk data-setup-garch11](comparison-packages/data-setup-garch11-1.png)
 
 ## VAR(2)
 
@@ -261,7 +261,7 @@ var_data <- x[-seq_len(2), ]
 plot.ts(var_data)
 ```
 
-![plot of chunk data-setup-var2](figure/data-setup-var2-1.png)
+![plot of chunk data-setup-var2](comparison-packages/data-setup-var2-1.png)
 
 # Univariate mean change
 
@@ -499,7 +499,7 @@ if (requireNamespace("mcp", quietly = TRUE)) {
 }
 ```
 
-![plot of chunk univariate-mean-change-mcp-result](figure/univariate-mean-change-mcp-result-1.png)
+![plot of chunk univariate-mean-change-mcp-result](comparison-packages/univariate-mean-change-mcp-result-1.png)
 
 
 ``` r
@@ -514,7 +514,7 @@ if (requireNamespace("not", quietly = TRUE)) {
 }
 ```
 
-![plot of chunk univariate-mean-change-not-result](figure/univariate-mean-change-not-result-1.png)
+![plot of chunk univariate-mean-change-not-result](comparison-packages/univariate-mean-change-not-result-1.png)
 
 
 ``` r
@@ -530,7 +530,7 @@ if (requireNamespace("bcp", quietly = TRUE)) {
 }
 ```
 
-![plot of chunk univariate-mean-change-bcp-result](figure/univariate-mean-change-bcp-result-1.png)
+![plot of chunk univariate-mean-change-bcp-result](comparison-packages/univariate-mean-change-bcp-result-1.png)
 
 # Univariate mean and/or variance change
 
@@ -633,7 +633,7 @@ if (requireNamespace("mcp", quietly = TRUE)) {
 }
 ```
 
-![plot of chunk univariate-mean-and-or-variance-change-mcp-result](figure/univariate-mean-and-or-variance-change-mcp-result-1.png)
+![plot of chunk univariate-mean-and-or-variance-change-mcp-result](comparison-packages/univariate-mean-and-or-variance-change-mcp-result-1.png)
 
 
 ``` r
@@ -648,13 +648,13 @@ if (requireNamespace("not", quietly = TRUE)) {
 }
 ```
 
-![plot of chunk univariate-mean-and-or-variance-change-not-result](figure/univariate-mean-and-or-variance-change-not-result-1.png)
+![plot of chunk univariate-mean-and-or-variance-change-not-result](comparison-packages/univariate-mean-and-or-variance-change-not-result-1.png)
 
 ```
 #> Press [enter] to continue
 ```
 
-![plot of chunk univariate-mean-and-or-variance-change-not-result](figure/univariate-mean-and-or-variance-change-not-result-2.png)
+![plot of chunk univariate-mean-and-or-variance-change-not-result](comparison-packages/univariate-mean-and-or-variance-change-not-result-2.png)
 
 # Multivariate mean change
 
@@ -744,7 +744,7 @@ if (requireNamespace("bcp", quietly = TRUE)) {
 }
 ```
 
-![plot of chunk multivariate-mean-change-bcp-result](figure/multivariate-mean-change-bcp-result-1.png)
+![plot of chunk multivariate-mean-change-bcp-result](comparison-packages/multivariate-mean-change-bcp-result-1.png)
 
 # Multivariate mean and/or variance change
 
@@ -1004,7 +1004,7 @@ if (requireNamespace("mcp", quietly = TRUE)) {
 }
 ```
 
-![plot of chunk ar3-mcp-result](figure/ar3-mcp-result-1.png)
+![plot of chunk ar3-mcp-result](comparison-packages/ar3-mcp-result-1.png)
 
 # GARCH(1, 1)
 
@@ -1242,7 +1242,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 }
 ```
 
-![plot of chunk detection-comparison-well-log-plot](figure/detection-comparison-well-log-plot-1.png)
+![plot of chunk detection-comparison-well-log-plot](comparison-packages/detection-comparison-well-log-plot-1.png)
 
 # Time comparison using `well_log`
 
@@ -1315,14 +1315,14 @@ if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("microbenchm
 }
 ```
 
-![plot of chunk time-comparison-well-log-plot](figure/time-comparison-well-log-plot-1.png)
+![plot of chunk time-comparison-well-log-plot](comparison-packages/time-comparison-well-log-plot-1.png)
 
 # Notes
 
 This document is generated by the following code:
 
 ```shell
-R -e 'knitr::knit("vignettes/comparison-packages.Rmd.original", output = "vignettes/comparison-packages.Rmd")' && rm -rf vignettes/figure && mv -f figure vignettes
+R -e 'knitr::knit("vignettes/comparison-packages.Rmd.original", output = "vignettes/comparison-packages.Rmd")' && rm -rf vignettes/comparison-packages && mv -f comparison-packages vignettes
 ```
 
 # Related issues
@@ -1349,7 +1349,8 @@ R -e 'knitr::knit("vignettes/comparison-packages.Rmd.original", output = "vignet
 ``` r
 knitr::opts_chunk$set(
   collapse = TRUE, comment = "#>", eval = TRUE, cache = FALSE,
-  warning = FALSE, fig.width = 8, fig.height = 5
+  warning = FALSE, fig.width = 8, fig.height = 5,
+  fig.path="comparison-packages/"
 )
 
 # devtools::install_github(c("swang87/bcp", "veseshan/DNAcopy", "vrunge/gfpop"))
