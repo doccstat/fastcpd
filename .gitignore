@@ -45,6 +45,7 @@ src/*.so
 src/*.dll
 inst/doc
 vignettes/*.aux
+vignettes/comparison-packages-results.RData
 .vscode/
 docs
 pkgdown/favicon/
