@@ -1,13 +1,12 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   comparison-packages: comparison-packages.html
   comparison-pelt: comparison-pelt.html
   examples-advanced: examples-advanced.html
   examples-custom-model: examples-custom-model.html
-last_built: 2024-05-30T06:20Z
+last_built: 2024-11-04T21:26Z
 urls:
   reference: https://fastcpd.xingchi.li/reference
   article: https://fastcpd.xingchi.li/articles
-
