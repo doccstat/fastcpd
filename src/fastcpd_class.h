@@ -16,6 +16,7 @@ using ::std::string;
 using ::std::string_view;
 using ::std::unique_ptr;
 using ::std::unordered_map;
+using ::std::vector;
 
 using ::fastcpd::test::FastcpdTest;
 
@@ -578,6 +579,15 @@ class Fastcpd {
   void update_r_progress_tick();
 
   void update_start(const unsigned int col, const colvec start_col);
+
+  void update_step(
+    unsigned int t,
+    ucolvec& r_t_set,
+    unsigned int& r_t_count,
+    vector<colvec>& cp_sets,
+    colvec& fvec,
+    double lambda
+  );
 
   // Append a new column to \code{theta_hat}.
   void update_theta_hat(colvec new_theta_hat);

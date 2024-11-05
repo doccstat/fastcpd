@@ -149,7 +149,7 @@ List Fastcpd::run() {
   r_t_set(1) = 1;
   unsigned int r_t_count = 2;
 
-  std::vector<colvec> cp_sets = {{0}};
+  vector<colvec> cp_sets = {{0}};
   linspace(1, data_n_rows, data_n_rows).for_each([&](int i) {
     cp_sets.push_back({0});
   });
@@ -165,39 +165,7 @@ List Fastcpd::run() {
   update_r_progress_tick();
 
   for (unsigned int t = 2; t <= data_n_rows; t++) {
-    colvec cval = get_cval_step(r_t_set, r_t_count, t, lambda);
-    update_r_clock_tick("pruning");
-
-    if (vanilla_percentage != 1) {
-      update_fastcpd_parameters(t);
-    }
-
-    colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta;
-    double min_obj = min(obj);
-    double tau_star = r_t_set(index_min(obj));
-
-    cp_sets[t] = join_cols(cp_sets[tau_star], colvec{tau_star});
-
-    ucolvec pruned_left = find(
-      cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + pruning_coef <= min_obj
-    );
-    r_t_count = pruned_left.n_elem + 1;
-    if (pruned_left.n_elem) {
-      r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
-    }
-    r_t_set(pruned_left.n_elem) = t;
-
-    if (vanilla_percentage != 1) {
-      update_theta_hat(pruned_left);
-      update_theta_sum(pruned_left);
-      update_hessian(pruned_left);
-    }
-
-    fvec(t) = min_obj;
-
-    checkUserInterrupt();
-    update_r_progress_tick();
-    update_r_clock_tock("pruning");
+    update_step(t, r_t_set, r_t_count, cp_sets, fvec, lambda);
   }
 
   create_clock_in_r(r_clock);
@@ -877,6 +845,49 @@ void Fastcpd::update_r_progress_tick() {
 
 void Fastcpd::update_start(const unsigned int col, const colvec start_col) {
   start.col(col) = start_col;
+}
+
+void Fastcpd::update_step(
+  unsigned int t,
+  ucolvec& r_t_set,
+  unsigned int& r_t_count,
+  vector<colvec>& cp_sets,
+  colvec& fvec,
+  double lambda
+) {
+  colvec cval = get_cval_step(r_t_set, r_t_count, t, lambda);
+  update_r_clock_tick("pruning");
+
+  if (vanilla_percentage != 1) {
+    update_fastcpd_parameters(t);
+  }
+
+  colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta;
+  double min_obj = min(obj);
+  double tau_star = r_t_set(index_min(obj));
+
+  cp_sets[t] = join_cols(cp_sets[tau_star], colvec{tau_star});
+
+  ucolvec pruned_left = find(
+    cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + pruning_coef <= min_obj
+  );
+  r_t_count = pruned_left.n_elem + 1;
+  if (pruned_left.n_elem) {
+    r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
+  }
+  r_t_set(pruned_left.n_elem) = t;
+
+  if (vanilla_percentage != 1) {
+    update_theta_hat(pruned_left);
+    update_theta_sum(pruned_left);
+    update_hessian(pruned_left);
+  }
+
+  fvec(t) = min_obj;
+  update_r_clock_tock("pruning");
+
+  checkUserInterrupt();
+  update_r_progress_tick();
 }
 
 void Fastcpd::update_theta_hat(colvec new_theta_hat) {

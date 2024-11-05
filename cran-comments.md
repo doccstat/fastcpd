@@ -1,14 +1,5 @@
-## Updates since last CRAN release (0.14.3)
+## Updates since last CRAN release (0.14.6)
 
-### fastcpd 0.14.6
+### fastcpd 0.14.7
 
-*   Update package comparison and remove packages breaking seed setting.
-
-### fastcpd 0.14.5
-
-*   Add pre-compiled vignettes.
-
-### fastcpd 0.14.4
-
-*   Simplify code.
-*   Expose `fastcpd_impl` API for use in other packages.
+*   Simplify methods initialization.
