@@ -42,6 +42,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
   summary(result_lm)
   plot(result_lm)
 }
+\donttest{
 if (requireNamespace("mvtnorm", quietly = TRUE)) {
   set.seed(1)
   n <- 600
@@ -56,6 +57,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
   )
   result_mlm <- fastcpd.lm(cbind.data.frame(y = y, x = x), p.response = 2)
   summary(result_mlm)
+}
 }
 }
 \seealso{
