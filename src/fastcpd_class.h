@@ -2,6 +2,7 @@
 #define FASTCPD_CLASS_H_
 
 #include <memory>
+#include <unordered_map>
 
 #include "fastcpd_test.h"
 #include "RcppClock.h"
@@ -14,6 +15,7 @@ using ::Rcpp::List;
 using ::std::string;
 using ::std::string_view;
 using ::std::unique_ptr;
+using ::std::unordered_map;
 
 using ::fastcpd::test::FastcpdTest;
 
@@ -55,6 +57,32 @@ class Fastcpd {
   List run();
 
  private:
+  struct GetFunctionSet {
+    colvec (Fastcpd::*gradient)(
+      const unsigned int segment_start,
+      const unsigned int segment_end,
+      const colvec& theta
+    );
+    mat (Fastcpd::*hessian)(
+      const unsigned int segment_start,
+      const unsigned int segment_end,
+      const colvec& theta
+    );
+    double (Fastcpd::*nll_sen)(
+      const unsigned int segment_start,
+      const unsigned int segment_end,
+      colvec theta,
+      double lambda
+    );
+    CostResult (Fastcpd::*nll_pelt)(
+      const unsigned int segment_start,
+      const unsigned int segment_end,
+      const double lambda,
+      const bool cv,
+      const Nullable<colvec>& start
+    );
+  };
+
   // `act_num` is used in Lasso and Gaussian families only.
   colvec act_num;
 
@@ -191,6 +219,9 @@ class Fastcpd {
 
   const double trim;
 
+  // Static mapping from family names to their function sets
+  static const unordered_map<string, GetFunctionSet> family_function_map;
+
   // Upper bound of the parameters to be estimated during the optimization.
   const colvec upper;
 
@@ -219,8 +250,15 @@ class Fastcpd {
   // Initialize theta_hat_t_t to be the estimate in the segment.
   void create_segment_statistics();
 
+  // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian} and
+  // theta_hat_t_t to be the estimate in the segment.
+  void create_statistics_and_gradients();
+
   // Set \code{theta_sum} for a specific column.
   void create_theta_sum(const unsigned int col, colvec new_theta_sum);
+
+  // Clean up the memory allocated for \code{zero_data_c}.
+  void delete_zero_data_c();
 
   double get_cost_adjustment_value(const unsigned nrows);
 
@@ -267,6 +305,13 @@ class Fastcpd {
     const unsigned int segment_end,
     const unsigned int i,
     const double lambda
+  );
+
+  colvec get_cval_step(
+    const ucolvec& r_t_set,
+    unsigned int r_t_count,
+    unsigned int t,
+    double lambda
   );
 
   colvec get_gradient_arma(

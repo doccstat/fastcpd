@@ -158,21 +158,14 @@ List Fastcpd::run() {
   fvec.fill(arma::datum::inf);
   fvec(0) = -beta;
 
-  create_segment_statistics();
-  create_gradients();
+  create_statistics_and_gradients();
 
   checkUserInterrupt();
   update_r_progress_start();
   update_r_progress_tick();
 
   for (unsigned int t = 2; t <= data_n_rows; t++) {
-    colvec cval = zeros<vec>(r_t_count);
-
-    update_r_clock_tick("r_t_set_for_loop");
-    for (unsigned int i = 0; i < r_t_count - 1; i++) {
-      cval(i) = get_cval_for_r_t_set(r_t_set(i), i, t, lambda);
-    }
-    update_r_clock_tock("r_t_set_for_loop");
+    colvec cval = get_cval_step(r_t_set, r_t_count, t, lambda);
     update_r_clock_tick("pruning");
 
     if (vanilla_percentage != 1) {
@@ -210,14 +203,61 @@ List Fastcpd::run() {
   create_clock_in_r(r_clock);
 
   List result = get_cp_set(cp_sets[data_n_rows], lambda);
-
-  for (unsigned int i = 0; i < data_n_rows + 1; i++) {
-    free(zero_data_c[i]);
-  }
-  free(zero_data_c);
+  delete_zero_data_c();
 
   return result;
 }
+
+const unordered_map<string, Fastcpd::GetFunctionSet> Fastcpd::family_function_map = {
+  { "binomial", GetFunctionSet{
+    &Fastcpd::get_gradient_binomial,
+    &Fastcpd::get_hessian_binomial,
+    &Fastcpd::get_nll_sen_binomial,
+    &Fastcpd::get_nll_pelt_glm
+  }},
+  { "gaussian", GetFunctionSet{
+    &Fastcpd::get_gradient_lm,
+    &Fastcpd::get_hessian_lm,
+    &Fastcpd::get_nll_sen_lm,
+    &Fastcpd::get_nll_pelt_glm
+  }},
+  { "lasso", GetFunctionSet{
+    &Fastcpd::get_gradient_lm,
+    &Fastcpd::get_hessian_lm,
+    &Fastcpd::get_nll_sen_lm,
+    &Fastcpd::get_nll_pelt_lasso
+  }},
+  { "poisson", GetFunctionSet{
+    &Fastcpd::get_gradient_poisson,
+    &Fastcpd::get_hessian_poisson,
+    &Fastcpd::get_nll_sen_poisson,
+    &Fastcpd::get_nll_pelt_glm
+  }},
+  { "mean", GetFunctionSet{
+    nullptr, // No gradient
+    nullptr, // No hessian
+    nullptr, // No nll_sen
+    &Fastcpd::get_nll_pelt_mean
+  }},
+  { "meanvariance", GetFunctionSet{
+    nullptr, // No gradient
+    nullptr, // No hessian
+    nullptr, // No nll_sen
+    &Fastcpd::get_nll_pelt_meanvariance
+  }},
+  { "mgaussian", GetFunctionSet{
+    nullptr, // No gradient
+    nullptr, // No hessian
+    nullptr, // No nll_sen
+    &Fastcpd::get_nll_pelt_mgaussian
+  }},
+  { "variance", GetFunctionSet{
+    nullptr, // No gradient
+    nullptr, // No hessian
+    nullptr, // No nll_sen
+    &Fastcpd::get_nll_pelt_variance
+  }}
+};
 
 void Fastcpd::create_clock_in_r(const std::string name) {
   if (!r_clock.empty()) {
@@ -230,54 +270,38 @@ void Fastcpd::create_gets(
   Nullable<Function>& cost_gradient,
   Nullable<Function>& cost_hessian
 ) {
-  if (family == "arma" && order(0) > 0) {
-    get_gradient = &Fastcpd::get_gradient_arma;
-    get_hessian = &Fastcpd::get_hessian_arma;
-    get_nll_sen = &Fastcpd::get_nll_sen_arma;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
-  } else if (family.compare("binomial") == 0) {
-    get_gradient = &Fastcpd::get_gradient_binomial;
-    get_hessian = &Fastcpd::get_hessian_binomial;
-    get_nll_sen = &Fastcpd::get_nll_sen_binomial;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
-  } else if (family == "gaussian") {
-    get_gradient = &Fastcpd::get_gradient_lm;
-    get_hessian = &Fastcpd::get_hessian_lm;
-    get_nll_sen = &Fastcpd::get_nll_sen_lm;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
-  } else if (family == "lasso") {
-    get_gradient = &Fastcpd::get_gradient_lm;
-    get_hessian = &Fastcpd::get_hessian_lm;
-    get_nll_sen = &Fastcpd::get_nll_sen_lm;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_lasso;
-  } else if (family == "arma" && order(0) == 0) {
-    get_gradient = &Fastcpd::get_gradient_ma;
-    get_hessian = &Fastcpd::get_hessian_ma;
-    get_nll_sen = &Fastcpd::get_nll_sen_ma;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
-  } else if (family == "mean") {
-    get_nll_pelt = &Fastcpd::get_nll_pelt_mean;
-  } else if (family == "meanvariance") {
-    get_nll_pelt = &Fastcpd::get_nll_pelt_meanvariance;
-  } else if (family == "mgaussian") {
-    get_nll_pelt = &Fastcpd::get_nll_pelt_mgaussian;
-  } else if (family.compare("poisson") == 0) {
-    get_gradient = &Fastcpd::get_gradient_poisson;
-    get_hessian = &Fastcpd::get_hessian_poisson;
-    get_nll_sen = &Fastcpd::get_nll_sen_poisson;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_glm;
-  } else if (family == "variance") {
-    get_nll_pelt = &Fastcpd::get_nll_pelt_variance;
-  } else {
-    this->cost = make_unique<Function>(cost);
-    if (cost_gradient.isNotNull() || cost_hessian.isNotNull()) {
-      this->cost_gradient = make_unique<Function>(cost_gradient);
-      this->cost_hessian = make_unique<Function>(cost_hessian);
+  // Handle the special 'arma' family with order condition
+  if (family == "arma") {
+    if (order(0) > 0) {
+      get_gradient = &Fastcpd::get_gradient_arma;
+      get_hessian = &Fastcpd::get_hessian_arma;
+      get_nll_sen = &Fastcpd::get_nll_sen_arma;
+      get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
+    } else { // order(0) == 0
+      get_gradient = &Fastcpd::get_gradient_ma;
+      get_hessian = &Fastcpd::get_hessian_ma;
+      get_nll_sen = &Fastcpd::get_nll_sen_ma;
+      get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
     }
-    get_gradient = &Fastcpd::get_gradient_custom;
-    get_hessian = &Fastcpd::get_hessian_custom;
-    get_nll_sen = &Fastcpd::get_nll_sen_custom;
-    get_nll_pelt = &Fastcpd::get_nll_pelt_custom;
+  } else {
+    auto it = family_function_map.find(family);
+    if (it != family_function_map.end()) {
+      const GetFunctionSet &func_set = it->second;
+      get_gradient = func_set.gradient;
+      get_hessian = func_set.hessian;
+      get_nll_sen = func_set.nll_sen;
+      get_nll_pelt = func_set.nll_pelt;
+    } else {
+      this->cost = make_unique<Function>(cost);
+      if (cost_gradient.isNotNull() || cost_hessian.isNotNull()) {
+        this->cost_gradient = make_unique<Function>(cost_gradient);
+        this->cost_hessian = make_unique<Function>(cost_hessian);
+      }
+      get_gradient = &Fastcpd::get_gradient_custom;
+      get_hessian = &Fastcpd::get_hessian_custom;
+      get_nll_sen = &Fastcpd::get_nll_sen_custom;
+      get_nll_pelt = &Fastcpd::get_nll_pelt_custom;
+    }
   }
 
   // TODO(doccstat): Store environment functions from R.
@@ -344,10 +368,22 @@ void Fastcpd::create_segment_statistics() {
   }
 }
 
+void Fastcpd::create_statistics_and_gradients() {
+  create_segment_statistics();
+  create_gradients();
+}
+
 void Fastcpd::create_theta_sum(
   const unsigned int col, colvec new_theta_sum
 ) {
   theta_sum.col(col) = new_theta_sum;
+}
+
+void Fastcpd::delete_zero_data_c() {
+  for (unsigned int i = 0; i < data_n_rows + 1; i++) {
+    free(zero_data_c[i]);
+  }
+  free(zero_data_c);
 }
 
 double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
@@ -536,6 +572,21 @@ double Fastcpd::get_cval_sen(
     ).value;
   }
   // else segment_length < p or for lasso segment_length < 3
+  return cval;
+}
+
+colvec Fastcpd::get_cval_step(
+  const ucolvec& r_t_set,
+  unsigned int r_t_count,
+  unsigned int t,
+  double lambda
+) {
+  colvec cval = zeros<vec>(r_t_count);
+  update_r_clock_tick("r_t_set_for_loop");
+  for (unsigned int i = 0; i < r_t_count - 1; i++) {
+    cval(i) = get_cval_for_r_t_set(r_t_set(i), i, t, lambda);
+  }
+  update_r_clock_tock("r_t_set_for_loop");
   return cval;
 }
 
