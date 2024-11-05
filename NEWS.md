@@ -1,3 +1,7 @@
+# fastcpd 0.14.7
+
+*   Simplify methods initialization.
+
 # fastcpd 0.14.6
 
 *   Update package comparison and remove packages breaking seed setting.
