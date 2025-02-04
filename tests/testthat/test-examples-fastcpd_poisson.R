@@ -9,6 +9,6 @@ testthat::test_that(
       collapse = "\n"
     )))
 
-    testthat::expect_equal(result@cp_set, c(498, 805, 1003))
+    testthat::expect_equal(result@cp_set, c(506, 838, 1003))
   }
 )

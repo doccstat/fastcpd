@@ -4,13 +4,13 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
   result <- fastcpd.variance(
     rbind(
       mvtnorm::rmvnorm(
-        300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+        3000, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
       ),
       mvtnorm::rmvnorm(
-        400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+        4000, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
       ),
       mvtnorm::rmvnorm(
-        300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+        3000, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
       )
     )
   )

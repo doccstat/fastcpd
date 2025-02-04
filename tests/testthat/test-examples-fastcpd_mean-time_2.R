@@ -8,7 +8,7 @@ testthat::test_that(
       collapse = "\n"
     )))
 
-    testthat::expect_equal(result@cp_set, c(10007, 19998))
+    testthat::expect_equal(result@cp_set, c(10007, 20002))
     testthat::expect_lt(result_time[3], 100)
   }
 )

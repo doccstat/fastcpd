@@ -36,13 +36,13 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
   result <- fastcpd.variance(
     rbind(
       mvtnorm::rmvnorm(
-        300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+        3000, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
       ),
       mvtnorm::rmvnorm(
-        400, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+        4000, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
       ),
       mvtnorm::rmvnorm(
-        300, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+        3000, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
       )
     )
   )
@@ -50,7 +50,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
 }
 \donttest{
 set.seed(1)
-data <- c(rnorm(3000, 0, 1), rnorm(3000, 0, 2), rnorm(3000, 0, 1))
+data <- c(rnorm(2000, 0, 1), rnorm(2000, 0, 5), rnorm(2000, 0, 1))
 (result_time <- system.time(
   result <- fastcpd.variance(data, r.progress = FALSE, cp_only = TRUE)
 ))

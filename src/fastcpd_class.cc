@@ -357,7 +357,7 @@ void Fastcpd::delete_zero_data_c() {
 double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
   double adjusted = 0;
   if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
-    adjusted = p * std::log((double) nrows / data_n_rows) / 2.0;
+    adjusted = p * std::log(nrows) / 2.0;
   }
   if (cost_adjustment == "MDL") {
     adjusted *= std::log2(M_E);
