@@ -6,7 +6,7 @@ testthat::test_that(
       collapse = "\n"
     )))
 
-    testthat::expect_equal(result_builtin@cp_set, 198)
+    testthat::expect_equal(result_builtin@cp_set, 201)
     testthat::expect_equal(result_custom@cp_set, 204)
   }
 )

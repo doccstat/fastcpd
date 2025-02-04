@@ -1,3 +1,7 @@
+# fastcpd 0.15.0
+
+*   Remove constants.
+
 # fastcpd 0.14.7
 
 *   Simplify methods initialization.

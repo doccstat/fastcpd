@@ -499,8 +499,7 @@ CostResult Fastcpd::get_nll_pelt_mean(
   return {
     {zeros<colvec>(p)},
     {zeros<mat>(segment_length, p)},
-    std::log(2.0 * M_PI) * data_n_cols + log_det_sympd(variance_estimate) *
-      (segment_length) / 2.0 + (
+    (
       (zero_data_c[segment_end + 1][p] - zero_data_c[segment_start][p]) -
       two_norm / segment_length
     ) / 2.0
@@ -548,7 +547,7 @@ CostResult Fastcpd::get_nll_pelt_meanvariance(
   return {
     {zeros<colvec>(p)},
     {mat()},
-    (d * std::log(2.0 * M_PI) + d + log(det_value)) * segment_length / 2.0
+    log(det_value) * segment_length / 2.0
   };
 }
 
@@ -615,7 +614,7 @@ CostResult Fastcpd::get_nll_pelt_variance(
   return {
     {zeros<mat>(d, d)},
     {mat()},
-    (std::log(2.0 * M_PI) * d + d + log(det_value)) * segment_length / 2.0
+    log(det_value) * segment_length / 2.0
   };
 }
 
