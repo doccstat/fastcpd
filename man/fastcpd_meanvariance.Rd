@@ -64,7 +64,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
 set.seed(1)
 data <- c(rnorm(2000, 0, 1), rnorm(2000, 1, 1), rnorm(2000, 1, 2))
 (result_time <- system.time(
-  result <- fastcpd.variance(data, r.progress = FALSE, cp_only = TRUE)
+  result <- fastcpd.meanvariance(data, r.progress = FALSE, cp_only = TRUE)
 ))
 result@cp_set
 }
@@ -72,7 +72,7 @@ result@cp_set
 set.seed(1)
 data <- c(rnorm(2000, 0, 1), rnorm(2000, 1, 1), rnorm(2000, 1, 2))
 (result_time <- system.time(
-  result <- fastcpd.variance(
+  result <- fastcpd.meanvariance(
     data, beta = "BIC", cost_adjustment = "BIC",
     r.progress = TRUE, cp_only = TRUE
   )
