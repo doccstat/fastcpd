@@ -26,8 +26,10 @@ if (requireNamespace("microbenchmark", quietly = TRUE)) {
 if (file.exists("comparison-packages-results.RData")) {
   # Available at https://pcloud.xingchi.li/comparison-packages-results.RData
   load("comparison-packages-results.RData")
+  rerun <- FALSE
 } else {
   results <- list()
+  rerun <- TRUE
 }
 ```
 
@@ -250,7 +252,7 @@ plot.ts(var_data)
 The true change points are 300 and 700.
 Some methods are plotted due to the un-retrievable change points.
 
-```{r univariate-mean-change-fastcpd, eval = FALSE}
+```{r univariate-mean-change-fastcpd, eval = rerun}
 results[["mean_data_1"]][["fastcpd"]] <-
   fastcpd::fastcpd.mean(mean_data_1, r.progress = FALSE)@cp_set
 ```
@@ -263,7 +265,7 @@ results[["mean_data_1"]][["fastcpd"]]
 testthat::expect_equal(results[["mean_data_1"]][["fastcpd"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-CptNonPar, eval = FALSE}
+```{r univariate-mean-change-CptNonPar, eval = rerun}
 results[["mean_data_1"]][["CptNonPar"]] <-
   CptNonPar::np.mojo(mean_data_1, G = floor(length(mean_data_1) / 6))$cpts
 ```
@@ -276,7 +278,7 @@ results[["mean_data_1"]][["CptNonPar"]]
 testthat::expect_equal(results[["mean_data_1"]][["CptNonPar"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-strucchange, eval = FALSE}
+```{r univariate-mean-change-strucchange, eval = rerun}
 results[["mean_data_1"]][["strucchange"]] <-
   strucchange::breakpoints(y ~ 1, data = data.frame(y = mean_data_1))$breakpoints
 ```
@@ -289,7 +291,7 @@ results[["mean_data_1"]][["strucchange"]]
 testthat::expect_equal(results[["mean_data_1"]][["strucchange"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-ecp, eval = FALSE}
+```{r univariate-mean-change-ecp, eval = rerun}
 results[["mean_data_1"]][["ecp"]] <- ecp::e.divisive(mean_data_1)$estimates
 ```
 
@@ -301,7 +303,7 @@ results[["mean_data_1"]][["ecp"]]
 testthat::expect_equal(results[["mean_data_1"]][["ecp"]], c(1, 301, 701, 1001), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-changepoint, eval = FALSE}
+```{r univariate-mean-change-changepoint, eval = rerun}
 results[["mean_data_1"]][["changepoint"]] <-
   changepoint::cpts(changepoint::cpt.mean(c(mean_data_1)/mad(mean_data_1), method = "PELT"))
 ```
@@ -314,7 +316,7 @@ results[["mean_data_1"]][["changepoint"]]
 testthat::expect_equal(results[["mean_data_1"]][["changepoint"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-breakfast, eval = FALSE}
+```{r univariate-mean-change-breakfast, eval = rerun}
 results[["mean_data_1"]][["breakfast"]] <-
   breakfast::breakfast(mean_data_1)$cptmodel.list[[6]]$cpts
 ```
@@ -327,7 +329,7 @@ results[["mean_data_1"]][["breakfast"]]
 testthat::expect_equal(results[["mean_data_1"]][["breakfast"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-wbs, eval = FALSE}
+```{r univariate-mean-change-wbs, eval = rerun}
 results[["mean_data_1"]][["wbs"]] <-
   wbs::wbs(mean_data_1)$cpt$cpt.ic$mbic.penalty
 ```
@@ -340,7 +342,7 @@ results[["mean_data_1"]][["wbs"]]
 testthat::expect_equal(results[["mean_data_1"]][["wbs"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-mosum, eval = FALSE}
+```{r univariate-mean-change-mosum, eval = rerun}
 results[["mean_data_1"]][["mosum"]] <-
   mosum::mosum(c(mean_data_1), G = 40)$cpts.info$cpts
 ```
@@ -353,7 +355,7 @@ results[["mean_data_1"]][["mosum"]]
 testthat::expect_equal(results[["mean_data_1"]][["mosum"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-fpop, eval = FALSE}
+```{r univariate-mean-change-fpop, eval = rerun}
 results[["mean_data_1"]][["fpop"]] <-
   fpop::Fpop(mean_data_1, nrow(mean_data_1))$t.est
 ```
@@ -366,7 +368,7 @@ results[["mean_data_1"]][["fpop"]]
 testthat::expect_equal(results[["mean_data_1"]][["fpop"]], c(300, 700, 1000), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-gfpop, eval = FALSE}
+```{r univariate-mean-change-gfpop, eval = rerun}
 results[["mean_data_1"]][["gfpop"]] <-
   gfpop::gfpop(
     data = mean_data_1,
@@ -386,7 +388,7 @@ results[["mean_data_1"]][["gfpop"]]
 testthat::expect_equal(results[["mean_data_1"]][["gfpop"]], c(300, 700, 1000), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-jointseg, eval = FALSE}
+```{r univariate-mean-change-jointseg, eval = rerun}
 results[["mean_data_1"]][["jointseg"]] <-
   jointseg::jointSeg(mean_data_1, K = 2)$bestBkp
 ```
@@ -399,7 +401,7 @@ results[["mean_data_1"]][["jointseg"]]
 testthat::expect_equal(results[["mean_data_1"]][["jointseg"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-stepR, eval = FALSE}
+```{r univariate-mean-change-stepR, eval = rerun}
 results[["mean_data_1"]][["stepR"]] <-
   stepR::stepFit(mean_data_1, alpha = 0.5)$rightEnd
 ```
@@ -412,7 +414,7 @@ results[["mean_data_1"]][["stepR"]]
 testthat::expect_equal(results[["mean_data_1"]][["stepR"]], c(300, 700, 1000), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-cpm, eval = FALSE}
+```{r univariate-mean-change-cpm, eval = rerun}
 results[["mean_data_1"]][["cpm"]] <-
   cpm::processStream(mean_data_1, cpmType = "Student")$changePoints
 ```
@@ -425,7 +427,7 @@ results[["mean_data_1"]][["cpm"]]
 testthat::expect_equal(results[["mean_data_1"]][["cpm"]], c(299, 699), tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-segmented, eval = FALSE}
+```{r univariate-mean-change-segmented, eval = rerun}
 results[["mean_data_1"]][["segmented"]] <-
   segmented::stepmented(
     as.numeric(mean_data_1), npsi = 2
@@ -440,7 +442,7 @@ results[["mean_data_1"]][["segmented"]]
 testthat::expect_equal(results[["mean_data_1"]][["segmented"]], c(298, 699), ignore_attr = TRUE, tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-mcp, eval = FALSE}
+```{r univariate-mean-change-mcp, eval = rerun}
 results[["mean_data_1"]][["mcp"]] <- mcp::mcp(
   list(y ~ 1, ~ 1, ~ 1),
   data = data.frame(y = mean_data_1, x = seq_len(nrow(mean_data_1))),
@@ -454,7 +456,7 @@ if (requireNamespace("mcp", quietly = TRUE)) {
 }
 ```
 
-```{r univariate-mean-change-not, eval = FALSE}
+```{r univariate-mean-change-not, eval = rerun}
 results[["mean_data_1"]][["not"]] <-
   not::not(mean_data_1, contrast = "pcwsConstMean")
 ```
@@ -465,7 +467,7 @@ if (requireNamespace("not", quietly = TRUE)) {
 }
 ```
 
-```{r univariate-mean-change-bcp, eval = FALSE}
+```{r univariate-mean-change-bcp, eval = rerun}
 results[["mean_data_1"]][["bcp"]] <- bcp::bcp(mean_data_1)
 ```
 
@@ -480,7 +482,7 @@ if (requireNamespace("bcp", quietly = TRUE)) {
 The true change points are 300, 700, 1000, 1300 and 1700.
 Some methods are plotted due to the un-retrievable change points.
 
-```{r univariate-mean-and-or-variance-change-fastcpd, eval = FALSE}
+```{r univariate-mean-and-or-variance-change-fastcpd, eval = rerun}
 results[["mv_data_1"]][["fastcpd"]] <-
   fastcpd::fastcpd.mv(mv_data_1, r.progress = FALSE)@cp_set
 ```
@@ -493,7 +495,7 @@ results[["mv_data_1"]][["fastcpd"]]
 testthat::expect_equal(results[["mv_data_1"]][["fastcpd"]], c(300, 700, 1001, 1300, 1700), tolerance = 0.2)
 ```
 
-```{r univariate-mean-and-or-variance-change-ecp, eval = FALSE}
+```{r univariate-mean-and-or-variance-change-ecp, eval = rerun}
 results[["mv_data_1"]][["ecp"]] <- ecp::e.divisive(mv_data_1)$estimates
 ```
 
@@ -505,7 +507,7 @@ results[["mv_data_1"]][["ecp"]]
 testthat::expect_equal(results[["mv_data_1"]][["ecp"]], c(1, 301, 701, 1001, 1301, 1701, 2001), tolerance = 0.2)
 ```
 
-```{r univariate-mean-and-or-variance-change-changepoint, eval = FALSE}
+```{r univariate-mean-and-or-variance-change-changepoint, eval = rerun}
 results[["mv_data_1"]][["changepoint"]] <-
   changepoint::cpts(changepoint::cpt.meanvar(c(mv_data_1), method = "PELT"))
 ```
@@ -518,7 +520,7 @@ results[["mv_data_1"]][["changepoint"]]
 testthat::expect_equal(results[["mv_data_1"]][["changepoint"]], c(300, 700, 1000, 1300, 1700), tolerance = 0.2)
 ```
 
-```{r univariate-mean-and-or-variance-change-CptNonPar, eval = FALSE}
+```{r univariate-mean-and-or-variance-change-CptNonPar, eval = rerun}
 results[["mv_data_1"]][["CptNonPar"]] <-
   CptNonPar::np.mojo(mv_data_1, G = floor(length(mv_data_1) / 6))$cpts
 ```
@@ -531,7 +533,7 @@ results[["mv_data_1"]][["CptNonPar"]]
 testthat::expect_equal(results[["mv_data_1"]][["CptNonPar"]], c(333, 700, 1300), tolerance = 0.2)
 ```
 
-```{r univariate-mean-and-or-variance-change-cpm, eval = FALSE}
+```{r univariate-mean-and-or-variance-change-cpm, eval = rerun}
 results[["mv_data_1"]][["cpm"]] <-
   cpm::processStream(mv_data_1, cpmType = "GLR")$changePoints
 ```
@@ -544,7 +546,7 @@ results[["mv_data_1"]][["cpm"]]
 testthat::expect_equal(results[["mv_data_1"]][["cpm"]], c(293, 300, 403, 408, 618, 621, 696, 1000, 1021, 1024, 1293, 1300, 1417, 1693, 1700, 1981), tolerance = 0.2)
 ```
 
-```{r univariate-mean-and-or-variance-change-mcp, eval = FALSE}
+```{r univariate-mean-and-or-variance-change-mcp, eval = rerun}
 results[["mv_data_1"]][["mcp"]] <- mcp::mcp(
   list(y ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1),
   data = data.frame(y = mv_data_1, x = seq_len(nrow(mv_data_1))),
@@ -558,7 +560,7 @@ if (requireNamespace("mcp", quietly = TRUE)) {
 }
 ```
 
-```{r univariate-mean-and-or-variance-change-not, eval = FALSE}
+```{r univariate-mean-and-or-variance-change-not, eval = rerun}
 results[["mv_data_1"]][["not"]] <-
   not::not(mv_data_1, contrast = "pcwsConstMeanVar")
 ```
@@ -574,7 +576,7 @@ if (requireNamespace("not", quietly = TRUE)) {
 The true change points are 300 and 700.
 Some methods are plotted due to the un-retrievable change points.
 
-```{r multivariate-mean-change-fastcpd, eval = FALSE}
+```{r multivariate-mean-change-fastcpd, eval = rerun}
 results[["mean_data_3"]][["fastcpd"]] <-
   fastcpd::fastcpd.mean(mean_data_3, r.progress = FALSE)@cp_set
 ```
@@ -587,7 +589,7 @@ results[["mean_data_3"]][["fastcpd"]]
 testthat::expect_equal(results[["mean_data_3"]][["fastcpd"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r multivariate-mean-change-CptNonPar, eval = FALSE}
+```{r multivariate-mean-change-CptNonPar, eval = rerun}
 results[["mean_data_3"]][["CptNonPar"]] <-
   CptNonPar::np.mojo(mean_data_3, G = floor(nrow(mean_data_3) / 6))$cpts
 ```
@@ -600,7 +602,7 @@ results[["mean_data_3"]][["CptNonPar"]]
 testthat::expect_equal(results[["mean_data_3"]][["CptNonPar"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r multivariate-mean-change-jointseg, eval = FALSE}
+```{r multivariate-mean-change-jointseg, eval = rerun}
 results[["mean_data_3"]][["jointseg"]] <-
   jointseg::jointSeg(mean_data_3, K = 2)$bestBkp
 ```
@@ -613,7 +615,7 @@ results[["mean_data_3"]][["jointseg"]]
 testthat::expect_equal(results[["mean_data_3"]][["jointseg"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r multivariate-mean-change-strucchange, eval = FALSE}
+```{r multivariate-mean-change-strucchange, eval = rerun}
 results[["mean_data_3"]][["strucchange"]] <-
   strucchange::breakpoints(
     cbind(y.1, y.2, y.3) ~ 1, data = data.frame(y = mean_data_3)
@@ -628,7 +630,7 @@ results[["mean_data_3"]][["strucchange"]]
 testthat::expect_equal(results[["mean_data_3"]][["strucchange"]], c(300, 700), tolerance = 0.2)
 ```
 
-```{r multivariate-mean-change-ecp, eval = FALSE}
+```{r multivariate-mean-change-ecp, eval = rerun}
 results[["mean_data_3"]][["ecp"]] <- ecp::e.divisive(mean_data_3)$estimates
 ```
 
@@ -640,7 +642,7 @@ results[["mean_data_3"]][["ecp"]]
 testthat::expect_equal(results[["mean_data_3"]][["ecp"]], c(1, 301, 701, 1001), tolerance = 0.2)
 ```
 
-```{r multivariate-mean-change-bcp, eval = FALSE}
+```{r multivariate-mean-change-bcp, eval = rerun}
 results[["mean_data_3"]][["bcp"]] <- bcp::bcp(mean_data_3)
 ```
 
@@ -655,7 +657,7 @@ if (requireNamespace("bcp", quietly = TRUE)) {
 The true change points are 300, 700, 1000, 1300 and 1700.
 Some methods are plotted due to the un-retrievable change points.
 
-```{r multivariate-mean-and-or-variance-change-fastcpd, eval = FALSE}
+```{r multivariate-mean-and-or-variance-change-fastcpd, eval = rerun}
 results[["mv_data_3"]][["fastcpd"]] <-
   fastcpd::fastcpd.mv(mv_data_3, r.progress = FALSE)@cp_set
 ```
@@ -668,7 +670,7 @@ results[["mv_data_3"]][["fastcpd"]]
 testthat::expect_equal(results[["mv_data_3"]][["fastcpd"]], c(300, 700, 1000, 1300, 1700), tolerance = 0.2)
 ```
 
-```{r multivariate-mean-and-or-variance-change-ecp, eval = FALSE}
+```{r multivariate-mean-and-or-variance-change-ecp, eval = rerun}
 results[["mv_data_3"]][["ecp"]] <- ecp::e.divisive(mv_data_3)$estimates
 ```
 
@@ -684,7 +686,7 @@ testthat::expect_equal(results[["mv_data_3"]][["ecp"]], c(1, 301, 701, 1001, 130
 
 The true change points are 100 and 200.
 
-```{r linear-regression-fastcpd, eval = FALSE}
+```{r linear-regression-fastcpd, eval = rerun}
 results[["lm_data"]][["fastcpd"]] <-
   fastcpd::fastcpd.lm(lm_data, r.progress = FALSE)@cp_set
 ```
@@ -697,7 +699,7 @@ results[["lm_data"]][["fastcpd"]]
 testthat::expect_equal(results[["lm_data"]][["fastcpd"]], c(97, 201), tolerance = 0.2)
 ```
 
-```{r linear-regression-strucchange, eval = FALSE}
+```{r linear-regression-strucchange, eval = rerun}
 results[["lm_data"]][["strucchange"]] <-
   strucchange::breakpoints(y ~ . - 1, data = lm_data)$breakpoints
 ```
@@ -710,7 +712,7 @@ results[["lm_data"]][["strucchange"]]
 testthat::expect_equal(results[["lm_data"]][["strucchange"]], c(100, 201), tolerance = 0.2)
 ```
 
-```{r linear-regression-segmented, eval = FALSE}
+```{r linear-regression-segmented, eval = rerun}
 results[["lm_data"]][["segmented"]] <-
   segmented::segmented(
     lm(
@@ -732,7 +734,7 @@ testthat::expect_equal(results[["lm_data"]][["segmented"]], c(233), ignore_attr 
 
 The true change point is 300.
 
-```{r logistic-regression-fastcpd, eval = FALSE}
+```{r logistic-regression-fastcpd, eval = rerun}
 results[["binomial_data"]][["fastcpd"]] <-
   fastcpd::fastcpd.binomial(binomial_data, r.progress = FALSE)@cp_set
 ```
@@ -745,7 +747,7 @@ results[["binomial_data"]][["fastcpd"]]
 testthat::expect_equal(results[["binomial_data"]][["fastcpd"]], 302, tolerance = 0.2)
 ```
 
-```{r logistic-regression-strucchange, eval = FALSE}
+```{r logistic-regression-strucchange, eval = rerun}
 results[["binomial_data"]][["strucchange"]] <-
   strucchange::breakpoints(y ~ . - 1, data = binomial_data)$breakpoints
 ```
@@ -762,7 +764,7 @@ testthat::expect_equal(results[["binomial_data"]][["strucchange"]], 297, toleran
 
 The true change points are 500, 800 and 1000.
 
-```{r poisson-regression-fastcpd, eval = FALSE}
+```{r poisson-regression-fastcpd, eval = rerun}
 results[["poisson_data"]][["fastcpd"]] <-
   fastcpd::fastcpd.poisson(poisson_data, r.progress = FALSE)@cp_set
 ```
@@ -775,7 +777,7 @@ results[["poisson_data"]][["fastcpd"]]
 testthat::expect_equal(results[["poisson_data"]][["fastcpd"]], c(498, 805, 1003), tolerance = 0.2)
 ```
 
-```{r poisson-regression-strucchange, eval = FALSE}
+```{r poisson-regression-strucchange, eval = rerun}
 results[["poisson_data"]][["strucchange"]] <-
   strucchange::breakpoints(y ~ . - 1, data = poisson_data)$breakpoints
 ```
@@ -792,7 +794,7 @@ testthat::expect_equal(results[["poisson_data"]][["strucchange"]], 935, toleranc
 
 The true change points are 80, 200 and 320.
 
-```{r lasso-fastcpd, eval = FALSE}
+```{r lasso-fastcpd, eval = rerun}
 results[["lasso_data"]][["fastcpd"]] <-
   fastcpd::fastcpd.lasso(lasso_data, r.progress = FALSE)@cp_set
 ```
@@ -805,7 +807,7 @@ results[["lasso_data"]][["fastcpd"]]
 testthat::expect_equal(results[["lasso_data"]][["fastcpd"]], c(79, 199, 320), tolerance = 0.2)
 ```
 
-```{r lasso-strucchange, eval = FALSE}
+```{r lasso-strucchange, eval = rerun}
 results[["lasso_data"]][["strucchange"]] <-
   strucchange::breakpoints(y ~ . - 1, data = lasso_data)$breakpoints
 ```
@@ -823,7 +825,7 @@ testthat::expect_equal(results[["lasso_data"]][["strucchange"]], c(80, 200, 321)
 The true change point is 600.
 Some methods are plotted due to the un-retrievable change points.
 
-```{r ar3-fastcpd, eval = FALSE}
+```{r ar3-fastcpd, eval = rerun}
 results[["ar_data"]][["fastcpd"]] <-
   fastcpd::fastcpd.ar(ar_data, 3, r.progress = FALSE)@cp_set
 ```
@@ -836,7 +838,7 @@ results[["ar_data"]][["fastcpd"]]
 testthat::expect_equal(results[["ar_data"]][["fastcpd"]], c(614), tolerance = 0.2)
 ```
 
-```{r ar3-CptNonPar, eval = FALSE}
+```{r ar3-CptNonPar, eval = rerun}
 results[["ar_data"]][["CptNonPar"]] <-
   CptNonPar::np.mojo(ar_data, G = floor(length(ar_data) / 6))$cpts
 ```
@@ -849,7 +851,7 @@ results[["ar_data"]][["CptNonPar"]]
 testthat::expect_equal(results[["ar_data"]][["CptNonPar"]], numeric(0), tolerance = 0.2)
 ```
 
-```{r ar3-segmented, eval = FALSE}
+```{r ar3-segmented, eval = rerun}
 results[["ar_data"]][["segmented"]] <-
   segmented::segmented(
     lm(
@@ -867,7 +869,7 @@ results[["ar_data"]][["segmented"]]
 testthat::expect_equal(results[["ar_data"]][["segmented"]], c(690), ignore_attr = TRUE, tolerance = 0.2)
 ```
 
-```{r ar3-mcp, eval = FALSE}
+```{r ar3-mcp, eval = rerun}
 results[["ar_data"]][["mcp"]] <-
   mcp::mcp(
     list(y ~ 1 + ar(3), ~ 0 + ar(3)),
@@ -886,7 +888,7 @@ if (requireNamespace("mcp", quietly = TRUE)) {
 
 The true change point is 200.
 
-```{r garch11-fastcpd, eval = FALSE}
+```{r garch11-fastcpd, eval = rerun}
 results[["garch_data"]][["fastcpd"]] <-
   fastcpd::fastcpd.garch(garch_data, c(1, 1), r.progress = FALSE)@cp_set
 ```
@@ -899,7 +901,7 @@ results[["garch_data"]][["fastcpd"]]
 testthat::expect_equal(results[["garch_data"]][["fastcpd"]], c(205), tolerance = 0.2)
 ```
 
-```{r garch11-CptNonPar, eval = FALSE}
+```{r garch11-CptNonPar, eval = rerun}
 results[["garch_data"]][["CptNonPar"]] <-
   CptNonPar::np.mojo(garch_data, G = floor(length(garch_data) / 6))$cpts
 ```
@@ -912,7 +914,7 @@ results[["garch_data"]][["CptNonPar"]]
 testthat::expect_equal(results[["garch_data"]][["CptNonPar"]], c(206), tolerance = 0.2)
 ```
 
-```{r garch11-strucchange, eval = FALSE}
+```{r garch11-strucchange, eval = rerun}
 results[["garch_data"]][["strucchange"]] <-
   strucchange::breakpoints(x ~ 1, data = data.frame(x = garch_data))$breakpoints
 ```
@@ -929,7 +931,7 @@ testthat::expect_equal(results[["garch_data"]][["strucchange"]], NA, tolerance =
 
 The true change points is 500.
 
-```{r var2-fastcpd, eval = FALSE}
+```{r var2-fastcpd, eval = rerun}
 results[["var_data"]][["fastcpd"]] <-
   fastcpd::fastcpd.var(var_data, 2, r.progress = FALSE)@cp_set
 ```
@@ -942,7 +944,7 @@ results[["var_data"]][["fastcpd"]]
 testthat::expect_equal(results[["var_data"]][["fastcpd"]], c(500), tolerance = 0.2)
 ```
 
-```{r var2-VARDetect, eval = FALSE}
+```{r var2-VARDetect, eval = rerun}
 results[["var_data"]][["VARDetect"]] <- VARDetect::tbss(var_data)$cp
 ```
 
@@ -960,7 +962,7 @@ testthat::expect_equal(results[["var_data"]][["VARDetect"]], c(501), tolerance =
 well_log <- fastcpd::well_log
 ```
 
-```{r detection-comparison-well-log, eval = FALSE}
+```{r detection-comparison-well-log, eval = rerun}
 well_log <- well_log[well_log > 1e5]
 
 results[["well_log"]] <- list(
@@ -1061,7 +1063,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 
 # Time comparison using `well_log`
 
-```{r time-comparison-well-log, eval = FALSE}
+```{r time-comparison-well-log, eval = rerun}
 results[["microbenchmark"]] <- microbenchmark::microbenchmark(
   fastcpd = fastcpd::fastcpd.mean(well_log, trim = 0.003, r.progress = FALSE),
   changepoint = changepoint::cpt.mean(well_log/mad(well_log), method = "PELT"),
