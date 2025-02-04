@@ -149,11 +149,7 @@ List Fastcpd::run() {
   r_t_set(1) = 1;
   unsigned int r_t_count = 2;
 
-  vector<colvec> cp_sets = {{0}};
-  linspace(1, data_n_rows, data_n_rows).for_each([&](int i) {
-    cp_sets.push_back({0});
-  });
-
+  colvec cp_sets = zeros<colvec>(data_n_rows + 1);
   colvec fvec = zeros<vec>(data_n_rows + 1);
   fvec.fill(arma::datum::inf);
   fvec(0) = -beta;
@@ -169,8 +165,7 @@ List Fastcpd::run() {
   }
 
   create_clock_in_r(r_clock);
-
-  List result = get_cp_set(cp_sets[data_n_rows], lambda);
+  List result = get_cp_set(cp_sets, lambda);
   delete_zero_data_c();
 
   return result;
@@ -732,7 +727,15 @@ double Fastcpd::update_cost_value(
 
 colvec Fastcpd::update_cp_set(const colvec raw_cp_set) {
   // Remove change points close to the boundaries.
-  colvec cp_set = raw_cp_set;
+  colvec cp_set = zeros<colvec>(data_n_rows);
+  int ncpts = 0;
+  int last = data_n_rows;
+  while (last != 0) {
+    cp_set[ncpts] = last;
+    last = raw_cp_set[last];
+    ncpts += 1;
+  }
+  cp_set = sort(cp_set.rows(find(cp_set > 0)));
   cp_set = cp_set(find(cp_set > trim * data_n_rows));
   cp_set = cp_set(find(cp_set < (1 - trim) * data_n_rows));
   colvec cp_set_ = zeros<vec>(cp_set.n_elem + 1);
@@ -851,7 +854,7 @@ void Fastcpd::update_step(
   unsigned int t,
   ucolvec& r_t_set,
   unsigned int& r_t_count,
-  vector<colvec>& cp_sets,
+  colvec& cp_sets,
   colvec& fvec,
   double lambda
 ) {
@@ -864,9 +867,8 @@ void Fastcpd::update_step(
 
   colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta;
   double min_obj = min(obj);
-  double tau_star = r_t_set(index_min(obj));
 
-  cp_sets[t] = join_cols(cp_sets[tau_star], colvec{tau_star});
+  cp_sets[t] = r_t_set(index_min(obj));
 
   ucolvec pruned_left = find(
     cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + pruning_coef <= min_obj

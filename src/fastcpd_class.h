@@ -584,7 +584,7 @@ class Fastcpd {
     unsigned int t,
     ucolvec& r_t_set,
     unsigned int& r_t_count,
-    vector<colvec>& cp_sets,
+    colvec& cp_sets,
     colvec& fvec,
     double lambda
   );
