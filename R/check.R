@@ -152,7 +152,7 @@ get_sigma_data <- function(
   }
 
   sigma_ <- if (!is.null(variance_estimation)) {
-    variance_estimation
+    as.matrix(variance_estimation)
   } else if (family == "mean") {
     variance.mean(data_)
   } else if (family == "var" || family == "lm" && p_response > 1) {
