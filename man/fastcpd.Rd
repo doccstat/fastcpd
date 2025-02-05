@@ -24,6 +24,7 @@ fastcpd(
   epsilon = 1e-10,
   order = c(0, 0, 0),
   p = ncol(data) - 1,
+  variance_estimation = NULL,
   cp_only = FALSE,
   vanilla_percentage = 0,
   warm_start = FALSE,
@@ -198,6 +199,10 @@ ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model.}
 covariates will be inferred from the data, i.e.,
 \code{p = ncol(data) - 1}. This parameter is superseded by \code{order} in the
 case of time series models: "ar", "var", "arima".}
+
+\item{variance_estimation}{An estimate of the variance / covariance matrix
+for the data. If not specified, the variance / covariance matrix will be
+estimated using the data.}
 
 \item{cp_only}{If \code{TRUE}, only the change points are returned.
 Otherwise, the cost function values together with the estimated

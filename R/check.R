@@ -131,7 +131,9 @@ get_d <- function(data_, family) {
   }
 }
 
-get_sigma_data <- function(data_, family, order, p, p_response) {  # nolint
+get_sigma_data <- function(
+  data_, family, order, p, p_response, variance_estimation
+) {
   if (family == "ar") {
     y <- data_[p + seq_len(nrow(data_) - p), ]
     x <- matrix(NA, nrow(data_) - p, p)
@@ -149,7 +151,9 @@ get_sigma_data <- function(data_, family, order, p, p_response) {  # nolint
     data_ <- cbind(y, x)
   }
 
-  sigma_ <- if (family == "mean") {
+  sigma_ <- if (!is.null(variance_estimation)) {
+    variance_estimation
+  } else if (family == "mean") {
     variance.mean(data_)
   } else if (family == "var" || family == "lm" && p_response > 1) {
     as.matrix(Matrix::nearPD(variance.lm(data_, p_response))$mat)

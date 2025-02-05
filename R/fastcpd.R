@@ -146,6 +146,9 @@
 #' covariates will be inferred from the data, i.e.,
 #' \code{p = ncol(data) - 1}. This parameter is superseded by `order` in the
 #' case of time series models: "ar", "var", "arima".
+#' @param variance_estimation An estimate of the variance / covariance matrix
+#' for the data. If not specified, the variance / covariance matrix will be
+#' estimated using the data.
 #' @param cp_only If \code{TRUE}, only the change points are returned.
 #' Otherwise, the cost function values together with the estimated
 #' parameters for each segment are also returned. By default the value is
@@ -230,6 +233,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   epsilon = 1e-10,
   order = c(0, 0, 0),
   p = ncol(data) - 1,
+  variance_estimation = NULL,
   cp_only = FALSE,
   vanilla_percentage = 0,
   warm_start = FALSE,
@@ -336,7 +340,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   # Estimate the variance / covariance matrix and pre-process the data for
   # mean, variance, meanvariance, ar and var models.
-  sigma_data <- get_sigma_data(data_, family, order, p, p_response)
+  sigma_data <- get_sigma_data(
+    data_, family, order, p, p_response, variance_estimation
+  )
   sigma_ <- sigma_data$sigma
   data_ <- sigma_data$data
 
