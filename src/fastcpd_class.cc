@@ -145,7 +145,7 @@ List Fastcpd::run() {
   // Set up the initial values.
   double lambda = 0;
 
-  ucolvec r_t_set = zeros<ucolvec>(data_n_rows);
+  ucolvec r_t_set = zeros<ucolvec>(data_n_rows + 1);
   r_t_set(1) = 1;
   unsigned int r_t_count = 2;
 
@@ -153,6 +153,7 @@ List Fastcpd::run() {
   colvec fvec = zeros<vec>(data_n_rows + 1);
   fvec.fill(arma::datum::inf);
   fvec(0) = -beta;
+  fvec(1) = get_cval_for_r_t_set(0, 0, 1, lambda);
 
   create_statistics_and_gradients();
 

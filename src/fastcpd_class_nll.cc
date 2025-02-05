@@ -427,6 +427,9 @@ CostResult Fastcpd::get_nll_pelt_lasso(
   const bool cv,
   const Nullable<colvec>& start
 ) {
+  if (segment_start == segment_end) {
+    return {{zeros(data.n_cols - 1)}, {zeros(1)}, 0};
+  }
   if (cv) {
     const mat data_segment = data.rows(segment_start, segment_end);
     Environment glmnet = Environment::namespace_env("glmnet"),

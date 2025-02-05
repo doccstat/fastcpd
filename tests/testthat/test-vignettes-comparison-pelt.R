@@ -45,7 +45,7 @@ testthat::test_that("logistic regression", {
     rep(c(
       "fit_glm: algorithm did not converge",
       "fit_glm: fitted probabilities numerically 0 or 1 occurred"
-    ), c(6, 3983))
+    ), c(6, 3985))
   )
 
   testthat::expect_equal(change_points_binomial_fastcpd_vanilla, 125)
