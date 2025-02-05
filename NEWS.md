@@ -1,6 +1,8 @@
 # fastcpd 0.15.0
 
 *   Remove constants.
+*   Add parameter `variance_estimation` allowing users to specify the variance
+    or covariance matrix if known.
 
 # fastcpd 0.14.7
 
