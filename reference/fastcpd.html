@@ -70,6 +70,7 @@ parameters and returns a <a href="fastcpd-class.html">fastcpd</a> object.</p>
 <span>  epsilon <span class="op">=</span> <span class="fl">1e-10</span>,</span>
 <span>  order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>  p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
+<span>  variance_estimation <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cp_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  vanilla_percentage <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  warm_start <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -276,6 +277,12 @@ ARIMA(\(p\), \(d\), \(q\)) model.</p></dd>
 covariates will be inferred from the data, i.e.,
 <code>p = ncol(data) - 1</code>. This parameter is superseded by <code>order</code> in the
 case of time series models: "ar", "var", "arima".</p></dd>
+
+
+<dt id="arg-variance-estimation">variance_estimation<a class="anchor" aria-label="anchor" href="#arg-variance-estimation"></a></dt>
+<dd><p>An estimate of the variance / covariance matrix
+for the data. If not specified, the variance / covariance matrix will be
+estimated using the data.</p></dd>
 
 
 <dt id="arg-cp-only">cp_only<a class="anchor" aria-label="anchor" href="#arg-cp-only"></a></dt>
