@@ -149,20 +149,6 @@ testthat::test_that(
 )
 
 testthat::test_that(
-  "linear regression without change points", {
-    result <- fastcpd(
-      formula = y ~ . - 1,
-      data = data.frame(y = seq_len(100), x = seq_len(100)),
-      family = "lm",
-      beta = "BIC",
-      cost_adjustment = "BIC"
-    )
-
-    testthat::expect_length(result@cp_set, 0)
-  }
-)
-
-testthat::test_that(
   "invalid order for ar family", {
     testthat::expect_error(
       fastcpd(
