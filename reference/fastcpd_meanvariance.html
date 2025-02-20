@@ -113,10 +113,10 @@ observation and thus a formula is not required here.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     rnorm(300, 10, 10)))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 300 700 1000 1300 1700 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 300 700 1001 1300 1700 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -5.890901 26.91692 718.1489 17.41961 2.232584 724.8531 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -5.890901 26.91692 720.0313 17.3074 2.232584 724.8531 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fastcpd_meanvariance-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"mvtnorm"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -145,10 +145,10 @@ observation and thus a formula is not required here.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     p), sigma = diag(900, p))))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 600 1400 2002 2600 3400 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 600 1400 2003 2600 3400 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 98.15034 113.8909 6147.251 68.57624 -17.3152 6146.93 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 98.15034 113.8909 6155.912 68.40162 -17.3152 6146.93 </span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -156,9 +156,9 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.meanvariance</span><span class="op">(</span><span class="va">data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.017   0.000   0.018 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    0.02    0.00    0.02 </span>
 <span class="r-in"><span><span class="va">result</span><span class="op">@</span><span class="va">cp_set</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2034 4003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2032 4003</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
@@ -170,7 +170,7 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.290   0.000   0.289 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.377   0.000   0.378 </span>
 <span class="r-in"><span><span class="va">result</span><span class="op">@</span><span class="va">cp_set</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2002 4000</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
