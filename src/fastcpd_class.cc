@@ -548,7 +548,8 @@ colvec Fastcpd::get_obj(
 ) {
   colvec cval = zeros<vec>(r_t_count);
   update_r_clock_tick("r_t_set_for_loop");
-  for (unsigned int i = 0; i < r_t_count - 1; i++) {
+  unsigned int loop_end = r_t_count - (vanilla_percentage != 1);
+  for (unsigned int i = 0; i < loop_end; i++) {
     cval(i) = get_cval(r_t_set(i), i, t, lambda);
   }
   update_r_clock_tock("r_t_set_for_loop");
