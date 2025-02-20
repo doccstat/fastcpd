@@ -153,7 +153,7 @@ List Fastcpd::run() {
   colvec fvec = zeros<vec>(data_n_rows + 1);
   fvec.fill(arma::datum::inf);
   fvec(0) = -beta;
-  fvec(1) = get_cval_for_r_t_set(0, 0, 1, lambda);
+  fvec(1) = get_cval(0, 0, 1, lambda);
 
   create_statistics_and_gradients();
 
@@ -456,7 +456,7 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
   );
 }
 
-double Fastcpd::get_cval_for_r_t_set(
+double Fastcpd::get_cval(
   const int tau,
   const unsigned int i,
   const int t,
@@ -539,7 +539,8 @@ double Fastcpd::get_cval_sen(
   return cval;
 }
 
-colvec Fastcpd::get_cval_step(
+colvec Fastcpd::get_obj(
+  const colvec& fvec,
   const ucolvec& r_t_set,
   unsigned int r_t_count,
   unsigned int t,
@@ -548,10 +549,11 @@ colvec Fastcpd::get_cval_step(
   colvec cval = zeros<vec>(r_t_count);
   update_r_clock_tick("r_t_set_for_loop");
   for (unsigned int i = 0; i < r_t_count - 1; i++) {
-    cval(i) = get_cval_for_r_t_set(r_t_set(i), i, t, lambda);
+    cval(i) = get_cval(r_t_set(i), i, t, lambda);
   }
   update_r_clock_tock("r_t_set_for_loop");
-  return cval;
+  colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta;
+  return obj;
 }
 
 CostResult Fastcpd::get_optimized_cost(
@@ -859,21 +861,18 @@ void Fastcpd::update_step(
   colvec& fvec,
   double lambda
 ) {
-  colvec cval = get_cval_step(r_t_set, r_t_count, t, lambda);
   update_r_clock_tick("pruning");
 
   if (vanilla_percentage != 1) {
     update_fastcpd_parameters(t);
   }
 
-  colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta;
+  colvec obj = get_obj(fvec, r_t_set, r_t_count, t, lambda);
   double min_obj = min(obj);
 
   cp_sets[t] = r_t_set(index_min(obj));
 
-  ucolvec pruned_left = find(
-    cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + pruning_coef <= min_obj
-  );
+  ucolvec pruned_left = find(obj <= min_obj + beta - pruning_coef);
   r_t_count = pruned_left.n_elem + 1;
   if (pruned_left.n_elem) {
     r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);

@@ -287,7 +287,7 @@ class Fastcpd {
 
   List get_cp_set(const colvec raw_cp_set, const double lambda);
 
-  double get_cval_for_r_t_set(
+  double get_cval(
     const int tau,
     const unsigned int i,
     const int t,
@@ -306,13 +306,6 @@ class Fastcpd {
     const unsigned int segment_end,
     const unsigned int i,
     const double lambda
-  );
-
-  colvec get_cval_step(
-    const ucolvec& r_t_set,
-    unsigned int r_t_count,
-    unsigned int t,
-    double lambda
   );
 
   colvec get_gradient_arma(
@@ -489,6 +482,14 @@ class Fastcpd {
     const unsigned int segment_start,
     const unsigned int segment_end,
     colvec theta,
+    double lambda
+  );
+
+  colvec get_obj(
+    const colvec& fvec,
+    const ucolvec& r_t_set,
+    unsigned int r_t_count,
+    unsigned int t,
     double lambda
   );
 
