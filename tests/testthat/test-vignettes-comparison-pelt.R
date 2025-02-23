@@ -40,7 +40,7 @@ testthat::test_that("logistic regression", {
     )@cp_set
   )
 
-  testthat::expect_length(warning_messages, 3839)
+  testthat::expect_length(warning_messages, 3830)
 
   testthat::expect_equal(change_points_binomial_fastcpd_vanilla, 125)
 })
@@ -123,7 +123,7 @@ testthat::test_that("poisson regression", {
     )@cp_set
   )
 
-  testthat::expect_length(warning_messages, 1775)
+  testthat::expect_length(warning_messages, 1766)
 
   testthat::expect_equal(
     change_points_poisson_fastcpd_vanilla,

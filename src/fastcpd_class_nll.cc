@@ -1,4 +1,5 @@
 #include "fastcpd_class.h"
+#include "ref_fastglm_glm.h"
 
 using ::arma::as_scalar;
 using ::arma::eye;
@@ -403,16 +404,13 @@ CostResult Fastcpd::get_nll_pelt_glm(
 ) {
   const mat data_segment = data.rows(segment_start, segment_end);
   colvec y = data_segment.col(0);
-  Environment fastglm = Environment::namespace_env("fastglm");
-  Function fastglm_ = fastglm["fastglm"];
   List out;
   if (start.isNull()) {
     mat x = data_segment.cols(1, data_segment.n_cols - 1);
-    out = fastglm_(x, y, family);
+    out = fastglm(wrap(x), wrap(y), family);
   } else {
-    colvec start_ = as<colvec>(start);
     mat x = data_segment.cols(1, data_segment.n_cols - 1);
-    out = fastglm_(x, y, family, Named("start") = start_);
+    out = fastglm(wrap(x), wrap(y), family, wrap(start));
   }
   colvec par = as<colvec>(out["coefficients"]);
   colvec residuals = as<colvec>(out["residuals"]);
