@@ -207,7 +207,6 @@
 #' [summary.fastcpd()] for summarizing the results.
 #'
 #' @md
-#' @importFrom fastglm fastglm
 #' @importFrom glmnet glmnet cv.glmnet predict.glmnet
 #' @importFrom methods show
 #' @importFrom Rcpp evalCpp

@@ -26,7 +26,6 @@ BugReports: https://github.com/doccstat/fastcpd/issues
 Depends:
     R (>= 2.10)
 Imports:
-    fastglm,
     forecast,
     glmnet,
     Matrix,
@@ -56,6 +55,7 @@ LinkingTo:
     Rcpp,
     RcppArmadillo,
     RcppClock,
+    RcppEigen,
     testthat
 VignetteBuilder:
     knitr
