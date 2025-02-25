@@ -3,11 +3,196 @@
 #include "ref_fastglm_fit_glm.h"
 #include "ref_fastglm_fit_glm_dense.h"
 
-using namespace Rcpp;
+using ::Eigen::Map;
+using ::Eigen::VectorXd;
+using ::Rcpp::_;
+using ::Rcpp::as;
+using ::Rcpp::NumericMatrix;
+using ::Rcpp::NumericVector;
+using ::Rcpp::stop;
+using ::Rcpp::warning;
+using ::Rcpp::wrap;
+using ::std::abs;
+using ::std::exp;
+using ::std::fill;
+using ::std::pow;
+using ::std::round;
+using ::std::string;
 
+// extern SEXP logit_mu_eta(SEXP eta);
 extern "C"
 {
   SEXP logit_link(SEXP mu);
+  SEXP logit_linkinv(SEXP eta);
+  SEXP logit_mu_eta(SEXP eta);
+  SEXP binomial_dev_resids(SEXP y, SEXP mu, SEXP wt);
+}
+
+bool valideta_gaussian(const VectorXd &eta)
+{
+  return true;
+}
+
+bool valideta_binomial(const VectorXd &eta)
+{
+  return true;
+}
+
+bool valideta_poisson(const VectorXd &eta)
+{
+  return true;
+}
+
+bool validmu_gaussian(const VectorXd &mu)
+{
+  return true;
+}
+
+bool validmu_binomial(const VectorXd &mu)
+{
+  return mu.allFinite() && (mu.array() > 0).all() && (mu.array() < 1).all();
+}
+
+bool validmu_poisson(const VectorXd &mu)
+{
+  return mu.allFinite() && (mu.array() > 0).all();
+}
+
+NumericVector dev_resids_gaussian(
+    const Map<VectorXd> &y,
+    const VectorXd &mu,
+    const Map<VectorXd> &wt)
+{
+  int n = y.size();
+  NumericVector ans(n);
+  for (int i = 0; i < n; i++)
+  {
+    ans[i] = wt[i] * pow(y[i] - mu[i], 2);
+  }
+  return ans;
+}
+
+NumericVector dev_resids_binomial(
+    const Map<VectorXd> &y,
+    const VectorXd &mu,
+    const Map<VectorXd> &wt)
+{
+  // Convert the Eigen vectors to Rcpp NumericVectors.
+  NumericVector R_y = wrap(y);
+  NumericVector R_mu = wrap(mu);
+  NumericVector R_wt = wrap(wt);
+
+  // Call the exported function that returns SEXP.
+  SEXP res = binomial_dev_resids(R_y, R_mu, R_wt);
+  return NumericVector(res);
+}
+
+NumericVector dev_resids_poisson(
+    const Map<VectorXd> &y,
+    const VectorXd &mu,
+    const Map<VectorXd> &wt)
+{
+  int n = y.size();
+  NumericVector ans(n);
+  for (int i = 0; i < n; i++)
+  {
+    double r = mu[i] * wt[i];
+    if (y[i] > 0)
+    {
+      r = wt[i] * (y[i] * std::log(y[i] / mu[i]) - (y[i] - mu[i]));
+    }
+    ans[i] = 2.0 * r;
+  }
+  return ans;
+}
+
+NumericVector var_gaussian(const VectorXd &mu)
+{
+  int n = mu.size();
+  NumericVector ans(n);
+  fill(ans.begin(), ans.end(), 1.0);
+  return ans;
+}
+
+NumericVector var_binomial(const VectorXd &mu)
+{
+  int n = mu.size();
+  NumericVector ans(n);
+  for (int i = 0; i < n; i++)
+  {
+    ans[i] = mu[i] * (1.0 - mu[i]);
+  }
+  return ans;
+}
+
+NumericVector var_poisson(const VectorXd &mu)
+{
+  int n = mu.size();
+  NumericVector ans(n);
+  for (int i = 0; i < n; i++)
+  {
+    ans[i] = mu[i];
+  }
+  return ans;
+}
+
+NumericVector linkinv_gaussian(const VectorXd &eta)
+{
+  // return NumericVector(1);
+  // Simply wrap the Eigen vector as a NumericVector.
+  return wrap(eta);
+}
+
+NumericVector linkinv_binomial(const VectorXd &eta)
+{
+  // return NumericVector(1);
+  // Wrap eta into a NumericVector.
+  NumericVector R_eta = wrap(eta);
+  // Call the exported function.
+  SEXP res = logit_linkinv(R_eta);
+  return NumericVector(res);
+}
+
+NumericVector linkinv_poisson(const VectorXd &eta)
+{
+  // return NumericVector(1);
+  int n = eta.size();
+  NumericVector ans(n);
+  // .Machine$double.eps in R is typically 2.220446e-16.
+  // We'll use the C++ equivalent:
+  double eps = std::numeric_limits<double>::epsilon();
+  for (int i = 0; i < n; i++)
+  {
+    double value = exp(eta[i]);
+    ans[i] = (value < eps) ? eps : value;
+  }
+  return ans;
+}
+
+NumericVector mu_eta_gaussian(const VectorXd &eta)
+{
+  return NumericVector(eta.size(), 1.0);
+}
+
+NumericVector mu_eta_binomial(const VectorXd &eta)
+{
+  NumericVector R_eta = wrap(eta);
+  SEXP res = logit_mu_eta(R_eta);
+  return NumericVector(res);
+}
+
+NumericVector mu_eta_poisson(const VectorXd &eta)
+{
+  int n = eta.size();
+  NumericVector ans(n);
+  // Use the C++ equivalent of .Machine$double.eps.
+  double eps = std::numeric_limits<double>::epsilon();
+  for (int i = 0; i < n; i++)
+  {
+    double value = exp(eta[i]);
+    ans[i] = (value < eps) ? eps : value;
+  }
+  return ans;
 }
 
 NumericVector linkfun_gaussian(const NumericVector &mu)
@@ -28,7 +213,7 @@ NumericVector linkfun_poisson(const NumericVector &mu)
 
 List fastglm(NumericMatrix x,
              SEXP y,
-             std::string family,
+             string family,
              Nullable<NumericVector> start,
              Nullable<NumericVector> weights,
              Nullable<NumericVector> offset,
@@ -94,7 +279,7 @@ List fastglm(NumericMatrix x,
       for (int i = 0; i < nobs; i++)
       {
         double m_val = wt[i] * yVec[i];
-        if (std::abs(m_val - std::round(m_val)) > 0.001)
+        if (abs(m_val - round(m_val)) > 0.001)
           warning("non-integer #successes in a binomial glm!");
       }
     }
@@ -108,7 +293,7 @@ List fastglm(NumericMatrix x,
       {
         for (int j = 0; j < yMat.ncol(); j++)
         {
-          if (std::abs(yMat(i, j) - std::round(yMat(i, j))) > 0.001)
+          if (abs(yMat(i, j) - round(yMat(i, j))) > 0.001)
             warning("non-integer counts in a binomial glm!");
         }
       }
