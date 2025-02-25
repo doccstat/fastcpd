@@ -1,5 +1,5 @@
 #include "fastcpd_class.h"
-#include "ref_fastglm_glm.h"
+#include "ref_fastglm_fit_glm.h"
 
 using ::arma::as_scalar;
 using ::arma::eye;
