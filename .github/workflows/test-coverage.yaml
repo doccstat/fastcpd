@@ -4,9 +4,8 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
 
-name: test-coverage
+name: test-coverage.yaml
 
 permissions: read-all
 
@@ -35,12 +34,14 @@ jobs:
             clean = FALSE,
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
+          print(cov)
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
       - uses: codecov/codecov-action@v4
         with:
-          fail_ci_if_error: ${{ github.event_name != 'pull_request' && true || false }}
+          # Fail if error if not on PR, or if on PR and token is given
+          fail_ci_if_error: ${{ github.event_name != 'pull_request' || secrets.CODECOV_TOKEN }}
           file: ./cobertura.xml
           plugin: noop
           disable_search: true
