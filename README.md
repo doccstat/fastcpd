@@ -34,8 +34,11 @@ To learn more behind the algorithms:
 ## Installation
 
 ``` r
-# Install from CRAN
-install.packages("fastcpd")
+# Install from r-universe with CRAN version as a fallback
+install.packages(
+  "fastcpd",
+  repos = c("https://doccstat.r-universe.dev", "https://cloud.r-project.org")
+)
 ```
 
 <details close>
@@ -44,12 +47,6 @@ Development version
 </summary>
 
 ``` r
-# Development version from r-universe with CRAN version as a fallback
-install.packages(
-  "fastcpd",
-  repos = c("https://doccstat.r-universe.dev", "https://cloud.r-project.org")
-)
-
 ## install.packages("pak")
 pak::pak("doccstat/fastcpd")
 
@@ -170,7 +167,7 @@ summary(result)
 #> 614 
 #> 
 #> Cost values:
-#> 2743.759 2028.588 
+#> 2754.116 2038.945 
 #> 
 #> Parameters:
 #>     segment 1 segment 2

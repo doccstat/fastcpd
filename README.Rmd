@@ -40,8 +40,11 @@ To learn more behind the algorithms:
 ## Installation
 
 ```{r eval = FALSE}
-# Install from CRAN
-install.packages("fastcpd")
+# Install from r-universe with CRAN version as a fallback
+install.packages(
+  "fastcpd",
+  repos = c("https://doccstat.r-universe.dev", "https://cloud.r-project.org")
+)
 ```
 
 <details close>
@@ -49,12 +52,6 @@ install.packages("fastcpd")
 <summary>Development version</summary>
 
 ```{r eval = FALSE}
-# Development version from r-universe with CRAN version as a fallback
-install.packages(
-  "fastcpd",
-  repos = c("https://doccstat.r-universe.dev", "https://cloud.r-project.org")
-)
-
 ## install.packages("pak")
 pak::pak("doccstat/fastcpd")
 
