@@ -37,7 +37,7 @@ class Fastcpd {
     mat data,
     const double epsilon,
     const string family,
-    Nullable<Function> k,
+    Nullable<Function> multiple_epochs_function,
     colvec line_search,
     const colvec lower,
     const double momentum_coef,
@@ -170,7 +170,7 @@ class Fastcpd {
   // `hessian` stores the Hessian matrix up to the current data point.
   cube hessian;
 
-  unique_ptr<Function> k;
+  unique_ptr<Function> multiple_epochs_function;
 
   colvec line_search;
 
@@ -527,7 +527,6 @@ class Fastcpd {
   // @param data A data frame containing the data to be segmented.
   // @param tau Start of the current segment.
   // @param i Index of the current data in the whole data set.
-  // @param k Number of epochs in SGD.
   // @param family Family of the model.
   // @param momentum Momentum from the previous iteration.
   // @param epsilon Epsilon to avoid numerical issues. Only used for binomial

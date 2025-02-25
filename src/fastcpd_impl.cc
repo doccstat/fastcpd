@@ -10,7 +10,7 @@
 // @param segment_count Number of segments for initial guess.
 // @param trim Trimming for the boundary change points.
 // @param momentum_coef Momentum coefficient to be applied to each update.
-// @param k Function on number of epochs in SGD.
+// @param multiple_epochs_function Function on number of epochs in SGD.
 // @param family Family of the models. Can be "binomial", "poisson", "lasso",
 //   "lm" or "arma". If not provided, the user must specify the cost function
 //   and its gradient (and Hessian).
@@ -55,7 +55,7 @@ List fastcpd_impl(
     const int segment_count,
     const double trim,
     const double momentum_coef,
-    Nullable<Function> k,
+    Nullable<Function> multiple_epochs_function,
     const string family,
     const double epsilon,
     const int p,
@@ -77,9 +77,10 @@ List fastcpd_impl(
 ) {
   fastcpd::classes::Fastcpd fastcpd_class(
     beta, cost, cost_adjustment, cost_gradient, cost_hessian, cp_only, d, data,
-    epsilon, family, k, line_search, lower, momentum_coef, order,
-    p, p_response, pruning_coef, r_clock, r_progress, segment_count, trim,
-    upper, vanilla_percentage, variance_estimate, warm_start
+    epsilon, family, multiple_epochs_function, line_search, lower,
+    momentum_coef, order, p, p_response, pruning_coef, r_clock, r_progress,
+    segment_count, trim, upper, vanilla_percentage, variance_estimate,
+    warm_start
   );
   return fastcpd_class.run();
 }

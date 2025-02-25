@@ -58,7 +58,7 @@ Fastcpd::Fastcpd(
     mat data,
     const double epsilon,
     const string family,
-    Nullable<Function> k,
+    Nullable<Function> multiple_epochs_function,
     colvec line_search,
     const colvec lower,
     const double momentum_coef,
@@ -109,8 +109,10 @@ Fastcpd::Fastcpd(
     variance_estimate(variance_estimate),
     warm_start(warm_start),
     zero_data(join_cols(zeros<rowvec>(data_n_cols), data)) {
-  if (k.isNotNull()) {
-    this->k = std::make_unique<Function>(k);
+  if (multiple_epochs_function.isNotNull()) {
+    this->multiple_epochs_function = std::make_unique<Function>(
+      multiple_epochs_function
+    );
   }
 
   zero_data_c = (double **)malloc((data_n_rows + 1) * sizeof(double *));
@@ -704,8 +706,11 @@ List Fastcpd::update_cost_parameters_steps(
   );
 
   const unsigned int segment_length = segment_end - segment_start + 1;
+  const unsigned int multiple_epochs = as<int>(
+    (*multiple_epochs_function)(segment_length - tau)
+  );
 
-  for (int kk = 1; kk <= as<int>((*k)(segment_length - tau)); kk++) {
+  for (int epoch = 1; epoch <= multiple_epochs; epoch++) {
     for (unsigned j = tau + 1; j <= segment_length; j++) {
       update_cost_parameters_step(
         segment_start, segment_end, i, tau, j - 1, lambda, line_search
