@@ -10,6 +10,7 @@ using ::arma::trace;
 using ::arma::zeros;
 using ::Rcpp::as;
 using ::Rcpp::Named;
+using ::Rcpp::wrap;
 using ::std::pow;
 
 using ::Rcpp::Environment;

@@ -3,17 +3,20 @@
 
 #include <Rcpp.h>
 
-using namespace Rcpp;
+using ::Rcpp::NumericMatrix;
+using ::Rcpp::NumericVector;
+using ::Rcpp::List;
+using ::std::string;
 
-List fit_glm(Rcpp::NumericMatrix Xs,
-             Rcpp::NumericVector ys,
-             Rcpp::NumericVector weightss,
-             Rcpp::NumericVector offsets,
-             Rcpp::NumericVector starts,
-             Rcpp::NumericVector etas,
+List fit_glm(NumericMatrix Xs,
+             NumericVector ys,
+             NumericVector weightss,
+             NumericVector offsets,
+             NumericVector starts,
+             NumericVector etas,
              int type,
              double tol,
              int maxit,
-             std::string family);
+             string family);
 
 #endif // FIT_GLM_DENSE_H
