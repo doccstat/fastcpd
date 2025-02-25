@@ -358,7 +358,6 @@ mat Fastcpd::get_hessian_poisson(
 CostResult Fastcpd::get_nll_pelt_arma(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  const double lambda,
   const bool cv,
   const Nullable<colvec>& start
 ) {
@@ -380,7 +379,6 @@ CostResult Fastcpd::get_nll_pelt_arma(
 CostResult Fastcpd::get_nll_pelt_custom(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  const double lambda,
   const bool cv,
   const Nullable<colvec>& start
 ) {
@@ -398,7 +396,6 @@ CostResult Fastcpd::get_nll_pelt_custom(
 CostResult Fastcpd::get_nll_pelt_glm(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  const double lambda,
   const bool cv,
   const Nullable<colvec>& start
 ) {
@@ -421,7 +418,6 @@ CostResult Fastcpd::get_nll_pelt_glm(
 CostResult Fastcpd::get_nll_pelt_lasso(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  const double lambda,
   const bool cv,
   const Nullable<colvec>& start
 ) {
@@ -463,7 +459,8 @@ CostResult Fastcpd::get_nll_pelt_lasso(
       predict_glmnet = glmnet["predict.glmnet"];
     List out = glmnet_(
       data_segment.cols(1, data_segment.n_cols - 1), data_segment.col(0),
-      Named("family") = "gaussian", Named("lambda") = lambda
+      Named("family") = "gaussian",
+      Named("lambda") = lambda / sqrt(segment_end - segment_start + 1)
     );
     S4 out_par = out["beta"];
     colvec par_i = as<colvec>(out_par.slot("i"));
@@ -475,7 +472,9 @@ CostResult Fastcpd::get_nll_pelt_lasso(
     double value = as<double>(deviance(out));
     colvec fitted_values = as<colvec>(
       predict_glmnet(
-        out, data_segment.cols(1, data_segment.n_cols - 1), Named("s") = lambda
+        out,
+        data_segment.cols(1, data_segment.n_cols - 1),
+        Named("s") = lambda / sqrt(segment_end - segment_start + 1)
       )
     );
     colvec residuals = data_segment.col(0) - fitted_values;
@@ -486,7 +485,6 @@ CostResult Fastcpd::get_nll_pelt_lasso(
 CostResult Fastcpd::get_nll_pelt_mean(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  const double lambda,
   const bool cv,
   const Nullable<colvec>& start
 ) {
@@ -510,7 +508,6 @@ CostResult Fastcpd::get_nll_pelt_mean(
 CostResult Fastcpd::get_nll_pelt_meanvariance(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  const double lambda,
   const bool cv,
   const Nullable<colvec>& start
 ) {
@@ -555,7 +552,6 @@ CostResult Fastcpd::get_nll_pelt_meanvariance(
 CostResult Fastcpd::get_nll_pelt_mgaussian(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  const double lambda,
   const bool cv,
   const Nullable<colvec>& start
 ) {
@@ -584,7 +580,6 @@ CostResult Fastcpd::get_nll_pelt_mgaussian(
 CostResult Fastcpd::get_nll_pelt_variance(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  const double lambda,
   const bool cv,
   const Nullable<colvec>& start
 ) {
@@ -622,8 +617,7 @@ CostResult Fastcpd::get_nll_pelt_variance(
 double Fastcpd::get_nll_sen_arma(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  colvec theta,
-  double lambda
+  colvec theta
 ) {
   mat data_segment = data.rows(segment_start, segment_end);
   colvec reversed_theta = reverse(theta);
@@ -648,8 +642,7 @@ double Fastcpd::get_nll_sen_arma(
 double Fastcpd::get_nll_sen_binomial(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  colvec theta,
-  double lambda
+  colvec theta
 ) {
   mat data_segment = data.rows(segment_start, segment_end);
   colvec y = data_segment.col(0);
@@ -662,33 +655,40 @@ double Fastcpd::get_nll_sen_binomial(
 double Fastcpd::get_nll_sen_custom(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  colvec theta,
-  double lambda
+  colvec theta
 ) {
   return as<double>(
     (*cost)(data.rows(segment_start, segment_end), theta)
   );
 }
 
-double Fastcpd::get_nll_sen_lm(
+double Fastcpd::get_nll_sen_lasso(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  colvec theta,
-  double lambda
+  colvec theta
 ) {
   mat data_segment = data.rows(segment_start, segment_end);
   colvec y = data_segment.col(0);
-  // Calculate negative log likelihood in gaussian family
-  double penalty = lambda * accu(abs(theta));
   mat x = data_segment.cols(1, data_segment.n_cols - 1);
-  return accu(square(y - x * theta)) / 2 + penalty;
+  return accu(square(y - x * theta)) / 2 +
+    lambda / sqrt(segment_end - segment_start + 1) * accu(abs(theta));
+}
+
+double Fastcpd::get_nll_sen_lm(
+  const unsigned int segment_start,
+  const unsigned int segment_end,
+  colvec theta
+) {
+  mat data_segment = data.rows(segment_start, segment_end);
+  colvec y = data_segment.col(0);
+  mat x = data_segment.cols(1, data_segment.n_cols - 1);
+  return accu(square(y - x * theta)) / 2;
 }
 
 double Fastcpd::get_nll_sen_ma(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  colvec theta,
-  double lambda
+  colvec theta
 ) {
   mat data_segment = data.rows(segment_start, segment_end);
   const unsigned int q = order(1);
@@ -710,8 +710,7 @@ double Fastcpd::get_nll_sen_ma(
 double Fastcpd::get_nll_sen_poisson(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  colvec theta,
-  double lambda
+  colvec theta
 ) {
   mat data_segment = data.rows(segment_start, segment_end);
   colvec y = data_segment.col(0);

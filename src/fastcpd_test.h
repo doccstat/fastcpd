@@ -42,15 +42,13 @@ class FastcpdTest {
     const mat& data,
     const unsigned int segment_start,
     const unsigned int segment_end,
-    colvec theta,
-    double lambda
+    colvec theta
   );
 
   static CostResult get_nll_pelt(
     const mat& data,
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const double lambda,
     const bool cv,
     const Nullable<colvec>& start
   );
