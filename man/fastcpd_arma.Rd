@@ -31,14 +31,14 @@ and thus a formula is not required here.
 \examples{
 \donttest{
 set.seed(1)
-n <- 300
+n <- 200
 w <- rnorm(n + 3, 0, 3)
 x <- rep(0, n + 3)
-for (i in 1:200) {
+for (i in 1:150) {
   x[i + 3] <- 0.1 * x[i + 2] - 0.3 * x[i + 1] + 0.1 * x[i] +
     0.1 * w[i + 2] + 0.5 * w[i + 1] + w[i + 3]
 }
-for (i in 201:n) {
+for (i in 151:n) {
   x[i + 3] <- 0.3 * x[i + 2] + 0.1 * x[i + 1] - 0.3 * x[i] -
     0.6 * w[i + 2] - 0.1 * w[i + 1] + w[i + 3]
 }
@@ -51,7 +51,8 @@ result <- suppressWarnings(
     upper = c(rep(1, 3 + 2), Inf),
     line_search = c(1, 0.1, 1e-2),
     beta = "BIC",
-    cost_adjustment = "BIC"
+    cost_adjustment = "BIC",
+    trim = 0.025
   )
 )
 summary(result)

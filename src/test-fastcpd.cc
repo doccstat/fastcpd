@@ -11,7 +11,7 @@ using ::fastcpd::test::FastcpdTest;
 context("get_nll_pelt Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     const CostResult cost_result = FastcpdTest::get_nll_pelt(
-      colvec(kARMA32.data(), kARMA32.size()), 0, 199, 0, false, R_NilValue
+      colvec(kARMA32.data(), kARMA32.size()), 0, 199, false, R_NilValue
     );
     const colvec par = cost_result.par;
     const double value = cost_result.value;
@@ -34,7 +34,7 @@ context("get_nll_pelt Unit Test") {
 context("get_nll_sen Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     const double value = FastcpdTest::get_nll_sen(
-      colvec(kARMA32.data(), kARMA32.size()), 0, 199, 0.1 * ones<colvec>(6), 0.0
+      colvec(kARMA32.data(), kARMA32.size()), 0, 199, 0.1 * ones<colvec>(6)
     );
     const double expected_value = 1363.288;
     expect_true(abs(value -  expected_value) < 0.001);

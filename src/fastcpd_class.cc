@@ -144,9 +144,6 @@ Fastcpd::Fastcpd(
 }
 
 List Fastcpd::run() {
-  // Set up the initial values.
-  double lambda = 0;
-
   ucolvec r_t_set = zeros<ucolvec>(data_n_rows + 1);
   r_t_set(1) = 1;
   unsigned int r_t_count = 2;
@@ -155,20 +152,15 @@ List Fastcpd::run() {
   colvec fvec = zeros<vec>(data_n_rows + 1);
   fvec.fill(arma::datum::inf);
   fvec(0) = -beta;
-  fvec(1) = get_cval(0, 0, 1, lambda);
+  fvec(1) = get_cval(0, 0, 1);
 
   create_statistics_and_gradients();
 
-  checkUserInterrupt();
-  update_r_progress_start();
-  update_r_progress_tick();
-
   for (unsigned int t = 2; t <= data_n_rows; t++) {
-    update_step(t, r_t_set, r_t_count, cp_sets, fvec, lambda);
+    update_step(t, r_t_set, r_t_count, cp_sets, fvec);
   }
 
-  create_clock_in_r(r_clock);
-  List result = get_cp_set(cp_sets, lambda);
+  List result = get_cp_set(cp_sets);
   delete_zero_data_c();
 
   return result;
@@ -190,7 +182,7 @@ const unordered_map<string, Fastcpd::GetFunctionSet> Fastcpd::family_function_ma
   { "lasso", GetFunctionSet{
     &Fastcpd::get_gradient_lm,
     &Fastcpd::get_hessian_lm,
-    &Fastcpd::get_nll_sen_lm,
+    &Fastcpd::get_nll_sen_lasso,
     &Fastcpd::get_nll_pelt_lasso
   }},
   { "poisson", GetFunctionSet{
@@ -310,7 +302,6 @@ void Fastcpd::create_segment_statistics() {
       segment_indices(segment_index),
       segment_indices(segment_index + 1) - 1,
       R_NilValue,
-      0,
       true,
       R_NilValue
     ).par;
@@ -329,6 +320,8 @@ void Fastcpd::create_segment_statistics() {
       act_num(segment_index) = accu(abs(segment_theta) > 0);
     }
   }
+  // Mean of `err_sd` only works if error sd is unchanged.
+  lambda = mean(err_sd) * sqrt(2 * std::log(p));
   if (family == "lasso") {
     beta = beta * (1 + mean(act_num));
   }
@@ -337,6 +330,9 @@ void Fastcpd::create_segment_statistics() {
 void Fastcpd::create_statistics_and_gradients() {
   create_segment_statistics();
   create_gradients();
+  checkUserInterrupt();
+  update_r_progress_start();
+  update_r_progress_tick();
 }
 
 void Fastcpd::create_theta_sum(
@@ -367,22 +363,19 @@ CostResult Fastcpd::get_cost_result(
     const unsigned int segment_start,
     const unsigned int segment_end,
     Nullable<colvec> theta,
-    const double lambda,
     const bool cv,
     Nullable<colvec> start
 ) {
   CostResult cost_result;
   if (theta.isNull()) {
     cost_result = (this->*get_nll_pelt)(
-      segment_start, segment_end, lambda, cv, start
+      segment_start, segment_end, cv, start
     );
   } else {
     cost_result = CostResult{
       {colvec()},
       {colvec()},
-      (this->*get_nll_sen)(
-        segment_start, segment_end, as<colvec>(theta), lambda
-      )
+      (this->*get_nll_sen)(segment_start, segment_end, as<colvec>(theta))
     };
   }
   cost_result.value = update_cost_value(
@@ -391,7 +384,9 @@ CostResult Fastcpd::get_cost_result(
   return cost_result;
 }
 
-List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
+List Fastcpd::get_cp_set(const colvec raw_cp_set) {
+  create_clock_in_r(r_clock);
+
   colvec cp_set = update_cp_set(raw_cp_set);
 
   if (cp_only) {
@@ -426,7 +421,7 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
 
   for (unsigned int i = 0; i < cp_loc.n_elem - 1; i++) {
     CostResult cost_result = get_cost_result(
-      cp_loc(i), cp_loc(i + 1) - 1, R_NilValue, lambda, false, R_NilValue
+      cp_loc(i), cp_loc(i + 1) - 1, R_NilValue, false, R_NilValue
     );
 
     cost_values(i) = cost_result.value;
@@ -461,25 +456,19 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set, const double lambda) {
 double Fastcpd::get_cval(
   const int tau,
   const unsigned int i,
-  const int t,
-  double lambda
+  const int t
 ) {
-  if (family == "lasso") {
-    // Mean of `err_sd` only works if error sd is unchanged.
-    lambda = mean(err_sd) * sqrt(2 * std::log(p) / (t - tau));
-  }
   if (t > vanilla_percentage * data_n_rows) {
-    return get_cval_sen(tau, t - 1, i, lambda);
+    return get_cval_sen(tau, t - 1, i);
   } else {
-    return get_cval_pelt(tau, t - 1, i, lambda);
+    return get_cval_pelt(tau, t - 1, i);
   }
 }
 
 double Fastcpd::get_cval_pelt(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  const unsigned int i,
-  const double lambda
+  const unsigned int i
 ) {
   double cval = 0;
   CostResult cost_result;
@@ -488,7 +477,7 @@ double Fastcpd::get_cval_pelt(
     (warm_start && segment_end + 1 - segment_start >= 10 * p)
   ) {
     cost_result = get_cost_result(
-      segment_start, segment_end, R_NilValue, lambda, false,
+      segment_start, segment_end, R_NilValue, false,
       wrap(
         segment_theta_hat.row(index_max(find(segment_indices <= segment_end))
       ).t())
@@ -497,7 +486,7 @@ double Fastcpd::get_cval_pelt(
     update_start(segment_start, colvec(cost_result.par));
   } else {
     cost_result = get_cost_result(
-      segment_start, segment_end, R_NilValue, lambda, false, R_NilValue
+      segment_start, segment_end, R_NilValue, false, R_NilValue
     );
   }
   cval = cost_result.value;
@@ -516,25 +505,20 @@ double Fastcpd::get_cval_pelt(
 double Fastcpd::get_cval_sen(
   const unsigned int segment_start,
   const unsigned int segment_end,
-  const unsigned int i,
-  const double lambda
+  const unsigned int i
 ) {
   const unsigned int segment_length = segment_end - segment_start + 1;
   double cval = 0;
-  update_cost_parameters(
-    segment_end + 1, segment_start, i, lambda, line_search
-  );
+  update_cost_parameters(segment_start, segment_end, i);
   colvec theta = theta_sum.col(i) / segment_length;
   if (family == "custom") {
-    cval = (this->*get_nll_sen)(
-      segment_start, segment_end, theta, lambda
-    );
+    cval = (this->*get_nll_sen)(segment_start, segment_end, theta);
   } else if (
     (family != "lasso" && segment_length >= p) ||
     (family == "lasso" && segment_length >= 3)
   ) {
     cval = get_cost_result(
-      segment_start, segment_end, wrap(theta), lambda, false, R_NilValue
+      segment_start, segment_end, wrap(theta), false, R_NilValue
     ).value;
   }
   // else segment_length < p or for lasso segment_length < 3
@@ -545,14 +529,13 @@ colvec Fastcpd::get_obj(
   const colvec& fvec,
   const ucolvec& r_t_set,
   unsigned int r_t_count,
-  unsigned int t,
-  double lambda
+  unsigned int t
 ) {
   colvec cval = zeros<vec>(r_t_count);
   update_r_clock_tick("r_t_set_for_loop");
   unsigned int loop_end = r_t_count - (vanilla_percentage != 1);
   for (unsigned int i = 0; i < loop_end; i++) {
-    cval(i) = get_cval(r_t_set(i), i, t, lambda);
+    cval(i) = get_cval(r_t_set(i), i, t);
   }
   update_r_clock_tock("r_t_set_for_loop");
   colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta;
@@ -606,14 +589,12 @@ CostResult Fastcpd::get_optimized_cost(
 }
 
 void Fastcpd::update_cost_parameters(
-  const unsigned int t,
-  const unsigned int tau,
-  const unsigned int i,
-  const double lambda,
-  const colvec& line_search
+  const unsigned int segment_start,
+  const unsigned int segment_end,
+  const unsigned int i
 ) {
   List cost_update_result = update_cost_parameters_steps(
-    0, t - 1, tau, i, momentum, lambda, line_search
+    segment_start, segment_end, i, momentum
   );
   update_theta_hat(i, as<colvec>(cost_update_result[0]));
   create_theta_sum(i, as<colvec>(cost_update_result[1]));
@@ -622,22 +603,18 @@ void Fastcpd::update_cost_parameters(
 }
 
 void Fastcpd::update_cost_parameters_step(
-  const unsigned int segment_start,
-  const unsigned int segment_end,
-  const int i,
-  const int data_start,
-  const int data_end,
-  const double lambda,
-  const colvec& line_search
+  const int segment_start,
+  const int segment_end,
+  const int i
 ) {
   mat hessian_i = hessian.slice(i);
   colvec gradient;
 
   hessian_i += (this->*get_hessian)(
-    segment_start + data_start, segment_start + data_end, theta_hat.col(i)
+    segment_start, segment_end, theta_hat.col(i)
   );
   gradient = (this->*get_gradient)(
-    segment_start + data_start, segment_start + data_end, theta_hat.col(i)
+    segment_start, segment_end, theta_hat.col(i)
   );
 
   // Add epsilon to the diagonal for PSD hessian
@@ -662,7 +639,7 @@ void Fastcpd::update_cost_parameters_step(
       colvec theta_upper_bound = arma::min(std::move(theta_candidate), upper);
       colvec theta_projected = arma::max(std::move(theta_upper_bound), lower);
       line_search_costs[line_search_index] = (this->*get_nll_sen)(
-        segment_start, segment_end, theta_projected, lambda
+        segment_start, segment_end, theta_projected
       );
     }
   }
@@ -677,7 +654,10 @@ void Fastcpd::update_cost_parameters_step(
   if (family == "lasso" || family == "gaussian") {
     // Update theta_hat with L1 penalty
     double hessian_norm = norm(hessian_i, "fro");
-    vec normd = abs(theta_hat.col(i)) - lambda / hessian_norm;
+    vec normd = abs(theta_hat.col(i));
+    if (family == "lasso") {
+      normd -= lambda / sqrt(segment_end - segment_start + 1) / hessian_norm;
+    }
     theta_hat.col(i) = sign(theta_hat.col(i)) % arma::max(
       normd, zeros<colvec>(normd.n_elem)
     );
@@ -687,35 +667,21 @@ void Fastcpd::update_cost_parameters_step(
 }
 
 List Fastcpd::update_cost_parameters_steps(
-    const unsigned int segment_start,
+    const int segment_start,
     const unsigned int segment_end,
-    const int tau,
     const int i,
-    colvec momentum,
-    const double lambda,
-    const colvec& line_search
+    colvec momentum
 ) {
-  update_cost_parameters_step(
-    segment_start,
-    segment_end,
-    i,
-    0,
-    segment_end - segment_start,
-    lambda,
-    line_search
-  );
-
-  const unsigned int segment_length = segment_end - segment_start + 1;
   const unsigned int multiple_epochs = as<int>(
-    (*multiple_epochs_function)(segment_length - tau)
+    (*multiple_epochs_function)(segment_end - segment_start + 1)
   );
+  unsigned int loop_start = segment_end, loop_end = segment_end;
 
-  for (int epoch = 1; epoch <= multiple_epochs; epoch++) {
-    for (unsigned j = tau + 1; j <= segment_length; j++) {
-      update_cost_parameters_step(
-        segment_start, segment_end, i, tau, j - 1, lambda, line_search
-      );
+  for (unsigned int epoch = 0; epoch <= multiple_epochs; epoch++) {
+    for (loop_end = loop_start; loop_end <= segment_end; loop_end++) {
+      update_cost_parameters_step(segment_start, loop_end, i);
     }
+    loop_start = segment_start;
   }
 
   theta_sum.col(i) += theta_hat.col(i);
@@ -864,8 +830,7 @@ void Fastcpd::update_step(
   ucolvec& r_t_set,
   unsigned int& r_t_count,
   colvec& cp_sets,
-  colvec& fvec,
-  double lambda
+  colvec& fvec
 ) {
   update_r_clock_tick("pruning");
 
@@ -873,7 +838,7 @@ void Fastcpd::update_step(
     update_fastcpd_parameters(t);
   }
 
-  colvec obj = get_obj(fvec, r_t_set, r_t_count, t, lambda);
+  colvec obj = get_obj(fvec, r_t_set, r_t_count, t);
   double min_obj = min(obj);
 
   cp_sets[t] = r_t_set(index_min(obj));

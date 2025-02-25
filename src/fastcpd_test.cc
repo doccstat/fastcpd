@@ -157,8 +157,7 @@ double FastcpdTest::get_nll_sen(
     const mat& data,
     const unsigned int segment_start,
     const unsigned int segment_end,
-    colvec theta,
-    double lambda
+    colvec theta
 ) {
   Fastcpd fastcpd_class(
     /* beta */ 0,
@@ -189,7 +188,7 @@ double FastcpdTest::get_nll_sen(
     /* warm_start */ false
   );
   return (fastcpd_class.*fastcpd_class.get_nll_sen)(
-    segment_start, segment_end, theta, lambda
+    segment_start, segment_end, theta
   );
 }
 
@@ -197,7 +196,6 @@ CostResult FastcpdTest::get_nll_pelt(
   const mat& data,
   const unsigned int segment_start,
   const unsigned int segment_end,
-  const double lambda,
   const bool cv,
   const Nullable<colvec>& start
 ) {
@@ -230,7 +228,7 @@ CostResult FastcpdTest::get_nll_pelt(
     /* warm_start */ false
   );
   return (fastcpd_class.*fastcpd_class.get_nll_pelt)(
-    segment_start, segment_end, lambda, cv, start
+    segment_start, segment_end, cv, start
   );
 }
 

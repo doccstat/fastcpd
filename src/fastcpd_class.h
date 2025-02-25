@@ -72,13 +72,11 @@ class Fastcpd {
     double (Fastcpd::*nll_sen)(
       const unsigned int segment_start,
       const unsigned int segment_end,
-      colvec theta,
-      double lambda
+      colvec theta
     );
     CostResult (Fastcpd::*nll_pelt)(
       const unsigned int segment_start,
       const unsigned int segment_end,
-      const double lambda,
       const bool cv,
       const Nullable<colvec>& start
     );
@@ -155,7 +153,6 @@ class Fastcpd {
   CostResult (Fastcpd::*get_nll_pelt)(
       const unsigned int segment_start,
       const unsigned int segment_end,
-      const double lambda,
       const bool cv,
       const Nullable<colvec>& start
   );
@@ -163,14 +160,17 @@ class Fastcpd {
   double (Fastcpd::*get_nll_sen)(
       const unsigned int segment_start,
       const unsigned int segment_end,
-      colvec theta,
-      double lambda
+      colvec theta
   );
 
   // `hessian` stores the Hessian matrix up to the current data point.
   cube hessian;
 
   unique_ptr<Function> multiple_epochs_function;
+
+  // `lambda` is the lambda for L1 regularization. Only used for lasso. This
+  // parameter stores the penalty without the segment length scaling.
+  double lambda;
 
   colvec line_search;
 
@@ -280,32 +280,28 @@ class Fastcpd {
       const unsigned int segment_start,
       const unsigned int segment_end,
       Nullable<colvec> theta,
-      const double lambda,
       const bool cv = false,
       Nullable<colvec> start = R_NilValue
   );
 
-  List get_cp_set(const colvec raw_cp_set, const double lambda);
+  List get_cp_set(const colvec raw_cp_set);
 
   double get_cval(
     const int tau,
     const unsigned int i,
-    const int t,
-    double lambda
+    const int t
   );
 
   double get_cval_pelt(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const unsigned int i,
-    const double lambda
+    const unsigned int i
   );
 
   double get_cval_sen(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const unsigned int i,
-    const double lambda
+    const unsigned int i
   );
 
   colvec get_gradient_arma(
@@ -383,7 +379,6 @@ class Fastcpd {
   CostResult get_nll_pelt_arma(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const double lambda,
     const bool cv,
     const Nullable<colvec>& start
   );
@@ -391,7 +386,6 @@ class Fastcpd {
   CostResult get_nll_pelt_custom(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const double lambda,
     const bool cv,
     const Nullable<colvec>& start
   );
@@ -399,7 +393,6 @@ class Fastcpd {
   CostResult get_nll_pelt_glm(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const double lambda,
     const bool cv,
     const Nullable<colvec>& start
   );
@@ -407,14 +400,12 @@ class Fastcpd {
   CostResult get_nll_pelt_lasso(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const double lambda,
     const bool cv,
     const Nullable<colvec>& start
   );
   CostResult get_nll_pelt_mean(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const double lambda,
     const bool cv,
     const Nullable<colvec>& start
   );
@@ -422,7 +413,6 @@ class Fastcpd {
   CostResult get_nll_pelt_meanvariance(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const double lambda,
     const bool cv,
     const Nullable<colvec>& start
   );
@@ -430,7 +420,6 @@ class Fastcpd {
   CostResult get_nll_pelt_mgaussian(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const double lambda,
     const bool cv,
     const Nullable<colvec>& start
   );
@@ -438,7 +427,6 @@ class Fastcpd {
   CostResult get_nll_pelt_variance(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    const double lambda,
     const bool cv,
     const Nullable<colvec>& start
   );
@@ -446,51 +434,50 @@ class Fastcpd {
   double get_nll_sen_arma(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    colvec theta,
-    double lambda
+    colvec theta
   );
 
   double get_nll_sen_binomial(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    colvec theta,
-    double lambda
+    colvec theta
   );
 
   double get_nll_sen_custom(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    colvec theta,
-    double lambda
+    colvec theta
+  );
+
+  double get_nll_sen_lasso(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    colvec theta
   );
 
   double get_nll_sen_lm(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    colvec theta,
-    double lambda
+    colvec theta
   );
 
   double get_nll_sen_ma(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    colvec theta,
-    double lambda
+    colvec theta
   );
 
   double get_nll_sen_poisson(
     const unsigned int segment_start,
     const unsigned int segment_end,
-    colvec theta,
-    double lambda
+    colvec theta
   );
 
   colvec get_obj(
     const colvec& fvec,
     const ucolvec& r_t_set,
     unsigned int r_t_count,
-    unsigned int t,
-    double lambda
+    unsigned int t
   );
 
   // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
@@ -505,21 +492,15 @@ class Fastcpd {
   );
 
   void update_cost_parameters(
-      const unsigned int t,
-      const unsigned int tau,
-      const unsigned int i,
-      const double lambda,
-      const colvec& line_search
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const unsigned int i
   );
 
   void update_cost_parameters_step(
-    const unsigned int segment_start,
-    const unsigned int segment_end,
-    const int i,
-    const int tau,
-    const int j,
-    const double lambda,
-    const colvec& line_search
+    const int segment_start,
+    const int segment_end,
+    const int i
   );
 
   // Update the cost values for the segmentation.
@@ -531,19 +512,15 @@ class Fastcpd {
   // @param momentum Momentum from the previous iteration.
   // @param epsilon Epsilon to avoid numerical issues. Only used for binomial
   //   and poisson.
-  // @param lambda Lambda for L1 regularization. Only used for lasso.
   // @param line_search A vector containing the line search coefficients.
   //
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   \code{hessian}, and \code{momentum}.
   List update_cost_parameters_steps(
-    const unsigned int segment_start,
+    const int segment_start,
     const unsigned int segment_end,
-    const int tau,
     const int i,
-    colvec momentum,
-    const double lambda,
-    const colvec& line_search
+    colvec momentum
   );
 
   // Adjust cost value for MBIC and MDL.
@@ -585,8 +562,7 @@ class Fastcpd {
     ucolvec& r_t_set,
     unsigned int& r_t_count,
     colvec& cp_sets,
-    colvec& fvec,
-    double lambda
+    colvec& fvec
   );
 
   // Append a new column to \code{theta_hat}.
