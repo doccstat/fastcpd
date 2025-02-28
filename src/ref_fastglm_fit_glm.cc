@@ -211,10 +211,10 @@ NumericVector linkfun_poisson(const NumericVector &mu)
   return Rcpp::log(mu);
 }
 
-List fastglm(NumericMatrix x,
-             SEXP y,
-             string family,
-             Nullable<NumericVector> start,
+List fastglm(const mat& x_,
+             const colvec& y,
+             const string& family,
+             Nullable<colvec> start,
              Nullable<NumericVector> weights,
              Nullable<NumericVector> offset,
              Nullable<NumericVector> etastart,
@@ -223,10 +223,11 @@ List fastglm(NumericMatrix x,
              double tol,
              int maxit)
 {
+  NumericMatrix x = wrap(x_);
   // Determine number of observations and whether y is a matrix.
   int nobs;
   bool yIsMatrix = false;
-  NumericMatrix yMat = as<NumericMatrix>(y);
+  NumericMatrix yMat = wrap(y);
   NumericVector yVec;
   if (yMat.ncol() > 1)
   {

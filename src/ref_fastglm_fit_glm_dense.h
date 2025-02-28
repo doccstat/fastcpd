@@ -1,7 +1,7 @@
 #ifndef FIT_GLM_DENSE_H
 #define FIT_GLM_DENSE_H
 
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
 
 using ::Rcpp::NumericMatrix;
 using ::Rcpp::NumericVector;

@@ -1,9 +1,11 @@
 #ifndef FIT_GLM_H
 #define FIT_GLM_H
 
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
 #include <RcppEigen.h>
 
+using ::arma::colvec;
+using ::arma::mat;
 using ::Eigen::Map;
 using ::Eigen::VectorXd;
 using ::Rcpp::List;
@@ -76,10 +78,10 @@ NumericVector mu_eta_binomial(const VectorXd &eta);
 // Poisson mu.eta: computes pmax(exp(eta), .Machine$double.eps)
 NumericVector mu_eta_poisson(const VectorXd &eta);
 
-List fastglm(NumericMatrix x,
-             SEXP y,
-             string family,
-             Nullable<NumericVector> start = R_NilValue,
+List fastglm(const mat& x,
+             const colvec& y,
+             const string& family,
+             Nullable<colvec> start = R_NilValue,
              Nullable<NumericVector> weights = R_NilValue,
              Nullable<NumericVector> offset = R_NilValue,
              Nullable<NumericVector> etastart = R_NilValue,

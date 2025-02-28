@@ -405,10 +405,10 @@ CostResult Fastcpd::get_nll_pelt_glm(
   List out;
   if (start.isNull()) {
     mat x = data_segment.cols(1, data_segment.n_cols - 1);
-    out = fastglm(wrap(x), wrap(y), family);
+    out = fastglm(x, y, family);
   } else {
     mat x = data_segment.cols(1, data_segment.n_cols - 1);
-    out = fastglm(wrap(x), wrap(y), family, wrap(start));
+    out = fastglm(x, y, family, start);
   }
   colvec par = as<colvec>(out["coefficients"]);
   colvec residuals = as<colvec>(out["residuals"]);
