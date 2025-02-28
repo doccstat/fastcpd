@@ -428,6 +428,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       } else if (family == "garch") {
         residuals <- matrix(NA, nrow(data))
         segments <- c(0, cp_set, nrow(data))
+        thetas <- matrix(NA, p, length(segments) - 1)
         for (segments_i in seq_len(length(segments) - 1)) {
           segments_start <- segments[segments_i] + 1
           segments_end <- segments[segments_i + 1]
@@ -436,7 +437,14 @@ fastcpd <- function(  # nolint: cyclomatic complexity
             order,
             trace = FALSE
           )$residuals
+          thetas[, segments_i] <- garch(
+            data[segments_start:segments_end, 1],
+            order,
+            trace = FALSE
+          )$coef
         }
+        thetas <- data.frame(thetas)
+        names(thetas) <- paste0("segment ", seq_len(ncol(thetas)))
       },
       error = function(e) message("Residual calculation failed.")
     )
