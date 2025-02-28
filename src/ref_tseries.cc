@@ -1,24 +1,20 @@
 // This is a modified copy of tseries/R/garch.R
 
-#include <Rcpp.h>
 #include <cmath>
 #include <algorithm>
 #include <limits>
+#include "ref_tseries.h"
 
 using ::Rcpp::CharacterVector;
 using ::Rcpp::Function;
-using ::Rcpp::IntegerVector;
-using ::Rcpp::List;
-using ::Rcpp::Nullable;
 using ::Rcpp::NumericMatrix;
-using ::Rcpp::NumericVector;
-using ::std::string;
 
 using ::Rcpp::as;
 using ::Rcpp::Named;
 using ::Rcpp::sqrt;
 using ::Rcpp::stop;
 using ::Rcpp::warning;
+using ::Rcpp::wrap;
 using ::std::max;
 using ::std::pow;
 using ::std::to_string;
@@ -56,19 +52,20 @@ extern "C"
                             int *q);
 }
 
-// [[Rcpp::export]]
-List garch(NumericVector x,
-           IntegerVector order = IntegerVector::create(1, 1),
-           Nullable<string> series = R_NilValue,
-           int maxiter = 200,
-           bool trace = true,
-           Nullable<NumericVector> start = R_NilValue,
-           string grad = "analytical",
-           Nullable<double> abstol_ = R_NilValue,
-           Nullable<double> reltol_ = R_NilValue,
-           Nullable<double> xtol_ = R_NilValue,
-           Nullable<double> falsetol_ = R_NilValue)
+List garch(const colvec& x_,
+           const colvec& order_,
+           Nullable<string> series,
+           int maxiter,
+           bool trace,
+           Nullable<NumericVector> start,
+           string grad,
+           Nullable<double> abstol_,
+           Nullable<double> reltol_,
+           Nullable<double> xtol_,
+           Nullable<double> falsetol_)
 {
+  NumericVector x = wrap(x_);
+  IntegerVector order = wrap(order_);
   // Set machine-epsilon based defaults:
   double eps = std::numeric_limits<double>::epsilon();
   double abstol = abstol_.isNull() ? max(1e-20, pow(eps, 2.0)) : as<double>(abstol_);
