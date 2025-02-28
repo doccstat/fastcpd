@@ -1,7 +1,1 @@
-src/ref_fastglm_fit_glm_dense.cc
-src/ref_fastglm_fit_glm_dense.h
-src/ref_fastglm_fit_glm.cc
-src/ref_fastglm_fit_glm.h
-src/ref_fastglm_glm_base.h
-src/ref_fastglm_glm.h
-src/ref_r_family.c
+src/ref*
