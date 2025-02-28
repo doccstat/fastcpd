@@ -49,56 +49,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// fit_garch_wrapper
-Rcpp::List fit_garch_wrapper(Rcpp::NumericVector x, int n, Rcpp::NumericVector coef, int p, int q, int maxiter, double abstol, double reltol, double xtol, double falsetol, int agrad, int trace);
-RcppExport SEXP _fastcpd_fit_garch_wrapper(SEXP xSEXP, SEXP nSEXP, SEXP coefSEXP, SEXP pSEXP, SEXP qSEXP, SEXP maxiterSEXP, SEXP abstolSEXP, SEXP reltolSEXP, SEXP xtolSEXP, SEXP falsetolSEXP, SEXP agradSEXP, SEXP traceSEXP) {
+// garch
+List garch(NumericVector x, IntegerVector order, Nullable<string> series, int maxiter, bool trace, Nullable<NumericVector> start, string grad, Nullable<double> abstol_, Nullable<double> reltol_, Nullable<double> xtol_, Nullable<double> falsetol_);
+RcppExport SEXP _fastcpd_garch(SEXP xSEXP, SEXP orderSEXP, SEXP seriesSEXP, SEXP maxiterSEXP, SEXP traceSEXP, SEXP startSEXP, SEXP gradSEXP, SEXP abstol_SEXP, SEXP reltol_SEXP, SEXP xtol_SEXP, SEXP falsetol_SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type coef(coefSEXP);
-    Rcpp::traits::input_parameter< int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< int >::type q(qSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type order(orderSEXP);
+    Rcpp::traits::input_parameter< Nullable<string> >::type series(seriesSEXP);
     Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
-    Rcpp::traits::input_parameter< double >::type abstol(abstolSEXP);
-    Rcpp::traits::input_parameter< double >::type reltol(reltolSEXP);
-    Rcpp::traits::input_parameter< double >::type xtol(xtolSEXP);
-    Rcpp::traits::input_parameter< double >::type falsetol(falsetolSEXP);
-    Rcpp::traits::input_parameter< int >::type agrad(agradSEXP);
-    Rcpp::traits::input_parameter< int >::type trace(traceSEXP);
-    rcpp_result_gen = Rcpp::wrap(fit_garch_wrapper(x, n, coef, p, q, maxiter, abstol, reltol, xtol, falsetol, agrad, trace));
-    return rcpp_result_gen;
-END_RCPP
-}
-// pred_garch_wrapper
-Rcpp::NumericVector pred_garch_wrapper(Rcpp::NumericVector x, int n, Rcpp::NumericVector coef, int p, int q, bool genuine);
-RcppExport SEXP _fastcpd_pred_garch_wrapper(SEXP xSEXP, SEXP nSEXP, SEXP coefSEXP, SEXP pSEXP, SEXP qSEXP, SEXP genuineSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type coef(coefSEXP);
-    Rcpp::traits::input_parameter< int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< int >::type q(qSEXP);
-    Rcpp::traits::input_parameter< bool >::type genuine(genuineSEXP);
-    rcpp_result_gen = Rcpp::wrap(pred_garch_wrapper(x, n, coef, p, q, genuine));
-    return rcpp_result_gen;
-END_RCPP
-}
-// ophess_garch_wrapper
-Rcpp::NumericMatrix ophess_garch_wrapper(Rcpp::NumericVector x, int n, Rcpp::NumericVector coef, int p, int q);
-RcppExport SEXP _fastcpd_ophess_garch_wrapper(SEXP xSEXP, SEXP nSEXP, SEXP coefSEXP, SEXP pSEXP, SEXP qSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type coef(coefSEXP);
-    Rcpp::traits::input_parameter< int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< int >::type q(qSEXP);
-    rcpp_result_gen = Rcpp::wrap(ophess_garch_wrapper(x, n, coef, p, q));
+    Rcpp::traits::input_parameter< bool >::type trace(traceSEXP);
+    Rcpp::traits::input_parameter< Nullable<NumericVector> >::type start(startSEXP);
+    Rcpp::traits::input_parameter< string >::type grad(gradSEXP);
+    Rcpp::traits::input_parameter< Nullable<double> >::type abstol_(abstol_SEXP);
+    Rcpp::traits::input_parameter< Nullable<double> >::type reltol_(reltol_SEXP);
+    Rcpp::traits::input_parameter< Nullable<double> >::type xtol_(xtol_SEXP);
+    Rcpp::traits::input_parameter< Nullable<double> >::type falsetol_(falsetol_SEXP);
+    rcpp_result_gen = Rcpp::wrap(garch(x, order, series, maxiter, trace, start, grad, abstol_, reltol_, xtol_, falsetol_));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -107,9 +75,7 @@ RcppExport SEXP run_testthat_tests(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"_fastcpd_fastcpd_impl", (DL_FUNC) &_fastcpd_fastcpd_impl, 26},
-    {"_fastcpd_fit_garch_wrapper", (DL_FUNC) &_fastcpd_fit_garch_wrapper, 12},
-    {"_fastcpd_pred_garch_wrapper", (DL_FUNC) &_fastcpd_pred_garch_wrapper, 6},
-    {"_fastcpd_ophess_garch_wrapper", (DL_FUNC) &_fastcpd_ophess_garch_wrapper, 5},
+    {"_fastcpd_garch", (DL_FUNC) &_fastcpd_garch, 11},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };

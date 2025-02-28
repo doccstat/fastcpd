@@ -5,15 +5,7 @@ fastcpd_impl <- function(data, beta, cost_adjustment, d, segment_count, trim, mo
     .Call(`_fastcpd_fastcpd_impl`, data, beta, cost_adjustment, d, segment_count, trim, momentum_coef, multiple_epochs_function, family, epsilon, p, order, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper, line_search, variance_estimate, p_response, pruning_coef, r_clock, r_progress)
 }
 
-fit_garch_wrapper <- function(x, n, coef, p, q, maxiter, abstol, reltol, xtol, falsetol, agrad, trace) {
-    .Call(`_fastcpd_fit_garch_wrapper`, x, n, coef, p, q, maxiter, abstol, reltol, xtol, falsetol, agrad, trace)
-}
-
-pred_garch_wrapper <- function(x, n, coef, p, q, genuine) {
-    .Call(`_fastcpd_pred_garch_wrapper`, x, n, coef, p, q, genuine)
-}
-
-ophess_garch_wrapper <- function(x, n, coef, p, q) {
-    .Call(`_fastcpd_ophess_garch_wrapper`, x, n, coef, p, q)
+garch <- function(x, order = as.integer( c(1, 1)), series = NULL, maxiter = 200L, trace = TRUE, start = NULL, grad = "analytical", abstol_ = NULL, reltol_ = NULL, xtol_ = NULL, falsetol_ = NULL) {
+    .Call(`_fastcpd_garch`, x, order, series, maxiter, trace, start, grad, abstol_, reltol_, xtol_, falsetol_)
 }
 
