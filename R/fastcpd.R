@@ -321,7 +321,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   } else if (family == "garch") {
     cost <- function(data) {
       tryCatch(
-        expr = tseries::garch(data, order, trace = FALSE)$n.likeli,
+        expr = garch(data, order, trace = FALSE)$n.likeli,
         error = function(e) 0
       )
     }
@@ -431,7 +431,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         for (segments_i in seq_len(length(segments) - 1)) {
           segments_start <- segments[segments_i] + 1
           segments_end <- segments[segments_i + 1]
-          residuals[segments_start:segments_end] <- tseries::garch(
+          residuals[segments_start:segments_end] <- garch(
             data[segments_start:segments_end, 1],
             order,
             trace = FALSE
