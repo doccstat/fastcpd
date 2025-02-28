@@ -3,7 +3,7 @@
 #ifndef GLM_BASE_H
 #define GLM_BASE_H
 
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
 #include <RcppEigen.h>
 
 using namespace Rcpp;
