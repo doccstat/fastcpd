@@ -253,7 +253,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       "ar",  # -> "gaussian"
       "var",  # -> "mgaussian"
       "arima",  # -> "custom"
-      "garch",  # -> "custom"
+      "garch",  # -> "garch"
       "custom"  # -> "custom"
     )
   )
@@ -308,20 +308,13 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     r_clock <- eval.parent(match.call()[["r.clock"]])
   }
 
-  # Define the cost functions for ARIMA and GARCH models.
+  # Define the cost functions for ARIMA model.
   if (family == "arima") {
     cost <- function(data) {
       tryCatch(
         expr = -forecast::Arima(
           c(data), order = order, method = "ML", include.mean = include_mean
         )$loglik,
-        error = function(e) 0
-      )
-    }
-  } else if (family == "garch") {
-    cost <- function(data) {
-      tryCatch(
-        expr = garch(data, order, trace = FALSE)$n.likeli,
         error = function(e) 0
       )
     }
@@ -364,7 +357,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   )
 
   result <- fastcpd_impl(
-    data_, beta, cost_adjustment,  d, segment_count, trim, momentum_coef,
+    data_, beta, cost_adjustment, d, segment_count, trim, momentum_coef,
     multiple_epochs, fastcpd_family, epsilon, p, order, cost, cost_gradient,
     cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper,
     line_search, sigma_, p_response, pruning_coef, r_clock, r_progress

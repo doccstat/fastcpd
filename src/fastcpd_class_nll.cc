@@ -1,5 +1,6 @@
 #include "fastcpd_class.h"
 #include "ref_fastglm_fit_glm.h"
+#include "ref_tseries.h"
 
 using ::arma::as_scalar;
 using ::arma::eye;
@@ -392,6 +393,21 @@ CostResult Fastcpd::get_nll_pelt_custom(
       as<double>((*cost)(data.rows(segment_start, segment_end)))
     };
   }
+}
+
+CostResult Fastcpd::get_nll_pelt_garch(
+  const unsigned int segment_start,
+  const unsigned int segment_end,
+  const bool cv,
+  const Nullable<colvec>& start
+) {
+  colvec series = data.rows(segment_start, segment_end).col(0);
+  List out = garch(series, order);
+  return {
+    {as<colvec>(out["coef"])},
+    {as<colvec>(out["residuals"])},
+    as<double>(out["n.likeli"])
+  };
 }
 
 CostResult Fastcpd::get_nll_pelt_glm(

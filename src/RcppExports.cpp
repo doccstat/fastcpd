@@ -49,33 +49,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// garch
-List garch(NumericVector x, IntegerVector order, Nullable<string> series, int maxiter, bool trace, Nullable<NumericVector> start, string grad, Nullable<double> abstol_, Nullable<double> reltol_, Nullable<double> xtol_, Nullable<double> falsetol_);
-RcppExport SEXP _fastcpd_garch(SEXP xSEXP, SEXP orderSEXP, SEXP seriesSEXP, SEXP maxiterSEXP, SEXP traceSEXP, SEXP startSEXP, SEXP gradSEXP, SEXP abstol_SEXP, SEXP reltol_SEXP, SEXP xtol_SEXP, SEXP falsetol_SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type order(orderSEXP);
-    Rcpp::traits::input_parameter< Nullable<string> >::type series(seriesSEXP);
-    Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
-    Rcpp::traits::input_parameter< bool >::type trace(traceSEXP);
-    Rcpp::traits::input_parameter< Nullable<NumericVector> >::type start(startSEXP);
-    Rcpp::traits::input_parameter< string >::type grad(gradSEXP);
-    Rcpp::traits::input_parameter< Nullable<double> >::type abstol_(abstol_SEXP);
-    Rcpp::traits::input_parameter< Nullable<double> >::type reltol_(reltol_SEXP);
-    Rcpp::traits::input_parameter< Nullable<double> >::type xtol_(xtol_SEXP);
-    Rcpp::traits::input_parameter< Nullable<double> >::type falsetol_(falsetol_SEXP);
-    rcpp_result_gen = Rcpp::wrap(garch(x, order, series, maxiter, trace, start, grad, abstol_, reltol_, xtol_, falsetol_));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 RcppExport SEXP run_testthat_tests(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"_fastcpd_fastcpd_impl", (DL_FUNC) &_fastcpd_fastcpd_impl, 26},
-    {"_fastcpd_garch", (DL_FUNC) &_fastcpd_garch, 11},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };

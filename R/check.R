@@ -192,7 +192,7 @@ get_sigma_data <- function(
 
 get_fastcpd_family <- function(family, p_response) {
   if (family %in% c(
-    "binomial", "poisson", "lasso",
+    "binomial", "garch", "poisson", "lasso",
     "mean", "variance", "meanvariance", "arma"
   )) {
     family

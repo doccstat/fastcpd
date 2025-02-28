@@ -173,6 +173,12 @@ const unordered_map<string, Fastcpd::GetFunctionSet> Fastcpd::family_function_ma
     &Fastcpd::get_nll_sen_binomial,
     &Fastcpd::get_nll_pelt_glm
   }},
+  { "garch", GetFunctionSet{
+    nullptr, // No gradient
+    nullptr, // No hessian
+    nullptr, // No nll_sen
+    &Fastcpd::get_nll_pelt_garch
+  }},
   { "gaussian", GetFunctionSet{
     &Fastcpd::get_gradient_lm,
     &Fastcpd::get_hessian_lm,

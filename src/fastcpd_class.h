@@ -390,6 +390,13 @@ class Fastcpd {
     const Nullable<colvec>& start
   );
 
+  CostResult get_nll_pelt_garch(
+    const unsigned int segment_start,
+    const unsigned int segment_end,
+    const bool cv,
+    const Nullable<colvec>& start
+  );
+
   CostResult get_nll_pelt_glm(
     const unsigned int segment_start,
     const unsigned int segment_end,
