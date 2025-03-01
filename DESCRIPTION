@@ -33,12 +33,10 @@ Imports:
     Rcpp (>= 0.11.0),
     stats
 Suggests:
-    abind,
     dplyr,
     ggplot2,
     gridExtra,
     knitr,
-    lubridate,
     matrixStats,
     mockthat,
     mvtnorm,
@@ -47,8 +45,7 @@ Suggests:
     reshape2,
     rmarkdown,
     testthat (>= 3.0.0),
-    xml2,
-    zoo
+    xml2
 LinkingTo:
     progress,
     Rcpp,
