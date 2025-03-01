@@ -1,9 +1,7 @@
 \donttest{
 if (
-  requireNamespace("dplyr", quietly = TRUE) &&
-    requireNamespace("ggplot2", quietly = TRUE) &&
-    requireNamespace("mvtnorm", quietly = TRUE) &&
-    requireNamespace("reshape2", quietly = TRUE)
+  requireNamespace("ggplot2", quietly = TRUE) &&
+    requireNamespace("mvtnorm", quietly = TRUE)
 ) {
   set.seed(1)
   n <- 480
@@ -30,6 +28,7 @@ if (
   summary(result)
   plot(result)
 
+  # Combine estimated thetas with true parameters
   thetas <- result@thetas
   thetas <- cbind.data.frame(thetas, t(theta_0))
   names(thetas) <- c(
@@ -37,16 +36,27 @@ if (
     "segment 1 truth", "segment 2 truth", "segment 3 truth", "segment 4 truth"
   )
   thetas$coordinate <- c(seq_len(p_true), rep("rest", p - p_true))
-  molten <- reshape2::melt(thetas, id.vars = "coordinate")
-  molten <- dplyr::mutate(
-    molten,
-    segment = gsub("segment ", "", variable),
-    segment = gsub(" truth", "", segment),
-    height = as.numeric(gsub("segment.*", "", segment)) +
-      0.2 * as.numeric(grepl("truth", variable)),
-    parameter = ifelse(grepl("truth", variable), "truth", "estimated")
+
+  # Melt the data frame using base R (i.e., convert from wide to long format)
+  data_cols <- setdiff(names(thetas), "coordinate")
+  molten <- data.frame(
+    coordinate = rep(thetas$coordinate, times = length(data_cols)),
+    variable = rep(data_cols, each = nrow(thetas)),
+    value = as.vector(as.matrix(thetas[, data_cols]))
   )
-  ggplot2::ggplot() +
+
+  # Remove the "segment " and " truth" parts to extract the segment number
+  molten$segment <- gsub("segment ", "", molten$variable)
+  molten$segment <- gsub(" truth", "", molten$segment)
+
+  # Compute height: the numeric value of the segment plus an offset for truth values
+  molten$height <- as.numeric(gsub("segment.*", "", molten$segment)) +
+    0.2 * as.numeric(grepl("truth", molten$variable))
+
+  # Create a parameter indicator based on whether the variable corresponds to truth or estimation
+  molten$parameter <- ifelse(grepl("truth", molten$variable), "truth", "estimated")
+
+  p <- ggplot2::ggplot() +
     ggplot2::geom_point(
       data = molten,
       ggplot2::aes(
@@ -57,5 +67,6 @@ if (
     ggplot2::ylim(0.8, 4.4) +
     ggplot2::ylab("segment") +
     ggplot2::theme_bw()
+  print(p)
 }
 }

@@ -33,7 +33,6 @@ Imports:
     Rcpp (>= 0.11.0),
     stats
 Suggests:
-    dplyr,
     ggplot2,
     gridExtra,
     knitr,
@@ -42,7 +41,6 @@ Suggests:
     mvtnorm,
     numDeriv,
     RcppClock,
-    reshape2,
     rmarkdown,
     testthat (>= 3.0.0),
     xml2
