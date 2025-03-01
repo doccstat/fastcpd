@@ -312,7 +312,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   if (family == "arima") {
     cost <- function(data) {
       tryCatch(
-        expr = -forecast::Arima(
+        expr = -stats::arima(
           c(data), order = order, method = "ML", include.mean = include_mean
         )$loglik,
         error = function(e) 0
@@ -396,7 +396,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
         for (segments_i in seq_len(length(segments) - 1)) {
           segments_start <- segments[segments_i] + 1
           segments_end <- segments[segments_i + 1]
-          residuals[segments_start:segments_end] <- forecast::Arima(
+          residuals[segments_start:segments_end] <- stats::arima(
             c(data[segments_start:segments_end, 1]),
             order = order,
             method = "ML",
