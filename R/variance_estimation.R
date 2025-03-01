@@ -112,7 +112,8 @@ variance_lm <- function(
     )
   }
   if (d == 1) {
-    estimators <- stats::na.exclude(c(estimators))
+    estimators <- c(estimators)
+    estimators <- estimators[!is.na(estimators)]
     outlier_threshold <-
       stats::quantile(estimators, 0.75) + outlier_iqr * stats::IQR(estimators)
     mean(estimators[estimators < outlier_threshold], na.rm = TRUE)
