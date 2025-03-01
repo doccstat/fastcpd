@@ -9,6 +9,7 @@ testthat::test_that(
     )))
 
     testthat::expect_equal(result@cp_set, 759)
+    testthat::expect_equal(max(result@residuals, na.rm = TRUE), 3.89822750)
     testthat::expect_equal(result@thetas, data.frame(
       "segment 1" = c(79.822854422, 0.196544235, 0.000000000),
       "segment 2" = c(1.376189971, 0.125421192, 0.356561246),
