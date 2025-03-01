@@ -93,6 +93,7 @@ Fastcpd::Fastcpd(
     order(order),
     p(p),
     p_response(p_response),
+    pruned_left(ucolvec(data_n_rows + 1)),
     pruning_coef(pruning_coef),
     r_clock(r_clock),
     r_progress(r_progress),
@@ -859,20 +860,26 @@ void Fastcpd::update_step(
   fvec(t) = min_obj;
   cp_sets[t] = r_t_set[min_idx];
 
-  ucolvec pruned_left = find(obj <= min_obj + beta - pruning_coef);
-  r_t_count = pruned_left.n_elem + 1;
-  if (pruned_left.n_elem) {
-    r_t_set.rows(0, pruned_left.n_elem - 1) = r_t_set(pruned_left);
+  // The following code is the manual implementation of `find` function in
+  // Armadillo.
+  pruned_left_n_elem = 0;
+  for (unsigned int i = 0; i < r_t_count; i++) {
+    if (obj[i] <= min_obj + beta - pruning_coef) {
+      r_t_set[pruned_left_n_elem] = r_t_set[i];
+      pruned_left[pruned_left_n_elem] = i;
+      pruned_left_n_elem++;
+    }
   }
-  r_t_set(pruned_left.n_elem) = t;
+  r_t_count = pruned_left_n_elem;
+  r_t_set[r_t_count] = t;
+  r_t_count++;
 
   if (vanilla_percentage != 1) {
-    update_theta_hat(pruned_left);
-    update_theta_sum(pruned_left);
-    update_hessian(pruned_left);
+    update_theta_hat(pruned_left.rows(0, pruned_left_n_elem - 1));
+    update_theta_sum(pruned_left.rows(0, pruned_left_n_elem - 1));
+    update_hessian(pruned_left.rows(0, pruned_left_n_elem - 1));
   }
 
-  fvec(t) = min_obj;
   update_r_clock_tock("pruning");
 
   checkUserInterrupt();

@@ -198,6 +198,11 @@ class Fastcpd {
   // Number of response variables in regression.
   const unsigned int p_response;
 
+  // Indices after pruning.
+  ucolvec pruned_left;
+
+  unsigned int pruned_left_n_elem;
+
   const double pruning_coef;
 
   const string r_clock;
