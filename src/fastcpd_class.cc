@@ -155,20 +155,26 @@ List Fastcpd::run() {
   fvec(0) = -beta;
   fvec(1) = get_cval(0, 0, 1);
 
-  if (family == "mean" && d == 1 && cost_adjustment == "MBIC") {
+  if (family == "mean" && cost_adjustment == "MBIC") {
     double *obj = (double *)calloc(data_n_rows + 1, sizeof(double));
+    double two_norm;
+    unsigned int i, pi;
 
     for (unsigned int t = 2; t <= data_n_rows; t++) {
-      for (unsigned int i = 0; i < r_t_count; i++) {
+      for (i = 0; i < r_t_count; i++) {
+        two_norm = (zero_data_c[t][0] - zero_data_c[r_t_set[i]][0]) * (zero_data_c[t][0] - zero_data_c[r_t_set[i]][0]);
+        for (pi = 1; pi < p; pi++) {
+          two_norm += (zero_data_c[t][pi] - zero_data_c[r_t_set[i]][pi]) * (zero_data_c[t][pi] - zero_data_c[r_t_set[i]][pi]);
+        }
         obj[i] = fvec[r_t_set[i]] + (
-          (zero_data_c[t][1] - zero_data_c[r_t_set[i]][1]) -
-          ((zero_data_c[t][0] - zero_data_c[r_t_set[i]][0]) * (zero_data_c[t][0] - zero_data_c[r_t_set[i]][0])) / (t - r_t_set[i])
+          (zero_data_c[t][p] - zero_data_c[r_t_set[i]][p]) -
+          two_norm / (t - r_t_set[i])
         ) / 2.0 + std::log(t - r_t_set[i]) / 2.0 + beta;
       }
 
       min_obj = obj[0];
       min_idx = 0;
-      for (unsigned int i = 1; i < r_t_count; i++) {
+      for (i = 1; i < r_t_count; i++) {
         if (obj[i] < min_obj) {
           min_obj = obj[i];
           min_idx = i;
@@ -178,7 +184,7 @@ List Fastcpd::run() {
       cp_sets[t] = r_t_set[min_idx];
 
       pruned_left_n_elem = 0;
-      for (unsigned int i = 0; i < r_t_count; i++) {
+      for (i = 0; i < r_t_count; i++) {
         if (obj[i] <= min_obj + beta - pruning_coef) {
           r_t_set[pruned_left_n_elem] = r_t_set[i];
           pruned_left_n_elem++;
