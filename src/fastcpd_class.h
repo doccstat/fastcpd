@@ -177,6 +177,14 @@ class Fastcpd {
   // Lower bound of the parameters to be estimated during the optimization.
   const colvec lower;
 
+  // `min_idx` is the index of the minimum objective value.
+  // This value is stored to avoid reallocation of memory.
+  unsigned int min_idx;
+
+  // `min_obj` is the minimum objective value.
+  // This value is stored to avoid reallocation of memory.
+  double min_obj;
+
   // Momentum will be used in the update step if `momentum_coef` is not 0.
   colvec momentum;
 

@@ -845,9 +845,19 @@ void Fastcpd::update_step(
   }
 
   colvec obj = get_obj(fvec, r_t_set, r_t_count, t);
-  double min_obj = min(obj);
 
-  cp_sets[t] = r_t_set(index_min(obj));
+  // The following code is the manual implementation of `index_min` function
+  // in Armadillo.
+  min_obj = obj[0];
+  min_idx = 0;
+  for (unsigned int i = 1; i < r_t_count; i++) {
+    if (obj[i] < min_obj) {
+      min_obj = obj[i];
+      min_idx = i;
+    }
+  }
+  fvec(t) = min_obj;
+  cp_sets[t] = r_t_set[min_idx];
 
   ucolvec pruned_left = find(obj <= min_obj + beta - pruning_coef);
   r_t_count = pruned_left.n_elem + 1;
