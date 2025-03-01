@@ -339,7 +339,7 @@ fastcpd.poisson <- fastcpd_poisson  # nolint: Conventional R function style
 #' \item \code{"ar"}, NUMERIC(1): AR(\eqn{p}) model using linear regression.
 #' \item \code{"var"}, NUMERIC(1): VAR(\eqn{p}) model using linear regression.
 #' \item \code{"arima"}, NUMERIC(3): ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model
-#'   using [forecast::Arima()].
+#'   using [stats::arima()].
 #' \item \code{"garch"}, NUMERIC(2): GARCH(\eqn{p}, \eqn{q}) model using
 #'   [tseries::garch()].
 #' }

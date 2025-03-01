@@ -23,7 +23,7 @@ specifying the order of the time series. Possible combinations with
 \item \code{"ar"}, NUMERIC(1): AR(\eqn{p}) model using linear regression.
 \item \code{"var"}, NUMERIC(1): VAR(\eqn{p}) model using linear regression.
 \item \code{"arima"}, NUMERIC(3): ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model
-using \code{\link[forecast:Arima]{forecast::Arima()}}.
+using \code{\link[stats:arima]{stats::arima()}}.
 \item \code{"garch"}, NUMERIC(2): GARCH(\eqn{p}, \eqn{q}) model using
 \code{\link[tseries:garch]{tseries::garch()}}.
 }}
