@@ -135,7 +135,6 @@ public:
 
     for (i = 0; i < maxit; ++i)
     {
-
       update_var_mu();
 
       update_mu_eta();

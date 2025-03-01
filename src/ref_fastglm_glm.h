@@ -429,7 +429,6 @@ protected:
 
   virtual void save_se()
   {
-
     if (type == 0)
     {
       if (rank == nvars)
