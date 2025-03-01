@@ -433,7 +433,7 @@ List Fastcpd::get_cp_set(const colvec raw_cp_set) {
     cost_values(i) = cost_result.value;
 
     // Parameters are not involved for PELT.
-    if (vanilla_percentage < 1) {
+    if (vanilla_percentage < 1 || family == "garch") {
       thetas.col(i) = colvec(cost_result.par);
     }
 

@@ -371,13 +371,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     cp_set <- cp_set + order
   }
 
-  if (vanilla_percentage == 1) {
-    thetas <- data.frame(matrix(NA, 0, 0))
-  } else {
-    thetas <- data.frame(result$thetas)
-    if (ncol(thetas) > 0) {
-      names(thetas) <- paste0("segment ", seq_len(ncol(thetas)))
-    }
+  thetas <- data.frame(result$thetas)
+  if (ncol(thetas) > 0) {
+    names(thetas) <- paste0("segment ", seq_len(ncol(thetas)))
   }
 
   if (is.null(result$cost_values)) {
@@ -418,26 +414,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
             data[sgmt_index, ] - colMeans(data[sgmt_index, , drop = FALSE])
           )
         }
-      } else if (family == "garch") {
-        residuals <- matrix(NA, nrow(data))
-        segments <- c(0, cp_set, nrow(data))
-        thetas <- matrix(NA, p, length(segments) - 1)
-        for (segments_i in seq_len(length(segments) - 1)) {
-          segments_start <- segments[segments_i] + 1
-          segments_end <- segments[segments_i + 1]
-          residuals[segments_start:segments_end] <- garch(
-            data[segments_start:segments_end, 1],
-            order,
-            trace = FALSE
-          )$residuals
-          thetas[, segments_i] <- garch(
-            data[segments_start:segments_end, 1],
-            order,
-            trace = FALSE
-          )$coef
-        }
-        thetas <- data.frame(thetas)
-        names(thetas) <- paste0("segment ", seq_len(ncol(thetas)))
       },
       error = function(e) message("Residual calculation failed.")
     )
