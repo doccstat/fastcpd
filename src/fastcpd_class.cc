@@ -155,10 +155,44 @@ List Fastcpd::run() {
   fvec(0) = -beta;
   fvec(1) = get_cval(0, 0, 1);
 
-  create_statistics_and_gradients();
+  if (family == "mean" && d == 1 && cost_adjustment == "MBIC") {
+    double *obj = (double *)calloc(data_n_rows + 1, sizeof(double));
 
-  for (unsigned int t = 2; t <= data_n_rows; t++) {
-    update_step(t, r_t_set, r_t_count, cp_sets, fvec);
+    for (unsigned int t = 2; t <= data_n_rows; t++) {
+      for (unsigned int i = 0; i < r_t_count; i++) {
+        obj[i] = fvec[r_t_set[i]] + (
+          (zero_data_c[t][1] - zero_data_c[r_t_set[i]][1]) -
+          ((zero_data_c[t][0] - zero_data_c[r_t_set[i]][0]) * (zero_data_c[t][0] - zero_data_c[r_t_set[i]][0])) / (t - r_t_set[i])
+        ) / 2.0 + std::log(t - r_t_set[i]) / 2.0 + beta;
+      }
+
+      min_obj = obj[0];
+      min_idx = 0;
+      for (unsigned int i = 1; i < r_t_count; i++) {
+        if (obj[i] < min_obj) {
+          min_obj = obj[i];
+          min_idx = i;
+        }
+      }
+      fvec(t) = min_obj;
+      cp_sets[t] = r_t_set[min_idx];
+
+      pruned_left_n_elem = 0;
+      for (unsigned int i = 0; i < r_t_count; i++) {
+        if (obj[i] <= min_obj + beta - pruning_coef) {
+          r_t_set[pruned_left_n_elem] = r_t_set[i];
+          pruned_left_n_elem++;
+        }
+      }
+      r_t_count = pruned_left_n_elem;
+      r_t_set[r_t_count] = t;
+      r_t_count++;
+    }
+  } else {
+    create_statistics_and_gradients();
+    for (unsigned int t = 2; t <= data_n_rows; t++) {
+      update_step(t, r_t_set, r_t_count, cp_sets, fvec);
+    }
   }
 
   List result = get_cp_set(cp_sets);
