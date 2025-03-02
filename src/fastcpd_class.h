@@ -28,17 +28,17 @@ class Fastcpd {
  public:
   Fastcpd(
     const double beta,
-    Nullable<Function> cost,
+    const Nullable<Function> cost,
     const string cost_adjustment,
-    Nullable<Function> cost_gradient,
-    Nullable<Function> cost_hessian,
+    const Nullable<Function> cost_gradient,
+    const Nullable<Function> cost_hessian,
     const bool cp_only,
     const unsigned int d,
-    mat data,
+    const mat data,
     const double epsilon,
     const string family,
-    Nullable<Function> multiple_epochs_function,
-    colvec line_search,
+    const Nullable<Function> multiple_epochs_function,
+    const colvec line_search,
     const colvec lower,
     const double momentum_coef,
     const colvec order,
@@ -89,16 +89,16 @@ class Fastcpd {
   double beta;
 
   // `cost` is the cost function to be used.
-  unique_ptr<Function> cost;
+  const unique_ptr<Function> cost;
 
   // Adjustment to the cost function.
   const string cost_adjustment;
 
   // `cost_gradient` is the gradient of the cost function to be used.
-  unique_ptr<Function> cost_gradient;
+  const unique_ptr<Function> cost_gradient;
 
   // `cost_hessian` is the Hessian of the cost function to be used.
-  unique_ptr<Function> cost_hessian;
+  const unique_ptr<Function> cost_hessian;
 
   const bool cp_only;
 
@@ -254,12 +254,6 @@ class Fastcpd {
 
   // Stop the clock and create an R object with `name`.
   void create_clock_in_r(const std::string name);
-
-  void create_gets(
-    Nullable<Function>& cost,
-    Nullable<Function>& cost_gradient,
-    Nullable<Function>& cost_hessian
-  );
 
   // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   void create_gradients();

@@ -14,7 +14,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // fastcpd_impl
-List fastcpd_impl(const mat data, const double beta, const string cost_adjustment, const unsigned int d, const int segment_count, const double trim, const double momentum_coef, Nullable<Function> multiple_epochs_function, const string family, const double epsilon, const int p, const colvec order, Nullable<Function> cost, Nullable<Function> cost_gradient, Nullable<Function> cost_hessian, const bool cp_only, const double vanilla_percentage, const bool warm_start, colvec lower, colvec upper, colvec line_search, const mat variance_estimate, const unsigned int p_response, const double pruning_coef, const string r_clock, const bool r_progress);
+List fastcpd_impl(const mat data, const double beta, const string cost_adjustment, const unsigned int d, const int segment_count, const double trim, const double momentum_coef, const Nullable<Function> multiple_epochs_function, const string family, const double epsilon, const int p, const colvec order, const Nullable<Function> cost, const Nullable<Function> cost_gradient, const Nullable<Function> cost_hessian, const bool cp_only, const double vanilla_percentage, const bool warm_start, const colvec lower, const colvec upper, const colvec line_search, const mat variance_estimate, const unsigned int p_response, const double pruning_coef, const string r_clock, const bool r_progress);
 RcppExport SEXP _fastcpd_fastcpd_impl(SEXP dataSEXP, SEXP betaSEXP, SEXP cost_adjustmentSEXP, SEXP dSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP multiple_epochs_functionSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP pSEXP, SEXP orderSEXP, SEXP costSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP cp_onlySEXP, SEXP vanilla_percentageSEXP, SEXP warm_startSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP line_searchSEXP, SEXP variance_estimateSEXP, SEXP p_responseSEXP, SEXP pruning_coefSEXP, SEXP r_clockSEXP, SEXP r_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -26,20 +26,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int >::type segment_count(segment_countSEXP);
     Rcpp::traits::input_parameter< const double >::type trim(trimSEXP);
     Rcpp::traits::input_parameter< const double >::type momentum_coef(momentum_coefSEXP);
-    Rcpp::traits::input_parameter< Nullable<Function> >::type multiple_epochs_function(multiple_epochs_functionSEXP);
+    Rcpp::traits::input_parameter< const Nullable<Function> >::type multiple_epochs_function(multiple_epochs_functionSEXP);
     Rcpp::traits::input_parameter< const string >::type family(familySEXP);
     Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
     Rcpp::traits::input_parameter< const int >::type p(pSEXP);
     Rcpp::traits::input_parameter< const colvec >::type order(orderSEXP);
-    Rcpp::traits::input_parameter< Nullable<Function> >::type cost(costSEXP);
-    Rcpp::traits::input_parameter< Nullable<Function> >::type cost_gradient(cost_gradientSEXP);
-    Rcpp::traits::input_parameter< Nullable<Function> >::type cost_hessian(cost_hessianSEXP);
+    Rcpp::traits::input_parameter< const Nullable<Function> >::type cost(costSEXP);
+    Rcpp::traits::input_parameter< const Nullable<Function> >::type cost_gradient(cost_gradientSEXP);
+    Rcpp::traits::input_parameter< const Nullable<Function> >::type cost_hessian(cost_hessianSEXP);
     Rcpp::traits::input_parameter< const bool >::type cp_only(cp_onlySEXP);
     Rcpp::traits::input_parameter< const double >::type vanilla_percentage(vanilla_percentageSEXP);
     Rcpp::traits::input_parameter< const bool >::type warm_start(warm_startSEXP);
-    Rcpp::traits::input_parameter< colvec >::type lower(lowerSEXP);
-    Rcpp::traits::input_parameter< colvec >::type upper(upperSEXP);
-    Rcpp::traits::input_parameter< colvec >::type line_search(line_searchSEXP);
+    Rcpp::traits::input_parameter< const colvec >::type lower(lowerSEXP);
+    Rcpp::traits::input_parameter< const colvec >::type upper(upperSEXP);
+    Rcpp::traits::input_parameter< const colvec >::type line_search(line_searchSEXP);
     Rcpp::traits::input_parameter< const mat >::type variance_estimate(variance_estimateSEXP);
     Rcpp::traits::input_parameter< const unsigned int >::type p_response(p_responseSEXP);
     Rcpp::traits::input_parameter< const double >::type pruning_coef(pruning_coefSEXP);
