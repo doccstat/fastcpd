@@ -90,6 +90,12 @@ Fastcpd::Fastcpd(
     lower(lower),
     momentum(vec(p)),
     momentum_coef(momentum_coef),
+    multiple_epochs_function([&]() -> unique_ptr<Function> {
+      if (multiple_epochs_function.isNotNull()) {
+        return make_unique<Function>(multiple_epochs_function);
+      }
+      return nullptr;
+    }()),
     order(order),
     p(p),
     p_response(p_response),
@@ -109,12 +115,6 @@ Fastcpd::Fastcpd(
     vanilla_percentage(vanilla_percentage),
     variance_estimate(variance_estimate),
     warm_start(warm_start) {
-  if (multiple_epochs_function.isNotNull()) {
-    this->multiple_epochs_function = std::make_unique<Function>(
-      multiple_epochs_function
-    );
-  }
-
   if (family == "mean") {
     zero_data = data * chol(inv(variance_estimate)).t();
     zero_data = cumsum(join_rows(zero_data, sum(square(zero_data), 1)));

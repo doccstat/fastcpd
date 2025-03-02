@@ -166,7 +166,7 @@ class Fastcpd {
   // `hessian` stores the Hessian matrix up to the current data point.
   cube hessian;
 
-  unique_ptr<Function> multiple_epochs_function;
+  const unique_ptr<Function> multiple_epochs_function;
 
   // `lambda` is the lambda for L1 regularization. Only used for lasso. This
   // parameter stores the penalty without the segment length scaling.
