@@ -247,6 +247,11 @@ class Fastcpd {
 
   mat zero_data;
 
+  unsigned int zero_data_n_cols;
+  unsigned int zero_data_n_rows;
+
+  double* zero_data_ptr;
+
   // Stop the clock and create an R object with `name`.
   void create_clock_in_r(const std::string name);
 

@@ -119,6 +119,9 @@ Fastcpd::Fastcpd(
     zero_data = data * chol(inv(variance_estimate)).t();
     zero_data = cumsum(join_rows(zero_data, sum(square(zero_data), 1)));
     zero_data = join_cols(zeros<rowvec>(zero_data.n_cols), zero_data);
+    zero_data_n_cols = zero_data.n_cols;
+    zero_data_n_rows = zero_data.n_rows;
+    zero_data_ptr = zero_data.memptr();
   } else if (family == "variance") {
     zero_data = data;
     zero_data.each_row() -= mean(zero_data, 0);
@@ -128,6 +131,9 @@ Fastcpd::Fastcpd(
     }
     zero_data = cumsum(data_crossprod.t());
     zero_data = join_cols(zeros<rowvec>(zero_data.n_cols), zero_data);
+    zero_data_n_cols = zero_data.n_cols;
+    zero_data_n_rows = zero_data.n_rows;
+    zero_data_ptr = zero_data.memptr();
   } else if (family == "meanvariance") {
     mat data_crossprod(data_n_cols * data_n_cols, data_n_rows);
     for (unsigned int i = 0; i < data_n_rows; i++) {
@@ -135,6 +141,9 @@ Fastcpd::Fastcpd(
     }
     zero_data = cumsum(join_rows(data, data_crossprod.t()));
     zero_data = join_cols(zeros<rowvec>(zero_data.n_cols), zero_data);
+    zero_data_n_cols = zero_data.n_cols;
+    zero_data_n_rows = zero_data.n_rows;
+    zero_data_ptr = zero_data.memptr();
   }
 
   create_gets(cost, cost_gradient, cost_hessian);
@@ -158,14 +167,11 @@ List Fastcpd::run() {
 
     for (unsigned int t = 2; t <= data_n_rows; t++) {
       for (i = 0; i < r_t_count; i++) {
-        two_norm = (zero_data.at(t, 0) - zero_data.at(r_t_set[i], 0)) * (zero_data.at(t, 0) - zero_data.at(r_t_set[i], 0));
+        two_norm = (zero_data_ptr[t] - zero_data_ptr[r_t_set[i]]) * (zero_data_ptr[t] - zero_data_ptr[r_t_set[i]]);
         for (pi = 1; pi < p; pi++) {
-          two_norm += (zero_data.at(t, pi) - zero_data.at(r_t_set[i], pi)) * (zero_data.at(t, pi) - zero_data.at(r_t_set[i], pi));
+          two_norm += (zero_data_ptr[t + zero_data_n_rows * pi] - zero_data_ptr[r_t_set[i] + zero_data_n_rows * pi]) * (zero_data_ptr[t + zero_data_n_rows * pi] - zero_data_ptr[r_t_set[i] + zero_data_n_rows * pi]);
         }
-        obj[i] = fvec[r_t_set[i]] + (
-          (zero_data.at(t, p) - zero_data.at(r_t_set[i], p)) -
-          two_norm / (t - r_t_set[i])
-        ) / 2.0 + std::log(t - r_t_set[i]) / 2.0 + beta;
+        obj[i] = fvec[r_t_set[i]] + ((zero_data_ptr[t + zero_data_n_rows * p] - zero_data_ptr[r_t_set[i] + zero_data_n_rows * p]) - two_norm / (t - r_t_set[i])) / 2.0 + std::log(t - r_t_set[i]) / 2.0 + beta;
       }
 
       min_obj = obj[0];
