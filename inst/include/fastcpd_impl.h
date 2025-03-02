@@ -12,8 +12,8 @@ using ::std::function;
 using ::std::string;
 
 List fastcpd_impl(
-    mat data,
-    double beta,
+    const mat data,
+    const double beta,
     const string cost_adjustment,
     const unsigned int d,
     const int segment_count,

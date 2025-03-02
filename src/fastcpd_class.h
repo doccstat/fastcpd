@@ -106,7 +106,7 @@ class Fastcpd {
   const unsigned int d;
 
   // `data` is the data set to be segmented.
-  mat data;
+  const mat data;
 
   // The number of data points.
   const unsigned int data_n_rows;
@@ -247,8 +247,6 @@ class Fastcpd {
 
   mat zero_data;
 
-  double** zero_data_c;
-
   // Stop the clock and create an R object with `name`.
   void create_clock_in_r(const std::string name);
 
@@ -270,9 +268,6 @@ class Fastcpd {
 
   // Set \code{theta_sum} for a specific column.
   void create_theta_sum(const unsigned int col, colvec new_theta_sum);
-
-  // Clean up the memory allocated for \code{zero_data_c}.
-  void delete_zero_data_c();
 
   double get_cost_adjustment_value(const unsigned nrows);
 

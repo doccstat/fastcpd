@@ -108,37 +108,33 @@ Fastcpd::Fastcpd(
     upper(upper),
     vanilla_percentage(vanilla_percentage),
     variance_estimate(variance_estimate),
-    warm_start(warm_start),
-    zero_data(join_cols(zeros<rowvec>(data_n_cols), data)) {
+    warm_start(warm_start) {
   if (multiple_epochs_function.isNotNull()) {
     this->multiple_epochs_function = std::make_unique<Function>(
       multiple_epochs_function
     );
   }
 
-  zero_data_c = (double **)malloc((data_n_rows + 1) * sizeof(double *));
-  if (zero_data_c == NULL) {
-    FATAL("Memory allocation failed.");  // # nocov
-  }
-  unsigned int i = 0;
-  while (i < data_n_rows + 1) {
-    zero_data_c[i] = (double *)malloc(data_n_cols * sizeof(double));
-    if (zero_data_c[i] == NULL) {
-      break;  // # nocov
+  if (family == "mean") {
+    zero_data = data * chol(inv(variance_estimate)).t();
+    zero_data = cumsum(join_rows(zero_data, sum(square(zero_data), 1)));
+    zero_data = join_cols(zeros<rowvec>(zero_data.n_cols), zero_data);
+  } else if (family == "variance") {
+    zero_data = data;
+    zero_data.each_row() -= mean(zero_data, 0);
+    mat data_crossprod(data_n_cols * data_n_cols, data_n_rows);
+    for (unsigned int i = 0; i < data_n_rows; i++) {
+      data_crossprod.col(i) = vectorise(zero_data.row(i).t() * zero_data.row(i));
     }
-    i++;
-  }
-  if (i < data_n_rows + 1) {
-    for (unsigned int j = 0; j < i; j++) {  // # nocov start
-      free(zero_data_c[j]);
+    zero_data = cumsum(data_crossprod.t());
+    zero_data = join_cols(zeros<rowvec>(zero_data.n_cols), zero_data);
+  } else if (family == "meanvariance") {
+    mat data_crossprod(data_n_cols * data_n_cols, data_n_rows);
+    for (unsigned int i = 0; i < data_n_rows; i++) {
+      data_crossprod.col(i) = vectorise(data.row(i).t() * data.row(i));
     }
-    free(zero_data_c);
-    FATAL("Memory allocation failed.");  // # nocov end
-  }
-  for (unsigned int i = 0; i < data_n_rows + 1; i++) {
-    for (unsigned int j = 0; j < data_n_cols; j++) {
-      zero_data_c[i][j] = zero_data(i, j);
-    }
+    zero_data = cumsum(join_rows(data, data_crossprod.t()));
+    zero_data = join_cols(zeros<rowvec>(zero_data.n_cols), zero_data);
   }
 
   create_gets(cost, cost_gradient, cost_hessian);
@@ -162,12 +158,12 @@ List Fastcpd::run() {
 
     for (unsigned int t = 2; t <= data_n_rows; t++) {
       for (i = 0; i < r_t_count; i++) {
-        two_norm = (zero_data_c[t][0] - zero_data_c[r_t_set[i]][0]) * (zero_data_c[t][0] - zero_data_c[r_t_set[i]][0]);
+        two_norm = (zero_data.at(t, 0) - zero_data.at(r_t_set[i], 0)) * (zero_data.at(t, 0) - zero_data.at(r_t_set[i], 0));
         for (pi = 1; pi < p; pi++) {
-          two_norm += (zero_data_c[t][pi] - zero_data_c[r_t_set[i]][pi]) * (zero_data_c[t][pi] - zero_data_c[r_t_set[i]][pi]);
+          two_norm += (zero_data.at(t, pi) - zero_data.at(r_t_set[i], pi)) * (zero_data.at(t, pi) - zero_data.at(r_t_set[i], pi));
         }
         obj[i] = fvec[r_t_set[i]] + (
-          (zero_data_c[t][p] - zero_data_c[r_t_set[i]][p]) -
+          (zero_data.at(t, p) - zero_data.at(r_t_set[i], p)) -
           two_norm / (t - r_t_set[i])
         ) / 2.0 + std::log(t - r_t_set[i]) / 2.0 + beta;
       }
@@ -202,7 +198,6 @@ List Fastcpd::run() {
   }
 
   List result = get_cp_set(cp_sets);
-  delete_zero_data_c();
 
   return result;
 }
@@ -386,13 +381,6 @@ void Fastcpd::create_theta_sum(
   const unsigned int col, colvec new_theta_sum
 ) {
   theta_sum.col(col) = new_theta_sum;
-}
-
-void Fastcpd::delete_zero_data_c() {
-  for (unsigned int i = 0; i < data_n_rows + 1; i++) {
-    free(zero_data_c[i]);
-  }
-  free(zero_data_c);
 }
 
 double Fastcpd::get_cost_adjustment_value(const unsigned nrows) {
