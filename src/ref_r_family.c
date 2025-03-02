@@ -22,13 +22,12 @@
  *
  */
 
-#include <Rinternals.h>
-#include <Rconfig.h>
 #include <R_ext/Constants.h>
+#include <R_ext/Error.h>
+#include <Rconfig.h>
+#include <Rinternals.h>
 #include <float.h>
 #include <math.h>
-
-#include <R_ext/Error.h>
 #undef _
 #ifdef ENABLE_NLS
 #include <libintl.h>
@@ -49,10 +48,8 @@ static const double INVEPS = 1 / DBL_EPSILON;
  *
  * @return x/(1 - x)
  */
-static R_INLINE double x_d_omx(double x)
-{
-  if (x < 0 || x > 1)
-    error(_("Value %g out of range (0, 1)"), x);
+static R_INLINE double x_d_omx(double x) {
+  if (x < 0 || x > 1) error(_("Value %g out of range (0, 1)"), x);
   return x / (1 - x);
 }
 
@@ -66,91 +63,80 @@ static R_INLINE double x_d_omx(double x)
  */
 static R_INLINE double x_d_opx(double x) { return x / (1 + x); }
 
-SEXP logit_link(SEXP mu)
-{
+SEXP logit_link(SEXP mu) {
   int i, n = LENGTH(mu);
   if (!n || !isReal(mu))
     error(_("Argument %s must be a nonempty numeric vector"), "mu");
   SEXP ans = PROTECT(shallow_duplicate(mu));
   double *rans = REAL(ans), *rmu = REAL(mu);
 
-  for (i = 0; i < n; i++)
-    rans[i] = log(x_d_omx(rmu[i])); // log( x/(1-x) )
+  for (i = 0; i < n; i++) rans[i] = log(x_d_omx(rmu[i]));  // log( x/(1-x) )
   UNPROTECT(1);
   return ans;
 }
 
-SEXP logit_linkinv(SEXP eta)
-{
+SEXP logit_linkinv(SEXP eta) {
   int i, n = LENGTH(eta), nprot = 1;
   if (!n || !isNumeric(eta))
     error(_("Argument %s must be a nonempty numeric vector"), "eta");
-  if (!isReal(eta))
-  {
+  if (!isReal(eta)) {
     eta = PROTECT(coerceVector(eta, REALSXP));
     nprot++;
   }
   SEXP ans = PROTECT(shallow_duplicate(eta));
   double *rans = REAL(ans), *reta = REAL(eta);
 
-  for (i = 0; i < n; i++)
-  {
+  for (i = 0; i < n; i++) {
     double etai = reta[i], tmp;
-    tmp = (etai < MTHRESH) ? DBL_EPSILON : ((etai > THRESH) ? INVEPS : exp(etai));
+    tmp =
+        (etai < MTHRESH) ? DBL_EPSILON : ((etai > THRESH) ? INVEPS : exp(etai));
     rans[i] = x_d_opx(tmp);
   }
   UNPROTECT(nprot);
   return ans;
 }
 
-SEXP logit_mu_eta(SEXP eta)
-{
+SEXP logit_mu_eta(SEXP eta) {
   int i, n = LENGTH(eta), nprot = 1;
   if (!n || !isNumeric(eta))
     error(_("Argument %s must be a nonempty numeric vector"), "eta");
-  if (!isReal(eta))
-  {
+  if (!isReal(eta)) {
     eta = PROTECT(coerceVector(eta, REALSXP));
     nprot++;
   }
   SEXP ans = PROTECT(shallow_duplicate(eta));
   double *rans = REAL(ans), *reta = REAL(eta);
 
-  for (i = 0; i < n; i++)
-  {
+  for (i = 0; i < n; i++) {
     double etai = reta[i], expE = exp(etai), opexp = 1 + expE;
-    rans[i] = (etai > THRESH || etai < MTHRESH) ? DBL_EPSILON : expE / (opexp * opexp);
+    rans[i] = (etai > THRESH || etai < MTHRESH) ? DBL_EPSILON
+                                                : expE / (opexp * opexp);
   }
   UNPROTECT(nprot);
   return ans;
 }
 
-static R_INLINE double y_log_y(double y, double mu)
-{
+static R_INLINE double y_log_y(double y, double mu) {
   return (y != 0.) ? (y * log(y / mu)) : 0;
 }
 
-SEXP binomial_dev_resids(SEXP y, SEXP mu, SEXP wt)
-{
+SEXP binomial_dev_resids(SEXP y, SEXP mu, SEXP wt) {
   int i, n = LENGTH(y), lmu = LENGTH(mu), lwt = LENGTH(wt), nprot = 1;
   SEXP ans;
   double mui, yi, *rmu, *ry, *rwt, *rans;
 
-  if (!isReal(y))
-  {
+  if (!isReal(y)) {
     y = PROTECT(coerceVector(y, REALSXP));
     nprot++;
   }
   ry = REAL(y);
   ans = PROTECT(shallow_duplicate(y));
   rans = REAL(ans);
-  if (!isReal(mu))
-  {
+  if (!isReal(mu)) {
     mu = PROTECT(coerceVector(mu, REALSXP));
     nprot++;
   }
-  if (!isReal(wt))
-  {
+  if (!isReal(wt)) {
     wt = PROTECT(coerceVector(wt, REALSXP));
     nprot++;
   }
@@ -163,21 +149,16 @@ SEXP binomial_dev_resids(SEXP y, SEXP mu, SEXP wt)
     error(_("argument %s must be a numeric vector of length 1 or length %d"),
           "wt", n);
   /* Written separately to avoid an optimization bug on Solaris cc */
-  if (lmu > 1)
-  {
-    for (i = 0; i < n; i++)
-    {
+  if (lmu > 1) {
+    for (i = 0; i < n; i++) {
       mui = rmu[i];
       yi = ry[i];
       rans[i] = 2 * rwt[lwt > 1 ? i : 0] *
                 (y_log_y(yi, mui) + y_log_y(1 - yi, 1 - mui));
     }
-  }
-  else
-  {
+  } else {
     mui = rmu[0];
-    for (i = 0; i < n; i++)
-    {
+    for (i = 0; i < n; i++) {
       yi = ry[i];
       rans[i] = 2 * rwt[lwt > 1 ? i : 0] *
                 (y_log_y(yi, mui) + y_log_y(1 - yi, 1 - mui));

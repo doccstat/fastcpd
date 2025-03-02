@@ -17,9 +17,7 @@ struct ColMat {
     return data.as_col();
   }
 
-  operator mat() const {
-    return data;
-  }
+  operator mat() const { return data; }
 
   operator rowvec() const {
     // TODO(doccstat): Add a warning if the matrix has more than one column.
