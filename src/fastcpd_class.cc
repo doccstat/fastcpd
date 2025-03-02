@@ -49,17 +49,17 @@ namespace fastcpd::classes {
 
 Fastcpd::Fastcpd(
     const double beta,
-    Nullable<Function> cost,
+    const Nullable<Function> cost,
     const string cost_adjustment,
-    Nullable<Function> cost_gradient,
-    Nullable<Function> cost_hessian,
+    const Nullable<Function> cost_gradient,
+    const Nullable<Function> cost_hessian,
     const bool cp_only,
     const unsigned int d,
-    mat data,
+    const mat data,
     const double epsilon,
     const string family,
-    Nullable<Function> multiple_epochs_function,
-    colvec line_search,
+    const Nullable<Function> multiple_epochs_function,
+    const colvec line_search,
     const colvec lower,
     const double momentum_coef,
     const colvec order,
@@ -76,7 +76,25 @@ Fastcpd::Fastcpd(
     const bool warm_start
 ) : act_num(colvec(segment_count)),
     beta(beta),
+    cost([&]() -> unique_ptr<Function> {
+      if (family == "custom") {
+        return make_unique<Function>(cost);
+      }
+      return nullptr;
+    }()),
     cost_adjustment(cost_adjustment),
+    cost_gradient([&]() -> unique_ptr<Function> {
+      if (family == "custom" && cost_gradient.isNotNull()) {
+        return make_unique<Function>(cost_gradient);
+      }
+      return nullptr;
+    }()),
+    cost_hessian([&]() -> unique_ptr<Function> {
+      if (family == "custom" && cost_hessian.isNotNull()) {
+        return make_unique<Function>(cost_hessian);
+      }
+      return nullptr;
+    }()),
     cp_only(cp_only),
     d(d),
     data(data),
@@ -146,7 +164,36 @@ Fastcpd::Fastcpd(
     zero_data_ptr = zero_data.memptr();
   }
 
-  create_gets(cost, cost_gradient, cost_hessian);
+  // Handle the special 'arma' family with order condition
+  if (family == "arma") {
+    if (order(0) > 0) {
+      get_gradient = &Fastcpd::get_gradient_arma;
+      get_hessian = &Fastcpd::get_hessian_arma;
+      get_nll_sen = &Fastcpd::get_nll_sen_arma;
+      get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
+    } else { // order(0) == 0
+      get_gradient = &Fastcpd::get_gradient_ma;
+      get_hessian = &Fastcpd::get_hessian_ma;
+      get_nll_sen = &Fastcpd::get_nll_sen_ma;
+      get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
+    }
+  } else {
+    auto it = family_function_map.find(family);
+    if (it != family_function_map.end()) {
+      const GetFunctionSet &func_set = it->second;
+      get_gradient = func_set.gradient;
+      get_hessian = func_set.hessian;
+      get_nll_sen = func_set.nll_sen;
+      get_nll_pelt = func_set.nll_pelt;
+    } else {
+      get_gradient = &Fastcpd::get_gradient_custom;
+      get_hessian = &Fastcpd::get_hessian_custom;
+      get_nll_sen = &Fastcpd::get_nll_sen_custom;
+      get_nll_pelt = &Fastcpd::get_nll_pelt_custom;
+    }
+  }
+
+  // TODO(doccstat): Store environment functions from R.
 }
 
 List Fastcpd::run() {
@@ -269,48 +316,6 @@ void Fastcpd::create_clock_in_r(const std::string name) {
   if (!r_clock.empty()) {
     rClock.stop(name);
   }
-}
-
-void Fastcpd::create_gets(
-  Nullable<Function>& cost,
-  Nullable<Function>& cost_gradient,
-  Nullable<Function>& cost_hessian
-) {
-  // Handle the special 'arma' family with order condition
-  if (family == "arma") {
-    if (order(0) > 0) {
-      get_gradient = &Fastcpd::get_gradient_arma;
-      get_hessian = &Fastcpd::get_hessian_arma;
-      get_nll_sen = &Fastcpd::get_nll_sen_arma;
-      get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
-    } else { // order(0) == 0
-      get_gradient = &Fastcpd::get_gradient_ma;
-      get_hessian = &Fastcpd::get_hessian_ma;
-      get_nll_sen = &Fastcpd::get_nll_sen_ma;
-      get_nll_pelt = &Fastcpd::get_nll_pelt_arma;
-    }
-  } else {
-    auto it = family_function_map.find(family);
-    if (it != family_function_map.end()) {
-      const GetFunctionSet &func_set = it->second;
-      get_gradient = func_set.gradient;
-      get_hessian = func_set.hessian;
-      get_nll_sen = func_set.nll_sen;
-      get_nll_pelt = func_set.nll_pelt;
-    } else {
-      this->cost = make_unique<Function>(cost);
-      if (cost_gradient.isNotNull() || cost_hessian.isNotNull()) {
-        this->cost_gradient = make_unique<Function>(cost_gradient);
-        this->cost_hessian = make_unique<Function>(cost_hessian);
-      }
-      get_gradient = &Fastcpd::get_gradient_custom;
-      get_hessian = &Fastcpd::get_hessian_custom;
-      get_nll_sen = &Fastcpd::get_nll_sen_custom;
-      get_nll_pelt = &Fastcpd::get_nll_pelt_custom;
-    }
-  }
-
-  // TODO(doccstat): Store environment functions from R.
 }
 
 void Fastcpd::create_gradients() {

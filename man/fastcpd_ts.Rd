@@ -24,8 +24,7 @@ specifying the order of the time series. Possible combinations with
 \item \code{"var"}, NUMERIC(1): VAR(\eqn{p}) model using linear regression.
 \item \code{"arima"}, NUMERIC(3): ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model
 using \code{\link[stats:arima]{stats::arima()}}.
-\item \code{"garch"}, NUMERIC(2): GARCH(\eqn{p}, \eqn{q}) model using
-\code{\link[tseries:garch]{tseries::garch()}}.
+\item \code{"garch"}, NUMERIC(2): GARCH(\eqn{p}, \eqn{q}) model.
 }}
 
 \item{...}{Other arguments passed to \code{\link[=fastcpd]{fastcpd()}}, for example,
