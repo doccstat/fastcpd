@@ -508,15 +508,15 @@ CostResult Fastcpd::get_nll_pelt_mean(
   double two_norm = 0;
   for (unsigned int i = 0; i < p; i++) {
     two_norm +=
-      (zero_data_c[segment_end + 1][i] - zero_data_c[segment_start][i]) *
-      (zero_data_c[segment_end + 1][i] - zero_data_c[segment_start][i]);
+      (zero_data.at(segment_end + 1, i) - zero_data.at(segment_start, i)) *
+      (zero_data.at(segment_end + 1, i) - zero_data.at(segment_start, i));
   }
   const unsigned int segment_length = segment_end - segment_start + 1;
   return {
     {zeros<colvec>(p)},
     {zeros<mat>(segment_length, p)},
     (
-      (zero_data_c[segment_end + 1][p] - zero_data_c[segment_start][p]) -
+      (zero_data.at(segment_end + 1, p) - zero_data.at(segment_start, p)) -
       two_norm / segment_length
     ) / 2.0
   };

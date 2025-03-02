@@ -1,6 +1,16 @@
 #include "fastcpd_class.h"
 #include "fastcpd_impl.h"
 
+using ::arma::chol;
+using ::arma::cumsum;
+using ::arma::inv;
+using ::arma::join_cols;
+using ::arma::mean;
+using ::arma::square;
+using ::arma::sum;
+using ::arma::vectorise;
+using ::std::move;
+
 // Implementation of the fastcpd algorithm.
 //
 // @param data A data frame containing the data to be segmented.
@@ -48,8 +58,8 @@
 //   segment.
 // [[Rcpp::export]]
 List fastcpd_impl(
-    mat data,
-    double beta,
+    const mat data,
+    const double beta,
     const string cost_adjustment,
     const unsigned int d,
     const int segment_count,

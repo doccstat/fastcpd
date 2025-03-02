@@ -163,30 +163,6 @@ get_sigma_data <- function(
     diag(1)
   }
 
-  if (family == "mean") {
-    sigma_inv <- solve(sigma_)
-    chol_upper <- chol(sigma_inv)
-    data1 <- tcrossprod(data_, chol_upper)
-    data_ <- apply(cbind(data1, rowSums(data1^2)), 2, cumsum)
-  } else if (family == "variance") {
-    data_ <- data_ - colMeans(data_)
-    data_ <- apply(data_, 1, tcrossprod)
-    if (is.null(dim(data_)) || ncol(data_) == 1) {
-      data_ <- matrix(data_)
-    } else {
-      data_ <- t(data_)
-    }
-    data_ <- apply(data_, 2, cumsum)
-  } else if (family == "meanvariance") {
-    data2 <- apply(data_, 1, tcrossprod)
-    if (is.null(dim(data_)) || ncol(data_) == 1) {
-      data2 <- matrix(data2)
-    } else {
-      data2 <- t(data2)
-    }
-    data_ <- apply(cbind(data_, data2), 2, cumsum)
-  }
-
   list(sigma = sigma_, data = data_)
 }
 
