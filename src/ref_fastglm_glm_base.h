@@ -12,14 +12,13 @@ using namespace std;
 using Eigen::Map;
 
 template <typename VecTypeX, typename MatTypeX>
-class GlmBase
-{
-protected:
-  const int nvars; // dimension of beta
-  const int nobs;  // number of rows
+class GlmBase {
+ protected:
+  const int nvars;  // dimension of beta
+  const int nobs;   // number of rows
 
-  VecTypeX beta;      // parameters to be optimized
-  VecTypeX beta_prev; // auxiliary parameters
+  VecTypeX beta;       // parameters to be optimized
+  VecTypeX beta_prev;  // auxiliary parameters
 
   VecTypeX eta;
   VecTypeX var_mu;
@@ -31,110 +30,76 @@ protected:
   VecTypeX se;
   double dev, devold, devnull;
 
-  int maxit;  // max iterations
-  double tol; // tolerance for convergence
+  int maxit;   // max iterations
+  double tol;  // tolerance for convergence
   bool conv;
 
-  virtual bool converged()
-  {
-    if (std::abs(dev - devold) / (0.1 + std::abs(dev)) < tol)
-    {
+  virtual bool converged() {
+    if (std::abs(dev - devold) / (0.1 + std::abs(dev)) < tol) {
       return true;
-    }
-    else
-    {
+    } else {
       return false;
     }
   }
 
-  virtual void update_eta()
-  {
-  }
+  virtual void update_eta() {}
 
-  virtual void update_var_mu()
-  {
-  }
+  virtual void update_var_mu() {}
 
-  virtual void update_mu_eta()
-  {
-  }
+  virtual void update_mu_eta() {}
 
-  virtual void update_mu()
-  {
-  }
+  virtual void update_mu() {}
 
-  virtual void update_z()
-  {
-  }
+  virtual void update_z() {}
 
-  virtual void update_w()
-  {
-  }
+  virtual void update_w() {}
 
-  virtual void step_halve()
-  {
-  }
+  virtual void step_halve() {}
 
-  virtual void run_step_halving(int &iterr)
-  {
-  }
+  virtual void run_step_halving(int &iterr) {}
 
-  virtual void update_dev_resids()
-  {
-  }
+  virtual void update_dev_resids() {}
 
-  virtual void update_dev_resids_dont_update_old()
-  {
-  }
+  virtual void update_dev_resids_dont_update_old() {}
 
-  virtual void solve_wls(int iter)
-  {
-  }
+  virtual void solve_wls(int iter) {}
 
-  virtual void save_se()
-  {
-  }
+  virtual void save_se() {}
 
-public:
-  GlmBase(int n_, int p_,
-          double tol_ = 1e-6,
-          int maxit_ = 100) : nvars(p_), nobs(n_),
-                              beta(p_),
-                              beta_prev(p_), // allocate space but do not set values
-                              eta(n_),
-                              var_mu(n_),
-                              mu_eta(n_),
-                              mu(n_),
-                              z(n_),
-                              w(n_),
-                              vcov(p_, p_),
-                              se(p_),
-                              maxit(maxit_),
-                              tol(tol_)
-  {
-  }
+ public:
+  GlmBase(int n_, int p_, double tol_ = 1e-6, int maxit_ = 100)
+      : nvars(p_),
+        nobs(n_),
+        beta(p_),
+        beta_prev(p_),  // allocate space but do not set values
+        eta(n_),
+        var_mu(n_),
+        mu_eta(n_),
+        mu(n_),
+        z(n_),
+        w(n_),
+        vcov(p_, p_),
+        se(p_),
+        maxit(maxit_),
+        tol(tol_) {}
 
   virtual ~GlmBase() {}
 
-  virtual void init_parms(const Map<VecTypeX> &start_,
-                          const Map<VecTypeX> &mu_,
+  virtual void init_parms(const Map<VecTypeX> &start_, const Map<VecTypeX> &mu_,
                           const Map<VecTypeX> &eta_) {}
 
-  void update_beta()
-  {
+  void update_beta() {
     // VecTypeX newbeta(nvars);
     next_beta(beta);
     // beta.swap(newbeta);
   }
 
-  int solve(int maxit)
-  {
+  int solve(int maxit) {
     int i;
 
     conv = false;
 
-    for (i = 0; i < maxit; ++i)
-    {
+    for (i = 0; i < maxit; ++i) {
       update_var_mu();
 
       update_mu_eta();
@@ -153,13 +118,11 @@ public:
 
       run_step_halving(i);
 
-      if (std::isinf(dev) && i == 0)
-      {
+      if (std::isinf(dev) && i == 0) {
         stop("cannot find valid starting values: please specify some");
       }
 
-      if (converged())
-      {
+      if (converged()) {
         conv = true;
         break;
       }
@@ -182,4 +145,4 @@ public:
   virtual bool get_converged() { return conv; }
 };
 
-#endif // GLM_BASE_H
+#endif  // GLM_BASE_H

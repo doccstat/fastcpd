@@ -28,15 +28,13 @@ extern void F77_NAME(dsumsl)(int *n, double *d, double *x,
                                       double *, void (*)(void)),
                              void (*)(int *, double *, int *, double *, int *,
                                       double *, void (*)(void)),
-                             int *iv, int *liv, int *lv, double *v,
-                             int *uiparm, double *urparm,
-                             void (*)(void));
+                             int *iv, int *liv, int *lv, double *v, int *uiparm,
+                             double *urparm, void (*)(void));
 extern void F77_NAME(dsmsno)(int *n, double *d, double *x,
                              void (*)(int *, double *, int *, double *, int *,
                                       double *, void (*)(void)),
-                             int *iv, int *liv, int *lv, double *v,
-                             int *uiparm, double *urparm,
-                             void (*)(void));
+                             int *iv, int *liv, int *lv, double *v, int *uiparm,
+                             double *urparm, void (*)(void));
 extern void F77_NAME(ddeflt)(int *alg, int *iv, int *liv, int *lv, double *v);
 
 #define BIG 1.0e+10 /* function value if the parameters are invalid */
@@ -45,9 +43,12 @@ static double dsqrarg;
 #define DSQR(a) ((dsqrarg = (a)) == 0.0 ? 0.0 : dsqrarg * dsqrarg)
 
 static double dmaxarg1, dmaxarg2;
-#define DMAX(a, b) (dmaxarg1 = (a), dmaxarg2 = (b), (dmaxarg1) > (dmaxarg2) ? (dmaxarg1) : (dmaxarg2))
+#define DMAX(a, b)                 \
+  (dmaxarg1 = (a), dmaxarg2 = (b), \
+   (dmaxarg1) > (dmaxarg2) ? (dmaxarg1) : (dmaxarg2))
 
-struct garch_handler /* used to set up the additional parameters used in calcf and calcg */
+struct garch_handler /* used to set up the additional parameters used in calcf
+                        and calcg */
 {
   double *y;  /* the time series to fit */
   double *h;  /* the conditional variance (cv) */
@@ -60,7 +61,8 @@ static struct garch_handler garch_h;
 
 static void F77_SUB(calcf)(int *pq, double *p, int *nf, double *f, int *uiparm,
                            double *urparm, void (*F77_SUB(ufparm))(void))
-/* compute negative log likelihood apart from the constant and the pre-sample values */
+/* compute negative log likelihood apart from the constant and the pre-sample
+   values */
 {
   int i, j, ok;
   int maxpq = (int)DMAX(garch_h.p, garch_h.q);
@@ -68,26 +70,22 @@ static void F77_SUB(calcf)(int *pq, double *p, int *nf, double *f, int *uiparm,
   double sum = 0.0;
 
   ok = 1;
-  if (p[0] <= 0.0)
-    ok = 0;
+  if (p[0] <= 0.0) ok = 0;
   for (i = 1; i < (*pq); i++)
-    if (p[i] < 0.0)
-      ok = 0;
+    if (p[i] < 0.0) ok = 0;
   if (ok) /* parameters are valid */
   {
     for (i = maxpq; i < garch_h.n; i++) /* loop over time */
     {                                   /* compute cv at time i */
       temp = p[0];                      /* compute ARCH part of cv */
-      for (j = 1; j <= garch_h.q; j++)
-        temp += p[j] * DSQR(garch_h.y[i - j]);
+      for (j = 1; j <= garch_h.q; j++) temp += p[j] * DSQR(garch_h.y[i - j]);
       for (j = 1; j <= garch_h.p; j++) /* compute GARCH part of cv */
         temp += p[garch_h.q + j] * garch_h.h[i - j];
       sum += log(temp) + DSQR(garch_h.y[i]) / temp; /* compute eq. 18 */
       garch_h.h[i] = temp;                          /* assign cv at time i */
     }
     (*f) = 0.5 * sum;
-  }
-  else /* parameters are invalid */
+  } else /* parameters are invalid */
     (*f) = BIG;
 }
 
@@ -102,55 +100,46 @@ static void F77_SUB(calcg)(int *pq, double *p, int *nf, double *dp, int *uiparm,
   for (k = 0; k < (*pq); k++) /* initialize */
     dp[k] = 0.0;
   for (i = maxpq; i < garch_h.n; i++) /* loop over time */
-  {                                   /* compute cv at time i and derivatives dh_i/dp_j */
-    temp1 = p[0];                     /* compute ARCH part of cv */
-    for (j = 1; j <= garch_h.q; j++)
-      temp1 += p[j] * DSQR(garch_h.y[i - j]);
+  {               /* compute cv at time i and derivatives dh_i/dp_j */
+    temp1 = p[0]; /* compute ARCH part of cv */
+    for (j = 1; j <= garch_h.q; j++) temp1 += p[j] * DSQR(garch_h.y[i - j]);
     for (j = 1; j <= garch_h.p; j++) /* compute GARCH part of cv */
       temp1 += p[garch_h.q + j] * garch_h.h[i - j];
-    garch_h.h[i] = temp1;                                     /* assign cv at time i */
-    temp2 = 0.5 * (1.0 - DSQR(garch_h.y[i]) / temp1) / temp1; /* compute dl_i/dh_i, eq. 19 */
-    temp3 = 1.0;                                              /* compute dh_i/dp_0, eq. 21 */
+    garch_h.h[i] = temp1; /* assign cv at time i */
+    temp2 = 0.5 * (1.0 - DSQR(garch_h.y[i]) / temp1) /
+            temp1; /* compute dl_i/dh_i, eq. 19 */
+    temp3 = 1.0;   /* compute dh_i/dp_0, eq. 21 */
     for (j = 1; j <= garch_h.p; j++)
       temp3 += p[garch_h.q + j] * garch_h.dh[(*pq) * (i - j)];
-    garch_h.dh[(*pq) * i] = temp3;   /* assign dh_i/dp_0 */
-    dp[0] += temp2 * temp3;          /* assign dl_i/dp_0 = dl_i/dh_i * dh_i/dp_0 */
-    for (k = 1; k <= garch_h.q; k++) /* compute dl_i/dp_k for the ARCH part, eq. 19 */
+    garch_h.dh[(*pq) * i] = temp3; /* assign dh_i/dp_0 */
+    dp[0] += temp2 * temp3; /* assign dl_i/dp_0 = dl_i/dh_i * dh_i/dp_0 */
+    for (k = 1; k <= garch_h.q;
+         k++) /* compute dl_i/dp_k for the ARCH part, eq. 19 */
     {
       temp3 = DSQR(garch_h.y[i - k]); /* compute dh_i/dp_k, eq. 21 */
       for (j = 1; j <= garch_h.p; j++)
         temp3 += p[garch_h.q + j] * garch_h.dh[(*pq) * (i - j) + k];
       garch_h.dh[(*pq) * i + k] = temp3; /* assign dh_i/dp_k */
-      dp[k] += temp2 * temp3;            /* assign dl_i/dp_k = dl_i/dh_i * dh_i/dp_k */
+      dp[k] += temp2 * temp3; /* assign dl_i/dp_k = dl_i/dh_i * dh_i/dp_k */
     }
-    for (k = 1; k <= garch_h.p; k++) /* compute dl_i/dp_k for the GARCH part, eq. 19 */
+    for (k = 1; k <= garch_h.p;
+         k++) /* compute dl_i/dp_k for the GARCH part, eq. 19 */
     {
       temp3 = garch_h.h[i - k]; /* compute dh_i/dp_k, eq. 21 */
       for (j = 1; j <= garch_h.p; j++)
         temp3 += p[garch_h.q + j] * garch_h.dh[(*pq) * (i - j) + garch_h.q + k];
       garch_h.dh[(*pq) * i + garch_h.q + k] = temp3; /* assign dh_i/dp_k */
-      dp[garch_h.q + k] += temp2 * temp3;            /* assign dl_i/dp_k = dl_i/dh_i * dh_i/dp_k */
+      dp[garch_h.q + k] +=
+          temp2 * temp3; /* assign dl_i/dp_k = dl_i/dh_i * dh_i/dp_k */
     }
   }
 }
 
-static void F77_SUB(ufparm)(void)
-{
-  error("fatal error in fit_garch ()\n");
-}
+static void F77_SUB(ufparm)(void) { error("fatal error in fit_garch ()\n"); }
 
-void tseries_fit_garch(double *y,
-                       int *n,
-                       double *par,
-                       int *p,
-                       int *q,
-                       int *itmax,
-                       double *afctol,
-                       double *rfctol,
-                       double *xctol,
-                       double *xftol,
-                       double *fret,
-                       int *agrad,
+void tseries_fit_garch(double *y, int *n, double *par, int *p, int *q,
+                       int *itmax, double *afctol, double *rfctol,
+                       double *xctol, double *xftol, double *fret, int *agrad,
                        int *trace)
 /* fit a GARCH (p, q) model
 
@@ -181,8 +170,7 @@ fret           function value at minimum
   /* set up general optimizer parameters to default values */
   pq = (*p) + (*q) + 1;
   d = R_Calloc(pq, double);
-  for (i = 0; i < pq; i++)
-    d[i] = 1.0;
+  for (i = 0; i < pq; i++) d[i] = 1.0;
   liv = 60;
   iv = R_Calloc(liv, int);
   lv = 77 + pq * (pq + 17) / 2;
@@ -226,19 +214,16 @@ fret           function value at minimum
   {
     if (*trace)
       Rprintf("\n ***** ESTIMATION WITH ANALYTICAL GRADIENT ***** \n\n");
-    F77_CALL(dsumsl)(&pq, d, par, F77_SUB(calcf), F77_SUB(calcg),
-                     iv, &liv, &lv, v, NULL, NULL, F77_SUB(ufparm));
-    if (*trace)
-      Rprintf("\n");
-  }
-  else /* estimation with numerical gradient */
+    F77_CALL(dsumsl)(&pq, d, par, F77_SUB(calcf), F77_SUB(calcg), iv, &liv, &lv,
+                     v, NULL, NULL, F77_SUB(ufparm));
+    if (*trace) Rprintf("\n");
+  } else /* estimation with numerical gradient */
   {
     if (*trace)
       Rprintf("\n ***** ESTIMATION WITH NUMERICAL GRADIENT ***** \n\n");
-    F77_CALL(dsmsno)(&pq, d, par, F77_SUB(calcf), iv,
-                     &liv, &lv, v, NULL, NULL, F77_SUB(ufparm));
-    if (*trace)
-      Rprintf("\n");
+    F77_CALL(dsmsno)(&pq, d, par, F77_SUB(calcf), iv, &liv, &lv, v, NULL, NULL,
+                     F77_SUB(ufparm));
+    if (*trace) Rprintf("\n");
   }
 
   /* return function value */
@@ -252,8 +237,8 @@ fret           function value at minimum
   R_Free(garch_h.dh);
 }
 
-void tseries_pred_garch(double *y, double *h, int *n, double *par,
-                        int *p, int *q, int *genuine)
+void tseries_pred_garch(double *y, double *h, int *n, double *par, int *p,
+                        int *q, int *genuine)
 /* predict cv with a GARCH (p, q) model
 
 Input:
@@ -265,7 +250,8 @@ genuine      logical indicating if a genuine prediction is computed
 
 Output:
 
-h[0..N]      predicted cv, where N = n for genuine prediction, and N = n-1 otherwise
+h[0..N]      predicted cv, where N = n for genuine prediction, and N = n-1
+otherwise
 */
 {
   double var, temp;
@@ -285,16 +271,15 @@ h[0..N]      predicted cv, where N = n for genuine prediction, and N = n-1 other
   for (i = maxpq; i < N; i++) /* loop over time */
   {                           /* compute cv at time i */
     temp = par[0];            /* compute ARCH part of cv */
-    for (j = 1; j <= (*q); j++)
-      temp += par[j] * DSQR(y[i - j]);
+    for (j = 1; j <= (*q); j++) temp += par[j] * DSQR(y[i - j]);
     for (j = 1; j <= (*p); j++) /* compute GARCH part of cv */
       temp += par[(*q) + j] * h[i - j];
     h[i] = temp; /* assign cv at time i */
   }
 }
 
-void tseries_ophess_garch(double *y, int *n, double *par, double *he,
-                          int *p, int *q)
+void tseries_ophess_garch(double *y, int *n, double *par, double *he, int *p,
+                          int *q)
 /* Compute outer product approximation of the hessian of the
 negative log likelihood of a GARCH (p, q) model at given parameter
 estimates
@@ -324,47 +309,45 @@ he[0..(p+q+1)*(p+q+1)-1]      predicted cv
   var /= (double)(*n);
   for (i = 0; i < (int)DMAX((*p), (*q)); i++) /* initialize */
   {
-    h[i] = var;       /* with uv */
-    dh[pq * i] = 1.0; /* dh_i/dp_0 with 1 */
-    for (j = 1; j < pq; j++)
-      dh[pq * i + j] = 0.0; /* dh_i/dp_j with 0 */
+    h[i] = var;                                    /* with uv */
+    dh[pq * i] = 1.0;                              /* dh_i/dp_0 with 1 */
+    for (j = 1; j < pq; j++) dh[pq * i + j] = 0.0; /* dh_i/dp_j with 0 */
   }
   for (k = 0; k < pq; k++) /* initialize */
-    for (j = 0; j < pq; j++)
-      he[pq * k + j] = 0.0;
+    for (j = 0; j < pq; j++) he[pq * k + j] = 0.0;
   for (i = (int)DMAX((*p), (*q)); i < (*n); i++) /* loop over time */
-  {                                              /* compute cv at time i and derivatives dh_i/dp_j */
-    temp1 = par[0];                              /* compute ARCH part of cv */
-    for (j = 1; j <= (*q); j++)
-      temp1 += par[j] * DSQR(y[i - j]);
+  {                 /* compute cv at time i and derivatives dh_i/dp_j */
+    temp1 = par[0]; /* compute ARCH part of cv */
+    for (j = 1; j <= (*q); j++) temp1 += par[j] * DSQR(y[i - j]);
     for (j = 1; j <= (*p); j++) /* compute GARCH part of cv */
       temp1 += par[(*q) + j] * h[i - j];
-    h[i] = temp1;                                     /* assign cv at time i */
-    temp2 = 0.5 * (1.0 - DSQR(y[i]) / temp1) / temp1; /* compute dl_i/dh_i, eq. 19 */
-    temp3 = 1.0;                                      /* compute dh_i/dp_0, eq. 21 */
-    for (j = 1; j <= (*p); j++)
-      temp3 += par[(*q) + j] * dh[pq * (i - j)];
-    dh[pq * i] = temp3;         /* assign dh_i/dp_0 */
-    dpar[0] = temp2 * temp3;    /* assign dl_i/dp_0 = dl_i/dh_i * dh_i/dp_0 */
-    for (k = 1; k <= (*q); k++) /* compute dl_i/dp_k for the ARCH part, eq. 19 */
+    h[i] = temp1; /* assign cv at time i */
+    temp2 = 0.5 * (1.0 - DSQR(y[i]) / temp1) /
+            temp1; /* compute dl_i/dh_i, eq. 19 */
+    temp3 = 1.0;   /* compute dh_i/dp_0, eq. 21 */
+    for (j = 1; j <= (*p); j++) temp3 += par[(*q) + j] * dh[pq * (i - j)];
+    dh[pq * i] = temp3;      /* assign dh_i/dp_0 */
+    dpar[0] = temp2 * temp3; /* assign dl_i/dp_0 = dl_i/dh_i * dh_i/dp_0 */
+    for (k = 1; k <= (*q);
+         k++) /* compute dl_i/dp_k for the ARCH part, eq. 19 */
     {
       temp3 = DSQR(y[i - k]); /* compute dh_i/dp_k, eq. 21 */
-      for (j = 1; j <= (*p); j++)
-        temp3 += par[(*q) + j] * dh[pq * (i - j) + k];
+      for (j = 1; j <= (*p); j++) temp3 += par[(*q) + j] * dh[pq * (i - j) + k];
       dh[pq * i + k] = temp3;  /* assign dh_i/dp_k */
       dpar[k] = temp2 * temp3; /* assign dl_i/dp_k = dl_i/dh_i * dh_i/dp_k */
     }
-    for (k = 1; k <= (*p); k++) /* compute dl_i/dp_k for the GARCH part, eq. 19 */
+    for (k = 1; k <= (*p);
+         k++) /* compute dl_i/dp_k for the GARCH part, eq. 19 */
     {
       temp3 = h[i - k]; /* compute dh_i/dp_k, eq. 21 */
       for (j = 1; j <= (*p); j++)
         temp3 += par[(*q) + j] * dh[pq * (i - j) + (*q) + k];
-      dh[pq * i + (*q) + k] = temp3;  /* assign dh_i/dp_k */
-      dpar[(*q) + k] = temp2 * temp3; /* assign dl_i/dp_k = dl_i/dh_i * dh_i/dp_k */
+      dh[pq * i + (*q) + k] = temp3; /* assign dh_i/dp_k */
+      dpar[(*q) + k] =
+          temp2 * temp3; /* assign dl_i/dp_k = dl_i/dh_i * dh_i/dp_k */
     }
     for (k = 0; k < pq; k++) /* compute outer product approximation, p. 317 */
-      for (j = 0; j < pq; j++)
-        he[pq * k + j] += dpar[k] * dpar[j];
+      for (j = 0; j < pq; j++) he[pq * k + j] += dpar[k] * dpar[j];
   }
   R_Free(h);
   R_Free(dh);

@@ -3,20 +3,13 @@
 
 #include <RcppArmadillo.h>
 
+using ::Rcpp::List;
 using ::Rcpp::NumericMatrix;
 using ::Rcpp::NumericVector;
-using ::Rcpp::List;
 using ::std::string;
 
-List fit_glm(NumericMatrix Xs,
-             NumericVector ys,
-             NumericVector weightss,
-             NumericVector offsets,
-             NumericVector starts,
-             NumericVector etas,
-             int type,
-             double tol,
-             int maxit,
-             string family);
+List fit_glm(NumericMatrix Xs, NumericVector ys, NumericVector weightss,
+             NumericVector offsets, NumericVector starts, NumericVector etas,
+             int type, double tol, int maxit, string family);
 
-#endif // FIT_GLM_DENSE_H
+#endif  // FIT_GLM_DENSE_H
