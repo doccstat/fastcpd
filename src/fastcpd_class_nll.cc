@@ -20,7 +20,7 @@ using ::Rcpp::S4;
 
 namespace fastcpd::classes {
 
-colvec Fastcpd::get_gradient_arma(const unsigned int segment_start,
+colvec Fastcpd::GetGradientArma(const unsigned int segment_start,
                                   const unsigned int segment_end,
                                   const colvec& theta) {
   const mat data_segment = data.rows(segment_start, segment_end);
@@ -70,7 +70,7 @@ colvec Fastcpd::get_gradient_arma(const unsigned int segment_start,
   return gradient;
 }
 
-colvec Fastcpd::get_gradient_binomial(const unsigned int segment_start,
+colvec Fastcpd::GetGradientBinomial(const unsigned int segment_start,
                                       const unsigned int segment_end,
                                       const colvec& theta) {
   const mat data_segment = data.rows(segment_start, segment_end);
@@ -81,14 +81,14 @@ colvec Fastcpd::get_gradient_binomial(const unsigned int segment_start,
   return -(y - 1 / (1 + exp(-as_scalar(x * theta)))) * x.t();
 }
 
-colvec Fastcpd::get_gradient_custom(const unsigned int segment_start,
+colvec Fastcpd::GetGradientCustom(const unsigned int segment_start,
                                     const unsigned int segment_end,
                                     const colvec& theta) {
   return as<colvec>(
       (*cost_gradient)(data.rows(segment_start, segment_end), theta));
 }
 
-colvec Fastcpd::get_gradient_lm(const unsigned int segment_start,
+colvec Fastcpd::GetGradientLm(const unsigned int segment_start,
                                 const unsigned int segment_end,
                                 const colvec& theta) {
   const mat data_segment = data.rows(segment_start, segment_end);
@@ -99,7 +99,7 @@ colvec Fastcpd::get_gradient_lm(const unsigned int segment_start,
   return -(y - as_scalar(x * theta)) * x.t();
 }
 
-colvec Fastcpd::get_gradient_ma(const unsigned int segment_start,
+colvec Fastcpd::GetGradientMa(const unsigned int segment_start,
                                 const unsigned int segment_end,
                                 const colvec& theta) {
   const mat data_segment = data.rows(segment_start, segment_end);
@@ -134,7 +134,7 @@ colvec Fastcpd::get_gradient_ma(const unsigned int segment_start,
   return gradient;
 }
 
-colvec Fastcpd::get_gradient_poisson(const unsigned int segment_start,
+colvec Fastcpd::GetGradientPoisson(const unsigned int segment_start,
                                      const unsigned int segment_end,
                                      const colvec& theta) {
   const mat data_segment = data.rows(segment_start, segment_end);
@@ -145,7 +145,7 @@ colvec Fastcpd::get_gradient_poisson(const unsigned int segment_start,
   return -(y - exp(as_scalar(x * theta))) * x.t();
 }
 
-mat Fastcpd::get_hessian_arma(const unsigned int segment_start,
+mat Fastcpd::GetHessianArma(const unsigned int segment_start,
                               const unsigned int segment_end,
                               const colvec& theta) {
   const mat data_segment = data.rows(segment_start, segment_end);
@@ -210,41 +210,41 @@ mat Fastcpd::get_hessian_arma(const unsigned int segment_start,
             .t() -
         psi_psi_coefficient_part;
   }
-  mat hessian = zeros(sum(order) + 1, sum(order) + 1);
-  hessian.submat(0, 0, order(0) - 1, order(0) - 1) =
+  mat hessian_ = zeros(sum(order) + 1, sum(order) + 1);
+  hessian_.submat(0, 0, order(0) - 1, order(0) - 1) =
       phi_coefficient.row(segment_length - 1).t() *
       phi_coefficient.row(segment_length - 1) / theta(sum(order));
-  hessian.submat(0, order(0), order(0) - 1, sum(order) - 1) =
+  hessian_.submat(0, order(0), order(0) - 1, sum(order) - 1) =
       (phi_psi_coefficient.slice(segment_length - 1).t() *
            variance_term(segment_length - 1) +
        phi_coefficient.row(segment_length - 1).t() *
            psi_coefficient.row(segment_length - 1)) /
       theta(sum(order));
-  hessian.submat(order(0), 0, sum(order) - 1, order(0) - 1) =
-      hessian.submat(0, order(0), order(0) - 1, sum(order) - 1).t();
-  hessian.submat(0, sum(order), order(0) - 1, sum(order)) =
+  hessian_.submat(order(0), 0, sum(order) - 1, order(0) - 1) =
+      hessian_.submat(0, order(0), order(0) - 1, sum(order) - 1).t();
+  hessian_.submat(0, sum(order), order(0) - 1, sum(order)) =
       -phi_coefficient.row(segment_length - 1).t() *
       variance_term(segment_length - 1) / theta(sum(order)) / theta(sum(order));
-  hessian.submat(sum(order), 0, sum(order), order(0) - 1) =
-      hessian.submat(0, sum(order), order(0) - 1, sum(order)).t();
-  hessian.submat(order(0), order(0), sum(order) - 1, sum(order) - 1) =
+  hessian_.submat(sum(order), 0, sum(order), order(0) - 1) =
+      hessian_.submat(0, sum(order), order(0) - 1, sum(order)).t();
+  hessian_.submat(order(0), order(0), sum(order) - 1, sum(order) - 1) =
       (psi_coefficient.row(segment_length - 1).t() *
            psi_coefficient.row(segment_length - 1) +
        psi_psi_coefficient.slice(segment_length - 1) *
            variance_term(segment_length - 1)) /
       theta(sum(order));
-  hessian.submat(order(0), sum(order), sum(order) - 1, sum(order)) =
+  hessian_.submat(order(0), sum(order), sum(order) - 1, sum(order)) =
       -psi_coefficient.row(segment_length - 1).t() *
       variance_term(segment_length - 1) / theta(sum(order)) / theta(sum(order));
-  hessian.submat(sum(order), order(0), sum(order), sum(order) - 1) =
-      hessian.submat(order(0), sum(order), sum(order) - 1, sum(order)).t();
-  hessian(sum(order), sum(order)) =
+  hessian_.submat(sum(order), order(0), sum(order), sum(order) - 1) =
+      hessian_.submat(order(0), sum(order), sum(order) - 1, sum(order)).t();
+  hessian_(sum(order), sum(order)) =
       pow(variance_term(segment_length - 1), 2) / pow(theta(sum(order)), 3) -
       1.0 / 2.0 / pow(theta(sum(order)), 2);
-  return hessian;
+  return hessian_;
 }
 
-mat Fastcpd::get_hessian_binomial(const unsigned int segment_start,
+mat Fastcpd::GetHessianBinomial(const unsigned int segment_start,
                                   const unsigned int segment_end,
                                   const colvec& theta) {
   const mat data_segment = data.rows(segment_start, segment_end);
@@ -255,13 +255,13 @@ mat Fastcpd::get_hessian_binomial(const unsigned int segment_start,
   return (x.t() * x) * ((1 - prob) * prob);
 }
 
-mat Fastcpd::get_hessian_custom(const unsigned int segment_start,
+mat Fastcpd::GetHessianCustom(const unsigned int segment_start,
                                 const unsigned int segment_end,
                                 const colvec& theta) {
   return as<mat>((*cost_hessian)(data.rows(segment_start, segment_end), theta));
 }
 
-mat Fastcpd::get_hessian_lm(const unsigned int segment_start,
+mat Fastcpd::GetHessianLm(const unsigned int segment_start,
                             const unsigned int segment_end,
                             const colvec& theta) {
   const mat data_segment = data.rows(segment_start, segment_end);
@@ -271,7 +271,7 @@ mat Fastcpd::get_hessian_lm(const unsigned int segment_start,
   return x.t() * x;
 }
 
-mat Fastcpd::get_hessian_ma(const unsigned int segment_start,
+mat Fastcpd::GetHessianMa(const unsigned int segment_start,
                             const unsigned int segment_end,
                             const colvec& theta) {
   const mat data_segment = data.rows(segment_start, segment_end);
@@ -313,23 +313,23 @@ mat Fastcpd::get_hessian_ma(const unsigned int segment_start,
             .t() -
         psi_psi_coefficient_part;
   }
-  mat hessian = zeros(q + 1, q + 1);
-  hessian.submat(0, 0, q - 1, q - 1) =
+  mat hessian_ = zeros(q + 1, q + 1);
+  hessian_.submat(0, 0, q - 1, q - 1) =
       (psi_coefficient.row(segment_length - 1).t() *
            psi_coefficient.row(segment_length - 1) +
        psi_psi_coefficient.slice(segment_length - 1) *
            variance_term(segment_length - 1)) /
       theta(q);
-  hessian.submat(0, q, q - 1, q) =
+  hessian_.submat(0, q, q - 1, q) =
       -psi_coefficient.row(segment_length - 1).t() *
       variance_term(segment_length - 1) / theta(q) / theta(q);
-  hessian.submat(q, 0, q, q - 1) = hessian.submat(0, q, q - 1, q).t();
-  hessian(q, q) = pow(variance_term(segment_length - 1), 2) / pow(theta(q), 3) -
+  hessian_.submat(q, 0, q, q - 1) = hessian_.submat(0, q, q - 1, q).t();
+  hessian_(q, q) = pow(variance_term(segment_length - 1), 2) / pow(theta(q), 3) -
                   1.0 / 2.0 / pow(theta(q), 2);
-  return hessian;
+  return hessian_;
 }
 
-mat Fastcpd::get_hessian_poisson(const unsigned int segment_start,
+mat Fastcpd::GetHessianPoisson(const unsigned int segment_start,
                                  const unsigned int segment_end,
                                  const colvec& theta) {
   const mat data_segment = data.rows(segment_start, segment_end);
@@ -341,7 +341,7 @@ mat Fastcpd::get_hessian_poisson(const unsigned int segment_start,
   return (x.t() * x) * std::min(as_scalar(prob), 1e10);
 }
 
-CostResult Fastcpd::get_nll_pelt_arma(const unsigned int segment_start,
+CostResult Fastcpd::GetNllPeltArma(const unsigned int segment_start,
                                       const unsigned int segment_end,
                                       const bool cv,
                                       const Nullable<colvec>& start) {
@@ -359,12 +359,12 @@ CostResult Fastcpd::get_nll_pelt_arma(const unsigned int segment_start,
   return {{par}, {as<colvec>(out["residuals"])}, -as<double>(out["loglik"])};
 }
 
-CostResult Fastcpd::get_nll_pelt_custom(const unsigned int segment_start,
+CostResult Fastcpd::GetNllPeltCustom(const unsigned int segment_start,
                                         const unsigned int segment_end,
                                         const bool cv,
                                         const Nullable<colvec>& start) {
   if (cost_gradient || cost_hessian) {
-    return get_optimized_cost(segment_start, segment_end);
+    return GetOptimizedCostResult(segment_start, segment_end);
   } else {
     return {{colvec()},
             {colvec()},
@@ -372,7 +372,7 @@ CostResult Fastcpd::get_nll_pelt_custom(const unsigned int segment_start,
   }
 }
 
-CostResult Fastcpd::get_nll_pelt_garch(const unsigned int segment_start,
+CostResult Fastcpd::GetNllPeltGarch(const unsigned int segment_start,
                                        const unsigned int segment_end,
                                        const bool cv,
                                        const Nullable<colvec>& start) {
@@ -383,7 +383,7 @@ CostResult Fastcpd::get_nll_pelt_garch(const unsigned int segment_start,
           as<double>(out["n.likeli"])};
 }
 
-CostResult Fastcpd::get_nll_pelt_glm(const unsigned int segment_start,
+CostResult Fastcpd::GetNllPeltGlm(const unsigned int segment_start,
                                      const unsigned int segment_end,
                                      const bool cv,
                                      const Nullable<colvec>& start) {
@@ -403,7 +403,7 @@ CostResult Fastcpd::get_nll_pelt_glm(const unsigned int segment_start,
   return {{par}, {residuals}, value / 2};
 }
 
-CostResult Fastcpd::get_nll_pelt_lasso(const unsigned int segment_start,
+CostResult Fastcpd::GetNllPeltLasso(const unsigned int segment_start,
                                        const unsigned int segment_end,
                                        const bool cv,
                                        const Nullable<colvec>& start) {
@@ -457,7 +457,7 @@ CostResult Fastcpd::get_nll_pelt_lasso(const unsigned int segment_start,
   }
 }
 
-CostResult Fastcpd::get_nll_pelt_mean(const unsigned int segment_start,
+CostResult Fastcpd::GetNllPeltMean(const unsigned int segment_start,
                                       const unsigned int segment_end,
                                       const bool cv,
                                       const Nullable<colvec>& start) {
@@ -475,7 +475,7 @@ CostResult Fastcpd::get_nll_pelt_mean(const unsigned int segment_start,
               2.0};
 }
 
-CostResult Fastcpd::get_nll_pelt_meanvariance(const unsigned int segment_start,
+CostResult Fastcpd::GetNllPeltMeanVariance(const unsigned int segment_start,
                                               const unsigned int segment_end,
                                               const bool cv,
                                               const Nullable<colvec>& start) {
@@ -495,10 +495,10 @@ CostResult Fastcpd::get_nll_pelt_meanvariance(const unsigned int segment_start,
     } else {
       approximate_segment_start = 0;
     }
-    if (segment_end < data_n_rows - d) {
+    if (segment_end < data_n_rows_ - d) {
       approximate_segment_end = segment_end + d;
     } else {
-      approximate_segment_end = data_n_rows - 1;
+      approximate_segment_end = data_n_rows_ - 1;
     }
     data_diff = zero_data.row(approximate_segment_end + 1) -
                 zero_data.row(approximate_segment_start);
@@ -512,7 +512,7 @@ CostResult Fastcpd::get_nll_pelt_meanvariance(const unsigned int segment_start,
   return {{zeros<colvec>(p)}, {mat()}, log(det_value) * segment_length / 2.0};
 }
 
-CostResult Fastcpd::get_nll_pelt_mgaussian(const unsigned int segment_start,
+CostResult Fastcpd::GetNllPeltMgaussian(const unsigned int segment_start,
                                            const unsigned int segment_end,
                                            const bool cv,
                                            const Nullable<colvec>& start) {
@@ -537,7 +537,7 @@ CostResult Fastcpd::get_nll_pelt_mgaussian(const unsigned int segment_start,
   return {{par}, {residuals}, value / 2};
 }
 
-CostResult Fastcpd::get_nll_pelt_variance(const unsigned int segment_start,
+CostResult Fastcpd::GetNllPeltVariance(const unsigned int segment_start,
                                           const unsigned int segment_end,
                                           const bool cv,
                                           const Nullable<colvec>& start) {
@@ -555,10 +555,10 @@ CostResult Fastcpd::get_nll_pelt_variance(const unsigned int segment_start,
     } else {
       approximate_segment_start = 0;
     }
-    if (segment_end < data_n_rows - d) {
+    if (segment_end < data_n_rows_ - d) {
       approximate_segment_end = segment_end + d;
     } else {
-      approximate_segment_end = data_n_rows - 1;
+      approximate_segment_end = data_n_rows_ - 1;
     }
     det_value = det(arma::reshape(zero_data.row(approximate_segment_end + 1) -
                                       zero_data.row(approximate_segment_start),
@@ -569,7 +569,7 @@ CostResult Fastcpd::get_nll_pelt_variance(const unsigned int segment_start,
   return {{zeros<mat>(d, d)}, {mat()}, log(det_value) * segment_length / 2.0};
 }
 
-double Fastcpd::get_nll_sen_arma(const unsigned int segment_start,
+double Fastcpd::GetNllSenArma(const unsigned int segment_start,
                                  const unsigned int segment_end, colvec theta) {
   mat data_segment = data.rows(segment_start, segment_end);
   colvec reversed_theta = reverse(theta);
@@ -589,7 +589,7 @@ double Fastcpd::get_nll_sen_arma(const unsigned int segment_start,
          dot(variance_term, variance_term) / 2.0 / theta(sum(order));
 }
 
-double Fastcpd::get_nll_sen_binomial(const unsigned int segment_start,
+double Fastcpd::GetNllSenBinomial(const unsigned int segment_start,
                                      const unsigned int segment_end,
                                      colvec theta) {
   mat data_segment = data.rows(segment_start, segment_end);
@@ -600,13 +600,13 @@ double Fastcpd::get_nll_sen_binomial(const unsigned int segment_start,
   return accu(-y % u + arma::log(1 + exp(u)));
 }
 
-double Fastcpd::get_nll_sen_custom(const unsigned int segment_start,
+double Fastcpd::GetNllSenCustom(const unsigned int segment_start,
                                    const unsigned int segment_end,
                                    colvec theta) {
   return as<double>((*cost)(data.rows(segment_start, segment_end), theta));
 }
 
-double Fastcpd::get_nll_sen_lasso(const unsigned int segment_start,
+double Fastcpd::GetNllSenLasso(const unsigned int segment_start,
                                   const unsigned int segment_end,
                                   colvec theta) {
   mat data_segment = data.rows(segment_start, segment_end);
@@ -616,7 +616,7 @@ double Fastcpd::get_nll_sen_lasso(const unsigned int segment_start,
          lambda / sqrt(segment_end - segment_start + 1) * accu(abs(theta));
 }
 
-double Fastcpd::get_nll_sen_lm(const unsigned int segment_start,
+double Fastcpd::GetNllSenLm(const unsigned int segment_start,
                                const unsigned int segment_end, colvec theta) {
   mat data_segment = data.rows(segment_start, segment_end);
   colvec y = data_segment.col(0);
@@ -624,7 +624,7 @@ double Fastcpd::get_nll_sen_lm(const unsigned int segment_start,
   return accu(square(y - x * theta)) / 2;
 }
 
-double Fastcpd::get_nll_sen_ma(const unsigned int segment_start,
+double Fastcpd::GetNllSenMa(const unsigned int segment_start,
                                const unsigned int segment_end, colvec theta) {
   mat data_segment = data.rows(segment_start, segment_end);
   const unsigned int q = order(1);
@@ -643,7 +643,7 @@ double Fastcpd::get_nll_sen_ma(const unsigned int segment_start,
          dot(variance_term, variance_term) / 2.0 / theta(q);
 }
 
-double Fastcpd::get_nll_sen_poisson(const unsigned int segment_start,
+double Fastcpd::GetNllSenPoisson(const unsigned int segment_start,
                                     const unsigned int segment_end,
                                     colvec theta) {
   mat data_segment = data.rows(segment_start, segment_end);
