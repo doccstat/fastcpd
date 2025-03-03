@@ -406,10 +406,10 @@ CostResult Fastcpd::GetNllPeltGlm(const unsigned int segment_start,
   List out;
   if (start.isNull()) {
     mat x = data_segment.cols(1, data_segment.n_cols - 1);
-    out = fastglm(x, y, family);
+    out = fastglm(x, y, family_);
   } else {
     mat x = data_segment.cols(1, data_segment.n_cols - 1);
-    out = fastglm(x, y, family, start);
+    out = fastglm(x, y, family_, start);
   }
   colvec par = as<colvec>(out["coefficients"]);
   colvec residuals = as<colvec>(out["residuals"]);
@@ -451,10 +451,10 @@ CostResult Fastcpd::GetNllPeltLasso(const unsigned int segment_start,
                 glmnet = Environment::namespace_env("glmnet");
     Function deviance = stats["deviance"], glmnet_ = glmnet["glmnet"],
              predict_glmnet = glmnet["predict.glmnet"];
-    List out = glmnet_(
-        data_segment.cols(1, data_segment.n_cols - 1), data_segment.col(0),
-        Named("family") = "gaussian",
-        Named("lambda") = lambda / sqrt(segment_end - segment_start + 1));
+    List out = glmnet_(data_segment.cols(1, data_segment.n_cols - 1),
+                       data_segment.col(0), Named("family") = "gaussian",
+                       Named("lambda") = lasso_penalty_base_ /
+                                         sqrt(segment_end - segment_start + 1));
     S4 out_par = out["beta"];
     colvec par_i = as<colvec>(out_par.slot("i"));
     colvec par_x = as<colvec>(out_par.slot("x"));
@@ -465,7 +465,8 @@ CostResult Fastcpd::GetNllPeltLasso(const unsigned int segment_start,
     double value = as<double>(deviance(out));
     colvec fitted_values = as<colvec>(predict_glmnet(
         out, data_segment.cols(1, data_segment.n_cols - 1),
-        Named("s") = lambda / sqrt(segment_end - segment_start + 1)));
+        Named("s") =
+            lasso_penalty_base_ / sqrt(segment_end - segment_start + 1)));
     colvec residuals = data_segment.col(0) - fitted_values;
     return {{par}, {residuals}, value / 2};
   }
@@ -499,28 +500,31 @@ CostResult Fastcpd::GetNllPeltMeanVariance(const unsigned int segment_start,
   const unsigned int segment_length = segment_end - segment_start + 1;
 
   double det_value =
-      det((reshape(data_diff.subvec(d, parameters_count_ - 1), d, d) -
-           (data_diff.subvec(0, d - 1)).t() * (data_diff.subvec(0, d - 1)) /
-               segment_length) /
+      det((reshape(data_diff.subvec(data_n_dims_, parameters_count_ - 1),
+                   data_n_dims_, data_n_dims_) -
+           (data_diff.subvec(0, data_n_dims_ - 1)).t() *
+               (data_diff.subvec(0, data_n_dims_ - 1)) / segment_length) /
           segment_length);
-  if (segment_length <= d) {
+  if (segment_length <= data_n_dims_) {
     unsigned int approximate_segment_start;
     unsigned int approximate_segment_end;
-    if (segment_start >= d) {
-      approximate_segment_start = segment_start - d;
+    if (segment_start >= data_n_dims_) {
+      approximate_segment_start = segment_start - data_n_dims_;
     } else {
       approximate_segment_start = 0;
     }
-    if (segment_end < data_n_rows_ - d) {
-      approximate_segment_end = segment_end + d;
+    if (segment_end < data_n_rows_ - data_n_dims_) {
+      approximate_segment_end = segment_end + data_n_dims_;
     } else {
       approximate_segment_end = data_n_rows_ - 1;
     }
     data_diff = zero_data_.row(approximate_segment_end + 1) -
                 zero_data_.row(approximate_segment_start);
     det_value =
-        det((reshape(data_diff.subvec(d, parameters_count_ - 1), d, d) -
-             (data_diff.subvec(0, d - 1)).t() * (data_diff.subvec(0, d - 1)) /
+        det((reshape(data_diff.subvec(data_n_dims_, parameters_count_ - 1),
+                     data_n_dims_, data_n_dims_) -
+             (data_diff.subvec(0, data_n_dims_ - 1)).t() *
+                 (data_diff.subvec(0, data_n_dims_ - 1)) /
                  (approximate_segment_end - approximate_segment_start + 1)) /
             (approximate_segment_end - approximate_segment_start + 1));
   }
@@ -535,23 +539,25 @@ CostResult Fastcpd::GetNllPeltMgaussian(const unsigned int segment_start,
                                         const bool cv,
                                         const Nullable<colvec>& start) {
   const mat data_segment = data_.rows(segment_start, segment_end);
-  mat x = data_segment.cols(p_response, data_segment.n_cols - 1);
-  mat y = data_segment.cols(0, p_response - 1);
+  mat x =
+      data_segment.cols(regression_response_count_, data_segment.n_cols - 1);
+  mat y = data_segment.cols(0, regression_response_count_ - 1);
   mat x_t_x;
 
-  if (data_segment.n_rows <= data_segment.n_cols - p_response + 1) {
-    x_t_x = eye<mat>(data_segment.n_cols - p_response,
-                     data_segment.n_cols - p_response);
+  if (data_segment.n_rows <=
+      data_segment.n_cols - regression_response_count_ + 1) {
+    x_t_x = eye<mat>(data_segment.n_cols - regression_response_count_,
+                     data_segment.n_cols - regression_response_count_);
   } else {
     x_t_x = x.t() * x;
   }
 
   mat par = solve(x_t_x, x.t()) * y;
   mat residuals = y - x * par;
-  double value =
-      p_response * std::log(2.0 * M_PI) + log_det_sympd(variance_estimate);
+  double value = regression_response_count_ * std::log(2.0 * M_PI) +
+                 log_det_sympd(variance_estimate_);
   value *= data_segment.n_rows;
-  value += trace(solve(variance_estimate, residuals.t() * residuals));
+  value += trace(solve(variance_estimate_, residuals.t() * residuals));
   return {{par}, {residuals}, value / 2};
 }
 
@@ -563,28 +569,30 @@ CostResult Fastcpd::GetNllPeltVariance(const unsigned int segment_start,
 
   double det_value = det(arma::reshape(zero_data_.row(segment_end + 1) -
                                            zero_data_.row(segment_start),
-                                       d, d) /
+                                       data_n_dims_, data_n_dims_) /
                          segment_length);
-  if (segment_length < d) {
+  if (segment_length < data_n_dims_) {
     unsigned int approximate_segment_start;
     unsigned int approximate_segment_end;
-    if (segment_start >= d) {
-      approximate_segment_start = segment_start - d;
+    if (segment_start >= data_n_dims_) {
+      approximate_segment_start = segment_start - data_n_dims_;
     } else {
       approximate_segment_start = 0;
     }
-    if (segment_end < data_n_rows_ - d) {
-      approximate_segment_end = segment_end + d;
+    if (segment_end < data_n_rows_ - data_n_dims_) {
+      approximate_segment_end = segment_end + data_n_dims_;
     } else {
       approximate_segment_end = data_n_rows_ - 1;
     }
     det_value = det(arma::reshape(zero_data_.row(approximate_segment_end + 1) -
                                       zero_data_.row(approximate_segment_start),
-                                  d, d) /
+                                  data_n_dims_, data_n_dims_) /
                     (approximate_segment_end - approximate_segment_start + 1));
   }
 
-  return {{zeros<mat>(d, d)}, {mat()}, log(det_value) * segment_length / 2.0};
+  return {{zeros<mat>(data_n_dims_, data_n_dims_)},
+          {mat()},
+          log(det_value) * segment_length / 2.0};
 }
 
 double Fastcpd::GetNllSenArma(const unsigned int segment_start,
@@ -629,7 +637,8 @@ double Fastcpd::GetNllSenLasso(const unsigned int segment_start,
   colvec y = data_segment.col(0);
   mat x = data_segment.cols(1, data_segment.n_cols - 1);
   return accu(square(y - x * theta)) / 2 +
-         lambda / sqrt(segment_end - segment_start + 1) * accu(abs(theta));
+         lasso_penalty_base_ / sqrt(segment_end - segment_start + 1) *
+             accu(abs(theta));
 }
 
 double Fastcpd::GetNllSenLm(const unsigned int segment_start,

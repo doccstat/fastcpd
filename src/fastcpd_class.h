@@ -73,8 +73,7 @@ class Fastcpd {
   // @param data A data frame containing the data to be segmented.
   // @param theta Estimate of the parameters. If null, the function will
   //   estimate the parameters.
-  // @param lambda Lambda for L1 regularization. Only used for lasso.
-  // @param cv Whether to perform cross-validation to find the best lambda.
+  // @param cv Whether to perform cross-validation to find the best penalty.
   // @param start Starting point for the optimization for warm start.
   //   only used in mean change and lm.
   //
@@ -226,8 +225,6 @@ class Fastcpd {
 
   // Update \code{hessian} for a specific slice.
   void UpdateHessian(const unsigned int slice, arma::mat new_hessian);
-
-  // Update \code{momentum}.
   void UpdateMomentum(arma::colvec new_momentum);
 
   // Start the clock tick for `name`.
@@ -235,7 +232,6 @@ class Fastcpd {
 
   // Stop the clock tick for `name`.
   void UpdateRClockTock(const std::string name);
-
   void UpdateRProgressStart();
   void UpdateRProgressTick();
 
@@ -259,86 +255,47 @@ class Fastcpd {
 
   // `act_num_` is used in Lasso and Gaussian families only.
   arma::colvec act_num_;
-
-  // `beta_` is the initial cost value.
   double beta_;
 
   // `cost` is the cost function to be used.
   const std::unique_ptr<Rcpp::Function> cost_;
 
   // Adjustment to the cost function.
-  const std::string cost_adjustment;
+  const std::string cost_adjustment_;
 
   // `cost_gradient_` is the gradient of the cost function to be used.
   const std::unique_ptr<Rcpp::Function> cost_gradient_;
 
   // `cost_hessian_` is the Hessian of the cost function to be used.
   const std::unique_ptr<Rcpp::Function> cost_hessian_;
-
   const bool cp_only_;
-
-  // Dimension of the data.
-  const unsigned int d;
-
-  // `data` is the data set to be segmented.
   const arma::mat data_;
-
-  // The number of data points.
-  const unsigned int data_n_rows_;
-
-  // The number of data columns.
+  const unsigned int data_n_dims_;
   const unsigned int data_n_cols_;
+  const unsigned int data_n_rows_;
 
   // `epsilon` is the epsilon to avoid numerical issues. Only used for binomial
   // and poisson.
-  const double epsilon;
+  const double epsilon_;
 
   // `error_sd` is used in Gaussian family only.
   arma::colvec err_sd_;
-
-  // `family` is the family of the model.
-  const std::string family;
-
-  // Rcpp::Function to calculate the gradient at the current data.
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param theta Estimated theta from the previous iteration.
-  // @param family Family of the model.
-  // @param order Order of the time series models.
-  //
-  // @return Gradient at the current data.
+  const std::string family_;
   arma::colvec (Fastcpd::*get_gradient_)(const unsigned int segment_start,
                                          const unsigned int segment_end,
                                          const arma::colvec& theta);
-
-  // Rcpp::Function to calculate the Hessian matrix at the current data.
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param theta Estimated theta from the previous iteration.
-  //
-  // @return Hessian at the current data.
   arma::mat (Fastcpd::*get_hessian_)(const unsigned int segment_start,
                                      const unsigned int segment_end,
                                      const arma::colvec& theta);
-
   CostResult (Fastcpd::*get_nll_pelt_)(
       const unsigned int segment_start, const unsigned int segment_end,
       const bool cv, const Rcpp::Nullable<arma::colvec>& start);
-
   double (Fastcpd::*get_nll_sen_)(const unsigned int segment_start,
                                   const unsigned int segment_end,
                                   arma::colvec theta);
-
-  // `hessian_` stores the Hessian matrix up to the current data point.
   arma::cube hessian_;
-
-  // `lambda` is the lambda for L1 regularization. Only used for lasso. This
-  // parameter stores the penalty without the segment length scaling.
-  double lambda;
-  arma::colvec line_search;
-
-  // Lower bound of the parameters to be estimated during the optimization.
-  const arma::colvec lower;
+  double lasso_penalty_base_;
+  arma::colvec line_search_;
 
   // `min_idx_` is the index of the minimum objective value.
   // This value is stored to avoid reallocation of memory.
@@ -347,34 +304,27 @@ class Fastcpd {
   // `min_obj_` is the minimum objective value.
   // This value is stored to avoid reallocation of memory.
   double min_obj_;
-
-  // Momentum will be used in the update step if `momentum_coef_` is not 0.
   arma::colvec momentum_;
   const double momentum_coef_;
   const std::unique_ptr<Rcpp::Function> multiple_epochs_function_;
   const arma::colvec order_;
   const unsigned int parameters_count_;
-
-  // Number of response variables in regression.
-  const unsigned int p_response;
-
-  // Indices after pruning.
-  arma::ucolvec pruned_left;
-  unsigned int pruned_left_n_elem;
-  const double pruning_coef;
-  const std::string r_clock;
-  const bool r_progress;
-  Rcpp::Clock rClock;
-  std::unique_ptr<RProgress::RProgress> rProgress;
-  const int segment_count;
+  const arma::colvec parameters_lower_bound_;
+  const arma::colvec parameters_upper_bound_;
+  arma::ucolvec pruned_left_;
+  unsigned int pruned_left_n_elem_;
+  const double pruning_coefficient_;
+  const std::string r_clock_;
+  const bool r_progress_;
+  Rcpp::Clock rClock_;
+  std::unique_ptr<RProgress::RProgress> rProgress_;
+  const unsigned int regression_response_count_;
+  const int segment_count_;
   arma::colvec segment_indices_;
 
   // Create a matrix to store the estimated coefficients in each segment,
   // where each row represents estimated coefficients for a segment.
   arma::mat segment_theta_hat_;
-
-  // Matrix storing the warm starts.
-  arma::mat start;
 
   // `theta_hat_` stores the estimated coefficients up to the current data
   // point.
@@ -383,16 +333,14 @@ class Fastcpd {
   // `theta_sum` stores the sum of estimated coefficients up to the current data
   // point.
   arma::mat theta_sum_;
-  const double trim;
+  const double trim_;
 
   // Static mapping from family names to their function sets
   static const std::unordered_map<std::string, FunctionSet> family_function_map;
-
-  // Upper bound of the parameters to be estimated during the optimization.
-  const arma::colvec upper;
-  const double vanilla_percentage;
-  const arma::mat variance_estimate;
+  const double vanilla_percentage_;
+  const arma::mat variance_estimate_;
   const bool use_warm_start_;
+  arma::mat warm_start_;
   arma::mat zero_data_;
   unsigned int zero_data_n_cols_;
   unsigned int zero_data_n_rows_;
