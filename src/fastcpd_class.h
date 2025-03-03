@@ -53,8 +53,8 @@ class Fastcpd {
                                 const unsigned int segment_end,
                                 const colvec& theta);
     mat (Fastcpd::*hessian_)(const unsigned int segment_start,
-                            const unsigned int segment_end,
-                            const colvec& theta);
+                             const unsigned int segment_end,
+                             const colvec& theta);
     double (Fastcpd::*nll_sen)(const unsigned int segment_start,
                                const unsigned int segment_end, colvec theta);
     CostResult (Fastcpd::*nll_pelt)(const unsigned int segment_start,
@@ -95,19 +95,19 @@ class Fastcpd {
   // @return Negative log likelihood of the corresponding data with the given
   //   family.
   CostResult GetCostResult(const unsigned int segment_start,
-                             const unsigned int segment_end,
-                             Nullable<colvec> theta, const bool cv = false,
-                             Nullable<colvec> start = R_NilValue);
+                           const unsigned int segment_end,
+                           Nullable<colvec> theta, const bool cv = false,
+                           Nullable<colvec> start = R_NilValue);
 
   List GetChangePointSet(const colvec raw_cp_set);
 
   double GetCostValue(const int tau, const unsigned int i, const int t);
 
   double GetCostValuePelt(const unsigned int segment_start,
-                       const unsigned int segment_end, const unsigned int i);
+                          const unsigned int segment_end, const unsigned int i);
 
   double GetCostValueSen(const unsigned int segment_start,
-                      const unsigned int segment_end, const unsigned int i);
+                         const unsigned int segment_end, const unsigned int i);
 
   colvec GetGradientArma(const unsigned int segment_start,
                          const unsigned int segment_end, const colvec& theta);
@@ -126,8 +126,8 @@ class Fastcpd {
                        const unsigned int segment_end, const colvec& theta);
 
   colvec GetGradientPoisson(const unsigned int segment_start,
-                              const unsigned int segment_end,
-                              const colvec& theta);
+                            const unsigned int segment_end,
+                            const colvec& theta);
 
   mat GetHessianArma(const unsigned int segment_start,
                      const unsigned int segment_end, const colvec& theta);
@@ -139,7 +139,7 @@ class Fastcpd {
                        const unsigned int segment_end, const colvec& theta);
 
   mat GetHessianLm(const unsigned int segment_start,
-                     const unsigned int segment_end, const colvec& theta);
+                   const unsigned int segment_end, const colvec& theta);
 
   mat GetHessianMa(const unsigned int segment_start,
                    const unsigned int segment_end, const colvec& theta);
@@ -156,34 +156,32 @@ class Fastcpd {
                               const Nullable<colvec>& start);
 
   CostResult GetNllPeltGarch(const unsigned int segment_start,
-                                const unsigned int segment_end, const bool cv,
-                                const Nullable<colvec>& start);
+                             const unsigned int segment_end, const bool cv,
+                             const Nullable<colvec>& start);
 
   CostResult GetNllPeltGlm(const unsigned int segment_start,
                            const unsigned int segment_end, const bool cv,
                            const Nullable<colvec>& start);
 
   CostResult GetNllPeltLasso(const unsigned int segment_start,
-                                const unsigned int segment_end, const bool cv,
-                                const Nullable<colvec>& start);
+                             const unsigned int segment_end, const bool cv,
+                             const Nullable<colvec>& start);
   CostResult GetNllPeltMean(const unsigned int segment_start,
-                               const unsigned int segment_end, const bool cv,
-                               const Nullable<colvec>& start);
+                            const unsigned int segment_end, const bool cv,
+                            const Nullable<colvec>& start);
 
   CostResult GetNllPeltMeanVariance(const unsigned int segment_start,
-                                       const unsigned int segment_end,
-                                       const bool cv,
-                                       const Nullable<colvec>& start);
-
-  CostResult GetNllPeltMgaussian(const unsigned int segment_start,
                                     const unsigned int segment_end,
                                     const bool cv,
                                     const Nullable<colvec>& start);
 
+  CostResult GetNllPeltMgaussian(const unsigned int segment_start,
+                                 const unsigned int segment_end, const bool cv,
+                                 const Nullable<colvec>& start);
+
   CostResult GetNllPeltVariance(const unsigned int segment_start,
-                                   const unsigned int segment_end,
-                                   const bool cv,
-                                   const Nullable<colvec>& start);
+                                const unsigned int segment_end, const bool cv,
+                                const Nullable<colvec>& start);
 
   double GetNllSenArma(const unsigned int segment_start,
                        const unsigned int segment_end, colvec theta);
@@ -192,22 +190,22 @@ class Fastcpd {
                            const unsigned int segment_end, colvec theta);
 
   double GetNllSenCustom(const unsigned int segment_start,
-                            const unsigned int segment_end, colvec theta);
+                         const unsigned int segment_end, colvec theta);
 
   double GetNllSenLasso(const unsigned int segment_start,
-                           const unsigned int segment_end, colvec theta);
+                        const unsigned int segment_end, colvec theta);
 
   double GetNllSenLm(const unsigned int segment_start,
-                        const unsigned int segment_end, colvec theta);
+                     const unsigned int segment_end, colvec theta);
 
   double GetNllSenMa(const unsigned int segment_start,
-                        const unsigned int segment_end, colvec theta);
+                     const unsigned int segment_end, colvec theta);
 
   double GetNllSenPoisson(const unsigned int segment_start,
-                             const unsigned int segment_end, colvec theta);
+                          const unsigned int segment_end, colvec theta);
 
   colvec GetObjectiveFunctionValues(const colvec& fvec, const ucolvec& r_t_set,
-                 unsigned int r_t_count, unsigned int t);
+                                    unsigned int r_t_count, unsigned int t);
 
   // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   //
@@ -216,7 +214,7 @@ class Fastcpd {
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   and \code{hessian}.
   CostResult GetOptimizedCostResult(const unsigned int segment_start,
-                                const unsigned int segment_end);
+                                    const unsigned int segment_end);
 
   // Adjust cost value for MBIC and MDL.
   double UpdateCostValue(double value, const unsigned int nrows);
@@ -227,11 +225,11 @@ class Fastcpd {
   void UpdateSenParameters(const unsigned int t);
 
   void UpdateSenParameters(const unsigned int segment_start,
-                              const unsigned int segment_end,
-                              const unsigned int i);
+                           const unsigned int segment_end,
+                           const unsigned int i);
 
-  void UpdateSenParametersStep(const int segment_start,
-                                   const int segment_end, const int i);
+  void UpdateSenParametersStep(const int segment_start, const int segment_end,
+                               const int i);
 
   // Update the cost values for the segmentation.
   //
@@ -247,8 +245,8 @@ class Fastcpd {
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   \code{hessian}, and \code{momentum}.
   List UpdateSenParametersSteps(const int segment_start,
-                                    const unsigned int segment_end, const int i,
-                                    colvec momentum);
+                                const unsigned int segment_end, const int i,
+                                colvec momentum);
 
   // Append a new slice to \code{hessian}.
   void UpdateHessian(mat new_hessian);
@@ -272,7 +270,7 @@ class Fastcpd {
   void UpdateRProgressTick();
 
   void Step(unsigned int t, ucolvec& r_t_set, unsigned int& r_t_count,
-                   colvec& cp_sets, colvec& fvec);
+            colvec& cp_sets, colvec& fvec);
 
   // Append a new column to \code{theta_hat}.
   void UpdateThetaHat(colvec new_theta_hat);
@@ -342,9 +340,9 @@ class Fastcpd {
   // @param order Order of the time series models.
   //
   // @return Gradient at the current data.
-  colvec (Fastcpd::*GetGradient)(const unsigned int segment_start,
-                                 const unsigned int segment_end,
-                                 const colvec& theta);
+  colvec (Fastcpd::*get_gradient_)(const unsigned int segment_start,
+                                   const unsigned int segment_end,
+                                   const colvec& theta);
 
   // Function to calculate the Hessian matrix at the current data.
   //
@@ -352,17 +350,17 @@ class Fastcpd {
   // @param theta Estimated theta from the previous iteration.
   //
   // @return Hessian at the current data.
-  mat (Fastcpd::*GetHessian)(const unsigned int segment_start,
-                             const unsigned int segment_end,
-                             const colvec& theta);
+  mat (Fastcpd::*get_hessian_)(const unsigned int segment_start,
+                               const unsigned int segment_end,
+                               const colvec& theta);
 
-  CostResult (Fastcpd::*GetNllPelt)(const unsigned int segment_start,
-                                    const unsigned int segment_end,
-                                    const bool cv,
-                                    const Nullable<colvec>& start);
+  CostResult (Fastcpd::*get_nll_pelt_)(const unsigned int segment_start,
+                                       const unsigned int segment_end,
+                                       const bool cv,
+                                       const Nullable<colvec>& start);
 
-  double (Fastcpd::*GetNllSen)(const unsigned int segment_start,
-                               const unsigned int segment_end, colvec theta);
+  double (Fastcpd::*get_nll_sen_)(const unsigned int segment_start,
+                                  const unsigned int segment_end, colvec theta);
 
   // `hessian_` stores the Hessian matrix up to the current data point.
   cube hessian_;
@@ -430,7 +428,7 @@ class Fastcpd {
 
   // `theta_sum` stores the sum of estimated coefficients up to the current data
   // point.
-  mat theta_sum;
+  mat theta_sum_;
 
   const double trim;
 
