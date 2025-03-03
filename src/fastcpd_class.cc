@@ -75,21 +75,21 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
                  const double vanilla_percentage, const mat variance_estimate,
                  const bool warm_start)
     : act_num_(colvec(segment_count)),
-      beta(beta),
-      cost([&]() -> unique_ptr<Function> {
+      beta_(beta),
+      cost_([&]() -> unique_ptr<Function> {
         if (family == "custom") {
           return make_unique<Function>(cost);
         }
         return nullptr;
       }()),
       cost_adjustment(cost_adjustment),
-      cost_gradient([&]() -> unique_ptr<Function> {
+      cost_gradient_([&]() -> unique_ptr<Function> {
         if (family == "custom" && cost_gradient.isNotNull()) {
           return make_unique<Function>(cost_gradient);
         }
         return nullptr;
       }()),
-      cost_hessian([&]() -> unique_ptr<Function> {
+      cost_hessian_([&]() -> unique_ptr<Function> {
         if (family == "custom" && cost_hessian.isNotNull()) {
           return make_unique<Function>(cost_hessian);
         }
@@ -97,9 +97,9 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
       }()),
       cp_only_(cp_only),
       d(d),
-      data(data),
-      data_n_rows_(data.n_rows),
-      data_n_cols_(data.n_cols),
+      data_(data),
+      data_n_rows_(data_.n_rows),
+      data_n_cols_(data_.n_cols),
       epsilon(epsilon),
       err_sd_(colvec(segment_count)),
       family(family),
@@ -108,14 +108,14 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
       lower(lower),
       momentum_(vec(p)),
       momentum_coef_(momentum_coef),
-      multiple_epochs_function([&]() -> unique_ptr<Function> {
+      multiple_epochs_function_([&]() -> unique_ptr<Function> {
         if (multiple_epochs_function.isNotNull()) {
           return make_unique<Function>(multiple_epochs_function);
         }
         return nullptr;
       }()),
-      order(order),
-      p(p),
+      order_(order),
+      parameters_count_(p),
       p_response(p_response),
       pruned_left(ucolvec(data_n_rows_ + 1)),
       pruning_coef(pruning_coef),
@@ -134,14 +134,14 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
       variance_estimate(variance_estimate),
       use_warm_start_(warm_start) {
   if (family == "mean") {
-    zero_data_ = data * chol(inv(variance_estimate)).t();
+    zero_data_ = data_ * chol(inv(variance_estimate)).t();
     zero_data_ = cumsum(join_rows(zero_data_, sum(square(zero_data_), 1)));
     zero_data_ = join_cols(zeros<rowvec>(zero_data_.n_cols), zero_data_);
     zero_data_n_cols_ = zero_data_.n_cols;
     zero_data_n_rows_ = zero_data_.n_rows;
     zero_data_ptr_ = zero_data_.memptr();
   } else if (family == "variance") {
-    zero_data_ = data;
+    zero_data_ = data_;
     zero_data_.each_row() -= mean(zero_data_, 0);
     mat data_crossprod(data_n_cols_ * data_n_cols_, data_n_rows_);
     for (unsigned int i = 0; i < data_n_rows_; i++) {
@@ -156,23 +156,23 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
   } else if (family == "meanvariance") {
     mat data_crossprod(data_n_cols_ * data_n_cols_, data_n_rows_);
     for (unsigned int i = 0; i < data_n_rows_; i++) {
-      data_crossprod.col(i) = vectorise(data.row(i).t() * data.row(i));
+      data_crossprod.col(i) = vectorise(data_.row(i).t() * data_.row(i));
     }
-    zero_data_ = cumsum(join_rows(data, data_crossprod.t()));
+    zero_data_ = cumsum(join_rows(data_, data_crossprod.t()));
     zero_data_ = join_cols(zeros<rowvec>(zero_data_.n_cols), zero_data_);
     zero_data_n_cols_ = zero_data_.n_cols;
     zero_data_n_rows_ = zero_data_.n_rows;
     zero_data_ptr_ = zero_data_.memptr();
   }
 
-  // Handle the special 'arma' family with order condition
+  // Handle the special 'arma' family with order_ condition
   if (family == "arma") {
-    if (order(0) > 0) {
+    if (order_(0) > 0) {
       get_gradient_ = &Fastcpd::GetGradientArma;
       get_hessian_ = &Fastcpd::GetHessianArma;
       get_nll_sen_ = &Fastcpd::GetNllSenArma;
       get_nll_pelt_ = &Fastcpd::GetNllPeltArma;
-    } else {  // order(0) == 0
+    } else {  // order_(0) == 0
       get_gradient_ = &Fastcpd::GetGradientMa;
       get_hessian_ = &Fastcpd::GetHessianMa;
       get_nll_sen_ = &Fastcpd::GetNllSenMa;
@@ -205,7 +205,7 @@ List Fastcpd::Run() {
   colvec cp_sets = zeros<colvec>(data_n_rows_ + 1);
   colvec fvec = zeros<vec>(data_n_rows_ + 1);
   fvec.fill(arma::datum::inf);
-  fvec(0) = -beta;
+  fvec(0) = -beta_;
   fvec(1) = GetCostValue(0, 0, 1);
 
   if (family == "mean" && cost_adjustment == "MBIC") {
@@ -217,34 +217,35 @@ List Fastcpd::Run() {
       for (i = 0; i < r_t_count; i++) {
         two_norm = (zero_data_ptr_[t] - zero_data_ptr_[r_t_set[i]]) *
                    (zero_data_ptr_[t] - zero_data_ptr_[r_t_set[i]]);
-        for (pi = 1; pi < p; pi++) {
+        for (pi = 1; pi < parameters_count_; pi++) {
           two_norm += (zero_data_ptr_[t + zero_data_n_rows_ * pi] -
                        zero_data_ptr_[r_t_set[i] + zero_data_n_rows_ * pi]) *
                       (zero_data_ptr_[t + zero_data_n_rows_ * pi] -
                        zero_data_ptr_[r_t_set[i] + zero_data_n_rows_ * pi]);
         }
         obj[i] = fvec[r_t_set[i]] +
-                 ((zero_data_ptr_[t + zero_data_n_rows_ * p] -
-                   zero_data_ptr_[r_t_set[i] + zero_data_n_rows_ * p]) -
+                 ((zero_data_ptr_[t + zero_data_n_rows_ * parameters_count_] -
+                   zero_data_ptr_[r_t_set[i] +
+                                  zero_data_n_rows_ * parameters_count_]) -
                   two_norm / (t - r_t_set[i])) /
                      2.0 +
-                 std::log(t - r_t_set[i]) / 2.0 + beta;
+                 std::log(t - r_t_set[i]) / 2.0 + beta_;
       }
 
-      min_obj = obj[0];
-      min_idx = 0;
+      min_obj_ = obj[0];
+      min_idx_ = 0;
       for (i = 1; i < r_t_count; i++) {
-        if (obj[i] < min_obj) {
-          min_obj = obj[i];
-          min_idx = i;
+        if (obj[i] < min_obj_) {
+          min_obj_ = obj[i];
+          min_idx_ = i;
         }
       }
-      fvec(t) = min_obj;
-      cp_sets[t] = r_t_set[min_idx];
+      fvec(t) = min_obj_;
+      cp_sets[t] = r_t_set[min_idx_];
 
       pruned_left_n_elem = 0;
       for (i = 0; i < r_t_count; i++) {
-        if (obj[i] <= min_obj + beta - pruning_coef) {
+        if (obj[i] <= min_obj_ + beta_ - pruning_coef) {
           r_t_set[pruned_left_n_elem] = r_t_set[i];
           pruned_left_n_elem++;
         }
@@ -309,23 +310,29 @@ void Fastcpd::CreateSenParameters() {
   if (family == "binomial") {
     theta_sum_.col(0) = segment_theta_hat_.row(0).t();
     theta_hat_.col(0) = segment_theta_hat_.row(0).t();
-    const double prob = 1 / (1 + exp(-dot(theta_hat_, data.row(0).tail(p))));
-    hessian_.slice(0) =
-        (data.row(0).tail(p).t() * data.row(0).tail(p)) * prob * (1 - prob);
+    const double prob =
+        1 / (1 + exp(-dot(theta_hat_, data_.row(0).tail(parameters_count_))));
+    hessian_.slice(0) = (data_.row(0).tail(parameters_count_).t() *
+                         data_.row(0).tail(parameters_count_)) *
+                        prob * (1 - prob);
   } else if (family == "poisson") {
     theta_hat_.col(0) = segment_theta_hat_.row(0).t();
     theta_sum_.col(0) = segment_theta_hat_.row(0).t();
-    hessian_.slice(0) = (data.row(0).tail(p).t() * data.row(0).tail(p)) *
-                        exp(dot(theta_hat_, data.row(0).tail(p)));
+    hessian_.slice(0) =
+        (data_.row(0).tail(parameters_count_).t() *
+         data_.row(0).tail(parameters_count_)) *
+        exp(dot(theta_hat_, data_.row(0).tail(parameters_count_)));
   } else if (family == "lasso" || family == "gaussian") {
     theta_hat_.col(0) = segment_theta_hat_.row(0).t();
     theta_sum_.col(0) = segment_theta_hat_.row(0).t();
-    hessian_.slice(0) = data.row(0).tail(p).t() * data.row(0).tail(p) +
-                        epsilon * eye<mat>(p, p);
+    hessian_.slice(0) =
+        data_.row(0).tail(parameters_count_).t() *
+            data_.row(0).tail(parameters_count_) +
+        epsilon * eye<mat>(parameters_count_, parameters_count_);
   } else if (family == "custom") {
     theta_hat_.col(0) = segment_theta_hat_.row(0).t();
     theta_sum_.col(0) = segment_theta_hat_.row(0).t();
-    hessian_.slice(0) = zeros<mat>(p, p);
+    hessian_.slice(0) = zeros<mat>(parameters_count_, parameters_count_);
   }
 }
 
@@ -344,8 +351,8 @@ void Fastcpd::CreateSegmentStatistics() {
     // estimated coefficients in the segment.
     segment_theta_hat_.row(segment_index) = segment_theta;
     if (family == "lasso" || family == "gaussian") {
-      mat data_segment = data.rows(segment_indices_(segment_index),
-                                   segment_indices_(segment_index + 1) - 1);
+      mat data_segment = data_.rows(segment_indices_(segment_index),
+                                    segment_indices_(segment_index + 1) - 1);
       colvec segment_residual =
           data_segment.col(0) -
           data_segment.cols(1, data_segment.n_cols - 1) * segment_theta.t();
@@ -355,9 +362,9 @@ void Fastcpd::CreateSegmentStatistics() {
     }
   }
   // Mean of `err_sd_` only works if error sd is unchanged.
-  lambda = mean(err_sd_) * sqrt(2 * std::log(p));
+  lambda = mean(err_sd_) * sqrt(2 * std::log(parameters_count_));
   if (family == "lasso") {
-    beta = beta * (1 + mean(act_num_));
+    beta_ = beta_ * (1 + mean(act_num_));
   }
 }
 
@@ -376,7 +383,7 @@ void Fastcpd::CreateThetaSum(const unsigned int col, colvec new_theta_sum) {
 double Fastcpd::GetCostAdjustmentValue(const unsigned nrows) {
   double adjusted = 0;
   if (cost_adjustment == "MBIC" || cost_adjustment == "MDL") {
-    adjusted = p * std::log(nrows) / 2.0;
+    adjusted = parameters_count_ * std::log(nrows) / 2.0;
   }
   if (cost_adjustment == "MDL") {
     adjusted *= std::log2(M_E);
@@ -421,7 +428,7 @@ List Fastcpd::GetChangePointSet(const colvec raw_cp_set) {
   cp_loc_(cp_loc_.n_elem - 1) = data_n_rows_;
   colvec cp_loc = unique(std::move(cp_loc_));
   colvec cost_values = zeros<vec>(cp_loc.n_elem - 1);
-  mat thetas = zeros<mat>(p, cp_loc.n_elem - 1);
+  mat thetas = zeros<mat>(parameters_count_, cp_loc.n_elem - 1);
   mat residual;
   if (family == "mean" || family == "variance" || family == "meanvariance") {
     residual = zeros<mat>(data_n_rows_, d);
@@ -473,7 +480,8 @@ double Fastcpd::GetCostValuePelt(const unsigned int segment_start,
   double cval = 0;
   CostResult cost_result;
   if ((family == "binomial" || family == "poisson") &&
-      (use_warm_start_ && segment_end + 1 - segment_start >= 10 * p)) {
+      (use_warm_start_ &&
+       segment_end + 1 - segment_start >= 10 * parameters_count_)) {
     cost_result = GetCostResult(
         segment_start, segment_end, R_NilValue, false,
         wrap(segment_theta_hat_
@@ -507,13 +515,13 @@ double Fastcpd::GetCostValueSen(const unsigned int segment_start,
   colvec theta = theta_sum_.col(i) / segment_length;
   if (family == "custom") {
     cval = (this->*get_nll_sen_)(segment_start, segment_end, theta);
-  } else if ((family != "lasso" && segment_length >= p) ||
+  } else if ((family != "lasso" && segment_length >= parameters_count_) ||
              (family == "lasso" && segment_length >= 3)) {
     cval = GetCostResult(segment_start, segment_end, wrap(theta), false,
                          R_NilValue)
                .value;
   }
-  // else segment_length < p or for lasso segment_length < 3
+  // else segment_length < parameters_count_ or for lasso segment_length < 3
   return cval;
 }
 
@@ -528,26 +536,26 @@ colvec Fastcpd::GetObjectiveFunctionValues(const colvec& fvec,
     cval(i) = GetCostValue(r_t_set(i), i, t);
   }
   UpdateRClockTock("r_t_set_for_loop");
-  colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta;
+  colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta_;
   return obj;
 }
 
 CostResult Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
                                            const unsigned int segment_end) {
   CostResult cost_result;
-  const mat data_segment = data.rows(segment_start, segment_end);
-  if (p == 1) {
+  const mat data_segment = data_.rows(segment_start, segment_end);
+  if (parameters_count_ == 1) {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result =
         optim(Named("par") = 0,
               Named("fn") =
-                  InternalFunction(+[](double theta, mat data, Function cost) {
-                    return cost(Named("data") = data,
+                  InternalFunction(+[](double theta, mat data_, Function cost) {
+                    return cost(Named("data") = data_,
                                 Named("theta") = std::log(theta / (1 - theta)));
                   }),
               Named("method") = "Brent", Named("lower") = 0, Named("upper") = 1,
-              Named("data") = data_segment, Named("cost") = *cost);
+              Named("data") = data_segment, Named("cost") = *cost_);
     colvec par = as<colvec>(optim_result["par"]);
     double value = as<double>(optim_result["value"]);
     cost_result = {
@@ -555,10 +563,10 @@ CostResult Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
   } else {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
-    List optim_result =
-        optim(Named("par") = zeros<vec>(p), Named("fn") = *cost,
-              Named("method") = "L-BFGS-B", Named("data") = data_segment,
-              Named("lower") = lower, Named("upper") = upper);
+    List optim_result = optim(
+        Named("par") = zeros<vec>(parameters_count_), Named("fn") = *cost_,
+        Named("method") = "L-BFGS-B", Named("data") = data_segment,
+        Named("lower") = lower, Named("upper") = upper);
     cost_result = {
         {as<colvec>(optim_result["par"])}, {colvec()}, optim_result["value"]};
   }
@@ -634,7 +642,7 @@ List Fastcpd::UpdateSenParametersSteps(const int segment_start,
                                        const unsigned int segment_end,
                                        const int i, colvec momentum) {
   const unsigned int multiple_epochs =
-      as<int>((*multiple_epochs_function)(segment_end - segment_start + 1));
+      as<int>((*multiple_epochs_function_)(segment_end - segment_start + 1));
   unsigned int loop_start = segment_end, loop_end = segment_end;
 
   for (unsigned int epoch = 0; epoch <= multiple_epochs; epoch++) {
@@ -704,20 +712,21 @@ void Fastcpd::UpdateSenParameters(const unsigned int t) {
          coef_add = segment_theta_hat_.row(segment_index);
   mat hessian_new;
   if (family == "binomial") {
-    const rowvec x = data.row(t - 1).tail(p);
+    const rowvec x = data_.row(t - 1).tail(parameters_count_);
     const double prob = 1 / (1 + exp(-dot(coef_add, x)));
     hessian_new = (x.t() * x) * prob * (1 - prob);
   } else if (family == "poisson") {
-    const rowvec x = data.row(t - 1).tail(p);
+    const rowvec x = data_.row(t - 1).tail(parameters_count_);
     cum_coef_add = coef_add;
     hessian_new = (x.t() * x) * exp(dot(coef_add, x));
   } else if (family == "lasso" || family == "gaussian") {
-    const rowvec x = data.row(t - 1).tail(p);
-    hessian_new = x.t() * x + epsilon * eye<mat>(p, p);
+    const rowvec x = data_.row(t - 1).tail(parameters_count_);
+    hessian_new =
+        x.t() * x + epsilon * eye<mat>(parameters_count_, parameters_count_);
   } else if (family == "arma") {
     hessian_new = (this->*get_hessian_)(0, t - 1, coef_add.t());
   } else if (family == "custom") {
-    hessian_new = zeros<mat>(p, p);
+    hessian_new = zeros<mat>(parameters_count_, parameters_count_);
   }
 
   UpdateThetaHat(coef_add.t());
@@ -775,22 +784,22 @@ void Fastcpd::Step(unsigned int t, ucolvec& r_t_set, unsigned int& r_t_count,
 
   // The following code is the manual implementation of `index_min` function
   // in Armadillo.
-  min_obj = obj[0];
-  min_idx = 0;
+  min_obj_ = obj[0];
+  min_idx_ = 0;
   for (unsigned int i = 1; i < r_t_count; i++) {
-    if (obj[i] < min_obj) {
-      min_obj = obj[i];
-      min_idx = i;
+    if (obj[i] < min_obj_) {
+      min_obj_ = obj[i];
+      min_idx_ = i;
     }
   }
-  fvec(t) = min_obj;
-  cp_sets[t] = r_t_set[min_idx];
+  fvec(t) = min_obj_;
+  cp_sets[t] = r_t_set[min_idx_];
 
   // The following code is the manual implementation of `find` function in
   // Armadillo.
   pruned_left_n_elem = 0;
   for (unsigned int i = 0; i < r_t_count; i++) {
-    if (obj[i] <= min_obj + beta - pruning_coef) {
+    if (obj[i] <= min_obj_ + beta_ - pruning_coef) {
       r_t_set[pruned_left_n_elem] = r_t_set[i];
       pruned_left[pruned_left_n_elem] = i;
       pruned_left_n_elem++;
