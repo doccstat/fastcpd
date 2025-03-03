@@ -76,13 +76,13 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
                  const bool warm_start)
     : act_num_(colvec(segment_count)),
       beta_(beta),
+      cost_adjustment_(cost_adjustment),
       cost_function_([&]() -> unique_ptr<Function> {
         if (family == "custom") {
           return make_unique<Function>(cost);
         }
         return nullptr;
       }()),
-      cost_adjustment_(cost_adjustment),
       cost_gradient_([&]() -> unique_ptr<Function> {
         if (family == "custom" && cost_gradient.isNotNull()) {
           return make_unique<Function>(cost_gradient);
