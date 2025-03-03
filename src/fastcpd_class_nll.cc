@@ -475,15 +475,16 @@ CostResult Fastcpd::GetNllPeltMean(const unsigned int segment_start,
   double two_norm = 0;
   for (unsigned int i = 0; i < p; i++) {
     two_norm +=
-        (zero_data.at(segment_end + 1, i) - zero_data.at(segment_start, i)) *
-        (zero_data.at(segment_end + 1, i) - zero_data.at(segment_start, i));
+        (zero_data_.at(segment_end + 1, i) - zero_data_.at(segment_start, i)) *
+        (zero_data_.at(segment_end + 1, i) - zero_data_.at(segment_start, i));
   }
   const unsigned int segment_length = segment_end - segment_start + 1;
-  return {{zeros<colvec>(p)},
-          {zeros<mat>(segment_length, p)},
-          ((zero_data.at(segment_end + 1, p) - zero_data.at(segment_start, p)) -
-           two_norm / segment_length) /
-              2.0};
+  return {
+      {zeros<colvec>(p)},
+      {zeros<mat>(segment_length, p)},
+      ((zero_data_.at(segment_end + 1, p) - zero_data_.at(segment_start, p)) -
+       two_norm / segment_length) /
+          2.0};
 }
 
 CostResult Fastcpd::GetNllPeltMeanVariance(const unsigned int segment_start,
@@ -491,7 +492,7 @@ CostResult Fastcpd::GetNllPeltMeanVariance(const unsigned int segment_start,
                                            const bool cv,
                                            const Nullable<colvec>& start) {
   rowvec data_diff =
-      zero_data.row(segment_end + 1) - zero_data.row(segment_start);
+      zero_data_.row(segment_end + 1) - zero_data_.row(segment_start);
   const unsigned int segment_length = segment_end - segment_start + 1;
 
   double det_value = det((reshape(data_diff.subvec(d, p - 1), d, d) -
@@ -511,8 +512,8 @@ CostResult Fastcpd::GetNllPeltMeanVariance(const unsigned int segment_start,
     } else {
       approximate_segment_end = data_n_rows_ - 1;
     }
-    data_diff = zero_data.row(approximate_segment_end + 1) -
-                zero_data.row(approximate_segment_start);
+    data_diff = zero_data_.row(approximate_segment_end + 1) -
+                zero_data_.row(approximate_segment_start);
     det_value =
         det((reshape(data_diff.subvec(d, p - 1), d, d) -
              (data_diff.subvec(0, d - 1)).t() * (data_diff.subvec(0, d - 1)) /
@@ -554,10 +555,10 @@ CostResult Fastcpd::GetNllPeltVariance(const unsigned int segment_start,
                                        const Nullable<colvec>& start) {
   const unsigned int segment_length = segment_end - segment_start + 1;
 
-  double det_value = det(
-      arma::reshape(
-          zero_data.row(segment_end + 1) - zero_data.row(segment_start), d, d) /
-      segment_length);
+  double det_value = det(arma::reshape(zero_data_.row(segment_end + 1) -
+                                           zero_data_.row(segment_start),
+                                       d, d) /
+                         segment_length);
   if (segment_length < d) {
     unsigned int approximate_segment_start;
     unsigned int approximate_segment_end;
@@ -571,8 +572,8 @@ CostResult Fastcpd::GetNllPeltVariance(const unsigned int segment_start,
     } else {
       approximate_segment_end = data_n_rows_ - 1;
     }
-    det_value = det(arma::reshape(zero_data.row(approximate_segment_end + 1) -
-                                      zero_data.row(approximate_segment_start),
+    det_value = det(arma::reshape(zero_data_.row(approximate_segment_end + 1) -
+                                      zero_data_.row(approximate_segment_start),
                                   d, d) /
                     (approximate_segment_end - approximate_segment_start + 1));
   }
