@@ -4,7 +4,8 @@
 #include <memory>
 #include <unordered_map>
 
-// TODO(doccstat): Fix the order issue.
+// TODO(doccstat): Fix the order issue. It seems that `fastcpd_test.h` or
+// `RcppArmadillo.h` should be included first.
 #include "fastcpd_test.h"
 #include "RProgress.h"
 #include "RcppClock.h"
@@ -37,7 +38,7 @@ class Fastcpd {
     arma::colvec (Fastcpd::*gradient)(const unsigned int segment_start,
                                       const unsigned int segment_end,
                                       const arma::colvec& theta);
-    arma::mat (Fastcpd::*hessian_)(const unsigned int segment_start,
+    arma::mat (Fastcpd::*hessian)(const unsigned int segment_start,
                                    const unsigned int segment_end,
                                    const arma::colvec& theta);
     double (Fastcpd::*nll_sen)(const unsigned int segment_start,
@@ -49,17 +50,9 @@ class Fastcpd {
                                     const Rcpp::Nullable<arma::colvec>& start);
   };
 
-  // Stop the clock and create an R object with `name`.
   void CreateRClock(const std::string name);
-
-  // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   void CreateSenParameters();
-
-  // Initialize theta_hat_t_t to be the estimate in the segment.
   void CreateSegmentStatistics();
-
-  // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian} and
-  // theta_hat_t_t to be the estimate in the segment.
   void CreateSegmentStatisticsAndSenParameters();
 
   // Set \code{theta_sum} for a specific column.
@@ -69,14 +62,6 @@ class Fastcpd {
 
   // Solve logistic/poisson regression using Gradient Descent Extension to the
   // multivariate case
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param theta Estimate of the parameters. If null, the function will
-  //   estimate the parameters.
-  // @param cv Whether to perform cross-validation to find the best penalty.
-  // @param start Starting point for the optimization for warm start.
-  //   only used in mean change and lm.
-  //
   // @return Negative log likelihood of the corresponding data with the given
   //   family.
   CostResult GetCostResult(const unsigned int segment_start,
@@ -174,8 +159,6 @@ class Fastcpd {
                                           unsigned int t);
   CostResult GetOptimizedCostResult(const unsigned int segment_start,
                                     const unsigned int segment_end);
-  void Step(unsigned int t, arma::ucolvec& r_t_set, unsigned int& r_t_count,
-            arma::colvec& cp_sets, arma::colvec& fvec);
 
   // Adjust cost value for MBIC and MDL.
   double UpdateCostValue(double value, const unsigned int nrows);
@@ -190,21 +173,14 @@ class Fastcpd {
                                const int i);
 
   // Update the cost values for the segmentation.
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param tau Start of the current segment.
-  // @param i Index of the current data in the whole data set.
-  // @param family Family of the model.
-  // @param momentum Momentum from the previous iteration.
-  // @param epsilon Epsilon to avoid numerical issues. Only used for binomial
-  //   and poisson.
-  // @param line_search A vector containing the line search coefficients.
-  //
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   \code{hessian}, and \code{momentum}.
   Rcpp::List UpdateSenParametersSteps(const int segment_start,
                                       const unsigned int segment_end,
                                       const int i, arma::colvec momentum);
+  void UpdateStep(unsigned int t, arma::ucolvec& r_t_set,
+                  unsigned int& r_t_count, arma::colvec& cp_sets,
+                  arma::colvec& fvec);
 
   // Append a new slice to \code{hessian}.
   void UpdateHessian(arma::mat new_hessian);
@@ -238,29 +214,28 @@ class Fastcpd {
   // Update \code{theta_sum} for a specific column by adding to that column.
   void UpdateThetaSum(const unsigned int col, arma::colvec new_theta_sum);
 
-  // `act_num_` is used in Lasso and Gaussian families only.
-  arma::colvec act_num_;
+  arma::colvec active_coefficients_count_;
   double beta_;
-
-  // Adjustment to the cost function.
+  arma::mat coefficients_;
+  arma::mat coefficients_sum_;
   const std::string cost_adjustment_;
   const std::unique_ptr<Rcpp::Function> cost_function_;
   const std::unique_ptr<Rcpp::Function> cost_gradient_;
   const std::unique_ptr<Rcpp::Function> cost_hessian_;
   const bool cp_only_;
   const arma::mat data_;
+  const arma::mat data_c_;
+  const unsigned int data_c_n_cols_;
+  const unsigned int data_c_n_rows_;
+  const double* data_c_ptr_;
   const unsigned int data_n_dims_;
   const unsigned int data_n_cols_;
   const unsigned int data_n_rows_;
-
-  // `epsilon` is the epsilon to avoid numerical issues. Only used for binomial
-  // and poisson.
-  const double epsilon_;
-
-  // `error_sd` is used in Gaussian family only.
-  arma::colvec err_sd_;
+  const double epsilon_in_hessian_;
+  arma::colvec error_standard_deviation_;
   const std::string family_;
-  static const std::unordered_map<std::string, FunctionSet> family_function_map;
+  static const std::unordered_map<std::string, FunctionSet>
+      family_function_map_;
   arma::colvec (Fastcpd::*get_gradient_)(const unsigned int segment_start,
                                          const unsigned int segment_end,
                                          const arma::colvec& theta);
@@ -276,14 +251,8 @@ class Fastcpd {
   arma::cube hessian_;
   double lasso_penalty_base_;
   arma::colvec line_search_;
-
-  // `min_idx_` is the index of the minimum objective value.
-  // This value is stored to avoid reallocation of memory.
-  unsigned int min_idx_;
-
-  // `min_obj_` is the minimum objective value.
-  // This value is stored to avoid reallocation of memory.
-  double min_obj_;
+  unsigned int min_objective_function_value_index_;
+  double min_objective_function_value_;
   arma::colvec momentum_;
   const double momentum_coef_;
   const std::unique_ptr<Rcpp::Function> multiple_epochs_function_;
@@ -299,29 +268,14 @@ class Fastcpd {
   Rcpp::Clock rClock_;
   const unsigned int regression_response_count_;
   std::unique_ptr<RProgress::RProgress> rProgress_;
+  arma::mat segment_coefficients_;
   const int segment_count_;
   arma::colvec segment_indices_;
-
-  // Create a matrix to store the estimated coefficients in each segment,
-  // where each row represents estimated coefficients for a segment.
-  arma::mat segment_theta_hat_;
-
-  // `theta_hat_` stores the estimated coefficients up to the current data
-  // point.
-  arma::mat theta_hat_;
-
-  // `theta_sum` stores the sum of estimated coefficients up to the current data
-  // point.
-  arma::mat theta_sum_;
   const double trim_;
   const bool use_warm_start_;
   const double vanilla_percentage_;
   const arma::mat variance_estimate_;
   arma::mat warm_start_;
-  arma::mat zero_data_;
-  unsigned int zero_data_n_cols_;
-  unsigned int zero_data_n_rows_;
-  double* zero_data_ptr_;
   friend fastcpd::test::FastcpdTest;
 };
 

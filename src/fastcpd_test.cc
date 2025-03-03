@@ -276,7 +276,7 @@ arma::mat FastcpdTest::UpdateThetaSum(const unsigned int col,
       /* warm_start */ false);
   fastcpd_instance.CreateThetaSum(0, old_theta_sum);
   fastcpd_instance.UpdateThetaSum(0, new_theta_sum);
-  return fastcpd_instance.theta_sum_;
+  return fastcpd_instance.coefficients_sum_;
 }
 
 }  // namespace test
