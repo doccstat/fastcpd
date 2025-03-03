@@ -76,6 +76,7 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
                  const bool warm_start)
     : active_coefficients_count_(colvec(segment_count)),
       beta_(beta),
+      change_points_(zeros<colvec>(data.n_rows + 1)),
       coefficients_(mat(p, 1)),
       coefficients_sum_(mat(p, 1)),
       cost_adjustment_(cost_adjustment),
@@ -146,11 +147,13 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
         }
         return nullptr;
       }()),
+      objective_function_values_(colvec(data_n_rows_ + 1)),
       order_(order),
       parameters_count_(p),
       parameters_lower_bound_(lower),
       parameters_upper_bound_(upper),
       pruned_left_(ucolvec(data_n_rows_ + 1)),
+      pruned_set_(zeros<ucolvec>(data_n_rows_ + 1)),
       pruning_coefficient_(pruning_coef),
       r_clock_(r_clock),
       r_progress_(r_progress),
@@ -197,15 +200,10 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
 }
 
 List Fastcpd::Run() {
-  ucolvec r_t_set = zeros<ucolvec>(data_n_rows_ + 1);
-  r_t_set(1) = 1;
-  unsigned int r_t_count = 2;
-
-  colvec cp_sets = zeros<colvec>(data_n_rows_ + 1);
-  colvec fvec = zeros<vec>(data_n_rows_ + 1);
-  fvec.fill(arma::datum::inf);
-  fvec(0) = -beta_;
-  fvec(1) = GetCostValue(0, 0, 1);
+  pruned_set_(1) = 1;
+  objective_function_values_.fill(arma::datum::inf);
+  objective_function_values_(0) = -beta_;
+  objective_function_values_(1) = GetCostValue(0, 0, 1);
 
   if (family_ == "mean" && cost_adjustment_ == "MBIC") {
     double* obj = (double*)calloc(data_n_rows_ + 1, sizeof(double));
@@ -213,57 +211,54 @@ List Fastcpd::Run() {
     unsigned int i, pi;
 
     for (unsigned int t = 2; t <= data_n_rows_; t++) {
-      for (i = 0; i < r_t_count; i++) {
-        two_norm = (data_c_ptr_[t] - data_c_ptr_[r_t_set[i]]) *
-                   (data_c_ptr_[t] - data_c_ptr_[r_t_set[i]]);
+      for (i = 0; i < pruned_set_size_; i++) {
+        two_norm = (data_c_ptr_[t] - data_c_ptr_[pruned_set_[i]]) *
+                   (data_c_ptr_[t] - data_c_ptr_[pruned_set_[i]]);
         for (pi = 1; pi < parameters_count_; pi++) {
           two_norm += (data_c_ptr_[t + data_c_n_rows_ * pi] -
-                       data_c_ptr_[r_t_set[i] + data_c_n_rows_ * pi]) *
+                       data_c_ptr_[pruned_set_[i] + data_c_n_rows_ * pi]) *
                       (data_c_ptr_[t + data_c_n_rows_ * pi] -
-                       data_c_ptr_[r_t_set[i] + data_c_n_rows_ * pi]);
+                       data_c_ptr_[pruned_set_[i] + data_c_n_rows_ * pi]);
         }
-        obj[i] =
-            fvec[r_t_set[i]] +
-            ((data_c_ptr_[t + data_c_n_rows_ * parameters_count_] -
-              data_c_ptr_[r_t_set[i] + data_c_n_rows_ * parameters_count_]) -
-             two_norm / (t - r_t_set[i])) /
-                2.0 +
-            std::log(t - r_t_set[i]) / 2.0 + beta_;
+        obj[i] = objective_function_values_[pruned_set_[i]] +
+                 ((data_c_ptr_[t + data_c_n_rows_ * parameters_count_] -
+                   data_c_ptr_[pruned_set_[i] +
+                               data_c_n_rows_ * parameters_count_]) -
+                  two_norm / (t - pruned_set_[i])) /
+                     2.0 +
+                 std::log(t - pruned_set_[i]) / 2.0 + beta_;
       }
 
-      min_objective_function_value_ = obj[0];
-      min_objective_function_value_index_ = 0;
-      for (i = 1; i < r_t_count; i++) {
-        if (obj[i] < min_objective_function_value_) {
-          min_objective_function_value_ = obj[i];
-          min_objective_function_value_index_ = i;
+      objective_function_values_min_ = obj[0];
+      objective_function_values_min_index_ = 0;
+      for (i = 1; i < pruned_set_size_; i++) {
+        if (obj[i] < objective_function_values_min_) {
+          objective_function_values_min_ = obj[i];
+          objective_function_values_min_index_ = i;
         }
       }
-      fvec(t) = min_objective_function_value_;
-      cp_sets[t] = r_t_set[min_objective_function_value_index_];
+      objective_function_values_(t) = objective_function_values_min_;
+      change_points_[t] = pruned_set_[objective_function_values_min_index_];
 
       pruned_left_n_elem_ = 0;
-      for (i = 0; i < r_t_count; i++) {
+      for (i = 0; i < pruned_set_size_; i++) {
         if (obj[i] <=
-            min_objective_function_value_ + beta_ - pruning_coefficient_) {
-          r_t_set[pruned_left_n_elem_] = r_t_set[i];
+            objective_function_values_min_ + beta_ - pruning_coefficient_) {
+          pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
           pruned_left_n_elem_++;
         }
       }
-      r_t_count = pruned_left_n_elem_;
-      r_t_set[r_t_count] = t;
-      r_t_count++;
+      pruned_set_size_ = pruned_left_n_elem_;
+      pruned_set_[pruned_set_size_] = t;
+      pruned_set_size_++;
     }
   } else {
     CreateSegmentStatisticsAndSenParameters();
     for (unsigned int t = 2; t <= data_n_rows_; t++) {
-      UpdateStep(t, r_t_set, r_t_count, cp_sets, fvec);
+      UpdateStep(t);
     }
   }
-
-  List result = GetChangePointSet(cp_sets);
-
-  return result;
+  return GetChangePointSet();
 }
 
 const unordered_map<string, Fastcpd::FunctionSet>
@@ -414,14 +409,13 @@ CostResult Fastcpd::GetCostResult(const unsigned int segment_start,
   return cost_result;
 }
 
-List Fastcpd::GetChangePointSet(const colvec raw_cp_set) {
+List Fastcpd::GetChangePointSet() {
   CreateRClock(r_clock_);
-
-  colvec cp_set = UpdateChangePointSet(raw_cp_set);
+  colvec cp_set = UpdateChangePointSet();
 
   if (cp_only_) {
     return List::create(
-        Named("raw_cp_set") = raw_cp_set, Named("cp_set") = cp_set,
+        Named("raw_cp_set") = change_points_, Named("cp_set") = cp_set,
         Named("cost_values") = R_NilValue, Named("residual") = R_NilValue,
         Named("thetas") = R_NilValue);
   }
@@ -465,7 +459,7 @@ List Fastcpd::GetChangePointSet(const colvec raw_cp_set) {
       residual_next_start += cost_optim_residual.n_rows;
     }
   }
-  return List::create(Named("raw_cp_set") = raw_cp_set,
+  return List::create(Named("raw_cp_set") = change_points_,
                       Named("cp_set") = cp_set,
                       Named("cost_values") = cost_values,
                       Named("residual") = residual, Named("thetas") = thetas);
@@ -530,18 +524,18 @@ double Fastcpd::GetCostValueSen(const unsigned int segment_start,
   return cval;
 }
 
-colvec Fastcpd::GetObjectiveFunctionValues(const colvec& fvec,
-                                           const ucolvec& r_t_set,
-                                           unsigned int r_t_count,
-                                           unsigned int t) {
-  colvec cval = zeros<vec>(r_t_count);
+colvec Fastcpd::GetObjectiveFunctionValues(unsigned int t) {
+  colvec cval = zeros<vec>(pruned_set_size_);
   UpdateRClockTick("r_t_set_for_loop");
-  unsigned int loop_end = r_t_count - (vanilla_percentage_ != 1);
+  unsigned int loop_end = pruned_set_size_ - (vanilla_percentage_ != 1);
   for (unsigned int i = 0; i < loop_end; i++) {
-    cval(i) = GetCostValue(r_t_set(i), i, t);
+    cval(i) = GetCostValue(pruned_set_(i), i, t);
   }
   UpdateRClockTock("r_t_set_for_loop");
-  colvec obj = cval + fvec.rows(r_t_set.rows(0, r_t_count - 1)) + beta_;
+  colvec obj = cval +
+               objective_function_values_.rows(
+                   pruned_set_.rows(0, pruned_set_size_ - 1)) +
+               beta_;
   return obj;
 }
 
@@ -676,14 +670,14 @@ double Fastcpd::UpdateCostValue(double value, const unsigned int nrows) {
   return value + GetCostAdjustmentValue(nrows);
 }
 
-colvec Fastcpd::UpdateChangePointSet(const colvec raw_cp_set) {
+colvec Fastcpd::UpdateChangePointSet() {
   // Remove change points close to the boundaries.
   colvec cp_set = zeros<colvec>(data_n_rows_);
   int ncpts = 0;
   int last = data_n_rows_;
   while (last != 0) {
     cp_set[ncpts] = last;
-    last = raw_cp_set[last];
+    last = change_points_[last];
     ncpts += 1;
   }
   cp_set = sort(cp_set.rows(find(cp_set > 0)));
@@ -784,44 +778,42 @@ void Fastcpd::UpdateRProgressTick() {
   }
 }
 
-void Fastcpd::UpdateStep(unsigned int t, ucolvec& r_t_set,
-                         unsigned int& r_t_count, colvec& cp_sets,
-                         colvec& fvec) {
+void Fastcpd::UpdateStep(unsigned int t) {
   UpdateRClockTick("pruning");
 
   if (vanilla_percentage_ != 1) {
     UpdateSenParameters(t);
   }
 
-  colvec obj = GetObjectiveFunctionValues(fvec, r_t_set, r_t_count, t);
+  colvec obj = GetObjectiveFunctionValues(t);
 
   // The following code is the manual implementation of `index_min` function
   // in Armadillo.
-  min_objective_function_value_ = obj[0];
-  min_objective_function_value_index_ = 0;
-  for (unsigned int i = 1; i < r_t_count; i++) {
-    if (obj[i] < min_objective_function_value_) {
-      min_objective_function_value_ = obj[i];
-      min_objective_function_value_index_ = i;
+  objective_function_values_min_ = obj[0];
+  objective_function_values_min_index_ = 0;
+  for (unsigned int i = 1; i < pruned_set_size_; i++) {
+    if (obj[i] < objective_function_values_min_) {
+      objective_function_values_min_ = obj[i];
+      objective_function_values_min_index_ = i;
     }
   }
-  fvec(t) = min_objective_function_value_;
-  cp_sets[t] = r_t_set[min_objective_function_value_index_];
+  objective_function_values_(t) = objective_function_values_min_;
+  change_points_[t] = pruned_set_[objective_function_values_min_index_];
 
   // The following code is the manual implementation of `find` function in
   // Armadillo.
   pruned_left_n_elem_ = 0;
-  for (unsigned int i = 0; i < r_t_count; i++) {
+  for (unsigned int i = 0; i < pruned_set_size_; i++) {
     if (obj[i] <=
-        min_objective_function_value_ + beta_ - pruning_coefficient_) {
-      r_t_set[pruned_left_n_elem_] = r_t_set[i];
+        objective_function_values_min_ + beta_ - pruning_coefficient_) {
+      pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
       pruned_left_[pruned_left_n_elem_] = i;
       pruned_left_n_elem_++;
     }
   }
-  r_t_count = pruned_left_n_elem_;
-  r_t_set[r_t_count] = t;
-  r_t_count++;
+  pruned_set_size_ = pruned_left_n_elem_;
+  pruned_set_[pruned_set_size_] = t;
+  pruned_set_size_++;
 
   if (vanilla_percentage_ != 1) {
     UpdateThetaHat(pruned_left_.rows(0, pruned_left_n_elem_ - 1));

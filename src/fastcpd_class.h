@@ -39,8 +39,8 @@ class Fastcpd {
                                       const unsigned int segment_end,
                                       const arma::colvec& theta);
     arma::mat (Fastcpd::*hessian)(const unsigned int segment_start,
-                                   const unsigned int segment_end,
-                                   const arma::colvec& theta);
+                                  const unsigned int segment_end,
+                                  const arma::colvec& theta);
     double (Fastcpd::*nll_sen)(const unsigned int segment_start,
                                const unsigned int segment_end,
                                arma::colvec theta);
@@ -69,7 +69,7 @@ class Fastcpd {
                            Rcpp::Nullable<arma::colvec> theta,
                            const bool cv = false,
                            Rcpp::Nullable<arma::colvec> start = R_NilValue);
-  Rcpp::List GetChangePointSet(const arma::colvec raw_cp_set);
+  Rcpp::List GetChangePointSet();
   double GetCostValue(const int tau, const unsigned int i, const int t);
   double GetCostValuePelt(const unsigned int segment_start,
                           const unsigned int segment_end, const unsigned int i);
@@ -153,16 +153,13 @@ class Fastcpd {
                      const unsigned int segment_end, arma::colvec theta);
   double GetNllSenPoisson(const unsigned int segment_start,
                           const unsigned int segment_end, arma::colvec theta);
-  arma::colvec GetObjectiveFunctionValues(const arma::colvec& fvec,
-                                          const arma::ucolvec& r_t_set,
-                                          unsigned int r_t_count,
-                                          unsigned int t);
+  arma::colvec GetObjectiveFunctionValues(unsigned int t);
   CostResult GetOptimizedCostResult(const unsigned int segment_start,
                                     const unsigned int segment_end);
 
   // Adjust cost value for MBIC and MDL.
   double UpdateCostValue(double value, const unsigned int nrows);
-  arma::colvec UpdateChangePointSet(const arma::colvec raw_cp_set);
+  arma::colvec UpdateChangePointSet();
 
   // Append new values to \code{fastcpd_parameters}.
   void UpdateSenParameters(const unsigned int t);
@@ -178,9 +175,7 @@ class Fastcpd {
   Rcpp::List UpdateSenParametersSteps(const int segment_start,
                                       const unsigned int segment_end,
                                       const int i, arma::colvec momentum);
-  void UpdateStep(unsigned int t, arma::ucolvec& r_t_set,
-                  unsigned int& r_t_count, arma::colvec& cp_sets,
-                  arma::colvec& fvec);
+  void UpdateStep(unsigned int t);
 
   // Append a new slice to \code{hessian}.
   void UpdateHessian(arma::mat new_hessian);
@@ -216,6 +211,7 @@ class Fastcpd {
 
   arma::colvec active_coefficients_count_;
   double beta_;
+  arma::colvec change_points_;
   arma::mat coefficients_;
   arma::mat coefficients_sum_;
   const std::string cost_adjustment_;
@@ -251,17 +247,20 @@ class Fastcpd {
   arma::cube hessian_;
   double lasso_penalty_base_;
   arma::colvec line_search_;
-  unsigned int min_objective_function_value_index_;
-  double min_objective_function_value_;
   arma::colvec momentum_;
   const double momentum_coef_;
   const std::unique_ptr<Rcpp::Function> multiple_epochs_function_;
+  arma::colvec objective_function_values_;
+  double objective_function_values_min_;
+  unsigned int objective_function_values_min_index_;
   const arma::colvec order_;
   const unsigned int parameters_count_;
   const arma::colvec parameters_lower_bound_;
   const arma::colvec parameters_upper_bound_;
   arma::ucolvec pruned_left_;
   unsigned int pruned_left_n_elem_;
+  arma::ucolvec pruned_set_;
+  unsigned int pruned_set_size_ = 2;
   const double pruning_coefficient_;
   const std::string r_clock_;
   const bool r_progress_;
