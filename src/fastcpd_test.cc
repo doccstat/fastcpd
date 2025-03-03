@@ -197,8 +197,8 @@ double FastcpdTest::GetNllSen(const arma::mat& data,
       /* vanilla_percentage */ 0.0,
       /* variance_estimate */ arma::mat(),
       /* warm_start */ false);
-  return (fastcpd_instance.*fastcpd_instance.GetNllSen)(segment_start,
-                                                        segment_end, theta);
+  return (fastcpd_instance.*fastcpd_instance.get_nll_sen_)(segment_start,
+                                                           segment_end, theta);
 }
 
 //------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ fastcpd::classes::CostResult FastcpdTest::GetNllPelt(
       /* vanilla_percentage */ 0.0,
       /* variance_estimate */ arma::mat(),
       /* warm_start */ false);
-  return (fastcpd_instance.*fastcpd_instance.GetNllPelt)(
+  return (fastcpd_instance.*fastcpd_instance.get_nll_pelt_)(
       segment_start, segment_end, cv, start);
 }
 
@@ -276,7 +276,7 @@ arma::mat FastcpdTest::UpdateThetaSum(const unsigned int col,
       /* warm_start */ false);
   fastcpd_instance.CreateThetaSum(0, old_theta_sum);
   fastcpd_instance.UpdateThetaSum(0, new_theta_sum);
-  return fastcpd_instance.theta_sum;
+  return fastcpd_instance.theta_sum_;
 }
 
 }  // namespace test
