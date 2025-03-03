@@ -76,7 +76,7 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
                  const bool warm_start)
     : act_num_(colvec(segment_count)),
       beta_(beta),
-      cost_([&]() -> unique_ptr<Function> {
+      cost_function_([&]() -> unique_ptr<Function> {
         if (family == "custom") {
           return make_unique<Function>(cost);
         }
@@ -555,7 +555,7 @@ CostResult Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
                                 Named("theta") = std::log(theta / (1 - theta)));
                   }),
               Named("method") = "Brent", Named("lower") = 0, Named("upper") = 1,
-              Named("data") = data_segment, Named("cost") = *cost_);
+              Named("data") = data_segment, Named("cost") = *cost_function_);
     colvec par = as<colvec>(optim_result["par"]);
     double value = as<double>(optim_result["value"]);
     cost_result = {
@@ -564,9 +564,9 @@ CostResult Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
     List optim_result = optim(
-        Named("par") = zeros<vec>(parameters_count_), Named("fn") = *cost_,
-        Named("method") = "L-BFGS-B", Named("data") = data_segment,
-        Named("lower") = parameters_lower_bound_,
+        Named("par") = zeros<vec>(parameters_count_),
+        Named("fn") = *cost_function_, Named("method") = "L-BFGS-B",
+        Named("data") = data_segment, Named("lower") = parameters_lower_bound_,
         Named("upper") = parameters_upper_bound_);
     cost_result = {
         {as<colvec>(optim_result["par"])}, {colvec()}, optim_result["value"]};

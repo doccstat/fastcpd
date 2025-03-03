@@ -172,31 +172,20 @@ class Fastcpd {
                                           const arma::ucolvec& r_t_set,
                                           unsigned int r_t_count,
                                           unsigned int t);
-
-  // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
-  //
-  // @param data_segment A data frame containing a segment of the data.
-  //
-  // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
-  //   and \code{hessian}.
   CostResult GetOptimizedCostResult(const unsigned int segment_start,
                                     const unsigned int segment_end);
-
   void Step(unsigned int t, arma::ucolvec& r_t_set, unsigned int& r_t_count,
             arma::colvec& cp_sets, arma::colvec& fvec);
 
   // Adjust cost value for MBIC and MDL.
   double UpdateCostValue(double value, const unsigned int nrows);
-
   arma::colvec UpdateChangePointSet(const arma::colvec raw_cp_set);
 
   // Append new values to \code{fastcpd_parameters}.
   void UpdateSenParameters(const unsigned int t);
-
   void UpdateSenParameters(const unsigned int segment_start,
                            const unsigned int segment_end,
                            const unsigned int i);
-
   void UpdateSenParametersStep(const int segment_start, const int segment_end,
                                const int i);
 
@@ -226,11 +215,7 @@ class Fastcpd {
   // Update \code{hessian} for a specific slice.
   void UpdateHessian(const unsigned int slice, arma::mat new_hessian);
   void UpdateMomentum(arma::colvec new_momentum);
-
-  // Start the clock tick for `name`.
   void UpdateRClockTick(const std::string name);
-
-  // Stop the clock tick for `name`.
   void UpdateRClockTock(const std::string name);
   void UpdateRProgressStart();
   void UpdateRProgressTick();
@@ -257,16 +242,10 @@ class Fastcpd {
   arma::colvec act_num_;
   double beta_;
 
-  // `cost` is the cost function to be used.
-  const std::unique_ptr<Rcpp::Function> cost_;
-
   // Adjustment to the cost function.
   const std::string cost_adjustment_;
-
-  // `cost_gradient_` is the gradient of the cost function to be used.
+  const std::unique_ptr<Rcpp::Function> cost_function_;
   const std::unique_ptr<Rcpp::Function> cost_gradient_;
-
-  // `cost_hessian_` is the Hessian of the cost function to be used.
   const std::unique_ptr<Rcpp::Function> cost_hessian_;
   const bool cp_only_;
   const arma::mat data_;
@@ -281,6 +260,7 @@ class Fastcpd {
   // `error_sd` is used in Gaussian family only.
   arma::colvec err_sd_;
   const std::string family_;
+  static const std::unordered_map<std::string, FunctionSet> family_function_map;
   arma::colvec (Fastcpd::*get_gradient_)(const unsigned int segment_start,
                                          const unsigned int segment_end,
                                          const arma::colvec& theta);
@@ -317,8 +297,8 @@ class Fastcpd {
   const std::string r_clock_;
   const bool r_progress_;
   Rcpp::Clock rClock_;
-  std::unique_ptr<RProgress::RProgress> rProgress_;
   const unsigned int regression_response_count_;
+  std::unique_ptr<RProgress::RProgress> rProgress_;
   const int segment_count_;
   arma::colvec segment_indices_;
 
@@ -334,12 +314,9 @@ class Fastcpd {
   // point.
   arma::mat theta_sum_;
   const double trim_;
-
-  // Static mapping from family names to their function sets
-  static const std::unordered_map<std::string, FunctionSet> family_function_map;
+  const bool use_warm_start_;
   const double vanilla_percentage_;
   const arma::mat variance_estimate_;
-  const bool use_warm_start_;
   arma::mat warm_start_;
   arma::mat zero_data_;
   unsigned int zero_data_n_cols_;
