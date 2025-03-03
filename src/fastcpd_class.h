@@ -9,10 +9,14 @@
 #include "RProgress.h"
 #include "RcppClock.h"
 
+using ::arma::colvec;
 using ::arma::cube;
+using ::arma::mat;
+using ::arma::rowvec;
 using ::arma::ucolvec;
 using ::Rcpp::Function;
 using ::Rcpp::List;
+using ::Rcpp::Nullable;
 using ::std::string;
 using ::std::string_view;
 using ::std::unique_ptr;
@@ -41,14 +45,14 @@ class Fastcpd {
           const double vanilla_percentage, const mat variance_estimate,
           const bool warm_start);
 
-  List run();
+  List Run();
 
  private:
-  struct GetFunctionSet {
+  struct FunctionSet {
     colvec (Fastcpd::*gradient)(const unsigned int segment_start,
                                 const unsigned int segment_end,
                                 const colvec& theta);
-    mat (Fastcpd::*hessian)(const unsigned int segment_start,
+    mat (Fastcpd::*hessian_)(const unsigned int segment_start,
                             const unsigned int segment_end,
                             const colvec& theta);
     double (Fastcpd::*nll_sen)(const unsigned int segment_start,
@@ -59,8 +63,237 @@ class Fastcpd {
                                     const Nullable<colvec>& start);
   };
 
-  // `act_num` is used in Lasso and Gaussian families only.
-  colvec act_num;
+  // Stop the clock and create an R object with `name`.
+  void CreateRClock(const std::string name);
+
+  // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
+  void CreateSenParameters();
+
+  // Initialize theta_hat_t_t to be the estimate in the segment.
+  void CreateSegmentStatistics();
+
+  // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian} and
+  // theta_hat_t_t to be the estimate in the segment.
+  void CreateSegmentStatisticsAndSenParameters();
+
+  // Set \code{theta_sum} for a specific column.
+  void CreateThetaSum(const unsigned int col, colvec new_theta_sum);
+
+  double GetCostAdjustmentValue(const unsigned nrows);
+
+  // Solve logistic/poisson regression using Gradient Descent Extension to the
+  // multivariate case
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param theta Estimate of the parameters. If null, the function will
+  //   estimate the parameters.
+  // @param lambda Lambda for L1 regularization. Only used for lasso.
+  // @param cv Whether to perform cross-validation to find the best lambda.
+  // @param start Starting point for the optimization for warm start.
+  //   only used in mean change and lm.
+  //
+  // @return Negative log likelihood of the corresponding data with the given
+  //   family.
+  CostResult GetCostResult(const unsigned int segment_start,
+                             const unsigned int segment_end,
+                             Nullable<colvec> theta, const bool cv = false,
+                             Nullable<colvec> start = R_NilValue);
+
+  List GetChangePointSet(const colvec raw_cp_set);
+
+  double GetCostValue(const int tau, const unsigned int i, const int t);
+
+  double GetCostValuePelt(const unsigned int segment_start,
+                       const unsigned int segment_end, const unsigned int i);
+
+  double GetCostValueSen(const unsigned int segment_start,
+                      const unsigned int segment_end, const unsigned int i);
+
+  colvec GetGradientArma(const unsigned int segment_start,
+                         const unsigned int segment_end, const colvec& theta);
+
+  colvec GetGradientBinomial(const unsigned int segment_start,
+                             const unsigned int segment_end,
+                             const colvec& theta);
+
+  colvec GetGradientCustom(const unsigned int segment_start,
+                           const unsigned int segment_end, const colvec& theta);
+
+  colvec GetGradientLm(const unsigned int segment_start,
+                       const unsigned int segment_end, const colvec& theta);
+
+  colvec GetGradientMa(const unsigned int segment_start,
+                       const unsigned int segment_end, const colvec& theta);
+
+  colvec GetGradientPoisson(const unsigned int segment_start,
+                              const unsigned int segment_end,
+                              const colvec& theta);
+
+  mat GetHessianArma(const unsigned int segment_start,
+                     const unsigned int segment_end, const colvec& theta);
+
+  mat GetHessianBinomial(const unsigned int segment_start,
+                         const unsigned int segment_end, const colvec& theta);
+
+  mat GetHessianCustom(const unsigned int segment_start,
+                       const unsigned int segment_end, const colvec& theta);
+
+  mat GetHessianLm(const unsigned int segment_start,
+                     const unsigned int segment_end, const colvec& theta);
+
+  mat GetHessianMa(const unsigned int segment_start,
+                   const unsigned int segment_end, const colvec& theta);
+
+  mat GetHessianPoisson(const unsigned int segment_start,
+                        const unsigned int segment_end, const colvec& theta);
+
+  CostResult GetNllPeltArma(const unsigned int segment_start,
+                            const unsigned int segment_end, const bool cv,
+                            const Nullable<colvec>& start);
+
+  CostResult GetNllPeltCustom(const unsigned int segment_start,
+                              const unsigned int segment_end, const bool cv,
+                              const Nullable<colvec>& start);
+
+  CostResult GetNllPeltGarch(const unsigned int segment_start,
+                                const unsigned int segment_end, const bool cv,
+                                const Nullable<colvec>& start);
+
+  CostResult GetNllPeltGlm(const unsigned int segment_start,
+                           const unsigned int segment_end, const bool cv,
+                           const Nullable<colvec>& start);
+
+  CostResult GetNllPeltLasso(const unsigned int segment_start,
+                                const unsigned int segment_end, const bool cv,
+                                const Nullable<colvec>& start);
+  CostResult GetNllPeltMean(const unsigned int segment_start,
+                               const unsigned int segment_end, const bool cv,
+                               const Nullable<colvec>& start);
+
+  CostResult GetNllPeltMeanVariance(const unsigned int segment_start,
+                                       const unsigned int segment_end,
+                                       const bool cv,
+                                       const Nullable<colvec>& start);
+
+  CostResult GetNllPeltMgaussian(const unsigned int segment_start,
+                                    const unsigned int segment_end,
+                                    const bool cv,
+                                    const Nullable<colvec>& start);
+
+  CostResult GetNllPeltVariance(const unsigned int segment_start,
+                                   const unsigned int segment_end,
+                                   const bool cv,
+                                   const Nullable<colvec>& start);
+
+  double GetNllSenArma(const unsigned int segment_start,
+                       const unsigned int segment_end, colvec theta);
+
+  double GetNllSenBinomial(const unsigned int segment_start,
+                           const unsigned int segment_end, colvec theta);
+
+  double GetNllSenCustom(const unsigned int segment_start,
+                            const unsigned int segment_end, colvec theta);
+
+  double GetNllSenLasso(const unsigned int segment_start,
+                           const unsigned int segment_end, colvec theta);
+
+  double GetNllSenLm(const unsigned int segment_start,
+                        const unsigned int segment_end, colvec theta);
+
+  double GetNllSenMa(const unsigned int segment_start,
+                        const unsigned int segment_end, colvec theta);
+
+  double GetNllSenPoisson(const unsigned int segment_start,
+                             const unsigned int segment_end, colvec theta);
+
+  colvec GetObjectiveFunctionValues(const colvec& fvec, const ucolvec& r_t_set,
+                 unsigned int r_t_count, unsigned int t);
+
+  // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
+  //
+  // @param data_segment A data frame containing a segment of the data.
+  //
+  // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
+  //   and \code{hessian}.
+  CostResult GetOptimizedCostResult(const unsigned int segment_start,
+                                const unsigned int segment_end);
+
+  // Adjust cost value for MBIC and MDL.
+  double UpdateCostValue(double value, const unsigned int nrows);
+
+  colvec UpdateChangePointSet(const colvec raw_cp_set);
+
+  // Append new values to \code{fastcpd_parameters}.
+  void UpdateSenParameters(const unsigned int t);
+
+  void UpdateSenParameters(const unsigned int segment_start,
+                              const unsigned int segment_end,
+                              const unsigned int i);
+
+  void UpdateSenParametersStep(const int segment_start,
+                                   const int segment_end, const int i);
+
+  // Update the cost values for the segmentation.
+  //
+  // @param data A data frame containing the data to be segmented.
+  // @param tau Start of the current segment.
+  // @param i Index of the current data in the whole data set.
+  // @param family Family of the model.
+  // @param momentum Momentum from the previous iteration.
+  // @param epsilon Epsilon to avoid numerical issues. Only used for binomial
+  //   and poisson.
+  // @param line_search A vector containing the line search coefficients.
+  //
+  // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
+  //   \code{hessian}, and \code{momentum}.
+  List UpdateSenParametersSteps(const int segment_start,
+                                    const unsigned int segment_end, const int i,
+                                    colvec momentum);
+
+  // Append a new slice to \code{hessian}.
+  void UpdateHessian(mat new_hessian);
+
+  // Prune the slices of \code{hessian}.
+  void UpdateHessian(ucolvec pruned_left);
+
+  // Update \code{hessian} for a specific slice.
+  void UpdateHessian(const unsigned int slice, mat new_hessian);
+
+  // Update \code{momentum}.
+  void UpdateMomentum(colvec new_momentum);
+
+  // Start the clock tick for `name`.
+  void UpdateRClockTick(const std::string name);
+
+  // Stop the clock tick for `name`.
+  void UpdateRClockTock(const std::string name);
+
+  void UpdateRProgressStart();
+  void UpdateRProgressTick();
+
+  void Step(unsigned int t, ucolvec& r_t_set, unsigned int& r_t_count,
+                   colvec& cp_sets, colvec& fvec);
+
+  // Append a new column to \code{theta_hat}.
+  void UpdateThetaHat(colvec new_theta_hat);
+
+  // Prune the columns of \code{theta_hat}.
+  void UpdateThetaHat(ucolvec pruned_left);
+
+  // Update \code{theta_hat} for a specific column.
+  void UpdateThetaHat(const unsigned int col, colvec new_theta_hat);
+
+  // Append a new column to \code{theta_sum}.
+  void UpdateThetaSum(colvec new_theta_sum);
+
+  // Prune the columns of \code{theta_sum}.
+  void UpdateThetaSum(ucolvec pruned_left);
+
+  // Update \code{theta_sum} for a specific column by adding to that column.
+  void UpdateThetaSum(const unsigned int col, colvec new_theta_sum);
+
+  // `act_num_` is used in Lasso and Gaussian families only.
+  colvec act_num_;
 
   // `beta` is the initial cost value.
   double beta;
@@ -77,7 +310,7 @@ class Fastcpd {
   // `cost_hessian` is the Hessian of the cost function to be used.
   const unique_ptr<Function> cost_hessian;
 
-  const bool cp_only;
+  const bool cp_only_;
 
   // Dimension of the data.
   const unsigned int d;
@@ -86,17 +319,17 @@ class Fastcpd {
   const mat data;
 
   // The number of data points.
-  const unsigned int data_n_rows;
+  const unsigned int data_n_rows_;
 
   // The number of data columns.
-  const unsigned int data_n_cols;
+  const unsigned int data_n_cols_;
 
   // `epsilon` is the epsilon to avoid numerical issues. Only used for binomial
   // and poisson.
   const double epsilon;
 
   // `error_sd` is used in Gaussian family only.
-  colvec err_sd;
+  colvec err_sd_;
 
   // `family` is the family of the model.
   const string family;
@@ -109,9 +342,9 @@ class Fastcpd {
   // @param order Order of the time series models.
   //
   // @return Gradient at the current data.
-  colvec (Fastcpd::*get_gradient)(const unsigned int segment_start,
-                                  const unsigned int segment_end,
-                                  const colvec& theta);
+  colvec (Fastcpd::*GetGradient)(const unsigned int segment_start,
+                                 const unsigned int segment_end,
+                                 const colvec& theta);
 
   // Function to calculate the Hessian matrix at the current data.
   //
@@ -119,20 +352,20 @@ class Fastcpd {
   // @param theta Estimated theta from the previous iteration.
   //
   // @return Hessian at the current data.
-  mat (Fastcpd::*get_hessian)(const unsigned int segment_start,
-                              const unsigned int segment_end,
-                              const colvec& theta);
+  mat (Fastcpd::*GetHessian)(const unsigned int segment_start,
+                             const unsigned int segment_end,
+                             const colvec& theta);
 
-  CostResult (Fastcpd::*get_nll_pelt)(const unsigned int segment_start,
-                                      const unsigned int segment_end,
-                                      const bool cv,
-                                      const Nullable<colvec>& start);
+  CostResult (Fastcpd::*GetNllPelt)(const unsigned int segment_start,
+                                    const unsigned int segment_end,
+                                    const bool cv,
+                                    const Nullable<colvec>& start);
 
-  double (Fastcpd::*get_nll_sen)(const unsigned int segment_start,
-                                 const unsigned int segment_end, colvec theta);
+  double (Fastcpd::*GetNllSen)(const unsigned int segment_start,
+                               const unsigned int segment_end, colvec theta);
 
-  // `hessian` stores the Hessian matrix up to the current data point.
-  cube hessian;
+  // `hessian_` stores the Hessian matrix up to the current data point.
+  cube hessian_;
 
   // `lambda` is the lambda for L1 regularization. Only used for lasso. This
   // parameter stores the penalty without the segment length scaling.
@@ -151,10 +384,10 @@ class Fastcpd {
   // This value is stored to avoid reallocation of memory.
   double min_obj;
 
-  // Momentum will be used in the update step if `momentum_coef` is not 0.
+  // Momentum will be used in the update step if `momentum_coef_` is not 0.
   colvec momentum;
 
-  const double momentum_coef;
+  const double momentum_coef_;
 
   const unique_ptr<Function> multiple_epochs_function;
 
@@ -202,7 +435,7 @@ class Fastcpd {
   const double trim;
 
   // Static mapping from family names to their function sets
-  static const unordered_map<string, GetFunctionSet> family_function_map;
+  static const unordered_map<string, FunctionSet> family_function_map;
 
   // Upper bound of the parameters to be estimated during the optimization.
   const colvec upper;
@@ -215,245 +448,10 @@ class Fastcpd {
 
   mat zero_data;
 
-  unsigned int zero_data_n_cols;
-  unsigned int zero_data_n_rows;
+  unsigned int zero_data_n_cols_;
+  unsigned int zero_data_n_rows_;
 
   double* zero_data_ptr;
-
-  // Stop the clock and create an R object with `name`.
-  void create_clock_in_r(const std::string name);
-
-  // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
-  void create_gradients();
-
-  // Initialize theta_hat_t_t to be the estimate in the segment.
-  void create_segment_statistics();
-
-  // Initialize \code{theta_hat}, \code{theta_sum}, and \code{hessian} and
-  // theta_hat_t_t to be the estimate in the segment.
-  void create_statistics_and_gradients();
-
-  // Set \code{theta_sum} for a specific column.
-  void create_theta_sum(const unsigned int col, colvec new_theta_sum);
-
-  double get_cost_adjustment_value(const unsigned nrows);
-
-  // Solve logistic/poisson regression using Gradient Descent Extension to the
-  // multivariate case
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param theta Estimate of the parameters. If null, the function will
-  //   estimate the parameters.
-  // @param lambda Lambda for L1 regularization. Only used for lasso.
-  // @param cv Whether to perform cross-validation to find the best lambda.
-  // @param start Starting point for the optimization for warm start.
-  //   only used in mean change and lm.
-  //
-  // @return Negative log likelihood of the corresponding data with the given
-  //   family.
-  CostResult get_cost_result(const unsigned int segment_start,
-                             const unsigned int segment_end,
-                             Nullable<colvec> theta, const bool cv = false,
-                             Nullable<colvec> start = R_NilValue);
-
-  List get_cp_set(const colvec raw_cp_set);
-
-  double get_cval(const int tau, const unsigned int i, const int t);
-
-  double get_cval_pelt(const unsigned int segment_start,
-                       const unsigned int segment_end, const unsigned int i);
-
-  double get_cval_sen(const unsigned int segment_start,
-                      const unsigned int segment_end, const unsigned int i);
-
-  colvec get_gradient_arma(const unsigned int segment_start,
-                           const unsigned int segment_end, const colvec& theta);
-
-  colvec get_gradient_binomial(const unsigned int segment_start,
-                               const unsigned int segment_end,
-                               const colvec& theta);
-
-  colvec get_gradient_custom(const unsigned int segment_start,
-                             const unsigned int segment_end,
-                             const colvec& theta);
-
-  colvec get_gradient_lm(const unsigned int segment_start,
-                         const unsigned int segment_end, const colvec& theta);
-
-  colvec get_gradient_ma(const unsigned int segment_start,
-                         const unsigned int segment_end, const colvec& theta);
-
-  colvec get_gradient_poisson(const unsigned int segment_start,
-                              const unsigned int segment_end,
-                              const colvec& theta);
-
-  mat get_hessian_arma(const unsigned int segment_start,
-                       const unsigned int segment_end, const colvec& theta);
-
-  mat get_hessian_binomial(const unsigned int segment_start,
-                           const unsigned int segment_end, const colvec& theta);
-
-  mat get_hessian_custom(const unsigned int segment_start,
-                         const unsigned int segment_end, const colvec& theta);
-
-  mat get_hessian_lm(const unsigned int segment_start,
-                     const unsigned int segment_end, const colvec& theta);
-
-  mat get_hessian_ma(const unsigned int segment_start,
-                     const unsigned int segment_end, const colvec& theta);
-
-  mat get_hessian_poisson(const unsigned int segment_start,
-                          const unsigned int segment_end, const colvec& theta);
-
-  CostResult get_nll_pelt_arma(const unsigned int segment_start,
-                               const unsigned int segment_end, const bool cv,
-                               const Nullable<colvec>& start);
-
-  CostResult get_nll_pelt_custom(const unsigned int segment_start,
-                                 const unsigned int segment_end, const bool cv,
-                                 const Nullable<colvec>& start);
-
-  CostResult get_nll_pelt_garch(const unsigned int segment_start,
-                                const unsigned int segment_end, const bool cv,
-                                const Nullable<colvec>& start);
-
-  CostResult get_nll_pelt_glm(const unsigned int segment_start,
-                              const unsigned int segment_end, const bool cv,
-                              const Nullable<colvec>& start);
-
-  CostResult get_nll_pelt_lasso(const unsigned int segment_start,
-                                const unsigned int segment_end, const bool cv,
-                                const Nullable<colvec>& start);
-  CostResult get_nll_pelt_mean(const unsigned int segment_start,
-                               const unsigned int segment_end, const bool cv,
-                               const Nullable<colvec>& start);
-
-  CostResult get_nll_pelt_meanvariance(const unsigned int segment_start,
-                                       const unsigned int segment_end,
-                                       const bool cv,
-                                       const Nullable<colvec>& start);
-
-  CostResult get_nll_pelt_mgaussian(const unsigned int segment_start,
-                                    const unsigned int segment_end,
-                                    const bool cv,
-                                    const Nullable<colvec>& start);
-
-  CostResult get_nll_pelt_variance(const unsigned int segment_start,
-                                   const unsigned int segment_end,
-                                   const bool cv,
-                                   const Nullable<colvec>& start);
-
-  double get_nll_sen_arma(const unsigned int segment_start,
-                          const unsigned int segment_end, colvec theta);
-
-  double get_nll_sen_binomial(const unsigned int segment_start,
-                              const unsigned int segment_end, colvec theta);
-
-  double get_nll_sen_custom(const unsigned int segment_start,
-                            const unsigned int segment_end, colvec theta);
-
-  double get_nll_sen_lasso(const unsigned int segment_start,
-                           const unsigned int segment_end, colvec theta);
-
-  double get_nll_sen_lm(const unsigned int segment_start,
-                        const unsigned int segment_end, colvec theta);
-
-  double get_nll_sen_ma(const unsigned int segment_start,
-                        const unsigned int segment_end, colvec theta);
-
-  double get_nll_sen_poisson(const unsigned int segment_start,
-                             const unsigned int segment_end, colvec theta);
-
-  colvec get_obj(const colvec& fvec, const ucolvec& r_t_set,
-                 unsigned int r_t_count, unsigned int t);
-
-  // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
-  //
-  // @param data_segment A data frame containing a segment of the data.
-  //
-  // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
-  //   and \code{hessian}.
-  CostResult get_optimized_cost(const unsigned int segment_start,
-                                const unsigned int segment_end);
-
-  void update_cost_parameters(const unsigned int segment_start,
-                              const unsigned int segment_end,
-                              const unsigned int i);
-
-  void update_cost_parameters_step(const int segment_start,
-                                   const int segment_end, const int i);
-
-  // Update the cost values for the segmentation.
-  //
-  // @param data A data frame containing the data to be segmented.
-  // @param tau Start of the current segment.
-  // @param i Index of the current data in the whole data set.
-  // @param family Family of the model.
-  // @param momentum Momentum from the previous iteration.
-  // @param epsilon Epsilon to avoid numerical issues. Only used for binomial
-  //   and poisson.
-  // @param line_search A vector containing the line search coefficients.
-  //
-  // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
-  //   \code{hessian}, and \code{momentum}.
-  List update_cost_parameters_steps(const int segment_start,
-                                    const unsigned int segment_end, const int i,
-                                    colvec momentum);
-
-  // Adjust cost value for MBIC and MDL.
-  double update_cost_value(double value, const unsigned int nrows);
-
-  colvec update_cp_set(const colvec raw_cp_set);
-
-  // Update `err_sd` for a specific segment.
-  void update_err_sd(const unsigned int segment_index, const double err_var);
-
-  // Append new values to \code{fastcpd_parameters}.
-  void update_fastcpd_parameters(const unsigned int t);
-
-  // Append a new slice to \code{hessian}.
-  void update_hessian(mat new_hessian);
-
-  // Prune the slices of \code{hessian}.
-  void update_hessian(ucolvec pruned_left);
-
-  // Update \code{hessian} for a specific slice.
-  void update_hessian(const unsigned int slice, mat new_hessian);
-
-  // Update \code{momentum}.
-  void update_momentum(colvec new_momentum);
-
-  // Start the clock tick for `name`.
-  void update_r_clock_tick(const std::string name);
-
-  // Stop the clock tick for `name`.
-  void update_r_clock_tock(const std::string name);
-
-  void update_r_progress_start();
-  void update_r_progress_tick();
-
-  void update_start(const unsigned int col, const colvec start_col);
-
-  void update_step(unsigned int t, ucolvec& r_t_set, unsigned int& r_t_count,
-                   colvec& cp_sets, colvec& fvec);
-
-  // Append a new column to \code{theta_hat}.
-  void update_theta_hat(colvec new_theta_hat);
-
-  // Prune the columns of \code{theta_hat}.
-  void update_theta_hat(ucolvec pruned_left);
-
-  // Update \code{theta_hat} for a specific column.
-  void update_theta_hat(const unsigned int col, colvec new_theta_hat);
-
-  // Append a new column to \code{theta_sum}.
-  void update_theta_sum(colvec new_theta_sum);
-
-  // Prune the columns of \code{theta_sum}.
-  void update_theta_sum(ucolvec pruned_left);
-
-  // Update \code{theta_sum} for a specific column by adding to that column.
-  void update_theta_sum(const unsigned int col, colvec new_theta_sum);
 
   friend FastcpdTest;
 };
