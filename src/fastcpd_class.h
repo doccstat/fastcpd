@@ -260,20 +260,20 @@ class Fastcpd {
   // `act_num_` is used in Lasso and Gaussian families only.
   arma::colvec act_num_;
 
-  // `beta` is the initial cost value.
-  double beta;
+  // `beta_` is the initial cost value.
+  double beta_;
 
   // `cost` is the cost function to be used.
-  const std::unique_ptr<Rcpp::Function> cost;
+  const std::unique_ptr<Rcpp::Function> cost_;
 
   // Adjustment to the cost function.
   const std::string cost_adjustment;
 
-  // `cost_gradient` is the gradient of the cost function to be used.
-  const std::unique_ptr<Rcpp::Function> cost_gradient;
+  // `cost_gradient_` is the gradient of the cost function to be used.
+  const std::unique_ptr<Rcpp::Function> cost_gradient_;
 
-  // `cost_hessian` is the Hessian of the cost function to be used.
-  const std::unique_ptr<Rcpp::Function> cost_hessian;
+  // `cost_hessian_` is the Hessian of the cost function to be used.
+  const std::unique_ptr<Rcpp::Function> cost_hessian_;
 
   const bool cp_only_;
 
@@ -281,7 +281,7 @@ class Fastcpd {
   const unsigned int d;
 
   // `data` is the data set to be segmented.
-  const arma::mat data;
+  const arma::mat data_;
 
   // The number of data points.
   const unsigned int data_n_rows_;
@@ -340,22 +340,20 @@ class Fastcpd {
   // Lower bound of the parameters to be estimated during the optimization.
   const arma::colvec lower;
 
-  // `min_idx` is the index of the minimum objective value.
+  // `min_idx_` is the index of the minimum objective value.
   // This value is stored to avoid reallocation of memory.
-  unsigned int min_idx;
+  unsigned int min_idx_;
 
-  // `min_obj` is the minimum objective value.
+  // `min_obj_` is the minimum objective value.
   // This value is stored to avoid reallocation of memory.
-  double min_obj;
+  double min_obj_;
 
   // Momentum will be used in the update step if `momentum_coef_` is not 0.
   arma::colvec momentum_;
   const double momentum_coef_;
-  const std::unique_ptr<Rcpp::Function> multiple_epochs_function;
-  const arma::colvec order;
-
-  // `p` is the number of parameters to be estimated.
-  const unsigned int p;
+  const std::unique_ptr<Rcpp::Function> multiple_epochs_function_;
+  const arma::colvec order_;
+  const unsigned int parameters_count_;
 
   // Number of response variables in regression.
   const unsigned int p_response;
