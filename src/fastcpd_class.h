@@ -9,58 +9,44 @@
 #include "RProgress.h"
 #include "RcppClock.h"
 
-using ::arma::colvec;
-using ::arma::cube;
-using ::arma::mat;
-using ::arma::rowvec;
-using ::arma::ucolvec;
-using ::Rcpp::Function;
-using ::Rcpp::List;
-using ::Rcpp::Nullable;
-using ::std::string;
-using ::std::string_view;
-using ::std::unique_ptr;
-using ::std::unordered_map;
-using ::std::vector;
-
-using ::fastcpd::test::FastcpdTest;
-
 constexpr char kRProgress[] = "[:bar] :current/:total in :elapsed";
 
 namespace fastcpd::classes {
 
 class Fastcpd {
  public:
-  Fastcpd(const double beta, const Nullable<Function> cost,
-          const string cost_adjustment, const Nullable<Function> cost_gradient,
-          const Nullable<Function> cost_hessian, const bool cp_only,
-          const unsigned int d, const mat data, const double epsilon,
-          const string family,
-          const Nullable<Function> multiple_epochs_function,
-          const colvec line_search, const colvec lower,
-          const double momentum_coef, const colvec order, const int p,
+  Fastcpd(const double beta, const Rcpp::Nullable<Rcpp::Function> cost,
+          const std::string cost_adjustment,
+          const Rcpp::Nullable<Rcpp::Function> cost_gradient,
+          const Rcpp::Nullable<Rcpp::Function> cost_hessian, const bool cp_only,
+          const unsigned int d, const arma::mat data, const double epsilon,
+          const std::string family,
+          const Rcpp::Nullable<Rcpp::Function> multiple_epochs_function,
+          const arma::colvec line_search, const arma::colvec lower,
+          const double momentum_coef, const arma::colvec order, const int p,
           const unsigned int p_response, const double pruning_coef,
-          const string r_clock, const bool r_progress, const int segment_count,
-          const double trim, const colvec upper,
-          const double vanilla_percentage, const mat variance_estimate,
+          const std::string r_clock, const bool r_progress,
+          const int segment_count, const double trim, const arma::colvec upper,
+          const double vanilla_percentage, const arma::mat variance_estimate,
           const bool warm_start);
 
-  List Run();
+  Rcpp::List Run();
 
  private:
   struct FunctionSet {
-    colvec (Fastcpd::*gradient)(const unsigned int segment_start,
-                                const unsigned int segment_end,
-                                const colvec& theta);
-    mat (Fastcpd::*hessian_)(const unsigned int segment_start,
-                             const unsigned int segment_end,
-                             const colvec& theta);
+    arma::colvec (Fastcpd::*gradient)(const unsigned int segment_start,
+                                      const unsigned int segment_end,
+                                      const arma::colvec& theta);
+    arma::mat (Fastcpd::*hessian_)(const unsigned int segment_start,
+                                   const unsigned int segment_end,
+                                   const arma::colvec& theta);
     double (Fastcpd::*nll_sen)(const unsigned int segment_start,
-                               const unsigned int segment_end, colvec theta);
+                               const unsigned int segment_end,
+                               arma::colvec theta);
     CostResult (Fastcpd::*nll_pelt)(const unsigned int segment_start,
                                     const unsigned int segment_end,
                                     const bool cv,
-                                    const Nullable<colvec>& start);
+                                    const Rcpp::Nullable<arma::colvec>& start);
   };
 
   // Stop the clock and create an R object with `name`.
@@ -77,7 +63,7 @@ class Fastcpd {
   void CreateSegmentStatisticsAndSenParameters();
 
   // Set \code{theta_sum} for a specific column.
-  void CreateThetaSum(const unsigned int col, colvec new_theta_sum);
+  void CreateThetaSum(const unsigned int col, arma::colvec new_theta_sum);
 
   double GetCostAdjustmentValue(const unsigned nrows);
 
@@ -96,10 +82,11 @@ class Fastcpd {
   //   family.
   CostResult GetCostResult(const unsigned int segment_start,
                            const unsigned int segment_end,
-                           Nullable<colvec> theta, const bool cv = false,
-                           Nullable<colvec> start = R_NilValue);
+                           Rcpp::Nullable<arma::colvec> theta,
+                           const bool cv = false,
+                           Rcpp::Nullable<arma::colvec> start = R_NilValue);
 
-  List GetChangePointSet(const colvec raw_cp_set);
+  Rcpp::List GetChangePointSet(const arma::colvec raw_cp_set);
 
   double GetCostValue(const int tau, const unsigned int i, const int t);
 
@@ -109,103 +96,115 @@ class Fastcpd {
   double GetCostValueSen(const unsigned int segment_start,
                          const unsigned int segment_end, const unsigned int i);
 
-  colvec GetGradientArma(const unsigned int segment_start,
-                         const unsigned int segment_end, const colvec& theta);
+  arma::colvec GetGradientArma(const unsigned int segment_start,
+                               const unsigned int segment_end,
+                               const arma::colvec& theta);
 
-  colvec GetGradientBinomial(const unsigned int segment_start,
+  arma::colvec GetGradientBinomial(const unsigned int segment_start,
+                                   const unsigned int segment_end,
+                                   const arma::colvec& theta);
+
+  arma::colvec GetGradientCustom(const unsigned int segment_start,
+                                 const unsigned int segment_end,
+                                 const arma::colvec& theta);
+
+  arma::colvec GetGradientLm(const unsigned int segment_start,
                              const unsigned int segment_end,
-                             const colvec& theta);
+                             const arma::colvec& theta);
 
-  colvec GetGradientCustom(const unsigned int segment_start,
-                           const unsigned int segment_end, const colvec& theta);
+  arma::colvec GetGradientMa(const unsigned int segment_start,
+                             const unsigned int segment_end,
+                             const arma::colvec& theta);
 
-  colvec GetGradientLm(const unsigned int segment_start,
-                       const unsigned int segment_end, const colvec& theta);
+  arma::colvec GetGradientPoisson(const unsigned int segment_start,
+                                  const unsigned int segment_end,
+                                  const arma::colvec& theta);
 
-  colvec GetGradientMa(const unsigned int segment_start,
-                       const unsigned int segment_end, const colvec& theta);
+  arma::mat GetHessianArma(const unsigned int segment_start,
+                           const unsigned int segment_end,
+                           const arma::colvec& theta);
 
-  colvec GetGradientPoisson(const unsigned int segment_start,
-                            const unsigned int segment_end,
-                            const colvec& theta);
+  arma::mat GetHessianBinomial(const unsigned int segment_start,
+                               const unsigned int segment_end,
+                               const arma::colvec& theta);
 
-  mat GetHessianArma(const unsigned int segment_start,
-                     const unsigned int segment_end, const colvec& theta);
+  arma::mat GetHessianCustom(const unsigned int segment_start,
+                             const unsigned int segment_end,
+                             const arma::colvec& theta);
 
-  mat GetHessianBinomial(const unsigned int segment_start,
-                         const unsigned int segment_end, const colvec& theta);
+  arma::mat GetHessianLm(const unsigned int segment_start,
+                         const unsigned int segment_end,
+                         const arma::colvec& theta);
 
-  mat GetHessianCustom(const unsigned int segment_start,
-                       const unsigned int segment_end, const colvec& theta);
+  arma::mat GetHessianMa(const unsigned int segment_start,
+                         const unsigned int segment_end,
+                         const arma::colvec& theta);
 
-  mat GetHessianLm(const unsigned int segment_start,
-                   const unsigned int segment_end, const colvec& theta);
-
-  mat GetHessianMa(const unsigned int segment_start,
-                   const unsigned int segment_end, const colvec& theta);
-
-  mat GetHessianPoisson(const unsigned int segment_start,
-                        const unsigned int segment_end, const colvec& theta);
+  arma::mat GetHessianPoisson(const unsigned int segment_start,
+                              const unsigned int segment_end,
+                              const arma::colvec& theta);
 
   CostResult GetNllPeltArma(const unsigned int segment_start,
                             const unsigned int segment_end, const bool cv,
-                            const Nullable<colvec>& start);
+                            const Rcpp::Nullable<arma::colvec>& start);
 
   CostResult GetNllPeltCustom(const unsigned int segment_start,
                               const unsigned int segment_end, const bool cv,
-                              const Nullable<colvec>& start);
+                              const Rcpp::Nullable<arma::colvec>& start);
 
   CostResult GetNllPeltGarch(const unsigned int segment_start,
                              const unsigned int segment_end, const bool cv,
-                             const Nullable<colvec>& start);
+                             const Rcpp::Nullable<arma::colvec>& start);
 
   CostResult GetNllPeltGlm(const unsigned int segment_start,
                            const unsigned int segment_end, const bool cv,
-                           const Nullable<colvec>& start);
+                           const Rcpp::Nullable<arma::colvec>& start);
 
   CostResult GetNllPeltLasso(const unsigned int segment_start,
                              const unsigned int segment_end, const bool cv,
-                             const Nullable<colvec>& start);
+                             const Rcpp::Nullable<arma::colvec>& start);
   CostResult GetNllPeltMean(const unsigned int segment_start,
                             const unsigned int segment_end, const bool cv,
-                            const Nullable<colvec>& start);
+                            const Rcpp::Nullable<arma::colvec>& start);
 
   CostResult GetNllPeltMeanVariance(const unsigned int segment_start,
                                     const unsigned int segment_end,
                                     const bool cv,
-                                    const Nullable<colvec>& start);
+                                    const Rcpp::Nullable<arma::colvec>& start);
 
   CostResult GetNllPeltMgaussian(const unsigned int segment_start,
                                  const unsigned int segment_end, const bool cv,
-                                 const Nullable<colvec>& start);
+                                 const Rcpp::Nullable<arma::colvec>& start);
 
   CostResult GetNllPeltVariance(const unsigned int segment_start,
                                 const unsigned int segment_end, const bool cv,
-                                const Nullable<colvec>& start);
+                                const Rcpp::Nullable<arma::colvec>& start);
 
   double GetNllSenArma(const unsigned int segment_start,
-                       const unsigned int segment_end, colvec theta);
+                       const unsigned int segment_end, arma::colvec theta);
 
   double GetNllSenBinomial(const unsigned int segment_start,
-                           const unsigned int segment_end, colvec theta);
+                           const unsigned int segment_end, arma::colvec theta);
 
   double GetNllSenCustom(const unsigned int segment_start,
-                         const unsigned int segment_end, colvec theta);
+                         const unsigned int segment_end, arma::colvec theta);
 
   double GetNllSenLasso(const unsigned int segment_start,
-                        const unsigned int segment_end, colvec theta);
+                        const unsigned int segment_end, arma::colvec theta);
 
   double GetNllSenLm(const unsigned int segment_start,
-                     const unsigned int segment_end, colvec theta);
+                     const unsigned int segment_end, arma::colvec theta);
 
   double GetNllSenMa(const unsigned int segment_start,
-                     const unsigned int segment_end, colvec theta);
+                     const unsigned int segment_end, arma::colvec theta);
 
   double GetNllSenPoisson(const unsigned int segment_start,
-                          const unsigned int segment_end, colvec theta);
+                          const unsigned int segment_end, arma::colvec theta);
 
-  colvec GetObjectiveFunctionValues(const colvec& fvec, const ucolvec& r_t_set,
-                                    unsigned int r_t_count, unsigned int t);
+  arma::colvec GetObjectiveFunctionValues(const arma::colvec& fvec,
+                                          const arma::ucolvec& r_t_set,
+                                          unsigned int r_t_count,
+                                          unsigned int t);
 
   // Update \code{theta_hat}, \code{theta_sum}, and \code{hessian}.
   //
@@ -216,10 +215,13 @@ class Fastcpd {
   CostResult GetOptimizedCostResult(const unsigned int segment_start,
                                     const unsigned int segment_end);
 
+  void Step(unsigned int t, arma::ucolvec& r_t_set, unsigned int& r_t_count,
+            arma::colvec& cp_sets, arma::colvec& fvec);
+
   // Adjust cost value for MBIC and MDL.
   double UpdateCostValue(double value, const unsigned int nrows);
 
-  colvec UpdateChangePointSet(const colvec raw_cp_set);
+  arma::colvec UpdateChangePointSet(const arma::colvec raw_cp_set);
 
   // Append new values to \code{fastcpd_parameters}.
   void UpdateSenParameters(const unsigned int t);
@@ -244,21 +246,21 @@ class Fastcpd {
   //
   // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
   //   \code{hessian}, and \code{momentum}.
-  List UpdateSenParametersSteps(const int segment_start,
-                                const unsigned int segment_end, const int i,
-                                colvec momentum);
+  Rcpp::List UpdateSenParametersSteps(const int segment_start,
+                                      const unsigned int segment_end,
+                                      const int i, arma::colvec momentum);
 
   // Append a new slice to \code{hessian}.
-  void UpdateHessian(mat new_hessian);
+  void UpdateHessian(arma::mat new_hessian);
 
   // Prune the slices of \code{hessian}.
-  void UpdateHessian(ucolvec pruned_left);
+  void UpdateHessian(arma::ucolvec pruned_left);
 
   // Update \code{hessian} for a specific slice.
-  void UpdateHessian(const unsigned int slice, mat new_hessian);
+  void UpdateHessian(const unsigned int slice, arma::mat new_hessian);
 
   // Update \code{momentum}.
-  void UpdateMomentum(colvec new_momentum);
+  void UpdateMomentum(arma::colvec new_momentum);
 
   // Start the clock tick for `name`.
   void UpdateRClockTick(const std::string name);
@@ -269,44 +271,41 @@ class Fastcpd {
   void UpdateRProgressStart();
   void UpdateRProgressTick();
 
-  void Step(unsigned int t, ucolvec& r_t_set, unsigned int& r_t_count,
-            colvec& cp_sets, colvec& fvec);
-
   // Append a new column to \code{theta_hat}.
-  void UpdateThetaHat(colvec new_theta_hat);
+  void UpdateThetaHat(arma::colvec new_theta_hat);
 
   // Prune the columns of \code{theta_hat}.
-  void UpdateThetaHat(ucolvec pruned_left);
+  void UpdateThetaHat(arma::ucolvec pruned_left);
 
   // Update \code{theta_hat} for a specific column.
-  void UpdateThetaHat(const unsigned int col, colvec new_theta_hat);
+  void UpdateThetaHat(const unsigned int col, arma::colvec new_theta_hat);
 
   // Append a new column to \code{theta_sum}.
-  void UpdateThetaSum(colvec new_theta_sum);
+  void UpdateThetaSum(arma::colvec new_theta_sum);
 
   // Prune the columns of \code{theta_sum}.
-  void UpdateThetaSum(ucolvec pruned_left);
+  void UpdateThetaSum(arma::ucolvec pruned_left);
 
   // Update \code{theta_sum} for a specific column by adding to that column.
-  void UpdateThetaSum(const unsigned int col, colvec new_theta_sum);
+  void UpdateThetaSum(const unsigned int col, arma::colvec new_theta_sum);
 
   // `act_num_` is used in Lasso and Gaussian families only.
-  colvec act_num_;
+  arma::colvec act_num_;
 
   // `beta` is the initial cost value.
   double beta;
 
   // `cost` is the cost function to be used.
-  const unique_ptr<Function> cost;
+  const std::unique_ptr<Rcpp::Function> cost;
 
   // Adjustment to the cost function.
-  const string cost_adjustment;
+  const std::string cost_adjustment;
 
   // `cost_gradient` is the gradient of the cost function to be used.
-  const unique_ptr<Function> cost_gradient;
+  const std::unique_ptr<Rcpp::Function> cost_gradient;
 
   // `cost_hessian` is the Hessian of the cost function to be used.
-  const unique_ptr<Function> cost_hessian;
+  const std::unique_ptr<Rcpp::Function> cost_hessian;
 
   const bool cp_only_;
 
@@ -314,7 +313,7 @@ class Fastcpd {
   const unsigned int d;
 
   // `data` is the data set to be segmented.
-  const mat data;
+  const arma::mat data;
 
   // The number of data points.
   const unsigned int data_n_rows_;
@@ -327,12 +326,12 @@ class Fastcpd {
   const double epsilon;
 
   // `error_sd` is used in Gaussian family only.
-  colvec err_sd_;
+  arma::colvec err_sd_;
 
   // `family` is the family of the model.
-  const string family;
+  const std::string family;
 
-  // Function to calculate the gradient at the current data.
+  // Rcpp::Function to calculate the gradient at the current data.
   //
   // @param data A data frame containing the data to be segmented.
   // @param theta Estimated theta from the previous iteration.
@@ -340,39 +339,39 @@ class Fastcpd {
   // @param order Order of the time series models.
   //
   // @return Gradient at the current data.
-  colvec (Fastcpd::*get_gradient_)(const unsigned int segment_start,
-                                   const unsigned int segment_end,
-                                   const colvec& theta);
+  arma::colvec (Fastcpd::*get_gradient_)(const unsigned int segment_start,
+                                         const unsigned int segment_end,
+                                         const arma::colvec& theta);
 
-  // Function to calculate the Hessian matrix at the current data.
+  // Rcpp::Function to calculate the Hessian matrix at the current data.
   //
   // @param data A data frame containing the data to be segmented.
   // @param theta Estimated theta from the previous iteration.
   //
   // @return Hessian at the current data.
-  mat (Fastcpd::*get_hessian_)(const unsigned int segment_start,
-                               const unsigned int segment_end,
-                               const colvec& theta);
+  arma::mat (Fastcpd::*get_hessian_)(const unsigned int segment_start,
+                                     const unsigned int segment_end,
+                                     const arma::colvec& theta);
 
-  CostResult (Fastcpd::*get_nll_pelt_)(const unsigned int segment_start,
-                                       const unsigned int segment_end,
-                                       const bool cv,
-                                       const Nullable<colvec>& start);
+  CostResult (Fastcpd::*get_nll_pelt_)(
+      const unsigned int segment_start, const unsigned int segment_end,
+      const bool cv, const Rcpp::Nullable<arma::colvec>& start);
 
   double (Fastcpd::*get_nll_sen_)(const unsigned int segment_start,
-                                  const unsigned int segment_end, colvec theta);
+                                  const unsigned int segment_end,
+                                  arma::colvec theta);
 
   // `hessian_` stores the Hessian matrix up to the current data point.
-  cube hessian_;
+  arma::cube hessian_;
 
   // `lambda` is the lambda for L1 regularization. Only used for lasso. This
   // parameter stores the penalty without the segment length scaling.
   double lambda;
 
-  colvec line_search;
+  arma::colvec line_search;
 
   // Lower bound of the parameters to be estimated during the optimization.
-  const colvec lower;
+  const arma::colvec lower;
 
   // `min_idx` is the index of the minimum objective value.
   // This value is stored to avoid reallocation of memory.
@@ -383,13 +382,13 @@ class Fastcpd {
   double min_obj;
 
   // Momentum will be used in the update step if `momentum_coef_` is not 0.
-  colvec momentum;
+  arma::colvec momentum;
 
   const double momentum_coef_;
 
-  const unique_ptr<Function> multiple_epochs_function;
+  const std::unique_ptr<Rcpp::Function> multiple_epochs_function;
 
-  const colvec order;
+  const arma::colvec order;
 
   // `p` is the number of parameters to be estimated.
   const unsigned int p;
@@ -398,60 +397,60 @@ class Fastcpd {
   const unsigned int p_response;
 
   // Indices after pruning.
-  ucolvec pruned_left;
+  arma::ucolvec pruned_left;
 
   unsigned int pruned_left_n_elem;
 
   const double pruning_coef;
 
-  const string r_clock;
+  const std::string r_clock;
   const bool r_progress;
 
   Rcpp::Clock rClock;
-  unique_ptr<RProgress::RProgress> rProgress;
+  std::unique_ptr<RProgress::RProgress> rProgress;
 
   // `segment_count` is the number of segments for initial guess.
   const int segment_count;
 
   // `segment_indices` is the indices of the segments.
-  colvec segment_indices;
+  arma::colvec segment_indices;
 
   // Create a matrix to store the estimated coefficients in each segment,
   // where each row represents estimated coefficients for a segment.
-  mat segment_theta_hat;
+  arma::mat segment_theta_hat;
 
   // Matrix storing the warm starts.
-  mat start;
+  arma::mat start;
 
   // `theta_hat` stores the estimated coefficients up to the current data point.
-  mat theta_hat;
+  arma::mat theta_hat;
 
   // `theta_sum` stores the sum of estimated coefficients up to the current data
   // point.
-  mat theta_sum_;
+  arma::mat theta_sum_;
 
   const double trim;
 
   // Static mapping from family names to their function sets
-  static const unordered_map<string, FunctionSet> family_function_map;
+  static const std::unordered_map<std::string, FunctionSet> family_function_map;
 
   // Upper bound of the parameters to be estimated during the optimization.
-  const colvec upper;
+  const arma::colvec upper;
 
   const double vanilla_percentage;
 
-  const mat variance_estimate;
+  const arma::mat variance_estimate;
 
   const bool warm_start;
 
-  mat zero_data;
+  arma::mat zero_data;
 
   unsigned int zero_data_n_cols_;
   unsigned int zero_data_n_rows_;
 
   double* zero_data_ptr;
 
-  friend FastcpdTest;
+  friend fastcpd::test::FastcpdTest;
 };
 
 }  // namespace fastcpd::classes
