@@ -381,9 +381,10 @@ CostResult Fastcpd::GetNllPeltCustom(const unsigned int segment_start,
   if (cost_gradient_ || cost_hessian_) {
     return GetOptimizedCostResult(segment_start, segment_end);
   } else {
-    return {{colvec()},
-            {colvec()},
-            as<double>((*cost_)(data_.rows(segment_start, segment_end)))};
+    return {
+        {colvec()},
+        {colvec()},
+        as<double>((*cost_function_)(data_.rows(segment_start, segment_end)))};
   }
 }
 
@@ -628,7 +629,8 @@ double Fastcpd::GetNllSenBinomial(const unsigned int segment_start,
 
 double Fastcpd::GetNllSenCustom(const unsigned int segment_start,
                                 const unsigned int segment_end, colvec theta) {
-  return as<double>((*cost_)(data_.rows(segment_start, segment_end), theta));
+  return as<double>(
+      (*cost_function_)(data_.rows(segment_start, segment_end), theta));
 }
 
 double Fastcpd::GetNllSenLasso(const unsigned int segment_start,
