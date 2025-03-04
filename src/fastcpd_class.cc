@@ -39,6 +39,7 @@ using ::Rcpp::Named;
 using ::Rcpp::Nullable;
 using ::Rcpp::wrap;
 using ::std::make_unique;
+using ::std::memcpy;
 using ::std::string;
 using ::std::string_view;
 using ::std::unique_ptr;
@@ -77,8 +78,8 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
     : active_coefficients_count_(colvec(segment_count)),
       beta_(beta),
       change_points_(zeros<colvec>(data.n_rows + 1)),
-      coefficients_(mat(p, 1)),
-      coefficients_sum_(mat(p, 1)),
+      coefficients_(mat(p, data.n_rows + 1)),
+      coefficients_sum_(mat(p, data.n_rows + 1)),
       cost_adjustment_(cost_adjustment),
       cost_function_([&]() -> unique_ptr<Function> {
         if (family == "custom") {
@@ -137,7 +138,7 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
       epsilon_in_hessian_(epsilon),
       error_standard_deviation_(colvec(segment_count)),
       family_(family),
-      hessian_(cube(p, p, 1)),
+      hessian_(cube(p, p, data.n_rows + 1)),
       line_search_(line_search),
       momentum_(vec(p)),
       momentum_coef_(momentum_coef),
@@ -581,7 +582,7 @@ void Fastcpd::UpdateSenParameters(const unsigned int segment_start,
   UpdateThetaHat(i, as<colvec>(cost_update_result[0]));
   CreateThetaSum(i, as<colvec>(cost_update_result[1]));
   UpdateHessian(i, as<mat>(cost_update_result[2]));
-  UpdateMomentum(as<colvec>(cost_update_result[3]));
+  momentum_ = as<colvec>(cost_update_result[3]);
 }
 
 void Fastcpd::UpdateSenParametersStep(const int segment_start,
@@ -598,10 +599,7 @@ void Fastcpd::UpdateSenParametersStep(const int segment_start,
   mat hessian_psd =
       hessian_i + epsilon_in_hessian_ *
                       eye<mat>(coefficients_.n_rows, coefficients_.n_rows);
-
-  // Calculate momentum step
   momentum_ = momentum_coef_ * momentum_ - solve(hessian_psd, gradient);
-
   double best_learning_rate = 1;
   colvec line_search_costs = zeros<colvec>(line_search_.n_elem);
 
@@ -620,10 +618,7 @@ void Fastcpd::UpdateSenParametersStep(const int segment_start,
     }
   }
   best_learning_rate = line_search_[line_search_costs.index_min()];
-
-  // Update coefficients_ with momentum
   coefficients_.col(i) += best_learning_rate * momentum_;
-
   coefficients_.col(i) =
       arma::min(coefficients_.col(i), parameters_upper_bound_);
   coefficients_.col(i) =
@@ -713,9 +708,10 @@ colvec Fastcpd::UpdateChangePointSet() {
 }
 
 void Fastcpd::UpdateSenParameters(const unsigned int t) {
+  if (vanilla_percentage_ == 1) return;
   const int segment_index = index_max(find(segment_indices_ <= t - 1));
-  rowvec cum_coef_add = segment_coefficients_.row(segment_index),
-         coef_add = segment_coefficients_.row(segment_index);
+  colvec cum_coef_add = segment_coefficients_.row(segment_index).t(),
+         coef_add = segment_coefficients_.row(segment_index).t();
   mat hessian_new;
   if (family_ == "binomial") {
     const rowvec x = data_.row(t - 1).tail(parameters_count_);
@@ -730,29 +726,21 @@ void Fastcpd::UpdateSenParameters(const unsigned int t) {
     hessian_new = x.t() * x + epsilon_in_hessian_ * eye<mat>(parameters_count_,
                                                              parameters_count_);
   } else if (family_ == "arma") {
-    hessian_new = (this->*get_hessian_)(0, t - 1, coef_add.t());
+    hessian_new = (this->*get_hessian_)(0, t - 1, coef_add);
   } else if (family_ == "custom") {
     hessian_new = zeros<mat>(parameters_count_, parameters_count_);
   }
-
-  UpdateThetaHat(coef_add.t());
-  UpdateThetaSum(cum_coef_add.t());
-  UpdateHessian(hessian_new);
+  memcpy(coefficients_.colptr(pruned_set_size_ - 1), coef_add.memptr(),
+         sizeof(double) * parameters_count_);
+  memcpy(coefficients_sum_.colptr(pruned_set_size_ - 1), cum_coef_add.memptr(),
+         sizeof(double) * parameters_count_);
+  memcpy(hessian_.slice(pruned_set_size_ - 1).memptr(), hessian_new.memptr(),
+         sizeof(double) * parameters_count_ * parameters_count_);
 }
 
 void Fastcpd::UpdateHessian(const unsigned int slice, mat new_hessian) {
   hessian_.slice(slice) = new_hessian;
 }
-
-void Fastcpd::UpdateHessian(mat new_hessian) {
-  hessian_ = join_slices(hessian_, new_hessian);
-}
-
-void Fastcpd::UpdateHessian(ucolvec pruned_left) {
-  hessian_ = hessian_.slices(pruned_left);
-}
-
-void Fastcpd::UpdateMomentum(colvec new_momentum) { momentum_ = new_momentum; }
 
 void Fastcpd::UpdateRClockTick(const std::string name) {
   if (!r_clock_.empty()) {
@@ -780,11 +768,7 @@ void Fastcpd::UpdateRProgressTick() {
 
 void Fastcpd::UpdateStep(unsigned int t) {
   UpdateRClockTick("pruning");
-
-  if (vanilla_percentage_ != 1) {
-    UpdateSenParameters(t);
-  }
-
+  UpdateSenParameters(t);
   colvec obj = GetObjectiveFunctionValues(t);
 
   // The following code is the manual implementation of `index_min` function
@@ -807,6 +791,15 @@ void Fastcpd::UpdateStep(unsigned int t) {
     if (obj[i] <=
         objective_function_values_min_ + beta_ - pruning_coefficient_) {
       pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
+      if (vanilla_percentage_ != 1 && pruned_left_n_elem_ != i) {
+        memcpy(coefficients_.colptr(pruned_left_n_elem_),
+               coefficients_.colptr(i), sizeof(double) * parameters_count_);
+        memcpy(coefficients_sum_.colptr(pruned_left_n_elem_),
+               coefficients_sum_.colptr(i), sizeof(double) * parameters_count_);
+        memcpy(hessian_.slice(pruned_left_n_elem_).memptr(),
+               hessian_.slice(i).memptr(),
+               sizeof(double) * parameters_count_ * parameters_count_);
+      }
       pruned_left_[pruned_left_n_elem_] = i;
       pruned_left_n_elem_++;
     }
@@ -814,37 +807,13 @@ void Fastcpd::UpdateStep(unsigned int t) {
   pruned_set_size_ = pruned_left_n_elem_;
   pruned_set_[pruned_set_size_] = t;
   pruned_set_size_++;
-
-  if (vanilla_percentage_ != 1) {
-    UpdateThetaHat(pruned_left_.rows(0, pruned_left_n_elem_ - 1));
-    UpdateThetaSum(pruned_left_.rows(0, pruned_left_n_elem_ - 1));
-    UpdateHessian(pruned_left_.rows(0, pruned_left_n_elem_ - 1));
-  }
-
   UpdateRClockTock("pruning");
-
-  checkUserInterrupt();
   UpdateRProgressTick();
-}
-
-void Fastcpd::UpdateThetaHat(colvec new_theta_hat) {
-  coefficients_ = join_rows(coefficients_, new_theta_hat);
+  checkUserInterrupt();
 }
 
 void Fastcpd::UpdateThetaHat(const unsigned int col, colvec new_theta_hat) {
   coefficients_.col(col) = new_theta_hat;
-}
-
-void Fastcpd::UpdateThetaHat(ucolvec pruned_left) {
-  coefficients_ = coefficients_.cols(pruned_left);
-}
-
-void Fastcpd::UpdateThetaSum(colvec new_theta_sum) {
-  coefficients_sum_ = join_rows(coefficients_sum_, new_theta_sum);
-}
-
-void Fastcpd::UpdateThetaSum(ucolvec pruned_left) {
-  coefficients_sum_ = coefficients_sum_.cols(pruned_left);
 }
 
 void Fastcpd::UpdateThetaSum(const unsigned int col, colvec new_theta_sum) {

@@ -223,40 +223,40 @@ mat Fastcpd::GetHessianArma(const unsigned int segment_start,
             .t() -
         psi_psi_coefficient_part;
   }
-  mat hessian_ = zeros(sum(order_) + 1, sum(order_) + 1);
-  hessian_.submat(0, 0, order_(0) - 1, order_(0) - 1) =
+  mat hessian = zeros(sum(order_) + 1, sum(order_) + 1);
+  hessian.submat(0, 0, order_(0) - 1, order_(0) - 1) =
       phi_coefficient.row(segment_length - 1).t() *
       phi_coefficient.row(segment_length - 1) / theta(sum(order_));
-  hessian_.submat(0, order_(0), order_(0) - 1, sum(order_) - 1) =
+  hessian.submat(0, order_(0), order_(0) - 1, sum(order_) - 1) =
       (phi_psi_coefficient.slice(segment_length - 1).t() *
            variance_term(segment_length - 1) +
        phi_coefficient.row(segment_length - 1).t() *
            psi_coefficient.row(segment_length - 1)) /
       theta(sum(order_));
-  hessian_.submat(order_(0), 0, sum(order_) - 1, order_(0) - 1) =
-      hessian_.submat(0, order_(0), order_(0) - 1, sum(order_) - 1).t();
-  hessian_.submat(0, sum(order_), order_(0) - 1, sum(order_)) =
+  hessian.submat(order_(0), 0, sum(order_) - 1, order_(0) - 1) =
+      hessian.submat(0, order_(0), order_(0) - 1, sum(order_) - 1).t();
+  hessian.submat(0, sum(order_), order_(0) - 1, sum(order_)) =
       -phi_coefficient.row(segment_length - 1).t() *
       variance_term(segment_length - 1) / theta(sum(order_)) /
       theta(sum(order_));
-  hessian_.submat(sum(order_), 0, sum(order_), order_(0) - 1) =
-      hessian_.submat(0, sum(order_), order_(0) - 1, sum(order_)).t();
-  hessian_.submat(order_(0), order_(0), sum(order_) - 1, sum(order_) - 1) =
+  hessian.submat(sum(order_), 0, sum(order_), order_(0) - 1) =
+      hessian.submat(0, sum(order_), order_(0) - 1, sum(order_)).t();
+  hessian.submat(order_(0), order_(0), sum(order_) - 1, sum(order_) - 1) =
       (psi_coefficient.row(segment_length - 1).t() *
            psi_coefficient.row(segment_length - 1) +
        psi_psi_coefficient.slice(segment_length - 1) *
            variance_term(segment_length - 1)) /
       theta(sum(order_));
-  hessian_.submat(order_(0), sum(order_), sum(order_) - 1, sum(order_)) =
+  hessian.submat(order_(0), sum(order_), sum(order_) - 1, sum(order_)) =
       -psi_coefficient.row(segment_length - 1).t() *
       variance_term(segment_length - 1) / theta(sum(order_)) /
       theta(sum(order_));
-  hessian_.submat(sum(order_), order_(0), sum(order_), sum(order_) - 1) =
-      hessian_.submat(order_(0), sum(order_), sum(order_) - 1, sum(order_)).t();
-  hessian_(sum(order_), sum(order_)) =
+  hessian.submat(sum(order_), order_(0), sum(order_), sum(order_) - 1) =
+      hessian.submat(order_(0), sum(order_), sum(order_) - 1, sum(order_)).t();
+  hessian(sum(order_), sum(order_)) =
       pow(variance_term(segment_length - 1), 2) / pow(theta(sum(order_)), 3) -
       1.0 / 2.0 / pow(theta(sum(order_)), 2);
-  return hessian_;
+  return hessian;
 }
 
 mat Fastcpd::GetHessianBinomial(const unsigned int segment_start,
@@ -327,21 +327,20 @@ mat Fastcpd::GetHessianMa(const unsigned int segment_start,
             .t() -
         psi_psi_coefficient_part;
   }
-  mat hessian_ = zeros(q + 1, q + 1);
-  hessian_.submat(0, 0, q - 1, q - 1) =
+  mat hessian = zeros(q + 1, q + 1);
+  hessian.submat(0, 0, q - 1, q - 1) =
       (psi_coefficient.row(segment_length - 1).t() *
            psi_coefficient.row(segment_length - 1) +
        psi_psi_coefficient.slice(segment_length - 1) *
            variance_term(segment_length - 1)) /
       theta(q);
-  hessian_.submat(0, q, q - 1, q) =
+  hessian.submat(0, q, q - 1, q) =
       -psi_coefficient.row(segment_length - 1).t() *
       variance_term(segment_length - 1) / theta(q) / theta(q);
-  hessian_.submat(q, 0, q, q - 1) = hessian_.submat(0, q, q - 1, q).t();
-  hessian_(q, q) =
-      pow(variance_term(segment_length - 1), 2) / pow(theta(q), 3) -
-      1.0 / 2.0 / pow(theta(q), 2);
-  return hessian_;
+  hessian.submat(q, 0, q, q - 1) = hessian.submat(0, q, q - 1, q).t();
+  hessian(q, q) = pow(variance_term(segment_length - 1), 2) / pow(theta(q), 3) -
+                  1.0 / 2.0 / pow(theta(q), 2);
+  return hessian;
 }
 
 mat Fastcpd::GetHessianPoisson(const unsigned int segment_start,

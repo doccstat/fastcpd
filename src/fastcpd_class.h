@@ -54,16 +54,8 @@ class Fastcpd {
   void CreateSenParameters();
   void CreateSegmentStatistics();
   void CreateSegmentStatisticsAndSenParameters();
-
-  // Set \code{theta_sum} for a specific column.
   void CreateThetaSum(const unsigned int col, arma::colvec new_theta_sum);
-
   double GetCostAdjustmentValue(const unsigned nrows);
-
-  // Solve logistic/poisson regression using Gradient Descent Extension to the
-  // multivariate case
-  // @return Negative log likelihood of the corresponding data with the given
-  //   family.
   CostResult GetCostResult(const unsigned int segment_start,
                            const unsigned int segment_end,
                            Rcpp::Nullable<arma::colvec> theta,
@@ -156,57 +148,24 @@ class Fastcpd {
   arma::colvec GetObjectiveFunctionValues(unsigned int t);
   CostResult GetOptimizedCostResult(const unsigned int segment_start,
                                     const unsigned int segment_end);
-
-  // Adjust cost value for MBIC and MDL.
   double UpdateCostValue(double value, const unsigned int nrows);
   arma::colvec UpdateChangePointSet();
-
-  // Append new values to \code{fastcpd_parameters}.
   void UpdateSenParameters(const unsigned int t);
   void UpdateSenParameters(const unsigned int segment_start,
                            const unsigned int segment_end,
                            const unsigned int i);
   void UpdateSenParametersStep(const int segment_start, const int segment_end,
                                const int i);
-
-  // Update the cost values for the segmentation.
-  // @return A list containing new values of \code{theta_hat}, \code{theta_sum},
-  //   \code{hessian}, and \code{momentum}.
   Rcpp::List UpdateSenParametersSteps(const int segment_start,
                                       const unsigned int segment_end,
                                       const int i, arma::colvec momentum);
   void UpdateStep(unsigned int t);
-
-  // Append a new slice to \code{hessian}.
-  void UpdateHessian(arma::mat new_hessian);
-
-  // Prune the slices of \code{hessian}.
-  void UpdateHessian(arma::ucolvec pruned_left);
-
-  // Update \code{hessian} for a specific slice.
   void UpdateHessian(const unsigned int slice, arma::mat new_hessian);
-  void UpdateMomentum(arma::colvec new_momentum);
   void UpdateRClockTick(const std::string name);
   void UpdateRClockTock(const std::string name);
   void UpdateRProgressStart();
   void UpdateRProgressTick();
-
-  // Append a new column to \code{theta_hat}.
-  void UpdateThetaHat(arma::colvec new_theta_hat);
-
-  // Prune the columns of \code{theta_hat}.
-  void UpdateThetaHat(arma::ucolvec pruned_left);
-
-  // Update \code{theta_hat} for a specific column.
   void UpdateThetaHat(const unsigned int col, arma::colvec new_theta_hat);
-
-  // Append a new column to \code{theta_sum}.
-  void UpdateThetaSum(arma::colvec new_theta_sum);
-
-  // Prune the columns of \code{theta_sum}.
-  void UpdateThetaSum(arma::ucolvec pruned_left);
-
-  // Update \code{theta_sum} for a specific column by adding to that column.
   void UpdateThetaSum(const unsigned int col, arma::colvec new_theta_sum);
 
   arma::colvec active_coefficients_count_;
