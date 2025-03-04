@@ -43,11 +43,6 @@ class FastcpdTest {
       const arma::mat& data, const unsigned int segment_start,
       const unsigned int segment_end, const bool cv,
       const Rcpp::Nullable<arma::colvec>& start);
-
-  // Updates the theta sum.
-  static arma::mat UpdateThetaSum(const unsigned int col,
-                                  arma::colvec old_theta_sum,
-                                  arma::colvec new_theta_sum);
 };
 
 }  // namespace test

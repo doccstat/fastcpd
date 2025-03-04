@@ -304,6 +304,12 @@ void Fastcpd::CreateRClock(const std::string name) {
   }
 }
 
+void Fastcpd::CreateRProgress() {
+  if (r_progress_) {
+    rProgress_->tick(0);
+  }
+}
+
 void Fastcpd::CreateSenParameters() {
   if (vanilla_percentage_ == 1) return;
   if (family_ == "binomial") {
@@ -373,12 +379,8 @@ void Fastcpd::CreateSegmentStatisticsAndSenParameters() {
   CreateSegmentStatistics();
   CreateSenParameters();
   checkUserInterrupt();
-  UpdateRProgressStart();
-  UpdateRProgressTick();
-}
-
-void Fastcpd::CreateThetaSum(const unsigned int col, colvec new_theta_sum) {
-  coefficients_sum_.col(col) = new_theta_sum;
+  CreateRProgress();
+  UpdateRProgress();
 }
 
 double Fastcpd::GetCostAdjustmentValue(const unsigned nrows) {
@@ -500,8 +502,8 @@ double Fastcpd::GetCostValuePelt(const unsigned int segment_start,
   // thetas for later `fastcpd` steps.
   if (vanilla_percentage_ < 1 &&
       segment_end < vanilla_percentage_ * data_n_rows_) {
-    UpdateThetaHat(i, cost_result.par);
-    UpdateThetaSum(i, cost_result.par);
+    coefficients_.col(i) = colvec(cost_result.par);
+    coefficients_sum_.col(i) += colvec(cost_result.par);
   }
   return cval;
 }
@@ -511,7 +513,7 @@ double Fastcpd::GetCostValueSen(const unsigned int segment_start,
                                 const unsigned int i) {
   const unsigned int segment_length = segment_end - segment_start + 1;
   double cval = 0;
-  UpdateSenParameters(segment_start, segment_end, i);
+  UpdateSenParametersSteps(segment_start, segment_end, i);
   colvec theta = coefficients_sum_.col(i) / segment_length;
   if (family_ == "custom") {
     cval = (this->*get_nll_sen_)(segment_start, segment_end, theta);
@@ -574,17 +576,6 @@ CostResult Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
   return cost_result;
 }
 
-void Fastcpd::UpdateSenParameters(const unsigned int segment_start,
-                                  const unsigned int segment_end,
-                                  const unsigned int i) {
-  List cost_update_result =
-      UpdateSenParametersSteps(segment_start, segment_end, i, momentum_);
-  UpdateThetaHat(i, as<colvec>(cost_update_result[0]));
-  CreateThetaSum(i, as<colvec>(cost_update_result[1]));
-  UpdateHessian(i, as<mat>(cost_update_result[2]));
-  momentum_ = as<colvec>(cost_update_result[3]);
-}
-
 void Fastcpd::UpdateSenParametersStep(const int segment_start,
                                       const int segment_end, const int i) {
   mat hessian_i = hessian_.slice(i);
@@ -639,9 +630,11 @@ void Fastcpd::UpdateSenParametersStep(const int segment_start,
   hessian_.slice(i) = std::move(hessian_i);
 }
 
-List Fastcpd::UpdateSenParametersSteps(const int segment_start,
+void Fastcpd::UpdateSenParametersSteps(const int segment_start,
                                        const unsigned int segment_end,
-                                       const int i, colvec momentum) {
+                                       const int i) {
+  // This hack is to avoid the issue during momentum assigment of `solve`.
+  colvec tmp = momentum_;
   const unsigned int multiple_epochs =
       as<int>((*multiple_epochs_function_)(segment_end - segment_start + 1));
   unsigned int loop_start = segment_end, loop_end = segment_end;
@@ -654,8 +647,7 @@ List Fastcpd::UpdateSenParametersSteps(const int segment_start,
   }
 
   coefficients_sum_.col(i) += coefficients_.col(i);
-  return List::create(coefficients_.col(i), coefficients_sum_.col(i),
-                      hessian_.slice(i), momentum);
+  momentum_ = tmp;
 }
 
 double Fastcpd::UpdateCostValue(double value, const unsigned int nrows) {
@@ -738,10 +730,6 @@ void Fastcpd::UpdateSenParameters(const unsigned int t) {
          sizeof(double) * parameters_count_ * parameters_count_);
 }
 
-void Fastcpd::UpdateHessian(const unsigned int slice, mat new_hessian) {
-  hessian_.slice(slice) = new_hessian;
-}
-
 void Fastcpd::UpdateRClockTick(const std::string name) {
   if (!r_clock_.empty()) {
     rClock_.tick(name);
@@ -754,13 +742,7 @@ void Fastcpd::UpdateRClockTock(const std::string name) {
   }
 }
 
-void Fastcpd::UpdateRProgressStart() {
-  if (r_progress_) {
-    rProgress_->tick(0);
-  }
-}
-
-void Fastcpd::UpdateRProgressTick() {
+void Fastcpd::UpdateRProgress() {
   if (r_progress_) {
     rProgress_->tick();
   }
@@ -808,16 +790,8 @@ void Fastcpd::UpdateStep(unsigned int t) {
   pruned_set_[pruned_set_size_] = t;
   pruned_set_size_++;
   UpdateRClockTock("pruning");
-  UpdateRProgressTick();
+  UpdateRProgress();
   checkUserInterrupt();
-}
-
-void Fastcpd::UpdateThetaHat(const unsigned int col, colvec new_theta_hat) {
-  coefficients_.col(col) = new_theta_hat;
-}
-
-void Fastcpd::UpdateThetaSum(const unsigned int col, colvec new_theta_sum) {
-  coefficients_sum_.col(col) += new_theta_sum;
 }
 
 }  // namespace fastcpd::classes
