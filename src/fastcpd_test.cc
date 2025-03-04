@@ -240,44 +240,5 @@ fastcpd::classes::CostResult FastcpdTest::GetNllPelt(
       segment_start, segment_end, cv, start);
 }
 
-//------------------------------------------------------------------------------
-// UpdateThetaSum
-// Updates and returns the theta sum by combining an old and a new theta sum.
-//------------------------------------------------------------------------------
-arma::mat FastcpdTest::UpdateThetaSum(const unsigned int col,
-                                      arma::colvec old_theta_sum,
-                                      arma::colvec new_theta_sum) {
-  fastcpd::classes::Fastcpd fastcpd_instance(
-      /* beta */ 0,
-      /* cost */ R_NilValue,
-      /* cost_adjustment */ "MBIC",
-      /* cost_gradient */ R_NilValue,
-      /* cost_hessian */ R_NilValue,
-      /* cp_only */ true,
-      /* d */ 0,
-      /* data */ arma::mat(),
-      /* epsilon */ 0.0,
-      /* family */ "gaussian",
-      /* multiple_epochs_function */ R_NilValue,
-      /* line_search */ arma::colvec(),
-      /* lower */ arma::colvec(),
-      /* momentum_coef */ 0.0,
-      /* order */ arma::colvec(),
-      /* p */ 3,
-      /* p_response */ 0,
-      /* pruning_coef */ 0,
-      /* r_clock */ "",
-      /* r_progress */ false,
-      /* segment_count */ 0,
-      /* trim */ 0,
-      /* upper */ arma::colvec(),
-      /* vanilla_percentage */ 0.0,
-      /* variance_estimate */ arma::mat(),
-      /* warm_start */ false);
-  fastcpd_instance.CreateThetaSum(0, old_theta_sum);
-  fastcpd_instance.UpdateThetaSum(0, new_theta_sum);
-  return fastcpd_instance.coefficients_sum_;
-}
-
 }  // namespace test
 }  // namespace fastcpd

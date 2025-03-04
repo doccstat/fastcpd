@@ -51,10 +51,10 @@ class Fastcpd {
   };
 
   void CreateRClock(const std::string name);
+  void CreateRProgress();
   void CreateSenParameters();
   void CreateSegmentStatistics();
   void CreateSegmentStatisticsAndSenParameters();
-  void CreateThetaSum(const unsigned int col, arma::colvec new_theta_sum);
   double GetCostAdjustmentValue(const unsigned nrows);
   CostResult GetCostResult(const unsigned int segment_start,
                            const unsigned int segment_end,
@@ -151,22 +151,14 @@ class Fastcpd {
   double UpdateCostValue(double value, const unsigned int nrows);
   arma::colvec UpdateChangePointSet();
   void UpdateSenParameters(const unsigned int t);
-  void UpdateSenParameters(const unsigned int segment_start,
-                           const unsigned int segment_end,
-                           const unsigned int i);
   void UpdateSenParametersStep(const int segment_start, const int segment_end,
                                const int i);
-  Rcpp::List UpdateSenParametersSteps(const int segment_start,
-                                      const unsigned int segment_end,
-                                      const int i, arma::colvec momentum);
+  void UpdateSenParametersSteps(const int segment_start,
+                                const unsigned int segment_end, const int i);
   void UpdateStep(unsigned int t);
-  void UpdateHessian(const unsigned int slice, arma::mat new_hessian);
   void UpdateRClockTick(const std::string name);
   void UpdateRClockTock(const std::string name);
-  void UpdateRProgressStart();
-  void UpdateRProgressTick();
-  void UpdateThetaHat(const unsigned int col, arma::colvec new_theta_hat);
-  void UpdateThetaSum(const unsigned int col, arma::colvec new_theta_sum);
+  void UpdateRProgress();
 
   arma::colvec active_coefficients_count_;
   double beta_;

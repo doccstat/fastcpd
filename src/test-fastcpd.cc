@@ -78,15 +78,3 @@ context("GetHessian Unit Test") {
     expect_true(norm(hessian - expected_hessian, "fro") < 2e-5);
   }
 }
-
-context("UpdateThetaSum Unit Test") {
-  test_that("update performs normally") {
-    mat theta_sum = FastcpdTest::UpdateThetaSum(0, {1, 2, 3}, {4, 5, 6});
-    expect_true(theta_sum.n_rows == 3);
-    expect_true(theta_sum.n_cols == 1);
-    const colvec theta_sum_col = theta_sum.col(0);
-    const colvec expected_theta_sum = {5, 7, 9};
-    expect_true(
-        approx_equal(theta_sum_col, expected_theta_sum, "absdiff", 1e-6));
-  }
-}
