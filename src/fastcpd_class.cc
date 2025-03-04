@@ -1,7 +1,5 @@
 #include "fastcpd_class.h"
 
-#include "RProgress.h"
-
 using ::arma::abs;
 using ::arma::accu;
 using ::arma::as_scalar;
@@ -254,7 +252,10 @@ List Fastcpd::Run() {
       pruned_set_size_++;
     }
   } else {
-    CreateSegmentStatisticsAndSenParameters();
+    CreateSegmentStatistics();
+    CreateSenParameters();
+    CreateRProgress();
+    UpdateRProgress();
     for (unsigned int t = 2; t <= data_n_rows_; t++) {
       UpdateStep(t);
     }
@@ -373,14 +374,6 @@ void Fastcpd::CreateSegmentStatistics() {
   if (family_ == "lasso") {
     beta_ = beta_ * (1 + mean(active_coefficients_count_));
   }
-}
-
-void Fastcpd::CreateSegmentStatisticsAndSenParameters() {
-  CreateSegmentStatistics();
-  CreateSenParameters();
-  checkUserInterrupt();
-  CreateRProgress();
-  UpdateRProgress();
 }
 
 double Fastcpd::GetCostAdjustmentValue(const unsigned nrows) {

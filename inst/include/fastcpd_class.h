@@ -54,7 +54,6 @@ class Fastcpd {
   void CreateRProgress();
   void CreateSenParameters();
   void CreateSegmentStatistics();
-  void CreateSegmentStatisticsAndSenParameters();
   double GetCostAdjustmentValue(const unsigned nrows);
   CostResult GetCostResult(const unsigned int segment_start,
                            const unsigned int segment_end,

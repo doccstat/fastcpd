@@ -38,31 +38,12 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
   summary(result)
 }
 set.seed(1)
-data <- c(rnorm(10000), rnorm(1000) + 1)
-(result_time <- system.time(
-  result <- fastcpd.mean(data, r.progress = FALSE, cp_only = TRUE)
-))
-result@cp_set
-\donttest{
-set.seed(1)
 n <- 10^7
 data <- c(rnorm(n / 2), rnorm(n / 2, 50))
 (result_time <- system.time(
   result <- fastcpd.mean(data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)
 ))
 result@cp_set
-}
-\donttest{
-set.seed(1)
-data <- c(rnorm(10000), rnorm(10000, 1), rnorm(10000))
-(result_time <- system.time(
-  result <- fastcpd.mean(
-    data, beta = "BIC", cost_adjustment = "BIC",
-    r.progress = FALSE, cp_only = TRUE
-  )
-))
-result@cp_set
-}
 }
 \seealso{
 \code{\link[=fastcpd]{fastcpd()}}
