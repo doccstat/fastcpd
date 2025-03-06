@@ -251,6 +251,53 @@ List Fastcpd::Run() {
       pruned_set_[pruned_set_size_] = t;
       pruned_set_size_++;
     }
+  } else if (family_ == "mean" && cost_adjustment_ == "BIC") {
+    double* obj = (double*)calloc(data_n_rows_ + 1, sizeof(double));
+    double two_norm;
+    unsigned int i, pi;
+
+    for (unsigned int t = 2; t <= data_n_rows_; t++) {
+      for (i = 0; i < pruned_set_size_; i++) {
+        two_norm = (data_c_ptr_[t] - data_c_ptr_[pruned_set_[i]]) *
+                   (data_c_ptr_[t] - data_c_ptr_[pruned_set_[i]]);
+        for (pi = 1; pi < parameters_count_; pi++) {
+          two_norm += (data_c_ptr_[t + data_c_n_rows_ * pi] -
+                       data_c_ptr_[pruned_set_[i] + data_c_n_rows_ * pi]) *
+                      (data_c_ptr_[t + data_c_n_rows_ * pi] -
+                       data_c_ptr_[pruned_set_[i] + data_c_n_rows_ * pi]);
+        }
+        obj[i] = objective_function_values_[pruned_set_[i]] +
+                 ((data_c_ptr_[t + data_c_n_rows_ * parameters_count_] -
+                   data_c_ptr_[pruned_set_[i] +
+                               data_c_n_rows_ * parameters_count_]) -
+                  two_norm / (t - pruned_set_[i])) /
+                     2.0 +
+                 beta_;
+      }
+
+      objective_function_values_min_ = obj[0];
+      objective_function_values_min_index_ = 0;
+      for (i = 1; i < pruned_set_size_; i++) {
+        if (obj[i] < objective_function_values_min_) {
+          objective_function_values_min_ = obj[i];
+          objective_function_values_min_index_ = i;
+        }
+      }
+      objective_function_values_(t) = objective_function_values_min_;
+      change_points_[t] = pruned_set_[objective_function_values_min_index_];
+
+      pruned_left_n_elem_ = 0;
+      for (i = 0; i < pruned_set_size_; i++) {
+        if (obj[i] <=
+            objective_function_values_min_ + beta_ - pruning_coefficient_) {
+          pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
+          pruned_left_n_elem_++;
+        }
+      }
+      pruned_set_size_ = pruned_left_n_elem_;
+      pruned_set_[pruned_set_size_] = t;
+      pruned_set_size_++;
+    }
   } else {
     CreateSegmentStatistics();
     CreateSenParameters();
