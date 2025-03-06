@@ -666,7 +666,6 @@ fastcpd.lm <- fastcpd_lm  # nolint: Conventional R function style
 #' data frame or a vector with each row / element as an observation and thus a
 #' formula is not required here.
 #' @example tests/testthat/examples/fastcpd_mean.R
-#' @example tests/testthat/examples/fastcpd_mean-time.R
 #' @seealso [fastcpd()]
 #'
 #' @md
