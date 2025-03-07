@@ -339,6 +339,79 @@ List Fastcpd::Run() {
       pruned_set_[pruned_set_size_] = t;
       pruned_set_size_++;
     }
+  } else if (family_ == "variance" && cost_adjustment_ == "MBIC" &&
+             data_n_dims_ > 1) {
+    double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
+    double two_norm;
+    unsigned int i, pi;
+
+    for (unsigned int t = 2; t <= data_n_rows_; t++) {
+      for (i = 0; i < pruned_set_size_; i++) {
+        const unsigned int segment_length = t - pruned_set_[i];
+        mat covar = zeros<mat>(data_n_dims_, data_n_dims_);
+        for (unsigned int di = 0; di < data_n_dims_; di++) {
+          for (unsigned int dj = 0; dj < data_n_dims_; dj++) {
+            covar(di, dj) =
+                data_c_ptr_[t + data_c_n_rows_ * (di * data_n_dims_ + dj)] -
+                data_c_ptr_[pruned_set_[i] +
+                            data_c_n_rows_ * (di * data_n_dims_ + dj)];
+          }
+        }
+        double det_value = det(covar / segment_length);
+        if (segment_length < data_n_dims_) {
+          unsigned int approximate_segment_start;
+          unsigned int approximate_segment_end;
+          if (pruned_set_[i] >= data_n_dims_) {
+            approximate_segment_start = pruned_set_[i] - data_n_dims_;
+          } else {
+            approximate_segment_start = 0;
+          }
+          if (t - 1 < data_n_rows_ - data_n_dims_) {
+            approximate_segment_end = t - 1 + data_n_dims_;
+          } else {
+            approximate_segment_end = data_n_rows_ - 1;
+          }
+          mat covar_approx = zeros<mat>(data_n_dims_, data_n_dims_);
+          for (unsigned int di = 0; di < data_n_dims_; di++) {
+            for (unsigned int dj = 0; dj < data_n_dims_; dj++) {
+              covar_approx(di, dj) =
+                  data_c_ptr_[approximate_segment_end + 1 +
+                              data_c_n_rows_ * (di * data_n_dims_ + dj)] -
+                  data_c_ptr_[approximate_segment_start +
+                              data_c_n_rows_ * (di * data_n_dims_ + dj)];
+            }
+          }
+          det_value = det(covar_approx / (approximate_segment_end -
+                                          approximate_segment_start + 1));
+        }
+        obj[i] = objective_function_values_[pruned_set_[i]] +
+                 (log(det_value) * segment_length / 2.0) +
+                 std::log(segment_length) / 2.0 + beta_;
+      }
+
+      objective_function_values_min_ = obj[0];
+      objective_function_values_min_index_ = 0;
+      for (i = 1; i < pruned_set_size_; i++) {
+        if (obj[i] < objective_function_values_min_) {
+          objective_function_values_min_ = obj[i];
+          objective_function_values_min_index_ = i;
+        }
+      }
+      objective_function_values_(t) = objective_function_values_min_;
+      change_points_[t] = pruned_set_[objective_function_values_min_index_];
+
+      pruned_left_n_elem_ = 0;
+      for (i = 0; i < pruned_set_size_; i++) {
+        if (obj[i] <=
+            objective_function_values_min_ + beta_ - pruning_coefficient_) {
+          pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
+          pruned_left_n_elem_++;
+        }
+      }
+      pruned_set_size_ = pruned_left_n_elem_;
+      pruned_set_[pruned_set_size_] = t;
+      pruned_set_size_++;
+    }
   } else {
     CreateSegmentStatistics();
     CreateSenParameters();
