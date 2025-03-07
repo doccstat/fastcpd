@@ -255,11 +255,11 @@ summary.fastcpd <- function(object, ...) {
   if (length(object@cp_set)) {
     cat("Change points:\n")
     cat(object@cp_set, "\n")
-    if (object@family != "custom" && !object@cp_only) {
-      cat("\nCost values:\n")
-      cat(object@cost_values, "\n")
-    }
-    if (ncol(object@thetas) > 0) {
+    if (!object@cp_only) {
+      if (object@family != "custom") {
+        cat("\nCost values:\n")
+        cat(object@cost_values, "\n")
+      }
       cat("\nParameters:\n")
       if (object@family != "lasso") {
         print(object@thetas)

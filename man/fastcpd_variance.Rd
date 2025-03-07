@@ -26,28 +26,24 @@ default a matrix or data frame or a vector with each row / element as an
 observation and thus a formula is not required here.
 }
 \examples{
-set.seed(1)
-data <- c(rnorm(3e+5, 0, 1), rnorm(4e+5, 0, 5), rnorm(3e+5, 0, 1))
-(result_time <- system.time(
-  result <- fastcpd.variance(data, r.progress = FALSE, cp_only = TRUE)
-))
-result@cp_set
 if (requireNamespace("mvtnorm", quietly = TRUE)) {
   set.seed(1)
   p <- 3
-  result <- fastcpd.variance(
-    rbind(
-      mvtnorm::rmvnorm(
-        3000, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-      ),
-      mvtnorm::rmvnorm(
-        4000, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-      ),
-      mvtnorm::rmvnorm(
-        3000, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
-      )
+  data <- rbind(
+    mvtnorm::rmvnorm(
+      3e+5, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+    ),
+    mvtnorm::rmvnorm(
+      4e+5, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
+    ),
+    mvtnorm::rmvnorm(
+      3e+5, rep(0, p), crossprod(matrix(runif(p^2) * 2 - 1, p))
     )
   )
+  result_time <- system.time(
+    result <- fastcpd.variance(data, r.progress = FALSE, cp_only = TRUE)
+  )
+  print(result_time)
   summary(result)
 }
 }
