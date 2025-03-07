@@ -182,7 +182,7 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
   } else {
     auto it = family_function_map_.find(family_);
     if (it != family_function_map_.end()) {
-      const FunctionSet& func_set = it->second;
+      const FunctionSet &func_set = it->second;
       get_gradient_ = func_set.gradient;
       get_hessian_ = func_set.hessian;
       get_nll_sen_ = func_set.nll_sen;
@@ -205,7 +205,7 @@ List Fastcpd::Run() {
   objective_function_values_(1) = GetCostValue(0, 0, 1);
 
   if (family_ == "mean" && cost_adjustment_ == "MBIC") {
-    double* obj = (double*)calloc(data_n_rows_ + 1, sizeof(double));
+    double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
     double two_norm;
     unsigned int i, pi;
 
@@ -252,7 +252,7 @@ List Fastcpd::Run() {
       pruned_set_size_++;
     }
   } else if (family_ == "mean" && cost_adjustment_ == "BIC") {
-    double* obj = (double*)calloc(data_n_rows_ + 1, sizeof(double));
+    double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
     double two_norm;
     unsigned int i, pi;
 
@@ -273,6 +273,47 @@ List Fastcpd::Run() {
                   two_norm / (t - pruned_set_[i])) /
                      2.0 +
                  beta_;
+      }
+
+      objective_function_values_min_ = obj[0];
+      objective_function_values_min_index_ = 0;
+      for (i = 1; i < pruned_set_size_; i++) {
+        if (obj[i] < objective_function_values_min_) {
+          objective_function_values_min_ = obj[i];
+          objective_function_values_min_index_ = i;
+        }
+      }
+      objective_function_values_(t) = objective_function_values_min_;
+      change_points_[t] = pruned_set_[objective_function_values_min_index_];
+
+      pruned_left_n_elem_ = 0;
+      for (i = 0; i < pruned_set_size_; i++) {
+        if (obj[i] <=
+            objective_function_values_min_ + beta_ - pruning_coefficient_) {
+          pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
+          pruned_left_n_elem_++;
+        }
+      }
+      pruned_set_size_ = pruned_left_n_elem_;
+      pruned_set_[pruned_set_size_] = t;
+      pruned_set_size_++;
+    }
+  } else if (family_ == "variance" && cost_adjustment_ == "MBIC" &&
+             data_n_dims_ == 1) {
+    double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
+    double two_norm;
+    unsigned int i, pi;
+
+    for (unsigned int t = 2; t <= data_n_rows_; t++) {
+      for (i = 0; i < pruned_set_size_; i++) {
+        const unsigned int segment_length = t - pruned_set_[i];
+        double det_value = data_c_ptr_[t] - data_c_ptr_[pruned_set_[i]];
+        if (det_value <= 0) {
+          det_value = 1e-11;
+        }
+        obj[i] = objective_function_values_[pruned_set_[i]] +
+                 (log(det_value / segment_length) * segment_length / 2.0) +
+                 std::log(segment_length) / 2.0 + beta_;
       }
 
       objective_function_values_min_ = obj[0];

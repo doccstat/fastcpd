@@ -27,9 +27,11 @@ observation and thus a formula is not required here.
 }
 \examples{
 set.seed(1)
-data <- c(rnorm(300, 0, 1), rnorm(400, 0, 100), rnorm(300, 0, 1))
-result <- fastcpd.variance(data)
-summary(result)
+data <- c(rnorm(3e+5, 0, 1), rnorm(4e+5, 0, 5), rnorm(3e+5, 0, 1))
+(result_time <- system.time(
+  result <- fastcpd.variance(data, r.progress = FALSE, cp_only = TRUE)
+))
+result@cp_set
 if (requireNamespace("mvtnorm", quietly = TRUE)) {
   set.seed(1)
   p <- 3
@@ -47,25 +49,6 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     )
   )
   summary(result)
-}
-\donttest{
-set.seed(1)
-data <- c(rnorm(2000, 0, 1), rnorm(2000, 0, 5), rnorm(2000, 0, 1))
-(result_time <- system.time(
-  result <- fastcpd.variance(data, r.progress = FALSE, cp_only = TRUE)
-))
-result@cp_set
-}
-\donttest{
-set.seed(1)
-data <- c(rnorm(3000, 0, 1), rnorm(3000, 0, 2), rnorm(3000, 0, 1))
-(result_time <- system.time(
-  result <- fastcpd.variance(
-    data, beta = "BIC", cost_adjustment = "BIC",
-    r.progress = FALSE, cp_only = TRUE
-  )
-))
-result@cp_set
 }
 }
 \seealso{
