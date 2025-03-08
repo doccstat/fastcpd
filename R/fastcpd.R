@@ -174,10 +174,6 @@
 #' \item \code{include.mean} is used to determine if a mean/intercept term
 #' should be included in the ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) or
 #' GARCH(\eqn{p}, \eqn{q}) models.
-#' \item \code{r.clock} is used to create an \code{RcppClock} object to record
-#' the time spent in the C++ code. Default is an empty string. If set to
-#' any non-empty string, an object with specified name will be created.
-#' Usage: \code{library(RcppClock); plot(VARIABLE_NAME)}.
 #' \item \code{r.progress} is used to control the progress bar. By default the
 #' progress bar will be shown. To disable it, set \code{r.progress = FALSE}.
 #' \item \code{p.response} is used to specify the number of response variables.
@@ -294,7 +290,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   include_mean <- TRUE
   p_response <- get_p_response(family, y, data_)
   r_progress <- TRUE
-  r_clock <- ""
   if (methods::hasArg("include.mean")) {
     include_mean <- eval.parent(match.call()[["include.mean"]])
   }
@@ -303,9 +298,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   }
   if (methods::hasArg("r.progress")) {
     r_progress <- eval.parent(match.call()[["r.progress"]])
-  }
-  if (methods::hasArg("r.clock")) {
-    r_clock <- eval.parent(match.call()[["r.clock"]])
   }
 
   # Define the cost functions for ARIMA model.
@@ -360,7 +352,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     data_, beta, cost_adjustment, d, segment_count, trim, momentum_coef,
     multiple_epochs, fastcpd_family, epsilon, p, order, cost, cost_gradient,
     cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper,
-    line_search, sigma_, p_response, pruning_coef, r_clock, r_progress
+    line_search, sigma_, p_response, pruning_coef, r_progress
   )
 
   raw_cp_set <- c(result$raw_cp_set)

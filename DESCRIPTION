@@ -39,7 +39,6 @@ Suggests:
     mockthat,
     mvtnorm,
     numDeriv,
-    RcppClock,
     rmarkdown,
     testthat (>= 3.0.0),
     xml2
@@ -47,7 +46,6 @@ LinkingTo:
     progress,
     Rcpp,
     RcppArmadillo,
-    RcppClock,
     RcppEigen,
     testthat
 VignetteBuilder:

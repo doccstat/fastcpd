@@ -16,6 +16,6 @@ Rcpp::List fastcpd_impl(
     const arma::colvec lower, const arma::colvec upper,
     const arma::colvec line_search, const arma::mat variance_estimate,
     const unsigned int p_response, const double pruning_coef,
-    const std::string r_clock, const bool r_progress);
+    const bool r_progress);
 
 #endif  // FASTCPD_IMPL_H_

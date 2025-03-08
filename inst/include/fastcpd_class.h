@@ -8,7 +8,6 @@
 // `RcppArmadillo.h` should be included first.
 #include "fastcpd_test.h"
 #include "RProgress.h"
-#include "RcppClock.h"
 
 #define ERROR(msg)                                                        \
   Rcpp::Rcout << "error: " << __FILE__ << ": " << __LINE__ << ": " << msg \
@@ -34,10 +33,9 @@ class Fastcpd {
           const arma::colvec line_search, const arma::colvec lower,
           const double momentum_coef, const arma::colvec order, const int p,
           const unsigned int p_response, const double pruning_coef,
-          const std::string r_clock, const bool r_progress,
-          const int segment_count, const double trim, const arma::colvec upper,
-          const double vanilla_percentage, const arma::mat variance_estimate,
-          const bool warm_start);
+          const bool r_progress, const int segment_count, const double trim,
+          const arma::colvec upper, const double vanilla_percentage,
+          const arma::mat variance_estimate, const bool warm_start);
 
   Rcpp::List Run();
 
@@ -57,7 +55,6 @@ class Fastcpd {
                               const Rcpp::Nullable<arma::colvec>& start);
   };
 
-  void CreateRClock(const std::string name);
   void CreateRProgress();
   void CreateSenParameters();
   void CreateSegmentStatistics();
@@ -159,8 +156,6 @@ class Fastcpd {
   void UpdateSenParametersSteps(const int segment_start,
                                 const unsigned int segment_end, const int i);
   void UpdateStep(unsigned int t);
-  void UpdateRClockTick(const std::string name);
-  void UpdateRClockTock(const std::string name);
   void UpdateRProgress();
 
   arma::colvec active_coefficients_count_;
@@ -216,9 +211,7 @@ class Fastcpd {
   arma::ucolvec pruned_set_;
   unsigned int pruned_set_size_ = 2;
   const double pruning_coefficient_;
-  const std::string r_clock_;
   const bool r_progress_;
-  Rcpp::Clock rClock_;
   const unsigned int regression_response_count_;
   arma::mat result_coefficients_;
   arma::mat result_residuals_;
