@@ -52,20 +52,17 @@ using ::Rcpp::Rcout;
 
 namespace fastcpd::classes {
 
-Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
-                 const string cost_adjustment,
-                 const Nullable<Function> cost_gradient,
-                 const Nullable<Function> cost_hessian, const bool cp_only,
-                 const unsigned int d, const mat data, const double epsilon,
-                 const string family,
-                 const Nullable<Function> multiple_epochs_function,
-                 const colvec line_search, const colvec lower,
-                 const double momentum_coef, const colvec order, const int p,
-                 const unsigned int p_response, const double pruning_coef,
-                 const string r_clock, const bool r_progress,
-                 const int segment_count, const double trim, const colvec upper,
-                 const double vanilla_percentage, const mat variance_estimate,
-                 const bool warm_start)
+Fastcpd::Fastcpd(
+    const double beta, const Nullable<Function> cost,
+    const string cost_adjustment, const Nullable<Function> cost_gradient,
+    const Nullable<Function> cost_hessian, const bool cp_only,
+    const unsigned int d, const mat data, const double epsilon,
+    const string family, const Nullable<Function> multiple_epochs_function,
+    const colvec line_search, const colvec lower, const double momentum_coef,
+    const colvec order, const int p, const unsigned int p_response,
+    const double pruning_coef, const bool r_progress, const int segment_count,
+    const double trim, const colvec upper, const double vanilla_percentage,
+    const mat variance_estimate, const bool warm_start)
     : active_coefficients_count_(colvec(segment_count)),
       beta_(beta),
       change_points_(zeros<colvec>(data.n_rows + 1)),
@@ -147,7 +144,6 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
       pruned_left_(ucolvec(data_n_rows_ + 1)),
       pruned_set_(zeros<ucolvec>(data_n_rows_ + 1)),
       pruning_coefficient_(pruning_coef),
-      r_clock_(r_clock),
       r_progress_(r_progress),
       regression_response_count_(p_response),
       rProgress_(make_unique<RProgress::RProgress>(kRProgress, data_n_rows_)),
@@ -586,12 +582,6 @@ const unordered_map<string, Fastcpd::FunctionSet>
                                  nullptr,  // No nll_sen
                                  &Fastcpd::GetNllPeltVariance}}};
 
-void Fastcpd::CreateRClock(const std::string name) {
-  if (!r_clock_.empty()) {
-    rClock_.stop(name);
-  }
-}
-
 void Fastcpd::CreateRProgress() {
   if (r_progress_) {
     rProgress_->tick(0);
@@ -692,7 +682,6 @@ void Fastcpd::GetCostResult(const unsigned int segment_start,
 }
 
 List Fastcpd::GetChangePointSet() {
-  CreateRClock(r_clock_);
   colvec cp_set = UpdateChangePointSet();
 
   if (cp_only_) {
@@ -801,12 +790,10 @@ double Fastcpd::GetCostValueSen(const unsigned int segment_start,
 
 colvec Fastcpd::GetObjectiveFunctionValues(unsigned int t) {
   colvec cval = zeros<vec>(pruned_set_size_);
-  UpdateRClockTick("r_t_set_for_loop");
   unsigned int loop_end = pruned_set_size_ - (vanilla_percentage_ != 1);
   for (unsigned int i = 0; i < loop_end; i++) {
     cval(i) = GetCostValue(pruned_set_(i), i, t);
   }
-  UpdateRClockTock("r_t_set_for_loop");
   colvec obj = cval +
                objective_function_values_.rows(
                    pruned_set_.rows(0, pruned_set_size_ - 1)) +
@@ -995,18 +982,6 @@ void Fastcpd::UpdateSenParameters(const unsigned int t) {
          sizeof(double) * parameters_count_ * parameters_count_);
 }
 
-void Fastcpd::UpdateRClockTick(const std::string name) {
-  if (!r_clock_.empty()) {
-    rClock_.tick(name);
-  }
-}
-
-void Fastcpd::UpdateRClockTock(const std::string name) {
-  if (!r_clock_.empty()) {
-    rClock_.tock(name);
-  }
-}
-
 void Fastcpd::UpdateRProgress() {
   if (r_progress_) {
     rProgress_->tick();
@@ -1014,7 +989,6 @@ void Fastcpd::UpdateRProgress() {
 }
 
 void Fastcpd::UpdateStep(unsigned int t) {
-  UpdateRClockTick("pruning");
   UpdateSenParameters(t);
   colvec obj = GetObjectiveFunctionValues(t);
 
@@ -1054,7 +1028,6 @@ void Fastcpd::UpdateStep(unsigned int t) {
   pruned_set_size_ = pruned_left_n_elem_;
   pruned_set_[pruned_set_size_] = t;
   pruned_set_size_++;
-  UpdateRClockTock("pruning");
   UpdateRProgress();
   checkUserInterrupt();
 }

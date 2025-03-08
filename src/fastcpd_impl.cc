@@ -51,8 +51,6 @@ using ::std::move;
 // @param p_response Dimension of the response, used with multivariate
 //   response.
 // @param pruning_coef The constant to satisfy the pruning condition.
-// @param r_clock String indicating whether to profile the program using
-//   `RcppClock`. Empty string means no profiling.
 // @param r_progress Whether to show progress bar.
 //
 // @return A list containing the change points and the cost values for each
@@ -71,11 +69,11 @@ Rcpp::List fastcpd_impl(
     const arma::colvec lower, const arma::colvec upper,
     const arma::colvec line_search, const arma::mat variance_estimate,
     const unsigned int p_response, const double pruning_coef,
-    const std::string r_clock, const bool r_progress) {
+    const bool r_progress) {
   fastcpd::classes::Fastcpd fastcpd_class(
       beta, cost, cost_adjustment, cost_gradient, cost_hessian, cp_only, d,
       data, epsilon, family, multiple_epochs_function, line_search, lower,
-      momentum_coef, order, p, p_response, pruning_coef, r_clock, r_progress,
+      momentum_coef, order, p, p_response, pruning_coef, r_progress,
       segment_count, trim, upper, vanilla_percentage, variance_estimate,
       warm_start);
   return fastcpd_class.Run();
