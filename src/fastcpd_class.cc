@@ -136,6 +136,7 @@ Fastcpd::Fastcpd(
         }
         return nullptr;
       }()),
+      obj((double *)calloc(data_n_rows_ + 1, sizeof(double))),
       objective_function_values_(colvec(data_n_rows_ + 1)),
       order_(order),
       parameters_count_(p),
@@ -196,7 +197,6 @@ List Fastcpd::Run() {
   // TODO(doccstat): Investigate if the following branches can be merged into
   // `fastcpd_class_nll.cc`.
   if (family_ == "mean" && cost_adjustment_ == "MBIC") {
-    double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
     double two_norm;
     unsigned int i, pi;
 
@@ -243,7 +243,6 @@ List Fastcpd::Run() {
       pruned_set_size_++;
     }
   } else if (family_ == "mean" && cost_adjustment_ == "BIC") {
-    double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
     double two_norm;
     unsigned int i, pi;
 
@@ -291,7 +290,6 @@ List Fastcpd::Run() {
     }
   } else if (family_ == "variance" && cost_adjustment_ == "MBIC" &&
              data_n_dims_ == 1) {
-    double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
     unsigned int i;
 
     for (unsigned int t = 2; t <= data_n_rows_; t++) {
@@ -331,7 +329,6 @@ List Fastcpd::Run() {
     }
   } else if (family_ == "variance" && cost_adjustment_ == "MBIC" &&
              data_n_dims_ > 1) {
-    double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
     unsigned int i;
 
     for (unsigned int t = 2; t <= data_n_rows_; t++) {
@@ -403,7 +400,6 @@ List Fastcpd::Run() {
     }
   } else if (family_ == "meanvariance" && cost_adjustment_ == "MBIC" &&
              data_n_dims_ == 1) {
-    double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
     unsigned int i;
 
     for (unsigned int t = 2; t <= data_n_rows_; t++) {
@@ -447,7 +443,6 @@ List Fastcpd::Run() {
     }
   } else if (family_ == "meanvariance" && cost_adjustment_ == "MBIC" &&
              data_n_dims_ > 1) {
-    double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
     unsigned int i;
 
     for (unsigned int t = 2; t <= data_n_rows_; t++) {
@@ -788,19 +783,6 @@ double Fastcpd::GetCostValueSen(const unsigned int segment_start,
   return cval;
 }
 
-colvec Fastcpd::GetObjectiveFunctionValues(unsigned int t) {
-  colvec cval = zeros<vec>(pruned_set_size_);
-  unsigned int loop_end = pruned_set_size_ - (vanilla_percentage_ != 1);
-  for (unsigned int i = 0; i < loop_end; i++) {
-    cval(i) = GetCostValue(pruned_set_(i), i, t);
-  }
-  colvec obj = cval +
-               objective_function_values_.rows(
-                   pruned_set_.rows(0, pruned_set_size_ - 1)) +
-               beta_;
-  return obj;
-}
-
 void Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
                                      const unsigned int segment_end) {
   const mat data_segment = data_.rows(segment_start, segment_end);
@@ -990,7 +972,14 @@ void Fastcpd::UpdateRProgress() {
 
 void Fastcpd::UpdateStep(unsigned int t) {
   UpdateSenParameters(t);
-  colvec obj = GetObjectiveFunctionValues(t);
+  for (unsigned int i = 0; i < pruned_set_size_; i++) {
+    if (i == pruned_set_size_ - 1 && vanilla_percentage_ != 1) {
+      obj[i] = objective_function_values_(pruned_set_(i)) + beta_;
+    } else {
+      obj[i] = objective_function_values_(pruned_set_(i)) +
+               GetCostValue(pruned_set_(i), i, t) + beta_;
+    }
+  }
 
   // The following code is the manual implementation of `index_min` function
   // in Armadillo.
