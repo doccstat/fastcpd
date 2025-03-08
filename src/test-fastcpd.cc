@@ -7,16 +7,15 @@ using ::arma::colvec;
 using ::arma::mat;
 using ::arma::ones;
 
-using ::fastcpd::classes::CostResult;
 using ::fastcpd::test::FastcpdTest;
 
 context("GetNllPelt Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
-    const CostResult cost_result = FastcpdTest::GetNllPelt(
+    const std::tuple<mat, mat, double> cost_result = FastcpdTest::GetNllPelt(
         colvec(kARMA32.data(), kARMA32.size()), 0, 199, false, R_NilValue);
-    const colvec par = cost_result.par;
-    const double value = cost_result.value;
-    const colvec residuals = cost_result.residuals;
+    const colvec par = std::get<0>(cost_result);
+    const colvec residuals = std::get<1>(cost_result);
+    const double value = std::get<2>(cost_result);
 
     // Expected values obtained from the following R code:
     //   arima(x, order = c(3, 0, 2), include.mean = FALSE)

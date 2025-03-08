@@ -205,7 +205,7 @@ double FastcpdTest::GetNllSen(const arma::mat& data,
 // GetNllPelt
 // Computes the negative log-likelihood for the PELT model.
 //------------------------------------------------------------------------------
-fastcpd::classes::CostResult FastcpdTest::GetNllPelt(
+std::tuple<arma::mat, arma::mat, double> FastcpdTest::GetNllPelt(
     const arma::mat& data, const unsigned int segment_start,
     const unsigned int segment_end, const bool cv,
     const Rcpp::Nullable<arma::colvec>& start) {
@@ -238,9 +238,9 @@ fastcpd::classes::CostResult FastcpdTest::GetNllPelt(
       /* warm_start */ false);
   (fastcpd_instance.*fastcpd_instance.get_nll_pelt_)(segment_start, segment_end,
                                                      cv, start);
-  return {{fastcpd_instance.result_coefficients_},
-          {fastcpd_instance.result_residuals_},
-          fastcpd_instance.result_value_};
+  return std::make_tuple(fastcpd_instance.result_coefficients_,
+                         fastcpd_instance.result_residuals_,
+                         fastcpd_instance.result_value_);
 }
 
 }  // namespace test
