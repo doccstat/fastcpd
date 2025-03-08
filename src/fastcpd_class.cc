@@ -303,8 +303,7 @@ List Fastcpd::Run() {
   } else if (family_ == "variance" && cost_adjustment_ == "MBIC" &&
              data_n_dims_ == 1) {
     double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
-    double two_norm;
-    unsigned int i, pi;
+    unsigned int i;
 
     for (unsigned int t = 2; t <= data_n_rows_; t++) {
       for (i = 0; i < pruned_set_size_; i++) {
@@ -344,8 +343,7 @@ List Fastcpd::Run() {
   } else if (family_ == "variance" && cost_adjustment_ == "MBIC" &&
              data_n_dims_ > 1) {
     double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
-    double two_norm;
-    unsigned int i, pi;
+    unsigned int i;
 
     for (unsigned int t = 2; t <= data_n_rows_; t++) {
       for (i = 0; i < pruned_set_size_; i++) {
@@ -417,8 +415,7 @@ List Fastcpd::Run() {
   } else if (family_ == "meanvariance" && cost_adjustment_ == "MBIC" &&
              data_n_dims_ == 1) {
     double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
-    double two_norm;
-    unsigned int i, pi;
+    unsigned int i;
 
     for (unsigned int t = 2; t <= data_n_rows_; t++) {
       for (i = 0; i < pruned_set_size_; i++) {
@@ -462,8 +459,7 @@ List Fastcpd::Run() {
   } else if (family_ == "meanvariance" && cost_adjustment_ == "MBIC" &&
              data_n_dims_ > 1) {
     double *obj = (double *)calloc(data_n_rows_ + 1, sizeof(double));
-    double two_norm;
-    unsigned int i, pi;
+    unsigned int i;
 
     for (unsigned int t = 2; t <= data_n_rows_; t++) {
       for (i = 0; i < pruned_set_size_; i++) {
