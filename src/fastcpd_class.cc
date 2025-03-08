@@ -618,7 +618,9 @@ void Fastcpd::CreateSenParameters() {
 // TODO(doccstat): Use `segment_theta` as warm start.
 
 void Fastcpd::CreateSegmentStatistics() {
-  if (family_ == "custom" && vanilla_percentage_ == 1) return;
+  if (family_ == "mean" || family_ == "variance" || family_ == "meanvariance" ||
+      family_ == "custom" && vanilla_percentage_ == 1)
+    return;
   for (int segment_index = 0; segment_index < segment_count_; ++segment_index) {
     GetCostResult(segment_indices_(segment_index),
                   segment_indices_(segment_index + 1) - 1, R_NilValue, true,
