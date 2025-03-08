@@ -635,11 +635,10 @@ void Fastcpd::CreateSenParameters() {
 void Fastcpd::CreateSegmentStatistics() {
   if (family_ == "custom" && vanilla_percentage_ == 1) return;
   for (int segment_index = 0; segment_index < segment_count_; ++segment_index) {
-    rowvec segment_theta =
-        GetCostResult(segment_indices_(segment_index),
-                      segment_indices_(segment_index + 1) - 1, R_NilValue, true,
-                      R_NilValue)
-            .par;
+    GetCostResult(segment_indices_(segment_index),
+                  segment_indices_(segment_index + 1) - 1, R_NilValue, true,
+                  R_NilValue);
+    rowvec segment_theta = result_coefficients_.t().as_row();
 
     // Initialize the estimated coefficients for each segment to be the
     // estimated coefficients in the segment.
@@ -674,24 +673,20 @@ double Fastcpd::GetCostAdjustmentValue(const unsigned nrows) {
   return adjusted;
 }
 
-CostResult Fastcpd::GetCostResult(const unsigned int segment_start,
-                                  const unsigned int segment_end,
-                                  Nullable<colvec> theta, const bool cv,
-                                  Nullable<colvec> start) {
-  CostResult cost_result;
+void Fastcpd::GetCostResult(const unsigned int segment_start,
+                            const unsigned int segment_end,
+                            Nullable<colvec> theta, const bool cv,
+                            Nullable<colvec> start) {
   if (theta.isNull()) {
     (this->*get_nll_pelt_)(segment_start, segment_end, cv, start);
-    cost_result =
-        CostResult{{result_coefficients_}, {result_residuals_}, result_value_};
   } else {
-    cost_result = CostResult{
-        {colvec()},
-        {colvec()},
-        (this->*get_nll_sen_)(segment_start, segment_end, as<colvec>(theta))};
+    result_coefficients_ = mat();
+    result_residuals_ = mat();
+    result_value_ =
+        (this->*get_nll_sen_)(segment_start, segment_end, as<colvec>(theta));
   }
-  cost_result.value =
-      UpdateCostValue(cost_result.value, segment_end - segment_start + 1);
-  return cost_result;
+  result_value_ =
+      UpdateCostValue(result_value_, segment_end - segment_start + 1);
 }
 
 List Fastcpd::GetChangePointSet() {
@@ -724,20 +719,18 @@ List Fastcpd::GetChangePointSet() {
   unsigned int residual_next_start = 0;
 
   for (unsigned int i = 0; i < cp_loc.n_elem - 1; i++) {
-    CostResult cost_result = GetCostResult(cp_loc(i), cp_loc(i + 1) - 1,
-                                           R_NilValue, false, R_NilValue);
-
-    cost_values(i) = cost_result.value;
+    GetCostResult(cp_loc(i), cp_loc(i + 1) - 1, R_NilValue, false, R_NilValue);
+    cost_values(i) = result_value_;
 
     // Parameters are not involved for PELT.
     if (vanilla_percentage_ < 1 || family_ == "garch") {
-      thetas.col(i) = colvec(cost_result.par);
+      thetas.col(i) = result_coefficients_.as_col();
     }
 
     // Residual is only calculated for built-in families.
     if (family_ != "custom" && family_ != "mean" && family_ != "variance" &&
         family_ != "meanvariance") {
-      mat cost_optim_residual = cost_result.residuals;
+      mat cost_optim_residual = result_residuals_;
       residual.rows(residual_next_start,
                     residual_next_start + cost_optim_residual.n_rows - 1) =
           cost_optim_residual;
@@ -762,30 +755,28 @@ double Fastcpd::GetCostValuePelt(const unsigned int segment_start,
                                  const unsigned int segment_end,
                                  const unsigned int i) {
   double cval = 0;
-  CostResult cost_result;
   if ((family_ == "binomial" || family_ == "poisson") &&
       (use_warm_start_ &&
        segment_end + 1 - segment_start >= 10 * parameters_count_)) {
-    cost_result = GetCostResult(
+    GetCostResult(
         segment_start, segment_end, R_NilValue, false,
         wrap(segment_coefficients_
                  .row(index_max(find(segment_indices_ <= segment_end)))
                  .t())
         // Or use `wrap(start.col(segment_start))` for warm start.
     );
-    warm_start_.col(segment_start) = colvec(cost_result.par);
+    warm_start_.col(segment_start) = result_coefficients_.as_col();
   } else {
-    cost_result = GetCostResult(segment_start, segment_end, R_NilValue, false,
-                                R_NilValue);
+    GetCostResult(segment_start, segment_end, R_NilValue, false, R_NilValue);
   }
-  cval = cost_result.value;
+  cval = result_value_;
 
   // If `vanilla_percentage_` is not 1, then we need to keep track of
   // thetas for later `fastcpd` steps.
   if (vanilla_percentage_ < 1 &&
       segment_end < vanilla_percentage_ * data_n_rows_) {
-    coefficients_.col(i) = colvec(cost_result.par);
-    coefficients_sum_.col(i) += colvec(cost_result.par);
+    coefficients_.col(i) = result_coefficients_.as_col();
+    coefficients_sum_.col(i) += result_coefficients_.as_col();
   }
   return cval;
 }
@@ -801,9 +792,8 @@ double Fastcpd::GetCostValueSen(const unsigned int segment_start,
     cval = (this->*get_nll_sen_)(segment_start, segment_end, theta);
   } else if ((family_ != "lasso" && segment_length >= parameters_count_) ||
              (family_ == "lasso" && segment_length >= 3)) {
-    cval = GetCostResult(segment_start, segment_end, wrap(theta), false,
-                         R_NilValue)
-               .value;
+    GetCostResult(segment_start, segment_end, wrap(theta), false, R_NilValue);
+    cval = result_value_;
   }
   // else segment_length < parameters_count_ or for lasso segment_length < 3
   return cval;

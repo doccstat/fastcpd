@@ -9,7 +9,6 @@
 #include "fastcpd_test.h"
 #include "RProgress.h"
 #include "RcppClock.h"
-#include "fastcpd_wrapper.h"
 
 #define ERROR(msg)                                                        \
   Rcpp::Rcout << "error: " << __FILE__ << ": " << __LINE__ << ": " << msg \
@@ -63,11 +62,10 @@ class Fastcpd {
   void CreateSenParameters();
   void CreateSegmentStatistics();
   double GetCostAdjustmentValue(const unsigned nrows);
-  CostResult GetCostResult(const unsigned int segment_start,
-                           const unsigned int segment_end,
-                           Rcpp::Nullable<arma::colvec> theta,
-                           const bool cv = false,
-                           Rcpp::Nullable<arma::colvec> start = R_NilValue);
+  void GetCostResult(const unsigned int segment_start,
+                     const unsigned int segment_end,
+                     Rcpp::Nullable<arma::colvec> theta, const bool cv = false,
+                     Rcpp::Nullable<arma::colvec> start = R_NilValue);
   Rcpp::List GetChangePointSet();
   double GetCostValue(const int tau, const unsigned int i, const int t);
   double GetCostValuePelt(const unsigned int segment_start,
