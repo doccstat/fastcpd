@@ -146,7 +146,6 @@ class Fastcpd {
                      const unsigned int segment_end, arma::colvec theta);
   double GetNllSenPoisson(const unsigned int segment_start,
                           const unsigned int segment_end, arma::colvec theta);
-  arma::colvec GetObjectiveFunctionValues(unsigned int t);
   void GetOptimizedCostResult(const unsigned int segment_start,
                               const unsigned int segment_end);
   arma::colvec UpdateChangePointSet();
@@ -199,6 +198,7 @@ class Fastcpd {
   arma::colvec momentum_;
   const double momentum_coef_;
   const std::unique_ptr<Rcpp::Function> multiple_epochs_function_;
+  double* obj;
   arma::colvec objective_function_values_;
   double objective_function_values_min_;
   unsigned int objective_function_values_min_index_;
