@@ -10,6 +10,14 @@
 #include "RProgress.h"
 #include "RcppClock.h"
 
+#define ERROR(msg)                                                        \
+  Rcpp::Rcout << "error: " << __FILE__ << ": " << __LINE__ << ": " << msg \
+              << std::endl
+#define FATAL(msg)                                                        \
+  Rcpp::Rcout << "fatal: " << __FILE__ << ": " << __LINE__ << ": " << msg \
+              << std::endl;                                               \
+  throw std::runtime_error(msg)
+
 constexpr char kRProgress[] = "[:bar] :current/:total in :elapsed";
 
 namespace fastcpd::classes {
@@ -44,10 +52,9 @@ class Fastcpd {
     double (Fastcpd::*nll_sen)(const unsigned int segment_start,
                                const unsigned int segment_end,
                                arma::colvec theta);
-    CostResult (Fastcpd::*nll_pelt)(const unsigned int segment_start,
-                                    const unsigned int segment_end,
-                                    const bool cv,
-                                    const Rcpp::Nullable<arma::colvec>& start);
+    void (Fastcpd::*nll_pelt)(const unsigned int segment_start,
+                              const unsigned int segment_end, const bool cv,
+                              const Rcpp::Nullable<arma::colvec>& start);
   };
 
   void CreateRClock(const std::string name);
@@ -102,34 +109,33 @@ class Fastcpd {
   arma::mat GetHessianPoisson(const unsigned int segment_start,
                               const unsigned int segment_end,
                               const arma::colvec& theta);
-  CostResult GetNllPeltArma(const unsigned int segment_start,
-                            const unsigned int segment_end, const bool cv,
-                            const Rcpp::Nullable<arma::colvec>& start);
-  CostResult GetNllPeltCustom(const unsigned int segment_start,
+  void GetNllPeltArma(const unsigned int segment_start,
+                      const unsigned int segment_end, const bool cv,
+                      const Rcpp::Nullable<arma::colvec>& start);
+  void GetNllPeltCustom(const unsigned int segment_start,
+                        const unsigned int segment_end, const bool cv,
+                        const Rcpp::Nullable<arma::colvec>& start);
+  void GetNllPeltGarch(const unsigned int segment_start,
+                       const unsigned int segment_end, const bool cv,
+                       const Rcpp::Nullable<arma::colvec>& start);
+  void GetNllPeltGlm(const unsigned int segment_start,
+                     const unsigned int segment_end, const bool cv,
+                     const Rcpp::Nullable<arma::colvec>& start);
+  void GetNllPeltLasso(const unsigned int segment_start,
+                       const unsigned int segment_end, const bool cv,
+                       const Rcpp::Nullable<arma::colvec>& start);
+  void GetNllPeltMean(const unsigned int segment_start,
+                      const unsigned int segment_end, const bool cv,
+                      const Rcpp::Nullable<arma::colvec>& start);
+  void GetNllPeltMeanVariance(const unsigned int segment_start,
                               const unsigned int segment_end, const bool cv,
                               const Rcpp::Nullable<arma::colvec>& start);
-  CostResult GetNllPeltGarch(const unsigned int segment_start,
-                             const unsigned int segment_end, const bool cv,
-                             const Rcpp::Nullable<arma::colvec>& start);
-  CostResult GetNllPeltGlm(const unsigned int segment_start,
+  void GetNllPeltMgaussian(const unsigned int segment_start,
                            const unsigned int segment_end, const bool cv,
                            const Rcpp::Nullable<arma::colvec>& start);
-  CostResult GetNllPeltLasso(const unsigned int segment_start,
-                             const unsigned int segment_end, const bool cv,
-                             const Rcpp::Nullable<arma::colvec>& start);
-  CostResult GetNllPeltMean(const unsigned int segment_start,
-                            const unsigned int segment_end, const bool cv,
-                            const Rcpp::Nullable<arma::colvec>& start);
-  CostResult GetNllPeltMeanVariance(const unsigned int segment_start,
-                                    const unsigned int segment_end,
-                                    const bool cv,
-                                    const Rcpp::Nullable<arma::colvec>& start);
-  CostResult GetNllPeltMgaussian(const unsigned int segment_start,
-                                 const unsigned int segment_end, const bool cv,
-                                 const Rcpp::Nullable<arma::colvec>& start);
-  CostResult GetNllPeltVariance(const unsigned int segment_start,
-                                const unsigned int segment_end, const bool cv,
-                                const Rcpp::Nullable<arma::colvec>& start);
+  void GetNllPeltVariance(const unsigned int segment_start,
+                          const unsigned int segment_end, const bool cv,
+                          const Rcpp::Nullable<arma::colvec>& start);
   double GetNllSenArma(const unsigned int segment_start,
                        const unsigned int segment_end, arma::colvec theta);
   double GetNllSenBinomial(const unsigned int segment_start,
@@ -188,9 +194,9 @@ class Fastcpd {
   arma::mat (Fastcpd::*get_hessian_)(const unsigned int segment_start,
                                      const unsigned int segment_end,
                                      const arma::colvec& theta);
-  CostResult (Fastcpd::*get_nll_pelt_)(
-      const unsigned int segment_start, const unsigned int segment_end,
-      const bool cv, const Rcpp::Nullable<arma::colvec>& start);
+  void (Fastcpd::*get_nll_pelt_)(const unsigned int segment_start,
+                                 const unsigned int segment_end, const bool cv,
+                                 const Rcpp::Nullable<arma::colvec>& start);
   double (Fastcpd::*get_nll_sen_)(const unsigned int segment_start,
                                   const unsigned int segment_end,
                                   arma::colvec theta);
@@ -216,6 +222,9 @@ class Fastcpd {
   const bool r_progress_;
   Rcpp::Clock rClock_;
   const unsigned int regression_response_count_;
+  arma::mat result_coefficients_;
+  arma::mat result_residuals_;
+  double result_value_;
   std::unique_ptr<RProgress::RProgress> rProgress_;
   arma::mat segment_coefficients_;
   const int segment_count_;

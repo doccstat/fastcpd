@@ -50,13 +50,6 @@ using ::Rcpp::InternalFunction;
 
 using ::Rcpp::Rcout;
 
-#define ERROR(msg) \
-  Rcout << "error: " << __FILE__ << ": " << __LINE__ << ": " << msg << std::endl
-#define FATAL(msg)                                                  \
-  Rcout << "fatal: " << __FILE__ << ": " << __LINE__ << ": " << msg \
-        << std::endl;                                               \
-  throw std::runtime_error(msg)
-
 namespace fastcpd::classes {
 
 Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
@@ -687,7 +680,9 @@ CostResult Fastcpd::GetCostResult(const unsigned int segment_start,
                                   Nullable<colvec> start) {
   CostResult cost_result;
   if (theta.isNull()) {
-    cost_result = (this->*get_nll_pelt_)(segment_start, segment_end, cv, start);
+    (this->*get_nll_pelt_)(segment_start, segment_end, cv, start);
+    cost_result =
+        CostResult{{result_coefficients_}, {result_residuals_}, result_value_};
   } else {
     cost_result = CostResult{
         {colvec()},

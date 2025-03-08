@@ -236,8 +236,11 @@ fastcpd::classes::CostResult FastcpdTest::GetNllPelt(
       /* vanilla_percentage */ 0.0,
       /* variance_estimate */ arma::mat(),
       /* warm_start */ false);
-  return (fastcpd_instance.*fastcpd_instance.get_nll_pelt_)(
-      segment_start, segment_end, cv, start);
+  (fastcpd_instance.*fastcpd_instance.get_nll_pelt_)(segment_start, segment_end,
+                                                     cv, start);
+  return {{fastcpd_instance.result_coefficients_},
+          {fastcpd_instance.result_residuals_},
+          fastcpd_instance.result_value_};
 }
 
 }  // namespace test
