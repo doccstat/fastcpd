@@ -824,9 +824,8 @@ colvec Fastcpd::GetObjectiveFunctionValues(unsigned int t) {
   return obj;
 }
 
-CostResult Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
-                                           const unsigned int segment_end) {
-  CostResult cost_result;
+void Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
+                                     const unsigned int segment_end) {
   const mat data_segment = data_.rows(segment_start, segment_end);
   if (parameters_count_ == 1) {
     Environment stats = Environment::namespace_env("stats");
@@ -842,8 +841,9 @@ CostResult Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
               Named("data") = data_segment, Named("cost") = *cost_function_);
     colvec par = as<colvec>(optim_result["par"]);
     double value = as<double>(optim_result["value"]);
-    cost_result = {
-        {log(par / (1 - par))}, {colvec()}, exp(value) / (1 + exp(value))};
+    result_coefficients_ = mat(log(par / (1 - par)));
+    result_residuals_ = mat();
+    result_value_ = exp(value) / (1 + exp(value));
   } else {
     Environment stats = Environment::namespace_env("stats");
     Function optim = stats["optim"];
@@ -852,10 +852,10 @@ CostResult Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
         Named("fn") = *cost_function_, Named("method") = "L-BFGS-B",
         Named("data") = data_segment, Named("lower") = parameters_lower_bound_,
         Named("upper") = parameters_upper_bound_);
-    cost_result = {
-        {as<colvec>(optim_result["par"])}, {colvec()}, optim_result["value"]};
+    result_coefficients_ = as<mat>(optim_result["par"]);
+    result_residuals_ = mat();
+    result_value_ = as<double>(optim_result["value"]);
   }
-  return cost_result;
 }
 
 void Fastcpd::UpdateSenParametersStep(const int segment_start,
