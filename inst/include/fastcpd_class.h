@@ -9,6 +9,7 @@
 #include "fastcpd_test.h"
 #include "RProgress.h"
 #include "RcppClock.h"
+#include "fastcpd_wrapper.h"
 
 #define ERROR(msg)                                                        \
   Rcpp::Rcout << "error: " << __FILE__ << ": " << __LINE__ << ": " << msg \

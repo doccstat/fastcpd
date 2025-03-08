@@ -1,7 +1,7 @@
 #ifndef FASTCPD_TEST_H_
 #define FASTCPD_TEST_H_
 
-#include "fastcpd_wrapper.h"
+#include "RcppArmadillo.h"
 
 namespace fastcpd {
 namespace test {
@@ -39,7 +39,7 @@ class FastcpdTest {
                           const unsigned int segment_end, arma::colvec theta);
 
   // Computes the negative log-likelihood for the PELT model.
-  static fastcpd::classes::CostResult GetNllPelt(
+  static std::tuple<arma::mat, arma::mat, double> GetNllPelt(
       const arma::mat& data, const unsigned int segment_start,
       const unsigned int segment_end, const bool cv,
       const Rcpp::Nullable<arma::colvec>& start);
