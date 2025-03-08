@@ -152,7 +152,6 @@ class Fastcpd {
   arma::colvec GetObjectiveFunctionValues(unsigned int t);
   void GetOptimizedCostResult(const unsigned int segment_start,
                               const unsigned int segment_end);
-  double UpdateCostValue(double value, const unsigned int nrows);
   arma::colvec UpdateChangePointSet();
   void UpdateSenParameters(const unsigned int t);
   void UpdateSenParametersStep(const int segment_start, const int segment_end,
