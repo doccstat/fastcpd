@@ -685,8 +685,10 @@ void Fastcpd::GetCostResult(const unsigned int segment_start,
     result_value_ =
         (this->*get_nll_sen_)(segment_start, segment_end, as<colvec>(theta));
   }
-  result_value_ =
-      UpdateCostValue(result_value_, segment_end - segment_start + 1);
+  if (cost_adjustment_ == "MDL") {
+    result_value_ = result_value_ * std::log2(M_E);
+  }
+  result_value_ += GetCostAdjustmentValue(segment_end - segment_start + 1);
 }
 
 List Fastcpd::GetChangePointSet() {
@@ -918,13 +920,6 @@ void Fastcpd::UpdateSenParametersSteps(const int segment_start,
 
   coefficients_sum_.col(i) += coefficients_.col(i);
   momentum_ = tmp;
-}
-
-double Fastcpd::UpdateCostValue(double value, const unsigned int nrows) {
-  if (cost_adjustment_ == "MDL") {
-    value = value * std::log2(M_E);
-  }
-  return value + GetCostAdjustmentValue(nrows);
 }
 
 colvec Fastcpd::UpdateChangePointSet() {
