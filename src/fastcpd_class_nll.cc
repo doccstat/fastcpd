@@ -377,10 +377,7 @@ void Fastcpd::GetNllPeltCustom(const unsigned int segment_start,
                                const unsigned int segment_end, const bool cv,
                                const Nullable<colvec>& start) {
   if (cost_gradient_ || cost_hessian_) {
-    CostResult cost_result = GetOptimizedCostResult(segment_start, segment_end);
-    result_coefficients_ = cost_result.par;
-    result_residuals_ = cost_result.residuals;
-    result_value_ = cost_result.value;
+    GetOptimizedCostResult(segment_start, segment_end);
   } else {
     result_coefficients_ = mat();
     result_residuals_ = mat();
