@@ -747,14 +747,14 @@ double Fastcpd::GetCostValue(const int tau, const unsigned int i, const int t) {
   if (t > vanilla_percentage_ * data_n_rows_) {
     return GetCostValueSen(tau, t - 1, i);
   } else {
-    return GetCostValuePelt(tau, t - 1, i);
+    GetCostValuePelt(tau, t - 1, i);
+    return result_value_;
   }
 }
 
-double Fastcpd::GetCostValuePelt(const unsigned int segment_start,
-                                 const unsigned int segment_end,
-                                 const unsigned int i) {
-  double cval = 0;
+void Fastcpd::GetCostValuePelt(const unsigned int segment_start,
+                               const unsigned int segment_end,
+                               const unsigned int i) {
   if ((family_ == "binomial" || family_ == "poisson") &&
       (use_warm_start_ &&
        segment_end + 1 - segment_start >= 10 * parameters_count_)) {
@@ -769,7 +769,6 @@ double Fastcpd::GetCostValuePelt(const unsigned int segment_start,
   } else {
     GetCostResult(segment_start, segment_end, R_NilValue, false, R_NilValue);
   }
-  cval = result_value_;
 
   // If `vanilla_percentage_` is not 1, then we need to keep track of
   // thetas for later `fastcpd` steps.
@@ -778,7 +777,6 @@ double Fastcpd::GetCostValuePelt(const unsigned int segment_start,
     coefficients_.col(i) = result_coefficients_.as_col();
     coefficients_sum_.col(i) += result_coefficients_.as_col();
   }
-  return cval;
 }
 
 double Fastcpd::GetCostValueSen(const unsigned int segment_start,
