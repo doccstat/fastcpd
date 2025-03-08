@@ -16,8 +16,8 @@ knitr::opts_chunk$set(
   fig.path="comparison-packages/"
 )
 
-# devtools::install_github(c("swang87/bcp", "veseshan/DNAcopy", "vrunge/gfpop"))
-# install.packages(c("bcp", "changepoint", "cpm", "CptNonPar", "strucchange", "ecp", "breakfast", "wbs", "mcp", "mosum", "not", "fpop", "jointseg", "microbenchmark", "segmented", "stepR", "VARDetect"))
+# devtools::install_github(c("swang87/bcp", "veseshan/DNAcopy", "vrunge/gfpop", "peiliangbai92/VARDetect"))
+# install.packages(c("changepoint", "cpm", "CptNonPar", "strucchange", "ecp", "breakfast", "wbs", "mcp", "mosum", "not", "fpop", "jointseg", "microbenchmark", "segmented", "stepR"))
 
 if (requireNamespace("microbenchmark", quietly = TRUE)) {
   library(microbenchmark)
@@ -88,14 +88,14 @@ plot.ts(mean_data_3)
 ```{r data-setup-multivariate-mean-and-or-variance-change}
 # Multivariate mean and/or variance change
 set.seed(1)
-p <- 4
+p <- 3
 mv_data_3 <- rbind(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
+  mvtnorm::rmvnorm(400, mean = rep(100, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(400, p)),
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(100, p))
+  mvtnorm::rmvnorm(400, mean = rep(100, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(300, mean = rep(100, p), sigma = diag(400, p))
 )
 
 plot.ts(mv_data_3)
@@ -210,14 +210,14 @@ plot.ts(ar_data)
 ```{r data-setup-garch11}
 # GARCH(1, 1)
 set.seed(1)
-n <- 400
+n <- 1501
 sigma_2 <- rep(1, n + 1)
 x <- rep(0, n + 1)
-for (i in seq_len(200)) {
-  sigma_2[i + 1] <- 20 + 0.5 * x[i]^2 + 0.1 * sigma_2[i]
+for (i in seq_len(750)) {
+  sigma_2[i + 1] <- 20 + 0.8 * x[i]^2 + 0.1 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
-for (i in 201:400) {
+for (i in 751:n) {
   sigma_2[i + 1] <- 1 + 0.1 * x[i]^2 + 0.5 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
@@ -667,7 +667,7 @@ results[["mv_data_3"]][["fastcpd"]]
 ```
 
 ```{r multivariate-mean-and-or-variance-change-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(results[["mv_data_3"]][["fastcpd"]], c(300, 700, 1000, 1300, 1700), tolerance = 0.2)
+testthat::expect_equal(results[["mv_data_3"]][["fastcpd"]], c(300, 700, 1013, 1300, 1700), tolerance = 0.2)
 ```
 
 ```{r multivariate-mean-and-or-variance-change-ecp, eval = rerun}
@@ -886,7 +886,7 @@ if (requireNamespace("mcp", quietly = TRUE)) {
 
 # GARCH(1, 1)
 
-The true change point is 200.
+The true change point is 750.
 
 ```{r garch11-fastcpd, eval = rerun}
 results[["garch_data"]][["fastcpd"]] <-
@@ -898,7 +898,7 @@ results[["garch_data"]][["fastcpd"]]
 ```
 
 ```{r garch11-fastcpd-testthat, include = FALSE}
-testthat::expect_equal(results[["garch_data"]][["fastcpd"]], c(205), tolerance = 0.2)
+testthat::expect_equal(results[["garch_data"]][["fastcpd"]], c(759), tolerance = 0.2)
 ```
 
 ```{r garch11-CptNonPar, eval = rerun}
@@ -911,7 +911,7 @@ results[["garch_data"]][["CptNonPar"]]
 ```
 
 ```{r garch11-CptNonPar-testthat, include = FALSE}
-testthat::expect_equal(results[["garch_data"]][["CptNonPar"]], c(206), tolerance = 0.2)
+testthat::expect_equal(results[["garch_data"]][["CptNonPar"]], c(759), tolerance = 0.2)
 ```
 
 ```{r garch11-strucchange, eval = rerun}
@@ -1063,15 +1063,16 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 
 # Time comparison using `well_log`
 
+Some packages are commented out due to the excessive running time.
+
 ```{r time-comparison-well-log, eval = rerun}
 results[["microbenchmark"]] <- microbenchmark::microbenchmark(
-  fastcpd = fastcpd::fastcpd.mean(well_log, trim = 0.003, r.progress = FALSE),
+  fastcpd = fastcpd::fastcpd.mean(well_log, r.progress = FALSE, cp_only = TRUE),
   changepoint = changepoint::cpt.mean(well_log/mad(well_log), method = "PELT"),
-  CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
-  strucchange =
-    strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),
-  ecp = ecp::e.divisive(matrix(well_log)),
-  breakfast = breakfast::breakfast(well_log),
+  # CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
+  # strucchange = strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),
+  # ecp = ecp::e.divisive(matrix(well_log)),
+  # breakfast = breakfast::breakfast(well_log),
   wbs = wbs::wbs(well_log),
   mosum = mosum::mosum(c(well_log), G = 40),
   fpop = fpop::Fpop(well_log, nrow(well_log)),
@@ -1085,8 +1086,7 @@ results[["microbenchmark"]] <- microbenchmark::microbenchmark(
   ),
   jointseg = jointseg::jointSeg(well_log, K = 12),
   stepR = stepR::stepFit(well_log, alpha = 0.5),
-  not = not::not(well_log, contrast = "pcwsConstMean"),
-  times = 10
+  not = not::not(well_log, contrast = "pcwsConstMean")
 )
 ```
 

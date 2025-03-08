@@ -76,14 +76,14 @@ plot.ts(mean_data_3)
 ``` r
 # Multivariate mean and/or variance change
 set.seed(1)
-p <- 4
+p <- 3
 mv_data_3 <- rbind(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
+  mvtnorm::rmvnorm(400, mean = rep(100, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(400, p)),
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(100, p))
+  mvtnorm::rmvnorm(400, mean = rep(100, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(300, mean = rep(100, p), sigma = diag(400, p))
 )
 
 plot.ts(mv_data_3)
@@ -221,14 +221,14 @@ plot.ts(ar_data)
 ``` r
 # GARCH(1, 1)
 set.seed(1)
-n <- 400
+n <- 1501
 sigma_2 <- rep(1, n + 1)
 x <- rep(0, n + 1)
-for (i in seq_len(200)) {
-  sigma_2[i + 1] <- 20 + 0.5 * x[i]^2 + 0.1 * sigma_2[i]
+for (i in seq_len(750)) {
+  sigma_2[i + 1] <- 20 + 0.8 * x[i]^2 + 0.1 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
-for (i in 201:400) {
+for (i in 751:n) {
   sigma_2[i + 1] <- 1 + 0.1 * x[i]^2 + 0.5 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
@@ -480,16 +480,12 @@ results[["mean_data_1"]][["mcp"]] <- mcp::mcp(
   data = data.frame(y = mean_data_1, x = seq_len(nrow(mean_data_1))),
   par_x = "x"
 )
-#> Compiling model graph
-#>    Resolving undeclared variables
-#>    Allocating nodes
-#> Graph information:
-#>    Observed stochastic nodes: 1000
-#>    Unobserved stochastic nodes: 6
-#>    Total graph size: 17028
-#> 
-#> Initializing model
-#> Finished sampling in 19.3 seconds
+#> Error : .onLoad failed in loadNamespace() for 'rjags', details:
+#>   call: dyn.load(file, DLLpath = DLLpath, ...)
+#>   error: unable to load shared object '/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/rjags/libs/rjags.so':
+#>   dlopen(/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/rjags/libs/rjags.so, 0x000A): Library not loaded: /usr/local/lib/libjags.4.dylib
+#>   Referenced from: <CAF5E1DC-317A-34FE-988A-FB6F7C73D89E> /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/rjags/libs/rjags.so
+#>   Reason: tried: '/usr/local/lib/libjags.4.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/usr/local/lib/libjags.4.dylib' (no such file), '/usr/local/lib/libjags.4.dylib' (no such file), '/Library/Frameworks/R.framework/Resources/lib/libjags.4.dylib' (no such file), '/Library/Java/JavaVirtualMachines/jdk-11.0.18+10/Contents/Home/lib/server/libjags.4.dylib' (no such file), '/var/folders/lw/np6nlqmn527g1n2ysqssf00c0000gn/T/rstudio-fallback-library-path-1577547578/libjags.4.dylib' (no such file)
 ```
 
 
@@ -497,9 +493,8 @@ results[["mean_data_1"]][["mcp"]] <- mcp::mcp(
 if (requireNamespace("mcp", quietly = TRUE)) {
   plot(results[["mean_data_1"]][["mcp"]])
 }
+#> Error in samples[[1]]: subscript out of bounds
 ```
-
-![plot of chunk univariate-mean-change-mcp-result](comparison-packages/univariate-mean-change-mcp-result-1.png)
 
 
 ``` r
@@ -519,8 +514,6 @@ if (requireNamespace("not", quietly = TRUE)) {
 
 ``` r
 results[["mean_data_1"]][["bcp"]] <- bcp::bcp(mean_data_1)
-#> Loading required package: bcp
-#> Loading required package: grid
 ```
 
 
@@ -601,8 +594,7 @@ results[["mv_data_1"]][["cpm"]] <-
 
 ``` r
 results[["mv_data_1"]][["cpm"]]
-#>  [1]  293  300  403  408  618  621  696 1000 1021 1024 1293 1300 1417 1693 1700
-#> [16] 1981
+#>  [1]  293  300  403  408  618  621  696 1000 1021 1024 1293 1300 1417 1693 1700 1981
 ```
 
 
@@ -614,16 +606,12 @@ results[["mv_data_1"]][["mcp"]] <- mcp::mcp(
   data = data.frame(y = mv_data_1, x = seq_len(nrow(mv_data_1))),
   par_x = "x"
 )
-#> Compiling model graph
-#>    Resolving undeclared variables
-#>    Allocating nodes
-#> Graph information:
-#>    Observed stochastic nodes: 2000
-#>    Unobserved stochastic nodes: 12
-#>    Total graph size: 64034
-#> 
-#> Initializing model
-#> Finished sampling in 150.3 seconds
+#> Error : .onLoad failed in loadNamespace() for 'rjags', details:
+#>   call: dyn.load(file, DLLpath = DLLpath, ...)
+#>   error: unable to load shared object '/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/rjags/libs/rjags.so':
+#>   dlopen(/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/rjags/libs/rjags.so, 0x000A): Library not loaded: /usr/local/lib/libjags.4.dylib
+#>   Referenced from: <CAF5E1DC-317A-34FE-988A-FB6F7C73D89E> /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/rjags/libs/rjags.so
+#>   Reason: tried: '/usr/local/lib/libjags.4.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/usr/local/lib/libjags.4.dylib' (no such file), '/usr/local/lib/libjags.4.dylib' (no such file), '/Library/Frameworks/R.framework/Resources/lib/libjags.4.dylib' (no such file), '/Library/Java/JavaVirtualMachines/jdk-11.0.18+10/Contents/Home/lib/server/libjags.4.dylib' (no such file), '/var/folders/lw/np6nlqmn527g1n2ysqssf00c0000gn/T/rstudio-fallback-library-path-1577547578/libjags.4.dylib' (no such file)
 ```
 
 
@@ -631,9 +619,8 @@ results[["mv_data_1"]][["mcp"]] <- mcp::mcp(
 if (requireNamespace("mcp", quietly = TRUE)) {
   plot(results[["mv_data_1"]][["mcp"]])
 }
+#> Error in samples[[1]]: subscript out of bounds
 ```
-
-![plot of chunk univariate-mean-and-or-variance-change-mcp-result](comparison-packages/univariate-mean-and-or-variance-change-mcp-result-1.png)
 
 
 ``` r
@@ -648,13 +635,7 @@ if (requireNamespace("not", quietly = TRUE)) {
 }
 ```
 
-![plot of chunk univariate-mean-and-or-variance-change-not-result](comparison-packages/univariate-mean-and-or-variance-change-not-result-1.png)
-
-```
-#> Press [enter] to continue
-```
-
-![plot of chunk univariate-mean-and-or-variance-change-not-result](comparison-packages/univariate-mean-and-or-variance-change-not-result-2.png)
+![plot of chunk univariate-mean-and-or-variance-change-not-result](comparison-packages/univariate-mean-and-or-variance-change-not-result-1.png)![plot of chunk univariate-mean-and-or-variance-change-not-result](comparison-packages/univariate-mean-and-or-variance-change-not-result-2.png)
 
 # Multivariate mean change
 
@@ -760,7 +741,7 @@ results[["mv_data_3"]][["fastcpd"]] <-
 
 ``` r
 results[["mv_data_3"]][["fastcpd"]]
-#> [1]  300  700 1000 1300 1700
+#> [1]  300  700 1013 1300 1700
 ```
 
 
@@ -874,7 +855,7 @@ results[["poisson_data"]][["fastcpd"]] <-
 
 ``` r
 results[["poisson_data"]][["fastcpd"]]
-#> [1]  498  805 1003
+#> [1]  506  838 1003
 ```
 
 
@@ -972,7 +953,7 @@ results[["ar_data"]][["segmented"]] <-
 
 ``` r
 results[["ar_data"]][["segmented"]]
-#> [1] 690
+#> [1] 690.0001
 ```
 
 
@@ -985,16 +966,12 @@ results[["ar_data"]][["mcp"]] <-
     data = data.frame(y = ar_data, x = seq_along(ar_data)),
     par_x = "x"
   )
-#> Compiling model graph
-#>    Resolving undeclared variables
-#>    Allocating nodes
-#> Graph information:
-#>    Observed stochastic nodes: 1000
-#>    Unobserved stochastic nodes: 9
-#>    Total graph size: 24020
-#> 
-#> Initializing model
-#> Finished sampling in 77.5 seconds
+#> Error : .onLoad failed in loadNamespace() for 'rjags', details:
+#>   call: dyn.load(file, DLLpath = DLLpath, ...)
+#>   error: unable to load shared object '/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/rjags/libs/rjags.so':
+#>   dlopen(/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/rjags/libs/rjags.so, 0x000A): Library not loaded: /usr/local/lib/libjags.4.dylib
+#>   Referenced from: <CAF5E1DC-317A-34FE-988A-FB6F7C73D89E> /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/rjags/libs/rjags.so
+#>   Reason: tried: '/usr/local/lib/libjags.4.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/usr/local/lib/libjags.4.dylib' (no such file), '/usr/local/lib/libjags.4.dylib' (no such file), '/Library/Frameworks/R.framework/Resources/lib/libjags.4.dylib' (no such file), '/Library/Java/JavaVirtualMachines/jdk-11.0.18+10/Contents/Home/lib/server/libjags.4.dylib' (no such file), '/var/folders/lw/np6nlqmn527g1n2ysqssf00c0000gn/T/rstudio-fallback-library-path-1577547578/libjags.4.dylib' (no such file)
 ```
 
 
@@ -1002,27 +979,24 @@ results[["ar_data"]][["mcp"]] <-
 if (requireNamespace("mcp", quietly = TRUE)) {
   plot(results[["ar_data"]][["mcp"]])
 }
+#> Error in `sample_n()`:
+#> ! `tbl` must be a data frame, not `NULL`.
 ```
-
-![plot of chunk ar3-mcp-result](comparison-packages/ar3-mcp-result-1.png)
 
 # GARCH(1, 1)
 
-The true change point is 200.
+The true change point is 750.
 
 
 ``` r
 results[["garch_data"]][["fastcpd"]] <-
   fastcpd::fastcpd.garch(garch_data, c(1, 1), r.progress = FALSE)@cp_set
-#> Registered S3 method overwritten by 'quantmod':
-#>   method            from
-#>   as.zoo.data.frame zoo
 ```
 
 
 ``` r
 results[["garch_data"]][["fastcpd"]]
-#> [1] 205
+#> [1] 759
 ```
 
 
@@ -1036,7 +1010,7 @@ results[["garch_data"]][["CptNonPar"]] <-
 
 ``` r
 results[["garch_data"]][["CptNonPar"]]
-#> [1] 206
+#> [1] 759
 ```
 
 
@@ -1127,8 +1101,7 @@ results[["well_log"]] <- list(
 ``` r
 results[["well_log"]]
 #> $fastcpd
-#>  [1]   12  572  704  776 1021 1057 1198 1347 1406 1502 1660 1842 2023 2202 2384
-#> [16] 2445 2507 2567 2749 2926 3094 3107 3509 3622 3709 3820 3976
+#>  [1]   12  572  704  779 1021 1057 1198 1348 1406 1502 1665 1842 2023 2385 2445 2507 2567 2749 2926 3076 3523 3622 3709 3820 3976
 #> 
 #> $changepoint
 #>  [1]    6 1021 1057 1502 1661 1842 2023 2385 2445 2507 2567 2745
@@ -1140,36 +1113,29 @@ results[["well_log"]]
 #> [1] 1057 1660 2568 3283
 #> 
 #> $ecp
-#>  [1]    1   33  315  435  567  705  803 1026 1058 1348 1503 1662 1843 2024 2203
-#> [16] 2386 2446 2508 2569 2745 2780 2922 3073 3136 3252 3465 3500 3554 3623 3710
-#> [31] 3821 3868 3990
+#>  [1]    1   33  315  435  567  705  803 1026 1058 1348 1503 1662 1843 2024 2203 2386 2446 2508 2569 2745 2780 2922 3073 3136 3252 3465 3500 3554 3623 3710 3821 3868 3990
 #> 
 #> $breakfast
-#>  [1]   33  310  434  572  704  779 1021 1057 1347 1502 1659 1842 2021 2032 2202
-#> [16] 2384 2446 2507 2567 2747 2779 2926 3094 3106 3125 3283 3464 3499 3622 3709
-#> [31] 3806 3835 3848 3877 3896 3976
+#>  [1]   33  310  434  572  704  779 1021 1057 1347 1502 1659 1842 2021 2032 2202 2384 2446 2507 2567 2747 2779 2926 3094 3106 3125 3283 3464 3499 3622 3709 3806 3835 3848 3877 3896
+#> [36] 3976
 #> 
 #> $wbs
-#>  [1] 2568 1057 1661 1842 2385 2023 1502 2445 2744    6 2507 1021 3709 3820 1347
-#> [16]  434 1200 3131 1197  776  704 3509 1402 3976 3622 3104 3094  314 2921 3251
-#> [31] 3848 3464 3906 2202 2779   60 3904  566   12 3639 3636    7  706    8 1408
+#>  [1] 2568 1057 1661 1842 2385 2023 1502 2445 2744    6 2507 1021 3709 3820 1402  434 1408 1200 3131  704  776 3509 3622 3976  314 3104 1347 3251 3464 3094 2752 2921 3848 3906 1663
+#> [36]   60 3904 2202  566 1197   12    7 2747
 #> 
 #> $mosum
-#>  [1]    6  434  704 1017 1057 1325 1502 1661 1842 2023 2385 2445 2507 2567 2744
-#> [16] 3060 3438 3509 3610 3697 3820 3867 3976
+#>  [1]    6  434  704 1017 1057 1325 1502 1661 1842 2023 2385 2445 2507 2567 2744 3060 3438 3509 3610 3697 3820 3867 3976
 #> 
 #> $gfpop
-#>  [1]    6    7    8   12  314  434  556  560  704  776 1021 1057 1197 1200 1347
-#> [16] 1364 1405 1407 1491 1502 1661 1842 2023 2385 2445 2507 2567 2664 2747 2752
-#> [31] 2921 3094 3104 3125 3251 3464 3499 3622 3709 3820 3976 3989
+#>  [1]    6    7    8   12  314  434  556  560  704  776 1021 1057 1197 1200 1347 1364 1405 1407 1491 1502 1661 1842 2023 2385 2445 2507 2567 2664 2747 2752 2921 3094 3104 3125 3251
+#> [36] 3464 3499 3622 3709 3820 3976 3989
 #> 
 #> $jointseg
 #>  [1]    6 1021 1057 1502 1661 1842 2022 2384 2445 2507 2568 2738
 #> 
 #> $stepR
-#>  [1]    7   14  314  434  566  704  776 1021 1057 1197 1200 1347 1405 1407 1502
-#> [16] 1661 1694 1842 2023 2202 2385 2445 2507 2567 2747 2752 2921 3094 3104 3125
-#> [31] 3251 3464 3499 3609 3658 3709 3820 3867 3905 3976 3989
+#>  [1]    7   14  314  434  566  704  776 1021 1057 1197 1200 1347 1405 1407 1502 1661 1694 1842 2023 2202 2385 2445 2507 2567 2747 2752 2921 3094 3104 3125 3251 3464 3499 3609 3658
+#> [36] 3709 3820 3867 3905 3976 3989
 ```
 
 
@@ -1197,8 +1163,7 @@ for (i in seq_len(length(most_selected) - 1)) {
   }
 }
 (most_selected <- most_selected[!is.na(most_selected)])
-#>  [1]    6  434  704  776 1021 1057 1347 1502 1661 1842 2023 2202 2385 2445 2507
-#> [16] 2567 3094 3464 3622 3709 3820 3976
+#>  [1]    6  434  704 1021 1057 1347 1502 1661 1842 2023 2385 2445 2507 2567 2747 3094 3464 3622 3709 3820 3976
 ```
 
 
@@ -1246,16 +1211,17 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 
 # Time comparison using `well_log`
 
+Some packages are commented out due to the excessive running time.
+
 
 ``` r
 results[["microbenchmark"]] <- microbenchmark::microbenchmark(
-  fastcpd = fastcpd::fastcpd.mean(well_log, trim = 0.003, r.progress = FALSE),
+  fastcpd = fastcpd::fastcpd.mean(well_log, r.progress = FALSE, cp_only = TRUE),
   changepoint = changepoint::cpt.mean(well_log/mad(well_log), method = "PELT"),
-  CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
-  strucchange =
-    strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),
-  ecp = ecp::e.divisive(matrix(well_log)),
-  breakfast = breakfast::breakfast(well_log),
+  # CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
+  # strucchange = strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),
+  # ecp = ecp::e.divisive(matrix(well_log)),
+  # breakfast = breakfast::breakfast(well_log),
   wbs = wbs::wbs(well_log),
   mosum = mosum::mosum(c(well_log), G = 40),
   fpop = fpop::Fpop(well_log, nrow(well_log)),
@@ -1269,8 +1235,7 @@ results[["microbenchmark"]] <- microbenchmark::microbenchmark(
   ),
   jointseg = jointseg::jointSeg(well_log, K = 12),
   stepR = stepR::stepFit(well_log, alpha = 0.5),
-  not = not::not(well_log, contrast = "pcwsConstMean"),
-  times = 10
+  not = not::not(well_log, contrast = "pcwsConstMean")
 )
 ```
 
@@ -1278,34 +1243,16 @@ results[["microbenchmark"]] <- microbenchmark::microbenchmark(
 ``` r
 results[["microbenchmark"]]
 #> Unit: microseconds
-#>         expr          min           lq         mean       median           uq
-#>      fastcpd 1.432566e+05 1.441787e+05 1.487573e+05 1.487723e+05 1.504056e+05
-#>  changepoint 1.201330e+05 1.210716e+05 1.224048e+05 1.219767e+05 1.236914e+05
-#>    CptNonPar 7.770534e+06 7.879313e+06 8.154598e+06 8.073969e+06 8.481170e+06
-#>  strucchange 3.470085e+07 3.484380e+07 3.527593e+07 3.512008e+07 3.540097e+07
-#>          ecp 2.781250e+08 2.822974e+08 2.953586e+08 2.952175e+08 3.042787e+08
-#>    breakfast 4.747592e+06 4.783883e+06 4.877119e+06 4.839840e+06 4.971219e+06
-#>          wbs 5.636799e+04 5.654363e+04 5.865315e+04 5.779885e+04 5.904718e+04
-#>        mosum 8.551370e+02 9.224180e+02 1.420199e+03 9.635615e+02 2.363978e+03
-#>         fpop 1.259028e+03 1.290721e+03 3.643412e+03 1.664846e+03 2.532652e+03
-#>        gfpop 3.262276e+04 3.289951e+04 3.426555e+04 3.367465e+04 3.490031e+04
-#>     jointseg 1.135598e+04 1.192050e+04 1.376823e+04 1.228512e+04 1.305715e+04
-#>        stepR 1.755264e+05 1.763980e+05 1.805602e+05 1.778727e+05 1.788489e+05
-#>          not 5.285913e+04 5.315892e+04 5.415099e+04 5.393064e+04 5.470171e+04
-#>           max neval
-#>  1.600519e+05    10
-#>  1.254676e+05    10
-#>  8.737743e+06    10
-#>  3.704112e+07    10
-#>  3.143164e+08    10
-#>  5.092928e+06    10
-#>  6.612705e+04    10
-#>  2.852042e+03    10
-#>  2.065100e+04    10
-#>  3.829789e+04    10
-#>  2.500828e+04    10
-#>  2.072325e+05    10
-#>  5.629927e+04    10
+#>         expr       min        lq       mean     median         uq       max neval
+#>      fastcpd  6245.325  6447.332  7086.8283  6555.5310  6752.3515 13977.187   100
+#>  changepoint 28794.177 29138.577 29463.6463 29275.8040 29458.9100 35287.429   100
+#>          wbs 51531.260 52697.669 53605.2848 53153.4250 53592.7605 65784.705   100
+#>        mosum   506.268   560.593   577.0709   577.0955   595.4635   655.877   100
+#>         fpop  1116.225  1160.895  1321.8826  1177.6430  1199.3320  9798.467   100
+#>        gfpop 30872.426 31118.918 31558.2539 31281.2575 31399.0095 37123.122   100
+#>     jointseg  8176.179  8328.309  8838.3495  8422.5480  8557.6430 12874.410   100
+#>        stepR 44931.080 45298.809 45808.1098 45458.4220 45608.6255 60913.577   100
+#>          not 49734.435 50815.175 52003.4189 51456.0455 52269.0960 58119.714   100
 ```
 
 
@@ -1353,8 +1300,8 @@ knitr::opts_chunk$set(
   fig.path="comparison-packages/"
 )
 
-# devtools::install_github(c("swang87/bcp", "veseshan/DNAcopy", "vrunge/gfpop"))
-# install.packages(c("bcp", "changepoint", "cpm", "CptNonPar", "strucchange", "ecp", "breakfast", "wbs", "mcp", "mosum", "not", "fpop", "jointseg", "microbenchmark", "segmented", "stepR", "VARDetect"))
+# devtools::install_github(c("swang87/bcp", "veseshan/DNAcopy", "vrunge/gfpop", "peiliangbai92/VARDetect"))
+# install.packages(c("changepoint", "cpm", "CptNonPar", "strucchange", "ecp", "breakfast", "wbs", "mcp", "mosum", "not", "fpop", "jointseg", "microbenchmark", "segmented", "stepR"))
 
 if (requireNamespace("microbenchmark", quietly = TRUE)) {
   library(microbenchmark)
@@ -1363,8 +1310,10 @@ if (requireNamespace("microbenchmark", quietly = TRUE)) {
 if (file.exists("comparison-packages-results.RData")) {
   # Available at https://pcloud.xingchi.li/comparison-packages-results.RData
   load("comparison-packages-results.RData")
+  rerun <- FALSE
 } else {
   results <- list()
+  rerun <- TRUE
 }
 # Univariate mean change
 set.seed(1)
@@ -1401,14 +1350,14 @@ mean_data_3 <- rbind(
 plot.ts(mean_data_3)
 # Multivariate mean and/or variance change
 set.seed(1)
-p <- 4
+p <- 3
 mv_data_3 <- rbind(
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(100, p)),
+  mvtnorm::rmvnorm(400, mean = rep(100, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(400, p)),
   mvtnorm::rmvnorm(300, mean = rep(0, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(400, mean = rep(10, p), sigma = diag(1, p)),
-  mvtnorm::rmvnorm(300, mean = rep(10, p), sigma = diag(100, p))
+  mvtnorm::rmvnorm(400, mean = rep(100, p), sigma = diag(1, p)),
+  mvtnorm::rmvnorm(300, mean = rep(100, p), sigma = diag(400, p))
 )
 
 plot.ts(mv_data_3)
@@ -1493,14 +1442,14 @@ ar_data <- x[-seq_len(3)]
 plot.ts(ar_data)
 # GARCH(1, 1)
 set.seed(1)
-n <- 400
+n <- 1501
 sigma_2 <- rep(1, n + 1)
 x <- rep(0, n + 1)
-for (i in seq_len(200)) {
-  sigma_2[i + 1] <- 20 + 0.5 * x[i]^2 + 0.1 * sigma_2[i]
+for (i in seq_len(750)) {
+  sigma_2[i + 1] <- 20 + 0.8 * x[i]^2 + 0.1 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
-for (i in 201:400) {
+for (i in 751:n) {
   sigma_2[i + 1] <- 1 + 0.1 * x[i]^2 + 0.5 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
@@ -1664,7 +1613,7 @@ if (requireNamespace("bcp", quietly = TRUE)) {
 results[["mv_data_3"]][["fastcpd"]] <-
   fastcpd::fastcpd.mv(mv_data_3, r.progress = FALSE)@cp_set
 results[["mv_data_3"]][["fastcpd"]]
-testthat::expect_equal(results[["mv_data_3"]][["fastcpd"]], c(300, 700, 1000, 1300, 1700), tolerance = 0.2)
+testthat::expect_equal(results[["mv_data_3"]][["fastcpd"]], c(300, 700, 1013, 1300, 1700), tolerance = 0.2)
 results[["mv_data_3"]][["ecp"]] <- ecp::e.divisive(mv_data_3)$estimates
 results[["mv_data_3"]][["ecp"]]
 testthat::expect_equal(results[["mv_data_3"]][["ecp"]], c(1, 301, 701, 1001, 1301, 1701, 2001), tolerance = 0.2)
@@ -1738,11 +1687,11 @@ if (requireNamespace("mcp", quietly = TRUE)) {
 results[["garch_data"]][["fastcpd"]] <-
   fastcpd::fastcpd.garch(garch_data, c(1, 1), r.progress = FALSE)@cp_set
 results[["garch_data"]][["fastcpd"]]
-testthat::expect_equal(results[["garch_data"]][["fastcpd"]], c(205), tolerance = 0.2)
+testthat::expect_equal(results[["garch_data"]][["fastcpd"]], c(759), tolerance = 0.2)
 results[["garch_data"]][["CptNonPar"]] <-
   CptNonPar::np.mojo(garch_data, G = floor(length(garch_data) / 6))$cpts
 results[["garch_data"]][["CptNonPar"]]
-testthat::expect_equal(results[["garch_data"]][["CptNonPar"]], c(206), tolerance = 0.2)
+testthat::expect_equal(results[["garch_data"]][["CptNonPar"]], c(759), tolerance = 0.2)
 results[["garch_data"]][["strucchange"]] <-
   strucchange::breakpoints(x ~ 1, data = data.frame(x = garch_data))$breakpoints
 results[["garch_data"]][["strucchange"]]
@@ -1843,13 +1792,12 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
     ggplot2::xlab(NULL) + ggplot2::ylab(NULL)
 }
 results[["microbenchmark"]] <- microbenchmark::microbenchmark(
-  fastcpd = fastcpd::fastcpd.mean(well_log, trim = 0.003, r.progress = FALSE),
+  fastcpd = fastcpd::fastcpd.mean(well_log, r.progress = FALSE, cp_only = TRUE),
   changepoint = changepoint::cpt.mean(well_log/mad(well_log), method = "PELT"),
-  CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
-  strucchange =
-    strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),
-  ecp = ecp::e.divisive(matrix(well_log)),
-  breakfast = breakfast::breakfast(well_log),
+  # CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
+  # strucchange = strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),
+  # ecp = ecp::e.divisive(matrix(well_log)),
+  # breakfast = breakfast::breakfast(well_log),
   wbs = wbs::wbs(well_log),
   mosum = mosum::mosum(c(well_log), G = 40),
   fpop = fpop::Fpop(well_log, nrow(well_log)),
@@ -1863,8 +1811,7 @@ results[["microbenchmark"]] <- microbenchmark::microbenchmark(
   ),
   jointseg = jointseg::jointSeg(well_log, K = 12),
   stepR = stepR::stepFit(well_log, alpha = 0.5),
-  not = not::not(well_log, contrast = "pcwsConstMean"),
-  times = 10
+  not = not::not(well_log, contrast = "pcwsConstMean")
 )
 results[["microbenchmark"]]
 if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("microbenchmark", quietly = TRUE)) {
