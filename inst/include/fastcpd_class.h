@@ -68,8 +68,8 @@ class Fastcpd {
                      Rcpp::Nullable<arma::colvec> start = R_NilValue);
   Rcpp::List GetChangePointSet();
   double GetCostValue(const int tau, const unsigned int i, const int t);
-  double GetCostValuePelt(const unsigned int segment_start,
-                          const unsigned int segment_end, const unsigned int i);
+  void GetCostValuePelt(const unsigned int segment_start,
+                        const unsigned int segment_end, const unsigned int i);
   double GetCostValueSen(const unsigned int segment_start,
                          const unsigned int segment_end, const unsigned int i);
   arma::colvec GetGradientArma(const unsigned int segment_start,
