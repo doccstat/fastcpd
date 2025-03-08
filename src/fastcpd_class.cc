@@ -131,7 +131,7 @@ Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
       family_(family),
       hessian_(cube(p, p, data.n_rows + 1)),
       line_search_(line_search),
-      momentum_(vec(p)),
+      momentum_(colvec(p)),
       momentum_coef_(momentum_coef),
       multiple_epochs_function_([&]() -> unique_ptr<Function> {
         if (multiple_epochs_function.isNotNull()) {
@@ -638,17 +638,17 @@ void Fastcpd::CreateSegmentStatistics() {
     GetCostResult(segment_indices_(segment_index),
                   segment_indices_(segment_index + 1) - 1, R_NilValue, true,
                   R_NilValue);
-    rowvec segment_theta = result_coefficients_.t().as_row();
+    colvec segment_theta = result_coefficients_.as_col();
 
     // Initialize the estimated coefficients for each segment to be the
     // estimated coefficients in the segment.
-    segment_coefficients_.row(segment_index) = segment_theta;
+    segment_coefficients_.row(segment_index) = segment_theta.t();
     if (family_ == "lasso" || family_ == "gaussian") {
       mat data_segment = data_.rows(segment_indices_(segment_index),
                                     segment_indices_(segment_index + 1) - 1);
       colvec segment_residual =
           data_segment.col(0) -
-          data_segment.cols(1, data_segment.n_cols - 1) * segment_theta.t();
+          data_segment.cols(1, data_segment.n_cols - 1) * segment_theta;
       double err_var = as_scalar(mean(square(segment_residual)));
       error_standard_deviation_(segment_index) = sqrt(err_var);
       active_coefficients_count_(segment_index) = accu(abs(segment_theta) > 0);
