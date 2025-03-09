@@ -1,4 +1,4 @@
-#include "fastcpd_test.h"
+#include "fastcpd_class.h"
 #include "fastcpd_test_constants.h"
 #include "testthat.h"
 
