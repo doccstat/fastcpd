@@ -163,6 +163,10 @@ get_sigma_data <- function(
     diag(1)
   }
 
+  if (rcond(sigma_) < 1e-10) {
+    sigma_ <- diag(1e-10, nrow(sigma_))
+  }
+
   list(sigma = sigma_, data = data_)
 }
 
