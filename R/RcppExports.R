@@ -5,3 +5,11 @@ fastcpd_impl <- function(data, beta, cost_adjustment, d, segment_count, trim, mo
     .Call(`_fastcpd_fastcpd_impl`, data, beta, cost_adjustment, d, segment_count, trim, momentum_coef, multiple_epochs_function, family, epsilon, p, order, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper, line_search, variance_estimate, p_response, pruning_coef, r_progress)
 }
 
+start_profiler <- function(str) {
+    .Call(`_fastcpd_start_profiler`, str)
+}
+
+stop_profiler <- function() {
+    .Call(`_fastcpd_stop_profiler`)
+}
+

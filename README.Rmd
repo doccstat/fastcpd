@@ -24,6 +24,27 @@ options(cli.hyperlink = FALSE, eval = TRUE)
 [![R-CMD-check](https://github.com/doccstat/fastcpd/workflows/R-CMD-check/badge.svg)](https://github.com/doccstat/fastcpd/actions)
 [![r-universe](https://doccstat.r-universe.dev/badges/fastcpd)](https://doccstat.r-universe.dev)
 
+# Branch `profiling` is for profiling purposes only.
+
+```{r eval = FALSE}
+library(fastcpd)
+set.seed(1)
+p <- 3
+data <- rbind(
+  mvtnorm::rmvnorm(3e+6, mean = rep(0, p), sigma = diag(100, p)),
+  mvtnorm::rmvnorm(4e+6, mean = rep(50, p), sigma = diag(100, p)),
+  mvtnorm::rmvnorm(3e+6, mean = rep(2, p), sigma = diag(100, p))
+)
+
+fastcpd:::start_profiler("./profile.out")
+fastcpd.mean(data, r.progress = FALSE, cp_only = TRUE)
+fastcpd:::stop_profiler()
+```
+
+```shell
+pprof --pdf /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/fastcpd/libs/fastcpd.so ./profile.out > profile.pdf
+```
+
 ## Overview
 
 The fastcpd (**fast** **c**hange **p**oint **d**etection) is a fast
