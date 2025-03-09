@@ -161,13 +161,15 @@ Fastcpd::Fastcpd(
     if (order_(0) > 0) {
       get_gradient_ = &Fastcpd::GetGradientArma;
       get_hessian_ = &Fastcpd::GetHessianArma;
-      get_nll_sen_ = &Fastcpd::GetNllSenArma;
       get_nll_pelt_ = &Fastcpd::GetNllPeltArma;
+      get_nll_pelt_value_ = &Fastcpd::GetNllPeltArma;
+      get_nll_sen_ = &Fastcpd::GetNllSenArma;
     } else {  // order_(0) == 0
       get_gradient_ = &Fastcpd::GetGradientMa;
       get_hessian_ = &Fastcpd::GetHessianMa;
-      get_nll_sen_ = &Fastcpd::GetNllSenMa;
       get_nll_pelt_ = &Fastcpd::GetNllPeltArma;
+      get_nll_pelt_value_ = &Fastcpd::GetNllPeltArma;
+      get_nll_sen_ = &Fastcpd::GetNllSenMa;
     }
   } else {
     auto it = family_function_map_.find(family_);
@@ -175,13 +177,15 @@ Fastcpd::Fastcpd(
       const FunctionSet &func_set = it->second;
       get_gradient_ = func_set.gradient;
       get_hessian_ = func_set.hessian;
-      get_nll_sen_ = func_set.nll_sen;
       get_nll_pelt_ = func_set.nll_pelt;
+      get_nll_pelt_value_ = func_set.nll_pelt_value;
+      get_nll_sen_ = func_set.nll_sen;
     } else {
       get_gradient_ = &Fastcpd::GetGradientCustom;
       get_hessian_ = &Fastcpd::GetHessianCustom;
-      get_nll_sen_ = &Fastcpd::GetNllSenCustom;
       get_nll_pelt_ = &Fastcpd::GetNllPeltCustom;
+      get_nll_pelt_value_ = &Fastcpd::GetNllPeltCustom;
+      get_nll_sen_ = &Fastcpd::GetNllSenCustom;
     }
   }
 
@@ -545,37 +549,56 @@ const unordered_map<string, Fastcpd::FunctionSet>
     Fastcpd::family_function_map_ = {
         {"binomial",
          FunctionSet{&Fastcpd::GetGradientBinomial,
-                     &Fastcpd::GetHessianBinomial, &Fastcpd::GetNllSenBinomial,
-                     &Fastcpd::GetNllPeltGlm}},
-        {"garch", FunctionSet{nullptr,  // No gradient
-                              nullptr,  // No hessian
-                              nullptr,  // No nll_sen
-                              &Fastcpd::GetNllPeltGarch}},
+                     &Fastcpd::GetHessianBinomial, &Fastcpd::GetNllPeltGlm,
+                     &Fastcpd::GetNllPeltGlm, &Fastcpd::GetNllSenBinomial}},
+        {"garch",
+         FunctionSet{
+             nullptr,  // No gradient
+             nullptr,  // No hessian
+             &Fastcpd::GetNllPeltGarch, &Fastcpd::GetNllPeltGarch,
+             nullptr  // No nll_sen
+         }},
         {"gaussian",
          FunctionSet{&Fastcpd::GetGradientLm, &Fastcpd::GetHessianLm,
-                     &Fastcpd::GetNllSenLm, &Fastcpd::GetNllPeltGlm}},
+                     &Fastcpd::GetNllPeltGlm, &Fastcpd::GetNllPeltGlm,
+                     &Fastcpd::GetNllSenLm}},
         {"lasso",
          FunctionSet{&Fastcpd::GetGradientLm, &Fastcpd::GetHessianLm,
-                     &Fastcpd::GetNllSenLasso, &Fastcpd::GetNllPeltLasso}},
+                     &Fastcpd::GetNllPeltLasso, &Fastcpd::GetNllPeltLasso,
+                     &Fastcpd::GetNllSenLasso}},
         {"poisson",
          FunctionSet{&Fastcpd::GetGradientPoisson, &Fastcpd::GetHessianPoisson,
-                     &Fastcpd::GetNllSenPoisson, &Fastcpd::GetNllPeltGlm}},
-        {"mean", FunctionSet{nullptr,  // No gradient
-                             nullptr,  // No hessian
-                             nullptr,  // No nll_sen
-                             &Fastcpd::GetNllPeltMean}},
-        {"meanvariance", FunctionSet{nullptr,  // No gradient
-                                     nullptr,  // No hessian
-                                     nullptr,  // No nll_sen
-                                     &Fastcpd::GetNllPeltMeanVariance}},
-        {"mgaussian", FunctionSet{nullptr,  // No gradient
-                                  nullptr,  // No hessian
-                                  nullptr,  // No nll_sen
-                                  &Fastcpd::GetNllPeltMgaussian}},
-        {"variance", FunctionSet{nullptr,  // No gradient
-                                 nullptr,  // No hessian
-                                 nullptr,  // No nll_sen
-                                 &Fastcpd::GetNllPeltVariance}}};
+                     &Fastcpd::GetNllPeltGlm, &Fastcpd::GetNllPeltGlm,
+                     &Fastcpd::GetNllSenPoisson}},
+        {"mean",
+         FunctionSet{
+             nullptr,  // No gradient
+             nullptr,  // No hessian
+             &Fastcpd::GetNllPeltMean, &Fastcpd::GetNllPeltMeanValue,
+             nullptr  // No nll_sen
+         }},
+        {"meanvariance",
+         FunctionSet{
+             nullptr,  // No gradient
+             nullptr,  // No hessian
+             &Fastcpd::GetNllPeltMeanvariance,
+             &Fastcpd::GetNllPeltMeanvarianceValue,
+             nullptr  // No nll_sen
+         }},
+        {"mgaussian",
+         FunctionSet{
+             nullptr,  // No gradient
+             nullptr,  // No hessian
+             &Fastcpd::GetNllPeltMgaussian, &Fastcpd::GetNllPeltMgaussian,
+             nullptr  // No nll_sen
+         }},
+        {"variance",
+         FunctionSet{
+             nullptr,  // No gradient
+             nullptr,  // No hessian
+             &Fastcpd::GetNllPeltVariance, &Fastcpd::GetNllPeltVarianceValue,
+             nullptr  // No nll_sen
+         }}};
 
 void Fastcpd::CreateRProgress() {
   if (r_progress_) {
@@ -665,7 +688,11 @@ void Fastcpd::GetCostResult(const unsigned int segment_start,
                             Nullable<colvec> theta, const bool cv,
                             Nullable<colvec> start) {
   if (theta.isNull()) {
-    (this->*get_nll_pelt_)(segment_start, segment_end, cv, start);
+    if (vanilla_percentage_ == 1) {
+      (this->*get_nll_pelt_value_)(segment_start, segment_end, cv, start);
+    } else {
+      (this->*get_nll_pelt_)(segment_start, segment_end, cv, start);
+    }
   } else {
     result_coefficients_ = mat();
     result_residuals_ = mat();

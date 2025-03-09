@@ -47,12 +47,16 @@ class Fastcpd {
     arma::mat (Fastcpd::*hessian)(const unsigned int segment_start,
                                   const unsigned int segment_end,
                                   const arma::colvec& theta);
-    double (Fastcpd::*nll_sen)(const unsigned int segment_start,
-                               const unsigned int segment_end,
-                               arma::colvec theta);
     void (Fastcpd::*nll_pelt)(const unsigned int segment_start,
                               const unsigned int segment_end, const bool cv,
                               const Rcpp::Nullable<arma::colvec>& start);
+    void (Fastcpd::*nll_pelt_value)(const unsigned int segment_start,
+                                    const unsigned int segment_end,
+                                    const bool cv,
+                                    const Rcpp::Nullable<arma::colvec>& start);
+    double (Fastcpd::*nll_sen)(const unsigned int segment_start,
+                               const unsigned int segment_end,
+                               arma::colvec theta);
   };
 
   void CreateRProgress();
@@ -123,15 +127,25 @@ class Fastcpd {
   void GetNllPeltMean(const unsigned int segment_start,
                       const unsigned int segment_end, const bool cv,
                       const Rcpp::Nullable<arma::colvec>& start);
-  void GetNllPeltMeanVariance(const unsigned int segment_start,
+  void GetNllPeltMeanValue(const unsigned int segment_start,
+                           const unsigned int segment_end, const bool cv,
+                           const Rcpp::Nullable<arma::colvec>& start);
+  void GetNllPeltMeanvariance(const unsigned int segment_start,
                               const unsigned int segment_end, const bool cv,
                               const Rcpp::Nullable<arma::colvec>& start);
+  void GetNllPeltMeanvarianceValue(const unsigned int segment_start,
+                                   const unsigned int segment_end,
+                                   const bool cv,
+                                   const Rcpp::Nullable<arma::colvec>& start);
   void GetNllPeltMgaussian(const unsigned int segment_start,
                            const unsigned int segment_end, const bool cv,
                            const Rcpp::Nullable<arma::colvec>& start);
   void GetNllPeltVariance(const unsigned int segment_start,
                           const unsigned int segment_end, const bool cv,
                           const Rcpp::Nullable<arma::colvec>& start);
+  void GetNllPeltVarianceValue(const unsigned int segment_start,
+                               const unsigned int segment_end, const bool cv,
+                               const Rcpp::Nullable<arma::colvec>& start);
   double GetNllSenArma(const unsigned int segment_start,
                        const unsigned int segment_end, arma::colvec theta);
   double GetNllSenBinomial(const unsigned int segment_start,
@@ -189,6 +203,9 @@ class Fastcpd {
   void (Fastcpd::*get_nll_pelt_)(const unsigned int segment_start,
                                  const unsigned int segment_end, const bool cv,
                                  const Rcpp::Nullable<arma::colvec>& start);
+  void (Fastcpd::*get_nll_pelt_value_)(
+      const unsigned int segment_start, const unsigned int segment_end,
+      const bool cv, const Rcpp::Nullable<arma::colvec>& start);
   double (Fastcpd::*get_nll_sen_)(const unsigned int segment_start,
                                   const unsigned int segment_end,
                                   arma::colvec theta);
