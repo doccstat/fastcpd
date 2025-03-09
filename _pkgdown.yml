@@ -101,6 +101,11 @@ articles:
   - comparison-packages
   - comparison-pelt
 
+- title: Exploration
+  navbar: Exploration
+  contents:
+  - exploration-during-development
+
 authors:
   Xingchi Li:
     href: https://www.xingchi.li

@@ -1,12 +1,11 @@
 #ifndef FASTCPD_CLASS_H_
 #define FASTCPD_CLASS_H_
 
+#include <RcppArmadillo.h>
+
 #include <memory>
 #include <unordered_map>
 
-// TODO(doccstat): Fix the order issue. It seems that `fastcpd_test.h` or
-// `RcppArmadillo.h` should be included first.
-#include "fastcpd_test.h"
 #include "RProgress.h"
 
 #define ERROR(msg)                                                        \
@@ -19,7 +18,52 @@
 
 constexpr char kRProgress[] = "[:bar] :current/:total in :elapsed";
 
-namespace fastcpd::classes {
+namespace fastcpd {
+
+namespace test {
+
+// The FastcpdTest class provides static helper methods for testing Fastcpd.
+class FastcpdTest {
+ public:
+  // Computes the gradient using the Armadillo implementation.
+  static arma::colvec GetGradientArma(const arma::mat& data,
+                                      const unsigned int segment_start,
+                                      const unsigned int segment_end,
+                                      const arma::colvec& theta);
+
+  // Computes the Hessian using the Armadillo implementation.
+  static arma::mat GetHessianArma(const arma::mat& data,
+                                  const unsigned int segment_start,
+                                  const unsigned int segment_end,
+                                  const arma::colvec& theta);
+
+  // Computes the Hessian for the binomial model.
+  static arma::mat GetHessianBinomial(const arma::mat& data,
+                                      const unsigned int segment_start,
+                                      const unsigned int segment_end,
+                                      const arma::colvec& theta);
+
+  // Computes the Hessian for the Poisson model.
+  static arma::mat GetHessianPoisson(const arma::mat& data,
+                                     const unsigned int segment_start,
+                                     const unsigned int segment_end,
+                                     const arma::colvec& theta);
+
+  // Computes the negative log-likelihood for the SEN model.
+  static double GetNllSen(const arma::mat& data,
+                          const unsigned int segment_start,
+                          const unsigned int segment_end, arma::colvec theta);
+
+  // Computes the negative log-likelihood for the PELT model.
+  static std::tuple<arma::mat, arma::mat, double> GetNllPelt(
+      const arma::mat& data, const unsigned int segment_start,
+      const unsigned int segment_end, const bool cv,
+      const Rcpp::Nullable<arma::colvec>& start);
+};
+
+}  // namespace test
+
+namespace classes {
 
 class Fastcpd {
  public:
@@ -247,6 +291,8 @@ class Fastcpd {
   friend fastcpd::test::FastcpdTest;
 };
 
-}  // namespace fastcpd::classes
+}  // namespace classes
+
+}  // namespace fastcpd
 
 #endif  // FASTCPD_CLASS_H_

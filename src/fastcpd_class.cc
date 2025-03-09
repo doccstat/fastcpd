@@ -176,7 +176,7 @@ Fastcpd::Fastcpd(
   } else {
     auto it = family_function_map_.find(family_);
     if (it != family_function_map_.end()) {
-      const FunctionSet &func_set = it->second;
+      const FunctionSet& func_set = it->second;
       get_gradient_ = func_set.gradient;
       get_hessian_ = func_set.hessian;
       get_nll_pelt_ = func_set.nll_pelt;

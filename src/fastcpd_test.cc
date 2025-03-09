@@ -3,8 +3,6 @@
 // Implementation of the FastcpdTest helper class for testing fastcpd
 // functionality.
 
-#include "fastcpd_test.h"
-
 #include "fastcpd_class.h"
 
 namespace fastcpd {
