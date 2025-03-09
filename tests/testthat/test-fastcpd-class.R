@@ -1,34 +1,4 @@
 testthat::test_that(
-  "ggplot2 is not installed mock", {
-    testthat::skip_if_not_installed("mockthat")
-    match_call <- ""
-    class(match_call) <- "language"
-    thetas <- data.frame(matrix(c(1, 2), 1, 2))
-    names(thetas) <- c("segment 1", "segment 2")
-
-    class_instance <- methods::new(
-      Class = "fastcpd",
-      call = match_call,
-      data = data.frame(y = c(1, 1, 2, 2), x = rep(1, 4)),
-      family = "lasso",
-      cp_set = 3,
-      cost_values = c(9.5, 10.5),
-      residuals = matrix(0, 4),
-      thetas = thetas,
-      cp_only = FALSE
-    )
-
-    testthat::expect_warning(
-      mockthat::with_mock(
-        `require_namespace` = function(...) FALSE,
-        plot(class_instance)
-      ),
-      "ggplot2 is not installed. No plot is made."
-    )
-  }
-)
-
-testthat::test_that(
   "utility functions output test", {
     match_call <- ""
     class(match_call) <- "language"

@@ -36,7 +36,6 @@ Suggests:
     gridExtra,
     knitr,
     matrixStats,
-    mockthat,
     mvtnorm,
     rmarkdown,
     testthat (>= 3.0.0),
