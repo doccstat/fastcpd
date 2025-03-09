@@ -64,7 +64,7 @@ class Fastcpd {
                      Rcpp::Nullable<arma::colvec> theta, const bool cv = false,
                      Rcpp::Nullable<arma::colvec> start = R_NilValue);
   Rcpp::List GetChangePointSet();
-  double GetCostValue(const int tau, const unsigned int i, const int t);
+  double GetCostValue(const int tau, const unsigned int i);
   void GetCostValuePelt(const unsigned int segment_start,
                         const unsigned int segment_end, const unsigned int i);
   double GetCostValueSen(const unsigned int segment_start,
@@ -149,12 +149,12 @@ class Fastcpd {
   void GetOptimizedCostResult(const unsigned int segment_start,
                               const unsigned int segment_end);
   arma::colvec UpdateChangePointSet();
-  void UpdateSenParameters(const unsigned int t);
+  void UpdateSenParameters();
   void UpdateSenParametersStep(const int segment_start, const int segment_end,
                                const int i);
   void UpdateSenParametersSteps(const int segment_start,
                                 const unsigned int segment_end, const int i);
-  void UpdateStep(unsigned int t);
+  void UpdateStep();
   void UpdateRProgress();
 
   arma::colvec active_coefficients_count_;
@@ -220,6 +220,7 @@ class Fastcpd {
   arma::mat segment_coefficients_;
   const int segment_count_;
   arma::colvec segment_indices_;
+  unsigned int t = 1;
   const double trim_;
   const bool use_warm_start_;
   const double vanilla_percentage_;
