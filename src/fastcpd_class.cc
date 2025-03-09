@@ -192,7 +192,7 @@ List Fastcpd::Run() {
   pruned_set_(1) = 1;
   objective_function_values_.fill(arma::datum::inf);
   objective_function_values_(0) = -beta_;
-  objective_function_values_(1) = GetCostValue(0, 0, 1);
+  objective_function_values_(1) = GetCostValue(0, 0);
 
   // TODO(doccstat): Investigate if the following branches can be merged into
   // `fastcpd_class_nll.cc`.
@@ -200,7 +200,7 @@ List Fastcpd::Run() {
     double two_norm;
     unsigned int i, pi;
 
-    for (unsigned int t = 2; t <= data_n_rows_; t++) {
+    for (t = 2; t <= data_n_rows_; t++) {
       for (i = 0; i < pruned_set_size_; i++) {
         two_norm = (data_c_ptr_[t] - data_c_ptr_[pruned_set_[i]]) *
                    (data_c_ptr_[t] - data_c_ptr_[pruned_set_[i]]);
@@ -246,7 +246,7 @@ List Fastcpd::Run() {
     double two_norm;
     unsigned int i, pi;
 
-    for (unsigned int t = 2; t <= data_n_rows_; t++) {
+    for (t = 2; t <= data_n_rows_; t++) {
       for (i = 0; i < pruned_set_size_; i++) {
         two_norm = (data_c_ptr_[t] - data_c_ptr_[pruned_set_[i]]) *
                    (data_c_ptr_[t] - data_c_ptr_[pruned_set_[i]]);
@@ -292,7 +292,7 @@ List Fastcpd::Run() {
              data_n_dims_ == 1) {
     unsigned int i;
 
-    for (unsigned int t = 2; t <= data_n_rows_; t++) {
+    for (t = 2; t <= data_n_rows_; t++) {
       for (i = 0; i < pruned_set_size_; i++) {
         const unsigned int segment_length = t - pruned_set_[i];
         double det_value = data_c_ptr_[t] - data_c_ptr_[pruned_set_[i]];
@@ -331,7 +331,7 @@ List Fastcpd::Run() {
              data_n_dims_ > 1) {
     unsigned int i;
 
-    for (unsigned int t = 2; t <= data_n_rows_; t++) {
+    for (t = 2; t <= data_n_rows_; t++) {
       for (i = 0; i < pruned_set_size_; i++) {
         const unsigned int segment_length = t - pruned_set_[i];
         mat covar = zeros<mat>(data_n_dims_, data_n_dims_);
@@ -402,7 +402,7 @@ List Fastcpd::Run() {
              data_n_dims_ == 1) {
     unsigned int i;
 
-    for (unsigned int t = 2; t <= data_n_rows_; t++) {
+    for (t = 2; t <= data_n_rows_; t++) {
       for (i = 0; i < pruned_set_size_; i++) {
         const unsigned int segment_length = t - pruned_set_[i];
         double det_value = data_c_ptr_[t + data_c_n_rows_] -
@@ -445,7 +445,7 @@ List Fastcpd::Run() {
              data_n_dims_ > 1) {
     unsigned int i;
 
-    for (unsigned int t = 2; t <= data_n_rows_; t++) {
+    for (t = 2; t <= data_n_rows_; t++) {
       for (i = 0; i < pruned_set_size_; i++) {
         const unsigned int segment_length = t - pruned_set_[i];
         mat covar = zeros<mat>(data_n_dims_, data_n_dims_);
@@ -534,8 +534,8 @@ List Fastcpd::Run() {
     CreateSenParameters();
     CreateRProgress();
     UpdateRProgress();
-    for (unsigned int t = 2; t <= data_n_rows_; t++) {
-      UpdateStep(t);
+    for (t = 2; t <= data_n_rows_; t++) {
+      UpdateStep();
     }
   }
   return GetChangePointSet();
@@ -619,7 +619,7 @@ void Fastcpd::CreateSenParameters() {
 
 void Fastcpd::CreateSegmentStatistics() {
   if (family_ == "mean" || family_ == "variance" || family_ == "meanvariance" ||
-      family_ == "custom" && vanilla_percentage_ == 1)
+      (family_ == "custom" && vanilla_percentage_ == 1))
     return;
   for (int segment_index = 0; segment_index < segment_count_; ++segment_index) {
     GetCostResult(segment_indices_(segment_index),
@@ -731,7 +731,7 @@ List Fastcpd::GetChangePointSet() {
                       Named("residual") = residual, Named("thetas") = thetas);
 }
 
-double Fastcpd::GetCostValue(const int tau, const unsigned int i, const int t) {
+double Fastcpd::GetCostValue(const int tau, const unsigned int i) {
   if (t > vanilla_percentage_ * data_n_rows_) {
     return GetCostValueSen(tau, t - 1, i);
   } else {
@@ -935,7 +935,7 @@ colvec Fastcpd::UpdateChangePointSet() {
   return cp_set(find(cp_set > 0));
 }
 
-void Fastcpd::UpdateSenParameters(const unsigned int t) {
+void Fastcpd::UpdateSenParameters() {
   if (vanilla_percentage_ == 1) return;
   const int segment_index = index_max(find(segment_indices_ <= t - 1));
   colvec cum_coef_add = segment_coefficients_.row(segment_index).t(),
@@ -972,14 +972,14 @@ void Fastcpd::UpdateRProgress() {
   }
 }
 
-void Fastcpd::UpdateStep(unsigned int t) {
-  UpdateSenParameters(t);
+void Fastcpd::UpdateStep() {
+  UpdateSenParameters();
   for (unsigned int i = 0; i < pruned_set_size_; i++) {
     if (i == pruned_set_size_ - 1 && vanilla_percentage_ != 1) {
       obj[i] = objective_function_values_(pruned_set_(i)) + beta_;
     } else {
       obj[i] = objective_function_values_(pruned_set_(i)) +
-               GetCostValue(pruned_set_(i), i, t) + beta_;
+               GetCostValue(pruned_set_(i), i) + beta_;
     }
   }
 
