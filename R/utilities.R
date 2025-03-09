@@ -1,7 +1,3 @@
-require_namespace <- function(package_name) {
-  requireNamespace(package_name, quietly = TRUE)
-}
-
 check_family <- function(family, allowed_families) {
   error_message <- paste0(
     "The family should be one of ",
@@ -118,16 +114,6 @@ check_cost <- function(cost, cost_gradient, cost_hessian, family) {  # nolint
     error_message[2] <-
       "specify the Hessian function if the gradient function is available."
     stop(paste(error_message, collapse = " "))
-  }
-}
-
-get_d <- function(data_, family) {
-  if (family %in% c(
-    "mean", "variance", "meanvariance", "ar", "arma", "arima", "garch", "var"
-  )) {
-    ncol(data_)
-  } else {
-    ncol(data_) - 1
   }
 }
 

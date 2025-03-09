@@ -52,17 +52,19 @@ using ::Rcpp::Rcout;
 
 namespace fastcpd::classes {
 
-Fastcpd::Fastcpd(
-    const double beta, const Nullable<Function> cost,
-    const string cost_adjustment, const Nullable<Function> cost_gradient,
-    const Nullable<Function> cost_hessian, const bool cp_only,
-    const unsigned int d, const mat data, const double epsilon,
-    const string family, const Nullable<Function> multiple_epochs_function,
-    const colvec line_search, const colvec lower, const double momentum_coef,
-    const colvec order, const int p, const unsigned int p_response,
-    const double pruning_coef, const bool r_progress, const int segment_count,
-    const double trim, const colvec upper, const double vanilla_percentage,
-    const mat variance_estimate, const bool warm_start)
+Fastcpd::Fastcpd(const double beta, const Nullable<Function> cost,
+                 const string cost_adjustment,
+                 const Nullable<Function> cost_gradient,
+                 const Nullable<Function> cost_hessian, const bool cp_only,
+                 const mat data, const double epsilon, const string family,
+                 const Nullable<Function> multiple_epochs_function,
+                 const colvec line_search, const colvec lower,
+                 const double momentum_coef, const colvec order, const int p,
+                 const unsigned int p_response, const double pruning_coef,
+                 const bool r_progress, const int segment_count,
+                 const double trim, const colvec upper,
+                 const double vanilla_percentage, const mat variance_estimate,
+                 const bool warm_start)
     : active_coefficients_count_(colvec(segment_count)),
       beta_(beta),
       change_points_(zeros<colvec>(data.n_rows + 1)),
@@ -120,7 +122,14 @@ Fastcpd::Fastcpd(
       data_c_n_cols_(data_c_.n_cols),
       data_c_n_rows_(data_c_.n_rows),
       data_c_ptr_(data_c_.memptr()),
-      data_n_dims_(d),
+      data_n_dims_([&]() -> unsigned int {
+        if (family == "mean" || family == "variance" ||
+            family == "meanvariance" || family == "ar" || family == "arma" ||
+            family == "arima" || family == "garch" || family == "var") {
+          return data.n_cols;
+        }
+        return data.n_cols - 1;
+      }()),
       data_n_cols_(data_.n_cols),
       data_n_rows_(data_.n_rows),
       epsilon_in_hessian_(epsilon),
