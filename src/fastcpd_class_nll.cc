@@ -472,6 +472,15 @@ void Fastcpd::GetNllPeltLasso(const unsigned int segment_start,
 void Fastcpd::GetNllPeltMean(const unsigned int segment_start,
                              const unsigned int segment_end, const bool cv,
                              const Nullable<colvec>& start) {
+  result_coefficients_ = zeros<mat>(parameters_count_, 1);
+  result_residuals_ =
+      zeros<mat>(segment_end - segment_start + 1, parameters_count_);
+  GetNllPeltMeanValue(segment_start, segment_end, cv, start);
+}
+
+void Fastcpd::GetNllPeltMeanValue(const unsigned int segment_start,
+                                  const unsigned int segment_end, const bool cv,
+                                  const Nullable<colvec>& start) {
   double two_norm = 0;
   for (unsigned int i = 0; i < parameters_count_; i++) {
     two_norm +=
@@ -479,18 +488,25 @@ void Fastcpd::GetNllPeltMean(const unsigned int segment_start,
         (data_c_.at(segment_end + 1, i) - data_c_.at(segment_start, i));
   }
   const unsigned int segment_length = segment_end - segment_start + 1;
-  result_coefficients_ = zeros<mat>(parameters_count_, 1);
-  result_residuals_ = zeros<mat>(segment_length, parameters_count_);
   result_value_ = ((data_c_.at(segment_end + 1, parameters_count_) -
                     data_c_.at(segment_start, parameters_count_)) -
                    two_norm / segment_length) /
                   2.0;
 }
 
-void Fastcpd::GetNllPeltMeanVariance(const unsigned int segment_start,
+void Fastcpd::GetNllPeltMeanvariance(const unsigned int segment_start,
                                      const unsigned int segment_end,
                                      const bool cv,
                                      const Nullable<colvec>& start) {
+  result_coefficients_ = zeros<mat>(parameters_count_, 1);
+  result_residuals_ = mat();
+  GetNllPeltMeanvarianceValue(segment_start, segment_end, cv, start);
+}
+
+void Fastcpd::GetNllPeltMeanvarianceValue(const unsigned int segment_start,
+                                          const unsigned int segment_end,
+                                          const bool cv,
+                                          const Nullable<colvec>& start) {
   rowvec data_diff = data_c_.row(segment_end + 1) - data_c_.row(segment_start);
   const unsigned int segment_length = segment_end - segment_start + 1;
 
@@ -523,8 +539,6 @@ void Fastcpd::GetNllPeltMeanVariance(const unsigned int segment_start,
                  (approximate_segment_end - approximate_segment_start + 1)) /
             (approximate_segment_end - approximate_segment_start + 1));
   }
-  result_coefficients_ = zeros<mat>(parameters_count_, 1);
-  result_residuals_ = mat();
   result_value_ = log(det_value) * segment_length / 2.0;
 }
 
@@ -558,6 +572,15 @@ void Fastcpd::GetNllPeltMgaussian(const unsigned int segment_start,
 void Fastcpd::GetNllPeltVariance(const unsigned int segment_start,
                                  const unsigned int segment_end, const bool cv,
                                  const Nullable<colvec>& start) {
+  result_coefficients_ = zeros<mat>(data_n_dims_, data_n_dims_);
+  result_residuals_ = mat();
+  GetNllPeltVarianceValue(segment_start, segment_end, cv, start);
+}
+
+void Fastcpd::GetNllPeltVarianceValue(const unsigned int segment_start,
+                                      const unsigned int segment_end,
+                                      const bool cv,
+                                      const Nullable<colvec>& start) {
   const unsigned int segment_length = segment_end - segment_start + 1;
 
   double det_value = det(
@@ -582,9 +605,6 @@ void Fastcpd::GetNllPeltVariance(const unsigned int segment_start,
                                   data_n_dims_, data_n_dims_) /
                     (approximate_segment_end - approximate_segment_start + 1));
   }
-
-  result_coefficients_ = zeros<mat>(data_n_dims_, data_n_dims_);
-  result_residuals_ = mat();
   result_value_ = log(det_value) * segment_length / 2.0;
 }
 
