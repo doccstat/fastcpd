@@ -136,8 +136,10 @@ Fastcpd::Fastcpd(
         }
         return nullptr;
       }()),
-      obj((double *)calloc(data_n_rows_ + 1, sizeof(double))),
       objective_function_values_(colvec(data_n_rows_ + 1)),
+      objective_function_values_candidates_(colvec(data_n_rows_ + 1)),
+      objective_function_values_candidates_ptr_(
+          objective_function_values_candidates_.memptr()),
       order_(order),
       parameters_count_(p),
       parameters_lower_bound_(lower),
@@ -214,20 +216,24 @@ List Fastcpd::Run() {
                       (data_c_ptr_[t + data_c_n_rows_ * pi] -
                        data_c_ptr_[pruned_set_[i] + data_c_n_rows_ * pi]);
         }
-        obj[i] = objective_function_values_[pruned_set_[i]] +
-                 ((data_c_ptr_[t + data_c_n_rows_ * parameters_count_] -
-                   data_c_ptr_[pruned_set_[i] +
-                               data_c_n_rows_ * parameters_count_]) -
-                  two_norm / (t - pruned_set_[i])) /
-                     2.0 +
-                 std::log(t - pruned_set_[i]) / 2.0 + beta_;
+        objective_function_values_candidates_ptr_[i] =
+            objective_function_values_[pruned_set_[i]] +
+            ((data_c_ptr_[t + data_c_n_rows_ * parameters_count_] -
+              data_c_ptr_[pruned_set_[i] +
+                          data_c_n_rows_ * parameters_count_]) -
+             two_norm / (t - pruned_set_[i])) /
+                2.0 +
+            std::log(t - pruned_set_[i]) / 2.0 + beta_;
       }
 
-      objective_function_values_min_ = obj[0];
+      objective_function_values_min_ =
+          objective_function_values_candidates_ptr_[0];
       objective_function_values_min_index_ = 0;
       for (i = 1; i < pruned_set_size_; i++) {
-        if (obj[i] < objective_function_values_min_) {
-          objective_function_values_min_ = obj[i];
+        if (objective_function_values_candidates_ptr_[i] <
+            objective_function_values_min_) {
+          objective_function_values_min_ =
+              objective_function_values_candidates_ptr_[i];
           objective_function_values_min_index_ = i;
         }
       }
@@ -236,7 +242,7 @@ List Fastcpd::Run() {
 
       pruned_left_n_elem_ = 0;
       for (i = 0; i < pruned_set_size_; i++) {
-        if (obj[i] <=
+        if (objective_function_values_candidates_ptr_[i] <=
             objective_function_values_min_ + beta_ - pruning_coefficient_) {
           pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
           pruned_left_n_elem_++;
@@ -260,20 +266,24 @@ List Fastcpd::Run() {
                       (data_c_ptr_[t + data_c_n_rows_ * pi] -
                        data_c_ptr_[pruned_set_[i] + data_c_n_rows_ * pi]);
         }
-        obj[i] = objective_function_values_[pruned_set_[i]] +
-                 ((data_c_ptr_[t + data_c_n_rows_ * parameters_count_] -
-                   data_c_ptr_[pruned_set_[i] +
-                               data_c_n_rows_ * parameters_count_]) -
-                  two_norm / (t - pruned_set_[i])) /
-                     2.0 +
-                 beta_;
+        objective_function_values_candidates_ptr_[i] =
+            objective_function_values_[pruned_set_[i]] +
+            ((data_c_ptr_[t + data_c_n_rows_ * parameters_count_] -
+              data_c_ptr_[pruned_set_[i] +
+                          data_c_n_rows_ * parameters_count_]) -
+             two_norm / (t - pruned_set_[i])) /
+                2.0 +
+            beta_;
       }
 
-      objective_function_values_min_ = obj[0];
+      objective_function_values_min_ =
+          objective_function_values_candidates_ptr_[0];
       objective_function_values_min_index_ = 0;
       for (i = 1; i < pruned_set_size_; i++) {
-        if (obj[i] < objective_function_values_min_) {
-          objective_function_values_min_ = obj[i];
+        if (objective_function_values_candidates_ptr_[i] <
+            objective_function_values_min_) {
+          objective_function_values_min_ =
+              objective_function_values_candidates_ptr_[i];
           objective_function_values_min_index_ = i;
         }
       }
@@ -282,7 +292,7 @@ List Fastcpd::Run() {
 
       pruned_left_n_elem_ = 0;
       for (i = 0; i < pruned_set_size_; i++) {
-        if (obj[i] <=
+        if (objective_function_values_candidates_ptr_[i] <=
             objective_function_values_min_ + beta_ - pruning_coefficient_) {
           pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
           pruned_left_n_elem_++;
@@ -303,16 +313,20 @@ List Fastcpd::Run() {
         if (det_value <= 0) {
           det_value = 1e-11;
         }
-        obj[i] = objective_function_values_[pruned_set_[i]] +
-                 (log(det_value / segment_length) * segment_length / 2.0) +
-                 std::log(segment_length) / 2.0 + beta_;
+        objective_function_values_candidates_ptr_[i] =
+            objective_function_values_[pruned_set_[i]] +
+            (log(det_value / segment_length) * segment_length / 2.0) +
+            std::log(segment_length) / 2.0 + beta_;
       }
 
-      objective_function_values_min_ = obj[0];
+      objective_function_values_min_ =
+          objective_function_values_candidates_ptr_[0];
       objective_function_values_min_index_ = 0;
       for (i = 1; i < pruned_set_size_; i++) {
-        if (obj[i] < objective_function_values_min_) {
-          objective_function_values_min_ = obj[i];
+        if (objective_function_values_candidates_ptr_[i] <
+            objective_function_values_min_) {
+          objective_function_values_min_ =
+              objective_function_values_candidates_ptr_[i];
           objective_function_values_min_index_ = i;
         }
       }
@@ -321,7 +335,7 @@ List Fastcpd::Run() {
 
       pruned_left_n_elem_ = 0;
       for (i = 0; i < pruned_set_size_; i++) {
-        if (obj[i] <=
+        if (objective_function_values_candidates_ptr_[i] <=
             objective_function_values_min_ + beta_ - pruning_coefficient_) {
           pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
           pruned_left_n_elem_++;
@@ -374,16 +388,20 @@ List Fastcpd::Run() {
           det_value = det(covar_approx / (approximate_segment_end -
                                           approximate_segment_start + 1));
         }
-        obj[i] = objective_function_values_[pruned_set_[i]] +
-                 (log(det_value) * segment_length / 2.0) +
-                 std::log(segment_length) / 2.0 + beta_;
+        objective_function_values_candidates_ptr_[i] =
+            objective_function_values_[pruned_set_[i]] +
+            (log(det_value) * segment_length / 2.0) +
+            std::log(segment_length) / 2.0 + beta_;
       }
 
-      objective_function_values_min_ = obj[0];
+      objective_function_values_min_ =
+          objective_function_values_candidates_ptr_[0];
       objective_function_values_min_index_ = 0;
       for (i = 1; i < pruned_set_size_; i++) {
-        if (obj[i] < objective_function_values_min_) {
-          objective_function_values_min_ = obj[i];
+        if (objective_function_values_candidates_ptr_[i] <
+            objective_function_values_min_) {
+          objective_function_values_min_ =
+              objective_function_values_candidates_ptr_[i];
           objective_function_values_min_index_ = i;
         }
       }
@@ -392,7 +410,7 @@ List Fastcpd::Run() {
 
       pruned_left_n_elem_ = 0;
       for (i = 0; i < pruned_set_size_; i++) {
-        if (obj[i] <=
+        if (objective_function_values_candidates_ptr_[i] <=
             objective_function_values_min_ + beta_ - pruning_coefficient_) {
           pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
           pruned_left_n_elem_++;
@@ -417,16 +435,20 @@ List Fastcpd::Run() {
         if (det_value <= 0) {
           det_value = 1e-11;
         }
-        obj[i] = objective_function_values_[pruned_set_[i]] +
-                 (log(det_value / segment_length) * segment_length / 2.0) +
-                 std::log(segment_length) / 2.0 + beta_;
+        objective_function_values_candidates_ptr_[i] =
+            objective_function_values_[pruned_set_[i]] +
+            (log(det_value / segment_length) * segment_length / 2.0) +
+            std::log(segment_length) / 2.0 + beta_;
       }
 
-      objective_function_values_min_ = obj[0];
+      objective_function_values_min_ =
+          objective_function_values_candidates_ptr_[0];
       objective_function_values_min_index_ = 0;
       for (i = 1; i < pruned_set_size_; i++) {
-        if (obj[i] < objective_function_values_min_) {
-          objective_function_values_min_ = obj[i];
+        if (objective_function_values_candidates_ptr_[i] <
+            objective_function_values_min_) {
+          objective_function_values_min_ =
+              objective_function_values_candidates_ptr_[i];
           objective_function_values_min_index_ = i;
         }
       }
@@ -435,7 +457,7 @@ List Fastcpd::Run() {
 
       pruned_left_n_elem_ = 0;
       for (i = 0; i < pruned_set_size_; i++) {
-        if (obj[i] <=
+        if (objective_function_values_candidates_ptr_[i] <=
             objective_function_values_min_ + beta_ - pruning_coefficient_) {
           pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
           pruned_left_n_elem_++;
@@ -505,16 +527,20 @@ List Fastcpd::Run() {
           det_value = det(covar_approx / (approximate_segment_end -
                                           approximate_segment_start + 1));
         }
-        obj[i] = objective_function_values_[pruned_set_[i]] +
-                 (log(det_value) * segment_length / 2.0) +
-                 std::log(segment_length) / 2.0 + beta_;
+        objective_function_values_candidates_ptr_[i] =
+            objective_function_values_[pruned_set_[i]] +
+            (log(det_value) * segment_length / 2.0) +
+            std::log(segment_length) / 2.0 + beta_;
       }
 
-      objective_function_values_min_ = obj[0];
+      objective_function_values_min_ =
+          objective_function_values_candidates_ptr_[0];
       objective_function_values_min_index_ = 0;
       for (i = 1; i < pruned_set_size_; i++) {
-        if (obj[i] < objective_function_values_min_) {
-          objective_function_values_min_ = obj[i];
+        if (objective_function_values_candidates_ptr_[i] <
+            objective_function_values_min_) {
+          objective_function_values_min_ =
+              objective_function_values_candidates_ptr_[i];
           objective_function_values_min_index_ = i;
         }
       }
@@ -523,7 +549,7 @@ List Fastcpd::Run() {
 
       pruned_left_n_elem_ = 0;
       for (i = 0; i < pruned_set_size_; i++) {
-        if (obj[i] <=
+        if (objective_function_values_candidates_ptr_[i] <=
             objective_function_values_min_ + beta_ - pruning_coefficient_) {
           pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
           pruned_left_n_elem_++;
@@ -1003,20 +1029,24 @@ void Fastcpd::UpdateStep() {
   UpdateSenParameters();
   for (unsigned int i = 0; i < pruned_set_size_; i++) {
     if (i == pruned_set_size_ - 1 && vanilla_percentage_ != 1) {
-      obj[i] = objective_function_values_(pruned_set_(i)) + beta_;
+      objective_function_values_candidates_ptr_[i] =
+          objective_function_values_(pruned_set_(i)) + beta_;
     } else {
-      obj[i] = objective_function_values_(pruned_set_(i)) +
-               GetCostValue(pruned_set_(i), i) + beta_;
+      objective_function_values_candidates_ptr_[i] =
+          objective_function_values_(pruned_set_(i)) +
+          GetCostValue(pruned_set_(i), i) + beta_;
     }
   }
 
   // The following code is the manual implementation of `index_min` function
   // in Armadillo.
-  objective_function_values_min_ = obj[0];
+  objective_function_values_min_ = objective_function_values_candidates_ptr_[0];
   objective_function_values_min_index_ = 0;
   for (unsigned int i = 1; i < pruned_set_size_; i++) {
-    if (obj[i] < objective_function_values_min_) {
-      objective_function_values_min_ = obj[i];
+    if (objective_function_values_candidates_ptr_[i] <
+        objective_function_values_min_) {
+      objective_function_values_min_ =
+          objective_function_values_candidates_ptr_[i];
       objective_function_values_min_index_ = i;
     }
   }
@@ -1027,7 +1057,7 @@ void Fastcpd::UpdateStep() {
   // Armadillo.
   pruned_left_n_elem_ = 0;
   for (unsigned int i = 0; i < pruned_set_size_; i++) {
-    if (obj[i] <=
+    if (objective_function_values_candidates_ptr_[i] <=
         objective_function_values_min_ + beta_ - pruning_coefficient_) {
       pruned_set_[pruned_left_n_elem_] = pruned_set_[i];
       if (vanilla_percentage_ != 1 && pruned_left_n_elem_ != i) {

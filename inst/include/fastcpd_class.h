@@ -215,8 +215,9 @@ class Fastcpd {
   arma::colvec momentum_;
   const double momentum_coef_;
   const std::unique_ptr<Rcpp::Function> multiple_epochs_function_;
-  double* obj;
   arma::colvec objective_function_values_;
+  arma::colvec objective_function_values_candidates_;
+  double* objective_function_values_candidates_ptr_;
   double objective_function_values_min_;
   unsigned int objective_function_values_min_index_;
   const arma::colvec order_;
