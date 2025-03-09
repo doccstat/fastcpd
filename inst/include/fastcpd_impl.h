@@ -5,8 +5,7 @@
 
 Rcpp::List fastcpd_impl(
     const arma::mat data, const double beta, const std::string cost_adjustment,
-    const unsigned int d, const int segment_count, const double trim,
-    const double momentum_coef,
+    const int segment_count, const double trim, const double momentum_coef,
     const Rcpp::Nullable<Rcpp::Function> multiple_epochs_function,
     const std::string family, const double epsilon, const int p,
     const arma::colvec order, const Rcpp::Nullable<Rcpp::Function> cost,

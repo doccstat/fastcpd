@@ -58,8 +58,7 @@ using ::std::move;
 // [[Rcpp::export]]
 Rcpp::List fastcpd_impl(
     const arma::mat data, const double beta, const std::string cost_adjustment,
-    const unsigned int d, const int segment_count, const double trim,
-    const double momentum_coef,
+    const int segment_count, const double trim, const double momentum_coef,
     const Rcpp::Nullable<Rcpp::Function> multiple_epochs_function,
     const std::string family, const double epsilon, const int p,
     const arma::colvec order, const Rcpp::Nullable<Rcpp::Function> cost,
@@ -71,8 +70,8 @@ Rcpp::List fastcpd_impl(
     const unsigned int p_response, const double pruning_coef,
     const bool r_progress) {
   fastcpd::classes::Fastcpd fastcpd_class(
-      beta, cost, cost_adjustment, cost_gradient, cost_hessian, cp_only, d,
-      data, epsilon, family, multiple_epochs_function, line_search, lower,
+      beta, cost, cost_adjustment, cost_gradient, cost_hessian, cp_only, data,
+      epsilon, family, multiple_epochs_function, line_search, lower,
       momentum_coef, order, p, p_response, pruning_coef, r_progress,
       segment_count, trim, upper, vanilla_percentage, variance_estimate,
       warm_start);

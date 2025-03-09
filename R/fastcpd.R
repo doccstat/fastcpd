@@ -312,9 +312,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     }
   }
 
-  # Get dimension of the data.
-  d <- get_d(data_, family)
-
   # Get the number of paramters for the model to calculate the penalty.
   p <- get_p(data_, family, p_response, order, include_mean)
 
@@ -349,7 +346,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   )
 
   result <- fastcpd_impl(
-    data_, beta, cost_adjustment, d, segment_count, trim, momentum_coef,
+    data_, beta, cost_adjustment, segment_count, trim, momentum_coef,
     multiple_epochs, fastcpd_family, epsilon, p, order, cost, cost_gradient,
     cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper,
     line_search, sigma_, p_response, pruning_coef, r_progress

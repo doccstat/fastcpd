@@ -65,7 +65,7 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
     warning("Can not plot mean change points with p > 1.")
     return()
   }
-  if (!require_namespace("ggplot2")) {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
     warning("ggplot2 is not installed. No plot is made.")
     return()
   }
