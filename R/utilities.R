@@ -156,16 +156,20 @@ get_sigma_data <- function(
   list(sigma = sigma_, data = data_)
 }
 
-get_fastcpd_family <- function(family, p_response) {
+get_fastcpd_family <- function(family, order, p_response) {
   if (family %in% c(
     "binomial", "garch", "poisson", "lasso",
-    "mean", "variance", "meanvariance", "arma"
+    "mean", "variance", "meanvariance"
   )) {
     family
   } else if (family == "lm" && p_response == 1 || family == "ar") {
     "gaussian"
   } else if (family == "var" || family == "lm" && p_response > 1) {
     "mgaussian"
+  } else if (family == "arma" && order[1] == 0) {
+    "ma"
+  } else if (family == "arma" && order[1] != 0) {
+    family
   } else {
     "custom"
   }

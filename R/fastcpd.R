@@ -317,7 +317,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   # Assign families as "gaussian" for "lm" and "ar" or "mgaussian" for
   # "mlm" and "var".
-  fastcpd_family <- get_fastcpd_family(family, p_response)
+  fastcpd_family <- get_fastcpd_family(family, order, p_response)
 
   # Estimate the variance / covariance matrix and pre-process the data for
   # mean, variance, meanvariance, ar and var models.

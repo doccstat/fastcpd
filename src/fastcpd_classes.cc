@@ -133,7 +133,8 @@ Fastcpd::Fastcpd(const double beta, const Rcpp::Nullable<Rcpp::Function>& cost,
       data_n_dims_([&]() -> unsigned int {
         if (family == "mean" || family == "variance" ||
             family == "meanvariance" || family == "ar" || family == "arma" ||
-            family == "arima" || family == "garch" || family == "var") {
+            family == "arima" || family == "garch" || family == "var" ||
+            family == "ma") {
           return data.n_cols;
         }
         return data.n_cols - 1;
@@ -143,6 +144,57 @@ Fastcpd::Fastcpd(const double beta, const Rcpp::Nullable<Rcpp::Function>& cost,
       epsilon_in_hessian_(epsilon),
       error_standard_deviation_(colvec(segment_count)),
       family_(family),
+      get_gradient_([&]() -> arma::colvec (Fastcpd::*)(const unsigned int,
+                                                       const unsigned int,
+                                                       const arma::colvec&) {
+        auto it = family_function_map_.find(family);
+        if (it != family_function_map_.end()) {
+          const FunctionSet& func_set = it->second;
+          return func_set.gradient;
+        }
+        return &Fastcpd::GetGradientCustom;
+      }()),
+      get_hessian_([&]() -> arma::mat (Fastcpd::*)(const unsigned int,
+                                                   const unsigned int,
+                                                   const arma::colvec&) {
+        auto it = family_function_map_.find(family);
+        if (it != family_function_map_.end()) {
+          const FunctionSet& func_set = it->second;
+          return func_set.hessian;
+        }
+        return &Fastcpd::GetHessianCustom;
+      }()),
+      get_nll_pelt_([&]() -> void (Fastcpd::*)(
+                              const unsigned int, const unsigned int,
+                              const bool, const Rcpp::Nullable<arma::colvec>&) {
+        auto it = family_function_map_.find(family);
+        if (it != family_function_map_.end()) {
+          const FunctionSet& func_set = it->second;
+          return func_set.nll_pelt;
+        }
+        return &Fastcpd::GetNllPeltCustom;
+      }()),
+      get_nll_pelt_value_(
+          [&]() -> void (Fastcpd::*)(const unsigned int, const unsigned int,
+                                     const bool,
+                                     const Rcpp::Nullable<arma::colvec>&) {
+            auto it = family_function_map_.find(family);
+            if (it != family_function_map_.end()) {
+              const FunctionSet& func_set = it->second;
+              return func_set.nll_pelt_value;
+            }
+            return &Fastcpd::GetNllPeltCustom;
+          }()),
+      get_nll_sen_([&]() -> double (Fastcpd::*)(const unsigned int,
+                                                const unsigned int,
+                                                const arma::colvec&) {
+        auto it = family_function_map_.find(family);
+        if (it != family_function_map_.end()) {
+          const FunctionSet& func_set = it->second;
+          return func_set.nll_sen;
+        }
+        return &Fastcpd::GetNllSenCustom;
+      }()),
       hessian_(cube(p, p, data.n_rows + 1)),
       line_search_(line_search),
       momentum_(colvec(p)),
@@ -175,39 +227,6 @@ Fastcpd::Fastcpd(const double beta, const Rcpp::Nullable<Rcpp::Function>& cost,
       vanilla_percentage_(vanilla_percentage),
       variance_estimate_(variance_estimate),
       warm_start_(zeros<mat>(p, data_n_rows_)) {
-  // Handle the special 'arma' family_ with order_ condition
-  if (family_ == "arma") {
-    if (order_(0) > 0) {
-      get_gradient_ = &Fastcpd::GetGradientArma;
-      get_hessian_ = &Fastcpd::GetHessianArma;
-      get_nll_pelt_ = &Fastcpd::GetNllPeltArma;
-      get_nll_pelt_value_ = &Fastcpd::GetNllPeltArma;
-      get_nll_sen_ = &Fastcpd::GetNllSenArma;
-    } else {  // order_(0) == 0
-      get_gradient_ = &Fastcpd::GetGradientMa;
-      get_hessian_ = &Fastcpd::GetHessianMa;
-      get_nll_pelt_ = &Fastcpd::GetNllPeltArma;
-      get_nll_pelt_value_ = &Fastcpd::GetNllPeltArma;
-      get_nll_sen_ = &Fastcpd::GetNllSenMa;
-    }
-  } else {
-    auto it = family_function_map_.find(family_);
-    if (it != family_function_map_.end()) {
-      const FunctionSet& func_set = it->second;
-      get_gradient_ = func_set.gradient;
-      get_hessian_ = func_set.hessian;
-      get_nll_pelt_ = func_set.nll_pelt;
-      get_nll_pelt_value_ = func_set.nll_pelt_value;
-      get_nll_sen_ = func_set.nll_sen;
-    } else {
-      get_gradient_ = &Fastcpd::GetGradientCustom;
-      get_hessian_ = &Fastcpd::GetHessianCustom;
-      get_nll_pelt_ = &Fastcpd::GetNllPeltCustom;
-      get_nll_pelt_value_ = &Fastcpd::GetNllPeltCustom;
-      get_nll_sen_ = &Fastcpd::GetNllSenCustom;
-    }
-  }
-
   // TODO(doccstat): Store environment functions from R.
 }
 
@@ -590,6 +609,10 @@ List Fastcpd::Run() {
 
 const unordered_map<string, Fastcpd::FunctionSet>
     Fastcpd::family_function_map_ = {
+        {"arma",
+         FunctionSet{&Fastcpd::GetGradientArma, &Fastcpd::GetHessianArma,
+                     &Fastcpd::GetNllPeltArma, &Fastcpd::GetNllPeltArma,
+                     &Fastcpd::GetNllSenArma}},
         {"binomial",
          FunctionSet{&Fastcpd::GetGradientBinomial,
                      &Fastcpd::GetHessianBinomial, &Fastcpd::GetNllPeltGlm,
@@ -609,6 +632,9 @@ const unordered_map<string, Fastcpd::FunctionSet>
          FunctionSet{&Fastcpd::GetGradientLm, &Fastcpd::GetHessianLm,
                      &Fastcpd::GetNllPeltLasso, &Fastcpd::GetNllPeltLasso,
                      &Fastcpd::GetNllSenLasso}},
+        {"ma", FunctionSet{&Fastcpd::GetGradientMa, &Fastcpd::GetHessianMa,
+                           &Fastcpd::GetNllPeltArma, &Fastcpd::GetNllPeltArma,
+                           &Fastcpd::GetNllSenMa}},
         {"poisson",
          FunctionSet{&Fastcpd::GetGradientPoisson, &Fastcpd::GetHessianPoisson,
                      &Fastcpd::GetNllPeltGlm, &Fastcpd::GetNllPeltGlm,
@@ -1023,7 +1049,7 @@ void Fastcpd::UpdateSenParameters() {
     const rowvec x = data_.row(t - 1).tail(parameters_count_);
     hessian_new = x.t() * x + epsilon_in_hessian_ * eye<mat>(parameters_count_,
                                                              parameters_count_);
-  } else if (family_ == "arma") {
+  } else if (family_ == "arma" || family_ == "ma") {
     hessian_new = (this->*get_hessian_)(0, t - 1, coef_add);
   } else if (family_ == "custom") {
     hessian_new = zeros<mat>(parameters_count_, parameters_count_);
