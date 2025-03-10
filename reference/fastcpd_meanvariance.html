@@ -115,7 +115,7 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1.567   0.893   1.647 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1.686   0.945   1.805 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.mv(data = rbind(mvtnorm::rmvnorm(2e+05, mean = rep(0, </span>
@@ -133,19 +133,32 @@ observation and thus a formula is not required here.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 108.8674 -43.02536 1385124 -50.71083 377.4763 1381660 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    segment 1 segment 2 segment 3 segment 4 segment 5 segment 6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1          0         0         0         0         0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2          0         0         0         0         0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3          0         0         0         0         0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4          0         0         0         0         0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5          0         0         0         0         0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6          0         0         0         0         0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7          0         0         0         0         0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8          0         0         0         0         0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9          0         0         0         0         0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10         0         0         0         0         0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11         0         0         0         0         0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12         0         0         0         0         0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       segment 1     segment 2     segment 3     segment 4    segment 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0.001011082 50.0003528125  -0.016501485  0.0033379848 49.995348620</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  -0.001572291 50.0047380197   0.027308617 -0.0002731255 49.995608790</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  -0.001048280 49.9949663194  -0.000285863 -0.0022305825 50.004925725</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   1.001716184  1.0053160771  99.837900270  1.0049251320  1.011184355</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   0.003146441 -0.0061509213   0.155411984  0.0033208418  0.002837378</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   0.001702982 -0.0009432632  -0.174243448 -0.0030404684 -0.001092170</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   0.003146441 -0.0061509213   0.155411984  0.0033208418  0.002837378</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   0.998570871  0.9954591727 100.257688784  0.9940791908  0.999139034</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   0.001008951 -0.0062795529   0.070720757  0.0006369845 -0.001649613</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10  0.001702982 -0.0009432632  -0.174243448 -0.0030404684 -0.001092170</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11  0.001008951 -0.0062795529   0.070720757  0.0006369845 -0.001649613</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12  1.000100554  0.9971197656 100.588745799  0.9998191884  0.995957111</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       segment 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   50.00765767</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   49.97689987</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   50.01812646</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  100.43738403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    0.09929858</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    0.04291338</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7    0.09929858</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   99.71858356</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   -0.09614237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   0.04291338</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11  -0.09614237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12  99.88324093</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
