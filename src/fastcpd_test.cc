@@ -3,7 +3,7 @@
 // Implementation of the FastcpdTest helper class for testing fastcpd
 // functionality.
 
-#include "fastcpd_class.h"
+#include "fastcpd.h"
 
 namespace fastcpd {
 namespace test {
@@ -159,7 +159,7 @@ arma::mat FastcpdTest::GetHessianPoisson(const arma::mat& data,
 double FastcpdTest::GetNllSen(const arma::mat& data,
                               const unsigned int segment_start,
                               const unsigned int segment_end,
-                              arma::colvec theta) {
+                              const arma::colvec& theta) {
   fastcpd::classes::Fastcpd fastcpd_instance(
       /* beta */ 0,
       /* cost */ R_NilValue,
