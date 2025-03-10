@@ -757,7 +757,12 @@ void Fastcpd::GetCostResult(const unsigned int segment_start,
                             Nullable<colvec> theta, const bool cv,
                             Nullable<colvec> start) {
   if (theta.isNull()) {
-    if (vanilla_percentage_ == 1) {
+    if (((family_ == "mean" || family_ == "variance" ||
+          family_ == "meanvariance") &&
+         t < data_c_n_rows_) ||
+        (!(family_ == "mean" || family_ == "variance" ||
+           family_ == "meanvariance") &&
+         vanilla_percentage_ == 1)) {
       (this->*get_nll_pelt_value_)(segment_start, segment_end, cv, start);
     } else {
       (this->*get_nll_pelt_)(segment_start, segment_end, cv, start);
@@ -805,20 +810,16 @@ List Fastcpd::GetChangePointSet() {
   for (unsigned int i = 0; i < cp_loc.n_elem - 1; i++) {
     GetCostResult(cp_loc(i), cp_loc(i + 1) - 1, R_NilValue, false, R_NilValue);
     cost_values(i) = result_value_;
-
-    // Parameters are not involved for PELT.
-    if (vanilla_percentage_ < 1 || family_ == "garch") {
+    if (family_ != "custom") {
       thetas.col(i) = result_coefficients_.as_col();
     }
-
     // Residual is only calculated for built-in families.
     if (family_ != "custom" && family_ != "mean" && family_ != "variance" &&
         family_ != "meanvariance") {
-      mat cost_optim_residual = result_residuals_;
       residual.rows(residual_next_start,
-                    residual_next_start + cost_optim_residual.n_rows - 1) =
-          cost_optim_residual;
-      residual_next_start += cost_optim_residual.n_rows;
+                    residual_next_start + result_residuals_.n_rows - 1) =
+          result_residuals_;
+      residual_next_start += result_residuals_.n_rows;
     }
   }
   return List::create(Named("raw_cp_set") = change_points_,
@@ -1562,9 +1563,9 @@ void Fastcpd::GetNllPeltLasso(const unsigned int segment_start,
 void Fastcpd::GetNllPeltMean(const unsigned int segment_start,
                              const unsigned int segment_end, const bool cv,
                              const Nullable<colvec>& start) {
-  result_coefficients_ = zeros<mat>(parameters_count_, 1);
-  result_residuals_ =
-      zeros<mat>(segment_end - segment_start + 1, parameters_count_);
+  mat data_segment = data_.rows(segment_start, segment_end);
+  result_coefficients_ = mean(data_segment, 0);
+  result_residuals_ = data_segment.each_row() - result_coefficients_;
   GetNllPeltMeanValue(segment_start, segment_end, cv, start);
 }
 
@@ -1588,7 +1589,11 @@ void Fastcpd::GetNllPeltMeanvariance(const unsigned int segment_start,
                                      const unsigned int segment_end,
                                      const bool cv,
                                      const Nullable<colvec>& start) {
+  mat data_segment = data_.rows(segment_start, segment_end);
   result_coefficients_ = zeros<mat>(parameters_count_, 1);
+  result_coefficients_.rows(0, data_n_dims_ - 1) = mean(data_segment, 0).t();
+  result_coefficients_.rows(data_n_dims_, parameters_count_ - 1) =
+      cov(data_segment).as_col();
   result_residuals_ = mat();
   GetNllPeltMeanvarianceValue(segment_start, segment_end, cv, start);
 }
@@ -1662,7 +1667,8 @@ void Fastcpd::GetNllPeltMgaussian(const unsigned int segment_start,
 void Fastcpd::GetNllPeltVariance(const unsigned int segment_start,
                                  const unsigned int segment_end, const bool cv,
                                  const Nullable<colvec>& start) {
-  result_coefficients_ = zeros<mat>(data_n_dims_, data_n_dims_);
+  mat data_segment = data_.rows(segment_start, segment_end);
+  result_coefficients_ = cov(data_segment);
   result_residuals_ = mat();
   GetNllPeltVarianceValue(segment_start, segment_end, cv, start);
 }
