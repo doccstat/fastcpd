@@ -244,21 +244,21 @@ class Fastcpd {
   const std::string family_;
   static const std::unordered_map<std::string, FunctionSet>
       family_function_map_;
-  arma::colvec (Fastcpd::*get_gradient_)(const unsigned int segment_start,
-                                         const unsigned int segment_end,
-                                         const arma::colvec& theta);
-  arma::mat (Fastcpd::*get_hessian_)(const unsigned int segment_start,
-                                     const unsigned int segment_end,
-                                     const arma::colvec& theta);
-  void (Fastcpd::*get_nll_pelt_)(const unsigned int segment_start,
-                                 const unsigned int segment_end, const bool cv,
-                                 const Rcpp::Nullable<arma::colvec>& start);
-  void (Fastcpd::*get_nll_pelt_value_)(
+  arma::colvec (Fastcpd::* const get_gradient_)(
+      const unsigned int segment_start, const unsigned int segment_end,
+      const arma::colvec& theta);
+  arma::mat (Fastcpd::* const get_hessian_)(const unsigned int segment_start,
+                                            const unsigned int segment_end,
+                                            const arma::colvec& theta);
+  void (Fastcpd::* const get_nll_pelt_)(
       const unsigned int segment_start, const unsigned int segment_end,
       const bool cv, const Rcpp::Nullable<arma::colvec>& start);
-  double (Fastcpd::*get_nll_sen_)(const unsigned int segment_start,
-                                  const unsigned int segment_end,
-                                  const arma::colvec& theta);
+  void (Fastcpd::* const get_nll_pelt_value_)(
+      const unsigned int segment_start, const unsigned int segment_end,
+      const bool cv, const Rcpp::Nullable<arma::colvec>& start);
+  double (Fastcpd::* const get_nll_sen_)(const unsigned int segment_start,
+                                         const unsigned int segment_end,
+                                         const arma::colvec& theta);
   arma::cube hessian_;
   double lasso_penalty_base_;
   arma::colvec line_search_;
