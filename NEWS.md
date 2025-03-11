@@ -1,6 +1,7 @@
 # fastcpd 0.16.0
 
 *   Performance improvement.
+*   Less package dependencies.
 
 # fastcpd 0.15.0
 
