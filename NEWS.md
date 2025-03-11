@@ -1,3 +1,7 @@
+# fastcpd 0.16.0
+
+*   Performance improvement.
+
 # fastcpd 0.15.0
 
 *   Remove constants.
