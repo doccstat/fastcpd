@@ -89,17 +89,18 @@ reference:
       - fastcpd-class
 
 articles:
-- title: Examples
+- title: Comparisons
   navbar: ~
+  contents:
+  - time-complexity
+  - comparison-packages
+  - comparison-pelt
+
+- title: Examples
+  navbar: Examples
   contents:
   - examples-advanced
   - examples-custom-model
-
-- title: Comparison
-  navbar: Comparison
-  contents:
-  - comparison-packages
-  - comparison-pelt
 
 - title: Exploration
   navbar: Exploration
