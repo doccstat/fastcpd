@@ -28,12 +28,13 @@ observation and thus a formula is not required here."><meta property="og:image" 
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/examples-advanced.html">Advanced examples</a></li>
-    <li><a class="dropdown-item" href="../articles/examples-custom-model.html">Custom logistic regression model</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Comparison</h6></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/time-complexity.html">Time Complexity Analysis in fastcpd</a></li>
     <li><a class="dropdown-item" href="../articles/comparison-packages.html">Comparison with other R packages</a></li>
     <li><a class="dropdown-item" href="../articles/comparison-pelt.html">Comparison with vanilla PELT</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/examples-advanced.html">Advanced examples</a></li>
+    <li><a class="dropdown-item" href="../articles/examples-custom-model.html">Custom logistic regression model</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Exploration</h6></li>
     <li><a class="dropdown-item" href="../articles/exploration-during-development.html">Exploration during development</a></li>
@@ -121,32 +122,32 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">result_time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.mv</span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   2.097   0.192   2.289 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1.133   0.201   1.334 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.mv(data = data)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2e+05 3e+05 499999 7e+05 8e+05 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2e+05 3e+05 500408 7e+05 8e+05 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cost values:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 108.8674 -43.02536 1382904 -47.68093 377.4763 1381660 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 108.8674 -43.02536 1385124 -50.71083 377.4763 1381660 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       segment 1     segment 2     segment 3     segment 4    segment 5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0.001011082 50.0003528125 -1.647663e-02  0.0032725571 49.995348620</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  -0.001572291 50.0047380197  2.735846e-02 -0.0002665615 49.995608790</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  -0.001048280 49.9949663194 -2.119325e-04 -0.0023005354 50.004925725</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   1.001716184  1.0053160771  1.000400e+02  1.0049799581  1.011184355</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   0.003146441 -0.0061509213  1.558501e-01  0.0031928989  0.002837378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   0.001702982 -0.0009432632 -1.746045e-01 -0.0030281680 -0.001092170</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   0.003146441 -0.0061509213  1.558501e-01  0.0031928989  0.002837378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   0.998570871  0.9954591727  1.004605e+02  0.9942135351  0.999139034</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9   0.001008951 -0.0062795529  7.083125e-02  0.0006677883 -0.001649613</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10  0.001702982 -0.0009432632 -1.746045e-01 -0.0030281680 -0.001092170</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11  0.001008951 -0.0062795529  7.083125e-02  0.0006677883 -0.001649613</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12  1.000100554  0.9971197656  1.007926e+02  0.9996613540  0.995957111</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0.001011082 50.0003528125  -0.016501485  0.0033379848 49.995348620</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  -0.001572291 50.0047380197   0.027308617 -0.0002731255 49.995608790</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  -0.001048280 49.9949663194  -0.000285863 -0.0022305825 50.004925725</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   1.001716184  1.0053160771  99.837900270  1.0049251320  1.011184355</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   0.003146441 -0.0061509213   0.155411984  0.0033208418  0.002837378</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   0.001702982 -0.0009432632  -0.174243448 -0.0030404684 -0.001092170</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   0.003146441 -0.0061509213   0.155411984  0.0033208418  0.002837378</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   0.998570871  0.9954591727 100.257688784  0.9940791908  0.999139034</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   0.001008951 -0.0062795529   0.070720757  0.0006369845 -0.001649613</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10  0.001702982 -0.0009432632  -0.174243448 -0.0030404684 -0.001092170</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11  0.001008951 -0.0062795529   0.070720757  0.0006369845 -0.001649613</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12  1.000100554  0.9971197656 100.588745799  0.9998191884  0.995957111</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       segment 6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   50.00765767</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   49.97689987</span>
@@ -161,10 +162,10 @@ observation and thus a formula is not required here.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11  -0.09614237</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12  99.88324093</span>
 <span class="r-in"><span><span class="va">result</span><span class="op">@</span><span class="va">thetas</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span>, <span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      segment 1 segment 2     segment 3     segment 4 segment 5 segment 6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.001011082  50.00035 -0.0164766285  0.0032725571  49.99535  50.00766</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.001572291  50.00474  0.0273584578 -0.0002665615  49.99561  49.97690</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.001048280  49.99497 -0.0002119325 -0.0023005354  50.00493  50.01813</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      segment 1 segment 2    segment 3     segment 4 segment 5 segment 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.001011082  50.00035 -0.016501485  0.0033379848  49.99535  50.00766</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.001572291  50.00474  0.027308617 -0.0002731255  49.99561  49.97690</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.001048280  49.99497 -0.000285863 -0.0022305825  50.00493  50.01813</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">result</span><span class="op">@</span><span class="va">thetas</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">p</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">p</span>, <span class="op">]</span>, <span class="kw">function</span><span class="op">(</span><span class="va">thetas</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">thetas</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $`segment 1`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]        [,2]        [,3]</span>
@@ -179,16 +180,16 @@ observation and thus a formula is not required here.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -0.0009432632 -0.006279553  0.9971197656</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $`segment 3`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]         [,2]         [,3]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 100.0399627   0.15585014  -0.17460453</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]   0.1558501 100.46054935   0.07083125</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  -0.1746045   0.07083125 100.79256474</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]         [,2]         [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 99.8379003   0.15541198  -0.17424345</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  0.1554120 100.25768878   0.07072076</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -0.1742434   0.07072076 100.58874580</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $`segment 4`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]         [,2]          [,3]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  1.004979958 0.0031928989 -0.0030281680</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  0.003192899 0.9942135351  0.0006677883</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -0.003028168 0.0006677883  0.9996613540</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  1.004925132 0.0033208418 -0.0030404684</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  0.003320842 0.9940791908  0.0006369845</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -0.003040468 0.0006369845  0.9998191884</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $`segment 5`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]         [,2]         [,3]</span>

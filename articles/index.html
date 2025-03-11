@@ -18,12 +18,13 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/examples-advanced.html">Advanced examples</a></li>
-    <li><a class="dropdown-item" href="../articles/examples-custom-model.html">Custom logistic regression model</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Comparison</h6></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/time-complexity.html">Time Complexity Analysis in fastcpd</a></li>
     <li><a class="dropdown-item" href="../articles/comparison-packages.html">Comparison with other R packages</a></li>
     <li><a class="dropdown-item" href="../articles/comparison-pelt.html">Comparison with vanilla PELT</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Examples</h6></li>
+    <li><a class="dropdown-item" href="../articles/examples-advanced.html">Advanced examples</a></li>
+    <li><a class="dropdown-item" href="../articles/examples-custom-model.html">Custom logistic regression model</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Exploration</h6></li>
     <li><a class="dropdown-item" href="../articles/exploration-during-development.html">Exploration during development</a></li>
@@ -43,6 +44,17 @@
     </div>
 
     <div class="section ">
+      <h3>Comparisons</h3>
+      <div class="section-desc"></div>
+
+      <dl><dt><a href="time-complexity.html">Time Complexity Analysis in fastcpd</a></dt>
+        <dd><p>This vignette explores the computational complexity of the <code>fastcpd.mean</code> function and demonstrates the impact of SeDG on change point detection using <code><a href="../reference/fastcpd_lasso.html">fastcpd.lasso()</a></code>.</p>
+        </dd><dt><a href="comparison-packages.html">Comparison with other R packages</a></dt>
+        <dd><p>Speed and result comparison with other R packages.</p>
+        </dd><dt><a href="comparison-pelt.html">Comparison with vanilla PELT</a></dt>
+        <dd><p>Speed comparison with vanilla PELT algorithm.</p>
+      </dd></dl></div>
+    <div class="section ">
       <h3>Examples</h3>
       <div class="section-desc"></div>
 
@@ -50,15 +62,6 @@
         <dd><p>Examples using advanced features of the package.</p>
         </dd><dt><a href="examples-custom-model.html">Custom logistic regression model</a></dt>
         <dd><p>Examples of using custom model to reproduce change point detection in logistic regression models.</p>
-      </dd></dl></div>
-    <div class="section ">
-      <h3>Comparison</h3>
-      <div class="section-desc"></div>
-
-      <dl><dt><a href="comparison-packages.html">Comparison with other R packages</a></dt>
-        <dd><p>Speed and result comparison with other R packages.</p>
-        </dd><dt><a href="comparison-pelt.html">Comparison with vanilla PELT</a></dt>
-        <dd><p>Speed comparison with vanilla PELT algorithm.</p>
       </dd></dl></div>
     <div class="section ">
       <h3>Exploration</h3>
