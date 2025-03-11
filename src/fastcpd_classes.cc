@@ -1245,16 +1245,12 @@ void Fastcpd::GetNllPeltMeanvarianceValue(const unsigned int segment_start,
   unsigned int approximate_segment_start = segment_start,
                approximate_segment_end = segment_end;
   if (approximate_segment_end - approximate_segment_start + 1 <= data_n_dims_) {
-    if (segment_start >= data_n_dims_) {
-      approximate_segment_start = segment_start - data_n_dims_;
-    } else {
-      approximate_segment_start = 0;
-    }
     if (segment_end < data_n_rows_ - data_n_dims_) {
       approximate_segment_end = segment_end + data_n_dims_;
     } else {
       approximate_segment_end = data_n_rows_ - 1;
     }
+    approximate_segment_start = approximate_segment_end - data_n_dims_;
   }
   const unsigned int segment_length =
       approximate_segment_end - approximate_segment_start + 1;
@@ -1312,16 +1308,12 @@ void Fastcpd::GetNllPeltVarianceValue(const unsigned int segment_start,
   unsigned int approximate_segment_start = segment_start,
                approximate_segment_end = segment_end;
   if (approximate_segment_end - approximate_segment_start + 1 < data_n_dims_) {
-    if (segment_start >= data_n_dims_) {
-      approximate_segment_start = segment_start - data_n_dims_;
-    } else {
-      approximate_segment_start = 0;
-    }
     if (segment_end < data_n_rows_ - data_n_dims_) {
       approximate_segment_end = segment_end + data_n_dims_;
     } else {
       approximate_segment_end = data_n_rows_ - 1;
     }
+    approximate_segment_start = approximate_segment_end - data_n_dims_;
   }
   const unsigned int segment_length =
       approximate_segment_end - approximate_segment_start + 1;
