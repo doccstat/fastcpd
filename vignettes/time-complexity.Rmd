@@ -1,0 +1,150 @@
+---
+title: "Time Complexity Analysis in fastcpd"
+output: rmarkdown::html_vignette
+description: |
+  This vignette explores the computational complexity of the `fastcpd.mean`
+  function and demonstrates the impact of SeDG on change point detection
+  using `fastcpd.lasso()`.
+vignette: >
+  %\VignetteIndexEntry{Time Complexity Analysis in fastcpd}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = TRUE)
+library(fastcpd)
+```
+
+# Introduction
+
+This vignette examines two aspects of the **fastcpd** package:
+
+1. **Time Complexity of `fastcpd.mean()`:**
+   We assess how the execution time scales with the length of the data.
+
+2. **Impact of SeDG in `fastcpd.lasso()`:**
+   We simulate a Lasso regression setting with multiple change points and compare the detected change points under two settings of the `vanilla_percentage` parameter. This highlights the performance improvement provided by SeDG.
+
+# Time Complexity Simulation for `fastcpd.mean()`
+
+In this section, we generate multivariate normal data with varying lengths and measure the execution time of the `fastcpd.mean()` function. We then create a log-log plot of the execution times and perform a linear regression on the log-transformed data to estimate the power law coefficient.
+
+
+```{r time-complexity}
+# Load necessary libraries
+library(ggplot2)
+library(fastcpd)
+
+# Set a seed for reproducibility
+set.seed(1)
+
+# Function to evaluate execution time for different data lengths
+evaluate_time_complexity <- function(ns, p) {
+  times <- numeric(length(ns))  # Vector to store execution times
+
+  for (i in seq_along(ns)) {
+    n <- ns[i]
+    # Generate n samples of p-dimensional data from a multivariate normal distribution
+    data_matrix <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(1, p))
+    # Record the elapsed time for detecting change points
+    times[i] <- system.time(fastcpd.mean(data_matrix, r.progress = FALSE, cp_only = TRUE))[[1]]
+  }
+
+  return(times)
+}
+
+# Define a sequence of data lengths
+ns <- 10^5 * seq_len(10)
+p <- 5  # Dimensionality of the data
+
+# Evaluate execution times for each data length
+execution_times <- evaluate_time_complexity(ns, p)
+
+# Prepare data for plotting
+time_data <- data.frame(
+  n = ns,
+  time = execution_times
+)
+
+# Plot execution times on a log-log scale
+ggplot(time_data, aes(x = n, y = time)) +
+  geom_point() +
+  geom_line() +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(
+    title = "Time Complexity of fastcpd.mean",
+    x = "Data Length (log10 scale)",
+    y = "Execution Time (seconds, log10 scale)"
+  ) +
+  theme_minimal()
+
+# Log-transform the data for linear regression
+log_ns <- log10(ns)
+log_times <- log10(execution_times)
+
+# Perform linear regression to estimate the power coefficient
+regression_model <- lm(log_times ~ log_ns)
+summary(regression_model)
+
+# Extract and display the slope (power coefficient)
+power_coefficient <- coef(regression_model)[2]
+power_coefficient
+```
+
+# Impact of SeDG in `fastcpd.lasso()`
+
+In this section, we simulate a Lasso regression model with change points. We compare the performance of the vanilla approach (without SeDG) and the SeDG-enhanced approach by varying the `vanilla_percentage` parameter. The detected change points are extracted for both settings.
+
+```{r segd-simulation}
+# Load required libraries
+library(fastcpd)
+
+# Set seed for reproducibility
+set.seed(1)
+
+# Simulation parameters
+n <- 480         # Total number of observations
+p_true <- 6      # Number of true predictors with non-zero coefficients
+p <- 50          # Total number of predictors
+
+# Generate design matrix with n observations and p predictors
+x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+
+# Create true coefficient matrix for 4 segments
+theta_0 <- rbind(
+  runif(p_true, -5, -2),
+  runif(p_true, -3, 3),
+  runif(p_true, 2, 5),
+  runif(p_true, -5, 5)
+)
+# Pad the coefficient matrix with zeros for the remaining predictors
+theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+
+# Simulate response variable with change points across segments
+y <- c(
+  x[1:80, ] %*% theta_0[1, ] + rnorm(80, 0, 2),
+  x[81:200, ] %*% theta_0[2, ] + rnorm(120, 0, 2),
+  x[201:320, ] %*% theta_0[3, ] + rnorm(120, 0, 2),
+  x[321:n, ] %*% theta_0[4, ] + rnorm(160, 0, 2)
+)
+
+# Combine response and predictors into a data frame
+lasso_data <- data.frame(y = y, x = x)
+
+# Detect change points using fastcpd.lasso without SeDG (vanilla_percentage = 0)
+system.time(result_seg_non_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 0))
+cat("Change points with SeDG (vanilla_percentage = 0):\n")
+result_seg_non_vanilla@cp_set
+
+# Detect change points using fastcpd.lasso with the vanilla approach (vanilla_percentage = 1)
+system.time(result_seg_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 1))
+cat("Change points with vanilla approach (vanilla_percentage = 1):\n")
+result_seg_vanilla@cp_set
+```
+
+# Appendix: all code snippets
+
+```{r ref.label = knitr::all_labels(), echo = TRUE}
+```

@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 )
 
 # devtools::install_github(c("swang87/bcp", "veseshan/DNAcopy", "vrunge/gfpop", "peiliangbai92/VARDetect"))
-# install.packages(c("changepoint", "cpm", "CptNonPar", "strucchange", "ecp", "breakfast", "wbs", "mcp", "mosum", "not", "fpop", "jointseg", "microbenchmark", "segmented", "stepR"))
+# install.packages(c("changepoint", "cpm", "CptNonPar", "strucchange", "ecp", "breakfast", "wbs", "mosum", "not", "fpop", "jointseg", "microbenchmark", "segmented", "stepR"))
 
 if (requireNamespace("microbenchmark", quietly = TRUE)) {
   library(microbenchmark)
@@ -442,20 +442,6 @@ results[["mean_data_1"]][["segmented"]]
 testthat::expect_equal(results[["mean_data_1"]][["segmented"]], c(298, 699), ignore_attr = TRUE, tolerance = 0.2)
 ```
 
-```{r univariate-mean-change-mcp, eval = rerun}
-results[["mean_data_1"]][["mcp"]] <- mcp::mcp(
-  list(y ~ 1, ~ 1, ~ 1),
-  data = data.frame(y = mean_data_1, x = seq_len(nrow(mean_data_1))),
-  par_x = "x"
-)
-```
-
-```{r univariate-mean-change-mcp-result}
-if (requireNamespace("mcp", quietly = TRUE)) {
-  plot(results[["mean_data_1"]][["mcp"]])
-}
-```
-
 ```{r univariate-mean-change-not, eval = rerun}
 results[["mean_data_1"]][["not"]] <-
   not::not(mean_data_1, contrast = "pcwsConstMean")
@@ -544,20 +530,6 @@ results[["mv_data_1"]][["cpm"]]
 
 ```{r univariate-mean-and-or-variance-change-cpm-testthat, include = FALSE}
 testthat::expect_equal(results[["mv_data_1"]][["cpm"]], c(293, 300, 403, 408, 618, 621, 696, 1000, 1021, 1024, 1293, 1300, 1417, 1693, 1700, 1981), tolerance = 0.2)
-```
-
-```{r univariate-mean-and-or-variance-change-mcp, eval = rerun}
-results[["mv_data_1"]][["mcp"]] <- mcp::mcp(
-  list(y ~ 1, ~ 1, ~ 1, ~ 1, ~ 1, ~ 1),
-  data = data.frame(y = mv_data_1, x = seq_len(nrow(mv_data_1))),
-  par_x = "x"
-)
-```
-
-```{r univariate-mean-and-or-variance-change-mcp-result}
-if (requireNamespace("mcp", quietly = TRUE)) {
-  plot(results[["mv_data_1"]][["mcp"]])
-}
 ```
 
 ```{r univariate-mean-and-or-variance-change-not, eval = rerun}
@@ -869,21 +841,6 @@ results[["ar_data"]][["segmented"]]
 testthat::expect_equal(results[["ar_data"]][["segmented"]], c(690), ignore_attr = TRUE, tolerance = 0.2)
 ```
 
-```{r ar3-mcp, eval = rerun}
-results[["ar_data"]][["mcp"]] <-
-  mcp::mcp(
-    list(y ~ 1 + ar(3), ~ 0 + ar(3)),
-    data = data.frame(y = ar_data, x = seq_along(ar_data)),
-    par_x = "x"
-  )
-```
-
-```{r ar3-mcp-result}
-if (requireNamespace("mcp", quietly = TRUE)) {
-  plot(results[["ar_data"]][["mcp"]])
-}
-```
-
 # GARCH(1, 1)
 
 The true change point is 750.
@@ -1111,8 +1068,7 @@ R -e 'knitr::knit("vignettes/comparison-packages.Rmd.original", output = "vignet
 # Related issues
 
 -   `mosum`: [[#4](https://github.com/doccstat/fastcpd/issues/4)].
--   `mcp`: [link 1](https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531091)
-    and [link 2](https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531284).
+-   `mcp`: Package removed due to the usage of `rjags`.
 -   `bcp`: [[#5](https://github.com/doccstat/fastcpd/issues/5)].
 -   `gfpop`: [[#10](https://github.com/doccstat/fastcpd/issues/10)].
 
