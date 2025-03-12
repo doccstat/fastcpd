@@ -75,40 +75,6 @@ conda install -c conda-forge r-fastcpd
 
 <details close>
 <summary>
-Package dependencies
-</summary>
-
-`fastcpd` depends on the following packages:
-
-- [Rcpp](https://github.com/RcppCore/Rcpp), for C++ source code
-  compilation.
-- [RcppArmadillo](https://github.com/RcppCore/RcppArmadillo), for fast
-  linear algebra.
-- [fastglm](https://github.com/jaredhuling/fastglm), for fast
-  generalized linear models.
-- [glmnet](https://glmnet.stanford.edu/), for penalized regression.
-- [ggplot2](https://github.com/tidyverse/ggplot2), for data
-  visualization.
-
-If you’re compiling from source, you can run the following command to
-see the complete set of system packages needed on your machine.
-
-``` r
-pak::pkg_sysreqs("doccstat/fastcpd")
-#> ── Install scripts ───────────────────────────────────────────── Ubuntu 20.04
-#> apt-get -y update
-#> apt-get -y install libcurl4-openssl-dev libssl-dev zlib1g-dev make
-#>
-#> ── Packages and their system dependencies ───────────────────────────────────
-#> curl       – libcurl4-openssl-dev, libssl-dev
-#> data.table – zlib1g-dev
-#> fs         – make
-#> openssl    – libssl-dev
-```
-
-</details>
-<details close>
-<summary>
 Should I install suggested packages?
 </summary>
 
@@ -199,6 +165,35 @@ Note
 expected to see the progress bar when running the code by default.
 
 </details>
+
+``` r
+library(microbenchmark)
+set.seed(1)
+n <- 10^6
+mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+ggplot2::autoplot(microbenchmark(
+  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1),
+  changepoint = changepoint::cpt.mean(mean_data, method = "PELT"),
+  fpop = fpop::Fpop(mean_data, 2 * log(n)),
+  gfpop = gfpop::gfpop(
+    data = mean_data,
+    mygraph = gfpop::graph(
+      penalty = 2 * log(length(mean_data)) * gfpop::sdDiff(mean_data) ^ 2,
+      type = "updown"
+    ),
+    type = "mean"
+  ),
+  jointseg = jointseg::jointSeg(mean_data, K = 12),
+  mosum = mosum::mosum(c(mean_data), G = 40),
+  not = not::not(mean_data, contrast = "pcwsConstMean"),
+  wbs = wbs::wbs(mean_data),
+  times = 10
+))
+#> Warning in microbenchmark(fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress
+#> = FALSE, : less accurate nanosecond times to avoid potential integer overflows
+```
+
+![](man/figures/README-time-comparison-1.png)<!-- -->
 
 ## Examples
 
