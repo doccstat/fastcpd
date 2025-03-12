@@ -172,24 +172,24 @@ log-transformed data to estimate the power law coefficient.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Residuals:</span></span>
 <span><span class="co">#&gt;       Min        1Q    Median        3Q       Max </span></span>
-<span><span class="co">#&gt; -0.022249 -0.017242  0.001032  0.013463  0.028717 </span></span>
+<span><span class="co">#&gt; -0.021080 -0.016515 -0.001789  0.011311  0.034080 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">#&gt; (Intercept) -4.77284    0.11446  -41.70 1.20e-10 ***</span></span>
-<span><span class="co">#&gt; log_ns       0.88983    0.02021   44.03 7.81e-11 ***</span></span>
+<span><span class="co">#&gt; (Intercept) -4.74809    0.12222  -38.85 2.12e-10 ***</span></span>
+<span><span class="co">#&gt; log_ns       0.89024    0.02158   41.26 1.31e-10 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual standard error: 0.0193 on 8 degrees of freedom</span></span>
-<span><span class="co">#&gt; Multiple R-squared:  0.9959, Adjusted R-squared:  0.9954 </span></span>
-<span><span class="co">#&gt; F-statistic:  1939 on 1 and 8 DF,  p-value: 7.807e-11</span></span>
+<span><span class="co">#&gt; Residual standard error: 0.02061 on 8 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.9953, Adjusted R-squared:  0.9947 </span></span>
+<span><span class="co">#&gt; F-statistic:  1702 on 1 and 8 DF,  p-value: 1.312e-10</span></span>
 <span></span>
 <span><span class="co"># Extract and display the slope (power coefficient)</span></span>
 <span><span class="va">power_coefficient</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">regression_model</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
 <span><span class="va">power_coefficient</span></span>
 <span><span class="co">#&gt;    log_ns </span></span>
-<span><span class="co">#&gt; 0.8898253</span></span></code></pre></div>
+<span><span class="co">#&gt; 0.8902402</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="impact-of-sedg-in-fastcpd-lasso">Impact of SeDG in <code>fastcpd.lasso()</code><a class="anchor" aria-label="anchor" href="#impact-of-sedg-in-fastcpd-lasso"></a>
@@ -238,7 +238,7 @@ are extracted for both settings.</p>
 <span><span class="co"># Detect change points using fastcpd.lasso without SeDG (vanilla_percentage = 0)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_non_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  11.009  17.744   8.143</span></span>
+<span><span class="co">#&gt;  11.113  17.779   8.175</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Change points with SeDG (vanilla_percentage = 0):\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Change points with SeDG (vanilla_percentage = 0):</span></span>
 <span><span class="va">result_seg_non_vanilla</span><span class="op">@</span><span class="va">cp_set</span></span>
@@ -247,7 +247,7 @@ are extracted for both settings.</p>
 <span><span class="co"># Detect change points using fastcpd.lasso with the vanilla approach (vanilla_percentage = 1)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt; 242.495   0.004 242.508</span></span>
+<span><span class="co">#&gt; 254.570   0.018 254.597</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Change points with vanilla approach (vanilla_percentage = 1):\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Change points with vanilla approach (vanilla_percentage = 1):</span></span>
 <span><span class="va">result_seg_vanilla</span><span class="op">@</span><span class="va">cp_set</span></span>
@@ -322,24 +322,24 @@ are extracted for both settings.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Residuals:</span></span>
 <span><span class="co">#&gt;       Min        1Q    Median        3Q       Max </span></span>
-<span><span class="co">#&gt; -0.030118 -0.009564 -0.004329  0.008213  0.044510 </span></span>
+<span><span class="co">#&gt; -0.028954 -0.013150 -0.003275  0.005411  0.047276 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">#&gt; (Intercept) -5.38336    0.12819  -42.00 1.14e-10 ***</span></span>
-<span><span class="co">#&gt; log_ns       0.99610    0.02263   44.01 7.84e-11 ***</span></span>
+<span><span class="co">#&gt; (Intercept) -5.41113    0.13461  -40.20 1.61e-10 ***</span></span>
+<span><span class="co">#&gt; log_ns       1.00166    0.02377   42.15 1.11e-10 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual standard error: 0.02161 on 8 degrees of freedom</span></span>
-<span><span class="co">#&gt; Multiple R-squared:  0.9959, Adjusted R-squared:  0.9954 </span></span>
-<span><span class="co">#&gt; F-statistic:  1937 on 1 and 8 DF,  p-value: 7.836e-11</span></span>
+<span><span class="co">#&gt; Residual standard error: 0.0227 on 8 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.9955, Adjusted R-squared:  0.995 </span></span>
+<span><span class="co">#&gt; F-statistic:  1776 on 1 and 8 DF,  p-value: 1.107e-10</span></span>
 <span></span>
 <span><span class="co"># Extract and display the slope (power coefficient)</span></span>
 <span><span class="va">power_coefficient</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">regression_model</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
 <span><span class="va">power_coefficient</span></span>
-<span><span class="co">#&gt;    log_ns </span></span>
-<span><span class="co">#&gt; 0.9961017</span></span>
+<span><span class="co">#&gt;   log_ns </span></span>
+<span><span class="co">#&gt; 1.001656</span></span>
 <span><span class="co"># Load required libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span></span>
@@ -378,7 +378,7 @@ are extracted for both settings.</p>
 <span><span class="co"># Detect change points using fastcpd.lasso without SeDG (vanilla_percentage = 0)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_non_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  11.089  17.909   8.201</span></span>
+<span><span class="co">#&gt;  11.136  17.488   8.097</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Change points with SeDG (vanilla_percentage = 0):\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Change points with SeDG (vanilla_percentage = 0):</span></span>
 <span><span class="va">result_seg_non_vanilla</span><span class="op">@</span><span class="va">cp_set</span></span>
@@ -387,7 +387,7 @@ are extracted for both settings.</p>
 <span><span class="co"># Detect change points using fastcpd.lasso with the vanilla approach (vanilla_percentage = 1)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt; 242.328   0.008 242.344</span></span>
+<span><span class="co">#&gt; 253.233   0.011 253.253</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Change points with vanilla approach (vanilla_percentage = 1):\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Change points with vanilla approach (vanilla_percentage = 1):</span></span>
 <span><span class="va">result_seg_vanilla</span><span class="op">@</span><span class="va">cp_set</span></span>
