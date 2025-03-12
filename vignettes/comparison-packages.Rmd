@@ -1275,8 +1275,7 @@ R -e 'knitr::knit("vignettes/comparison-packages.Rmd.original", output = "vignet
 # Related issues
 
 -   `mosum`: [[#4](https://github.com/doccstat/fastcpd/issues/4)].
--   `mcp`: [link 1](https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531091)
-    and [link 2](https://github.com/doccstat/fastcpd/actions/runs/7272426093/job/19814531284).
+-   `mcp`: Package removed due to the usage of `rjags`.
 -   `bcp`: [[#5](https://github.com/doccstat/fastcpd/issues/5)].
 -   `gfpop`: [[#10](https://github.com/doccstat/fastcpd/issues/10)].
 
