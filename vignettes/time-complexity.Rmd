@@ -37,27 +37,20 @@ library(fastcpd)
 # Set a seed for reproducibility
 set.seed(1)
 
-# Function to evaluate execution time for different data lengths
-evaluate_time_complexity <- function(ns, p) {
-  times <- numeric(length(ns))  # Vector to store execution times
-
-  for (i in seq_along(ns)) {
-    n <- ns[i]
-    # Generate n samples of p-dimensional data from a multivariate normal distribution
-    data_matrix <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(1, p))
-    # Record the elapsed time for detecting change points
-    times[i] <- system.time(fastcpd.mean(data_matrix, r.progress = FALSE, cp_only = TRUE))[[1]]
-  }
-
-  return(times)
-}
-
 # Define a sequence of data lengths
-ns <- 10^5 * seq_len(10)
-p <- 5  # Dimensionality of the data
+ns <- 1e+3 * c(1, 5, 10, 50, 100, 500, 1000, 5000, 1e+4, 5e+4)
+p <- 4  # Dimensionality of the data
 
 # Evaluate execution times for each data length
-execution_times <- evaluate_time_complexity(ns, p)
+execution_times <- numeric(length(ns))
+
+for (i in seq_along(ns)) {
+  execution_times[i] <- system.time(fastcpd.mean(
+    mvtnorm::rmvnorm(ns[i], mean = rep(0, p), sigma = diag(1, p)),
+    r.progress = FALSE,
+    cp_only = TRUE
+  ))[[1]]
+}
 
 # Prepare data for plotting
 time_data <- data.frame(
@@ -95,25 +88,25 @@ summary(regression_model)
 #> lm(formula = log_times ~ log_ns)
 #> 
 #> Residuals:
-#>        Min         1Q     Median         3Q        Max 
-#> -0.0166987 -0.0093375 -0.0004944  0.0062624  0.0281940 
+#>      Min       1Q   Median       3Q      Max 
+#> -0.18758 -0.11814  0.01454  0.03862  0.38958 
 #> 
 #> Coefficients:
 #>             Estimate Std. Error t value Pr(>|t|)    
-#> (Intercept) -5.57486    0.08242  -67.64 2.54e-12 ***
-#> log_ns       0.97266    0.01455   66.84 2.79e-12 ***
+#> (Intercept) -5.27452    0.21144  -24.95 7.13e-09 ***
+#> log_ns       0.92934    0.03814   24.37 8.58e-09 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 0.0139 on 8 degrees of freedom
-#> Multiple R-squared:  0.9982,	Adjusted R-squared:  0.998 
-#> F-statistic:  4468 on 1 and 8 DF,  p-value: 2.792e-12
+#> Residual standard error: 0.1757 on 8 degrees of freedom
+#> Multiple R-squared:  0.9867,	Adjusted R-squared:  0.985 
+#> F-statistic: 593.8 on 1 and 8 DF,  p-value: 8.582e-09
 
 # Extract and display the slope (power coefficient)
 power_coefficient <- coef(regression_model)[2]
 power_coefficient
-#>    log_ns 
-#> 0.9726593
+#>   log_ns 
+#> 0.929341
 ```
 
 # Impact of SeDG in `fastcpd.lasso()`
@@ -160,7 +153,7 @@ lasso_data <- data.frame(y = y, x = x)
 # Detect change points using fastcpd.lasso without SeDG (vanilla_percentage = 0)
 system.time(result_seg_non_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 0, r.progress = FALSE))
 #>    user  system elapsed 
-#>   5.475   0.678   6.179
+#>   5.556   0.794   6.364
 cat("Change points with SeDG (vanilla_percentage = 0):\n")
 #> Change points with SeDG (vanilla_percentage = 0):
 result_seg_non_vanilla@cp_set
@@ -169,7 +162,7 @@ result_seg_non_vanilla@cp_set
 # Detect change points using fastcpd.lasso with the vanilla approach (vanilla_percentage = 1)
 system.time(result_seg_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 1, r.progress = FALSE))
 #>    user  system elapsed 
-#> 116.042   6.229 122.451
+#> 112.649   5.302 118.156
 cat("Change points with vanilla approach (vanilla_percentage = 1):\n")
 #> Change points with vanilla approach (vanilla_percentage = 1):
 result_seg_vanilla@cp_set
@@ -200,27 +193,20 @@ library(fastcpd)
 # Set a seed for reproducibility
 set.seed(1)
 
-# Function to evaluate execution time for different data lengths
-evaluate_time_complexity <- function(ns, p) {
-  times <- numeric(length(ns))  # Vector to store execution times
-
-  for (i in seq_along(ns)) {
-    n <- ns[i]
-    # Generate n samples of p-dimensional data from a multivariate normal distribution
-    data_matrix <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(1, p))
-    # Record the elapsed time for detecting change points
-    times[i] <- system.time(fastcpd.mean(data_matrix, r.progress = FALSE, cp_only = TRUE))[[1]]
-  }
-
-  return(times)
-}
-
 # Define a sequence of data lengths
-ns <- 10^5 * seq_len(10)
-p <- 5  # Dimensionality of the data
+ns <- 1e+3 * c(1, 5, 10, 50, 100, 500, 1000, 5000, 1e+4, 5e+4)
+p <- 4  # Dimensionality of the data
 
 # Evaluate execution times for each data length
-execution_times <- evaluate_time_complexity(ns, p)
+execution_times <- numeric(length(ns))
+
+for (i in seq_along(ns)) {
+  execution_times[i] <- system.time(fastcpd.mean(
+    mvtnorm::rmvnorm(ns[i], mean = rep(0, p), sigma = diag(1, p)),
+    r.progress = FALSE,
+    cp_only = TRUE
+  ))[[1]]
+}
 
 # Prepare data for plotting
 time_data <- data.frame(

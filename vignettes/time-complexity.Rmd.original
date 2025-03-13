@@ -42,27 +42,20 @@ library(fastcpd)
 # Set a seed for reproducibility
 set.seed(1)
 
-# Function to evaluate execution time for different data lengths
-evaluate_time_complexity <- function(ns, p) {
-  times <- numeric(length(ns))  # Vector to store execution times
-
-  for (i in seq_along(ns)) {
-    n <- ns[i]
-    # Generate n samples of p-dimensional data from a multivariate normal distribution
-    data_matrix <- mvtnorm::rmvnorm(n, mean = rep(0, p), sigma = diag(1, p))
-    # Record the elapsed time for detecting change points
-    times[i] <- system.time(fastcpd.mean(data_matrix, r.progress = FALSE, cp_only = TRUE))[[1]]
-  }
-
-  return(times)
-}
-
 # Define a sequence of data lengths
-ns <- 10^5 * seq_len(10)
-p <- 5  # Dimensionality of the data
+ns <- 1e+3 * c(1, 5, 10, 50, 100, 500, 1000, 5000, 1e+4, 5e+4)
+p <- 4  # Dimensionality of the data
 
 # Evaluate execution times for each data length
-execution_times <- evaluate_time_complexity(ns, p)
+execution_times <- numeric(length(ns))
+
+for (i in seq_along(ns)) {
+  execution_times[i] <- system.time(fastcpd.mean(
+    mvtnorm::rmvnorm(ns[i], mean = rep(0, p), sigma = diag(1, p)),
+    r.progress = FALSE,
+    cp_only = TRUE
+  ))[[1]]
+}
 
 # Prepare data for plotting
 time_data <- data.frame(
