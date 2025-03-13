@@ -85,18 +85,14 @@
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install from r-universe with CRAN version as a fallback</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span>
 <span>  <span class="st">"fastcpd"</span>,</span>
 <span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://doccstat.r-universe.dev"</span>, <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <details close><summary>
 Development version
 </summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## install.packages("devtools")</span></span>
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"doccstat/fastcpd"</span><span class="op">)</span></span></code></pre></div>
 </details><details close><summary>
 With mamba or conda (available soon)
@@ -106,27 +102,7 @@ With mamba or conda (available soon)
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="ex">mamba</span> install r-fastcpd</span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co"># Use conda</span></span>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge r-fastcpd</span></code></pre></div>
-</details><div class="section level3">
-<h3 id="faq">FAQ<a class="anchor" aria-label="anchor" href="#faq"></a>
-</h3>
-<details close><summary>
-Should I install suggested packages?
-</summary><p>The suggested packages are not required for the main functionality of the package. They are only required for the vignettes. If you want to learn more about the package comparison and other vignettes, you could either check out vignettes on <a href="https://CRAN.R-project.org/package=fastcpd" class="external-link">CRAN</a> or <a href="https://fastcpd.xingchi.li/articles/">pkgdown generated documentation</a>.</p>
-</details><details close><summary>
-I countered problems related to gfortran on Mac OSX or Linux!
-</summary><p>The package should be able to install on Mac and any Linux distribution without any problems if all the dependencies are installed. However, if you encountered problems related to gfortran, it might be because <code>RcppArmadillo</code> is not installed previously. Try <a href="https://stackoverflow.com/a/72997915" class="external-link">Mac OSX stackoverflow solution</a> or <a href="https://stackoverflow.com/a/15540919" class="external-link">Linux stackover solution</a> if you have trouble installing <code>RcppArmadillo</code>.</p>
 </details>
-</div>
-</div>
-<div class="section level2">
-<h2 id="cheatsheet">Cheatsheet<a class="anchor" aria-label="anchor" href="#cheatsheet"></a>
-</h2>
-<p><a href="https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf" class="external-link"><img src="reference/figures/cheatsheets.png" alt="fastcpd cheatsheet"></a></p>
-<div class="section level3">
-<h3 id="r-shiny-app">R Shiny App<a class="anchor" aria-label="anchor" href="#r-shiny-app"></a>
-</h3>
-<p>Available soon: <a href="https://rshiny.fastcpd.xingchi.li" class="external-link">rshiny.fastcpd.xingchi.li</a></p>
-</div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -161,12 +137,12 @@ I countered problems related to gfortran on Mac OSX or Linux!
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-ar3-1.png"><!-- --></p>
 <details open><summary>
-Tip
-</summary><p>It is hard to demonstrate all the features of <code>fastcpd</code> in a single example due to the flexibility of the package. For more examples, please refer to the <a href="https://fastcpd.xingchi.li/reference/index.html">function reference</a>.</p>
-</details><details open><summary>
 Note
 </summary><p><code>r.progress = FALSE</code> is used to suppress the progress bar. Users are expected to see the progress bar when running the code by default.</p>
-</details><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+</details><div class="section level3">
+<h3 id="comparison">Comparison<a class="anchor" aria-label="anchor" href="#comparison"></a>
+</h3>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/joshuaulrich/microbenchmark/" class="external-link">microbenchmark</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="op">*</span> <span class="fl">10</span><span class="op">^</span><span class="fl">6</span></span>
@@ -192,22 +168,22 @@ Note
 <span><span class="co">#&gt; = FALSE, : less accurate nanosecond times to avoid potential integer overflows</span></span></code></pre></div>
 <p><img src="reference/figures/README-time-comparison-1.png"><!-- --></p>
 </div>
+</div>
 <div class="section level2">
-<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
+<h2 id="cheatsheet">Cheatsheet<a class="anchor" aria-label="anchor" href="#cheatsheet"></a>
 </h2>
-<div class="section level3">
-<h3 id="main-function">Main function<a class="anchor" aria-label="anchor" href="#main-function"></a>
-</h3>
+<p><a href="https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf" class="external-link"><img src="reference/figures/cheatsheets.png" alt="fastcpd cheatsheet"></a></p>
+<details close><summary>
+Function references
+</summary><ul>
+<li>Main function
 <ul>
 <li><a href="https://fastcpd.xingchi.li/reference/fastcpd.html"><code>fastcpd</code></a></li>
 </ul>
-</div>
-<div class="section level3">
-<h3 id="wrapper-functions">Wrapper functions<a class="anchor" aria-label="anchor" href="#wrapper-functions"></a>
-</h3>
-<div class="section level4">
-<h4 id="time-series">Time series<a class="anchor" aria-label="anchor" href="#time-series"></a>
-</h4>
+</li>
+<li>Wrapper functions
+<ul>
+<li>Time series
 <ul>
 <li>AR(p): <a href="https://fastcpd.xingchi.li/reference/fastcpd_ar.html"><code>fastcpd_ar</code></a>
 </li>
@@ -222,10 +198,8 @@ Note
 <li>General time series: <a href="https://fastcpd.xingchi.li/reference/fastcpd_ts.html"><code>fastcpd_ts</code></a>
 </li>
 </ul>
-</div>
-<div class="section level4">
-<h4 id="unlabeled-data">Unlabeled data<a class="anchor" aria-label="anchor" href="#unlabeled-data"></a>
-</h4>
+</li>
+<li>Unlabeled data
 <ul>
 <li>Mean change: <a href="https://fastcpd.xingchi.li/reference/fastcpd_mean.html"><code>fastcpd_mean</code></a>
 </li>
@@ -234,10 +208,8 @@ Note
 <li>Mean and/or variance change: <a href="https://fastcpd.xingchi.li/reference/fastcpd_meanvariance.html"><code>fastcpd_meanvariance</code></a>
 </li>
 </ul>
-</div>
-<div class="section level4">
-<h4 id="regression-data">Regression data<a class="anchor" aria-label="anchor" href="#regression-data"></a>
-</h4>
+</li>
+<li>Regression data
 <ul>
 <li>Logistic regression: <a href="https://fastcpd.xingchi.li/reference/fastcpd_binomial.html"><code>fastcpd_binomial</code></a>
 </li>
@@ -248,14 +220,12 @@ Note
 <li>Poisson regression: <a href="https://fastcpd.xingchi.li/reference/fastcpd_poisson.html"><code>fastcpd_poisson</code></a>
 </li>
 </ul>
-</div>
-</div>
-<div class="section level3">
-<h3 id="utility-functions">Utility functions<a class="anchor" aria-label="anchor" href="#utility-functions"></a>
-</h3>
-<div class="section level4">
-<h4 id="variance-estimation">Variance estimation<a class="anchor" aria-label="anchor" href="#variance-estimation"></a>
-</h4>
+</li>
+</ul>
+</li>
+<li>Utility functions
+<ul>
+<li>Variance estimation
 <ul>
 <li>Variance estimation in ARMA models: <a href="https://fastcpd.xingchi.li/reference/variance_arma.html"><code>variance_arma</code></a>
 </li>
@@ -266,10 +236,10 @@ Note
 <li>Variance estimation in median change models: <a href="https://fastcpd.xingchi.li/reference/variance_median.html"><code>variance_median</code></a>
 </li>
 </ul>
-</div>
-<div class="section level4">
-<h4 id="class-methods">Class methods<a class="anchor" aria-label="anchor" href="#class-methods"></a>
-</h4>
+</li>
+</ul>
+</li>
+<li>Class methods
 <ul>
 <li>Plot: <a href="https://fastcpd.xingchi.li/reference/plot.html"><code>plot</code></a>
 </li>
@@ -280,11 +250,8 @@ Note
 <li>Summary: <a href="https://fastcpd.xingchi.li/reference/summary.html"><code>summary</code></a>
 </li>
 </ul>
-</div>
-</div>
-<div class="section level3">
-<h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
-</h3>
+</li>
+<li>Data
 <ul>
 <li>Bitcoin Market Price (USD): <a href="https://fastcpd.xingchi.li/reference/bitcoin.html"><code>bitcoin</code></a>
 </li>
@@ -297,14 +264,28 @@ Note
 <li>Well-log Dataset from Numerical Bayesian Methods Applied to Signal Processing: <a href="https://fastcpd.xingchi.li/reference/well_log.html"><code>well_log</code></a>
 </li>
 </ul>
-</div>
-<div class="section level3">
-<h3 id="main-class">Main class<a class="anchor" aria-label="anchor" href="#main-class"></a>
-</h3>
+</li>
+<li>Main class
 <ul>
 <li><a href="https://fastcpd.xingchi.li/reference/fastcpd-class.html"><code>fastcpd</code></a></li>
 </ul>
+</li>
+</ul></details><div class="section level3">
+<h3 id="r-shiny-app">R Shiny App<a class="anchor" aria-label="anchor" href="#r-shiny-app"></a>
+</h3>
+<p>Available soon: <a href="https://rshiny.fastcpd.xingchi.li" class="external-link">rshiny.fastcpd.xingchi.li</a></p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="faq">FAQ<a class="anchor" aria-label="anchor" href="#faq"></a>
+</h2>
+<details close><summary>
+Should I install suggested packages?
+</summary><p>The suggested packages are not required for the main functionality of the package. They are only required for the vignettes. If you want to learn more about the package comparison and other vignettes, you could either check out vignettes on <a href="https://CRAN.R-project.org/package=fastcpd" class="external-link">CRAN</a> or <a href="https://fastcpd.xingchi.li/articles/">pkgdown generated documentation</a>.</p>
+</details><details close><summary>
+I countered problems related to gfortran on Mac OSX or Linux!
+</summary><p>The package should be able to install on Mac and any Linux distribution without any problems if all the dependencies are installed. However, if you encountered problems related to gfortran, it might be because <code>RcppArmadillo</code> is not installed previously. Try <a href="https://stackoverflow.com/a/72997915" class="external-link">Mac OSX stackoverflow solution</a> or <a href="https://stackoverflow.com/a/15540919" class="external-link">Linux stackover solution</a> if you have trouble installing <code>RcppArmadillo</code>.</p>
+</details>
 </div>
 <div class="section level2">
 <h2 id="make-contributions">Make contributions<a class="anchor" aria-label="anchor" href="#make-contributions"></a>
