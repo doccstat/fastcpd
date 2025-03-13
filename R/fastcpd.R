@@ -315,9 +315,26 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   # Get the number of paramters for the model to calculate the penalty.
   p <- get_p(data_, family, p_response, order, include_mean)
 
-  # Assign families as "gaussian" for "lm" and "ar" or "mgaussian" for
-  # "mlm" and "var".
-  fastcpd_family <- get_fastcpd_family(family, order, p_response)
+  if (family %in% c("binomial", "poisson", "lasso")) {
+    fastcpd_family <- family
+  } else if (family %in% c("mean", "variance", "meanvariance", "garch")) {
+    fastcpd_family <- family
+    vanilla_percentage <- 1
+  } else if (family == "lm" && p_response == 1 || family == "ar") {
+    fastcpd_family <- "gaussian"
+  } else if (family == "var" || family == "lm" && p_response > 1) {
+    fastcpd_family <- "mgaussian"
+    vanilla_percentage <- 1
+  } else if (family == "arma" && order[1] == 0) {
+    fastcpd_family <- "ma"
+  } else if (family == "arma" && order[1] != 0) {
+    fastcpd_family <- family
+  } else {
+    fastcpd_family <- "custom"
+    if (!is.null(cost) && length(formals(cost)) == 1) {
+      vanilla_percentage <- 1
+    }
+  }
 
   # Estimate the variance / covariance matrix and pre-process the data for
   # mean, variance, meanvariance, ar and var models.
@@ -326,11 +343,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   )
   sigma_ <- sigma_data$sigma
   data_ <- sigma_data$data
-
-  # Use vanilla PELT for
-  # "mean", "variance", "meanvariance", "arima", "garch", "mgaussian".
-  vanilla_percentage <-
-    get_vanilla_percentage(vanilla_percentage, cost, fastcpd_family)
 
   # Adjust the penalty for "lm".
   beta <- get_beta(beta, p, nrow(data_), fastcpd_family, sigma_)
