@@ -251,8 +251,6 @@ installing `RcppArmadillo`.
 
 </details>
 
-## Make contributions
-
 <details close>
 <summary>
 We welcome contributions from everyone. Please follow the instructions
@@ -287,8 +285,6 @@ below to make contributions.
     `devtools::check()`.
 
 </details>
-
-## Contact us
 
 <details close>
 <summary>
