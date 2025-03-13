@@ -169,7 +169,7 @@ expected to see the progress bar when running the code by default.
 ``` r
 library(microbenchmark)
 set.seed(1)
-n <- 10^6
+n <- 5 * 10^6
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
 ggplot2::autoplot(microbenchmark(
   fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1),
@@ -186,8 +186,7 @@ ggplot2::autoplot(microbenchmark(
   jointseg = jointseg::jointSeg(mean_data, K = 12),
   mosum = mosum::mosum(c(mean_data), G = 40),
   not = not::not(mean_data, contrast = "pcwsConstMean"),
-  wbs = wbs::wbs(mean_data),
-  times = 10
+  wbs = wbs::wbs(mean_data)
 ))
 #> Warning in microbenchmark(fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress
 #> = FALSE, : less accurate nanosecond times to avoid potential integer overflows
