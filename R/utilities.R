@@ -156,35 +156,6 @@ get_sigma_data <- function(
   list(sigma = sigma_, data = data_)
 }
 
-get_fastcpd_family <- function(family, order, p_response) {
-  if (family %in% c(
-    "binomial", "garch", "poisson", "lasso",
-    "mean", "variance", "meanvariance"
-  )) {
-    family
-  } else if (family == "lm" && p_response == 1 || family == "ar") {
-    "gaussian"
-  } else if (family == "var" || family == "lm" && p_response > 1) {
-    "mgaussian"
-  } else if (family == "arma" && order[1] == 0) {
-    "ma"
-  } else if (family == "arma" && order[1] != 0) {
-    family
-  } else {
-    "custom"
-  }
-}
-
-get_vanilla_percentage <- function(vanilla_percentage, cost, fastcpd_family) {
-  if (!is.null(cost) && length(formals(cost)) == 1 || fastcpd_family %in% c(
-    "mean", "variance", "meanvariance", "arima", "garch", "mgaussian"
-  )) {
-    1
-  } else {
-    vanilla_percentage
-  }
-}
-
 get_beta <- function(beta, p, n, fastcpd_family, sigma_) {
   if (is.character(beta)) {
     if (!(beta %in% c("BIC", "MBIC", "MDL"))) {
