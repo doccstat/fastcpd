@@ -156,7 +156,9 @@ log-transformed data to estimate the power law coefficient.</p>
 <span>    y <span class="op">=</span> <span class="st">"Execution Time (seconds, log10 scale)"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="time-complexity_files/figure-html/time-complexity-1.png" width="700"></p>
+<div class="float">
+<img src="time-complexity%2Ftime-complexity-1.png" alt="plot of chunk time-complexity"><div class="figcaption">plot of chunk time-complexity</div>
+</div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Log-transform the data for linear regression</span></span>
@@ -171,25 +173,25 @@ log-transformed data to estimate the power law coefficient.</p>
 <span><span class="co">#&gt; lm(formula = log_times ~ log_ns)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Residuals:</span></span>
-<span><span class="co">#&gt;       Min        1Q    Median        3Q       Max </span></span>
-<span><span class="co">#&gt; -0.021080 -0.016515 -0.001789  0.011311  0.034080 </span></span>
+<span><span class="co">#&gt;        Min         1Q     Median         3Q        Max </span></span>
+<span><span class="co">#&gt; -0.0166987 -0.0093375 -0.0004944  0.0062624  0.0281940 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">#&gt; (Intercept) -4.74809    0.12222  -38.85 2.12e-10 ***</span></span>
-<span><span class="co">#&gt; log_ns       0.89024    0.02158   41.26 1.31e-10 ***</span></span>
+<span><span class="co">#&gt; (Intercept) -5.57486    0.08242  -67.64 2.54e-12 ***</span></span>
+<span><span class="co">#&gt; log_ns       0.97266    0.01455   66.84 2.79e-12 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual standard error: 0.02061 on 8 degrees of freedom</span></span>
-<span><span class="co">#&gt; Multiple R-squared:  0.9953, Adjusted R-squared:  0.9947 </span></span>
-<span><span class="co">#&gt; F-statistic:  1702 on 1 and 8 DF,  p-value: 1.312e-10</span></span>
+<span><span class="co">#&gt; Residual standard error: 0.0139 on 8 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.9982, Adjusted R-squared:  0.998 </span></span>
+<span><span class="co">#&gt; F-statistic:  4468 on 1 and 8 DF,  p-value: 2.792e-12</span></span>
 <span></span>
 <span><span class="co"># Extract and display the slope (power coefficient)</span></span>
 <span><span class="va">power_coefficient</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">regression_model</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
 <span><span class="va">power_coefficient</span></span>
 <span><span class="co">#&gt;    log_ns </span></span>
-<span><span class="co">#&gt; 0.8902402</span></span></code></pre></div>
+<span><span class="co">#&gt; 0.9726593</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="impact-of-sedg-in-fastcpd-lasso">Impact of SeDG in <code>fastcpd.lasso()</code><a class="anchor" aria-label="anchor" href="#impact-of-sedg-in-fastcpd-lasso"></a>
@@ -236,28 +238,37 @@ are extracted for both settings.</p>
 <span><span class="va">lasso_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Detect change points using fastcpd.lasso without SeDG (vanilla_percentage = 0)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_non_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_non_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  11.113  17.779   8.175</span></span>
+<span><span class="co">#&gt;   5.475   0.678   6.179</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Change points with SeDG (vanilla_percentage = 0):\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Change points with SeDG (vanilla_percentage = 0):</span></span>
 <span><span class="va">result_seg_non_vanilla</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1]  79 203 320</span></span>
 <span></span>
 <span><span class="co"># Detect change points using fastcpd.lasso with the vanilla approach (vanilla_percentage = 1)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">1</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt; 254.570   0.018 254.597</span></span>
+<span><span class="co">#&gt; 116.042   6.229 122.451</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Change points with vanilla approach (vanilla_percentage = 1):\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Change points with vanilla approach (vanilla_percentage = 1):</span></span>
 <span><span class="va">result_seg_vanilla</span><span class="op">@</span><span class="va">cp_set</span></span>
 <span><span class="co">#&gt; [1] 200 321</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>
+</h2>
+<p>This document is generated by the following code:</p>
+<pre class="shell"><code>R -e 'knitr::knit("vignettes/time-complexity.Rmd.original", output = "vignettes/time-complexity.Rmd")' &amp;&amp; rm -rf vignettes/time-complexity &amp;&amp; mv -f time-complexity vignettes</code></pre>
+</div>
+<div class="section level2">
 <h2 id="appendix-all-code-snippets">Appendix: all code snippets<a class="anchor" aria-label="anchor" href="#appendix-all-code-snippets"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span>, eval <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span></span>
+<span>  collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span>, eval <span class="op">=</span> <span class="cn">TRUE</span>, warning <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fig.path<span class="op">=</span><span class="st">"time-complexity/"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="co"># Load necessary libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -305,10 +316,8 @@ are extracted for both settings.</p>
 <span>    x <span class="op">=</span> <span class="st">"Data Length (log10 scale)"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Execution Time (seconds, log10 scale)"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="time-complexity_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># Log-transform the data for linear regression</span></span>
 <span><span class="va">log_ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log10</a></span><span class="op">(</span><span class="va">ns</span><span class="op">)</span></span>
 <span><span class="va">log_times</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log10</a></span><span class="op">(</span><span class="va">execution_times</span><span class="op">)</span></span>
@@ -316,30 +325,10 @@ are extracted for both settings.</p>
 <span><span class="co"># Perform linear regression to estimate the power coefficient</span></span>
 <span><span class="va">regression_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">log_times</span> <span class="op">~</span> <span class="va">log_ns</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">regression_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; lm(formula = log_times ~ log_ns)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residuals:</span></span>
-<span><span class="co">#&gt;       Min        1Q    Median        3Q       Max </span></span>
-<span><span class="co">#&gt; -0.028954 -0.013150 -0.003275  0.005411  0.047276 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">#&gt; (Intercept) -5.41113    0.13461  -40.20 1.61e-10 ***</span></span>
-<span><span class="co">#&gt; log_ns       1.00166    0.02377   42.15 1.11e-10 ***</span></span>
-<span><span class="co">#&gt; ---</span></span>
-<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual standard error: 0.0227 on 8 degrees of freedom</span></span>
-<span><span class="co">#&gt; Multiple R-squared:  0.9955, Adjusted R-squared:  0.995 </span></span>
-<span><span class="co">#&gt; F-statistic:  1776 on 1 and 8 DF,  p-value: 1.107e-10</span></span>
 <span></span>
 <span><span class="co"># Extract and display the slope (power coefficient)</span></span>
 <span><span class="va">power_coefficient</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">regression_model</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
 <span><span class="va">power_coefficient</span></span>
-<span><span class="co">#&gt;   log_ns </span></span>
-<span><span class="co">#&gt; 1.001656</span></span>
 <span><span class="co"># Load required libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span></span>
@@ -376,22 +365,14 @@ are extracted for both settings.</p>
 <span><span class="va">lasso_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Detect change points using fastcpd.lasso without SeDG (vanilla_percentage = 0)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_non_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  11.136  17.488   8.097</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_non_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Change points with SeDG (vanilla_percentage = 0):\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Change points with SeDG (vanilla_percentage = 0):</span></span>
 <span><span class="va">result_seg_non_vanilla</span><span class="op">@</span><span class="va">cp_set</span></span>
-<span><span class="co">#&gt; [1]  79 203 320</span></span>
 <span></span>
 <span><span class="co"># Detect change points using fastcpd.lasso with the vanilla approach (vanilla_percentage = 1)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt; 253.233   0.011 253.253</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result_seg_vanilla</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">lasso_data</span>, vanilla_percentage <span class="op">=</span> <span class="fl">1</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Change points with vanilla approach (vanilla_percentage = 1):\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Change points with vanilla approach (vanilla_percentage = 1):</span></span>
-<span><span class="va">result_seg_vanilla</span><span class="op">@</span><span class="va">cp_set</span></span>
-<span><span class="co">#&gt; [1] 200 321</span></span></code></pre></div>
+<span><span class="va">result_seg_vanilla</span><span class="op">@</span><span class="va">cp_set</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
