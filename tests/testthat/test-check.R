@@ -252,12 +252,3 @@ testthat::test_that(
     )
   }
 )
-
-testthat::test_that(
-  "get_beta", {
-    testthat::expect_error(
-      get_beta("AIC", 0, 0, "", matrix(0, 0, 0)),
-      "Invalid beta selection criterion provided."
-    )
-  }
-)

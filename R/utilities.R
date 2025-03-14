@@ -117,72 +117,6 @@ check_cost <- function(cost, cost_gradient, cost_hessian, family) {  # nolint
   }
 }
 
-get_sigma_data <- function(
-  data_, family, order, p, p_response, variance_estimation
-) {
-  if (family == "ar") {
-    y <- data_[p + seq_len(nrow(data_) - p), ]
-    x <- matrix(NA, nrow(data_) - p, p)
-    for (p_i in seq_len(p)) {
-      x[, p_i] <- data_[(p - p_i) + seq_len(nrow(data_) - p), ]
-    }
-    data_ <- cbind(y, x)
-  } else if (family == "var") {
-    y <- data_[order + seq_len(nrow(data_) - order), ]
-    x <- matrix(NA, nrow(data_) - order, order * ncol(data_))
-    for (p_i in seq_len(order)) {
-      x[, (p_i - 1) * ncol(data_) + seq_len(ncol(data_))] <-
-        data_[(order - p_i) + seq_len(nrow(data_) - order), ]
-    }
-    data_ <- cbind(y, x)
-  }
-
-  sigma_ <- if (!is.null(variance_estimation)) {
-    as.matrix(variance_estimation)
-  } else if (family == "mean") {
-    variance.mean(data_)
-  } else if (family == "var" || family == "lm" && p_response > 1) {
-    as.matrix(Matrix::nearPD(variance.lm(data_, p_response))$mat)
-  } else if (family == "lm" || family == "ar") {
-    as.matrix(variance.lm(data_))
-  } else {
-    diag(1)
-  }
-
-  if (rcond(sigma_) < 1e-10) {
-    sigma_ <- diag(1e-10, nrow(sigma_))
-  }
-
-  list(sigma = sigma_, data = data_)
-}
-
-get_beta <- function(beta, p, n, fastcpd_family, sigma_) {
-  if (is.character(beta)) {
-    if (!(beta %in% c("BIC", "MBIC", "MDL"))) {
-      stop("Invalid beta selection criterion provided.")
-    }
-
-    beta <- switch(
-      beta,
-      BIC = (p + 1) * log(n) / 2,
-      MBIC = (p + 2) * log(n) / 2,
-      MDL = (p + 2) * log2(n) / 2
-    )
-
-    # For linear regression models, an estimate of the variance is needed in the
-    # cost function. The variance estimation is only for "lm" family with no
-    # `beta` provided. Only estimate the variance for Gaussian family when
-    # `beta` is null.
-    if (fastcpd_family == "gaussian") {
-      beta * c(sigma_)
-    } else {
-      beta
-    }
-  } else {
-    beta
-  }
-}
-
 get_pruning_coef <- function(
   pruning_coef_is_set,
   pruning_coef,
@@ -212,29 +146,5 @@ get_p_response <- function(family, y, data) {
     1
   } else {
     ncol(y)
-  }
-}
-
-get_p <- function(data_, family, p_response, order, include_mean) {
-  if (family == "mean") {
-    ncol(data_)
-  } else if (family == "variance") {
-    ncol(data_)^2
-  } else if (family == "meanvariance") {
-    ncol(data_)^2 + ncol(data_)
-  } else if (family == "ar") {
-    order
-  } else if (family == "arma") {
-    sum(order) + 1
-  } else if (family == "arima") {
-    sum(order[-2]) + 1 + include_mean
-  } else if (family == "garch") {
-    sum(order) + 1
-  } else if (family == "var") {
-    order * p_response^2
-  } else if (family == "lm" && p_response > 1) {
-    (ncol(data_) - p_response) * p_response
-  } else {
-    ncol(data_) - 1
   }
 }
