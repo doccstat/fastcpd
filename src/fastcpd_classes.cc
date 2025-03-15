@@ -1658,7 +1658,7 @@ void Fastcpd::GetNllPeltVariance(const unsigned int segment_start,
   mat data_segment = data_.rows(segment_start, segment_end);
   result_coefficients_ = cov(data_segment);
   result_residuals_ =
-      data_segment.each_row() / sqrt(result_coefficients_.diag());
+      data_segment.each_row() / sqrt(result_coefficients_.diag()).t();
   GetNllPeltVarianceValue(segment_start, segment_end, cv, start);
 }
 
