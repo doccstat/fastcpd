@@ -100,7 +100,7 @@ to see the progress bar when running the code by default.
 
 ### Comparison
 
-```{r time-comparison}
+```{r time-comparison-small}
 library(microbenchmark)
 set.seed(1)
 n <- 5 * 10^6
@@ -121,6 +121,24 @@ ggplot2::autoplot(microbenchmark(
   mosum = mosum::mosum(c(mean_data), G = 40),
   not = not::not(mean_data, contrast = "pcwsConstMean"),
   wbs = wbs::wbs(mean_data)
+))
+```
+
+```{r time-comparison-large}
+library(microbenchmark)
+set.seed(1)
+n <- 10^8
+mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+system.time(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1))
+system.time(changepoint::cpt.mean(mean_data, method = "PELT"))
+system.time(fpop::Fpop(mean_data, 2 * log(n)))
+system.time(mosum::mosum(c(mean_data), G = 40))
+ggplot2::autoplot(microbenchmark(
+  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1),
+  changepoint = changepoint::cpt.mean(mean_data, method = "PELT"),
+  fpop = fpop::Fpop(mean_data, 2 * log(n)),
+  mosum = mosum::mosum(c(mean_data), G = 40),
+  times = 10
 ))
 ```
 

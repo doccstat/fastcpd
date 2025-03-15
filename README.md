@@ -139,10 +139,40 @@ ggplot2::autoplot(microbenchmark(
 #> = FALSE, : less accurate nanosecond times to avoid potential integer overflows
 ```
 
-![](man/figures/README-time-comparison-1.png)<!-- -->
+![](man/figures/README-time-comparison-small-1.png)<!-- -->
 
-Some packages are not included in the `microbenchmark` comparison due to either
-memory constraints or long running time.
+``` r
+library(microbenchmark)
+set.seed(1)
+n <- 10^8
+mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+system.time(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1))
+#>    user  system elapsed 
+#>  11.753   9.150  26.455 
+system.time(changepoint::cpt.mean(mean_data, method = "PELT"))
+#>    user  system elapsed 
+#>  32.342   9.681  66.056 
+system.time(fpop::Fpop(mean_data, 2 * log(n)))
+#>    user  system elapsed 
+#>  35.926   5.231  58.269 
+system.time(mosum::mosum(c(mean_data), G = 40))
+#>    user  system elapsed 
+#>   5.518  11.516  38.368 
+ggplot2::autoplot(microbenchmark(
+  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1),
+  changepoint = changepoint::cpt.mean(mean_data, method = "PELT"),
+  fpop = fpop::Fpop(mean_data, 2 * log(n)),
+  mosum = mosum::mosum(c(mean_data), G = 40),
+  times = 10
+))
+#> Warning in microbenchmark(fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress
+#> = FALSE, : less accurate nanosecond times to avoid potential integer overflows
+```
+
+![](man/figures/README-time-comparison-large-1.png)<!-- -->
+
+Some packages are not included in the `microbenchmark` comparison due to
+either memory constraints or long running time.
 
 ``` r
 # Device: Mac mini (M1, 2020)
