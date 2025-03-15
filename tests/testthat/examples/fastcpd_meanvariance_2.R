@@ -19,7 +19,7 @@ data <- if (requireNamespace("mvtnorm", quietly = TRUE)) {
     matrix(rnorm(p * 2e+5, mean = 50, sd = 10), ncol = p)
   )
 }
-(result_time <- system.time(result <- fastcpd.mv(data)))
+system.time(result <- fastcpd.mv(data))
 summary(result)
 result@thetas[seq_len(p), ]
 lapply(result@thetas[seq_len(p^2) + p, ], function(thetas) matrix(thetas, p))

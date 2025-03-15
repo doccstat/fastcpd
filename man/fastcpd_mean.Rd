@@ -26,20 +26,24 @@ data frame or a vector with each row / element as an observation and thus a
 formula is not required here.
 }
 \examples{
-if (requireNamespace("mvtnorm", quietly = TRUE)) {
-  set.seed(1)
-  p <- 3
-  data <- rbind(
-    mvtnorm::rmvnorm(3e+5, mean = rep(0, p), sigma = diag(100, p)),
-    mvtnorm::rmvnorm(4e+5, mean = rep(50, p), sigma = diag(100, p)),
-    mvtnorm::rmvnorm(3e+5, mean = rep(2, p), sigma = diag(100, p))
-  )
-  result_time <- system.time(
-    result <- fastcpd.mean(data, r.progress = FALSE, cp_only = TRUE)
-  )
-  print(result_time)
-  summary(result)
-}
+set.seed(1)
+data <- matrix(c(
+  rnorm(300, mean = 0, sd = 10),
+  rnorm(400, mean = 50, sd = 10),
+  rnorm(300, mean = 2, sd = 10)
+))
+system.time(result <- fastcpd.mean(data))
+summary(result)
+plot(result)
+set.seed(1)
+p <- 3
+data <- rbind(
+  matrix(rnorm(p * 3e+5, mean = 0, sd = 10), ncol = p),
+  matrix(rnorm(p * 4e+5, mean = 50, sd = 10), ncol = p),
+  matrix(rnorm(p * 3e+5, mean = 2, sd = 10), ncol = p)
+)
+system.time(result <- fastcpd.mean(data, r.progress = FALSE, cp_only = TRUE))
+summary(result)
 }
 \seealso{
 \code{\link[=fastcpd]{fastcpd()}}
