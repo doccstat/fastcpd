@@ -167,6 +167,20 @@ Note
 <span><span class="co">#&gt; Warning in microbenchmark(fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress</span></span>
 <span><span class="co">#&gt; = FALSE, : less accurate nanosecond times to avoid potential integer overflows</span></span></code></pre></div>
 <p><img src="reference/figures/README-time-comparison-1.png"><!-- --></p>
+<p>Some packages are not included in the <code>microbenchmark</code> comparison due to either memory constraints or long running time.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Device: Mac mini (M1, 2020)</span></span>
+<span><span class="co"># Memory: 8 GB</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">CptNonPar</span><span class="fu">::</span><span class="fu">np.mojo</span><span class="op">(</span><span class="va">mean_data</span>, G <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span> <span class="op">/</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: vector memory limit of 16.0 Gb reached, see mem.maxVSize()</span></span>
+<span><span class="co">#&gt; Timing stopped at: 0.061 0.026 0.092</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">ecp</span><span class="fu">::</span><span class="fu">e.divisive</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: vector memory limit of 16.0 Gb reached, see mem.maxVSize()</span></span>
+<span><span class="co">#&gt; Timing stopped at: 0.076 0.044 0.241</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">strucchange</span><span class="fu">::</span><span class="fu">breakpoints</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean_data</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Timing stopped at: 265.1 145.8 832.5</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">breakfast</span><span class="fu">::</span><span class="fu">breakfast</span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Timing stopped at: 45.9 89.21 562.3</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
