@@ -34,6 +34,16 @@ observation and thus a formula is not required here.
 }
 \examples{
 set.seed(1)
+data <- c(
+  rnorm(3000, 0, 1),
+  rnorm(1000, 10, 1),
+  rnorm(3000, 10, 20),
+  rnorm(1000, 0, 1)
+)
+system.time(result <- fastcpd.mv(data))
+summary(result)
+plot(result)
+set.seed(1)
 p <- 3
 data <- if (requireNamespace("mvtnorm", quietly = TRUE)) {
   rbind(
@@ -54,7 +64,7 @@ data <- if (requireNamespace("mvtnorm", quietly = TRUE)) {
     matrix(rnorm(p * 2e+5, mean = 50, sd = 10), ncol = p)
   )
 }
-(result_time <- system.time(result <- fastcpd.mv(data)))
+system.time(result <- fastcpd.mv(data))
 summary(result)
 result@thetas[seq_len(p), ]
 lapply(result@thetas[seq_len(p^2) + p, ], function(thetas) matrix(thetas, p))

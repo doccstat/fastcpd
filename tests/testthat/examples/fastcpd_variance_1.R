@@ -1,0 +1,5 @@
+set.seed(1)
+data <- c(rnorm(300, 0, 1), rnorm(400, 0, 10), rnorm(300, 0, 1))
+system.time(result <- fastcpd.variance(data))
+summary(result)
+plot(result)

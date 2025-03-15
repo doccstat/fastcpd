@@ -26,6 +26,11 @@ default a matrix or data frame or a vector with each row / element as an
 observation and thus a formula is not required here.
 }
 \examples{
+set.seed(1)
+data <- c(rnorm(300, 0, 1), rnorm(400, 0, 10), rnorm(300, 0, 1))
+system.time(result <- fastcpd.variance(data))
+summary(result)
+plot(result)
 if (requireNamespace("mvtnorm", quietly = TRUE)) {
   set.seed(1)
   p <- 3

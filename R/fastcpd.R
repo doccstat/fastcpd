@@ -468,17 +468,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
             include.mean = include_mean
           )$residuals
         }
-      } else if (family %in% c("mean", "variance", "meanvariance")) {
-        residuals <- matrix(NA, nrow(data), ncol(data))
-        segments <- c(0, cp_set, nrow(data))
-        for (segments_i in seq_len(length(segments) - 1)) {
-          segments_start <- segments[segments_i] + 1
-          segments_end <- segments[segments_i + 1]
-          sgmt_index <- segments_start:segments_end
-          residuals[sgmt_index, ] <- as.matrix(
-            data[sgmt_index, ] - colMeans(data[sgmt_index, , drop = FALSE])
-          )
-        }
       },
       error = function(e) message("Residual calculation failed.")
     )
@@ -730,7 +719,8 @@ fastcpd.lm <- fastcpd_lm  # nolint: Conventional R function style
 #' similar to [fastcpd()] except that the data is by default a matrix or
 #' data frame or a vector with each row / element as an observation and thus a
 #' formula is not required here.
-#' @example tests/testthat/examples/fastcpd_mean.R
+#' @example tests/testthat/examples/fastcpd_mean_1.R
+#' @example tests/testthat/examples/fastcpd_mean_2.R
 #' @seealso [fastcpd()]
 #'
 #' @md
@@ -762,7 +752,8 @@ fastcpd.mean <- fastcpd_mean  # nolint: Conventional R function style
 #' function is similar to [fastcpd()] except that the data is by
 #' default a matrix or data frame or a vector with each row / element as an
 #' observation and thus a formula is not required here.
-#' @example tests/testthat/examples/fastcpd_meanvariance.R
+#' @example tests/testthat/examples/fastcpd_meanvariance_1.R
+#' @example tests/testthat/examples/fastcpd_meanvariance_2.R
 #' @seealso [fastcpd()]
 #'
 #' @md
@@ -913,7 +904,8 @@ fastcpd.var <- fastcpd_var  # nolint: Conventional R function style
 #' function is similar to [fastcpd()] except that the data is by
 #' default a matrix or data frame or a vector with each row / element as an
 #' observation and thus a formula is not required here.
-#' @example tests/testthat/examples/fastcpd_variance.R
+#' @example tests/testthat/examples/fastcpd_variance_1.R
+#' @example tests/testthat/examples/fastcpd_variance_2.R
 #' @seealso [fastcpd()]
 #'
 #' @md
