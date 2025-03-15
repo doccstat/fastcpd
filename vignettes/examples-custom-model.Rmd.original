@@ -10,7 +10,12 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>", eval = TRUE, warning = FALSE
+)
+library(fastcpd)
+```
 
 We try to reproduce the logistic regression models with
 custom cost functions and show that the results are similar to the built-in
@@ -28,8 +33,7 @@ parameters below,
 we can obtain similar results as the built-in logistic regression
 model.
 
-
-``` r
+```{r fastcpd_binomial}
 set.seed(1)
 x <- matrix(rnorm(2000, 0, 1), ncol = 5)
 theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
@@ -41,27 +45,9 @@ binomial_data <- data.frame(y = y, x = x)
 
 result <- fastcpd.binomial(cbind(y, x), r.progress = FALSE, cost_adjustment = NULL)
 summary(result)
-#> 
-#> Call:
-#> fastcpd.binomial(data = cbind(y, x), r.progress = FALSE, cost_adjustment = NULL)
-#> 
-#> Change points:
-#> 250 
-#> 
-#> Cost values:
-#> 99.40994 36.89336 
-#> 
-#> Parameters:
-#>    segment 1  segment 2
-#> 1 -1.0096300 3.46131278
-#> 2 -1.7740956 2.10636392
-#> 3  1.2736663 0.74124627
-#> 4  0.3955351 0.07297997
-#> 5 -0.1047536 2.00553153
 ```
 
-
-``` r
+```{r custom_cost_functions}
 logistic_loss <- function(data, theta) {
   x <- data[, -1]
   y <- data[, 1]
@@ -86,22 +72,6 @@ result <- fastcpd(
   r.progress = FALSE
 )
 summary(result)
-#> 
-#> Call:
-#> fastcpd(formula = y ~ . - 1, data = binomial_data, cost = logistic_loss, 
-#>     cost_gradient = logistic_gradient, cost_hessian = logistic_hessian, 
-#>     epsilon = 1e-05, r.progress = FALSE)
-#> 
-#> Change points:
-#> 9 252 
-#> 
-#> Parameters:
-#>   segment 1 segment 2 segment 3
-#> 1         0         0         0
-#> 2         0         0         0
-#> 3         0         0         0
-#> 4         0         0         0
-#> 5         0         0         0
 ```
 
 Note that the result obtained through custom cost functions is inferior
@@ -123,45 +93,5 @@ R -e 'knitr::knit("vignettes/examples-custom-model.Rmd.original", output = "vign
 
 # Appendix: all code snippets
 
-
-``` r
-knitr::opts_chunk$set(
-  collapse = TRUE, comment = "#>", eval = TRUE, warning = FALSE
-)
-library(fastcpd)
-set.seed(1)
-x <- matrix(rnorm(2000, 0, 1), ncol = 5)
-theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
-y <- c(
-  rbinom(250, 1, 1 / (1 + exp(-x[1:250, ] %*% theta[1, ]))),
-  rbinom(150, 1, 1 / (1 + exp(-x[251:400, ] %*% theta[2, ])))
-)
-binomial_data <- data.frame(y = y, x = x)
-
-result <- fastcpd.binomial(cbind(y, x), r.progress = FALSE, cost_adjustment = NULL)
-summary(result)
-logistic_loss <- function(data, theta) {
-  x <- data[, -1]
-  y <- data[, 1]
-  u <- x %*% theta
-  nll <- -y * u + log(1 + exp(u))
-  nll[u > 10] <- -y[u > 10] * u[u > 10] + u[u > 10]
-  sum(nll)
-}
-logistic_gradient <- function(data, theta) {
-  x <- data[nrow(data), -1]
-  y <- data[nrow(data), 1]
-  c(-(y - 1 / (1 + exp(-x %*% theta)))) * x
-}
-logistic_hessian <- function(data, theta) {
-  x <- data[nrow(data), -1]
-  prob <- 1 / (1 + exp(-x %*% theta))
-  (x %o% x) * c((1 - prob) * prob)
-}
-result <- fastcpd(
-  y ~ . - 1, binomial_data, epsilon = 1e-5, cost = logistic_loss,
-  cost_gradient = logistic_gradient, cost_hessian = logistic_hessian,
-  r.progress = FALSE
-)
-summary(result)
+```{r ref.label = knitr::all_labels(), echo = TRUE, eval = FALSE}
 ```

@@ -1,3 +1,5 @@
+testthat::skip_on_cran()
+
 testthat::test_that(
   "utility functions output test", {
     match_call <- ""

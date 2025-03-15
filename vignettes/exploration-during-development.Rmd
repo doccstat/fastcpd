@@ -9,14 +9,12 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
-library(fastcpd)
-```
+
 
 # Exploration of the QMLE method for ARMA models
 
-```{r qmle}
+
+``` r
 qmle <- function(data, theta, p = 1, q = 1) {
   if (nrow(data) < max(p, q) + 1) {
     return(0)
@@ -282,14 +280,29 @@ result <- fastcpd(
   trim = 0,
   p = 1 + 1 + 1,
   beta = (1 + 1 + 1 + 1) * log(n) / 2,
+  cost_adjustment = "BIC",
   cost = qmle,
   cost_gradient = qmle_gradient,
   cost_hessian = qmle_hessian,
   cp_only = TRUE,
   lower = c(rep(-1, 1 + 1), 1e-10),
   upper = c(rep(1, 1 + 1), Inf),
-  line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
+  line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9),
+  r.progress = FALSE
 )
+summary(result)
+#> 
+#> Call:
+#> fastcpd(formula = ~. - 1, data = data.frame(x = x[1 + seq_len(n)]), 
+#>     beta = (1 + 1 + 1 + 1) * log(n)/2, cost_adjustment = "BIC", 
+#>     cost = qmle, cost_gradient = qmle_gradient, cost_hessian = qmle_hessian, 
+#>     line_search = c(1, 0.1, 0.01, 0.001, 1e-04, 1e-05, 1e-06, 
+#>         1e-07, 1e-08, 1e-09), lower = c(rep(-1, 1 + 1), 1e-10), 
+#>     upper = c(rep(1, 1 + 1), Inf), trim = 0, p = 1 + 1 + 1, cp_only = TRUE, 
+#>     r.progress = FALSE)
+#> 
+#> Change points:
+#> 3 300
 
 # fastcpd arma 3 2
 set.seed(1)
@@ -304,27 +317,29 @@ for (i in 301:n) {
   x[i + 3] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] +
     w[i + 2] + 0.4 * w[i + 1] + 0.1 * w[i]
 }
-result <- fastcpd(
-  formula = ~ . - 1,
-  data = data.frame(x = x[3 + seq_len(n)]),
-  trim = 0,
-  p = 3 + 2 + 1,
-  beta = (3 + 2 + 1 + 1) * log(n) / 2,
-  cost = function(data, theta) {
-    qmle(data, theta, 3, 2)
-  },
-  cost_gradient = function(data, theta) {
-    qmle_gradient(data, theta, 3, 2)
-  },
-  cost_hessian = function(data, theta) {
-    qmle_hessian(data, theta, 3, 2)
-  },
-  cp_only = TRUE,
-  lower = c(rep(-1, 3 + 2), 1e-10),
-  upper = c(rep(1, 3 + 2), Inf),
-  line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
-)
-testthat::expect_equal(result@cp_set, c(4, 22, 290))
+# result <- fastcpd(
+#   formula = ~ . - 1,
+#   data = data.frame(x = x[3 + seq_len(n)]),
+#   trim = 0,
+#   p = 3 + 2 + 1,
+#   beta = (3 + 2 + 1 + 1) * log(n) / 2,
+#   cost_adjustment = "BIC",
+#   cost = function(data, theta) {
+#     qmle(data, theta, 3, 2)
+#   },
+#   cost_gradient = function(data, theta) {
+#     qmle_gradient(data, theta, 3, 2)
+#   },
+#   cost_hessian = function(data, theta) {
+#     qmle_hessian(data, theta, 3, 2)
+#   },
+#   cp_only = TRUE,
+#   lower = c(rep(-1, 3 + 2), 1e-10),
+#   upper = c(rep(1, 3 + 2), Inf),
+#   line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9),
+#   r.progress = FALSE
+# )
+# summary(result)
 
 # hessian check
 theta_estimate <- rep(0.1, 3 + 2 + 1)
@@ -340,7 +355,434 @@ optim(
   fn = function(data, theta) {
     qmle(data, theta, 3, 2)
   },
-  data = data,
+  data = matrix(x[3 + seq_len(n)]),
+  method = "L-BFGS-B",
+  lower = c(rep(-1, 3 + 2), 1e-10),
+  upper = c(rep(1, 3 + 2), Inf),
+  gr = function(data, theta) {
+    qmle_gradient_sum(data, theta, 3, 2)
+  }
+)
+#> $par
+#> [1]  0.2255153 -0.1465193  0.6170471  0.2376060  0.5062720  1.1398935
+#> 
+#> $value
+#> [1] 887.6911
+#> 
+#> $counts
+#> function gradient 
+#>       25       25 
+#> 
+#> $convergence
+#> [1] 0
+#> 
+#> $message
+#> [1] "CONVERGENCE: REL_REDUCTION_OF_F <= FACTR*EPSMCH"
+
+# convergence check
+x <- arima.sim(list(ar = c(0.1, -0.2, 0.6), ma = c(0.1, 0.5)), n = n + 3)
+theta_estimate <- rep(0.1, 3 + 2 + 1)
+data <- matrix(x[3 + seq_len(n)])
+qmle_path <- NULL
+prev_qmle <- 1
+curr_qmle <- Inf
+epochs_num <- 0
+while (abs(curr_qmle - prev_qmle) > 1e-5) {
+  prev_qmle <- curr_qmle
+  hessian <-
+    Matrix::nearPD(qmle_hessian_sum(data, theta_estimate, 3, 2))$mat
+  step <- solve(
+    hessian, qmle_gradient_sum(data, theta_estimate, 3, 2)
+  )
+  # line search
+  lr_choices <- c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
+  lr <- lr_choices[which.min(
+    sapply(lr_choices, function(lr) {
+      qmle(data, pmin(
+        pmax(theta_estimate - lr * step, c(rep(-1, 3 + 2), 1e-10)),
+        c(rep(1, 3 + 2), Inf)
+      ), 3, 2)
+    })
+  )]
+  theta_estimate <- pmin(
+    pmax(theta_estimate - lr * step, c(rep(-1, 3 + 2), 1e-10)),
+    c(rep(1, 3 + 2), Inf)
+  )
+  curr_qmle <- qmle(data, theta_estimate, 3, 2)
+  cat(epochs_num, curr_qmle, theta_estimate, "\n")
+  qmle_path <- c(qmle_path, curr_qmle)
+  epochs_num <- epochs_num + 1
+}
+#> 0 3944.634 0.04233446 -0.001623946 0.1377787 0.115717 0.2221914 0.09941663 
+#> 1 3936.952 0.01542032 -0.0531825 0.1509683 0.1246861 0.2805771 0.09928027 
+#> 2 3910.965 -0.08797532 -0.242957 0.1906819 0.170578 0.4839799 0.09910547 
+#> 3 3848.468 -0.04161028 -0.07070869 0.2030628 0.1721869 0.3068375 0.09787254 
+#> 4 3831.932 0.1216262 0.08513928 0.1587053 0.009073249 0.192338 0.09769375 
+#> 5 3776.199 -0.01651633 -0.01397911 0.2307269 0.1592173 0.2581484 0.09649129 
+#> 6 3765.216 -0.1259345 -0.2358653 0.2811266 0.2247347 0.4917298 0.09625032 
+#> 7 3747.53 -0.2338781 -0.2000905 0.3095502 0.381256 0.4029239 0.09616148 
+#> 8 3716.551 -0.153926 -0.2491416 0.3136961 0.2642216 0.4770571 0.09560175 
+#> 9 3713.008 -0.123153 -0.2626475 0.3090286 0.221204 0.5032787 0.09552786 
+#> 10 3711.746 -0.1027739 -0.2675548 0.3047442 0.1937621 0.5168513 0.09550011 
+#> 11 3710.812 0.07776053 -0.2838975 0.2622506 -0.04304759 0.610297 0.09530323 
+#> 12 2459.683 -0.07466526 -0.1866228 0.5580706 0.2496629 0.398122 0.1325774 
+#> 13 1756.478 0.01341224 -0.1173666 0.5715505 0.1583534 0.34973 0.1930662 
+#> 14 1337.572 0.04397173 -0.09448422 0.5641567 0.1253938 0.3330598 0.279927 
+#> 15 1094.001 0.0589584 -0.08427659 0.5583676 0.1088234 0.3254585 0.3992378 
+#> 16 962.9662 0.06613462 -0.0797346 0.5551347 0.1007856 0.3220491 0.5542437 
+#> 17 901.8344 0.06929215 -0.07782492 0.5536197 0.09722635 0.3206128 0.7372815 
+#> 18 880.06 0.07048913 -0.0771186 0.5530292 0.09587296 0.3200815 0.9184269 
+#> 19 875.545 0.07082844 -0.07692082 0.5528597 0.09548877 0.3199327 1.045147 
+#> 20 875.2373 0.07088068 -0.07689054 0.5528334 0.09542957 0.3199099 1.089357 
+#> 21 875.2352 0.07088299 -0.0768892 0.5528323 0.09542696 0.3199089 1.093412 
+#> 22 875.2352 0.070883 -0.0768892 0.5528323 0.09542695 0.3199089 1.093443
+```
+
+# Notes
+
+This document is generated by the following code:
+
+```shell
+R -e 'knitr::knit("vignettes/exploration-during-development.Rmd.original", output = "vignettes/exploration-during-development.Rmd")'
+```
+
+# Appendix: all code snippets
+
+
+``` r
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>", eval = TRUE, warning = FALSE
+)
+library(fastcpd)
+qmle <- function(data, theta, p = 1, q = 1) {
+  if (nrow(data) < max(p, q) + 1) {
+    return(0)
+  }
+  variance_term <- rep(0, nrow(data))
+  for (i in (max(p, q) + 1):nrow(data)) {
+    variance_term[i] <-
+      data[i] -
+      theta[1:p] %*% data[(i - 1):(i - p)] -
+      theta[(p + 1):(p + q)] %*% variance_term[(i - 1):(i - q)]
+  }
+  (log(2 * pi) + log(theta[p + q + 1])) * (nrow(data) - q) / 2 +
+    sum(variance_term^2) / (2 * theta[p + q + 1])
+}
+qmle_gradient <- function(data, theta, p = 1, q = 1) {
+  if (nrow(data) < max(p, q) + 1) {
+    return(rep(1, length(theta)))
+  }
+  variance_term <- rep(0, nrow(data))
+  for (i in (max(p, q) + 1):nrow(data)) {
+    variance_term[i] <-
+      data[i] -
+      theta[1:p] %*% data[(i - 1):(i - p)] -
+      theta[(p + 1):(p + q)] %*% variance_term[(i - 1):(i - q)]
+  }
+  phi_coefficient <- matrix(0, nrow(data), p)
+  psi_coefficient <- matrix(0, nrow(data), q)
+  for (i in (max(p, q) + 1):nrow(data)) {
+    phi_coefficient[i, ] <-
+      -data[(i - 1):(i - p)] -
+      theta[(p + 1):(p + q)] %*% phi_coefficient[(i - 1):(i - q), ]
+  }
+  for (i in (q + 1):nrow(data)) {
+    psi_coefficient[i, ] <-
+      -variance_term[(i - 1):(i - q)] -
+      theta[(p + 1):(p + q)] %*% psi_coefficient[(i - 1):(i - q), ]
+  }
+  c(
+    phi_coefficient[nrow(data), ] * variance_term[nrow(data)] /
+      theta[p + q + 1],
+    psi_coefficient[nrow(data), ] * variance_term[nrow(data)] /
+      theta[p + q + 1],
+    1 / 2 / theta[p + q + 1] -
+      variance_term[nrow(data)]^2 / (2 * theta[p + q + 1]^2)
+  )
+}
+qmle_gradient_sum <- function(data, theta, p = 1, q = 1) {
+  if (nrow(data) < max(p, q) + 1) {
+    return(rep(1, length(theta)))
+  }
+  variance_term <- rep(0, nrow(data))
+  for (i in (max(p, q) + 1):nrow(data)) {
+    variance_term[i] <-
+      data[i] -
+      theta[1:p] %*% data[(i - 1):(i - p)] -
+      theta[(p + 1):(p + q)] %*% variance_term[(i - 1):(i - q)]
+  }
+  phi_coefficient <- matrix(0, nrow(data), p)
+  psi_coefficient <- matrix(0, nrow(data), q)
+  for (i in (max(p, q) + 1):nrow(data)) {
+    phi_coefficient[i, ] <-
+      -data[(i - 1):(i - p)] -
+      theta[(p + 1):(p + q)] %*% phi_coefficient[(i - 1):(i - q), ]
+  }
+  for (i in (q + 1):nrow(data)) {
+    psi_coefficient[i, ] <-
+      -variance_term[(i - 1):(i - q)] -
+      theta[(p + 1):(p + q)] %*% psi_coefficient[(i - 1):(i - q), ]
+  }
+  c(
+    crossprod(phi_coefficient, variance_term) / theta[p + q + 1],
+    crossprod(psi_coefficient, variance_term) / theta[p + q + 1],
+    (nrow(data) - q) / 2 / theta[p + q + 1] -
+      crossprod(variance_term) / 2 / theta[p + q + 1]^2
+  )
+}
+qmle_hessian <- function(data, theta, p = 1, q = 1) {
+  if (nrow(data) < max(p, q) + 1) {
+    return(diag(length(theta)))
+  }
+  variance_term <- rep(0, nrow(data))
+  for (i in (max(p, q) + 1):nrow(data)) {
+    variance_term[i] <-
+      data[i] -
+      theta[1:p] %*% data[(i - 1):(i - p)] -
+      theta[(p + 1):(p + q)] %*% variance_term[(i - 1):(i - q)]
+  }
+  phi_coefficient <- matrix(0, nrow(data), p)
+  psi_coefficient <- matrix(0, nrow(data), q)
+  for (i in (max(p, q) + 1):nrow(data)) {
+    phi_coefficient[i, ] <-
+      -data[(i - 1):(i - p)] -
+      theta[(p + 1):(p + q)] %*% phi_coefficient[(i - 1):(i - q), ]
+  }
+  for (i in (q + 1):nrow(data)) {
+    psi_coefficient[i, ] <-
+      -variance_term[(i - 1):(i - q)] -
+      theta[(p + 1):(p + q)] %*% psi_coefficient[(i - 1):(i - q), ]
+  }
+  phi_psi_coefficient <- array(0, c(q, p, nrow(data)))
+  psi_psi_coefficient <- array(0, c(q, q, nrow(data)))
+  for (i in (q + 1):nrow(data)) {
+    phi_psi_coefficient[, , i] <-
+      -phi_coefficient[(i - 1):(i - q), ] -
+      rowSums(
+        sweep(
+          phi_psi_coefficient[, , (i - 1):(i - q), drop = FALSE],
+          3,
+          theta[(p + 1):(p + q)],
+          `*`
+        ),
+        dims = 2
+      )
+    psi_psi_coefficient[, , i] <-
+      -psi_coefficient[(i - 1):(i - q), ] -
+      t(psi_coefficient[(i - 1):(i - q), ]) -
+      rowSums(
+        sweep(
+          psi_psi_coefficient[, , (i - 1):(i - q), drop = FALSE],
+          3,
+          theta[(p + 1):(p + q)],
+          `*`
+        ),
+        dims = 2
+      )
+  }
+  hessian <- matrix(0, nrow = p + q + 1, ncol = p + q + 1)
+  hessian[1:p, 1:p] <-
+    crossprod(phi_coefficient[nrow(data), , drop = FALSE]) /
+    theta[p + q + 1]
+  hessian[1:p, (p + 1):(p + q)] <- (
+    t(phi_psi_coefficient[, , nrow(data)]) * variance_term[nrow(data)] +
+      crossprod(
+        phi_coefficient[nrow(data), , drop = FALSE],
+        psi_coefficient[nrow(data), , drop = FALSE]
+      )
+  ) / theta[p + q + 1]
+  hessian[(p + 1):(p + q), 1:p] <- t(hessian[1:p, (p + 1):(p + q)])
+  hessian[1:p, p + q + 1] <-
+    -t(phi_coefficient[nrow(data), ]) *
+    variance_term[nrow(data)] / theta[p + q + 1]^2
+  hessian[p + q + 1, 1:p] <- t(hessian[1:p, p + q + 1])
+  hessian[(p + 1):(p + q), (p + 1):(p + q)] <- (
+    crossprod(psi_coefficient[nrow(data), , drop = FALSE]) +
+      psi_psi_coefficient[, , nrow(data)] * variance_term[nrow(data)]
+  ) / theta[p + q + 1]
+  hessian[(p + 1):(p + q), p + q + 1] <-
+    -t(psi_coefficient[nrow(data), ]) *
+    variance_term[nrow(data)] / theta[p + q + 1]^2
+  hessian[p + q + 1, (p + 1):(p + q)] <-
+    t(hessian[(p + 1):(p + q), p + q + 1])
+  hessian[p + q + 1, p + q + 1] <-
+    variance_term[nrow(data)]^2 / theta[p + q + 1]^3 -
+    1 / 2 / theta[p + q + 1]^2
+  hessian
+}
+qmle_hessian_sum <- function(data, theta, p = 1, q = 1) {
+  if (nrow(data) < max(p, q) + 1) {
+    return(diag(length(theta)))
+  }
+  variance_term <- rep(0, nrow(data))
+  for (i in (max(p, q) + 1):nrow(data)) {
+    variance_term[i] <-
+      data[i] -
+      theta[1:p] %*% data[(i - 1):(i - p)] -
+      theta[(p + 1):(p + q)] %*% variance_term[(i - 1):(i - q)]
+  }
+  phi_coefficient <- matrix(0, nrow(data), p)
+  psi_coefficient <- matrix(0, nrow(data), q)
+  for (i in (max(p, q) + 1):nrow(data)) {
+    phi_coefficient[i, ] <-
+      -data[(i - 1):(i - p)] -
+      theta[(p + 1):(p + q)] %*% phi_coefficient[(i - 1):(i - q), ]
+  }
+  for (i in (q + 1):nrow(data)) {
+    psi_coefficient[i, ] <-
+      -variance_term[(i - 1):(i - q)] -
+      theta[(p + 1):(p + q)] %*% psi_coefficient[(i - 1):(i - q), ]
+  }
+  phi_psi_coefficient <- array(0, c(q, p, nrow(data)))
+  psi_psi_coefficient <- array(0, c(q, q, nrow(data)))
+  for (i in (q + 1):nrow(data)) {
+    phi_psi_coefficient[, , i] <-
+      -phi_coefficient[(i - 1):(i - q), ] -
+      rowSums(
+        sweep(
+          phi_psi_coefficient[, , (i - 1):(i - q), drop = FALSE],
+          3,
+          theta[(p + 1):(p + q)],
+          `*`
+        ),
+        dims = 2
+      )
+    psi_psi_coefficient[, , i] <-
+      -psi_coefficient[(i - 1):(i - q), ] -
+      t(psi_coefficient[(i - 1):(i - q), ]) -
+      rowSums(
+        sweep(
+          psi_psi_coefficient[, , (i - 1):(i - q), drop = FALSE],
+          3,
+          theta[(p + 1):(p + q)],
+          `*`
+        ),
+        dims = 2
+      )
+  }
+  hessian <- matrix(0, nrow = p + q + 1, ncol = p + q + 1)
+  hessian[1:p, 1:p] <-
+    crossprod(phi_coefficient) / theta[p + q + 1]
+  hessian[(p + 1):(p + q), 1:p] <- (
+    rowSums(
+      sweep(
+        phi_psi_coefficient,
+        3,
+        variance_term,
+        `*`
+      ),
+      dims = 2
+    ) +
+      crossprod(
+        psi_coefficient, phi_coefficient
+      )
+  ) / theta[p + q + 1]
+  hessian[1:p, (p + 1):(p + q)] <- t(hessian[(p + 1):(p + q), 1:p])
+  hessian[1:p, p + q + 1] <-
+    -crossprod(phi_coefficient, variance_term) / theta[p + q + 1]^2
+  hessian[p + q + 1, 1:p] <- t(hessian[1:p, p + q + 1])
+  hessian[(p + 1):(p + q), (p + 1):(p + q)] <- (
+    crossprod(psi_coefficient) + rowSums(
+      sweep(
+        psi_psi_coefficient,
+        3,
+        variance_term,
+        `*`
+      ),
+      dims = 2
+    )
+  ) / theta[p + q + 1]
+  hessian[(p + 1):(p + q), p + q + 1] <-
+    -crossprod(psi_coefficient, variance_term) / theta[p + q + 1]^2
+  hessian[p + q + 1, (p + 1):(p + q)] <-
+    t(hessian[(p + 1):(p + q), p + q + 1])
+  hessian[p + q + 1, p + q + 1] <-
+    crossprod(variance_term) / theta[p + q + 1]^3 -
+    (nrow(data) - q) / 2 / theta[p + q + 1]^2
+  hessian
+}
+
+# fastcpd arma 1 1
+set.seed(1)
+n <- 600
+w <- rnorm(n + 1, 0, 1)
+x <- rep(0, n + 1)
+for (i in 1:300) {
+  x[i + 1] <- 0.1 * x[i] + w[i + 1] + 0.1 * w[i]
+}
+for (i in 301:n) {
+  x[i + 1] <- 0.3 * x[i] + w[i + 1] + 0.4 * w[i]
+}
+result <- fastcpd(
+  formula = ~ . - 1,
+  data = data.frame(x = x[1 + seq_len(n)]),
+  trim = 0,
+  p = 1 + 1 + 1,
+  beta = (1 + 1 + 1 + 1) * log(n) / 2,
+  cost_adjustment = "BIC",
+  cost = qmle,
+  cost_gradient = qmle_gradient,
+  cost_hessian = qmle_hessian,
+  cp_only = TRUE,
+  lower = c(rep(-1, 1 + 1), 1e-10),
+  upper = c(rep(1, 1 + 1), Inf),
+  line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9),
+  r.progress = FALSE
+)
+summary(result)
+
+# fastcpd arma 3 2
+set.seed(1)
+n <- 600
+w <- rnorm(n + 2, 0, 1)
+x <- rep(0, n + 3)
+for (i in 1:300) {
+  x[i + 3] <- 0.1 * x[i + 2] - 0.2 * x[i + 1] + 0.6 * x[i] +
+    w[i + 2] + 0.1 * w[i + 1] + 0.5 * w[i]
+}
+for (i in 301:n) {
+  x[i + 3] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] +
+    w[i + 2] + 0.4 * w[i + 1] + 0.1 * w[i]
+}
+# result <- fastcpd(
+#   formula = ~ . - 1,
+#   data = data.frame(x = x[3 + seq_len(n)]),
+#   trim = 0,
+#   p = 3 + 2 + 1,
+#   beta = (3 + 2 + 1 + 1) * log(n) / 2,
+#   cost_adjustment = "BIC",
+#   cost = function(data, theta) {
+#     qmle(data, theta, 3, 2)
+#   },
+#   cost_gradient = function(data, theta) {
+#     qmle_gradient(data, theta, 3, 2)
+#   },
+#   cost_hessian = function(data, theta) {
+#     qmle_hessian(data, theta, 3, 2)
+#   },
+#   cp_only = TRUE,
+#   lower = c(rep(-1, 3 + 2), 1e-10),
+#   upper = c(rep(1, 3 + 2), Inf),
+#   line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9),
+#   r.progress = FALSE
+# )
+# summary(result)
+
+# hessian check
+theta_estimate <- rep(0.1, 3 + 2 + 1)
+testthat::expect_equal(
+  numDeriv::hessian(
+    qmle, theta_estimate, data = matrix(x[3 + seq_len(n)]), p = 3, q = 2
+  ),
+  qmle_hessian_sum(matrix(x[3 + seq_len(n)]), theta_estimate, 3, 2)
+)
+
+optim(
+  rep(0.1, 3 + 2 + 1),
+  fn = function(data, theta) {
+    qmle(data, theta, 3, 2)
+  },
+  data = matrix(x[3 + seq_len(n)]),
   method = "L-BFGS-B",
   lower = c(rep(-1, 3 + 2), 1e-10),
   upper = c(rep(1, 3 + 2), Inf),
@@ -383,13 +825,4 @@ while (abs(curr_qmle - prev_qmle) > 1e-5) {
   qmle_path <- c(qmle_path, curr_qmle)
   epochs_num <- epochs_num + 1
 }
-```
-
-# Notes
-
-The evaluation of this vignette is set to be `FALSE`.
-
-# Appendix: all code snippets
-
-```{r ref.label = knitr::all_labels(), echo = TRUE}
 ```

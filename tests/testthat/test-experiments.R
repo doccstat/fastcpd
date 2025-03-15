@@ -1,3 +1,5 @@
+testthat::skip_on_cran()
+
 testthat::test_that(
   "1d mean custom", {
     set.seed(1)
