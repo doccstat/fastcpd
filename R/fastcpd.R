@@ -365,7 +365,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       vanilla_percentage <- 1
     }
   } else {
-    p <- ncol(data_) - 1
+    if (!methods::hasArg("p")) {
+      p <- ncol(data_) - 1
+    }
     fastcpd_family <- "custom"
     if (!is.null(cost) && length(formals(cost)) == 1) {
       vanilla_percentage <- 1

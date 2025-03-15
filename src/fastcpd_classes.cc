@@ -231,6 +231,8 @@ Fastcpd::Fastcpd(const double beta, const Rcpp::Nullable<Rcpp::Function>& cost,
 }
 
 List Fastcpd::Run() {
+  CreateSegmentStatistics();
+  CreateSenParameters();
   pruned_set_(1) = 1;
   objective_function_values_.fill(arma::datum::inf);
   objective_function_values_(0) = -beta_;
@@ -596,8 +598,6 @@ List Fastcpd::Run() {
       pruned_set_size_++;
     }
   } else {
-    CreateSegmentStatistics();
-    CreateSenParameters();
     CreateRProgress();
     UpdateRProgress();
     for (t = 2; t <= data_n_rows_; t++) {

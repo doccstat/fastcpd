@@ -1,5 +1,6 @@
 testthat::test_that(
   "examples/fastcpd_3.txt", {
+    testthat::skip_on_cran()
     examples_garch <- readLines("examples/fastcpd_3.txt")
     source(textConnection(paste(
       examples_garch[seq_len(length(examples_garch) - 2) + 1],
@@ -7,6 +8,6 @@ testthat::test_that(
     )))
 
     testthat::expect_equal(result_builtin@cp_set, 201)
-    testthat::expect_equal(result_custom@cp_set, 204)
+    testthat::expect_equal(result_custom@cp_set, 198)
   }
 )

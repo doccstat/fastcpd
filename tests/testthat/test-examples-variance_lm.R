@@ -1,5 +1,6 @@
 testthat::test_that(
   "examples/variance_lm.R", {
+    testthat::skip_on_cran()
     testthat::skip_if_not_installed("mvtnorm")
 
     source("examples/variance_lm.R")

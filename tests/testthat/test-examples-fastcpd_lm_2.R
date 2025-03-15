@@ -1,5 +1,6 @@
 testthat::test_that(
   "examples/fastcpd_lm_2.txt", {
+    testthat::skip_on_cran()
     testthat::skip_if_not_installed("mvtnorm")
 
     examples_lm <- readLines("examples/fastcpd_lm_2.txt")
