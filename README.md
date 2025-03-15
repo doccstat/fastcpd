@@ -141,6 +141,24 @@ ggplot2::autoplot(microbenchmark(
 
 ![](man/figures/README-time-comparison-1.png)<!-- -->
 
+Some packages are not included in the `microbenchmark` comparison due to either
+memory constraints or long running time.
+
+``` r
+# Device: Mac mini (M1, 2020)
+# Memory: 8 GB
+system.time(CptNonPar::np.mojo(mean_data, G = floor(length(mean_data) / 6)))
+#> Error: vector memory limit of 16.0 Gb reached, see mem.maxVSize()
+#> Timing stopped at: 0.061 0.026 0.092
+system.time(ecp::e.divisive(matrix(mean_data)))
+#> Error: vector memory limit of 16.0 Gb reached, see mem.maxVSize()
+#> Timing stopped at: 0.076 0.044 0.241
+system.time(strucchange::breakpoints(y ~ 1, data = data.frame(y = mean_data)))
+#> Timing stopped at: 265.1 145.8 832.5
+system.time(breakfast::breakfast(mean_data))
+#> Timing stopped at: 45.9 89.21 562.3
+```
+
 ## Cheatsheet
 
 [![fastcpd
@@ -250,7 +268,6 @@ solution](https://stackoverflow.com/a/15540919) if you have trouble
 installing `RcppArmadillo`.
 
 </details>
-
 <details close>
 <summary>
 We welcome contributions from everyone. Please follow the instructions
@@ -285,7 +302,6 @@ below to make contributions.
     `devtools::check()`.
 
 </details>
-
 <details close>
 <summary>
 Encountered a bug or unintended behavior?
