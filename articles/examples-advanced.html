@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.16.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.16.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,527 +82,302 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">6</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">480</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">300</span></span>
+<span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">40</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="op">-</span><span class="fl">2</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">theta_0</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, ncol <span class="op">=</span> <span class="va">p</span> <span class="op">-</span> <span class="va">p_true</span>, nrow <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">80</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">81</span><span class="op">:</span><span class="fl">200</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">201</span><span class="op">:</span><span class="fl">320</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">321</span><span class="op">:</span><span class="fl">480</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">160</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.5</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.75</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.75</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">n</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">small_lasso</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"lasso"</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),</span></span>
-<span><span class="co">#&gt;     family = "lasso", r.progress = FALSE)</span></span>
-<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; fastcpd.lasso(data = small_lasso, segment_count = 2, r.progress = FALSE)</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 79 199 317</span></span>
-<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; 73 151 </span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Cost values:</span></span>
-<span><span class="co">#&gt; 125.1501 155.4486 160.4363 274.2228</span></span>
-<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; 403.3531 330.8874 1131.242 </span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt; 50 x 4 sparse Matrix of class "dgCMatrix"</span></span>
-<span><span class="co">#&gt;          segment 1    segment 2    segment 3    segment 4</span></span>
-<span><span class="co">#&gt;  [1,] -2.580352409 -2.428039439  4.900559900 -2.749985232</span></span>
-<span><span class="co">#&gt;  [2,] -2.668688731 -2.473539196  4.198921150  3.057387294</span></span>
-<span><span class="co">#&gt;  [3,] -4.354248176  0.983488542  5.054325016  3.735347545</span></span>
-<span><span class="co">#&gt;  [4,] -4.662566697  0.279505605  2.628354481 -3.216027015</span></span>
-<span><span class="co">#&gt;  [5,] -4.820139326  0.496565230  4.611603593  3.231304715</span></span>
-<span><span class="co">#&gt;  [6,] -3.860308911 -2.576467859  3.304903523  4.577405578</span></span>
-<span><span class="co">#&gt;  [7,]  0.117234534 -0.219145186 -0.015091394 -0.086048806</span></span>
-<span><span class="co">#&gt;  [8,]  0.117552281  0.035701649 -0.127986984 -0.138807479</span></span>
-<span><span class="co">#&gt;  [9,] -0.188756652  0.133653604  0.038250526 -0.037807789</span></span>
-<span><span class="co">#&gt; [10,] -0.074530965  0.010173561  0.021979969 -0.047707753</span></span>
-<span><span class="co">#&gt; [11,] -0.061721013 -0.176769170 -0.059312332 -0.135633390</span></span>
-<span><span class="co">#&gt; [12,]  0.021874954 -0.133777712  0.028889403 -0.130808437</span></span>
-<span><span class="co">#&gt; [13,]  0.067777695  0.129187849 -0.026100120  0.002593292</span></span>
-<span><span class="co">#&gt; [14,] -0.122270920  0.110865328  0.084858637  0.233903944</span></span>
-<span><span class="co">#&gt; [15,] -0.014192027  0.086100909  0.030268607  0.243927135</span></span>
-<span><span class="co">#&gt; [16,] -0.135970691 -0.043211895 -0.032229963 -0.134840827</span></span>
-<span><span class="co">#&gt; [17,]  0.007608049 -0.079445537 -0.013675459  0.102010778</span></span>
-<span><span class="co">#&gt; [18,] -0.010343806  0.132392790 -0.151237533 -0.123955960</span></span>
-<span><span class="co">#&gt; [19,]  0.252797503  0.253113165 -0.197620792  0.099319824</span></span>
-<span><span class="co">#&gt; [20,] -0.044505498 -0.049962311  0.233024977  0.176211754</span></span>
-<span><span class="co">#&gt; [21,]  0.084292730  0.366833682 -0.220176991 -0.035984666</span></span>
-<span><span class="co">#&gt; [22,] -0.373913824 -0.060767726  0.036430343 -0.105248408</span></span>
-<span><span class="co">#&gt; [23,]  0.316816197 -0.191114879 -0.127549606 -0.112775343</span></span>
-<span><span class="co">#&gt; [24,]  0.008174405  0.158066938 -0.121000263  0.232613924</span></span>
-<span><span class="co">#&gt; [25,] -0.388590727  0.098542973 -0.045207238  0.003838229</span></span>
-<span><span class="co">#&gt; [26,] -0.109916673  0.042028223  0.031122592 -0.173521656</span></span>
-<span><span class="co">#&gt; [27,] -0.040845604  0.023057708  0.067839093  0.084198705</span></span>
-<span><span class="co">#&gt; [28,]  0.080696347 -0.097192796  0.099373268 -0.166716428</span></span>
-<span><span class="co">#&gt; [29,] -0.117530646  0.002589360  0.051425084  0.098244052</span></span>
-<span><span class="co">#&gt; [30,] -0.037935138 -0.091390269  0.154099931  0.100237663</span></span>
-<span><span class="co">#&gt; [31,]  0.109674339  0.158620750 -0.181802621 -0.112714822</span></span>
-<span><span class="co">#&gt; [32,]  0.069971569 -0.425139230 -0.020032195 -0.193571920</span></span>
-<span><span class="co">#&gt; [33,]  0.050674415  0.050518682 -0.010950361 -0.068936556</span></span>
-<span><span class="co">#&gt; [34,]  0.065490413  0.142178491  0.174034864  0.072663828</span></span>
-<span><span class="co">#&gt; [35,] -0.045676268 -0.057128729  0.050522160 -0.165689753</span></span>
-<span><span class="co">#&gt; [36,]  0.368217440  0.096573493  0.120128008  0.020252183</span></span>
-<span><span class="co">#&gt; [37,]  0.037286542 -0.056101952 -0.018563948  0.263830281</span></span>
-<span><span class="co">#&gt; [38,]  0.094379823 -0.263914331 -0.002747609 -0.010850423</span></span>
-<span><span class="co">#&gt; [39,]  0.153890231  0.071449851 -0.075881371 -0.060456457</span></span>
-<span><span class="co">#&gt; [40,] -0.146742186 -0.117294226 -0.255229801 -0.124537184</span></span>
-<span><span class="co">#&gt; [41,] -0.274840831  0.009051742  0.124862149  0.074433697</span></span>
-<span><span class="co">#&gt; [42,] -0.008508998  0.110465493  0.215727137  0.269240087</span></span>
-<span><span class="co">#&gt; [43,]  0.014213371 -0.041499271  0.097848087  0.105722611</span></span>
-<span><span class="co">#&gt; [44,] -0.080890432  0.094198355  0.004240823 -0.187634605</span></span>
-<span><span class="co">#&gt; [45,]  0.051925330 -0.007981636  0.044460236 -0.066537564</span></span>
-<span><span class="co">#&gt; [46,]  0.213031014  0.168676929  0.097190703  0.046563300</span></span>
-<span><span class="co">#&gt; [47,]  0.175716867  0.045500673  0.175902385 -0.030590597</span></span>
-<span><span class="co">#&gt; [48,] -0.040155598 -0.120432098 -0.137764051 -0.088812037</span></span>
-<span><span class="co">#&gt; [49,]  0.164103981  0.024976184  0.015955563 -0.232780151</span></span>
-<span><span class="co">#&gt; [50,] -0.103164763 -0.135032022  0.029553283  0.267389634</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="multiple-epochs">Multiple epochs<a class="anchor" aria-label="anchor" href="#multiple-epochs"></a>
-</h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">result_multiple_epochs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"lasso"</span>,</span>
-<span>  multiple_epochs <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">segment_length</span><span class="op">)</span> <span class="kw">if</span> <span class="op">(</span><span class="va">segment_length</span> <span class="op">&lt;</span> <span class="fl">20</span><span class="op">)</span> <span class="fl">1</span> <span class="kw">else</span> <span class="fl">0</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_multiple_epochs</span><span class="op">)</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),</span></span>
-<span><span class="co">#&gt;     family = "lasso", multiple_epochs = function(segment_length) if (segment_length &lt;</span></span>
-<span><span class="co">#&gt;         20) 1 else 0, r.progress = FALSE)</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 79 199 320</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Cost values:</span></span>
-<span><span class="co">#&gt; 125.1501 155.4486 164.1284 177.9478</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt; 50 x 4 sparse Matrix of class "dgCMatrix"</span></span>
-<span><span class="co">#&gt;          segment 1    segment 2    segment 3    segment 4</span></span>
-<span><span class="co">#&gt;  [1,] -2.580352409 -2.428039439  4.898713954 -3.006202485</span></span>
-<span><span class="co">#&gt;  [2,] -2.668688731 -2.473539196  4.209460633  3.096081968</span></span>
-<span><span class="co">#&gt;  [3,] -4.354248176  0.983488542  5.011651466  3.718141515</span></span>
-<span><span class="co">#&gt;  [4,] -4.662566697  0.279505605  2.623742216 -3.130632564</span></span>
-<span><span class="co">#&gt;  [5,] -4.820139326  0.496565230  4.616444609  3.175562645</span></span>
-<span><span class="co">#&gt;  [6,] -3.860308911 -2.576467859  3.336301862  4.342890940</span></span>
-<span><span class="co">#&gt;  [7,]  0.117234534 -0.219145186 -0.039861426 -0.016395368</span></span>
-<span><span class="co">#&gt;  [8,]  0.117552281  0.035701649 -0.075921029 -0.022022294</span></span>
-<span><span class="co">#&gt;  [9,] -0.188756652  0.133653604  0.052907904  0.070683538</span></span>
-<span><span class="co">#&gt; [10,] -0.074530965  0.010173561  0.003352400  0.012791767</span></span>
-<span><span class="co">#&gt; [11,] -0.061721013 -0.176769170 -0.044814526 -0.166042077</span></span>
-<span><span class="co">#&gt; [12,]  0.021874954 -0.133777712  0.103526247  0.077820866</span></span>
-<span><span class="co">#&gt; [13,]  0.067777695  0.129187849 -0.072098209  0.077436979</span></span>
-<span><span class="co">#&gt; [14,] -0.122270920  0.110865328  0.095306898  0.114046507</span></span>
-<span><span class="co">#&gt; [15,] -0.014192027  0.086100909  0.006037145 -0.015966855</span></span>
-<span><span class="co">#&gt; [16,] -0.135970691 -0.043211895  0.026749332 -0.095751983</span></span>
-<span><span class="co">#&gt; [17,]  0.007608049 -0.079445537 -0.003130812 -0.010689927</span></span>
-<span><span class="co">#&gt; [18,] -0.010343806  0.132392790 -0.156866781 -0.138057246</span></span>
-<span><span class="co">#&gt; [19,]  0.252797503  0.253113165 -0.167436237  0.158967697</span></span>
-<span><span class="co">#&gt; [20,] -0.044505498 -0.049962311  0.177560915  0.030169316</span></span>
-<span><span class="co">#&gt; [21,]  0.084292730  0.366833682 -0.224849869 -0.181503446</span></span>
-<span><span class="co">#&gt; [22,] -0.373913824 -0.060767726  0.003860114  0.045649997</span></span>
-<span><span class="co">#&gt; [23,]  0.316816197 -0.191114879 -0.118941359 -0.025305755</span></span>
-<span><span class="co">#&gt; [24,]  0.008174405  0.158066938 -0.135680402 -0.137396624</span></span>
-<span><span class="co">#&gt; [25,] -0.388590727  0.098542973 -0.064383316  0.022336212</span></span>
-<span><span class="co">#&gt; [26,] -0.109916673  0.042028223  0.017815134 -0.059782090</span></span>
-<span><span class="co">#&gt; [27,] -0.040845604  0.023057708  0.053296378  0.030431412</span></span>
-<span><span class="co">#&gt; [28,]  0.080696347 -0.097192796  0.122665492 -0.080706668</span></span>
-<span><span class="co">#&gt; [29,] -0.117530646  0.002589360  0.062791240 -0.051542901</span></span>
-<span><span class="co">#&gt; [30,] -0.037935138 -0.091390269  0.122976438  0.048892128</span></span>
-<span><span class="co">#&gt; [31,]  0.109674339  0.158620750 -0.181785506  0.075434045</span></span>
-<span><span class="co">#&gt; [32,]  0.069971569 -0.425139230  0.030472706  0.033375101</span></span>
-<span><span class="co">#&gt; [33,]  0.050674415  0.050518682  0.034305534  0.070983107</span></span>
-<span><span class="co">#&gt; [34,]  0.065490413  0.142178491  0.164899160  0.032575571</span></span>
-<span><span class="co">#&gt; [35,] -0.045676268 -0.057128729  0.022794426 -0.134534869</span></span>
-<span><span class="co">#&gt; [36,]  0.368217440  0.096573493  0.114099285 -0.020673038</span></span>
-<span><span class="co">#&gt; [37,]  0.037286542 -0.056101952 -0.023029273  0.102043216</span></span>
-<span><span class="co">#&gt; [38,]  0.094379823 -0.263914331  0.003288922 -0.052763017</span></span>
-<span><span class="co">#&gt; [39,]  0.153890231  0.071449851 -0.097509620 -0.120642848</span></span>
-<span><span class="co">#&gt; [40,] -0.146742186 -0.117294226 -0.208865036 -0.045775725</span></span>
-<span><span class="co">#&gt; [41,] -0.274840831  0.009051742  0.127312770  0.123910218</span></span>
-<span><span class="co">#&gt; [42,] -0.008508998  0.110465493  0.118453225 -0.005505113</span></span>
-<span><span class="co">#&gt; [43,]  0.014213371 -0.041499271  0.113699538 -0.056131976</span></span>
-<span><span class="co">#&gt; [44,] -0.080890432  0.094198355  0.051912519  0.013524984</span></span>
-<span><span class="co">#&gt; [45,]  0.051925330 -0.007981636  0.085966205 -0.033628617</span></span>
-<span><span class="co">#&gt; [46,]  0.213031014  0.168676929  0.035738422 -0.029655833</span></span>
-<span><span class="co">#&gt; [47,]  0.175716867  0.045500673  0.175504506  0.119507574</span></span>
-<span><span class="co">#&gt; [48,] -0.040155598 -0.120432098 -0.139162874 -0.054349982</span></span>
-<span><span class="co">#&gt; [49,]  0.164103981  0.024976184  0.029374949 -0.056092814</span></span>
-<span><span class="co">#&gt; [50,] -0.103164763 -0.135032022  0.047475507 -0.032491294</span></span></code></pre></div>
-</div>
+<span><span class="co">#&gt; 40 x 3 sparse Matrix of class "dgCMatrix"</span></span>
+<span><span class="co">#&gt;       segment 1  segment 2 segment 3</span></span>
+<span><span class="co">#&gt;  [1,] 0.2725645  3.2847730 0.3945321</span></span>
+<span><span class="co">#&gt;  [2,] 1.0710180 -1.0318006 0.2333177</span></span>
+<span><span class="co">#&gt;  [3,] 2.0691658  0.8655912 .        </span></span>
+<span><span class="co">#&gt;  [4,] 0.2865536 -2.7810274 1.4952166</span></span>
+<span><span class="co">#&gt;  [5,] .          .         .        </span></span>
+<span><span class="co">#&gt;  [6,] .          .         .        </span></span>
+<span><span class="co">#&gt;  [7,] .          .         .        </span></span>
+<span><span class="co">#&gt;  [8,] .          .         .        </span></span>
+<span><span class="co">#&gt;  [9,] .          .         .        </span></span>
+<span><span class="co">#&gt; [10,] .          .         .        </span></span>
+<span><span class="co">#&gt; [11,] .          .         .        </span></span>
+<span><span class="co">#&gt; [12,] .          .         .        </span></span>
+<span><span class="co">#&gt; [13,] .          .         .        </span></span>
+<span><span class="co">#&gt; [14,] .          .         .        </span></span>
+<span><span class="co">#&gt; [15,] .          .         .        </span></span>
+<span><span class="co">#&gt; [16,] .          .         .        </span></span>
+<span><span class="co">#&gt; [17,] .          .         .        </span></span>
+<span><span class="co">#&gt; [18,] .          .         .        </span></span>
+<span><span class="co">#&gt; [19,] .          .         .        </span></span>
+<span><span class="co">#&gt; [20,] .          .         .        </span></span>
+<span><span class="co">#&gt; [21,] .          .         .        </span></span>
+<span><span class="co">#&gt; [22,] .          .         .        </span></span>
+<span><span class="co">#&gt; [23,] .          .         .        </span></span>
+<span><span class="co">#&gt; [24,] .          .         .        </span></span>
+<span><span class="co">#&gt; [25,] .          .         .        </span></span>
+<span><span class="co">#&gt; [26,] .          .         .        </span></span>
+<span><span class="co">#&gt; [27,] .          .         .        </span></span>
+<span><span class="co">#&gt; [28,] .          .         .        </span></span>
+<span><span class="co">#&gt; [29,] .          .         .        </span></span>
+<span><span class="co">#&gt; [30,] .          .         .        </span></span>
+<span><span class="co">#&gt; [31,] .          .         .        </span></span>
+<span><span class="co">#&gt; [32,] .          .         .        </span></span>
+<span><span class="co">#&gt; [33,] .          .         .        </span></span>
+<span><span class="co">#&gt; [34,] .          .         .        </span></span>
+<span><span class="co">#&gt; [35,] .          .         .        </span></span>
+<span><span class="co">#&gt; [36,] .          .         .        </span></span>
+<span><span class="co">#&gt; [37,] .          .         .        </span></span>
+<span><span class="co">#&gt; [38,] .          .         .        </span></span>
+<span><span class="co">#&gt; [39,] .          .         .        </span></span>
+<span><span class="co">#&gt; [40,] .          .         .</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="vanilla-percentage">Vanilla percentage<a class="anchor" aria-label="anchor" href="#vanilla-percentage"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">result_vanilla_percentage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"lasso"</span>,</span>
-<span>  vanilla_percentage <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result_vanilla_percentage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span></span>
+<span>  <span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_vanilla_percentage</span><span class="op">)</span></span>
-<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),</span></span>
-<span><span class="co">#&gt;     family = "lasso", vanilla_percentage = 0.2, r.progress = FALSE)</span></span>
-<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; fastcpd.lasso(data = small_lasso, segment_count = 2, vanilla_percentage = 0.5, </span></span>
+<span><span class="co">#&gt;     r.progress = FALSE)</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 79 199 317</span></span>
-<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; 74 150 </span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Cost values:</span></span>
-<span><span class="co">#&gt; 125.1501 155.4486 160.4363 274.2228</span></span>
-<span><span class="co">#&gt;</span></span>
+<span><span class="co">#&gt; 404.3949 296.7204 1162.25 </span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt; 50 x 4 sparse Matrix of class "dgCMatrix"</span></span>
-<span><span class="co">#&gt;          segment 1    segment 2    segment 3    segment 4</span></span>
-<span><span class="co">#&gt;  [1,] -2.580352409 -2.428039439  4.900559900 -2.749985232</span></span>
-<span><span class="co">#&gt;  [2,] -2.668688731 -2.473539196  4.198921150  3.057387294</span></span>
-<span><span class="co">#&gt;  [3,] -4.354248176  0.983488542  5.054325016  3.735347545</span></span>
-<span><span class="co">#&gt;  [4,] -4.662566697  0.279505605  2.628354481 -3.216027015</span></span>
-<span><span class="co">#&gt;  [5,] -4.820139326  0.496565230  4.611603593  3.231304715</span></span>
-<span><span class="co">#&gt;  [6,] -3.860308911 -2.576467859  3.304903523  4.577405578</span></span>
-<span><span class="co">#&gt;  [7,]  0.117234534 -0.219145186 -0.015091394 -0.086048806</span></span>
-<span><span class="co">#&gt;  [8,]  0.117552281  0.035701649 -0.127986984 -0.138807479</span></span>
-<span><span class="co">#&gt;  [9,] -0.188756652  0.133653604  0.038250526 -0.037807789</span></span>
-<span><span class="co">#&gt; [10,] -0.074530965  0.010173561  0.021979969 -0.047707753</span></span>
-<span><span class="co">#&gt; [11,] -0.061721013 -0.176769170 -0.059312332 -0.135633390</span></span>
-<span><span class="co">#&gt; [12,]  0.021874954 -0.133777712  0.028889403 -0.130808437</span></span>
-<span><span class="co">#&gt; [13,]  0.067777695  0.129187849 -0.026100120  0.002593292</span></span>
-<span><span class="co">#&gt; [14,] -0.122270920  0.110865328  0.084858637  0.233903944</span></span>
-<span><span class="co">#&gt; [15,] -0.014192027  0.086100909  0.030268607  0.243927135</span></span>
-<span><span class="co">#&gt; [16,] -0.135970691 -0.043211895 -0.032229963 -0.134840827</span></span>
-<span><span class="co">#&gt; [17,]  0.007608049 -0.079445537 -0.013675459  0.102010778</span></span>
-<span><span class="co">#&gt; [18,] -0.010343806  0.132392790 -0.151237533 -0.123955960</span></span>
-<span><span class="co">#&gt; [19,]  0.252797503  0.253113165 -0.197620792  0.099319824</span></span>
-<span><span class="co">#&gt; [20,] -0.044505498 -0.049962311  0.233024977  0.176211754</span></span>
-<span><span class="co">#&gt; [21,]  0.084292730  0.366833682 -0.220176991 -0.035984666</span></span>
-<span><span class="co">#&gt; [22,] -0.373913824 -0.060767726  0.036430343 -0.105248408</span></span>
-<span><span class="co">#&gt; [23,]  0.316816197 -0.191114879 -0.127549606 -0.112775343</span></span>
-<span><span class="co">#&gt; [24,]  0.008174405  0.158066938 -0.121000263  0.232613924</span></span>
-<span><span class="co">#&gt; [25,] -0.388590727  0.098542973 -0.045207238  0.003838229</span></span>
-<span><span class="co">#&gt; [26,] -0.109916673  0.042028223  0.031122592 -0.173521656</span></span>
-<span><span class="co">#&gt; [27,] -0.040845604  0.023057708  0.067839093  0.084198705</span></span>
-<span><span class="co">#&gt; [28,]  0.080696347 -0.097192796  0.099373268 -0.166716428</span></span>
-<span><span class="co">#&gt; [29,] -0.117530646  0.002589360  0.051425084  0.098244052</span></span>
-<span><span class="co">#&gt; [30,] -0.037935138 -0.091390269  0.154099931  0.100237663</span></span>
-<span><span class="co">#&gt; [31,]  0.109674339  0.158620750 -0.181802621 -0.112714822</span></span>
-<span><span class="co">#&gt; [32,]  0.069971569 -0.425139230 -0.020032195 -0.193571920</span></span>
-<span><span class="co">#&gt; [33,]  0.050674415  0.050518682 -0.010950361 -0.068936556</span></span>
-<span><span class="co">#&gt; [34,]  0.065490413  0.142178491  0.174034864  0.072663828</span></span>
-<span><span class="co">#&gt; [35,] -0.045676268 -0.057128729  0.050522160 -0.165689753</span></span>
-<span><span class="co">#&gt; [36,]  0.368217440  0.096573493  0.120128008  0.020252183</span></span>
-<span><span class="co">#&gt; [37,]  0.037286542 -0.056101952 -0.018563948  0.263830281</span></span>
-<span><span class="co">#&gt; [38,]  0.094379823 -0.263914331 -0.002747609 -0.010850423</span></span>
-<span><span class="co">#&gt; [39,]  0.153890231  0.071449851 -0.075881371 -0.060456457</span></span>
-<span><span class="co">#&gt; [40,] -0.146742186 -0.117294226 -0.255229801 -0.124537184</span></span>
-<span><span class="co">#&gt; [41,] -0.274840831  0.009051742  0.124862149  0.074433697</span></span>
-<span><span class="co">#&gt; [42,] -0.008508998  0.110465493  0.215727137  0.269240087</span></span>
-<span><span class="co">#&gt; [43,]  0.014213371 -0.041499271  0.097848087  0.105722611</span></span>
-<span><span class="co">#&gt; [44,] -0.080890432  0.094198355  0.004240823 -0.187634605</span></span>
-<span><span class="co">#&gt; [45,]  0.051925330 -0.007981636  0.044460236 -0.066537564</span></span>
-<span><span class="co">#&gt; [46,]  0.213031014  0.168676929  0.097190703  0.046563300</span></span>
-<span><span class="co">#&gt; [47,]  0.175716867  0.045500673  0.175902385 -0.030590597</span></span>
-<span><span class="co">#&gt; [48,] -0.040155598 -0.120432098 -0.137764051 -0.088812037</span></span>
-<span><span class="co">#&gt; [49,]  0.164103981  0.024976184  0.015955563 -0.232780151</span></span>
-<span><span class="co">#&gt; [50,] -0.103164763 -0.135032022  0.029553283  0.267389634</span></span></code></pre></div>
+<span><span class="co">#&gt; 40 x 3 sparse Matrix of class "dgCMatrix"</span></span>
+<span><span class="co">#&gt;       segment 1 segment 2 segment 3</span></span>
+<span><span class="co">#&gt;  [1,] 0.2835972  3.208983 0.4299211</span></span>
+<span><span class="co">#&gt;  [2,] 1.0913097 -1.306468 0.3019345</span></span>
+<span><span class="co">#&gt;  [3,] 2.0550480  0.697885 .        </span></span>
+<span><span class="co">#&gt;  [4,] 0.2928737 -2.771848 1.4996787</span></span>
+<span><span class="co">#&gt;  [5,] .          .        .        </span></span>
+<span><span class="co">#&gt;  [6,] .          .        .        </span></span>
+<span><span class="co">#&gt;  [7,] .          .        .        </span></span>
+<span><span class="co">#&gt;  [8,] .          .        .        </span></span>
+<span><span class="co">#&gt;  [9,] .          .        .        </span></span>
+<span><span class="co">#&gt; [10,] .          .        .        </span></span>
+<span><span class="co">#&gt; [11,] .          .        .        </span></span>
+<span><span class="co">#&gt; [12,] .          .        .        </span></span>
+<span><span class="co">#&gt; [13,] .          .        .        </span></span>
+<span><span class="co">#&gt; [14,] .          .        .        </span></span>
+<span><span class="co">#&gt; [15,] .          .        .        </span></span>
+<span><span class="co">#&gt; [16,] .          .        .        </span></span>
+<span><span class="co">#&gt; [17,] .          .        .        </span></span>
+<span><span class="co">#&gt; [18,] .          .        .        </span></span>
+<span><span class="co">#&gt; [19,] .          .        .        </span></span>
+<span><span class="co">#&gt; [20,] .          .        .        </span></span>
+<span><span class="co">#&gt; [21,] .          .        .        </span></span>
+<span><span class="co">#&gt; [22,] .          .        .        </span></span>
+<span><span class="co">#&gt; [23,] .          .        .        </span></span>
+<span><span class="co">#&gt; [24,] .          .        .        </span></span>
+<span><span class="co">#&gt; [25,] .          .        .        </span></span>
+<span><span class="co">#&gt; [26,] .          .        .        </span></span>
+<span><span class="co">#&gt; [27,] .          .        .        </span></span>
+<span><span class="co">#&gt; [28,] .          .        .        </span></span>
+<span><span class="co">#&gt; [29,] .          .        .        </span></span>
+<span><span class="co">#&gt; [30,] .          .        .        </span></span>
+<span><span class="co">#&gt; [31,] .          .        .        </span></span>
+<span><span class="co">#&gt; [32,] .          .        .        </span></span>
+<span><span class="co">#&gt; [33,] .          .        .        </span></span>
+<span><span class="co">#&gt; [34,] .          .        .        </span></span>
+<span><span class="co">#&gt; [35,] .          .        .        </span></span>
+<span><span class="co">#&gt; [36,] .          .        .        </span></span>
+<span><span class="co">#&gt; [37,] .          .        .        </span></span>
+<span><span class="co">#&gt; [38,] .          .        .        </span></span>
+<span><span class="co">#&gt; [39,] .          .        .        </span></span>
+<span><span class="co">#&gt; [40,] .          .        .</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="multiple-epochs">Multiple epochs<a class="anchor" aria-label="anchor" href="#multiple-epochs"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result_multiple_epochs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span></span>
+<span>  <span class="va">small_lasso</span>,</span>
+<span>  segment_count <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  multiple_epochs <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">segment_length</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">segment_length</span> <span class="op">&lt;</span> <span class="fl">25</span><span class="op">)</span> <span class="fl">1</span> <span class="kw">else</span> <span class="fl">0</span></span>
+<span>  <span class="op">}</span>,</span>
+<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_multiple_epochs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; fastcpd.lasso(data = small_lasso, segment_count = 2, multiple_epochs = function(segment_length) {</span></span>
+<span><span class="co">#&gt;     if (segment_length &lt; 25) </span></span>
+<span><span class="co">#&gt;         1</span></span>
+<span><span class="co">#&gt;     else 0</span></span>
+<span><span class="co">#&gt; }, r.progress = FALSE)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Change points:</span></span>
+<span><span class="co">#&gt; 74 151 227 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Cost values:</span></span>
+<span><span class="co">#&gt; 404.3949 323.0533 394.7117 245.3975 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Parameters:</span></span>
+<span><span class="co">#&gt; 40 x 4 sparse Matrix of class "dgCMatrix"</span></span>
+<span><span class="co">#&gt;       segment 1 segment 2 segment 3 segment 4</span></span>
+<span><span class="co">#&gt;  [1,] 0.2835972  3.269615 0.9960117 .        </span></span>
+<span><span class="co">#&gt;  [2,] 1.0913097 -1.089741 1.6936173 .        </span></span>
+<span><span class="co">#&gt;  [3,] 2.0550480  0.896723 1.5956191 .        </span></span>
+<span><span class="co">#&gt;  [4,] 0.2928737 -2.769824 2.1702226 0.1701821</span></span>
+<span><span class="co">#&gt;  [5,] .          .        .         .        </span></span>
+<span><span class="co">#&gt;  [6,] .          .        .         .        </span></span>
+<span><span class="co">#&gt;  [7,] .          .        .         .        </span></span>
+<span><span class="co">#&gt;  [8,] .          .        .         .        </span></span>
+<span><span class="co">#&gt;  [9,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [10,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [11,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [12,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [13,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [14,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [15,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [16,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [17,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [18,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [19,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [20,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [21,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [22,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [23,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [24,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [25,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [26,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [27,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [28,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [29,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [30,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [31,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [32,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [33,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [34,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [35,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [36,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [37,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [38,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [39,] .          .        .         .        </span></span>
+<span><span class="co">#&gt; [40,] .          .        .         .</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>
 </h2>
-<p>The evaluation of this vignette is set to be <code>FALSE</code>.</p>
+<p>This document is generated by the following code:</p>
+<pre class="shell"><code>R -e 'knitr::knit("vignettes/examples-advanced.Rmd.original", output = "vignettes/examples-advanced.Rmd")'</code></pre>
 </div>
 <div class="section level2">
 <h2 id="appendix-all-code-snippets">Appendix: all code snippets<a class="anchor" aria-label="anchor" href="#appendix-all-code-snippets"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span>, eval <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span></span>
+<span>  collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span>, eval <span class="op">=</span> <span class="cn">TRUE</span>, warning <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fastcpd.xingchi.li">fastcpd</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">6</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">480</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">300</span></span>
+<span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">40</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="op">-</span><span class="fl">2</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">theta_0</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, ncol <span class="op">=</span> <span class="va">p</span> <span class="op">-</span> <span class="va">p_true</span>, nrow <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">80</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">81</span><span class="op">:</span><span class="fl">200</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">201</span><span class="op">:</span><span class="fl">320</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">321</span><span class="op">:</span><span class="fl">480</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">160</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.5</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.75</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.75</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">n</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"lasso"</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
+<span><span class="va">small_lasso</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),</span></span>
-<span><span class="co">#&gt;     family = "lasso", r.progress = FALSE)</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 79 199 317</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Cost values:</span></span>
-<span><span class="co">#&gt; 125.1501 155.4486 160.4363 274.2228</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt; 50 x 4 sparse Matrix of class "dgCMatrix"</span></span>
-<span><span class="co">#&gt;          segment 1    segment 2    segment 3    segment 4</span></span>
-<span><span class="co">#&gt;  [1,] -2.580352409 -2.428039439  4.900559900 -2.749985232</span></span>
-<span><span class="co">#&gt;  [2,] -2.668688731 -2.473539196  4.198921150  3.057387294</span></span>
-<span><span class="co">#&gt;  [3,] -4.354248176  0.983488542  5.054325016  3.735347545</span></span>
-<span><span class="co">#&gt;  [4,] -4.662566697  0.279505605  2.628354481 -3.216027015</span></span>
-<span><span class="co">#&gt;  [5,] -4.820139326  0.496565230  4.611603593  3.231304715</span></span>
-<span><span class="co">#&gt;  [6,] -3.860308911 -2.576467859  3.304903523  4.577405578</span></span>
-<span><span class="co">#&gt;  [7,]  0.117234534 -0.219145186 -0.015091394 -0.086048806</span></span>
-<span><span class="co">#&gt;  [8,]  0.117552281  0.035701649 -0.127986984 -0.138807479</span></span>
-<span><span class="co">#&gt;  [9,] -0.188756652  0.133653604  0.038250526 -0.037807789</span></span>
-<span><span class="co">#&gt; [10,] -0.074530965  0.010173561  0.021979969 -0.047707753</span></span>
-<span><span class="co">#&gt; [11,] -0.061721013 -0.176769170 -0.059312332 -0.135633390</span></span>
-<span><span class="co">#&gt; [12,]  0.021874954 -0.133777712  0.028889403 -0.130808437</span></span>
-<span><span class="co">#&gt; [13,]  0.067777695  0.129187849 -0.026100120  0.002593292</span></span>
-<span><span class="co">#&gt; [14,] -0.122270920  0.110865328  0.084858637  0.233903944</span></span>
-<span><span class="co">#&gt; [15,] -0.014192027  0.086100909  0.030268607  0.243927135</span></span>
-<span><span class="co">#&gt; [16,] -0.135970691 -0.043211895 -0.032229963 -0.134840827</span></span>
-<span><span class="co">#&gt; [17,]  0.007608049 -0.079445537 -0.013675459  0.102010778</span></span>
-<span><span class="co">#&gt; [18,] -0.010343806  0.132392790 -0.151237533 -0.123955960</span></span>
-<span><span class="co">#&gt; [19,]  0.252797503  0.253113165 -0.197620792  0.099319824</span></span>
-<span><span class="co">#&gt; [20,] -0.044505498 -0.049962311  0.233024977  0.176211754</span></span>
-<span><span class="co">#&gt; [21,]  0.084292730  0.366833682 -0.220176991 -0.035984666</span></span>
-<span><span class="co">#&gt; [22,] -0.373913824 -0.060767726  0.036430343 -0.105248408</span></span>
-<span><span class="co">#&gt; [23,]  0.316816197 -0.191114879 -0.127549606 -0.112775343</span></span>
-<span><span class="co">#&gt; [24,]  0.008174405  0.158066938 -0.121000263  0.232613924</span></span>
-<span><span class="co">#&gt; [25,] -0.388590727  0.098542973 -0.045207238  0.003838229</span></span>
-<span><span class="co">#&gt; [26,] -0.109916673  0.042028223  0.031122592 -0.173521656</span></span>
-<span><span class="co">#&gt; [27,] -0.040845604  0.023057708  0.067839093  0.084198705</span></span>
-<span><span class="co">#&gt; [28,]  0.080696347 -0.097192796  0.099373268 -0.166716428</span></span>
-<span><span class="co">#&gt; [29,] -0.117530646  0.002589360  0.051425084  0.098244052</span></span>
-<span><span class="co">#&gt; [30,] -0.037935138 -0.091390269  0.154099931  0.100237663</span></span>
-<span><span class="co">#&gt; [31,]  0.109674339  0.158620750 -0.181802621 -0.112714822</span></span>
-<span><span class="co">#&gt; [32,]  0.069971569 -0.425139230 -0.020032195 -0.193571920</span></span>
-<span><span class="co">#&gt; [33,]  0.050674415  0.050518682 -0.010950361 -0.068936556</span></span>
-<span><span class="co">#&gt; [34,]  0.065490413  0.142178491  0.174034864  0.072663828</span></span>
-<span><span class="co">#&gt; [35,] -0.045676268 -0.057128729  0.050522160 -0.165689753</span></span>
-<span><span class="co">#&gt; [36,]  0.368217440  0.096573493  0.120128008  0.020252183</span></span>
-<span><span class="co">#&gt; [37,]  0.037286542 -0.056101952 -0.018563948  0.263830281</span></span>
-<span><span class="co">#&gt; [38,]  0.094379823 -0.263914331 -0.002747609 -0.010850423</span></span>
-<span><span class="co">#&gt; [39,]  0.153890231  0.071449851 -0.075881371 -0.060456457</span></span>
-<span><span class="co">#&gt; [40,] -0.146742186 -0.117294226 -0.255229801 -0.124537184</span></span>
-<span><span class="co">#&gt; [41,] -0.274840831  0.009051742  0.124862149  0.074433697</span></span>
-<span><span class="co">#&gt; [42,] -0.008508998  0.110465493  0.215727137  0.269240087</span></span>
-<span><span class="co">#&gt; [43,]  0.014213371 -0.041499271  0.097848087  0.105722611</span></span>
-<span><span class="co">#&gt; [44,] -0.080890432  0.094198355  0.004240823 -0.187634605</span></span>
-<span><span class="co">#&gt; [45,]  0.051925330 -0.007981636  0.044460236 -0.066537564</span></span>
-<span><span class="co">#&gt; [46,]  0.213031014  0.168676929  0.097190703  0.046563300</span></span>
-<span><span class="co">#&gt; [47,]  0.175716867  0.045500673  0.175902385 -0.030590597</span></span>
-<span><span class="co">#&gt; [48,] -0.040155598 -0.120432098 -0.137764051 -0.088812037</span></span>
-<span><span class="co">#&gt; [49,]  0.164103981  0.024976184  0.015955563 -0.232780151</span></span>
-<span><span class="co">#&gt; [50,] -0.103164763 -0.135032022  0.029553283  0.267389634</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">6</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">480</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">300</span></span>
+<span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">40</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="op">-</span><span class="fl">2</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">theta_0</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, ncol <span class="op">=</span> <span class="va">p</span> <span class="op">-</span> <span class="va">p_true</span>, nrow <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">80</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">81</span><span class="op">:</span><span class="fl">200</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">201</span><span class="op">:</span><span class="fl">320</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">321</span><span class="op">:</span><span class="fl">480</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">160</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.5</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.75</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.75</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">n</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">result_multiple_epochs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"lasso"</span>,</span>
-<span>  multiple_epochs <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">segment_length</span><span class="op">)</span> <span class="kw">if</span> <span class="op">(</span><span class="va">segment_length</span> <span class="op">&lt;</span> <span class="fl">20</span><span class="op">)</span> <span class="fl">1</span> <span class="kw">else</span> <span class="fl">0</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_multiple_epochs</span><span class="op">)</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),</span></span>
-<span><span class="co">#&gt;     family = "lasso", multiple_epochs = function(segment_length) if (segment_length &lt;</span></span>
-<span><span class="co">#&gt;         20) 1 else 0, r.progress = FALSE)</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 79 199 320</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Cost values:</span></span>
-<span><span class="co">#&gt; 125.1501 155.4486 164.1284 177.9478</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt; 50 x 4 sparse Matrix of class "dgCMatrix"</span></span>
-<span><span class="co">#&gt;          segment 1    segment 2    segment 3    segment 4</span></span>
-<span><span class="co">#&gt;  [1,] -2.580352409 -2.428039439  4.898713954 -3.006202485</span></span>
-<span><span class="co">#&gt;  [2,] -2.668688731 -2.473539196  4.209460633  3.096081968</span></span>
-<span><span class="co">#&gt;  [3,] -4.354248176  0.983488542  5.011651466  3.718141515</span></span>
-<span><span class="co">#&gt;  [4,] -4.662566697  0.279505605  2.623742216 -3.130632564</span></span>
-<span><span class="co">#&gt;  [5,] -4.820139326  0.496565230  4.616444609  3.175562645</span></span>
-<span><span class="co">#&gt;  [6,] -3.860308911 -2.576467859  3.336301862  4.342890940</span></span>
-<span><span class="co">#&gt;  [7,]  0.117234534 -0.219145186 -0.039861426 -0.016395368</span></span>
-<span><span class="co">#&gt;  [8,]  0.117552281  0.035701649 -0.075921029 -0.022022294</span></span>
-<span><span class="co">#&gt;  [9,] -0.188756652  0.133653604  0.052907904  0.070683538</span></span>
-<span><span class="co">#&gt; [10,] -0.074530965  0.010173561  0.003352400  0.012791767</span></span>
-<span><span class="co">#&gt; [11,] -0.061721013 -0.176769170 -0.044814526 -0.166042077</span></span>
-<span><span class="co">#&gt; [12,]  0.021874954 -0.133777712  0.103526247  0.077820866</span></span>
-<span><span class="co">#&gt; [13,]  0.067777695  0.129187849 -0.072098209  0.077436979</span></span>
-<span><span class="co">#&gt; [14,] -0.122270920  0.110865328  0.095306898  0.114046507</span></span>
-<span><span class="co">#&gt; [15,] -0.014192027  0.086100909  0.006037145 -0.015966855</span></span>
-<span><span class="co">#&gt; [16,] -0.135970691 -0.043211895  0.026749332 -0.095751983</span></span>
-<span><span class="co">#&gt; [17,]  0.007608049 -0.079445537 -0.003130812 -0.010689927</span></span>
-<span><span class="co">#&gt; [18,] -0.010343806  0.132392790 -0.156866781 -0.138057246</span></span>
-<span><span class="co">#&gt; [19,]  0.252797503  0.253113165 -0.167436237  0.158967697</span></span>
-<span><span class="co">#&gt; [20,] -0.044505498 -0.049962311  0.177560915  0.030169316</span></span>
-<span><span class="co">#&gt; [21,]  0.084292730  0.366833682 -0.224849869 -0.181503446</span></span>
-<span><span class="co">#&gt; [22,] -0.373913824 -0.060767726  0.003860114  0.045649997</span></span>
-<span><span class="co">#&gt; [23,]  0.316816197 -0.191114879 -0.118941359 -0.025305755</span></span>
-<span><span class="co">#&gt; [24,]  0.008174405  0.158066938 -0.135680402 -0.137396624</span></span>
-<span><span class="co">#&gt; [25,] -0.388590727  0.098542973 -0.064383316  0.022336212</span></span>
-<span><span class="co">#&gt; [26,] -0.109916673  0.042028223  0.017815134 -0.059782090</span></span>
-<span><span class="co">#&gt; [27,] -0.040845604  0.023057708  0.053296378  0.030431412</span></span>
-<span><span class="co">#&gt; [28,]  0.080696347 -0.097192796  0.122665492 -0.080706668</span></span>
-<span><span class="co">#&gt; [29,] -0.117530646  0.002589360  0.062791240 -0.051542901</span></span>
-<span><span class="co">#&gt; [30,] -0.037935138 -0.091390269  0.122976438  0.048892128</span></span>
-<span><span class="co">#&gt; [31,]  0.109674339  0.158620750 -0.181785506  0.075434045</span></span>
-<span><span class="co">#&gt; [32,]  0.069971569 -0.425139230  0.030472706  0.033375101</span></span>
-<span><span class="co">#&gt; [33,]  0.050674415  0.050518682  0.034305534  0.070983107</span></span>
-<span><span class="co">#&gt; [34,]  0.065490413  0.142178491  0.164899160  0.032575571</span></span>
-<span><span class="co">#&gt; [35,] -0.045676268 -0.057128729  0.022794426 -0.134534869</span></span>
-<span><span class="co">#&gt; [36,]  0.368217440  0.096573493  0.114099285 -0.020673038</span></span>
-<span><span class="co">#&gt; [37,]  0.037286542 -0.056101952 -0.023029273  0.102043216</span></span>
-<span><span class="co">#&gt; [38,]  0.094379823 -0.263914331  0.003288922 -0.052763017</span></span>
-<span><span class="co">#&gt; [39,]  0.153890231  0.071449851 -0.097509620 -0.120642848</span></span>
-<span><span class="co">#&gt; [40,] -0.146742186 -0.117294226 -0.208865036 -0.045775725</span></span>
-<span><span class="co">#&gt; [41,] -0.274840831  0.009051742  0.127312770  0.123910218</span></span>
-<span><span class="co">#&gt; [42,] -0.008508998  0.110465493  0.118453225 -0.005505113</span></span>
-<span><span class="co">#&gt; [43,]  0.014213371 -0.041499271  0.113699538 -0.056131976</span></span>
-<span><span class="co">#&gt; [44,] -0.080890432  0.094198355  0.051912519  0.013524984</span></span>
-<span><span class="co">#&gt; [45,]  0.051925330 -0.007981636  0.085966205 -0.033628617</span></span>
-<span><span class="co">#&gt; [46,]  0.213031014  0.168676929  0.035738422 -0.029655833</span></span>
-<span><span class="co">#&gt; [47,]  0.175716867  0.045500673  0.175504506  0.119507574</span></span>
-<span><span class="co">#&gt; [48,] -0.040155598 -0.120432098 -0.139162874 -0.054349982</span></span>
-<span><span class="co">#&gt; [49,]  0.164103981  0.024976184  0.029374949 -0.056092814</span></span>
-<span><span class="co">#&gt; [50,] -0.103164763 -0.135032022  0.047475507 -0.032491294</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">6</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="fl">480</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="op">-</span><span class="fl">2</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">2</span>, <span class="fl">5</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">theta_0</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, ncol <span class="op">=</span> <span class="va">p</span> <span class="op">-</span> <span class="va">p_true</span>, nrow <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">80</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">81</span><span class="op">:</span><span class="fl">200</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">201</span><span class="op">:</span><span class="fl">320</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="va">x</span><span class="op">[</span><span class="fl">321</span><span class="op">:</span><span class="fl">480</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">160</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">result_vanilla_percentage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>,</span>
-<span>  family <span class="op">=</span> <span class="st">"lasso"</span>,</span>
-<span>  vanilla_percentage <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span><span class="va">small_lasso</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">result_vanilla_percentage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span></span>
+<span>  <span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_vanilla_percentage</span><span class="op">)</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = data.frame(y = y, x = x),</span></span>
-<span><span class="co">#&gt;     family = "lasso", vanilla_percentage = 0.2, r.progress = FALSE)</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 79 199 317</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Cost values:</span></span>
-<span><span class="co">#&gt; 125.1501 155.4486 160.4363 274.2228</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt; 50 x 4 sparse Matrix of class "dgCMatrix"</span></span>
-<span><span class="co">#&gt;          segment 1    segment 2    segment 3    segment 4</span></span>
-<span><span class="co">#&gt;  [1,] -2.580352409 -2.428039439  4.900559900 -2.749985232</span></span>
-<span><span class="co">#&gt;  [2,] -2.668688731 -2.473539196  4.198921150  3.057387294</span></span>
-<span><span class="co">#&gt;  [3,] -4.354248176  0.983488542  5.054325016  3.735347545</span></span>
-<span><span class="co">#&gt;  [4,] -4.662566697  0.279505605  2.628354481 -3.216027015</span></span>
-<span><span class="co">#&gt;  [5,] -4.820139326  0.496565230  4.611603593  3.231304715</span></span>
-<span><span class="co">#&gt;  [6,] -3.860308911 -2.576467859  3.304903523  4.577405578</span></span>
-<span><span class="co">#&gt;  [7,]  0.117234534 -0.219145186 -0.015091394 -0.086048806</span></span>
-<span><span class="co">#&gt;  [8,]  0.117552281  0.035701649 -0.127986984 -0.138807479</span></span>
-<span><span class="co">#&gt;  [9,] -0.188756652  0.133653604  0.038250526 -0.037807789</span></span>
-<span><span class="co">#&gt; [10,] -0.074530965  0.010173561  0.021979969 -0.047707753</span></span>
-<span><span class="co">#&gt; [11,] -0.061721013 -0.176769170 -0.059312332 -0.135633390</span></span>
-<span><span class="co">#&gt; [12,]  0.021874954 -0.133777712  0.028889403 -0.130808437</span></span>
-<span><span class="co">#&gt; [13,]  0.067777695  0.129187849 -0.026100120  0.002593292</span></span>
-<span><span class="co">#&gt; [14,] -0.122270920  0.110865328  0.084858637  0.233903944</span></span>
-<span><span class="co">#&gt; [15,] -0.014192027  0.086100909  0.030268607  0.243927135</span></span>
-<span><span class="co">#&gt; [16,] -0.135970691 -0.043211895 -0.032229963 -0.134840827</span></span>
-<span><span class="co">#&gt; [17,]  0.007608049 -0.079445537 -0.013675459  0.102010778</span></span>
-<span><span class="co">#&gt; [18,] -0.010343806  0.132392790 -0.151237533 -0.123955960</span></span>
-<span><span class="co">#&gt; [19,]  0.252797503  0.253113165 -0.197620792  0.099319824</span></span>
-<span><span class="co">#&gt; [20,] -0.044505498 -0.049962311  0.233024977  0.176211754</span></span>
-<span><span class="co">#&gt; [21,]  0.084292730  0.366833682 -0.220176991 -0.035984666</span></span>
-<span><span class="co">#&gt; [22,] -0.373913824 -0.060767726  0.036430343 -0.105248408</span></span>
-<span><span class="co">#&gt; [23,]  0.316816197 -0.191114879 -0.127549606 -0.112775343</span></span>
-<span><span class="co">#&gt; [24,]  0.008174405  0.158066938 -0.121000263  0.232613924</span></span>
-<span><span class="co">#&gt; [25,] -0.388590727  0.098542973 -0.045207238  0.003838229</span></span>
-<span><span class="co">#&gt; [26,] -0.109916673  0.042028223  0.031122592 -0.173521656</span></span>
-<span><span class="co">#&gt; [27,] -0.040845604  0.023057708  0.067839093  0.084198705</span></span>
-<span><span class="co">#&gt; [28,]  0.080696347 -0.097192796  0.099373268 -0.166716428</span></span>
-<span><span class="co">#&gt; [29,] -0.117530646  0.002589360  0.051425084  0.098244052</span></span>
-<span><span class="co">#&gt; [30,] -0.037935138 -0.091390269  0.154099931  0.100237663</span></span>
-<span><span class="co">#&gt; [31,]  0.109674339  0.158620750 -0.181802621 -0.112714822</span></span>
-<span><span class="co">#&gt; [32,]  0.069971569 -0.425139230 -0.020032195 -0.193571920</span></span>
-<span><span class="co">#&gt; [33,]  0.050674415  0.050518682 -0.010950361 -0.068936556</span></span>
-<span><span class="co">#&gt; [34,]  0.065490413  0.142178491  0.174034864  0.072663828</span></span>
-<span><span class="co">#&gt; [35,] -0.045676268 -0.057128729  0.050522160 -0.165689753</span></span>
-<span><span class="co">#&gt; [36,]  0.368217440  0.096573493  0.120128008  0.020252183</span></span>
-<span><span class="co">#&gt; [37,]  0.037286542 -0.056101952 -0.018563948  0.263830281</span></span>
-<span><span class="co">#&gt; [38,]  0.094379823 -0.263914331 -0.002747609 -0.010850423</span></span>
-<span><span class="co">#&gt; [39,]  0.153890231  0.071449851 -0.075881371 -0.060456457</span></span>
-<span><span class="co">#&gt; [40,] -0.146742186 -0.117294226 -0.255229801 -0.124537184</span></span>
-<span><span class="co">#&gt; [41,] -0.274840831  0.009051742  0.124862149  0.074433697</span></span>
-<span><span class="co">#&gt; [42,] -0.008508998  0.110465493  0.215727137  0.269240087</span></span>
-<span><span class="co">#&gt; [43,]  0.014213371 -0.041499271  0.097848087  0.105722611</span></span>
-<span><span class="co">#&gt; [44,] -0.080890432  0.094198355  0.004240823 -0.187634605</span></span>
-<span><span class="co">#&gt; [45,]  0.051925330 -0.007981636  0.044460236 -0.066537564</span></span>
-<span><span class="co">#&gt; [46,]  0.213031014  0.168676929  0.097190703  0.046563300</span></span>
-<span><span class="co">#&gt; [47,]  0.175716867  0.045500673  0.175902385 -0.030590597</span></span>
-<span><span class="co">#&gt; [48,] -0.040155598 -0.120432098 -0.137764051 -0.088812037</span></span>
-<span><span class="co">#&gt; [49,]  0.164103981  0.024976184  0.015955563 -0.232780151</span></span>
-<span><span class="co">#&gt; [50,] -0.103164763 -0.135032022  0.029553283  0.267389634</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">300</span></span>
+<span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">40</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="va">n</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p_true</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">theta_0</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, ncol <span class="op">=</span> <span class="va">p</span> <span class="op">-</span> <span class="va">p_true</span>, nrow <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.5</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">2</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.75</span><span class="op">)</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">3</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.75</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">n</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">small_lasso</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">result_multiple_epochs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span></span>
+<span>  <span class="va">small_lasso</span>,</span>
+<span>  segment_count <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  multiple_epochs <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">segment_length</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">segment_length</span> <span class="op">&lt;</span> <span class="fl">25</span><span class="op">)</span> <span class="fl">1</span> <span class="kw">else</span> <span class="fl">0</span></span>
+<span>  <span class="op">}</span>,</span>
+<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_multiple_epochs</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
