@@ -1,5 +1,6 @@
 library(testthat)
 library(fastcpd)
 
-testthat::skip_on_cran()
-test_check("fastcpd")
+if (identical(Sys.getenv("NOT_CRAN"), "true")) {
+  test_check("fastcpd")
+}
