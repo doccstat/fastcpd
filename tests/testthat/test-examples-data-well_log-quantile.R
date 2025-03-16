@@ -1,6 +1,5 @@
 testthat::test_that(
   "examples/data-well_log-quantile.R", {
-    testthat::skip_on_cran()
     testthat::skip_if_not_installed("ggplot2")
     testthat::skip_if_not_installed("matrixStats")
 

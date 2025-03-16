@@ -1,6 +1,5 @@
 testthat::test_that(
   "examples/data-uk_seatbelts.R", {
-    testthat::skip_on_cran()
     testthat::skip_if_not_installed("ggplot2")
 
     source("examples/data-uk_seatbelts.R")

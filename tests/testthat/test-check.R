@@ -1,5 +1,3 @@
-testthat::skip_on_cran()
-
 testthat::test_that(
   "fastcpd.ts/fastcpd_ts", {
     testthat::expect_error(

@@ -1,6 +1,5 @@
 testthat::test_that(
   "examples/fastcpd_ar_1.R", {
-    testthat::skip_on_cran()
     testthat::skip_if_not_installed("ggplot2")
 
     source("examples/fastcpd_ar_1.R")

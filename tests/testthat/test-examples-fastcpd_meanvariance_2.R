@@ -1,6 +1,5 @@
 testthat::test_that(
   "examples/fastcpd_meanvariance_2.R", {
-    testthat::skip_on_cran()
     testthat::skip_if_not_installed("mvtnorm")
     source("examples/fastcpd_meanvariance_2.R")
     testthat::expect_equal(
