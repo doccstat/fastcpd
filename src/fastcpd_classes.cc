@@ -1451,7 +1451,7 @@ void Fastcpd::GetNllPeltArma(const unsigned int segment_start,
   List out =
       arima(Named("x") = data_segment.col(0),
             Named("order") = NumericVector::create(order_(0), 0, order_(1)),
-            Named("include.mean") = false);
+            Named("method") = "ML", Named("include.mean") = false);
   result_coefficients_ = zeros<mat>(sum(order_) + 1, 1);
   result_coefficients_.rows(0, sum(order_) - 1) = as<colvec>(out["coef"]);
   result_coefficients_(sum(order_)) = as<double>(out["sigma2"]);
