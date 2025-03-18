@@ -706,20 +706,20 @@ void Fastcpd::CreateSegmentStatistics() {
     GetCostResult(segment_indices_(segment_index),
                   segment_indices_(segment_index + 1) - 1, R_NilValue, true,
                   R_NilValue);
-    colvec segment_theta = result_coefficients_.as_col();
 
     // Initialize the estimated coefficients for each segment to be the
     // estimated coefficients in the segment.
-    segment_coefficients_.row(segment_index) = segment_theta.t();
+    segment_coefficients_.row(segment_index) = result_coefficients_.t();
     if (family_ == "lasso" || family_ == "gaussian") {
       mat data_segment = data_.rows(segment_indices_(segment_index),
                                     segment_indices_(segment_index + 1) - 1);
       colvec segment_residual =
           data_segment.col(0) -
-          data_segment.cols(1, data_segment.n_cols - 1) * segment_theta;
+          data_segment.cols(1, data_segment.n_cols - 1) * result_coefficients_;
       double err_var = as_scalar(mean(square(segment_residual)));
       error_standard_deviation_(segment_index) = sqrt(err_var);
-      active_coefficients_count_(segment_index) = accu(abs(segment_theta) > 0);
+      active_coefficients_count_(segment_index) =
+          accu(abs(result_coefficients_) > 0);
     }
   }
   // Mean of `error_standard_deviation_` only works if error sd is unchanged.
@@ -757,7 +757,7 @@ void Fastcpd::GetCostResult(const unsigned int segment_start,
       (this->*get_nll_pelt_)(segment_start, segment_end, cv, start);
     }
   } else {
-    result_coefficients_ = mat();
+    result_coefficients_ = colvec();
     result_residuals_ = mat();
     const colvec theta_ = as<colvec>(theta);
     result_value_ = (this->*get_nll_sen_)(segment_start, segment_end, theta_);
@@ -800,7 +800,7 @@ List Fastcpd::GetChangePointSet() {
     GetCostResult(cp_loc(i), cp_loc(i + 1) - 1, R_NilValue, false, R_NilValue);
     cost_values(i) = result_value_;
     if (family_ != "custom") {
-      thetas.col(i) = result_coefficients_.as_col();
+      thetas.col(i) = result_coefficients_;
       residual.rows(residual_next_start,
                     residual_next_start + result_residuals_.n_rows - 1) =
           result_residuals_;
@@ -835,7 +835,7 @@ void Fastcpd::GetCostValuePelt(const unsigned int segment_start,
                  .t())
         // Or use `wrap(start.col(segment_start))` for warm start.
     );
-    warm_start_.col(segment_start) = result_coefficients_.as_col();
+    warm_start_.col(segment_start) = result_coefficients_;
   } else {
     GetCostResult(segment_start, segment_end, R_NilValue, false, R_NilValue);
   }
@@ -844,8 +844,8 @@ void Fastcpd::GetCostValuePelt(const unsigned int segment_start,
   // thetas for later `fastcpd` steps.
   if (vanilla_percentage_ < 1 &&
       segment_end < vanilla_percentage_ * data_n_rows_) {
-    coefficients_.col(i) = result_coefficients_.as_col();
-    coefficients_sum_.col(i) += result_coefficients_.as_col();
+    coefficients_.col(i) = result_coefficients_;
+    coefficients_sum_.col(i) += result_coefficients_;
   }
 }
 
@@ -884,7 +884,7 @@ void Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
               Named("data") = data_segment, Named("cost") = *cost_function_);
     colvec par = as<colvec>(optim_result["par"]);
     double value = as<double>(optim_result["value"]);
-    result_coefficients_ = mat(log(par / (1 - par)));
+    result_coefficients_ = log(par / (1 - par));
     result_residuals_ = mat();
     result_value_ = exp(value) / (1 + exp(value));
   } else {
@@ -895,7 +895,7 @@ void Fastcpd::GetOptimizedCostResult(const unsigned int segment_start,
         Named("fn") = *cost_function_, Named("method") = "L-BFGS-B",
         Named("data") = data_segment, Named("lower") = parameters_lower_bound_,
         Named("upper") = parameters_upper_bound_);
-    result_coefficients_ = as<mat>(optim_result["par"]);
+    result_coefficients_ = as<colvec>(optim_result["par"]);
     result_residuals_ = mat();
     result_value_ = as<double>(optim_result["value"]);
   }
@@ -1439,7 +1439,7 @@ void Fastcpd::GetNllPeltArma(const unsigned int segment_start,
       arima(Named("x") = data_segment.col(0),
             Named("order") = NumericVector::create(order_(0), 0, order_(1)),
             Named("method") = "ML", Named("include.mean") = false);
-  result_coefficients_ = zeros<mat>(sum(order_) + 1, 1);
+  result_coefficients_ = zeros<colvec>(sum(order_) + 1);
   result_coefficients_.rows(0, sum(order_) - 1) = as<colvec>(out["coef"]);
   result_coefficients_(sum(order_)) = as<double>(out["sigma2"]);
   result_residuals_ = mat(as<colvec>(out["residuals"]));
@@ -1452,7 +1452,7 @@ void Fastcpd::GetNllPeltCustom(const unsigned int segment_start,
   if (cost_gradient_ || cost_hessian_) {
     GetOptimizedCostResult(segment_start, segment_end);
   } else {
-    result_coefficients_ = mat();
+    result_coefficients_ = colvec();
     result_residuals_ = mat();
     result_value_ = cost_function_pelt_(data_.rows(segment_start, segment_end));
   }
@@ -1463,7 +1463,7 @@ void Fastcpd::GetNllPeltGarch(const unsigned int segment_start,
                               const Nullable<colvec>& start) {
   colvec series = data_.rows(segment_start, segment_end).col(0);
   List out = garch(series, order_);
-  result_coefficients_ = mat(as<colvec>(out["coef"]));
+  result_coefficients_ = as<colvec>(out["coef"]);
   result_residuals_ = mat(as<colvec>(out["residuals"]));
   result_value_ = as<double>(out["n.likeli"]);
 }
@@ -1481,7 +1481,7 @@ void Fastcpd::GetNllPeltGlm(const unsigned int segment_start,
     mat x = data_segment.cols(1, data_segment.n_cols - 1);
     out = fastglm(x, y, family_, start);
   }
-  result_coefficients_ = mat(as<colvec>(out["coefficients"]));
+  result_coefficients_ = as<colvec>(out["coefficients"]);
   result_residuals_ = mat(as<colvec>(out["residuals"]));
   result_value_ = as<double>(out["deviance"]) / 2;
 }
@@ -1490,7 +1490,7 @@ void Fastcpd::GetNllPeltLasso(const unsigned int segment_start,
                               const unsigned int segment_end, const bool cv,
                               const Nullable<colvec>& start) {
   if (segment_start == segment_end) {
-    result_coefficients_ = zeros<mat>(data_.n_cols - 1, 1);
+    result_coefficients_ = zeros<colvec>(data_.n_cols - 1);
     result_residuals_ = zeros<mat>(1, 1);
     result_value_ = 0;
   } else if (cv) {
@@ -1509,7 +1509,7 @@ void Fastcpd::GetNllPeltLasso(const unsigned int segment_start,
                        Named("type") = "coefficients", Named("exact") = false);
     colvec glmnet_i = as<colvec>(out_coef.slot("i"));
     colvec glmnet_x = as<colvec>(out_coef.slot("x"));
-    result_coefficients_ = zeros<mat>(data_segment.n_cols - 1, 1);
+    result_coefficients_ = zeros<colvec>(data_segment.n_cols - 1);
     for (unsigned int i = 1; i < glmnet_i.n_elem; i++) {
       result_coefficients_(glmnet_i(i) - 1) = glmnet_x(i);
     }
@@ -1528,7 +1528,7 @@ void Fastcpd::GetNllPeltLasso(const unsigned int segment_start,
     S4 out_par = out["beta"];
     colvec par_i = as<colvec>(out_par.slot("i"));
     colvec par_x = as<colvec>(out_par.slot("x"));
-    result_coefficients_ = zeros<mat>(data_segment.n_cols - 1, 1);
+    result_coefficients_ = zeros<colvec>(data_segment.n_cols - 1);
     for (unsigned int i = 0; i < par_i.n_elem; i++) {
       result_coefficients_(par_i(i)) = par_x(i);
     }
@@ -1546,8 +1546,8 @@ void Fastcpd::GetNllPeltMean(const unsigned int segment_start,
                              const unsigned int segment_end, const bool cv,
                              const Nullable<colvec>& start) {
   mat data_segment = data_.rows(segment_start, segment_end);
-  result_coefficients_ = mean(data_segment, 0);
-  result_residuals_ = data_segment.each_row() - result_coefficients_;
+  result_coefficients_ = mean(data_segment, 0).t();
+  result_residuals_ = data_segment.each_row() - result_coefficients_.t();
   GetNllPeltMeanValue(segment_start, segment_end, cv, start);
 }
 
@@ -1575,7 +1575,7 @@ void Fastcpd::GetNllPeltMeanvariance(const unsigned int segment_start,
                                      const Nullable<colvec>& start) {
   mat data_segment = data_.rows(segment_start, segment_end);
   mat cov_matrix = cov(data_segment);
-  result_coefficients_ = zeros<mat>(parameters_count_, 1);
+  result_coefficients_ = zeros<colvec>(parameters_count_);
   result_coefficients_.rows(0, data_n_dims_ - 1) = mean(data_segment, 0).t();
   result_coefficients_.rows(data_n_dims_, parameters_count_ - 1) =
       cov_matrix.as_col();
@@ -1628,8 +1628,9 @@ void Fastcpd::GetNllPeltMgaussian(const unsigned int segment_start,
     x_t_x = x.t() * x;
   }
 
-  result_coefficients_ = solve(x_t_x, x.t()) * y;
-  result_residuals_ = y - x * result_coefficients_;
+  mat coefficients = solve(x_t_x, x.t()) * y;
+  result_coefficients_ = coefficients.as_col();
+  result_residuals_ = y - x * coefficients;
   double value = regression_response_count_ * std::log(2.0 * M_PI) +
                  log_det_sympd(variance_estimate_);
   value *= data_segment.n_rows;
@@ -1642,9 +1643,9 @@ void Fastcpd::GetNllPeltVariance(const unsigned int segment_start,
                                  const unsigned int segment_end, const bool cv,
                                  const Nullable<colvec>& start) {
   mat data_segment = data_.rows(segment_start, segment_end);
-  result_coefficients_ = cov(data_segment);
-  result_residuals_ =
-      data_segment.each_row() / sqrt(result_coefficients_.diag()).t();
+  mat covar = cov(data_segment);
+  result_coefficients_ = covar.as_col();
+  result_residuals_ = data_segment.each_row() / sqrt(covar.diag()).t();
   GetNllPeltVarianceValue(segment_start, segment_end, cv, start);
 }
 

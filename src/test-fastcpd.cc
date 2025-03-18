@@ -108,7 +108,7 @@ context("GetNllPelt Unit Test") {
   test_that("arma(3, 2) is correct for 200 data points") {
     const std::tuple<mat, mat, double> cost_result = FastcpdTest::GetNllPelt(
         colvec(kARMA32.data(), kARMA32.size()), 0, 199, false, R_NilValue);
-    const colvec par = std::get<0>(cost_result).as_col();
+    const colvec par = std::get<0>(cost_result);
     const colvec residuals = std::get<1>(cost_result).as_col();
     const double value = std::get<2>(cost_result);
 

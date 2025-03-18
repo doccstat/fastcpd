@@ -56,7 +56,7 @@ class FastcpdTest {
                           const arma::colvec& theta);
 
   // Computes the negative log-likelihood for the PELT model.
-  static std::tuple<arma::mat, arma::mat, double> GetNllPelt(
+  static std::tuple<arma::colvec, arma::mat, double> GetNllPelt(
       const arma::mat& data, const unsigned int segment_start,
       const unsigned int segment_end, const bool cv,
       const Rcpp::Nullable<arma::colvec>& start);
@@ -286,7 +286,7 @@ class Fastcpd {
   const double pruning_coefficient_;
   const bool r_progress_;
   const unsigned int regression_response_count_;
-  arma::mat result_coefficients_;
+  arma::colvec result_coefficients_;
   arma::mat result_residuals_;
   double result_value_;
   std::unique_ptr<RProgress::RProgress> rProgress_;
