@@ -59,20 +59,22 @@ using ::std::vector;
 
 namespace fastcpd::classes {
 
-Fastcpd::Fastcpd(const double beta, const Rcpp::Nullable<Rcpp::Function>& cost,
-                 const std::string& cost_adjustment,
-                 const Rcpp::Nullable<Rcpp::Function>& cost_gradient,
-                 const Rcpp::Nullable<Rcpp::Function>& cost_hessian,
-                 const bool cp_only, const arma::mat& data,
-                 const double epsilon, const std::string& family,
-                 const Rcpp::Nullable<Rcpp::Function>& multiple_epochs_function,
-                 const arma::colvec& line_search, const arma::colvec& lower,
-                 const double momentum_coef, const arma::colvec& order,
-                 const int p, const unsigned int p_response,
-                 const double pruning_coef, const bool r_progress,
-                 const int segment_count, const double trim,
-                 const arma::colvec& upper, const double vanilla_percentage,
-                 const arma::mat& variance_estimate, const bool warm_start)
+Fastcpd::Fastcpd(
+    const double beta, const Rcpp::Nullable<Rcpp::Function>& cost,
+    const std::function<double(arma::mat)>& cost_pelt,
+    const std::function<double(arma::mat, arma::colvec)>& cost_sen,
+    const std::string& cost_adjustment,
+    const std::function<arma::colvec(arma::mat, arma::colvec)>& cost_gradient,
+    const std::function<arma::mat(arma::mat, arma::colvec)>& cost_hessian,
+    const bool cp_only, const arma::mat& data, const double epsilon,
+    const std::string& family,
+    const std::function<unsigned int(unsigned int)>& multiple_epochs_function,
+    const arma::colvec& line_search, const arma::colvec& lower,
+    const double momentum_coef, const arma::colvec& order, const int p,
+    const unsigned int p_response, const double pruning_coef,
+    const bool r_progress, const int segment_count, const double trim,
+    const arma::colvec& upper, const double vanilla_percentage,
+    const arma::mat& variance_estimate, const bool warm_start)
     : active_coefficients_count_(colvec(segment_count)),
       beta_(beta),
       change_points_(zeros<colvec>(data.n_rows + 1)),
@@ -85,18 +87,10 @@ Fastcpd::Fastcpd(const double beta, const Rcpp::Nullable<Rcpp::Function>& cost,
         }
         return nullptr;
       }()),
-      cost_gradient_([&]() -> unique_ptr<Function> {
-        if (family == "custom" && cost_gradient.isNotNull()) {
-          return make_unique<Function>(cost_gradient);
-        }
-        return nullptr;
-      }()),
-      cost_hessian_([&]() -> unique_ptr<Function> {
-        if (family == "custom" && cost_hessian.isNotNull()) {
-          return make_unique<Function>(cost_hessian);
-        }
-        return nullptr;
-      }()),
+      cost_function_pelt_(cost_pelt),
+      cost_function_sen_(cost_sen),
+      cost_gradient_(cost_gradient),
+      cost_hessian_(cost_hessian),
       cp_only_(cp_only),
       data_(data),
       data_c_([&]() -> mat {
@@ -199,12 +193,7 @@ Fastcpd::Fastcpd(const double beta, const Rcpp::Nullable<Rcpp::Function>& cost,
       line_search_(line_search),
       momentum_(colvec(p)),
       momentum_coef_(momentum_coef),
-      multiple_epochs_function_([&]() -> unique_ptr<Function> {
-        if (multiple_epochs_function.isNotNull()) {
-          return make_unique<Function>(multiple_epochs_function);
-        }
-        return nullptr;
-      }()),
+      multiple_epochs_function_(multiple_epochs_function),
       objective_function_values_(colvec(data_n_rows_ + 1)),
       objective_function_values_candidates_(colvec(data_n_rows_ + 1)),
       objective_function_values_candidates_ptr_(
@@ -972,7 +961,7 @@ void Fastcpd::UpdateSenParametersSteps(const int segment_start,
   // This hack is to avoid the issue during momentum assigment of `solve`.
   colvec tmp = momentum_;
   const unsigned int multiple_epochs =
-      as<int>((*multiple_epochs_function_)(segment_end - segment_start + 1));
+      multiple_epochs_function_(segment_end - segment_start + 1);
   unsigned int loop_start = segment_end, loop_end = segment_end;
 
   for (unsigned int epoch = 0; epoch <= multiple_epochs; epoch++) {
@@ -1184,8 +1173,7 @@ colvec Fastcpd::GetGradientBinomial(const unsigned int segment_start,
 colvec Fastcpd::GetGradientCustom(const unsigned int segment_start,
                                   const unsigned int segment_end,
                                   const colvec& theta) {
-  return as<colvec>(
-      (*cost_gradient_)(data_.rows(segment_start, segment_end), theta));
+  return cost_gradient_(data_.rows(segment_start, segment_end), theta);
 }
 
 colvec Fastcpd::GetGradientLm(const unsigned int segment_start,
@@ -1360,8 +1348,7 @@ mat Fastcpd::GetHessianBinomial(const unsigned int segment_start,
 mat Fastcpd::GetHessianCustom(const unsigned int segment_start,
                               const unsigned int segment_end,
                               const colvec& theta) {
-  return as<mat>(
-      (*cost_hessian_)(data_.rows(segment_start, segment_end), theta));
+  return cost_hessian_(data_.rows(segment_start, segment_end), theta);
 }
 
 mat Fastcpd::GetHessianLm(const unsigned int segment_start,
@@ -1467,8 +1454,7 @@ void Fastcpd::GetNllPeltCustom(const unsigned int segment_start,
   } else {
     result_coefficients_ = mat();
     result_residuals_ = mat();
-    result_value_ =
-        as<double>((*cost_function_)(data_.rows(segment_start, segment_end)));
+    result_value_ = cost_function_pelt_(data_.rows(segment_start, segment_end));
   }
 }
 
@@ -1721,8 +1707,7 @@ double Fastcpd::GetNllSenBinomial(const unsigned int segment_start,
 double Fastcpd::GetNllSenCustom(const unsigned int segment_start,
                                 const unsigned int segment_end,
                                 const colvec& theta) {
-  return as<double>(
-      (*cost_function_)(data_.rows(segment_start, segment_end), theta));
+  return cost_function_sen_(data_.rows(segment_start, segment_end), theta);
 }
 
 double Fastcpd::GetNllSenLasso(const unsigned int segment_start,

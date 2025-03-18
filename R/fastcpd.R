@@ -374,6 +374,14 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     }
   }
 
+  cost_pelt <- NULL
+  cost_sen <- NULL
+  if (length(formals(cost)) == 1) {
+    cost_pelt <- cost
+  } else {
+    cost_sen <- cost
+  }
+
   sigma_ <- if (!is.null(variance_estimation)) {
     as.matrix(variance_estimation)
   } else if (family == "mean") {
@@ -423,9 +431,9 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   result <- fastcpd_impl(
     data_, beta, cost_adjustment, segment_count, trim, momentum_coef,
-    multiple_epochs, fastcpd_family, epsilon, p, order, cost, cost_gradient,
-    cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper,
-    line_search, sigma_, p_response, pruning_coef, r_progress
+    multiple_epochs, fastcpd_family, epsilon, p, order, cost_pelt, cost_sen,
+    cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
+    lower, upper, line_search, sigma_, p_response, pruning_coef, r_progress
   )
 
   raw_cp_set <- c(result$raw_cp_set)
