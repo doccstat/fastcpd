@@ -14,8 +14,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // fastcpd_impl
-Rcpp::List fastcpd_impl(const arma::mat& data, const double beta, const std::string& cost_adjustment, const int segment_count, const double trim, const double momentum_coef, const Rcpp::Nullable<Rcpp::Function>& multiple_epochs_function, const std::string& family, const double epsilon, const int p, const arma::colvec& order, const Rcpp::Nullable<Rcpp::Function>& cost, const Rcpp::Nullable<Rcpp::Function>& cost_gradient, const Rcpp::Nullable<Rcpp::Function>& cost_hessian, const bool cp_only, const double vanilla_percentage, const bool warm_start, const arma::colvec& lower, const arma::colvec& upper, const arma::colvec& line_search, const arma::mat& variance_estimate, const unsigned int p_response, const double pruning_coef, const bool r_progress);
-RcppExport SEXP _fastcpd_fastcpd_impl(SEXP dataSEXP, SEXP betaSEXP, SEXP cost_adjustmentSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP multiple_epochs_functionSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP pSEXP, SEXP orderSEXP, SEXP costSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP cp_onlySEXP, SEXP vanilla_percentageSEXP, SEXP warm_startSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP line_searchSEXP, SEXP variance_estimateSEXP, SEXP p_responseSEXP, SEXP pruning_coefSEXP, SEXP r_progressSEXP) {
+Rcpp::List fastcpd_impl(const arma::mat& data, const double beta, const std::string& cost_adjustment, const int segment_count, const double trim, const double momentum_coef, const Rcpp::Nullable<Rcpp::Function>& multiple_epochs_function, const std::string& family, const double epsilon, const int p, const arma::colvec& order, const Rcpp::Nullable<Rcpp::Function>& cost_pelt, const Rcpp::Nullable<Rcpp::Function>& cost_sen, const Rcpp::Nullable<Rcpp::Function>& cost_gradient, const Rcpp::Nullable<Rcpp::Function>& cost_hessian, const bool cp_only, const double vanilla_percentage, const bool warm_start, const arma::colvec& lower, const arma::colvec& upper, const arma::colvec& line_search, const arma::mat& variance_estimate, const unsigned int p_response, const double pruning_coef, const bool r_progress);
+RcppExport SEXP _fastcpd_fastcpd_impl(SEXP dataSEXP, SEXP betaSEXP, SEXP cost_adjustmentSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP multiple_epochs_functionSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP pSEXP, SEXP orderSEXP, SEXP cost_peltSEXP, SEXP cost_senSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP cp_onlySEXP, SEXP vanilla_percentageSEXP, SEXP warm_startSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP line_searchSEXP, SEXP variance_estimateSEXP, SEXP p_responseSEXP, SEXP pruning_coefSEXP, SEXP r_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -30,7 +30,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
     Rcpp::traits::input_parameter< const int >::type p(pSEXP);
     Rcpp::traits::input_parameter< const arma::colvec& >::type order(orderSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::Nullable<Rcpp::Function>& >::type cost(costSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::Nullable<Rcpp::Function>& >::type cost_pelt(cost_peltSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::Nullable<Rcpp::Function>& >::type cost_sen(cost_senSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Nullable<Rcpp::Function>& >::type cost_gradient(cost_gradientSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Nullable<Rcpp::Function>& >::type cost_hessian(cost_hessianSEXP);
     Rcpp::traits::input_parameter< const bool >::type cp_only(cp_onlySEXP);
@@ -43,7 +44,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const unsigned int >::type p_response(p_responseSEXP);
     Rcpp::traits::input_parameter< const double >::type pruning_coef(pruning_coefSEXP);
     Rcpp::traits::input_parameter< const bool >::type r_progress(r_progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(fastcpd_impl(data, beta, cost_adjustment, segment_count, trim, momentum_coef, multiple_epochs_function, family, epsilon, p, order, cost, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper, line_search, variance_estimate, p_response, pruning_coef, r_progress));
+    rcpp_result_gen = Rcpp::wrap(fastcpd_impl(data, beta, cost_adjustment, segment_count, trim, momentum_coef, multiple_epochs_function, family, epsilon, p, order, cost_pelt, cost_sen, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper, line_search, variance_estimate, p_response, pruning_coef, r_progress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -51,7 +52,7 @@ END_RCPP
 RcppExport SEXP run_testthat_tests(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_fastcpd_fastcpd_impl", (DL_FUNC) &_fastcpd_fastcpd_impl, 24},
+    {"_fastcpd_fastcpd_impl", (DL_FUNC) &_fastcpd_fastcpd_impl, 25},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };

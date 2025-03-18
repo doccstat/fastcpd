@@ -68,19 +68,22 @@ namespace classes {
 
 class Fastcpd {
  public:
-  Fastcpd(const double beta, const Rcpp::Nullable<Rcpp::Function>& cost,
-          const std::string& cost_adjustment,
-          const Rcpp::Nullable<Rcpp::Function>& cost_gradient,
-          const Rcpp::Nullable<Rcpp::Function>& cost_hessian,
-          const bool cp_only, const arma::mat& data, const double epsilon,
-          const std::string& family,
-          const Rcpp::Nullable<Rcpp::Function>& multiple_epochs_function,
-          const arma::colvec& line_search, const arma::colvec& lower,
-          const double momentum_coef, const arma::colvec& order, const int p,
-          const unsigned int p_response, const double pruning_coef,
-          const bool r_progress, const int segment_count, const double trim,
-          const arma::colvec& upper, const double vanilla_percentage,
-          const arma::mat& variance_estimate, const bool warm_start);
+  Fastcpd(
+      const double beta, const Rcpp::Nullable<Rcpp::Function>& cost,
+      const std::function<double(arma::mat)>& cost_pelt,
+      const std::function<double(arma::mat, arma::colvec)>& cost_sen,
+      const std::string& cost_adjustment,
+      const std::function<arma::colvec(arma::mat, arma::colvec)>& cost_gradient,
+      const std::function<arma::mat(arma::mat, arma::colvec)>& cost_hessian,
+      const bool cp_only, const arma::mat& data, const double epsilon,
+      const std::string& family,
+      const std::function<unsigned int(unsigned int)>& multiple_epochs_function,
+      const arma::colvec& line_search, const arma::colvec& lower,
+      const double momentum_coef, const arma::colvec& order, const int p,
+      const unsigned int p_response, const double pruning_coef,
+      const bool r_progress, const int segment_count, const double trim,
+      const arma::colvec& upper, const double vanilla_percentage,
+      const arma::mat& variance_estimate, const bool warm_start);
 
   Rcpp::List Run();
 
@@ -228,8 +231,10 @@ class Fastcpd {
   arma::mat coefficients_sum_;
   const std::string cost_adjustment_;
   const std::unique_ptr<Rcpp::Function> cost_function_;
-  const std::unique_ptr<Rcpp::Function> cost_gradient_;
-  const std::unique_ptr<Rcpp::Function> cost_hessian_;
+  const std::function<double(arma::mat)> cost_function_pelt_;
+  const std::function<double(arma::mat, arma::colvec)> cost_function_sen_;
+  const std::function<arma::colvec(arma::mat, arma::colvec)> cost_gradient_;
+  const std::function<arma::mat(arma::mat, arma::colvec)> cost_hessian_;
   const bool cp_only_;
   const arma::mat data_;
   const arma::mat data_c_;
@@ -264,7 +269,7 @@ class Fastcpd {
   arma::colvec line_search_;
   arma::colvec momentum_;
   const double momentum_coef_;
-  const std::unique_ptr<Rcpp::Function> multiple_epochs_function_;
+  const std::function<unsigned int(unsigned int)> multiple_epochs_function_;
   arma::colvec objective_function_values_;
   arma::colvec objective_function_values_candidates_;
   double* objective_function_values_candidates_ptr_;

@@ -52,7 +52,8 @@ Rcpp::List fastcpd_impl(
     const double trim, const double momentum_coef,
     const Rcpp::Nullable<Rcpp::Function>& multiple_epochs_function,
     const std::string& family, const double epsilon, const int p,
-    const arma::colvec& order, const Rcpp::Nullable<Rcpp::Function>& cost,
+    const arma::colvec& order, const Rcpp::Nullable<Rcpp::Function>& cost_pelt,
+    const Rcpp::Nullable<Rcpp::Function>& cost_sen,
     const Rcpp::Nullable<Rcpp::Function>& cost_gradient,
     const Rcpp::Nullable<Rcpp::Function>& cost_hessian, const bool cp_only,
     const double vanilla_percentage, const bool warm_start,
@@ -60,11 +61,63 @@ Rcpp::List fastcpd_impl(
     const arma::colvec& line_search, const arma::mat& variance_estimate,
     const unsigned int p_response, const double pruning_coef,
     const bool r_progress) {
+  std::function<double(arma::mat)> cost_pelt_;
+  if (family == "custom" && cost_pelt.isNotNull()) {
+    // Capture the R function in a local Rcpp::Function object.
+    Rcpp::Function rfun(cost_pelt);
+    cost_pelt_ = [rfun](arma::mat data) -> double {
+      // Call the R function and convert its result to double.
+      return Rcpp::as<double>(rfun(data));
+    };
+  }
+  std::function<double(arma::mat, arma::colvec)> cost_sen_;
+  if (family == "custom" && cost_sen.isNotNull()) {
+    // Capture the R function in a local Rcpp::Function object.
+    Rcpp::Function rfun(cost_sen);
+    cost_sen_ = [rfun](arma::mat data, arma::colvec theta) -> double {
+      // Call the R function and convert its result to double.
+      return Rcpp::as<double>(rfun(data, theta));
+    };
+  }
+  Rcpp::Nullable<Rcpp::Function> cost = R_NilValue;
+  if (family == "custom" && cost_pelt.isNotNull()) {
+    cost = cost_pelt;
+  } else if (family == "custom" && cost_sen.isNotNull()) {
+    cost = cost_sen;
+  }
+  std::function<arma::colvec(arma::mat, arma::colvec)> cost_gradient_;
+  if (family == "custom" && cost_gradient.isNotNull()) {
+    // Capture the R function in a local Rcpp::Function object.
+    Rcpp::Function rfun(cost_gradient);
+    cost_gradient_ = [rfun](arma::mat data,
+                            arma::colvec theta) -> arma::colvec {
+      // Call the R function and convert its result to arma::colvec.
+      return Rcpp::as<arma::colvec>(rfun(data, theta));
+    };
+  }
+  std::function<arma::mat(arma::mat, arma::colvec)> cost_hessian_;
+  if (family == "custom" && cost_hessian.isNotNull()) {
+    // Capture the R function in a local Rcpp::Function object.
+    Rcpp::Function rfun(cost_hessian);
+    cost_hessian_ = [rfun](arma::mat data, arma::colvec theta) -> arma::mat {
+      // Call the R function and convert its result to arma::mat.
+      return Rcpp::as<arma::mat>(rfun(data, theta));
+    };
+  }
+  std::function<unsigned int(unsigned int)> multiple_epochs_function_;
+  if (multiple_epochs_function.isNotNull()) {
+    // Capture the R function in a local Rcpp::Function object.
+    Rcpp::Function rfun(multiple_epochs_function);
+    multiple_epochs_function_ = [rfun](unsigned int i) -> unsigned int {
+      // Call the R function and convert its result to unsigned int.
+      return Rcpp::as<unsigned int>(rfun(i));
+    };
+  }
   fastcpd::classes::Fastcpd fastcpd_class(
-      beta, cost, cost_adjustment, cost_gradient, cost_hessian, cp_only, data,
-      epsilon, family, multiple_epochs_function, line_search, lower,
-      momentum_coef, order, p, p_response, pruning_coef, r_progress,
-      segment_count, trim, upper, vanilla_percentage, variance_estimate,
-      warm_start);
+      beta, cost, cost_pelt_, cost_sen_, cost_adjustment, cost_gradient_,
+      cost_hessian_, cp_only, data, epsilon, family, multiple_epochs_function_,
+      line_search, lower, momentum_coef, order, p, p_response, pruning_coef,
+      r_progress, segment_count, trim, upper, vanilla_percentage,
+      variance_estimate, warm_start);
   return fastcpd_class.Run();
 }
