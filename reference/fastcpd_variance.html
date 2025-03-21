@@ -49,7 +49,7 @@ observation and thus a formula is not required here."><meta property="og:image" 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.svg" class="logo" alt=""><h1>Find change points efficiently in variance change models</h1>
-      <small class="dont-index">Source: <a href="https://github.com/doccstat/fastcpd/blob/main/R/fastcpd.R" class="external-link"><code>R/fastcpd.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/doccstat/fastcpd/blob/v0.16.1/R/fastcpd.R" class="external-link"><code>R/fastcpd.R</code></a></small>
       <div class="d-none name"><code>fastcpd_variance.Rd</code></div>
     </div>
 
@@ -97,7 +97,7 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fastcpd.variance</span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>argument is not a function</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.003   0.000   0.004 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.003   0.000   0.003 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
@@ -136,7 +136,7 @@ observation and thus a formula is not required here.</p>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>argument is not a function</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.667   0.099   0.767 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.702   0.102   0.803 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd.variance(data = data, r.progress = FALSE, cp_only = TRUE)</span>
