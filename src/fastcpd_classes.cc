@@ -1435,15 +1435,34 @@ void Fastcpd::GetNllPeltArma(const unsigned int segment_start,
   const mat data_segment = data_.rows(segment_start, segment_end);
   Environment stats = Environment::namespace_env("stats");
   Function arima = stats["arima"];
-  List out =
-      arima(Named("x") = data_segment.col(0),
-            Named("order") = NumericVector::create(order_(0), 0, order_(1)),
-            Named("method") = "ML", Named("include.mean") = false);
-  result_coefficients_ = zeros<colvec>(sum(order_) + 1);
-  result_coefficients_.rows(0, sum(order_) - 1) = as<colvec>(out["coef"]);
-  result_coefficients_(sum(order_)) = as<double>(out["sigma2"]);
-  result_residuals_ = mat(as<colvec>(out["residuals"]));
-  result_value_ = -as<double>(out["loglik"]);
+
+  try {
+    List out =
+        arima(Named("x") = data_segment.col(0),
+              Named("order") = NumericVector::create(order_(0), 0, order_(1)),
+              Named("method") = "ML", Named("include.mean") = false);
+
+    result_coefficients_ = zeros<colvec>(sum(order_) + 1);
+    result_coefficients_.rows(0, sum(order_) - 1) = as<colvec>(out["coef"]);
+    result_coefficients_(sum(order_)) = as<double>(out["sigma2"]);
+    result_residuals_ = mat(as<colvec>(out["residuals"]));
+    result_value_ = -as<double>(out["loglik"]);
+  } catch (const std::exception& e) {
+    // Handle the error - use reasonable defaults
+    Rcpp::warning("ARMA model fitting failed: %s", e.what());
+
+    // Set default coefficients (zeros)
+    result_coefficients_ = zeros<colvec>(sum(order_) + 1);
+
+    // Use a high penalty value to discourage this segment
+    result_value_ = data_segment.n_rows * 10.0;
+
+    // Set residuals as the original data (conservative approach)
+    result_residuals_ = data_segment.col(0);
+
+    // Set a relatively high variance estimate
+    result_coefficients_(sum(order_)) = arma::var(data_segment.col(0));
+  }
 }
 
 void Fastcpd::GetNllPeltCustom(const unsigned int segment_start,
