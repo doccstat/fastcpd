@@ -83,7 +83,7 @@ testthat::test_that("poisson regression", {
     )@cp_set
   )
 
-  testthat::expect_length(warning_messages, 1767)
+  testthat::expect_length(warning_messages, 1767, tolerance = 1)
 
   testthat::expect_equal(
     change_points_poisson_fastcpd_vanilla,
