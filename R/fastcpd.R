@@ -222,7 +222,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   upper = rep(Inf, p),
   pruning_coef = 0,
   segment_count = 10,
-  trim = 0.02,
+  trim = 0.05,
   momentum_coef = 0,
   multiple_epochs = function(x) 0,
   epsilon = 1e-10,
