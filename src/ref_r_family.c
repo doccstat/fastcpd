@@ -29,12 +29,7 @@
 #include <float.h>
 #include <math.h>
 #undef _
-#ifdef ENABLE_NLS
-#include <libintl.h>
-#define _(String) dgettext("stats", String)
-#else
 #define _(String) (String)
-#endif
 
 static const double THRESH = 30.;
 static const double MTHRESH = -30.;
