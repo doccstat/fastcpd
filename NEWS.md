@@ -1,3 +1,9 @@
+# fastcpd 0.16.2
+
+*   Remove natural language support.
+*   Update mean variance cost function.
+*   Use larger default `trim` value.
+
 # fastcpd 0.16.1
 
 *   Skip tests on CRAN.

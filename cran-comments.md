@@ -1,5 +1,7 @@
-## Updates since last CRAN release (0.16.0)
+## Updates since last CRAN release (0.16.1)
 
-### fastcpd 0.16.1
+### fastcpd 0.16.2
 
-*   Skip tests on CRAN.
+*   Remove natural language support.
+*   Update mean variance cost function.
+*   Use larger default `trim` value.
