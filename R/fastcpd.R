@@ -376,7 +376,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   cost_pelt <- NULL
   cost_sen <- NULL
-  if (length(formals(cost)) == 1) {
+  if (!is.null(cost) && length(formals(cost)) == 1) {
     cost_pelt <- cost
   } else {
     cost_sen <- cost
