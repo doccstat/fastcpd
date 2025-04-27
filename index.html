@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.16.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.16.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,10 +136,7 @@ With mamba or conda (available soon)
 <span><span class="co">#&gt; 3  0.08221978 0.2290323</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-ar3-1.png"><!-- --></p>
-<details open><summary>
-Note
-</summary><p><code>r.progress = FALSE</code> is used to suppress the progress bar. Users are expected to see the progress bar when running the code by default.</p>
-</details><div class="section level3">
+<div class="section level3">
 <h3 id="comparison">Comparison<a class="anchor" aria-label="anchor" href="#comparison"></a>
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -148,24 +145,16 @@ Note
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="op">*</span> <span class="fl">10</span><span class="op">^</span><span class="fl">6</span></span>
 <span><span class="va">mean_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2</span>, <span class="fl">50</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="fu">microbenchmark</span><span class="op">(</span></span>
-<span>  fastcpd <span class="op">=</span> <span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span>, variance_estimation <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  changepoint <span class="op">=</span> <span class="fu">changepoint</span><span class="fu">::</span><span class="fu">cpt.mean</span><span class="op">(</span><span class="va">mean_data</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span>,</span>
-<span>  fpop <span class="op">=</span> <span class="fu">fpop</span><span class="fu">::</span><span class="fu">Fpop</span><span class="op">(</span><span class="va">mean_data</span>, <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  gfpop <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu">gfpop</span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">mean_data</span>,</span>
-<span>    mygraph <span class="op">=</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu">graph</span><span class="op">(</span></span>
-<span>      penalty <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu">gfpop</span><span class="fu">::</span><span class="fu">sdDiff</span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span> <span class="op">^</span> <span class="fl">2</span>,</span>
-<span>      type <span class="op">=</span> <span class="st">"updown"</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    type <span class="op">=</span> <span class="st">"mean"</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  jointseg <span class="op">=</span> <span class="fu">jointseg</span><span class="fu">::</span><span class="fu">jointSeg</span><span class="op">(</span><span class="va">mean_data</span>, K <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>,</span>
-<span>  mosum <span class="op">=</span> <span class="fu">mosum</span><span class="fu">::</span><span class="fu">mosum</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>,</span>
+<span>  wbs <span class="op">=</span> <span class="fu">wbs</span><span class="fu">::</span><span class="fu">wbs</span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span>,</span>
 <span>  not <span class="op">=</span> <span class="fu">not</span><span class="fu">::</span><span class="fu">not</span><span class="op">(</span><span class="va">mean_data</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMean"</span><span class="op">)</span>,</span>
-<span>  wbs <span class="op">=</span> <span class="fu">wbs</span><span class="fu">::</span><span class="fu">wbs</span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span></span>
+<span>  changepoint <span class="op">=</span> <span class="fu">changepoint</span><span class="fu">::</span><span class="fu">cpt.mean</span><span class="op">(</span><span class="va">mean_data</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span>,</span>
+<span>  jointseg <span class="op">=</span> <span class="fu">jointseg</span><span class="fu">::</span><span class="fu">jointSeg</span><span class="op">(</span><span class="va">mean_data</span>, K <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>,</span>
+<span>  fpop <span class="op">=</span> <span class="fu">fpop</span><span class="fu">::</span><span class="fu">Fpop</span><span class="op">(</span><span class="va">mean_data</span>, <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  mosum <span class="op">=</span> <span class="fu">mosum</span><span class="fu">::</span><span class="fu">mosum</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>,</span>
+<span>  fastcpd <span class="op">=</span> <span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span>, variance_estimation <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in microbenchmark(fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress</span></span>
-<span><span class="co">#&gt; = FALSE, : less accurate nanosecond times to avoid potential integer overflows</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning in microbenchmark(wbs = wbs::wbs(mean_data), not = not::not(mean_data,</span></span>
+<span><span class="co">#&gt; : less accurate nanosecond times to avoid potential integer overflows</span></span></code></pre></div>
 <p><img src="reference/figures/README-time-comparison-small-1.png"><!-- --></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/joshuaulrich/microbenchmark/" class="external-link">microbenchmark</a></span><span class="op">)</span></span>
@@ -175,24 +164,22 @@ Note
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span>, variance_estimation <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
 <span><span class="co">#&gt;  11.753   9.150  26.455 </span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">changepoint</span><span class="fu">::</span><span class="fu">cpt.mean</span><span class="op">(</span><span class="va">mean_data</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  32.342   9.681  66.056 </span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">fpop</span><span class="fu">::</span><span class="fu">Fpop</span><span class="op">(</span><span class="va">mean_data</span>, <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  35.926   5.231  58.269 </span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">mosum</span><span class="fu">::</span><span class="fu">mosum</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
 <span><span class="co">#&gt;   5.518  11.516  38.368 </span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">fpop</span><span class="fu">::</span><span class="fu">Fpop</span><span class="op">(</span><span class="va">mean_data</span>, <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    user  system elapsed </span></span>
+<span><span class="co">#&gt;  35.926   5.231  58.269 </span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">changepoint</span><span class="fu">::</span><span class="fu">cpt.mean</span><span class="op">(</span><span class="va">mean_data</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    user  system elapsed </span></span>
+<span><span class="co">#&gt;  32.342   9.681  66.056 </span></span>
 <span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="fu">microbenchmark</span><span class="op">(</span></span>
-<span>  fastcpd <span class="op">=</span> <span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span>, variance_estimation <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
 <span>  changepoint <span class="op">=</span> <span class="fu">changepoint</span><span class="fu">::</span><span class="fu">cpt.mean</span><span class="op">(</span><span class="va">mean_data</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span>,</span>
 <span>  fpop <span class="op">=</span> <span class="fu">fpop</span><span class="fu">::</span><span class="fu">Fpop</span><span class="op">(</span><span class="va">mean_data</span>, <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  mosum <span class="op">=</span> <span class="fu">mosum</span><span class="fu">::</span><span class="fu">mosum</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>,</span>
+<span>  fastcpd <span class="op">=</span> <span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span>, variance_estimation <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
 <span>  times <span class="op">=</span> <span class="fl">10</span></span>
-<span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in microbenchmark(fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress</span></span>
-<span><span class="co">#&gt; = FALSE, : less accurate nanosecond times to avoid potential integer overflows</span></span></code></pre></div>
+<span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-time-comparison-large-1.png"><!-- --></p>
 <p>Some packages are not included in the <code>microbenchmark</code> comparison due to either memory constraints or long running time.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
