@@ -89,15 +89,6 @@ summary(result)
 plot(result)
 ```
 
-<details open>
-
-<summary>Note</summary>
-
-`r.progress = FALSE` is used to suppress the progress bar. Users are expected
-to see the progress bar when running the code by default.
-
-</details>
-
 ### Comparison
 
 ```{r time-comparison-small}
@@ -106,21 +97,13 @@ set.seed(1)
 n <- 5 * 10^6
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
 ggplot2::autoplot(microbenchmark(
-  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1),
-  changepoint = changepoint::cpt.mean(mean_data, method = "PELT"),
-  fpop = fpop::Fpop(mean_data, 2 * log(n)),
-  gfpop = gfpop::gfpop(
-    data = mean_data,
-    mygraph = gfpop::graph(
-      penalty = 2 * log(length(mean_data)) * gfpop::sdDiff(mean_data) ^ 2,
-      type = "updown"
-    ),
-    type = "mean"
-  ),
-  jointseg = jointseg::jointSeg(mean_data, K = 12),
-  mosum = mosum::mosum(c(mean_data), G = 40),
+  wbs = wbs::wbs(mean_data),
   not = not::not(mean_data, contrast = "pcwsConstMean"),
-  wbs = wbs::wbs(mean_data)
+  changepoint = changepoint::cpt.mean(mean_data, method = "PELT"),
+  jointseg = jointseg::jointSeg(mean_data, K = 12),
+  fpop = fpop::Fpop(mean_data, 2 * log(n)),
+  mosum = mosum::mosum(c(mean_data), G = 40),
+  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)
 ))
 ```
 
@@ -130,14 +113,14 @@ set.seed(1)
 n <- 10^8
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
 system.time(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1))
-system.time(changepoint::cpt.mean(mean_data, method = "PELT"))
-system.time(fpop::Fpop(mean_data, 2 * log(n)))
 system.time(mosum::mosum(c(mean_data), G = 40))
+system.time(fpop::Fpop(mean_data, 2 * log(n)))
+system.time(changepoint::cpt.mean(mean_data, method = "PELT"))
 ggplot2::autoplot(microbenchmark(
-  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1),
   changepoint = changepoint::cpt.mean(mean_data, method = "PELT"),
   fpop = fpop::Fpop(mean_data, 2 * log(n)),
   mosum = mosum::mosum(c(mean_data), G = 40),
+  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1),
   times = 10
 ))
 ```
