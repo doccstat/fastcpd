@@ -296,8 +296,3 @@ Encountered a bug or unintended behavior?
 
 [![Stargazers over
 time](https://starchart.cc/doccstat/fastcpd.svg)](https://starchart.cc/doccstat/fastcpd)
-
-## Codecov Icicle
-
-[![Codecov
-Icicle](https://codecov.io/gh/doccstat/fastcpd/graphs/icicle.svg)](https://app.codecov.io/gh/doccstat/fastcpd?branch=main)
