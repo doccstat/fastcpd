@@ -34,38 +34,11 @@ To learn more behind the algorithms:
 ## Installation
 
 ``` r
-install.packages(
-  "fastcpd",
-  repos = c("https://doccstat.r-universe.dev", "https://cloud.r-project.org")
-)
-```
-
-<details close>
-<summary>
-Development version
-</summary>
-
-``` r
-pak::pak("doccstat/fastcpd")
+# install.packages("devtools")
 devtools::install_github("doccstat/fastcpd")
+# or install from CRAN
+install.packages("fastcpd")
 ```
-
-</details>
-<details close>
-<summary>
-With mamba or conda (available soon)
-</summary>
-
-``` bash
-# conda-forge is a fork from CRAN and may not be up-to-date
-
-# Use mamba
-mamba install r-fastcpd
-# Use conda
-conda install -c conda-forge r-fastcpd
-```
-
-</details>
 
 ## Usage
 
@@ -243,11 +216,6 @@ Function references
   - [`fastcpd`](https://fastcpd.xingchi.li/reference/fastcpd-class.html)
 
 </details>
-
-### R Shiny App
-
-Available soon:
-[rshiny.fastcpd.xingchi.li](https://rshiny.fastcpd.xingchi.li)
 
 ## FAQ
 
