@@ -4,19 +4,19 @@
 #include "RcppArmadillo.h"
 
 Rcpp::List fastcpd_impl(
-    const arma::mat& data, const double beta,
-    const std::string& cost_adjustment, const int segment_count,
-    const double trim, const double momentum_coef,
-    const Rcpp::Nullable<Rcpp::Function>& multiple_epochs_function,
-    const std::string& family, const double epsilon, const int p,
-    const arma::colvec& order, const Rcpp::Nullable<Rcpp::Function>& cost_pelt,
-    const Rcpp::Nullable<Rcpp::Function>& cost_sen,
-    const Rcpp::Nullable<Rcpp::Function>& cost_gradient,
-    const Rcpp::Nullable<Rcpp::Function>& cost_hessian, const bool cp_only,
-    const double vanilla_percentage, const bool warm_start,
-    const arma::colvec& lower, const arma::colvec& upper,
-    const arma::colvec& line_search, const arma::mat& variance_estimate,
-    const unsigned int p_response, const double pruning_coef,
-    const bool r_progress);
+    arma::mat const& data, double const beta,
+    std::string const& cost_adjustment, int const segment_count,
+    double const trim, double const momentum_coef,
+    Rcpp::Nullable<Rcpp::Function> const& multiple_epochs_function,
+    std::string const& family, double const epsilon, int const p,
+    arma::colvec const& order, Rcpp::Nullable<Rcpp::Function> const& cost_pelt,
+    Rcpp::Nullable<Rcpp::Function> const& cost_sen,
+    Rcpp::Nullable<Rcpp::Function> const& cost_gradient,
+    Rcpp::Nullable<Rcpp::Function> const& cost_hessian, bool const cp_only,
+    double const vanilla_percentage, bool const warm_start,
+    arma::colvec const& lower, arma::colvec const& upper,
+    arma::colvec const& line_search, arma::mat const& variance_estimate,
+    unsigned int const p_response, double const pruning_coef,
+    bool const r_progress);
 
 #endif  // FASTCPD_IMPL_H_

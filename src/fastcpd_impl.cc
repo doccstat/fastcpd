@@ -1,5 +1,4 @@
 #include "fastcpd_impl.h"
-
 #include "fastcpd.h"
 
 // Implementation of the fastcpd algorithm.
@@ -47,20 +46,20 @@
 //   segment.
 // [[Rcpp::export]]
 Rcpp::List fastcpd_impl(
-    const arma::mat& data, const double beta,
-    const std::string& cost_adjustment, const int segment_count,
-    const double trim, const double momentum_coef,
-    const Rcpp::Nullable<Rcpp::Function>& multiple_epochs_function,
-    const std::string& family, const double epsilon, const int p,
-    const arma::colvec& order, const Rcpp::Nullable<Rcpp::Function>& cost_pelt,
-    const Rcpp::Nullable<Rcpp::Function>& cost_sen,
-    const Rcpp::Nullable<Rcpp::Function>& cost_gradient,
-    const Rcpp::Nullable<Rcpp::Function>& cost_hessian, const bool cp_only,
-    const double vanilla_percentage, const bool warm_start,
-    const arma::colvec& lower, const arma::colvec& upper,
-    const arma::colvec& line_search, const arma::mat& variance_estimate,
-    const unsigned int p_response, const double pruning_coef,
-    const bool r_progress) {
+    arma::mat const& data, double const beta,
+    std::string const& cost_adjustment, int const segment_count,
+    double const trim, double const momentum_coef,
+    Rcpp::Nullable<Rcpp::Function> const& multiple_epochs_function,
+    std::string const& family, double const epsilon, int const p,
+    arma::colvec const& order, Rcpp::Nullable<Rcpp::Function> const& cost_pelt,
+    Rcpp::Nullable<Rcpp::Function> const& cost_sen,
+    Rcpp::Nullable<Rcpp::Function> const& cost_gradient,
+    Rcpp::Nullable<Rcpp::Function> const& cost_hessian, bool const cp_only,
+    double const vanilla_percentage, bool const warm_start,
+    arma::colvec const& lower, arma::colvec const& upper,
+    arma::colvec const& line_search, arma::mat const& variance_estimate,
+    unsigned int const p_response, double const pruning_coef,
+    bool const r_progress) {
   std::function<double(arma::mat)> cost_pelt_;
   if (family == "custom" && cost_pelt.isNotNull()) {
     // Capture the R function in a local Rcpp::Function object.
@@ -79,11 +78,13 @@ Rcpp::List fastcpd_impl(
       return Rcpp::as<double>(rfun(data, theta));
     };
   }
-  Rcpp::Nullable<Rcpp::Function> cost = R_NilValue;
+  std::optional<Rcpp::Function> cost = std::nullopt;
   if (family == "custom" && cost_pelt.isNotNull()) {
-    cost = cost_pelt;
+    Rcpp::Function rfun(cost_pelt);
+    cost = rfun;
   } else if (family == "custom" && cost_sen.isNotNull()) {
-    cost = cost_sen;
+    Rcpp::Function rfun(cost_sen);
+    cost = rfun;
   }
   std::function<arma::colvec(arma::mat, arma::colvec)> cost_gradient_;
   if (family == "custom" && cost_gradient.isNotNull()) {
@@ -119,5 +120,11 @@ Rcpp::List fastcpd_impl(
       line_search, lower, momentum_coef, order, p, p_response, pruning_coef,
       r_progress, segment_count, trim, upper, vanilla_percentage,
       variance_estimate, warm_start);
-  return fastcpd_class.Run();
+  std::tuple<arma::colvec, arma::colvec, arma::colvec, arma::mat, arma::mat>
+      result = fastcpd_class.Run();
+  return Rcpp::List::create(Rcpp::Named("raw_cp_set") = std::get<0>(result),
+                            Rcpp::Named("cp_set") = std::get<1>(result),
+                            Rcpp::Named("cost_values") = std::get<2>(result),
+                            Rcpp::Named("residual") = std::get<3>(result),
+                            Rcpp::Named("thetas") = std::get<4>(result));
 }

@@ -14,8 +14,8 @@ using Eigen::Map;
 template <typename VecTypeX, typename MatTypeX>
 class GlmBase {
  protected:
-  const int nvars;  // dimension of beta
-  const int nobs;   // number of rows
+  int const nvars;  // dimension of beta
+  int const nobs;   // number of rows
 
   VecTypeX beta;       // parameters to be optimized
   VecTypeX beta_prev;  // auxiliary parameters
@@ -56,7 +56,7 @@ class GlmBase {
 
   virtual void step_halve() {}
 
-  virtual void run_step_halving(int &iterr) {}
+  virtual void run_step_halving(int& iterr) {}
 
   virtual void update_dev_resids() {}
 
@@ -85,8 +85,8 @@ class GlmBase {
 
   virtual ~GlmBase() {}
 
-  virtual void init_parms(const Map<VecTypeX> &start_, const Map<VecTypeX> &mu_,
-                          const Map<VecTypeX> &eta_) {}
+  virtual void init_parms(Map<VecTypeX> const& start_, Map<VecTypeX> const& mu_,
+                          Map<VecTypeX> const& eta_) {}
 
   void update_beta() {
     // VecTypeX newbeta(nvars);

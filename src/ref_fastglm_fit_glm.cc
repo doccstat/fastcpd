@@ -166,7 +166,7 @@ NumericVector linkfun_binomial(const NumericVector &mu) {
 NumericVector linkfun_poisson(const NumericVector &mu) { return Rcpp::log(mu); }
 
 List fastglm(const mat &x_, const colvec &y, const string &family,
-             Nullable<colvec> start, Nullable<NumericVector> weights,
+             std::optional<colvec> start, Nullable<NumericVector> weights,
              Nullable<NumericVector> offset, Nullable<NumericVector> etastart,
              Nullable<NumericVector> mustart, int method, double tol,
              int maxit) {
@@ -300,8 +300,8 @@ List fastglm(const mat &x_, const colvec &y, const string &family,
   NumericVector eta;
   if (etastart.isNotNull()) {
     eta = as<NumericVector>(etastart);
-  } else if (start.isNotNull()) {
-    NumericVector startVec = as<NumericVector>(start);
+  } else if (start.has_value()) {
+    NumericVector startVec = wrap(start.value());
     if (startVec.size() != x.ncol())
       stop("Length of start must equal number of columns of x");
     int nrow = x.nrow();
@@ -323,8 +323,8 @@ List fastglm(const mat &x_, const colvec &y, const string &family,
 
   // If start is not provided, default to a zero vector of appropriate length.
   NumericVector startVec;
-  if (start.isNotNull()) {
-    startVec = as<NumericVector>(start);
+  if (start.has_value()) {
+    startVec = wrap(start.value());
   } else {
     startVec = NumericVector(x.ncol(), 0.0);
   }

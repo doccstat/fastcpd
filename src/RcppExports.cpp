@@ -14,36 +14,36 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // fastcpd_impl
-Rcpp::List fastcpd_impl(const arma::mat& data, const double beta, const std::string& cost_adjustment, const int segment_count, const double trim, const double momentum_coef, const Rcpp::Nullable<Rcpp::Function>& multiple_epochs_function, const std::string& family, const double epsilon, const int p, const arma::colvec& order, const Rcpp::Nullable<Rcpp::Function>& cost_pelt, const Rcpp::Nullable<Rcpp::Function>& cost_sen, const Rcpp::Nullable<Rcpp::Function>& cost_gradient, const Rcpp::Nullable<Rcpp::Function>& cost_hessian, const bool cp_only, const double vanilla_percentage, const bool warm_start, const arma::colvec& lower, const arma::colvec& upper, const arma::colvec& line_search, const arma::mat& variance_estimate, const unsigned int p_response, const double pruning_coef, const bool r_progress);
+Rcpp::List fastcpd_impl(arma::mat const& data, double const beta, std::string const& cost_adjustment, int const segment_count, double const trim, double const momentum_coef, Rcpp::Nullable<Rcpp::Function> const& multiple_epochs_function, std::string const& family, double const epsilon, int const p, arma::colvec const& order, Rcpp::Nullable<Rcpp::Function> const& cost_pelt, Rcpp::Nullable<Rcpp::Function> const& cost_sen, Rcpp::Nullable<Rcpp::Function> const& cost_gradient, Rcpp::Nullable<Rcpp::Function> const& cost_hessian, bool const cp_only, double const vanilla_percentage, bool const warm_start, arma::colvec const& lower, arma::colvec const& upper, arma::colvec const& line_search, arma::mat const& variance_estimate, unsigned int const p_response, double const pruning_coef, bool const r_progress);
 RcppExport SEXP _fastcpd_fastcpd_impl(SEXP dataSEXP, SEXP betaSEXP, SEXP cost_adjustmentSEXP, SEXP segment_countSEXP, SEXP trimSEXP, SEXP momentum_coefSEXP, SEXP multiple_epochs_functionSEXP, SEXP familySEXP, SEXP epsilonSEXP, SEXP pSEXP, SEXP orderSEXP, SEXP cost_peltSEXP, SEXP cost_senSEXP, SEXP cost_gradientSEXP, SEXP cost_hessianSEXP, SEXP cp_onlySEXP, SEXP vanilla_percentageSEXP, SEXP warm_startSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP line_searchSEXP, SEXP variance_estimateSEXP, SEXP p_responseSEXP, SEXP pruning_coefSEXP, SEXP r_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< const double >::type beta(betaSEXP);
-    Rcpp::traits::input_parameter< const std::string& >::type cost_adjustment(cost_adjustmentSEXP);
-    Rcpp::traits::input_parameter< const int >::type segment_count(segment_countSEXP);
-    Rcpp::traits::input_parameter< const double >::type trim(trimSEXP);
-    Rcpp::traits::input_parameter< const double >::type momentum_coef(momentum_coefSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::Nullable<Rcpp::Function>& >::type multiple_epochs_function(multiple_epochs_functionSEXP);
-    Rcpp::traits::input_parameter< const std::string& >::type family(familySEXP);
-    Rcpp::traits::input_parameter< const double >::type epsilon(epsilonSEXP);
-    Rcpp::traits::input_parameter< const int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< const arma::colvec& >::type order(orderSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::Nullable<Rcpp::Function>& >::type cost_pelt(cost_peltSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::Nullable<Rcpp::Function>& >::type cost_sen(cost_senSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::Nullable<Rcpp::Function>& >::type cost_gradient(cost_gradientSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::Nullable<Rcpp::Function>& >::type cost_hessian(cost_hessianSEXP);
-    Rcpp::traits::input_parameter< const bool >::type cp_only(cp_onlySEXP);
-    Rcpp::traits::input_parameter< const double >::type vanilla_percentage(vanilla_percentageSEXP);
-    Rcpp::traits::input_parameter< const bool >::type warm_start(warm_startSEXP);
-    Rcpp::traits::input_parameter< const arma::colvec& >::type lower(lowerSEXP);
-    Rcpp::traits::input_parameter< const arma::colvec& >::type upper(upperSEXP);
-    Rcpp::traits::input_parameter< const arma::colvec& >::type line_search(line_searchSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type variance_estimate(variance_estimateSEXP);
-    Rcpp::traits::input_parameter< const unsigned int >::type p_response(p_responseSEXP);
-    Rcpp::traits::input_parameter< const double >::type pruning_coef(pruning_coefSEXP);
-    Rcpp::traits::input_parameter< const bool >::type r_progress(r_progressSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< double const >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< std::string const& >::type cost_adjustment(cost_adjustmentSEXP);
+    Rcpp::traits::input_parameter< int const >::type segment_count(segment_countSEXP);
+    Rcpp::traits::input_parameter< double const >::type trim(trimSEXP);
+    Rcpp::traits::input_parameter< double const >::type momentum_coef(momentum_coefSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::Function> const& >::type multiple_epochs_function(multiple_epochs_functionSEXP);
+    Rcpp::traits::input_parameter< std::string const& >::type family(familySEXP);
+    Rcpp::traits::input_parameter< double const >::type epsilon(epsilonSEXP);
+    Rcpp::traits::input_parameter< int const >::type p(pSEXP);
+    Rcpp::traits::input_parameter< arma::colvec const& >::type order(orderSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::Function> const& >::type cost_pelt(cost_peltSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::Function> const& >::type cost_sen(cost_senSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::Function> const& >::type cost_gradient(cost_gradientSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::Function> const& >::type cost_hessian(cost_hessianSEXP);
+    Rcpp::traits::input_parameter< bool const >::type cp_only(cp_onlySEXP);
+    Rcpp::traits::input_parameter< double const >::type vanilla_percentage(vanilla_percentageSEXP);
+    Rcpp::traits::input_parameter< bool const >::type warm_start(warm_startSEXP);
+    Rcpp::traits::input_parameter< arma::colvec const& >::type lower(lowerSEXP);
+    Rcpp::traits::input_parameter< arma::colvec const& >::type upper(upperSEXP);
+    Rcpp::traits::input_parameter< arma::colvec const& >::type line_search(line_searchSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type variance_estimate(variance_estimateSEXP);
+    Rcpp::traits::input_parameter< unsigned int const >::type p_response(p_responseSEXP);
+    Rcpp::traits::input_parameter< double const >::type pruning_coef(pruning_coefSEXP);
+    Rcpp::traits::input_parameter< bool const >::type r_progress(r_progressSEXP);
     rcpp_result_gen = Rcpp::wrap(fastcpd_impl(data, beta, cost_adjustment, segment_count, trim, momentum_coef, multiple_epochs_function, family, epsilon, p, order, cost_pelt, cost_sen, cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, lower, upper, line_search, variance_estimate, p_response, pruning_coef, r_progress));
     return rcpp_result_gen;
 END_RCPP

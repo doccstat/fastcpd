@@ -10,7 +10,7 @@ using ::Rcpp::Nullable;
 using ::Rcpp::NumericVector;
 using ::std::string;
 
-List garch(const colvec& x_, const colvec& order_,
+List garch(colvec const& x_, colvec const& order_,
            Nullable<string> series = R_NilValue, int maxiter = 200,
            bool trace = false, Nullable<NumericVector> start = R_NilValue,
            string grad = "analytical", Nullable<double> abstol_ = R_NilValue,

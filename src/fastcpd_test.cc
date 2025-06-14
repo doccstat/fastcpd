@@ -12,13 +12,13 @@ namespace test {
 // GetGradientArma
 // Computes the gradient using the Armadillo implementation.
 //------------------------------------------------------------------------------
-arma::colvec FastcpdTest::GetGradientArma(const arma::mat& data,
-                                          const unsigned int segment_start,
-                                          const unsigned int segment_end,
-                                          const arma::colvec& theta) {
+arma::colvec FastcpdTest::GetGradientArma(arma::mat const& data,
+                                          unsigned int const segment_start,
+                                          unsigned int const segment_end,
+                                          arma::colvec const& theta) {
   fastcpd::classes::Fastcpd fastcpd_instance(
       /* beta */ 0,
-      /* cost */ R_NilValue,
+      /* cost */ std::nullopt,
       /* cost_pelt */ nullptr,
       /* cost_sen */ nullptr,
       /* cost_adjustment */ "MBIC",
@@ -50,13 +50,13 @@ arma::colvec FastcpdTest::GetGradientArma(const arma::mat& data,
 // GetHessianArma
 // Computes the Hessian using the Armadillo implementation.
 //------------------------------------------------------------------------------
-arma::mat FastcpdTest::GetHessianArma(const arma::mat& data,
-                                      const unsigned int segment_start,
-                                      const unsigned int segment_end,
-                                      const arma::colvec& theta) {
+arma::mat FastcpdTest::GetHessianArma(arma::mat const& data,
+                                      unsigned int const segment_start,
+                                      unsigned int const segment_end,
+                                      arma::colvec const& theta) {
   fastcpd::classes::Fastcpd fastcpd_instance(
       /* beta */ 0,
-      /* cost */ R_NilValue,
+      /* cost */ std::nullopt,
       /* cost_pelt */ nullptr,
       /* cost_sen */ nullptr,
       /* cost_adjustment */ "MBIC",
@@ -88,13 +88,13 @@ arma::mat FastcpdTest::GetHessianArma(const arma::mat& data,
 // GetHessianBinomial
 // Computes the Hessian for a binomial model.
 //------------------------------------------------------------------------------
-arma::mat FastcpdTest::GetHessianBinomial(const arma::mat& data,
-                                          const unsigned int segment_start,
-                                          const unsigned int segment_end,
-                                          const arma::colvec& theta) {
+arma::mat FastcpdTest::GetHessianBinomial(arma::mat const& data,
+                                          unsigned int const segment_start,
+                                          unsigned int const segment_end,
+                                          arma::colvec const& theta) {
   fastcpd::classes::Fastcpd fastcpd_instance(
       /* beta */ 0,
-      /* cost */ R_NilValue,
+      /* cost */ std::nullopt,
       /* cost_pelt */ nullptr,
       /* cost_sen */ nullptr,
       /* cost_adjustment */ "MBIC",
@@ -126,13 +126,13 @@ arma::mat FastcpdTest::GetHessianBinomial(const arma::mat& data,
 // GetHessianPoisson
 // Computes the Hessian for a Poisson model.
 //------------------------------------------------------------------------------
-arma::mat FastcpdTest::GetHessianPoisson(const arma::mat& data,
-                                         const unsigned int segment_start,
-                                         const unsigned int segment_end,
-                                         const arma::colvec& theta) {
+arma::mat FastcpdTest::GetHessianPoisson(arma::mat const& data,
+                                         unsigned int const segment_start,
+                                         unsigned int const segment_end,
+                                         arma::colvec const& theta) {
   fastcpd::classes::Fastcpd fastcpd_instance(
       /* beta */ 0,
-      /* cost */ R_NilValue,
+      /* cost */ std::nullopt,
       /* cost_pelt */ nullptr,
       /* cost_sen */ nullptr,
       /* cost_adjustment */ "MBIC",
@@ -164,13 +164,13 @@ arma::mat FastcpdTest::GetHessianPoisson(const arma::mat& data,
 // GetNllSen
 // Computes the negative log-likelihood for the SEN model.
 //------------------------------------------------------------------------------
-double FastcpdTest::GetNllSen(const arma::mat& data,
-                              const unsigned int segment_start,
-                              const unsigned int segment_end,
-                              const arma::colvec& theta) {
+double FastcpdTest::GetNllSen(arma::mat const& data,
+                              unsigned int const segment_start,
+                              unsigned int const segment_end,
+                              arma::colvec const& theta) {
   fastcpd::classes::Fastcpd fastcpd_instance(
       /* beta */ 0,
-      /* cost */ R_NilValue,
+      /* cost */ std::nullopt,
       /* cost_pelt */ nullptr,
       /* cost_sen */ nullptr,
       /* cost_adjustment */ "MBIC",
@@ -204,12 +204,12 @@ double FastcpdTest::GetNllSen(const arma::mat& data,
 // Computes the negative log-likelihood for the PELT model.
 //------------------------------------------------------------------------------
 std::tuple<arma::colvec, arma::mat, double> FastcpdTest::GetNllPelt(
-    const arma::mat& data, const unsigned int segment_start,
-    const unsigned int segment_end, const bool cv,
-    const Rcpp::Nullable<arma::colvec>& start) {
+    arma::mat const& data, unsigned int const segment_start,
+    unsigned int const segment_end, bool const cv,
+    std::optional<arma::colvec> const& start) {
   fastcpd::classes::Fastcpd fastcpd_instance(
       /* beta */ 0,
-      /* cost */ R_NilValue,
+      /* cost */ std::nullopt,
       /* cost_pelt */ nullptr,
       /* cost_sen */ nullptr,
       /* cost_adjustment */ "MBIC",

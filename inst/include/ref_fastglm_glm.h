@@ -32,10 +32,10 @@ class glm : public GlmBase<Eigen::VectorXd,
   typedef double Double;
   typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
   typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
-  typedef Eigen::Map<const Matrix> MapMat;
-  typedef Eigen::Map<const Vector> MapVec;
-  typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
-  typedef const Eigen::Ref<const Vector> ConstGenericVector;
+  typedef Eigen::Map<Matrix const> MapMat;
+  typedef Eigen::Map<Vector const> MapVec;
+  typedef Eigen::Ref<Matrix const> const ConstGenericMatrix;
+  typedef Eigen::Ref<Vector const> const ConstGenericVector;
   typedef Eigen::SparseMatrix<double> SpMat;
   typedef Eigen::SparseVector<double> SparseVector;
 
@@ -45,19 +45,18 @@ class glm : public GlmBase<Eigen::VectorXd,
   typedef ColPivHouseholderQR<MatrixXd>::PermutationType Permutation;
   typedef Permutation::IndicesType Indices;
 
-  const Map<MatrixXd> X;
-  const Map<VectorXd> Y;
-  const Map<VectorXd> weights;
-  const Map<VectorXd> offset;
+  Map<MatrixXd> const X;
+  Map<VectorXd> const Y;
+  Map<VectorXd> const weights;
+  Map<VectorXd> const offset;
 
-  NumericVector (*variance_fun)(const Eigen::VectorXd &);
-  NumericVector (*mu_eta_fun)(const Eigen::VectorXd &);
-  NumericVector (*linkinv)(const Eigen::VectorXd &);
-  NumericVector (*dev_resids_fun)(const Map<VectorXd> &,
-                                  const Eigen::VectorXd &,
-                                  const Map<VectorXd> &);
-  bool (*valideta)(const Eigen::VectorXd &);
-  bool (*validmu)(const Eigen::VectorXd &);
+  NumericVector (*variance_fun)(Eigen::VectorXd const&);
+  NumericVector (*mu_eta_fun)(Eigen::VectorXd const&);
+  NumericVector (*linkinv)(Eigen::VectorXd const&);
+  NumericVector (*dev_resids_fun)(Map<VectorXd> const&, Eigen::VectorXd const&,
+                                  Map<VectorXd> const&);
+  bool (*valideta)(Eigen::VectorXd const&);
+  bool (*validmu)(Eigen::VectorXd const&);
 
   double tol;
   int maxit;
@@ -86,7 +85,7 @@ class glm : public GlmBase<Eigen::VectorXd,
   }
 
   // from RcppEigen
-  inline ArrayXd Dplus(const ArrayXd &d) {
+  inline ArrayXd Dplus(ArrayXd const& d) {
     ArrayXd di(d.size());
     double comp(d.maxCoeff() * threshold());
     for (int j = 0; j < d.size(); ++j) di[j] = (d[j] < comp) ? 0. : 1. / d[j];
@@ -196,7 +195,7 @@ class glm : public GlmBase<Eigen::VectorXd,
     update_mu();
   }
 
-  virtual void run_step_halving(int &iterr) {
+  virtual void run_step_halving(int& iterr) {
     // check for infinite deviance
     if (std::isinf(dev)) {
       int itrr = 0;
@@ -439,16 +438,16 @@ class glm : public GlmBase<Eigen::VectorXd,
   }
 
  public:
-  glm(const Map<MatrixXd> &X_, const Map<VectorXd> &Y_,
-      const Map<VectorXd> &weights_, const Map<VectorXd> &offset_,
-      NumericVector (*variance_fun_)(const Eigen::VectorXd &),
-      NumericVector (*mu_eta_fun_)(const Eigen::VectorXd &),
-      NumericVector (*linkinv_)(const Eigen::VectorXd &),
-      NumericVector (*dev_resids_fun_)(const Map<VectorXd> &,
-                                       const Eigen::VectorXd &,
-                                       const Map<VectorXd> &),
-      bool (*valideta_)(const Eigen::VectorXd &),
-      bool (*validmu_)(const Eigen::VectorXd &), double tol_ = 1e-6,
+  glm(Map<MatrixXd> const& X_, Map<VectorXd> const& Y_,
+      Map<VectorXd> const& weights_, Map<VectorXd> const& offset_,
+      NumericVector (*variance_fun_)(Eigen::VectorXd const&),
+      NumericVector (*mu_eta_fun_)(Eigen::VectorXd const&),
+      NumericVector (*linkinv_)(Eigen::VectorXd const&),
+      NumericVector (*dev_resids_fun_)(Map<VectorXd> const&,
+                                       Eigen::VectorXd const&,
+                                       Map<VectorXd> const&),
+      bool (*valideta_)(Eigen::VectorXd const&),
+      bool (*validmu_)(Eigen::VectorXd const&), double tol_ = 1e-6,
       int maxit_ = 100, int type_ = 1, bool is_big_matrix_ = false)
       : GlmBase<Eigen::VectorXd, Eigen::MatrixXd>(X_.rows(), X_.cols(), tol_,
                                                   maxit_),
@@ -470,8 +469,8 @@ class glm : public GlmBase<Eigen::VectorXd,
         is_big_matrix(is_big_matrix_) {}
 
   // must set params to starting vals
-  void init_parms(const Map<VectorXd> &start_, const Map<VectorXd> &mu_,
-                  const Map<VectorXd> &eta_) {
+  void init_parms(Map<VectorXd> const& start_, Map<VectorXd> const& mu_,
+                  Map<VectorXd> const& eta_) {
     beta = start_;
     eta = eta_;
     mu = mu_;
