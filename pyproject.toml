@@ -1,0 +1,51 @@
+[project]
+name = "fastcpd"
+description="A Python package for performing fast change point detection."
+dynamic = ["version"]
+authors = [
+    {name="Xingchi Li", email="anthony.li.stat.tamu.edu@lixingchi.com"},
+    {name="Xianyang Zhang", email="zhangxiany@stat.tamu.edu"},
+]
+requires-python = ">=3.8"
+readme = "README.md"
+
+maintainers = [
+    {name="Xingchi Li", email="anthony.li.stat.tamu.edu@lixingchi.com"},
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Environment :: GPU",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C++",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Software Development :: Libraries",
+]
+
+
+[tool.setuptools.dynamic]
+version = {attr = "fastcpd.__version__"}
+
+
+[build-system]
+requires = [
+    "setuptools>=65.5.1",
+    "numpy",
+    "wheel",
+    "setuptools_scm"
+]
+
+[project.urls]
+Documentation = "https://fastcpd.xingchi.li/"
+Repository = "https://github.com/doccstat/fastcpd"

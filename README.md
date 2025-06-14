@@ -40,6 +40,10 @@ devtools::install_github("doccstat/fastcpd")
 install.packages("fastcpd")
 ```
 
+``` shell
+pip install .
+```
+
 ## Usage
 
 ``` r
@@ -73,6 +77,18 @@ plot(result)
 ```
 
 ![](man/figures/README-ar3-1.png)<!-- -->
+
+``` python
+import fastcpd
+from numpy import concatenate
+from numpy.random import normal, multivariate_normal
+covariance_mat = [[100, 0, 0], [0, 100, 0], [0, 0, 100]]
+data = concatenate((multivariate_normal([0, 0, 0], covariance_mat, 300),
+                    multivariate_normal([50, 50, 50], covariance_mat, 400),
+                    multivariate_normal([2, 2, 2], covariance_mat, 300)))
+fastcpd.mean(data)
+fastcpd.variance_estimation.mean(data)
+```
 
 ### Comparison
 
@@ -282,6 +298,19 @@ below to make contributions.
 </details>
 <details close>
 <summary>
+Trouble installing Python package.
+</summary>
+
+Python headers are required to install the Python package. If you are
+using Ubuntu, you can install the headers with:
+
+``` shell
+sudo apt install python3-dev
+```
+
+</details>
+<details close>
+<summary>
 Encountered a bug or unintended behavior?
 </summary>
 
@@ -296,3 +325,7 @@ Encountered a bug or unintended behavior?
 
 [![Stargazers over
 time](https://starchart.cc/doccstat/fastcpd.svg)](https://starchart.cc/doccstat/fastcpd)
+
+## Acknowledgements
+
+Special thanks to [clODE](https://github.com/patrickfletcher/clODE).
