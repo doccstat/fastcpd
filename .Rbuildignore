@@ -26,15 +26,12 @@
 ^BUILD\.bazel$
 
 # Python files.
-^cc$
 ^fastcpd$
 ^test$
-^\.pytest_cache$
 ^\.clang-format$
 ^bazelisk\.py$
 ^Makefile$
 ^MANIFEST\.in$
-^dist$
 ^mypy\.ini$
 ^pyproject\.toml$
 ^pytest\.ini$
