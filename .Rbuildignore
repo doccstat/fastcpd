@@ -17,19 +17,23 @@
 ^vignettes/.*\.original$
 ^vignettes/comparison-packages-results\.RData$
 
+# Bazel files.
 ^bazel$
+^\.bazeliskrc$
+^\.bazelrc$
+^\.bazelversion$
+^WORKSPACE$
+^BUILD\.bazel$
+
+# Python files.
 ^cc$
 ^fastcpd$
 ^test$
 ^\.pytest_cache$
-^\.bazeliskrc$
-^\.bazelrc$
-^\.bazelversion$
 ^\.clang-format$
 ^bazelisk\.py$
 ^Makefile$
 ^MANIFEST\.in$
-^BUILD\.bazel$
 ^dist$
 ^mypy\.ini$
 ^pyproject\.toml$
@@ -37,4 +41,3 @@
 ^requirements\.in$
 ^requirements_lock\.txt$
 ^setup\.py$
-^WORKSPACE$
