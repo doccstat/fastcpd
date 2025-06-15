@@ -26,8 +26,9 @@
 ^BUILD\.bazel$
 
 # Python files.
+^tests/.*\.py$
+^tests/BUILD\.bazel$
 ^fastcpd$
-^test$
 ^\.clang-format$
 ^bazelisk\.py$
 ^Makefile$
