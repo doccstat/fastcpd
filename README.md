@@ -42,7 +42,7 @@ devtools::install_github("doccstat/fastcpd")
 install.packages("fastcpd")
 ```
 
-### Python
+### Python WIP
 
 ``` shell
 pip install .
@@ -84,7 +84,7 @@ plot(result)
 
 ![](man/figures/README-ar3-1.png)<!-- -->
 
-### Python
+### Python WIP
 
 ``` python
 import fastcpd
