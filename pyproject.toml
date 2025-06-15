@@ -6,7 +6,7 @@ authors = [
     {name="Xingchi Li", email="anthony.li.stat.tamu.edu@lixingchi.com"},
     {name="Xianyang Zhang", email="zhangxiany@stat.tamu.edu"},
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 readme = "README.md"
 
 maintainers = [
@@ -21,8 +21,6 @@ classifiers = [
     "Operating System :: POSIX",
     "Environment :: GPU",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -39,10 +37,10 @@ version = {attr = "fastcpd.__version__"}
 
 [build-system]
 requires = [
-    "setuptools>=65.5.1",
-    "numpy",
-    "wheel",
-    "setuptools_scm"
+    "numpy>=2.0.3",
+    "build",
+    "pytest",
+    "setuptools",
 ]
 
 [project.urls]
