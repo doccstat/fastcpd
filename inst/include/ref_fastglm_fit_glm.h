@@ -1,6 +1,7 @@
 #ifndef FIT_GLM_H
 #define FIT_GLM_H
 
+#include <optional>
 #include <RcppArmadillo.h>
 #include <RcppEigen.h>
 
