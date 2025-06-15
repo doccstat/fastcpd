@@ -21,6 +21,7 @@
 ^cc$
 ^fastcpd$
 ^test$
+^\.pytest_cache$
 ^\.bazeliskrc$
 ^\.bazelrc$
 ^\.bazelversion$
@@ -28,9 +29,12 @@
 ^bazelisk\.py$
 ^Makefile$
 ^MANIFEST\.in$
+^BUILD\.bazel$
+^dist$
 ^mypy\.ini$
 ^pyproject\.toml$
 ^pytest\.ini$
-^requirements\.txt$
+^requirements\.in$
+^requirements_lock\.txt$
 ^setup\.py$
 ^WORKSPACE$
