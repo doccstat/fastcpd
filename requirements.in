@@ -1,4 +1,4 @@
 requests~=2.25.1
 yamllint~=1.28.0
-numpy
+numpy>=2.0.3
 build
