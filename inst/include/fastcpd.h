@@ -6,6 +6,7 @@
 #include <RcppArmadillo.h>
 #include "RProgress.h"
 #include <memory>
+#include <optional>
 #include <unordered_map>
 
 constexpr char kRProgress[] = "[:bar] :current/:total in :elapsed";

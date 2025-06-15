@@ -39,6 +39,8 @@ To learn more behind the algorithms:
 
 ## Installation
 
+### R
+
 ```{r eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("doccstat/fastcpd")
@@ -46,11 +48,15 @@ devtools::install_github("doccstat/fastcpd")
 install.packages("fastcpd")
 ```
 
+### Python
+
 ``` shell
 pip install .
 ```
 
 ## Usage
+
+### R
 
 ```{r ar3}
 set.seed(1)
@@ -66,6 +72,8 @@ result <- fastcpd::fastcpd.ar(x[3 + seq_len(n)], 3, r.progress = FALSE)
 summary(result)
 plot(result)
 ```
+
+### Python
 
 ``` python
 import fastcpd

@@ -33,6 +33,8 @@ To learn more behind the algorithms:
 
 ## Installation
 
+### R
+
 ``` r
 # install.packages("devtools")
 devtools::install_github("doccstat/fastcpd")
@@ -40,11 +42,15 @@ devtools::install_github("doccstat/fastcpd")
 install.packages("fastcpd")
 ```
 
+### Python
+
 ``` shell
 pip install .
 ```
 
 ## Usage
+
+### R
 
 ``` r
 set.seed(1)
@@ -77,6 +83,8 @@ plot(result)
 ```
 
 ![](man/figures/README-ar3-1.png)<!-- -->
+
+### Python
 
 ``` python
 import fastcpd
