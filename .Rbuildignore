@@ -42,3 +42,4 @@
 
 # Documentation files.
 ^\.readthedocs\.yaml$
+^docs$
