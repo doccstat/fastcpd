@@ -1,3 +1,4 @@
 ``` shell
-pdoc --docformat google -o pdoc fastcpd
+pip install .
+pdoc --docformat google -o pdoc fastcpd.segmentation fastcpd.variance_estimation
 ```
