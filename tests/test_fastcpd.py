@@ -1,6 +1,6 @@
 import unittest
 
-import fastcpd
+from fastcpd.segmentation import mean
 from numpy import concatenate
 from numpy.random import multivariate_normal, seed
 
@@ -15,7 +15,7 @@ class TestBasic(unittest.TestCase):
                                 [50, 50, 50], covariance_mat, 400),
                             multivariate_normal([2, 2, 2], covariance_mat, 300)
                             ))
-        result = fastcpd.mean(data)
+        result = mean(data)
         self.assertEqual(result[0], 300)
         self.assertEqual(result[1], 700)
 
