@@ -45,7 +45,10 @@ install.packages("fastcpd")
 ### Python WIP
 
 ``` shell
+# python -m ensurepip --upgrade
 pip install .
+# or install from TestPyPI
+pip install --extra-index-url https://test.pypi.org/simple/ fastcpd
 ```
 
 ## Usage
