@@ -15,7 +15,7 @@
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Fast Change Point Detection via Sequential Gradient Descent">
 <meta name="description" content="Implements fast change point detection algorithm based on the paper &quot;Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis&quot; by Xianyang Zhang, Trisha Dawn &lt;https://proceedings.mlr.press/v206/zhang23b.html&gt;. The algorithm is based on dynamic programming with pruning and sequential gradient descent. It is able to detect change points a magnitude faster than the vanilla Pruned Exact Linear Time(PELT). The package includes examples of linear regression, logistic regression, Poisson regression, penalized linear regression data, and whole lot more examples with custom cost function in case the user wants to use their own cost function.">
 <meta property="og:description" content="Implements fast change point detection algorithm based on the paper &quot;Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis&quot; by Xianyang Zhang, Trisha Dawn &lt;https://proceedings.mlr.press/v206/zhang23b.html&gt;. The algorithm is based on dynamic programming with pruning and sequential gradient descent. It is able to detect change points a magnitude faster than the vanilla Pruned Exact Linear Time(PELT). The package includes examples of linear regression, logistic regression, Poisson regression, penalized linear regression data, and whole lot more examples with custom cost function in case the user wants to use their own cost function.">
-<meta property="og:image" content="https://fastcpd.xingchi.li/logo.png">
+<meta property="og:image" content="https://fastcpd.xingchi.li/logo.svg">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -66,11 +66,11 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header">
-<img src="logo.png" class="logo" alt=""><h1 id="fast-change-point-detection-">Fast Change Point Detection 
+<img src="logo.svg" class="logo" alt=""><h1 id="fast-change-point-detection-">Fast Change Point Detection 
 <a class="anchor" aria-label="anchor" href="#fast-change-point-detection-"></a>
 </h1>
 </div>
-<p><a href="https://app.codecov.io/gh/doccstat/fastcpd?branch=main" class="external-link"><img src="https://codecov.io/gh/doccstat/fastcpd/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://www.codefactor.io/repository/github/doccstat/fastcpd" class="external-link"><img src="https://www.codefactor.io/repository/github/doccstat/fastcpd/badge" alt="CodeFactor"></a> <a href="https://cran.r-project.org/package=fastcpd" class="external-link"><img src="https://www.r-pkg.org/badges/version-last-release/fastcpd" alt="CRAN status"></a> <a href="https://doi.org/10.48550/arXiv.2404.05933" class="external-link"><img src="https://img.shields.io/badge/doi-10.48550/arXiv.2404.05933-green.svg" alt="doi"></a> <a href="https://cran.r-project.org/package=fastcpd" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/fastcpd" alt="Downloads"></a> <a href="https://github.com/doccstat/fastcpd" class="external-link"><img src="https://img.shields.io/github/last-commit/doccstat/fastcpd" alt="Last Commit"></a> <a href="https://github.com/doccstat/fastcpd/actions" class="external-link"><img src="https://github.com/doccstat/fastcpd/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check.yaml"></a> <a href="https://doccstat.r-universe.dev" class="external-link"><img src="https://doccstat.r-universe.dev/badges/fastcpd" alt="r-universe"></a></p>
+<p><a href="https://app.codecov.io/gh/doccstat/fastcpd?branch=main" class="external-link"><img src="https://codecov.io/gh/doccstat/fastcpd/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://www.codefactor.io/repository/github/doccstat/fastcpd" class="external-link"><img src="https://www.codefactor.io/repository/github/doccstat/fastcpd/badge" alt="CodeFactor"></a> <a href="https://cran.r-project.org/package=fastcpd" class="external-link"><img src="https://www.r-pkg.org/badges/version-last-release/fastcpd" alt="CRAN status"></a> <a href="https://doi.org/10.48550/arXiv.2404.05933" class="external-link"><img src="https://img.shields.io/badge/doi-10.48550/arXiv.2404.05933-green.svg" alt="doi"></a> <a href="https://cran.r-project.org/package=fastcpd" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/fastcpd" alt="Downloads"></a> <a href="https://github.com/doccstat/fastcpd" class="external-link"><img src="https://img.shields.io/github/last-commit/doccstat/fastcpd" alt="Last Commit"></a> <a href="https://github.com/doccstat/fastcpd/actions" class="external-link"><img src="https://github.com/doccstat/fastcpd/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check.yaml"></a> <a href="https://doccstat.r-universe.dev" class="external-link"><img src="https://doccstat.r-universe.dev/badges/fastcpd" alt="r-universe"></a> <a href="https://pypi.org/project/fastcpd/" class="external-link"><img src="https://img.shields.io/pypi/pyversions/fastcpd" alt="Python version"></a> <a href="https://pypi.org/project/fastcpd/" class="external-link"><img src="https://img.shields.io/pypi/v/fastcpd" alt="Python package"></a></p>
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
@@ -81,7 +81,7 @@
 <ul>
 <li>R documentation: <a href="https://fastcpd.xingchi.li">fastcpd.xingchi.li</a>
 </li>
-<li>Python documentation: <a href="https://python.fastcpd.xingchi.li" class="external-link">python.fastcpd.xingchi.li</a>
+<li>Python documentation: <a href="https://fastcpd.xingchi.li/python">fastcpd.xingchi.li/python</a>
 </li>
 </ul>
 </div>
