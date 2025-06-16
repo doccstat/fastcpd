@@ -31,6 +31,11 @@ To learn more behind the algorithms:
   Change-Point
   Analysis](https://proceedings.mlr.press/v206/zhang23b.html)
 
+### Documentation
+
+- R documentation: [fastcpd.xingchi.li](https://fastcpd.xingchi.li)
+- Python documentation: [fastcpd.readthedocs.io](https://fastcpd.readthedocs.io)
+
 ## Installation
 
 ### R
