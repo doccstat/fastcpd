@@ -9,6 +9,15 @@ template:
     font_scale: 1.2
     primary: "#447099"
 
+navbar:
+  structure:
+    left:  [reference, articles, news, python]
+    right: [search, github, lightswitch]
+  components:
+    python:
+      text: "Python API"
+      href: https://fastcpd.xingchi.li/python
+
 reference:
   - title: Main function
     desc: >
