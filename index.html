@@ -147,15 +147,17 @@ pip install fastcpd</code></pre>
 <div class="section level3">
 <h3 id="python-wip-1">Python WIP<a class="anchor" aria-label="anchor" href="#python-wip-1"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="im">import</span> fastcpd</span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="im">import</span> fastcpd.segmentation</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> concatenate</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> normal, multivariate_normal</span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>covariance_mat <span class="op">=</span> [[<span class="dv">100</span>, <span class="dv">0</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="dv">100</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">100</span>]]</span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>data <span class="op">=</span> concatenate((multivariate_normal([<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>], covariance_mat, <span class="dv">300</span>),</span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>                    multivariate_normal([<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">50</span>], covariance_mat, <span class="dv">400</span>),</span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>                    multivariate_normal([<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>], covariance_mat, <span class="dv">300</span>)))</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>fastcpd.mean(data)</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>fastcpd.variance_estimation.mean(data)</span></code></pre></div>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>fastcpd.segmentation.mean(data)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="im">import</span> fastcpd.variance_estimation</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>fastcpd.variance_estimation.mean(data)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="comparison">Comparison<a class="anchor" aria-label="anchor" href="#comparison"></a>

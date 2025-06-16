@@ -11,19 +11,40 @@
     <style>/*! theme.css */:root{--pdoc-background:#fff;}.pdoc{--text:#212529;--muted:#6c757d;--link:#3660a5;--link-hover:#1659c5;--code:#f8f8f8;--active:#fff598;--accent:#eee;--accent2:#c1c1c1;--nav-hover:rgba(255, 255, 255, 0.5);--name:#0066BB;--def:#008800;--annotation:#007020;}</style>
     <style>/*! layout.css */html, body{width:100%;height:100%;}html, main{scroll-behavior:smooth;}body{background-color:var(--pdoc-background);}@media (max-width:769px){#navtoggle{cursor:pointer;position:absolute;width:50px;height:40px;top:1rem;right:1rem;border-color:var(--text);color:var(--text);display:flex;opacity:0.8;z-index:999;}#navtoggle:hover{opacity:1;}#togglestate + div{display:none;}#togglestate:checked + div{display:inherit;}main, header{padding:2rem 3vw;}header + main{margin-top:-3rem;}.git-button{display:none !important;}nav input[type="search"]{max-width:77%;}nav input[type="search"]:first-child{margin-top:-6px;}nav input[type="search"]:valid ~ *{display:none !important;}}@media (min-width:770px){:root{--sidebar-width:clamp(12.5rem, 28vw, 22rem);}nav{position:fixed;overflow:auto;height:100vh;width:var(--sidebar-width);}main, header{padding:3rem 2rem 3rem calc(var(--sidebar-width) + 3rem);width:calc(54rem + var(--sidebar-width));max-width:100%;}header + main{margin-top:-4rem;}#navtoggle{display:none;}}#togglestate{position:absolute;height:0;opacity:0;}nav.pdoc{--pad:clamp(0.5rem, 2vw, 1.75rem);--indent:1.5rem;background-color:var(--accent);border-right:1px solid var(--accent2);box-shadow:0 0 20px rgba(50, 50, 50, .2) inset;padding:0 0 0 var(--pad);overflow-wrap:anywhere;scrollbar-width:thin; scrollbar-color:var(--accent2) transparent; z-index:1}nav.pdoc::-webkit-scrollbar{width:.4rem; }nav.pdoc::-webkit-scrollbar-thumb{background-color:var(--accent2); }nav.pdoc > div{padding:var(--pad) 0;}nav.pdoc .module-list-button{display:inline-flex;align-items:center;color:var(--text);border-color:var(--muted);margin-bottom:1rem;}nav.pdoc .module-list-button:hover{border-color:var(--text);}nav.pdoc input[type=search]{display:block;outline-offset:0;width:calc(100% - var(--pad));}nav.pdoc .logo{max-width:calc(100% - var(--pad));max-height:35vh;display:block;margin:0 auto 1rem;transform:translate(calc(-.5 * var(--pad)), 0);}nav.pdoc ul{list-style:none;padding-left:0;}nav.pdoc > div > ul{margin-left:calc(0px - var(--pad));}nav.pdoc li a{padding:.2rem 0 .2rem calc(var(--pad) + var(--indent));}nav.pdoc > div > ul > li > a{padding-left:var(--pad);}nav.pdoc li{transition:all 100ms;}nav.pdoc li:hover{background-color:var(--nav-hover);}nav.pdoc a, nav.pdoc a:hover{color:var(--text);}nav.pdoc a{display:block;}nav.pdoc > h2:first-of-type{margin-top:1.5rem;}nav.pdoc .class:before{content:"class ";color:var(--muted);}nav.pdoc .function:after{content:"()";color:var(--muted);}nav.pdoc footer:before{content:"";display:block;width:calc(100% - var(--pad));border-top:solid var(--accent2) 1px;margin-top:1.5rem;padding-top:.5rem;}nav.pdoc footer{font-size:small;}</style>
     <style>/*! content.css */.pdoc{color:var(--text);box-sizing:border-box;line-height:1.5;background:none;}.pdoc .pdoc-button{cursor:pointer;display:inline-block;border:solid black 1px;border-radius:2px;font-size:.75rem;padding:calc(0.5em - 1px) 1em;transition:100ms all;}.pdoc .alert{padding:1rem 1rem 1rem calc(1.5rem + 24px);border:1px solid transparent;border-radius:.25rem;background-repeat:no-repeat;background-position:.75rem center;margin-bottom:1rem;}.pdoc .alert > em{display:none;}.pdoc .alert > *:last-child{margin-bottom:0;}.pdoc .alert.note{color:#084298;background-color:#cfe2ff;border-color:#b6d4fe;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23084298%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M8%2016A8%208%200%201%200%208%200a8%208%200%200%200%200%2016zm.93-9.412-1%204.705c-.07.34.029.533.304.533.194%200%20.487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703%200-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381%202.29-.287zM8%205.5a1%201%200%201%201%200-2%201%201%200%200%201%200%202z%22/%3E%3C/svg%3E");}.pdoc .alert.tip{color:#0a3622;background-color:#d1e7dd;border-color:#a3cfbb;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%230a3622%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M2%206a6%206%200%201%201%2010.174%204.31c-.203.196-.359.4-.453.619l-.762%201.769A.5.5%200%200%201%2010.5%2013a.5.5%200%200%201%200%201%20.5.5%200%200%201%200%201l-.224.447a1%201%200%200%201-.894.553H6.618a1%201%200%200%201-.894-.553L5.5%2015a.5.5%200%200%201%200-1%20.5.5%200%200%201%200-1%20.5.5%200%200%201-.46-.302l-.761-1.77a2%202%200%200%200-.453-.618A5.98%205.98%200%200%201%202%206m6-5a5%205%200%200%200-3.479%208.592c.263.254.514.564.676.941L5.83%2012h4.342l.632-1.467c.162-.377.413-.687.676-.941A5%205%200%200%200%208%201%22/%3E%3C/svg%3E");}.pdoc .alert.important{color:#055160;background-color:#cff4fc;border-color:#9eeaf9;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23055160%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M2%200a2%202%200%200%200-2%202v12a2%202%200%200%200%202%202h12a2%202%200%200%200%202-2V2a2%202%200%200%200-2-2zm6%204c.535%200%20.954.462.9.995l-.35%203.507a.552.552%200%200%201-1.1%200L7.1%204.995A.905.905%200%200%201%208%204m.002%206a1%201%200%201%201%200%202%201%201%200%200%201%200-2%22/%3E%3C/svg%3E");}.pdoc .alert.warning{color:#664d03;background-color:#fff3cd;border-color:#ffecb5;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23664d03%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M8.982%201.566a1.13%201.13%200%200%200-1.96%200L.165%2013.233c-.457.778.091%201.767.98%201.767h13.713c.889%200%201.438-.99.98-1.767L8.982%201.566zM8%205c.535%200%20.954.462.9.995l-.35%203.507a.552.552%200%200%201-1.1%200L7.1%205.995A.905.905%200%200%201%208%205zm.002%206a1%201%200%201%201%200%202%201%201%200%200%201%200-2z%22/%3E%3C/svg%3E");}.pdoc .alert.caution{color:#842029;background-color:#f8d7da;border-color:#f5c2c7;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23842029%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M11.46.146A.5.5%200%200%200%2011.107%200H4.893a.5.5%200%200%200-.353.146L.146%204.54A.5.5%200%200%200%200%204.893v6.214a.5.5%200%200%200%20.146.353l4.394%204.394a.5.5%200%200%200%20.353.146h6.214a.5.5%200%200%200%20.353-.146l4.394-4.394a.5.5%200%200%200%20.146-.353V4.893a.5.5%200%200%200-.146-.353zM8%204c.535%200%20.954.462.9.995l-.35%203.507a.552.552%200%200%201-1.1%200L7.1%204.995A.905.905%200%200%201%208%204m.002%206a1%201%200%201%201%200%202%201%201%200%200%201%200-2%22/%3E%3C/svg%3E");}.pdoc .alert.danger{color:#842029;background-color:#f8d7da;border-color:#f5c2c7;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23842029%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M5.52.359A.5.5%200%200%201%206%200h4a.5.5%200%200%201%20.474.658L8.694%206H12.5a.5.5%200%200%201%20.395.807l-7%209a.5.5%200%200%201-.873-.454L6.823%209.5H3.5a.5.5%200%200%201-.48-.641l2.5-8.5z%22/%3E%3C/svg%3E");}.pdoc .visually-hidden{position:absolute !important;width:1px !important;height:1px !important;padding:0 !important;margin:-1px !important;overflow:hidden !important;clip:rect(0, 0, 0, 0) !important;white-space:nowrap !important;border:0 !important;}.pdoc h1, .pdoc h2, .pdoc h3{font-weight:300;margin:.3em 0;padding:.2em 0;}.pdoc > section:not(.module-info) h1{font-size:1.5rem;font-weight:500;}.pdoc > section:not(.module-info) h2{font-size:1.4rem;font-weight:500;}.pdoc > section:not(.module-info) h3{font-size:1.3rem;font-weight:500;}.pdoc > section:not(.module-info) h4{font-size:1.2rem;}.pdoc > section:not(.module-info) h5{font-size:1.1rem;}.pdoc a{text-decoration:none;color:var(--link);}.pdoc a:hover{color:var(--link-hover);}.pdoc blockquote{margin-left:2rem;}.pdoc pre{border-top:1px solid var(--accent2);border-bottom:1px solid var(--accent2);margin-top:0;margin-bottom:1em;padding:.5rem 0 .5rem .5rem;overflow-x:auto;background-color:var(--code);}.pdoc code{color:var(--text);padding:.2em .4em;margin:0;font-size:85%;background-color:var(--accent);border-radius:6px;}.pdoc a > code{color:inherit;}.pdoc pre > code{display:inline-block;font-size:inherit;background:none;border:none;padding:0;}.pdoc > section:not(.module-info){margin-bottom:1.5rem;}.pdoc .modulename{margin-top:0;font-weight:bold;}.pdoc .modulename a{color:var(--link);transition:100ms all;}.pdoc .git-button{float:right;border:solid var(--link) 1px;}.pdoc .git-button:hover{background-color:var(--link);color:var(--pdoc-background);}.view-source-toggle-state,.view-source-toggle-state ~ .pdoc-code{display:none;}.view-source-toggle-state:checked ~ .pdoc-code{display:block;}.view-source-button{display:inline-block;float:right;font-size:.75rem;line-height:1.5rem;color:var(--muted);padding:0 .4rem 0 1.3rem;cursor:pointer;text-indent:-2px;}.view-source-button > span{visibility:hidden;}.module-info .view-source-button{float:none;display:flex;justify-content:flex-end;margin:-1.2rem .4rem -.2rem 0;}.view-source-button::before{position:absolute;content:"View Source";display:list-item;list-style-type:disclosure-closed;}.view-source-toggle-state:checked ~ .attr .view-source-button::before,.view-source-toggle-state:checked ~ .view-source-button::before{list-style-type:disclosure-open;}.pdoc .docstring{margin-bottom:1.5rem;}.pdoc section:not(.module-info) .docstring{margin-left:clamp(0rem, 5vw - 2rem, 1rem);}.pdoc .docstring .pdoc-code{margin-left:1em;margin-right:1em;}.pdoc h1:target,.pdoc h2:target,.pdoc h3:target,.pdoc h4:target,.pdoc h5:target,.pdoc h6:target,.pdoc .pdoc-code > pre > span:target{background-color:var(--active);box-shadow:-1rem 0 0 0 var(--active);}.pdoc .pdoc-code > pre > span:target{display:block;}.pdoc div:target > .attr,.pdoc section:target > .attr,.pdoc dd:target > a{background-color:var(--active);}.pdoc *{scroll-margin:2rem;}.pdoc .pdoc-code .linenos{user-select:none;}.pdoc .attr:hover{filter:contrast(0.95);}.pdoc section, .pdoc .classattr{position:relative;}.pdoc .headerlink{--width:clamp(1rem, 3vw, 2rem);position:absolute;top:0;left:calc(0rem - var(--width));transition:all 100ms ease-in-out;opacity:0;}.pdoc .headerlink::before{content:"#";display:block;text-align:center;width:var(--width);height:2.3rem;line-height:2.3rem;font-size:1.5rem;}.pdoc .attr:hover ~ .headerlink,.pdoc *:target > .headerlink,.pdoc .headerlink:hover{opacity:1;}.pdoc .attr{display:block;margin:.5rem 0 .5rem;padding:.4rem .4rem .4rem 1rem;background-color:var(--accent);overflow-x:auto;}.pdoc .classattr{margin-left:2rem;}.pdoc .decorator-deprecated{color:#842029;}.pdoc .decorator-deprecated ~ span{filter:grayscale(1) opacity(0.8);}.pdoc .name{color:var(--name);font-weight:bold;}.pdoc .def{color:var(--def);font-weight:bold;}.pdoc .signature{background-color:transparent;}.pdoc .param, .pdoc .return-annotation{white-space:pre;}.pdoc .signature.multiline .param{display:block;}.pdoc .signature.condensed .param{display:inline-block;}.pdoc .annotation{color:var(--annotation);}.pdoc .view-value-toggle-state,.pdoc .view-value-toggle-state ~ .default_value{display:none;}.pdoc .view-value-toggle-state:checked ~ .default_value{display:inherit;}.pdoc .view-value-button{font-size:.5rem;vertical-align:middle;border-style:dashed;margin-top:-0.1rem;}.pdoc .view-value-button:hover{background:white;}.pdoc .view-value-button::before{content:"show";text-align:center;width:2.2em;display:inline-block;}.pdoc .view-value-toggle-state:checked ~ .view-value-button::before{content:"hide";}.pdoc .inherited{margin-left:2rem;}.pdoc .inherited dt{font-weight:700;}.pdoc .inherited dt, .pdoc .inherited dd{display:inline;margin-left:0;margin-bottom:.5rem;}.pdoc .inherited dd:not(:last-child):after{content:", ";}.pdoc .inherited .class:before{content:"class ";}.pdoc .inherited .function a:after{content:"()";}.pdoc .search-result .docstring{overflow:auto;max-height:25vh;}.pdoc .search-result.focused > .attr{background-color:var(--active);}.pdoc .attribution{margin-top:2rem;display:block;opacity:0.5;transition:all 200ms;filter:grayscale(100%);}.pdoc .attribution:hover{opacity:1;filter:grayscale(0%);}.pdoc .attribution img{margin-left:5px;height:35px;vertical-align:middle;width:70px;transition:all 200ms;}.pdoc table{display:block;width:max-content;max-width:100%;overflow:auto;margin-bottom:1rem;}.pdoc table th{font-weight:600;}.pdoc table th, .pdoc table td{padding:6px 13px;border:1px solid var(--accent2);}</style>
-    <style>/*! custom.css */</style></head>
+    <style>/*! custom.css */</style><script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']]
+        }
+    };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+    /* Re-invoke MathJax when DOM content changes, for example during search. */
+    document.addEventListener("DOMContentLoaded", () => {
+        new MutationObserver(() => MathJax.typeset()).observe(
+            document.querySelector("main.pdoc").parentNode,
+            {childList: true}
+        );
+    })
+</script>
+<style>
+    mjx-container {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+</style></head>
 <body>
     <nav class="pdoc">
         <label id="navtoggle" for="togglestate" class="pdoc-button"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke-linecap='round' stroke="currentColor" stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg></label>
         <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
-        <div>            <a class="pdoc-button module-list-button" href="../index.html">
+        <div>            <a class="pdoc-button module-list-button" href="../fastcpd.html">
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-left" viewBox="0 0 16 16">
   <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0v-2z"/>
   <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
-</svg>                &nbsp;
-                Module Index
-            </a>
+</svg>                &nbsp;fastcpd</a>
 
+            <img src="https://fastcpd.xingchi.li/logo.svg" class="logo" alt="project logo"/>
 
             <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
                    pattern=".+" required>
@@ -33,9 +54,6 @@
             <h2>API Documentation</h2>
                 <ul class="memberlist">
             <li>
-                    <a class="function" href="#detect">detect</a>
-            </li>
-            <li>
                     <a class="function" href="#mean">mean</a>
             </li>
             <li>
@@ -43,6 +61,9 @@
             </li>
             <li>
                     <a class="function" href="#meanvariance">meanvariance</a>
+            </li>
+            <li>
+                    <a class="function" href="#detect">detect</a>
             </li>
     </ul>
 
@@ -58,194 +79,330 @@
     <main class="pdoc">
             <section class="module-info">
                     <h1 class="modulename">
-fastcpd<wbr>.segmentation    </h1>
+<a href="./../fastcpd.html">fastcpd</a><wbr>.segmentation    </h1>
 
-                
+                        <div class="docstring"><p>Perform change point detection using fastcpd.</p>
+</div>
+
                         <input id="mod-segmentation-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-segmentation-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="c1"># import pandas as pd</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="c1"># from patsy import dmatrices</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="sd">Perform change point detection using fastcpd.</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="c1"># Assume fastcpd_impl and helper functions are exposed via pybind11</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">fastcpd.variance_estimation</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">log2</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">fastcpd.interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">fastcpd_impl</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="k">def</span><span class="w"> </span><span class="nf">detect</span><span class="p">(</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>    <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;y ~ . - 1&#39;</span><span class="p">,</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>    <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>    <span class="n">beta</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>    <span class="n">cost_adjustment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>    <span class="n">family</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>    <span class="n">cost</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>    <span class="n">cost_gradient</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>    <span class="n">cost_hessian</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    <span class="n">line_search</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>    <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>    <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>    <span class="n">pruning_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>    <span class="n">segment_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>    <span class="n">trim</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>    <span class="n">momentum_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>    <span class="n">multiple_epochs</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>    <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>    <span class="n">p</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>    <span class="n">variance_estimation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>    <span class="n">cp_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>    <span class="n">vanilla_percentage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>    <span class="n">warm_start</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>    <span class="o">**</span><span class="n">kwargs</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="p">):</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently.</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="c1"># import pandas as pd</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="c1"># from patsy import dmatrices</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">fastcpd.variance_estimation</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">log2</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">fastcpd.interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">fastcpd_impl</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in mean change models.</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="sd">    Args:</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">        data: Univariate or multivariate data for mean change detection.</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">    Returns:</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="k">def</span><span class="w"> </span><span class="nf">variance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in variance change models.</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="sd">    Args:</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="sd">        data: Univariate or multivariate data for variance change detection.</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">    Returns:</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="sd">    Args:</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="sd">        formula: A formula string specifying the model to be fitted. The</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="sd">            optional response variable should be on the LHS, covariates on the</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="sd">            RHS. Intercept should be removed by appending &#39;- 1&#39;. By default,</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="sd">            an intercept column is added as in R&#39;s lm().</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">        data: A NumPy array of shape (T, d) containing the data to be</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">            segmented. Each row is a data point z_t in R^d.</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">        beta: Penalty criterion for the number of change points. Can be one of</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">            &#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;, or a float value.</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">        cost_adjustment: Cost adjustment criterion modifying the cost function.</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="sd">            Can be one of &#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;, or None.</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">        family: Family of change point model. One of: &#39;mean&#39;, &#39;variance&#39;,</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="sd">            &#39;meanvariance&#39;, &#39;lm&#39;, &#39;binomial&#39;, &#39;poisson&#39;, &#39;lasso&#39;, &#39;ar&#39;,</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="sd">            &#39;arma&#39;, &#39;arima&#39;, &#39;garch&#39;, &#39;var&#39;, &#39;custom&#39;. If None, it is</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="sd">            treated as &#39;custom&#39;.</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="sd">        cost: Custom cost function, e.g., ``cost(data)`` or</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="sd">            ``cost(data, theta)``.</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">        cost_gradient: Gradient of custom cost, e.g.,</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">            ``cost_gradient(data, theta)``.</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">        cost_hessian: Hessian of custom cost, e.g.,</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">            ``cost_hessian(data, theta)``.</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">        line_search: Values for line search step sizes.</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">        lower: Lower bound for parameters after each update.</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">        upper: Upper bound for parameters after each update.</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">        pruning_coef: Pruning coefficient for PELT algorithm.</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">        segment_count: Initial guess for number of segments.</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">        trim: Trimming proportion for boundary change points.</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">        momentum_coef: Momentum coefficient for parameter updates.</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">        multiple_epochs: A function that takes the segment length and</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">            returns an int for additional epochs.</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">        epsilon: Epsilon for numerical stability.</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">        order: Order for AR, VAR, ARIMA, GARCH models.</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">        p: Number of covariates. If None, inferred from data.</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">        variance_estimation: Pre-specified variance/covariance matrix.</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">        cp_only: If True, only change points are returned.</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">        vanilla_percentage: Interpolation parameter between PELT and SeGD.</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">        warm_start: If True, use the previous segment&#39;s parameters as</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">            initial values for the new segment.</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">        **kwargs: Additional model-specific parameters.</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">    Returns:</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">        A ``FastCPDResult`` object containing change points, costs,</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">        residuals, and parameter estimates.</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">family</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;custom&#39;</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>    <span class="k">assert</span> <span class="n">family</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">)</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="k">assert</span> <span class="n">cost_adjustment</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;BIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MDL&#39;</span><span class="p">)</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="k">if</span> <span class="n">variance_estimation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">variance_estimation</span><span class="p">)</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">fastcpd</span><span class="o">.</span><span class="n">variance_estimation</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>    <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;variance&#39;</span><span class="p">:</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">:</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="k">if</span> <span class="n">pruning_coef</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="n">pruning_coef</span> <span class="o">=</span> <span class="mf">0.0</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="k">if</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MBIC&quot;</span><span class="p">:</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="k">elif</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MDL&quot;</span><span class="p">:</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>        <span class="k">if</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;BIC&#39;</span><span class="p">:</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">:</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MDL&#39;</span><span class="p">:</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown beta criterion: </span><span class="si">{</span><span class="n">beta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">fastcpd_impl</span><span class="p">(</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>        <span class="n">beta</span><span class="p">,</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="n">cost_adjustment</span><span class="p">,</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>        <span class="n">cp_only</span><span class="p">,</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="n">data</span><span class="p">,</span>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="n">epsilon</span><span class="p">,</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>        <span class="n">family</span><span class="p">,</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>        <span class="n">line_search</span><span class="p">,</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        <span class="p">[],</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>        <span class="n">momentum_coef</span><span class="p">,</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>        <span class="n">order</span><span class="p">,</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>        <span class="n">p</span><span class="p">,</span>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>        <span class="mi">0</span><span class="p">,</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>        <span class="n">pruning_coef</span><span class="p">,</span>
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>        <span class="n">segment_count</span><span class="p">,</span>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>        <span class="n">trim</span><span class="p">,</span>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>        <span class="p">[],</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>        <span class="mf">1.0</span><span class="p">,</span>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>        <span class="n">variance_estimation</span><span class="p">,</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>        <span class="n">warm_start</span><span class="p">,</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>    <span class="p">)</span>
-</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>    <span class="k">return</span> <span class="n">result</span>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in mean change models.</span>
-</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="sd">    Args:</span>
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a><span class="sd">        data: Univariate or multivariate data for mean change detection.</span>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
-</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="sd">    Returns:</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>
-</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a><span class="k">def</span><span class="w"> </span><span class="nf">variance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in variance change models.</span>
-</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>
-</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a><span class="sd">    Args:</span>
-</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a><span class="sd">        data: Univariate or multivariate data for variance change detection.</span>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
-</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>
-</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">    Returns:</span>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
-</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>
-</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>
-</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a><span class="k">def</span><span class="w"> </span><span class="nf">meanvariance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in mean and/or variance change models.</span>
-</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>
-</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="sd">    Args:</span>
-</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a><span class="sd">        data: Univariate or multivariate data for mean and/or variance change</span>
-</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a><span class="sd">            detection.</span>
-</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
-</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>
-</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="sd">    Returns:</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
-</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;meanvariance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="k">def</span><span class="w"> </span><span class="nf">meanvariance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in mean and/or variance change models.</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="sd">    Args:</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">        data: Univariate or multivariate data for mean and/or variance change</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">            detection.</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">    Returns:</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;meanvariance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="k">def</span><span class="w"> </span><span class="nf">detect</span><span class="p">(</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>    <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;y ~ . - 1&#39;</span><span class="p">,</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="n">data</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="n">beta</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>    <span class="n">cost_adjustment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="n">family</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>    <span class="n">cost</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="n">cost_gradient</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>    <span class="n">cost_hessian</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>    <span class="n">line_search</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>    <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>    <span class="n">pruning_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="n">segment_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="n">trim</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>    <span class="n">momentum_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>    <span class="n">multiple_epochs</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>    <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="n">p</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="n">variance_estimation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="n">cp_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>    <span class="n">vanilla_percentage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>    <span class="n">warm_start</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="o">**</span><span class="n">kwargs</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="p">):</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find change points efficiently.</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">    Args:</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">        formula: A formula string specifying the model to be fitted. The</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">            optional response variable should be on the LHS, covariates on the</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">            RHS. Intercept should be removed by appending &#39;- 1&#39;. By default,</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">            an intercept column is added as in R&#39;s lm().</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">        data: A NumPy array of shape (T, d) containing the data to be</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">            segmented. Each row is a data point $z_t$ in $\mathbb{R}^d$.</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">        beta: Penalty criterion for the number of change points. Can be one of</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">            &#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;, or a float value.</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">        cost_adjustment: Cost adjustment criterion modifying the cost function.</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">            Can be one of &#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;, or None.</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">        family: Family of change point model. One of: &#39;mean&#39;, &#39;variance&#39;,</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">            &#39;meanvariance&#39;, &#39;lm&#39;, &#39;binomial&#39;, &#39;poisson&#39;, &#39;lasso&#39;, &#39;ar&#39;,</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">            &#39;arma&#39;, &#39;arima&#39;, &#39;garch&#39;, &#39;var&#39;, &#39;custom&#39;. If None, it is</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">            treated as &#39;custom&#39;.</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">        cost: Custom cost function, e.g., ``cost(data)`` or</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">            ``cost(data, theta)``.</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">        cost_gradient: Gradient of custom cost, e.g.,</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">            ``cost_gradient(data, theta)``.</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">        cost_hessian: Hessian of custom cost, e.g.,</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">            ``cost_hessian(data, theta)``.</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">        line_search: Values for line search step sizes.</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">        lower: Lower bound for parameters after each update.</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">        upper: Upper bound for parameters after each update.</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="sd">        pruning_coef: Pruning coefficient for PELT algorithm.</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="sd">        segment_count: Initial guess for number of segments.</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="sd">        trim: Trimming proportion for boundary change points.</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="sd">        momentum_coef: Momentum coefficient for parameter updates.</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="sd">        multiple_epochs: A function that takes the segment length and</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="sd">            returns an int for additional epochs.</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="sd">        epsilon: Epsilon for numerical stability.</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="sd">        order: Order for AR, VAR, ARIMA, GARCH models.</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="sd">        p: Number of covariates. If None, inferred from data.</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">        variance_estimation: Pre-specified variance/covariance matrix.</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">        cp_only: If True, only change points are returned.</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">        vanilla_percentage: Interpolation parameter between PELT and SeGD.</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">        warm_start: If True, use the previous segment&#39;s parameters as</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">            initial values for the new segment.</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="sd">        **kwargs: Additional model-specific parameters.</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="sd">    Returns:</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">        A ``FastCPDResult`` object containing change points, costs,</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="sd">        residuals, and parameter estimates.</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>    <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">family</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;custom&#39;</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="k">assert</span> <span class="n">family</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">)</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>    <span class="k">assert</span> <span class="n">cost_adjustment</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;BIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MDL&#39;</span><span class="p">)</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>    <span class="k">if</span> <span class="n">variance_estimation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">variance_estimation</span><span class="p">)</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">fastcpd</span><span class="o">.</span><span class="n">variance_estimation</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>    <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;variance&#39;</span><span class="p">:</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">:</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>    <span class="k">if</span> <span class="n">pruning_coef</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>        <span class="n">pruning_coef</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>    <span class="k">if</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MBIC&quot;</span><span class="p">:</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>    <span class="k">elif</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MDL&quot;</span><span class="p">:</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>        <span class="k">if</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;BIC&#39;</span><span class="p">:</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">:</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MDL&#39;</span><span class="p">:</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown beta criterion: </span><span class="si">{</span><span class="n">beta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">fastcpd_impl</span><span class="p">(</span>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>        <span class="n">beta</span><span class="p">,</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>        <span class="n">cost_adjustment</span><span class="p">,</span>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>        <span class="n">cp_only</span><span class="p">,</span>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>        <span class="n">data</span><span class="p">,</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>        <span class="n">epsilon</span><span class="p">,</span>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>        <span class="n">family</span><span class="p">,</span>
+</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>        <span class="n">line_search</span><span class="p">,</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>        <span class="p">[],</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>        <span class="n">momentum_coef</span><span class="p">,</span>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>        <span class="n">order</span><span class="p">,</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>        <span class="n">p</span><span class="p">,</span>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>        <span class="mi">0</span><span class="p">,</span>
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>        <span class="n">pruning_coef</span><span class="p">,</span>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>        <span class="n">segment_count</span><span class="p">,</span>
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>        <span class="n">trim</span><span class="p">,</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>        <span class="p">[],</span>
+</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>        <span class="mf">1.0</span><span class="p">,</span>
+</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>        <span class="n">variance_estimation</span><span class="p">,</span>
+</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>        <span class="n">warm_start</span><span class="p">,</span>
+</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a>    <span class="p">)</span>
+</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a>    <span class="k">return</span> <span class="n">result</span>
 </span></pre></div>
 
 
             </section>
+                <section id="mean">
+                            <input id="mean-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">mean</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="mean-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#mean"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="mean-15"><a href="#mean-15"><span class="linenos">15</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="mean-16"><a href="#mean-16"><span class="linenos">16</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in mean change models.</span>
+</span><span id="mean-17"><a href="#mean-17"><span class="linenos">17</span></a>
+</span><span id="mean-18"><a href="#mean-18"><span class="linenos">18</span></a><span class="sd">    Args:</span>
+</span><span id="mean-19"><a href="#mean-19"><span class="linenos">19</span></a><span class="sd">        data: Univariate or multivariate data for mean change detection.</span>
+</span><span id="mean-20"><a href="#mean-20"><span class="linenos">20</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
+</span><span id="mean-21"><a href="#mean-21"><span class="linenos">21</span></a>
+</span><span id="mean-22"><a href="#mean-22"><span class="linenos">22</span></a><span class="sd">    Returns:</span>
+</span><span id="mean-23"><a href="#mean-23"><span class="linenos">23</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
+</span><span id="mean-24"><a href="#mean-24"><span class="linenos">24</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="mean-25"><a href="#mean-25"><span class="linenos">25</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Find change points efficiently in mean change models.</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>data:</strong>  Univariate or multivariate data for mean change detection.</li>
+<li><strong>**kwargs:</strong>  Additional arguments passed to <code><a href="#detect">detect()</a></code>.</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>A <code>FastCPDResult</code> object.</p>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="variance">
+                            <input id="variance-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">variance</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="variance-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#variance"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="variance-28"><a href="#variance-28"><span class="linenos">28</span></a><span class="k">def</span><span class="w"> </span><span class="nf">variance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="variance-29"><a href="#variance-29"><span class="linenos">29</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in variance change models.</span>
+</span><span id="variance-30"><a href="#variance-30"><span class="linenos">30</span></a>
+</span><span id="variance-31"><a href="#variance-31"><span class="linenos">31</span></a><span class="sd">    Args:</span>
+</span><span id="variance-32"><a href="#variance-32"><span class="linenos">32</span></a><span class="sd">        data: Univariate or multivariate data for variance change detection.</span>
+</span><span id="variance-33"><a href="#variance-33"><span class="linenos">33</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
+</span><span id="variance-34"><a href="#variance-34"><span class="linenos">34</span></a>
+</span><span id="variance-35"><a href="#variance-35"><span class="linenos">35</span></a><span class="sd">    Returns:</span>
+</span><span id="variance-36"><a href="#variance-36"><span class="linenos">36</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
+</span><span id="variance-37"><a href="#variance-37"><span class="linenos">37</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="variance-38"><a href="#variance-38"><span class="linenos">38</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Find change points efficiently in variance change models.</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>data:</strong>  Univariate or multivariate data for variance change detection.</li>
+<li><strong>**kwargs:</strong>  Additional arguments passed to <code><a href="#detect">detect()</a></code>.</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>A <code>FastCPDResult</code> object.</p>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="meanvariance">
+                            <input id="meanvariance-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">meanvariance</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="meanvariance-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#meanvariance"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="meanvariance-41"><a href="#meanvariance-41"><span class="linenos">41</span></a><span class="k">def</span><span class="w"> </span><span class="nf">meanvariance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="meanvariance-42"><a href="#meanvariance-42"><span class="linenos">42</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in mean and/or variance change models.</span>
+</span><span id="meanvariance-43"><a href="#meanvariance-43"><span class="linenos">43</span></a>
+</span><span id="meanvariance-44"><a href="#meanvariance-44"><span class="linenos">44</span></a><span class="sd">    Args:</span>
+</span><span id="meanvariance-45"><a href="#meanvariance-45"><span class="linenos">45</span></a><span class="sd">        data: Univariate or multivariate data for mean and/or variance change</span>
+</span><span id="meanvariance-46"><a href="#meanvariance-46"><span class="linenos">46</span></a><span class="sd">            detection.</span>
+</span><span id="meanvariance-47"><a href="#meanvariance-47"><span class="linenos">47</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
+</span><span id="meanvariance-48"><a href="#meanvariance-48"><span class="linenos">48</span></a>
+</span><span id="meanvariance-49"><a href="#meanvariance-49"><span class="linenos">49</span></a><span class="sd">    Returns:</span>
+</span><span id="meanvariance-50"><a href="#meanvariance-50"><span class="linenos">50</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
+</span><span id="meanvariance-51"><a href="#meanvariance-51"><span class="linenos">51</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="meanvariance-52"><a href="#meanvariance-52"><span class="linenos">52</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;meanvariance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Find change points efficiently in mean and/or variance change models.</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>data:</strong>  Univariate or multivariate data for mean and/or variance change
+detection.</li>
+<li><strong>**kwargs:</strong>  Additional arguments passed to <code><a href="#detect">detect()</a></code>.</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>A <code>FastCPDResult</code> object.</p>
+</blockquote>
+</div>
+
+
+                </section>
                 <section id="detect">
                             <input id="detect-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -257,133 +414,133 @@ fastcpd<wbr>.segmentation    </h1>
 
     </div>
     <a class="headerlink" href="#detect"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="detect-12"><a href="#detect-12"><span class="linenos"> 12</span></a><span class="k">def</span><span class="w"> </span><span class="nf">detect</span><span class="p">(</span>
-</span><span id="detect-13"><a href="#detect-13"><span class="linenos"> 13</span></a>    <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;y ~ . - 1&#39;</span><span class="p">,</span>
-</span><span id="detect-14"><a href="#detect-14"><span class="linenos"> 14</span></a>    <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="detect-15"><a href="#detect-15"><span class="linenos"> 15</span></a>    <span class="n">beta</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span>
-</span><span id="detect-16"><a href="#detect-16"><span class="linenos"> 16</span></a>    <span class="n">cost_adjustment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span>
-</span><span id="detect-17"><a href="#detect-17"><span class="linenos"> 17</span></a>    <span class="n">family</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="detect-18"><a href="#detect-18"><span class="linenos"> 18</span></a>    <span class="n">cost</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="detect-19"><a href="#detect-19"><span class="linenos"> 19</span></a>    <span class="n">cost_gradient</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="detect-20"><a href="#detect-20"><span class="linenos"> 20</span></a>    <span class="n">cost_hessian</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="detect-21"><a href="#detect-21"><span class="linenos"> 21</span></a>    <span class="n">line_search</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
-</span><span id="detect-22"><a href="#detect-22"><span class="linenos"> 22</span></a>    <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="detect-23"><a href="#detect-23"><span class="linenos"> 23</span></a>    <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="detect-24"><a href="#detect-24"><span class="linenos"> 24</span></a>    <span class="n">pruning_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="detect-25"><a href="#detect-25"><span class="linenos"> 25</span></a>    <span class="n">segment_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-</span><span id="detect-26"><a href="#detect-26"><span class="linenos"> 26</span></a>    <span class="n">trim</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
-</span><span id="detect-27"><a href="#detect-27"><span class="linenos"> 27</span></a>    <span class="n">momentum_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="detect-28"><a href="#detect-28"><span class="linenos"> 28</span></a>    <span class="n">multiple_epochs</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="detect-29"><a href="#detect-29"><span class="linenos"> 29</span></a>    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
-</span><span id="detect-30"><a href="#detect-30"><span class="linenos"> 30</span></a>    <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-</span><span id="detect-31"><a href="#detect-31"><span class="linenos"> 31</span></a>    <span class="n">p</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="detect-32"><a href="#detect-32"><span class="linenos"> 32</span></a>    <span class="n">variance_estimation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="detect-33"><a href="#detect-33"><span class="linenos"> 33</span></a>    <span class="n">cp_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="detect-34"><a href="#detect-34"><span class="linenos"> 34</span></a>    <span class="n">vanilla_percentage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="detect-35"><a href="#detect-35"><span class="linenos"> 35</span></a>    <span class="n">warm_start</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="detect-36"><a href="#detect-36"><span class="linenos"> 36</span></a>    <span class="o">**</span><span class="n">kwargs</span>
-</span><span id="detect-37"><a href="#detect-37"><span class="linenos"> 37</span></a><span class="p">):</span>
-</span><span id="detect-38"><a href="#detect-38"><span class="linenos"> 38</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently.</span>
-</span><span id="detect-39"><a href="#detect-39"><span class="linenos"> 39</span></a>
-</span><span id="detect-40"><a href="#detect-40"><span class="linenos"> 40</span></a><span class="sd">    Args:</span>
-</span><span id="detect-41"><a href="#detect-41"><span class="linenos"> 41</span></a><span class="sd">        formula: A formula string specifying the model to be fitted. The</span>
-</span><span id="detect-42"><a href="#detect-42"><span class="linenos"> 42</span></a><span class="sd">            optional response variable should be on the LHS, covariates on the</span>
-</span><span id="detect-43"><a href="#detect-43"><span class="linenos"> 43</span></a><span class="sd">            RHS. Intercept should be removed by appending &#39;- 1&#39;. By default,</span>
-</span><span id="detect-44"><a href="#detect-44"><span class="linenos"> 44</span></a><span class="sd">            an intercept column is added as in R&#39;s lm().</span>
-</span><span id="detect-45"><a href="#detect-45"><span class="linenos"> 45</span></a><span class="sd">        data: A NumPy array of shape (T, d) containing the data to be</span>
-</span><span id="detect-46"><a href="#detect-46"><span class="linenos"> 46</span></a><span class="sd">            segmented. Each row is a data point z_t in R^d.</span>
-</span><span id="detect-47"><a href="#detect-47"><span class="linenos"> 47</span></a><span class="sd">        beta: Penalty criterion for the number of change points. Can be one of</span>
-</span><span id="detect-48"><a href="#detect-48"><span class="linenos"> 48</span></a><span class="sd">            &#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;, or a float value.</span>
-</span><span id="detect-49"><a href="#detect-49"><span class="linenos"> 49</span></a><span class="sd">        cost_adjustment: Cost adjustment criterion modifying the cost function.</span>
-</span><span id="detect-50"><a href="#detect-50"><span class="linenos"> 50</span></a><span class="sd">            Can be one of &#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;, or None.</span>
-</span><span id="detect-51"><a href="#detect-51"><span class="linenos"> 51</span></a><span class="sd">        family: Family of change point model. One of: &#39;mean&#39;, &#39;variance&#39;,</span>
-</span><span id="detect-52"><a href="#detect-52"><span class="linenos"> 52</span></a><span class="sd">            &#39;meanvariance&#39;, &#39;lm&#39;, &#39;binomial&#39;, &#39;poisson&#39;, &#39;lasso&#39;, &#39;ar&#39;,</span>
-</span><span id="detect-53"><a href="#detect-53"><span class="linenos"> 53</span></a><span class="sd">            &#39;arma&#39;, &#39;arima&#39;, &#39;garch&#39;, &#39;var&#39;, &#39;custom&#39;. If None, it is</span>
-</span><span id="detect-54"><a href="#detect-54"><span class="linenos"> 54</span></a><span class="sd">            treated as &#39;custom&#39;.</span>
-</span><span id="detect-55"><a href="#detect-55"><span class="linenos"> 55</span></a><span class="sd">        cost: Custom cost function, e.g., ``cost(data)`` or</span>
-</span><span id="detect-56"><a href="#detect-56"><span class="linenos"> 56</span></a><span class="sd">            ``cost(data, theta)``.</span>
-</span><span id="detect-57"><a href="#detect-57"><span class="linenos"> 57</span></a><span class="sd">        cost_gradient: Gradient of custom cost, e.g.,</span>
-</span><span id="detect-58"><a href="#detect-58"><span class="linenos"> 58</span></a><span class="sd">            ``cost_gradient(data, theta)``.</span>
-</span><span id="detect-59"><a href="#detect-59"><span class="linenos"> 59</span></a><span class="sd">        cost_hessian: Hessian of custom cost, e.g.,</span>
-</span><span id="detect-60"><a href="#detect-60"><span class="linenos"> 60</span></a><span class="sd">            ``cost_hessian(data, theta)``.</span>
-</span><span id="detect-61"><a href="#detect-61"><span class="linenos"> 61</span></a><span class="sd">        line_search: Values for line search step sizes.</span>
-</span><span id="detect-62"><a href="#detect-62"><span class="linenos"> 62</span></a><span class="sd">        lower: Lower bound for parameters after each update.</span>
-</span><span id="detect-63"><a href="#detect-63"><span class="linenos"> 63</span></a><span class="sd">        upper: Upper bound for parameters after each update.</span>
-</span><span id="detect-64"><a href="#detect-64"><span class="linenos"> 64</span></a><span class="sd">        pruning_coef: Pruning coefficient for PELT algorithm.</span>
-</span><span id="detect-65"><a href="#detect-65"><span class="linenos"> 65</span></a><span class="sd">        segment_count: Initial guess for number of segments.</span>
-</span><span id="detect-66"><a href="#detect-66"><span class="linenos"> 66</span></a><span class="sd">        trim: Trimming proportion for boundary change points.</span>
-</span><span id="detect-67"><a href="#detect-67"><span class="linenos"> 67</span></a><span class="sd">        momentum_coef: Momentum coefficient for parameter updates.</span>
-</span><span id="detect-68"><a href="#detect-68"><span class="linenos"> 68</span></a><span class="sd">        multiple_epochs: A function that takes the segment length and</span>
-</span><span id="detect-69"><a href="#detect-69"><span class="linenos"> 69</span></a><span class="sd">            returns an int for additional epochs.</span>
-</span><span id="detect-70"><a href="#detect-70"><span class="linenos"> 70</span></a><span class="sd">        epsilon: Epsilon for numerical stability.</span>
-</span><span id="detect-71"><a href="#detect-71"><span class="linenos"> 71</span></a><span class="sd">        order: Order for AR, VAR, ARIMA, GARCH models.</span>
-</span><span id="detect-72"><a href="#detect-72"><span class="linenos"> 72</span></a><span class="sd">        p: Number of covariates. If None, inferred from data.</span>
-</span><span id="detect-73"><a href="#detect-73"><span class="linenos"> 73</span></a><span class="sd">        variance_estimation: Pre-specified variance/covariance matrix.</span>
-</span><span id="detect-74"><a href="#detect-74"><span class="linenos"> 74</span></a><span class="sd">        cp_only: If True, only change points are returned.</span>
-</span><span id="detect-75"><a href="#detect-75"><span class="linenos"> 75</span></a><span class="sd">        vanilla_percentage: Interpolation parameter between PELT and SeGD.</span>
-</span><span id="detect-76"><a href="#detect-76"><span class="linenos"> 76</span></a><span class="sd">        warm_start: If True, use the previous segment&#39;s parameters as</span>
-</span><span id="detect-77"><a href="#detect-77"><span class="linenos"> 77</span></a><span class="sd">            initial values for the new segment.</span>
-</span><span id="detect-78"><a href="#detect-78"><span class="linenos"> 78</span></a><span class="sd">        **kwargs: Additional model-specific parameters.</span>
-</span><span id="detect-79"><a href="#detect-79"><span class="linenos"> 79</span></a>
-</span><span id="detect-80"><a href="#detect-80"><span class="linenos"> 80</span></a><span class="sd">    Returns:</span>
-</span><span id="detect-81"><a href="#detect-81"><span class="linenos"> 81</span></a><span class="sd">        A ``FastCPDResult`` object containing change points, costs,</span>
-</span><span id="detect-82"><a href="#detect-82"><span class="linenos"> 82</span></a><span class="sd">        residuals, and parameter estimates.</span>
-</span><span id="detect-83"><a href="#detect-83"><span class="linenos"> 83</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="detect-84"><a href="#detect-84"><span class="linenos"> 84</span></a>    <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">family</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;custom&#39;</span>
-</span><span id="detect-85"><a href="#detect-85"><span class="linenos"> 85</span></a>    <span class="k">assert</span> <span class="n">family</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">)</span>
-</span><span id="detect-86"><a href="#detect-86"><span class="linenos"> 86</span></a>    <span class="k">assert</span> <span class="n">cost_adjustment</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;BIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MDL&#39;</span><span class="p">)</span>
-</span><span id="detect-87"><a href="#detect-87"><span class="linenos"> 87</span></a>
-</span><span id="detect-88"><a href="#detect-88"><span class="linenos"> 88</span></a>    <span class="k">if</span> <span class="n">variance_estimation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="detect-89"><a href="#detect-89"><span class="linenos"> 89</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">variance_estimation</span><span class="p">)</span>
-</span><span id="detect-90"><a href="#detect-90"><span class="linenos"> 90</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-</span><span id="detect-91"><a href="#detect-91"><span class="linenos"> 91</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">fastcpd</span><span class="o">.</span><span class="n">variance_estimation</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span id="detect-92"><a href="#detect-92"><span class="linenos"> 92</span></a>
-</span><span id="detect-93"><a href="#detect-93"><span class="linenos"> 93</span></a>    <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-</span><span id="detect-94"><a href="#detect-94"><span class="linenos"> 94</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-</span><span id="detect-95"><a href="#detect-95"><span class="linenos"> 95</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;variance&#39;</span><span class="p">:</span>
-</span><span id="detect-96"><a href="#detect-96"><span class="linenos"> 96</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
-</span><span id="detect-97"><a href="#detect-97"><span class="linenos"> 97</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">:</span>
-</span><span id="detect-98"><a href="#detect-98"><span class="linenos"> 98</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
-</span><span id="detect-99"><a href="#detect-99"><span class="linenos"> 99</span></a>
-</span><span id="detect-100"><a href="#detect-100"><span class="linenos">100</span></a>    <span class="k">if</span> <span class="n">pruning_coef</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="detect-101"><a href="#detect-101"><span class="linenos">101</span></a>        <span class="n">pruning_coef</span> <span class="o">=</span> <span class="mf">0.0</span>
-</span><span id="detect-102"><a href="#detect-102"><span class="linenos">102</span></a>    <span class="k">if</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MBIC&quot;</span><span class="p">:</span>
-</span><span id="detect-103"><a href="#detect-103"><span class="linenos">103</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="detect-104"><a href="#detect-104"><span class="linenos">104</span></a>    <span class="k">elif</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MDL&quot;</span><span class="p">:</span>
-</span><span id="detect-105"><a href="#detect-105"><span class="linenos">105</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="detect-106"><a href="#detect-106"><span class="linenos">106</span></a>
-</span><span id="detect-107"><a href="#detect-107"><span class="linenos">107</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="detect-108"><a href="#detect-108"><span class="linenos">108</span></a>        <span class="k">if</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;BIC&#39;</span><span class="p">:</span>
-</span><span id="detect-109"><a href="#detect-109"><span class="linenos">109</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="detect-110"><a href="#detect-110"><span class="linenos">110</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">:</span>
-</span><span id="detect-111"><a href="#detect-111"><span class="linenos">111</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="detect-112"><a href="#detect-112"><span class="linenos">112</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MDL&#39;</span><span class="p">:</span>
-</span><span id="detect-113"><a href="#detect-113"><span class="linenos">113</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="detect-114"><a href="#detect-114"><span class="linenos">114</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="detect-115"><a href="#detect-115"><span class="linenos">115</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown beta criterion: </span><span class="si">{</span><span class="n">beta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="detect-116"><a href="#detect-116"><span class="linenos">116</span></a>
-</span><span id="detect-117"><a href="#detect-117"><span class="linenos">117</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">fastcpd_impl</span><span class="p">(</span>
-</span><span id="detect-118"><a href="#detect-118"><span class="linenos">118</span></a>        <span class="n">beta</span><span class="p">,</span>
-</span><span id="detect-119"><a href="#detect-119"><span class="linenos">119</span></a>        <span class="n">cost_adjustment</span><span class="p">,</span>
-</span><span id="detect-120"><a href="#detect-120"><span class="linenos">120</span></a>        <span class="n">cp_only</span><span class="p">,</span>
-</span><span id="detect-121"><a href="#detect-121"><span class="linenos">121</span></a>        <span class="n">data</span><span class="p">,</span>
-</span><span id="detect-122"><a href="#detect-122"><span class="linenos">122</span></a>        <span class="n">epsilon</span><span class="p">,</span>
-</span><span id="detect-123"><a href="#detect-123"><span class="linenos">123</span></a>        <span class="n">family</span><span class="p">,</span>
-</span><span id="detect-124"><a href="#detect-124"><span class="linenos">124</span></a>        <span class="n">line_search</span><span class="p">,</span>
-</span><span id="detect-125"><a href="#detect-125"><span class="linenos">125</span></a>        <span class="p">[],</span>
-</span><span id="detect-126"><a href="#detect-126"><span class="linenos">126</span></a>        <span class="n">momentum_coef</span><span class="p">,</span>
-</span><span id="detect-127"><a href="#detect-127"><span class="linenos">127</span></a>        <span class="n">order</span><span class="p">,</span>
-</span><span id="detect-128"><a href="#detect-128"><span class="linenos">128</span></a>        <span class="n">p</span><span class="p">,</span>
-</span><span id="detect-129"><a href="#detect-129"><span class="linenos">129</span></a>        <span class="mi">0</span><span class="p">,</span>
-</span><span id="detect-130"><a href="#detect-130"><span class="linenos">130</span></a>        <span class="n">pruning_coef</span><span class="p">,</span>
-</span><span id="detect-131"><a href="#detect-131"><span class="linenos">131</span></a>        <span class="n">segment_count</span><span class="p">,</span>
-</span><span id="detect-132"><a href="#detect-132"><span class="linenos">132</span></a>        <span class="n">trim</span><span class="p">,</span>
-</span><span id="detect-133"><a href="#detect-133"><span class="linenos">133</span></a>        <span class="p">[],</span>
-</span><span id="detect-134"><a href="#detect-134"><span class="linenos">134</span></a>        <span class="mf">1.0</span><span class="p">,</span>
-</span><span id="detect-135"><a href="#detect-135"><span class="linenos">135</span></a>        <span class="n">variance_estimation</span><span class="p">,</span>
-</span><span id="detect-136"><a href="#detect-136"><span class="linenos">136</span></a>        <span class="n">warm_start</span><span class="p">,</span>
-</span><span id="detect-137"><a href="#detect-137"><span class="linenos">137</span></a>    <span class="p">)</span>
-</span><span id="detect-138"><a href="#detect-138"><span class="linenos">138</span></a>    <span class="k">return</span> <span class="n">result</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="detect-55"><a href="#detect-55"><span class="linenos"> 55</span></a><span class="k">def</span><span class="w"> </span><span class="nf">detect</span><span class="p">(</span>
+</span><span id="detect-56"><a href="#detect-56"><span class="linenos"> 56</span></a>    <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;y ~ . - 1&#39;</span><span class="p">,</span>
+</span><span id="detect-57"><a href="#detect-57"><span class="linenos"> 57</span></a>    <span class="n">data</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="detect-58"><a href="#detect-58"><span class="linenos"> 58</span></a>    <span class="n">beta</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span>
+</span><span id="detect-59"><a href="#detect-59"><span class="linenos"> 59</span></a>    <span class="n">cost_adjustment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span>
+</span><span id="detect-60"><a href="#detect-60"><span class="linenos"> 60</span></a>    <span class="n">family</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="detect-61"><a href="#detect-61"><span class="linenos"> 61</span></a>    <span class="n">cost</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="detect-62"><a href="#detect-62"><span class="linenos"> 62</span></a>    <span class="n">cost_gradient</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="detect-63"><a href="#detect-63"><span class="linenos"> 63</span></a>    <span class="n">cost_hessian</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="detect-64"><a href="#detect-64"><span class="linenos"> 64</span></a>    <span class="n">line_search</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
+</span><span id="detect-65"><a href="#detect-65"><span class="linenos"> 65</span></a>    <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="detect-66"><a href="#detect-66"><span class="linenos"> 66</span></a>    <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="detect-67"><a href="#detect-67"><span class="linenos"> 67</span></a>    <span class="n">pruning_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="detect-68"><a href="#detect-68"><span class="linenos"> 68</span></a>    <span class="n">segment_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+</span><span id="detect-69"><a href="#detect-69"><span class="linenos"> 69</span></a>    <span class="n">trim</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+</span><span id="detect-70"><a href="#detect-70"><span class="linenos"> 70</span></a>    <span class="n">momentum_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span id="detect-71"><a href="#detect-71"><span class="linenos"> 71</span></a>    <span class="n">multiple_epochs</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+</span><span id="detect-72"><a href="#detect-72"><span class="linenos"> 72</span></a>    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
+</span><span id="detect-73"><a href="#detect-73"><span class="linenos"> 73</span></a>    <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+</span><span id="detect-74"><a href="#detect-74"><span class="linenos"> 74</span></a>    <span class="n">p</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="detect-75"><a href="#detect-75"><span class="linenos"> 75</span></a>    <span class="n">variance_estimation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="detect-76"><a href="#detect-76"><span class="linenos"> 76</span></a>    <span class="n">cp_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="detect-77"><a href="#detect-77"><span class="linenos"> 77</span></a>    <span class="n">vanilla_percentage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span id="detect-78"><a href="#detect-78"><span class="linenos"> 78</span></a>    <span class="n">warm_start</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="detect-79"><a href="#detect-79"><span class="linenos"> 79</span></a>    <span class="o">**</span><span class="n">kwargs</span>
+</span><span id="detect-80"><a href="#detect-80"><span class="linenos"> 80</span></a><span class="p">):</span>
+</span><span id="detect-81"><a href="#detect-81"><span class="linenos"> 81</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find change points efficiently.</span>
+</span><span id="detect-82"><a href="#detect-82"><span class="linenos"> 82</span></a>
+</span><span id="detect-83"><a href="#detect-83"><span class="linenos"> 83</span></a><span class="sd">    Args:</span>
+</span><span id="detect-84"><a href="#detect-84"><span class="linenos"> 84</span></a><span class="sd">        formula: A formula string specifying the model to be fitted. The</span>
+</span><span id="detect-85"><a href="#detect-85"><span class="linenos"> 85</span></a><span class="sd">            optional response variable should be on the LHS, covariates on the</span>
+</span><span id="detect-86"><a href="#detect-86"><span class="linenos"> 86</span></a><span class="sd">            RHS. Intercept should be removed by appending &#39;- 1&#39;. By default,</span>
+</span><span id="detect-87"><a href="#detect-87"><span class="linenos"> 87</span></a><span class="sd">            an intercept column is added as in R&#39;s lm().</span>
+</span><span id="detect-88"><a href="#detect-88"><span class="linenos"> 88</span></a><span class="sd">        data: A NumPy array of shape (T, d) containing the data to be</span>
+</span><span id="detect-89"><a href="#detect-89"><span class="linenos"> 89</span></a><span class="sd">            segmented. Each row is a data point $z_t$ in $\mathbb{R}^d$.</span>
+</span><span id="detect-90"><a href="#detect-90"><span class="linenos"> 90</span></a><span class="sd">        beta: Penalty criterion for the number of change points. Can be one of</span>
+</span><span id="detect-91"><a href="#detect-91"><span class="linenos"> 91</span></a><span class="sd">            &#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;, or a float value.</span>
+</span><span id="detect-92"><a href="#detect-92"><span class="linenos"> 92</span></a><span class="sd">        cost_adjustment: Cost adjustment criterion modifying the cost function.</span>
+</span><span id="detect-93"><a href="#detect-93"><span class="linenos"> 93</span></a><span class="sd">            Can be one of &#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;, or None.</span>
+</span><span id="detect-94"><a href="#detect-94"><span class="linenos"> 94</span></a><span class="sd">        family: Family of change point model. One of: &#39;mean&#39;, &#39;variance&#39;,</span>
+</span><span id="detect-95"><a href="#detect-95"><span class="linenos"> 95</span></a><span class="sd">            &#39;meanvariance&#39;, &#39;lm&#39;, &#39;binomial&#39;, &#39;poisson&#39;, &#39;lasso&#39;, &#39;ar&#39;,</span>
+</span><span id="detect-96"><a href="#detect-96"><span class="linenos"> 96</span></a><span class="sd">            &#39;arma&#39;, &#39;arima&#39;, &#39;garch&#39;, &#39;var&#39;, &#39;custom&#39;. If None, it is</span>
+</span><span id="detect-97"><a href="#detect-97"><span class="linenos"> 97</span></a><span class="sd">            treated as &#39;custom&#39;.</span>
+</span><span id="detect-98"><a href="#detect-98"><span class="linenos"> 98</span></a><span class="sd">        cost: Custom cost function, e.g., ``cost(data)`` or</span>
+</span><span id="detect-99"><a href="#detect-99"><span class="linenos"> 99</span></a><span class="sd">            ``cost(data, theta)``.</span>
+</span><span id="detect-100"><a href="#detect-100"><span class="linenos">100</span></a><span class="sd">        cost_gradient: Gradient of custom cost, e.g.,</span>
+</span><span id="detect-101"><a href="#detect-101"><span class="linenos">101</span></a><span class="sd">            ``cost_gradient(data, theta)``.</span>
+</span><span id="detect-102"><a href="#detect-102"><span class="linenos">102</span></a><span class="sd">        cost_hessian: Hessian of custom cost, e.g.,</span>
+</span><span id="detect-103"><a href="#detect-103"><span class="linenos">103</span></a><span class="sd">            ``cost_hessian(data, theta)``.</span>
+</span><span id="detect-104"><a href="#detect-104"><span class="linenos">104</span></a><span class="sd">        line_search: Values for line search step sizes.</span>
+</span><span id="detect-105"><a href="#detect-105"><span class="linenos">105</span></a><span class="sd">        lower: Lower bound for parameters after each update.</span>
+</span><span id="detect-106"><a href="#detect-106"><span class="linenos">106</span></a><span class="sd">        upper: Upper bound for parameters after each update.</span>
+</span><span id="detect-107"><a href="#detect-107"><span class="linenos">107</span></a><span class="sd">        pruning_coef: Pruning coefficient for PELT algorithm.</span>
+</span><span id="detect-108"><a href="#detect-108"><span class="linenos">108</span></a><span class="sd">        segment_count: Initial guess for number of segments.</span>
+</span><span id="detect-109"><a href="#detect-109"><span class="linenos">109</span></a><span class="sd">        trim: Trimming proportion for boundary change points.</span>
+</span><span id="detect-110"><a href="#detect-110"><span class="linenos">110</span></a><span class="sd">        momentum_coef: Momentum coefficient for parameter updates.</span>
+</span><span id="detect-111"><a href="#detect-111"><span class="linenos">111</span></a><span class="sd">        multiple_epochs: A function that takes the segment length and</span>
+</span><span id="detect-112"><a href="#detect-112"><span class="linenos">112</span></a><span class="sd">            returns an int for additional epochs.</span>
+</span><span id="detect-113"><a href="#detect-113"><span class="linenos">113</span></a><span class="sd">        epsilon: Epsilon for numerical stability.</span>
+</span><span id="detect-114"><a href="#detect-114"><span class="linenos">114</span></a><span class="sd">        order: Order for AR, VAR, ARIMA, GARCH models.</span>
+</span><span id="detect-115"><a href="#detect-115"><span class="linenos">115</span></a><span class="sd">        p: Number of covariates. If None, inferred from data.</span>
+</span><span id="detect-116"><a href="#detect-116"><span class="linenos">116</span></a><span class="sd">        variance_estimation: Pre-specified variance/covariance matrix.</span>
+</span><span id="detect-117"><a href="#detect-117"><span class="linenos">117</span></a><span class="sd">        cp_only: If True, only change points are returned.</span>
+</span><span id="detect-118"><a href="#detect-118"><span class="linenos">118</span></a><span class="sd">        vanilla_percentage: Interpolation parameter between PELT and SeGD.</span>
+</span><span id="detect-119"><a href="#detect-119"><span class="linenos">119</span></a><span class="sd">        warm_start: If True, use the previous segment&#39;s parameters as</span>
+</span><span id="detect-120"><a href="#detect-120"><span class="linenos">120</span></a><span class="sd">            initial values for the new segment.</span>
+</span><span id="detect-121"><a href="#detect-121"><span class="linenos">121</span></a><span class="sd">        **kwargs: Additional model-specific parameters.</span>
+</span><span id="detect-122"><a href="#detect-122"><span class="linenos">122</span></a>
+</span><span id="detect-123"><a href="#detect-123"><span class="linenos">123</span></a><span class="sd">    Returns:</span>
+</span><span id="detect-124"><a href="#detect-124"><span class="linenos">124</span></a><span class="sd">        A ``FastCPDResult`` object containing change points, costs,</span>
+</span><span id="detect-125"><a href="#detect-125"><span class="linenos">125</span></a><span class="sd">        residuals, and parameter estimates.</span>
+</span><span id="detect-126"><a href="#detect-126"><span class="linenos">126</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="detect-127"><a href="#detect-127"><span class="linenos">127</span></a>    <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">family</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;custom&#39;</span>
+</span><span id="detect-128"><a href="#detect-128"><span class="linenos">128</span></a>    <span class="k">assert</span> <span class="n">family</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">)</span>
+</span><span id="detect-129"><a href="#detect-129"><span class="linenos">129</span></a>    <span class="k">assert</span> <span class="n">cost_adjustment</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;BIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MDL&#39;</span><span class="p">)</span>
+</span><span id="detect-130"><a href="#detect-130"><span class="linenos">130</span></a>
+</span><span id="detect-131"><a href="#detect-131"><span class="linenos">131</span></a>    <span class="k">if</span> <span class="n">variance_estimation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="detect-132"><a href="#detect-132"><span class="linenos">132</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">variance_estimation</span><span class="p">)</span>
+</span><span id="detect-133"><a href="#detect-133"><span class="linenos">133</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+</span><span id="detect-134"><a href="#detect-134"><span class="linenos">134</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">fastcpd</span><span class="o">.</span><span class="n">variance_estimation</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="detect-135"><a href="#detect-135"><span class="linenos">135</span></a>
+</span><span id="detect-136"><a href="#detect-136"><span class="linenos">136</span></a>    <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+</span><span id="detect-137"><a href="#detect-137"><span class="linenos">137</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="detect-138"><a href="#detect-138"><span class="linenos">138</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;variance&#39;</span><span class="p">:</span>
+</span><span id="detect-139"><a href="#detect-139"><span class="linenos">139</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+</span><span id="detect-140"><a href="#detect-140"><span class="linenos">140</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">:</span>
+</span><span id="detect-141"><a href="#detect-141"><span class="linenos">141</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+</span><span id="detect-142"><a href="#detect-142"><span class="linenos">142</span></a>
+</span><span id="detect-143"><a href="#detect-143"><span class="linenos">143</span></a>    <span class="k">if</span> <span class="n">pruning_coef</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="detect-144"><a href="#detect-144"><span class="linenos">144</span></a>        <span class="n">pruning_coef</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="detect-145"><a href="#detect-145"><span class="linenos">145</span></a>    <span class="k">if</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MBIC&quot;</span><span class="p">:</span>
+</span><span id="detect-146"><a href="#detect-146"><span class="linenos">146</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="detect-147"><a href="#detect-147"><span class="linenos">147</span></a>    <span class="k">elif</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MDL&quot;</span><span class="p">:</span>
+</span><span id="detect-148"><a href="#detect-148"><span class="linenos">148</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="detect-149"><a href="#detect-149"><span class="linenos">149</span></a>
+</span><span id="detect-150"><a href="#detect-150"><span class="linenos">150</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="detect-151"><a href="#detect-151"><span class="linenos">151</span></a>        <span class="k">if</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;BIC&#39;</span><span class="p">:</span>
+</span><span id="detect-152"><a href="#detect-152"><span class="linenos">152</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="detect-153"><a href="#detect-153"><span class="linenos">153</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">:</span>
+</span><span id="detect-154"><a href="#detect-154"><span class="linenos">154</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="detect-155"><a href="#detect-155"><span class="linenos">155</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MDL&#39;</span><span class="p">:</span>
+</span><span id="detect-156"><a href="#detect-156"><span class="linenos">156</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="detect-157"><a href="#detect-157"><span class="linenos">157</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="detect-158"><a href="#detect-158"><span class="linenos">158</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown beta criterion: </span><span class="si">{</span><span class="n">beta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="detect-159"><a href="#detect-159"><span class="linenos">159</span></a>
+</span><span id="detect-160"><a href="#detect-160"><span class="linenos">160</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">fastcpd_impl</span><span class="p">(</span>
+</span><span id="detect-161"><a href="#detect-161"><span class="linenos">161</span></a>        <span class="n">beta</span><span class="p">,</span>
+</span><span id="detect-162"><a href="#detect-162"><span class="linenos">162</span></a>        <span class="n">cost_adjustment</span><span class="p">,</span>
+</span><span id="detect-163"><a href="#detect-163"><span class="linenos">163</span></a>        <span class="n">cp_only</span><span class="p">,</span>
+</span><span id="detect-164"><a href="#detect-164"><span class="linenos">164</span></a>        <span class="n">data</span><span class="p">,</span>
+</span><span id="detect-165"><a href="#detect-165"><span class="linenos">165</span></a>        <span class="n">epsilon</span><span class="p">,</span>
+</span><span id="detect-166"><a href="#detect-166"><span class="linenos">166</span></a>        <span class="n">family</span><span class="p">,</span>
+</span><span id="detect-167"><a href="#detect-167"><span class="linenos">167</span></a>        <span class="n">line_search</span><span class="p">,</span>
+</span><span id="detect-168"><a href="#detect-168"><span class="linenos">168</span></a>        <span class="p">[],</span>
+</span><span id="detect-169"><a href="#detect-169"><span class="linenos">169</span></a>        <span class="n">momentum_coef</span><span class="p">,</span>
+</span><span id="detect-170"><a href="#detect-170"><span class="linenos">170</span></a>        <span class="n">order</span><span class="p">,</span>
+</span><span id="detect-171"><a href="#detect-171"><span class="linenos">171</span></a>        <span class="n">p</span><span class="p">,</span>
+</span><span id="detect-172"><a href="#detect-172"><span class="linenos">172</span></a>        <span class="mi">0</span><span class="p">,</span>
+</span><span id="detect-173"><a href="#detect-173"><span class="linenos">173</span></a>        <span class="n">pruning_coef</span><span class="p">,</span>
+</span><span id="detect-174"><a href="#detect-174"><span class="linenos">174</span></a>        <span class="n">segment_count</span><span class="p">,</span>
+</span><span id="detect-175"><a href="#detect-175"><span class="linenos">175</span></a>        <span class="n">trim</span><span class="p">,</span>
+</span><span id="detect-176"><a href="#detect-176"><span class="linenos">176</span></a>        <span class="p">[],</span>
+</span><span id="detect-177"><a href="#detect-177"><span class="linenos">177</span></a>        <span class="mf">1.0</span><span class="p">,</span>
+</span><span id="detect-178"><a href="#detect-178"><span class="linenos">178</span></a>        <span class="n">variance_estimation</span><span class="p">,</span>
+</span><span id="detect-179"><a href="#detect-179"><span class="linenos">179</span></a>        <span class="n">warm_start</span><span class="p">,</span>
+</span><span id="detect-180"><a href="#detect-180"><span class="linenos">180</span></a>    <span class="p">)</span>
+</span><span id="detect-181"><a href="#detect-181"><span class="linenos">181</span></a>    <span class="k">return</span> <span class="n">result</span>
 </span></pre></div>
 
 
@@ -397,7 +554,7 @@ optional response variable should be on the LHS, covariates on the
 RHS. Intercept should be removed by appending '- 1'. By default,
 an intercept column is added as in R's lm().</li>
 <li><strong>data:</strong>  A NumPy array of shape (T, d) containing the data to be
-segmented. Each row is a data point z_t in R^d.</li>
+segmented. Each row is a data point $z_t$ in $\mathbb{R}^d$.</li>
 <li><strong>beta:</strong>  Penalty criterion for the number of change points. Can be one of
 'BIC', 'MBIC', 'MDL', or a float value.</li>
 <li><strong>cost_adjustment:</strong>  Cost adjustment criterion modifying the cost function.
@@ -437,137 +594,6 @@ initial values for the new segment.</li>
 <blockquote>
   <p>A <code>FastCPDResult</code> object containing change points, costs,
   residuals, and parameter estimates.</p>
-</blockquote>
-</div>
-
-
-                </section>
-                <section id="mean">
-                            <input id="mean-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">mean</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="mean-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#mean"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="mean-141"><a href="#mean-141"><span class="linenos">141</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="mean-142"><a href="#mean-142"><span class="linenos">142</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in mean change models.</span>
-</span><span id="mean-143"><a href="#mean-143"><span class="linenos">143</span></a>
-</span><span id="mean-144"><a href="#mean-144"><span class="linenos">144</span></a><span class="sd">    Args:</span>
-</span><span id="mean-145"><a href="#mean-145"><span class="linenos">145</span></a><span class="sd">        data: Univariate or multivariate data for mean change detection.</span>
-</span><span id="mean-146"><a href="#mean-146"><span class="linenos">146</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
-</span><span id="mean-147"><a href="#mean-147"><span class="linenos">147</span></a>
-</span><span id="mean-148"><a href="#mean-148"><span class="linenos">148</span></a><span class="sd">    Returns:</span>
-</span><span id="mean-149"><a href="#mean-149"><span class="linenos">149</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
-</span><span id="mean-150"><a href="#mean-150"><span class="linenos">150</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="mean-151"><a href="#mean-151"><span class="linenos">151</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Find change points efficiently in mean change models.</p>
-
-<h6 id="arguments">Arguments:</h6>
-
-<ul>
-<li><strong>data:</strong>  Univariate or multivariate data for mean change detection.</li>
-<li><strong>**kwargs:</strong>  Additional arguments passed to <code><a href="#detect">detect()</a></code>.</li>
-</ul>
-
-<h6 id="returns">Returns:</h6>
-
-<blockquote>
-  <p>A <code>FastCPDResult</code> object.</p>
-</blockquote>
-</div>
-
-
-                </section>
-                <section id="variance">
-                            <input id="variance-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">variance</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="variance-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#variance"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="variance-154"><a href="#variance-154"><span class="linenos">154</span></a><span class="k">def</span><span class="w"> </span><span class="nf">variance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="variance-155"><a href="#variance-155"><span class="linenos">155</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in variance change models.</span>
-</span><span id="variance-156"><a href="#variance-156"><span class="linenos">156</span></a>
-</span><span id="variance-157"><a href="#variance-157"><span class="linenos">157</span></a><span class="sd">    Args:</span>
-</span><span id="variance-158"><a href="#variance-158"><span class="linenos">158</span></a><span class="sd">        data: Univariate or multivariate data for variance change detection.</span>
-</span><span id="variance-159"><a href="#variance-159"><span class="linenos">159</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
-</span><span id="variance-160"><a href="#variance-160"><span class="linenos">160</span></a>
-</span><span id="variance-161"><a href="#variance-161"><span class="linenos">161</span></a><span class="sd">    Returns:</span>
-</span><span id="variance-162"><a href="#variance-162"><span class="linenos">162</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
-</span><span id="variance-163"><a href="#variance-163"><span class="linenos">163</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="variance-164"><a href="#variance-164"><span class="linenos">164</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Find change points efficiently in variance change models.</p>
-
-<h6 id="arguments">Arguments:</h6>
-
-<ul>
-<li><strong>data:</strong>  Univariate or multivariate data for variance change detection.</li>
-<li><strong>**kwargs:</strong>  Additional arguments passed to <code><a href="#detect">detect()</a></code>.</li>
-</ul>
-
-<h6 id="returns">Returns:</h6>
-
-<blockquote>
-  <p>A <code>FastCPDResult</code> object.</p>
-</blockquote>
-</div>
-
-
-                </section>
-                <section id="meanvariance">
-                            <input id="meanvariance-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">meanvariance</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="meanvariance-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#meanvariance"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="meanvariance-167"><a href="#meanvariance-167"><span class="linenos">167</span></a><span class="k">def</span><span class="w"> </span><span class="nf">meanvariance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="meanvariance-168"><a href="#meanvariance-168"><span class="linenos">168</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in mean and/or variance change models.</span>
-</span><span id="meanvariance-169"><a href="#meanvariance-169"><span class="linenos">169</span></a>
-</span><span id="meanvariance-170"><a href="#meanvariance-170"><span class="linenos">170</span></a><span class="sd">    Args:</span>
-</span><span id="meanvariance-171"><a href="#meanvariance-171"><span class="linenos">171</span></a><span class="sd">        data: Univariate or multivariate data for mean and/or variance change</span>
-</span><span id="meanvariance-172"><a href="#meanvariance-172"><span class="linenos">172</span></a><span class="sd">            detection.</span>
-</span><span id="meanvariance-173"><a href="#meanvariance-173"><span class="linenos">173</span></a><span class="sd">        **kwargs: Additional arguments passed to ``detect()``.</span>
-</span><span id="meanvariance-174"><a href="#meanvariance-174"><span class="linenos">174</span></a>
-</span><span id="meanvariance-175"><a href="#meanvariance-175"><span class="linenos">175</span></a><span class="sd">    Returns:</span>
-</span><span id="meanvariance-176"><a href="#meanvariance-176"><span class="linenos">176</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
-</span><span id="meanvariance-177"><a href="#meanvariance-177"><span class="linenos">177</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="meanvariance-178"><a href="#meanvariance-178"><span class="linenos">178</span></a>    <span class="k">return</span> <span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;meanvariance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Find change points efficiently in mean and/or variance change models.</p>
-
-<h6 id="arguments">Arguments:</h6>
-
-<ul>
-<li><strong>data:</strong>  Univariate or multivariate data for mean and/or variance change
-detection.</li>
-<li><strong>**kwargs:</strong>  Additional arguments passed to <code><a href="#detect">detect()</a></code>.</li>
-</ul>
-
-<h6 id="returns">Returns:</h6>
-
-<blockquote>
-  <p>A <code>FastCPDResult</code> object.</p>
 </blockquote>
 </div>
 
