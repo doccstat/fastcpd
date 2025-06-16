@@ -41,5 +41,4 @@
 ^setup\.py$
 
 # Documentation files.
-^\.readthedocs\.yaml$
 ^docs$
