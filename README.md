@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# fastcpd: Fast Change Point Detection in R <a href="https://fastcpd.xingchi.li"><img src="docs/static/img/logo.svg" align="right" height="138" /></a>
+# fastcpd: Fast Change Point Detection in R <a href="https://fastcpd.xingchi.li"><img src="docs/python/static/img/logo.svg" align="right" height="138" /></a>
 
 [![Codecov test
 coverage](https://codecov.io/gh/doccstat/fastcpd/branch/main/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd?branch=main)
