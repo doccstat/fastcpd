@@ -1,3 +1,3 @@
 ``` shell
-pdoc -o pdoc fastcpd
+pdoc --docformat google -o pdoc fastcpd
 ```

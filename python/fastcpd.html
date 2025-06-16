@@ -107,198 +107,161 @@ fastcpd    </h1>
 </span><span id="pelt-35"><a href="#pelt-35"><span class="linenos"> 35</span></a>    <span class="n">warm_start</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="pelt-36"><a href="#pelt-36"><span class="linenos"> 36</span></a>    <span class="o">**</span><span class="n">kwargs</span>
 </span><span id="pelt-37"><a href="#pelt-37"><span class="linenos"> 37</span></a><span class="p">):</span>
-</span><span id="pelt-38"><a href="#pelt-38"><span class="linenos"> 38</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="pelt-39"><a href="#pelt-39"><span class="linenos"> 39</span></a><span class="sd">    Find change points efficiently.</span>
-</span><span id="pelt-40"><a href="#pelt-40"><span class="linenos"> 40</span></a>
-</span><span id="pelt-41"><a href="#pelt-41"><span class="linenos"> 41</span></a><span class="sd">    Parameters:</span>
-</span><span id="pelt-42"><a href="#pelt-42"><span class="linenos"> 42</span></a><span class="sd">    -----------</span>
-</span><span id="pelt-43"><a href="#pelt-43"><span class="linenos"> 43</span></a><span class="sd">    formula : str</span>
-</span><span id="pelt-44"><a href="#pelt-44"><span class="linenos"> 44</span></a><span class="sd">        A formula string specifying the model to be fitted. The optional</span>
-</span><span id="pelt-45"><a href="#pelt-45"><span class="linenos"> 45</span></a><span class="sd">        response variable should be on the LHS, covariates on the RHS.</span>
-</span><span id="pelt-46"><a href="#pelt-46"><span class="linenos"> 46</span></a><span class="sd">        Intercept should be removed by appending &#39;- 1&#39;. By default,</span>
-</span><span id="pelt-47"><a href="#pelt-47"><span class="linenos"> 47</span></a><span class="sd">        an intercept column is added as in R&#39;s lm().</span>
-</span><span id="pelt-48"><a href="#pelt-48"><span class="linenos"> 48</span></a><span class="sd">    data : pandas.DataFrame</span>
-</span><span id="pelt-49"><a href="#pelt-49"><span class="linenos"> 49</span></a><span class="sd">        DataFrame of shape (T, d) containing the data to be segmented.</span>
-</span><span id="pelt-50"><a href="#pelt-50"><span class="linenos"> 50</span></a><span class="sd">        Each row is a data point z_t in R^d.</span>
-</span><span id="pelt-51"><a href="#pelt-51"><span class="linenos"> 51</span></a><span class="sd">    beta : {&#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;} or float</span>
-</span><span id="pelt-52"><a href="#pelt-52"><span class="linenos"> 52</span></a><span class="sd">        Penalty criterion for the number of change points. String uses</span>
-</span><span id="pelt-53"><a href="#pelt-53"><span class="linenos"> 53</span></a><span class="sd">        built-in criteria; numeric uses provided value.</span>
-</span><span id="pelt-54"><a href="#pelt-54"><span class="linenos"> 54</span></a><span class="sd">    cost_adjustment : {&#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;} or None</span>
-</span><span id="pelt-55"><a href="#pelt-55"><span class="linenos"> 55</span></a><span class="sd">        Cost adjustment criterion modifying the cost function.</span>
-</span><span id="pelt-56"><a href="#pelt-56"><span class="linenos"> 56</span></a><span class="sd">    family : str or None</span>
-</span><span id="pelt-57"><a href="#pelt-57"><span class="linenos"> 57</span></a><span class="sd">        Family of change point model. One of:</span>
-</span><span id="pelt-58"><a href="#pelt-58"><span class="linenos"> 58</span></a><span class="sd">        &#39;mean&#39;, &#39;variance&#39;, &#39;meanvariance&#39;, &#39;lm&#39;, &#39;binomial&#39;, &#39;poisson&#39;,</span>
-</span><span id="pelt-59"><a href="#pelt-59"><span class="linenos"> 59</span></a><span class="sd">        &#39;lasso&#39;, &#39;ar&#39;, &#39;arma&#39;, &#39;arima&#39;, &#39;garch&#39;, &#39;var&#39;, &#39;custom&#39;.</span>
-</span><span id="pelt-60"><a href="#pelt-60"><span class="linenos"> 60</span></a><span class="sd">        None is treated as &#39;custom&#39;.</span>
-</span><span id="pelt-61"><a href="#pelt-61"><span class="linenos"> 61</span></a><span class="sd">    cost : callable or None</span>
-</span><span id="pelt-62"><a href="#pelt-62"><span class="linenos"> 62</span></a><span class="sd">        Custom cost function: cost(data) or cost(data, theta).</span>
-</span><span id="pelt-63"><a href="#pelt-63"><span class="linenos"> 63</span></a><span class="sd">    cost_gradient : callable or None</span>
-</span><span id="pelt-64"><a href="#pelt-64"><span class="linenos"> 64</span></a><span class="sd">        Gradient of custom cost: cost_gradient(data, theta).</span>
-</span><span id="pelt-65"><a href="#pelt-65"><span class="linenos"> 65</span></a><span class="sd">    cost_hessian : callable or None</span>
-</span><span id="pelt-66"><a href="#pelt-66"><span class="linenos"> 66</span></a><span class="sd">        Hessian of custom cost: cost_hessian(data, theta).</span>
-</span><span id="pelt-67"><a href="#pelt-67"><span class="linenos"> 67</span></a><span class="sd">    line_search : tuple of floats</span>
-</span><span id="pelt-68"><a href="#pelt-68"><span class="linenos"> 68</span></a><span class="sd">        Values for line search step sizes.</span>
-</span><span id="pelt-69"><a href="#pelt-69"><span class="linenos"> 69</span></a><span class="sd">    lower : array-like or None</span>
-</span><span id="pelt-70"><a href="#pelt-70"><span class="linenos"> 70</span></a><span class="sd">        Lower bound for parameters after each update.</span>
-</span><span id="pelt-71"><a href="#pelt-71"><span class="linenos"> 71</span></a><span class="sd">    upper : array-like or None</span>
-</span><span id="pelt-72"><a href="#pelt-72"><span class="linenos"> 72</span></a><span class="sd">        Upper bound for parameters after each update.</span>
-</span><span id="pelt-73"><a href="#pelt-73"><span class="linenos"> 73</span></a><span class="sd">    pruning_coef : float</span>
-</span><span id="pelt-74"><a href="#pelt-74"><span class="linenos"> 74</span></a><span class="sd">        Pruning coefficient for PELT algorithm.</span>
-</span><span id="pelt-75"><a href="#pelt-75"><span class="linenos"> 75</span></a><span class="sd">    segment_count : int</span>
-</span><span id="pelt-76"><a href="#pelt-76"><span class="linenos"> 76</span></a><span class="sd">        Initial guess for number of segments.</span>
-</span><span id="pelt-77"><a href="#pelt-77"><span class="linenos"> 77</span></a><span class="sd">    trim : float</span>
-</span><span id="pelt-78"><a href="#pelt-78"><span class="linenos"> 78</span></a><span class="sd">        Trimming proportion for boundary change points.</span>
-</span><span id="pelt-79"><a href="#pelt-79"><span class="linenos"> 79</span></a><span class="sd">    momentum_coef : float</span>
-</span><span id="pelt-80"><a href="#pelt-80"><span class="linenos"> 80</span></a><span class="sd">        Momentum coefficient for parameter updates.</span>
-</span><span id="pelt-81"><a href="#pelt-81"><span class="linenos"> 81</span></a><span class="sd">    multiple_epochs : callable</span>
-</span><span id="pelt-82"><a href="#pelt-82"><span class="linenos"> 82</span></a><span class="sd">        Function(segment_length) -&gt; int additional epochs.</span>
-</span><span id="pelt-83"><a href="#pelt-83"><span class="linenos"> 83</span></a><span class="sd">    epsilon : float</span>
-</span><span id="pelt-84"><a href="#pelt-84"><span class="linenos"> 84</span></a><span class="sd">        Epsilon for numerical stability.</span>
-</span><span id="pelt-85"><a href="#pelt-85"><span class="linenos"> 85</span></a><span class="sd">    order : tuple of int</span>
-</span><span id="pelt-86"><a href="#pelt-86"><span class="linenos"> 86</span></a><span class="sd">        Order for AR, VAR, ARIMA, GARCH models.</span>
-</span><span id="pelt-87"><a href="#pelt-87"><span class="linenos"> 87</span></a><span class="sd">    p : int or None</span>
-</span><span id="pelt-88"><a href="#pelt-88"><span class="linenos"> 88</span></a><span class="sd">        Number of covariates. If None, inferred from data.</span>
-</span><span id="pelt-89"><a href="#pelt-89"><span class="linenos"> 89</span></a><span class="sd">    variance_estimation : array-like or None</span>
-</span><span id="pelt-90"><a href="#pelt-90"><span class="linenos"> 90</span></a><span class="sd">        Pre-specified variance/covariance matrix.</span>
-</span><span id="pelt-91"><a href="#pelt-91"><span class="linenos"> 91</span></a><span class="sd">    cp_only : bool</span>
-</span><span id="pelt-92"><a href="#pelt-92"><span class="linenos"> 92</span></a><span class="sd">        If True, only change points are returned.</span>
-</span><span id="pelt-93"><a href="#pelt-93"><span class="linenos"> 93</span></a><span class="sd">    vanilla_percentage : float</span>
-</span><span id="pelt-94"><a href="#pelt-94"><span class="linenos"> 94</span></a><span class="sd">        Interpolation parameter between PELT and SeGD.</span>
-</span><span id="pelt-95"><a href="#pelt-95"><span class="linenos"> 95</span></a><span class="sd">    warm_start : bool</span>
-</span><span id="pelt-96"><a href="#pelt-96"><span class="linenos"> 96</span></a><span class="sd">        Use previous segment&#39;s params as initial values.</span>
-</span><span id="pelt-97"><a href="#pelt-97"><span class="linenos"> 97</span></a><span class="sd">    **kwargs :</span>
-</span><span id="pelt-98"><a href="#pelt-98"><span class="linenos"> 98</span></a><span class="sd">        Additional model-specific parameters.</span>
+</span><span id="pelt-38"><a href="#pelt-38"><span class="linenos"> 38</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently.</span>
+</span><span id="pelt-39"><a href="#pelt-39"><span class="linenos"> 39</span></a>
+</span><span id="pelt-40"><a href="#pelt-40"><span class="linenos"> 40</span></a><span class="sd">    Args:</span>
+</span><span id="pelt-41"><a href="#pelt-41"><span class="linenos"> 41</span></a><span class="sd">        formula: A formula string specifying the model to be fitted. The</span>
+</span><span id="pelt-42"><a href="#pelt-42"><span class="linenos"> 42</span></a><span class="sd">            optional response variable should be on the LHS, covariates on the</span>
+</span><span id="pelt-43"><a href="#pelt-43"><span class="linenos"> 43</span></a><span class="sd">            RHS. Intercept should be removed by appending &#39;- 1&#39;. By default,</span>
+</span><span id="pelt-44"><a href="#pelt-44"><span class="linenos"> 44</span></a><span class="sd">            an intercept column is added as in R&#39;s lm().</span>
+</span><span id="pelt-45"><a href="#pelt-45"><span class="linenos"> 45</span></a><span class="sd">        data: A NumPy array of shape (T, d) containing the data to be</span>
+</span><span id="pelt-46"><a href="#pelt-46"><span class="linenos"> 46</span></a><span class="sd">            segmented. Each row is a data point z_t in R^d.</span>
+</span><span id="pelt-47"><a href="#pelt-47"><span class="linenos"> 47</span></a><span class="sd">        beta: Penalty criterion for the number of change points. Can be one of</span>
+</span><span id="pelt-48"><a href="#pelt-48"><span class="linenos"> 48</span></a><span class="sd">            &#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;, or a float value.</span>
+</span><span id="pelt-49"><a href="#pelt-49"><span class="linenos"> 49</span></a><span class="sd">        cost_adjustment: Cost adjustment criterion modifying the cost function.</span>
+</span><span id="pelt-50"><a href="#pelt-50"><span class="linenos"> 50</span></a><span class="sd">            Can be one of &#39;BIC&#39;, &#39;MBIC&#39;, &#39;MDL&#39;, or None.</span>
+</span><span id="pelt-51"><a href="#pelt-51"><span class="linenos"> 51</span></a><span class="sd">        family: Family of change point model. One of: &#39;mean&#39;, &#39;variance&#39;,</span>
+</span><span id="pelt-52"><a href="#pelt-52"><span class="linenos"> 52</span></a><span class="sd">            &#39;meanvariance&#39;, &#39;lm&#39;, &#39;binomial&#39;, &#39;poisson&#39;, &#39;lasso&#39;, &#39;ar&#39;,</span>
+</span><span id="pelt-53"><a href="#pelt-53"><span class="linenos"> 53</span></a><span class="sd">            &#39;arma&#39;, &#39;arima&#39;, &#39;garch&#39;, &#39;var&#39;, &#39;custom&#39;. If None, it is</span>
+</span><span id="pelt-54"><a href="#pelt-54"><span class="linenos"> 54</span></a><span class="sd">            treated as &#39;custom&#39;.</span>
+</span><span id="pelt-55"><a href="#pelt-55"><span class="linenos"> 55</span></a><span class="sd">        cost: Custom cost function, e.g., ``cost(data)`` or</span>
+</span><span id="pelt-56"><a href="#pelt-56"><span class="linenos"> 56</span></a><span class="sd">            ``cost(data, theta)``.</span>
+</span><span id="pelt-57"><a href="#pelt-57"><span class="linenos"> 57</span></a><span class="sd">        cost_gradient: Gradient of custom cost, e.g.,</span>
+</span><span id="pelt-58"><a href="#pelt-58"><span class="linenos"> 58</span></a><span class="sd">            ``cost_gradient(data, theta)``.</span>
+</span><span id="pelt-59"><a href="#pelt-59"><span class="linenos"> 59</span></a><span class="sd">        cost_hessian: Hessian of custom cost, e.g.,</span>
+</span><span id="pelt-60"><a href="#pelt-60"><span class="linenos"> 60</span></a><span class="sd">            ``cost_hessian(data, theta)``.</span>
+</span><span id="pelt-61"><a href="#pelt-61"><span class="linenos"> 61</span></a><span class="sd">        line_search: Values for line search step sizes.</span>
+</span><span id="pelt-62"><a href="#pelt-62"><span class="linenos"> 62</span></a><span class="sd">        lower: Lower bound for parameters after each update.</span>
+</span><span id="pelt-63"><a href="#pelt-63"><span class="linenos"> 63</span></a><span class="sd">        upper: Upper bound for parameters after each update.</span>
+</span><span id="pelt-64"><a href="#pelt-64"><span class="linenos"> 64</span></a><span class="sd">        pruning_coef: Pruning coefficient for PELT algorithm.</span>
+</span><span id="pelt-65"><a href="#pelt-65"><span class="linenos"> 65</span></a><span class="sd">        segment_count: Initial guess for number of segments.</span>
+</span><span id="pelt-66"><a href="#pelt-66"><span class="linenos"> 66</span></a><span class="sd">        trim: Trimming proportion for boundary change points.</span>
+</span><span id="pelt-67"><a href="#pelt-67"><span class="linenos"> 67</span></a><span class="sd">        momentum_coef: Momentum coefficient for parameter updates.</span>
+</span><span id="pelt-68"><a href="#pelt-68"><span class="linenos"> 68</span></a><span class="sd">        multiple_epochs: A function that takes the segment length and</span>
+</span><span id="pelt-69"><a href="#pelt-69"><span class="linenos"> 69</span></a><span class="sd">            returns an int for additional epochs.</span>
+</span><span id="pelt-70"><a href="#pelt-70"><span class="linenos"> 70</span></a><span class="sd">        epsilon: Epsilon for numerical stability.</span>
+</span><span id="pelt-71"><a href="#pelt-71"><span class="linenos"> 71</span></a><span class="sd">        order: Order for AR, VAR, ARIMA, GARCH models.</span>
+</span><span id="pelt-72"><a href="#pelt-72"><span class="linenos"> 72</span></a><span class="sd">        p: Number of covariates. If None, inferred from data.</span>
+</span><span id="pelt-73"><a href="#pelt-73"><span class="linenos"> 73</span></a><span class="sd">        variance_estimation: Pre-specified variance/covariance matrix.</span>
+</span><span id="pelt-74"><a href="#pelt-74"><span class="linenos"> 74</span></a><span class="sd">        cp_only: If True, only change points are returned.</span>
+</span><span id="pelt-75"><a href="#pelt-75"><span class="linenos"> 75</span></a><span class="sd">        vanilla_percentage: Interpolation parameter between PELT and SeGD.</span>
+</span><span id="pelt-76"><a href="#pelt-76"><span class="linenos"> 76</span></a><span class="sd">        warm_start: If True, use the previous segment&#39;s parameters as</span>
+</span><span id="pelt-77"><a href="#pelt-77"><span class="linenos"> 77</span></a><span class="sd">            initial values for the new segment.</span>
+</span><span id="pelt-78"><a href="#pelt-78"><span class="linenos"> 78</span></a><span class="sd">        **kwargs: Additional model-specific parameters.</span>
+</span><span id="pelt-79"><a href="#pelt-79"><span class="linenos"> 79</span></a>
+</span><span id="pelt-80"><a href="#pelt-80"><span class="linenos"> 80</span></a><span class="sd">    Returns:</span>
+</span><span id="pelt-81"><a href="#pelt-81"><span class="linenos"> 81</span></a><span class="sd">        A ``FastCPDResult`` object containing change points, costs,</span>
+</span><span id="pelt-82"><a href="#pelt-82"><span class="linenos"> 82</span></a><span class="sd">        residuals, and parameter estimates.</span>
+</span><span id="pelt-83"><a href="#pelt-83"><span class="linenos"> 83</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="pelt-84"><a href="#pelt-84"><span class="linenos"> 84</span></a>    <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">family</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;custom&#39;</span>
+</span><span id="pelt-85"><a href="#pelt-85"><span class="linenos"> 85</span></a>    <span class="k">assert</span> <span class="n">family</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">)</span>
+</span><span id="pelt-86"><a href="#pelt-86"><span class="linenos"> 86</span></a>    <span class="k">assert</span> <span class="n">cost_adjustment</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;BIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MDL&#39;</span><span class="p">)</span>
+</span><span id="pelt-87"><a href="#pelt-87"><span class="linenos"> 87</span></a>
+</span><span id="pelt-88"><a href="#pelt-88"><span class="linenos"> 88</span></a>    <span class="k">if</span> <span class="n">variance_estimation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="pelt-89"><a href="#pelt-89"><span class="linenos"> 89</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">variance_estimation</span><span class="p">)</span>
+</span><span id="pelt-90"><a href="#pelt-90"><span class="linenos"> 90</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+</span><span id="pelt-91"><a href="#pelt-91"><span class="linenos"> 91</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">fastcpd</span><span class="o">.</span><span class="n">variance_estimation</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="pelt-92"><a href="#pelt-92"><span class="linenos"> 92</span></a>
+</span><span id="pelt-93"><a href="#pelt-93"><span class="linenos"> 93</span></a>    <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+</span><span id="pelt-94"><a href="#pelt-94"><span class="linenos"> 94</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="pelt-95"><a href="#pelt-95"><span class="linenos"> 95</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;variance&#39;</span><span class="p">:</span>
+</span><span id="pelt-96"><a href="#pelt-96"><span class="linenos"> 96</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+</span><span id="pelt-97"><a href="#pelt-97"><span class="linenos"> 97</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">:</span>
+</span><span id="pelt-98"><a href="#pelt-98"><span class="linenos"> 98</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
 </span><span id="pelt-99"><a href="#pelt-99"><span class="linenos"> 99</span></a>
-</span><span id="pelt-100"><a href="#pelt-100"><span class="linenos">100</span></a><span class="sd">    Returns:</span>
-</span><span id="pelt-101"><a href="#pelt-101"><span class="linenos">101</span></a><span class="sd">    --------</span>
-</span><span id="pelt-102"><a href="#pelt-102"><span class="linenos">102</span></a><span class="sd">    result : object</span>
-</span><span id="pelt-103"><a href="#pelt-103"><span class="linenos">103</span></a><span class="sd">        A FastCPDResult object containing change points, costs,</span>
-</span><span id="pelt-104"><a href="#pelt-104"><span class="linenos">104</span></a><span class="sd">        residuals, and parameter estimates.</span>
-</span><span id="pelt-105"><a href="#pelt-105"><span class="linenos">105</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="pelt-106"><a href="#pelt-106"><span class="linenos">106</span></a>    <span class="n">family</span> <span class="o">=</span> <span class="n">family</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">family</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;custom&#39;</span>
-</span><span id="pelt-107"><a href="#pelt-107"><span class="linenos">107</span></a>    <span class="k">assert</span> <span class="n">family</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">)</span>
-</span><span id="pelt-108"><a href="#pelt-108"><span class="linenos">108</span></a>    <span class="k">assert</span> <span class="n">cost_adjustment</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;BIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">,</span> <span class="s1">&#39;MDL&#39;</span><span class="p">)</span>
-</span><span id="pelt-109"><a href="#pelt-109"><span class="linenos">109</span></a>
-</span><span id="pelt-110"><a href="#pelt-110"><span class="linenos">110</span></a>    <span class="k">if</span> <span class="n">variance_estimation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="pelt-111"><a href="#pelt-111"><span class="linenos">111</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">variance_estimation</span><span class="p">)</span>
-</span><span id="pelt-112"><a href="#pelt-112"><span class="linenos">112</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-</span><span id="pelt-113"><a href="#pelt-113"><span class="linenos">113</span></a>        <span class="n">variance_estimation</span> <span class="o">=</span> <span class="n">fastcpd</span><span class="o">.</span><span class="n">variance_estimation</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span id="pelt-114"><a href="#pelt-114"><span class="linenos">114</span></a>
-</span><span id="pelt-115"><a href="#pelt-115"><span class="linenos">115</span></a>    <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-</span><span id="pelt-116"><a href="#pelt-116"><span class="linenos">116</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-</span><span id="pelt-117"><a href="#pelt-117"><span class="linenos">117</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;variance&#39;</span><span class="p">:</span>
-</span><span id="pelt-118"><a href="#pelt-118"><span class="linenos">118</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
-</span><span id="pelt-119"><a href="#pelt-119"><span class="linenos">119</span></a>    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;meanvariance&#39;</span><span class="p">:</span>
-</span><span id="pelt-120"><a href="#pelt-120"><span class="linenos">120</span></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
-</span><span id="pelt-121"><a href="#pelt-121"><span class="linenos">121</span></a>
-</span><span id="pelt-122"><a href="#pelt-122"><span class="linenos">122</span></a>    <span class="k">if</span> <span class="n">pruning_coef</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="pelt-123"><a href="#pelt-123"><span class="linenos">123</span></a>        <span class="n">pruning_coef</span> <span class="o">=</span> <span class="mf">0.0</span>
-</span><span id="pelt-124"><a href="#pelt-124"><span class="linenos">124</span></a>    <span class="k">if</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MBIC&quot;</span><span class="p">:</span>
-</span><span id="pelt-125"><a href="#pelt-125"><span class="linenos">125</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="pelt-126"><a href="#pelt-126"><span class="linenos">126</span></a>    <span class="k">elif</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MDL&quot;</span><span class="p">:</span>
-</span><span id="pelt-127"><a href="#pelt-127"><span class="linenos">127</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="pelt-128"><a href="#pelt-128"><span class="linenos">128</span></a>
-</span><span id="pelt-129"><a href="#pelt-129"><span class="linenos">129</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="pelt-130"><a href="#pelt-130"><span class="linenos">130</span></a>        <span class="k">if</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;BIC&#39;</span><span class="p">:</span>
-</span><span id="pelt-131"><a href="#pelt-131"><span class="linenos">131</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="pelt-132"><a href="#pelt-132"><span class="linenos">132</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">:</span>
-</span><span id="pelt-133"><a href="#pelt-133"><span class="linenos">133</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="pelt-134"><a href="#pelt-134"><span class="linenos">134</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MDL&#39;</span><span class="p">:</span>
-</span><span id="pelt-135"><a href="#pelt-135"><span class="linenos">135</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="pelt-136"><a href="#pelt-136"><span class="linenos">136</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="pelt-137"><a href="#pelt-137"><span class="linenos">137</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown beta criterion: </span><span class="si">{</span><span class="n">beta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="pelt-138"><a href="#pelt-138"><span class="linenos">138</span></a>
-</span><span id="pelt-139"><a href="#pelt-139"><span class="linenos">139</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">fastcpd_impl</span><span class="p">(</span>
-</span><span id="pelt-140"><a href="#pelt-140"><span class="linenos">140</span></a>        <span class="n">beta</span><span class="p">,</span>
-</span><span id="pelt-141"><a href="#pelt-141"><span class="linenos">141</span></a>        <span class="n">cost_adjustment</span><span class="p">,</span>
-</span><span id="pelt-142"><a href="#pelt-142"><span class="linenos">142</span></a>        <span class="n">cp_only</span><span class="p">,</span>
-</span><span id="pelt-143"><a href="#pelt-143"><span class="linenos">143</span></a>        <span class="n">data</span><span class="p">,</span>
-</span><span id="pelt-144"><a href="#pelt-144"><span class="linenos">144</span></a>        <span class="n">epsilon</span><span class="p">,</span>
-</span><span id="pelt-145"><a href="#pelt-145"><span class="linenos">145</span></a>        <span class="n">family</span><span class="p">,</span>
-</span><span id="pelt-146"><a href="#pelt-146"><span class="linenos">146</span></a>        <span class="n">line_search</span><span class="p">,</span>
-</span><span id="pelt-147"><a href="#pelt-147"><span class="linenos">147</span></a>        <span class="p">[],</span>
-</span><span id="pelt-148"><a href="#pelt-148"><span class="linenos">148</span></a>        <span class="n">momentum_coef</span><span class="p">,</span>
-</span><span id="pelt-149"><a href="#pelt-149"><span class="linenos">149</span></a>        <span class="n">order</span><span class="p">,</span>
-</span><span id="pelt-150"><a href="#pelt-150"><span class="linenos">150</span></a>        <span class="n">p</span><span class="p">,</span>
-</span><span id="pelt-151"><a href="#pelt-151"><span class="linenos">151</span></a>        <span class="mi">0</span><span class="p">,</span>
-</span><span id="pelt-152"><a href="#pelt-152"><span class="linenos">152</span></a>        <span class="n">pruning_coef</span><span class="p">,</span>
-</span><span id="pelt-153"><a href="#pelt-153"><span class="linenos">153</span></a>        <span class="n">segment_count</span><span class="p">,</span>
-</span><span id="pelt-154"><a href="#pelt-154"><span class="linenos">154</span></a>        <span class="n">trim</span><span class="p">,</span>
-</span><span id="pelt-155"><a href="#pelt-155"><span class="linenos">155</span></a>        <span class="p">[],</span>
-</span><span id="pelt-156"><a href="#pelt-156"><span class="linenos">156</span></a>        <span class="mf">1.0</span><span class="p">,</span>
-</span><span id="pelt-157"><a href="#pelt-157"><span class="linenos">157</span></a>        <span class="n">variance_estimation</span><span class="p">,</span>
-</span><span id="pelt-158"><a href="#pelt-158"><span class="linenos">158</span></a>        <span class="n">warm_start</span><span class="p">,</span>
-</span><span id="pelt-159"><a href="#pelt-159"><span class="linenos">159</span></a>    <span class="p">)</span>
-</span><span id="pelt-160"><a href="#pelt-160"><span class="linenos">160</span></a>    <span class="k">return</span> <span class="n">result</span>
+</span><span id="pelt-100"><a href="#pelt-100"><span class="linenos">100</span></a>    <span class="k">if</span> <span class="n">pruning_coef</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="pelt-101"><a href="#pelt-101"><span class="linenos">101</span></a>        <span class="n">pruning_coef</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="pelt-102"><a href="#pelt-102"><span class="linenos">102</span></a>    <span class="k">if</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MBIC&quot;</span><span class="p">:</span>
+</span><span id="pelt-103"><a href="#pelt-103"><span class="linenos">103</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="pelt-104"><a href="#pelt-104"><span class="linenos">104</span></a>    <span class="k">elif</span> <span class="n">cost_adjustment</span> <span class="o">==</span> <span class="s2">&quot;MDL&quot;</span><span class="p">:</span>
+</span><span id="pelt-105"><a href="#pelt-105"><span class="linenos">105</span></a>        <span class="n">pruning_coef</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="pelt-106"><a href="#pelt-106"><span class="linenos">106</span></a>
+</span><span id="pelt-107"><a href="#pelt-107"><span class="linenos">107</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="pelt-108"><a href="#pelt-108"><span class="linenos">108</span></a>        <span class="k">if</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;BIC&#39;</span><span class="p">:</span>
+</span><span id="pelt-109"><a href="#pelt-109"><span class="linenos">109</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="pelt-110"><a href="#pelt-110"><span class="linenos">110</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MBIC&#39;</span><span class="p">:</span>
+</span><span id="pelt-111"><a href="#pelt-111"><span class="linenos">111</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="pelt-112"><a href="#pelt-112"><span class="linenos">112</span></a>        <span class="k">elif</span> <span class="n">beta</span> <span class="o">==</span> <span class="s1">&#39;MDL&#39;</span><span class="p">:</span>
+</span><span id="pelt-113"><a href="#pelt-113"><span class="linenos">113</span></a>            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log2</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="pelt-114"><a href="#pelt-114"><span class="linenos">114</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="pelt-115"><a href="#pelt-115"><span class="linenos">115</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown beta criterion: </span><span class="si">{</span><span class="n">beta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="pelt-116"><a href="#pelt-116"><span class="linenos">116</span></a>
+</span><span id="pelt-117"><a href="#pelt-117"><span class="linenos">117</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">fastcpd_impl</span><span class="p">(</span>
+</span><span id="pelt-118"><a href="#pelt-118"><span class="linenos">118</span></a>        <span class="n">beta</span><span class="p">,</span>
+</span><span id="pelt-119"><a href="#pelt-119"><span class="linenos">119</span></a>        <span class="n">cost_adjustment</span><span class="p">,</span>
+</span><span id="pelt-120"><a href="#pelt-120"><span class="linenos">120</span></a>        <span class="n">cp_only</span><span class="p">,</span>
+</span><span id="pelt-121"><a href="#pelt-121"><span class="linenos">121</span></a>        <span class="n">data</span><span class="p">,</span>
+</span><span id="pelt-122"><a href="#pelt-122"><span class="linenos">122</span></a>        <span class="n">epsilon</span><span class="p">,</span>
+</span><span id="pelt-123"><a href="#pelt-123"><span class="linenos">123</span></a>        <span class="n">family</span><span class="p">,</span>
+</span><span id="pelt-124"><a href="#pelt-124"><span class="linenos">124</span></a>        <span class="n">line_search</span><span class="p">,</span>
+</span><span id="pelt-125"><a href="#pelt-125"><span class="linenos">125</span></a>        <span class="p">[],</span>
+</span><span id="pelt-126"><a href="#pelt-126"><span class="linenos">126</span></a>        <span class="n">momentum_coef</span><span class="p">,</span>
+</span><span id="pelt-127"><a href="#pelt-127"><span class="linenos">127</span></a>        <span class="n">order</span><span class="p">,</span>
+</span><span id="pelt-128"><a href="#pelt-128"><span class="linenos">128</span></a>        <span class="n">p</span><span class="p">,</span>
+</span><span id="pelt-129"><a href="#pelt-129"><span class="linenos">129</span></a>        <span class="mi">0</span><span class="p">,</span>
+</span><span id="pelt-130"><a href="#pelt-130"><span class="linenos">130</span></a>        <span class="n">pruning_coef</span><span class="p">,</span>
+</span><span id="pelt-131"><a href="#pelt-131"><span class="linenos">131</span></a>        <span class="n">segment_count</span><span class="p">,</span>
+</span><span id="pelt-132"><a href="#pelt-132"><span class="linenos">132</span></a>        <span class="n">trim</span><span class="p">,</span>
+</span><span id="pelt-133"><a href="#pelt-133"><span class="linenos">133</span></a>        <span class="p">[],</span>
+</span><span id="pelt-134"><a href="#pelt-134"><span class="linenos">134</span></a>        <span class="mf">1.0</span><span class="p">,</span>
+</span><span id="pelt-135"><a href="#pelt-135"><span class="linenos">135</span></a>        <span class="n">variance_estimation</span><span class="p">,</span>
+</span><span id="pelt-136"><a href="#pelt-136"><span class="linenos">136</span></a>        <span class="n">warm_start</span><span class="p">,</span>
+</span><span id="pelt-137"><a href="#pelt-137"><span class="linenos">137</span></a>    <span class="p">)</span>
+</span><span id="pelt-138"><a href="#pelt-138"><span class="linenos">138</span></a>    <span class="k">return</span> <span class="n">result</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Find change points efficiently.</p>
 
-<h2 id="parameters">Parameters:</h2>
+<h6 id="arguments">Arguments:</h6>
 
-<p>formula : str
-    A formula string specifying the model to be fitted. The optional
-    response variable should be on the LHS, covariates on the RHS.
-    Intercept should be removed by appending '- 1'. By default,
-    an intercept column is added as in R's lm().
-data : pandas.DataFrame
-    DataFrame of shape (T, d) containing the data to be segmented.
-    Each row is a data point z_t in R^d.
-beta : {'BIC', 'MBIC', 'MDL'} or float
-    Penalty criterion for the number of change points. String uses
-    built-in criteria; numeric uses provided value.
-cost_adjustment : {'BIC', 'MBIC', 'MDL'} or None
-    Cost adjustment criterion modifying the cost function.
-family : str or None
-    Family of change point model. One of:
-    'mean', 'variance', 'meanvariance', 'lm', 'binomial', 'poisson',
-    'lasso', 'ar', 'arma', 'arima', 'garch', 'var', 'custom'.
-    None is treated as 'custom'.
-cost : callable or None
-    Custom cost function: cost(data) or cost(data, theta).
-cost_gradient : callable or None
-    Gradient of custom cost: cost_gradient(data, theta).
-cost_hessian : callable or None
-    Hessian of custom cost: cost_hessian(data, theta).
-line_search : tuple of floats
-    Values for line search step sizes.
-lower : array-like or None
-    Lower bound for parameters after each update.
-upper : array-like or None
-    Upper bound for parameters after each update.
-pruning_coef : float
-    Pruning coefficient for PELT algorithm.
-segment_count : int
-    Initial guess for number of segments.
-trim : float
-    Trimming proportion for boundary change points.
-momentum_coef : float
-    Momentum coefficient for parameter updates.
-multiple_epochs : callable
-    Function(segment_length) -> int additional epochs.
-epsilon : float
-    Epsilon for numerical stability.
-order : tuple of int
-    Order for AR, VAR, ARIMA, GARCH models.
-p : int or None
-    Number of covariates. If None, inferred from data.
-variance_estimation : array-like or None
-    Pre-specified variance/covariance matrix.
-cp_only : bool
-    If True, only change points are returned.
-vanilla_percentage : float
-    Interpolation parameter between PELT and SeGD.
-warm_start : bool
-    Use previous segment's params as initial values.
-**kwargs :
-    Additional model-specific parameters.</p>
+<ul>
+<li><strong>formula:</strong>  A formula string specifying the model to be fitted. The
+optional response variable should be on the LHS, covariates on the
+RHS. Intercept should be removed by appending '- 1'. By default,
+an intercept column is added as in R's lm().</li>
+<li><strong>data:</strong>  A NumPy array of shape (T, d) containing the data to be
+segmented. Each row is a data point z_t in R^d.</li>
+<li><strong>beta:</strong>  Penalty criterion for the number of change points. Can be one of
+'BIC', 'MBIC', 'MDL', or a float value.</li>
+<li><strong>cost_adjustment:</strong>  Cost adjustment criterion modifying the cost function.
+Can be one of 'BIC', 'MBIC', 'MDL', or None.</li>
+<li><strong>family:</strong>  Family of change point model. One of: 'mean', 'variance',
+'meanvariance', 'lm', 'binomial', 'poisson', 'lasso', 'ar',
+'arma', 'arima', 'garch', 'var', 'custom'. If None, it is
+treated as 'custom'.</li>
+<li><strong>cost:</strong>  Custom cost function, e.g., <code>cost(data)</code> or
+<code>cost(data, theta)</code>.</li>
+<li><strong>cost_gradient:</strong>  Gradient of custom cost, e.g.,
+<code>cost_gradient(data, theta)</code>.</li>
+<li><strong>cost_hessian:</strong>  Hessian of custom cost, e.g.,
+<code>cost_hessian(data, theta)</code>.</li>
+<li><strong>line_search:</strong>  Values for line search step sizes.</li>
+<li><strong>lower:</strong>  Lower bound for parameters after each update.</li>
+<li><strong>upper:</strong>  Upper bound for parameters after each update.</li>
+<li><strong>pruning_coef:</strong>  Pruning coefficient for PELT algorithm.</li>
+<li><strong>segment_count:</strong>  Initial guess for number of segments.</li>
+<li><strong>trim:</strong>  Trimming proportion for boundary change points.</li>
+<li><strong>momentum_coef:</strong>  Momentum coefficient for parameter updates.</li>
+<li><strong>multiple_epochs:</strong>  A function that takes the segment length and
+returns an int for additional epochs.</li>
+<li><strong>epsilon:</strong>  Epsilon for numerical stability.</li>
+<li><strong>order:</strong>  Order for AR, VAR, ARIMA, GARCH models.</li>
+<li><strong>p:</strong>  Number of covariates. If None, inferred from data.</li>
+<li><strong>variance_estimation:</strong>  Pre-specified variance/covariance matrix.</li>
+<li><strong>cp_only:</strong>  If True, only change points are returned.</li>
+<li><strong>vanilla_percentage:</strong>  Interpolation parameter between PELT and SeGD.</li>
+<li><strong>warm_start:</strong>  If True, use the previous segment's parameters as
+initial values for the new segment.</li>
+<li><strong>**kwargs:</strong>  Additional model-specific parameters.</li>
+</ul>
 
-<h2 id="returns">Returns:</h2>
+<h6 id="returns">Returns:</h6>
 
-<p>result : object
-    A FastCPDResult object containing change points, costs,
-    residuals, and parameter estimates.</p>
+<blockquote>
+  <p>A <code>FastCPDResult</code> object containing change points, costs,
+  residuals, and parameter estimates.</p>
+</blockquote>
 </div>
 
 
@@ -314,37 +277,34 @@ warm_start : bool
 
     </div>
     <a class="headerlink" href="#mean"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="mean-163"><a href="#mean-163"><span class="linenos">163</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="mean-164"><a href="#mean-164"><span class="linenos">164</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="mean-165"><a href="#mean-165"><span class="linenos">165</span></a><span class="sd">    Find change points efficiently in mean change models.</span>
-</span><span id="mean-166"><a href="#mean-166"><span class="linenos">166</span></a>
-</span><span id="mean-167"><a href="#mean-167"><span class="linenos">167</span></a><span class="sd">    Parameters:</span>
-</span><span id="mean-168"><a href="#mean-168"><span class="linenos">168</span></a><span class="sd">    -----------</span>
-</span><span id="mean-169"><a href="#mean-169"><span class="linenos">169</span></a><span class="sd">    data : array-like or pandas.DataFrame</span>
-</span><span id="mean-170"><a href="#mean-170"><span class="linenos">170</span></a><span class="sd">        Univariate data for mean change detection.</span>
-</span><span id="mean-171"><a href="#mean-171"><span class="linenos">171</span></a><span class="sd">    **kwargs :</span>
-</span><span id="mean-172"><a href="#mean-172"><span class="linenos">172</span></a><span class="sd">        Additional arguments passed to pelt().</span>
-</span><span id="mean-173"><a href="#mean-173"><span class="linenos">173</span></a>
-</span><span id="mean-174"><a href="#mean-174"><span class="linenos">174</span></a><span class="sd">    Returns:</span>
-</span><span id="mean-175"><a href="#mean-175"><span class="linenos">175</span></a><span class="sd">    --------</span>
-</span><span id="mean-176"><a href="#mean-176"><span class="linenos">176</span></a><span class="sd">    result</span>
-</span><span id="mean-177"><a href="#mean-177"><span class="linenos">177</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="mean-178"><a href="#mean-178"><span class="linenos">178</span></a>    <span class="k">return</span> <span class="n">pelt</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="mean-141"><a href="#mean-141"><span class="linenos">141</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="mean-142"><a href="#mean-142"><span class="linenos">142</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in mean change models.</span>
+</span><span id="mean-143"><a href="#mean-143"><span class="linenos">143</span></a>
+</span><span id="mean-144"><a href="#mean-144"><span class="linenos">144</span></a><span class="sd">    Args:</span>
+</span><span id="mean-145"><a href="#mean-145"><span class="linenos">145</span></a><span class="sd">        data: Univariate or multivariate data for mean change detection.</span>
+</span><span id="mean-146"><a href="#mean-146"><span class="linenos">146</span></a><span class="sd">        **kwargs: Additional arguments passed to ``pelt()``.</span>
+</span><span id="mean-147"><a href="#mean-147"><span class="linenos">147</span></a>
+</span><span id="mean-148"><a href="#mean-148"><span class="linenos">148</span></a><span class="sd">    Returns:</span>
+</span><span id="mean-149"><a href="#mean-149"><span class="linenos">149</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
+</span><span id="mean-150"><a href="#mean-150"><span class="linenos">150</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="mean-151"><a href="#mean-151"><span class="linenos">151</span></a>    <span class="k">return</span> <span class="n">pelt</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Find change points efficiently in mean change models.</p>
 
-<h2 id="parameters">Parameters:</h2>
+<h6 id="arguments">Arguments:</h6>
 
-<p>data : array-like or pandas.DataFrame
-    Univariate data for mean change detection.
-**kwargs :
-    Additional arguments passed to pelt().</p>
+<ul>
+<li><strong>data:</strong>  Univariate or multivariate data for mean change detection.</li>
+<li><strong>**kwargs:</strong>  Additional arguments passed to <code><a href="#pelt">pelt()</a></code>.</li>
+</ul>
 
-<h2 id="returns">Returns:</h2>
+<h6 id="returns">Returns:</h6>
 
-<p>result</p>
+<blockquote>
+  <p>A <code>FastCPDResult</code> object.</p>
+</blockquote>
 </div>
 
 
@@ -360,15 +320,36 @@ warm_start : bool
 
     </div>
     <a class="headerlink" href="#meanvariance"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="meanvariance-188"><a href="#meanvariance-188"><span class="linenos">188</span></a><span class="k">def</span><span class="w"> </span><span class="nf">meanvariance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="meanvariance-189"><a href="#meanvariance-189"><span class="linenos">189</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="meanvariance-190"><a href="#meanvariance-190"><span class="linenos">190</span></a><span class="sd">    Find change points efficiently in mean and/or variance change models.</span>
-</span><span id="meanvariance-191"><a href="#meanvariance-191"><span class="linenos">191</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="meanvariance-192"><a href="#meanvariance-192"><span class="linenos">192</span></a>    <span class="k">return</span> <span class="n">pelt</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;meanvariance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="meanvariance-167"><a href="#meanvariance-167"><span class="linenos">167</span></a><span class="k">def</span><span class="w"> </span><span class="nf">meanvariance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="meanvariance-168"><a href="#meanvariance-168"><span class="linenos">168</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in mean and/or variance change models.</span>
+</span><span id="meanvariance-169"><a href="#meanvariance-169"><span class="linenos">169</span></a>
+</span><span id="meanvariance-170"><a href="#meanvariance-170"><span class="linenos">170</span></a><span class="sd">    Args:</span>
+</span><span id="meanvariance-171"><a href="#meanvariance-171"><span class="linenos">171</span></a><span class="sd">        data: Univariate or multivariate data for mean and/or variance change</span>
+</span><span id="meanvariance-172"><a href="#meanvariance-172"><span class="linenos">172</span></a><span class="sd">            detection.</span>
+</span><span id="meanvariance-173"><a href="#meanvariance-173"><span class="linenos">173</span></a><span class="sd">        **kwargs: Additional arguments passed to ``pelt()``.</span>
+</span><span id="meanvariance-174"><a href="#meanvariance-174"><span class="linenos">174</span></a>
+</span><span id="meanvariance-175"><a href="#meanvariance-175"><span class="linenos">175</span></a><span class="sd">    Returns:</span>
+</span><span id="meanvariance-176"><a href="#meanvariance-176"><span class="linenos">176</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
+</span><span id="meanvariance-177"><a href="#meanvariance-177"><span class="linenos">177</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="meanvariance-178"><a href="#meanvariance-178"><span class="linenos">178</span></a>    <span class="k">return</span> <span class="n">pelt</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;meanvariance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Find change points efficiently in mean and/or variance change models.</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>data:</strong>  Univariate or multivariate data for mean and/or variance change
+detection.</li>
+<li><strong>**kwargs:</strong>  Additional arguments passed to <code><a href="#pelt">pelt()</a></code>.</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>A <code>FastCPDResult</code> object.</p>
+</blockquote>
 </div>
 
 
@@ -384,15 +365,34 @@ warm_start : bool
 
     </div>
     <a class="headerlink" href="#variance"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="variance-181"><a href="#variance-181"><span class="linenos">181</span></a><span class="k">def</span><span class="w"> </span><span class="nf">variance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="variance-182"><a href="#variance-182"><span class="linenos">182</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="variance-183"><a href="#variance-183"><span class="linenos">183</span></a><span class="sd">    Find change points efficiently in variance change models.</span>
-</span><span id="variance-184"><a href="#variance-184"><span class="linenos">184</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="variance-185"><a href="#variance-185"><span class="linenos">185</span></a>    <span class="k">return</span> <span class="n">pelt</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="variance-154"><a href="#variance-154"><span class="linenos">154</span></a><span class="k">def</span><span class="w"> </span><span class="nf">variance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="variance-155"><a href="#variance-155"><span class="linenos">155</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find change points efficiently in variance change models.</span>
+</span><span id="variance-156"><a href="#variance-156"><span class="linenos">156</span></a>
+</span><span id="variance-157"><a href="#variance-157"><span class="linenos">157</span></a><span class="sd">    Args:</span>
+</span><span id="variance-158"><a href="#variance-158"><span class="linenos">158</span></a><span class="sd">        data: Univariate or multivariate data for variance change detection.</span>
+</span><span id="variance-159"><a href="#variance-159"><span class="linenos">159</span></a><span class="sd">        **kwargs: Additional arguments passed to ``pelt()``.</span>
+</span><span id="variance-160"><a href="#variance-160"><span class="linenos">160</span></a>
+</span><span id="variance-161"><a href="#variance-161"><span class="linenos">161</span></a><span class="sd">    Returns:</span>
+</span><span id="variance-162"><a href="#variance-162"><span class="linenos">162</span></a><span class="sd">        A ``FastCPDResult`` object.</span>
+</span><span id="variance-163"><a href="#variance-163"><span class="linenos">163</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="variance-164"><a href="#variance-164"><span class="linenos">164</span></a>    <span class="k">return</span> <span class="n">pelt</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;variance&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Find change points efficiently in variance change models.</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>data:</strong>  Univariate or multivariate data for variance change detection.</li>
+<li><strong>**kwargs:</strong>  Additional arguments passed to <code><a href="#pelt">pelt()</a></code>.</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>A <code>FastCPDResult</code> object.</p>
+</blockquote>
 </div>
 
 
