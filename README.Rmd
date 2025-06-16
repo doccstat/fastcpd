@@ -32,7 +32,7 @@ implmentation of change point detection methods in R/Python.
 ### Documentation
 
 * R documentation: [fastcpd.xingchi.li](https://fastcpd.xingchi.li)
-* Python documentation: [fastcpd.readthedocs.io](https://fastcpd.readthedocs.io)
+- Python documentation: [python.fastcpd.xingchi.li](https://python.fastcpd.xingchi.li)
 
 ## Installation
 
