@@ -14,6 +14,8 @@ status](https://www.r-pkg.org/badges/version-last-release/fastcpd)](https://cran
 Commit](https://img.shields.io/github/last-commit/doccstat/fastcpd)](https://github.com/doccstat/fastcpd)
 [![R-CMD-check.yaml](https://github.com/doccstat/fastcpd/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/doccstat/fastcpd/actions)
 [![r-universe](https://doccstat.r-universe.dev/badges/fastcpd)](https://doccstat.r-universe.dev)
+[![Python version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/project/fastcpd/)
+[![Python package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcpd/)
 
 ## Overview
 
@@ -23,7 +25,7 @@ implmentation of change point detection methods in R/Python.
 ### Documentation
 
 - R documentation: [fastcpd.xingchi.li](https://fastcpd.xingchi.li)
-- Python documentation: [python.fastcpd.xingchi.li](https://python.fastcpd.xingchi.li)
+- Python documentation: [fastcpd.xingchi.li/python](https://fastcpd.xingchi.li/python)
 
 ## Installation
 
