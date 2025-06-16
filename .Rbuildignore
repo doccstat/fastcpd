@@ -39,3 +39,6 @@
 ^requirements\.in$
 ^requirements_lock\.txt$
 ^setup\.py$
+
+# Documentation files.
+^\.readthedocs\.yaml$
