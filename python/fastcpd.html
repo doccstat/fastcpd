@@ -78,7 +78,9 @@ fastcpd    </h1>
 
                         <div class="docstring"><h1 id="what-is-fastcpd">What is fastcpd?</h1>
 
-<p>fastcpd is a Python package for fast change point detection in multivariate time series data. It provides efficient algorithms to identify points in time where the statistical properties of a sequence of observations change.</p>
+<p>fastcpd is a Python package for fast change point detection in multivariate
+time series data. It provides efficient algorithms to identify points in time
+where the statistical properties of a sequence of observations change.</p>
 
 <h1 id="quickstart">Quickstart</h1>
 
@@ -102,24 +104,26 @@ fastcpd    </h1>
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd"># What is fastcpd?</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="sd">fastcpd is a Python package for fast change point detection in multivariate time series data. It provides efficient algorithms to identify points in time where the statistical properties of a sequence of observations change.</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd"># Quickstart</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="sd">fastcpd is a Python package for fast change point detection in multivariate</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">time series data. It provides efficient algorithms to identify points in time</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">where the statistical properties of a sequence of observations change.</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">``` python</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">import fastcpd.segmentation</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">from numpy import concatenate</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">from numpy.random import normal, multivariate_normal</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">covariance_mat = [[100, 0, 0], [0, 100, 0], [0, 0, 100]]</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">data = concatenate((multivariate_normal([0, 0, 0], covariance_mat, 300),</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">                    multivariate_normal([50, 50, 50], covariance_mat, 400),</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">                    multivariate_normal([2, 2, 2], covariance_mat, 300)))</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">fastcpd.segmentation.mean(data)</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">```</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd"># Quickstart</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">``` python</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">import fastcpd.segmentation</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">from numpy import concatenate</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">from numpy.random import normal, multivariate_normal</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">covariance_mat = [[100, 0, 0], [0, 100, 0], [0, 0, 100]]</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">data = concatenate((multivariate_normal([0, 0, 0], covariance_mat, 300),</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">                    multivariate_normal([50, 50, 50], covariance_mat, 400),</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">                    multivariate_normal([2, 2, 2], covariance_mat, 300)))</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">fastcpd.segmentation.mean(data)</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">```</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.17.0&quot;</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.17.0&quot;</span>
 </span></pre></div>
 
 
