@@ -243,11 +243,9 @@ class Fastcpd {
   bool const cp_only_;
   arma::mat const data_;
   arma::mat const data_c_;
-  unsigned int const data_c_n_cols_;
   unsigned int const data_c_n_rows_;
   double const* data_c_ptr_;
   unsigned int const data_n_dims_;
-  unsigned int const data_n_cols_;
   unsigned int const data_n_rows_;
   double const epsilon_in_hessian_;
   arma::colvec error_standard_deviation_;

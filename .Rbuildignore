@@ -29,7 +29,7 @@
 # Python files.
 ^tests/.*\.py$
 ^tests/BUILD\.bazel$
-^fastcpd$
+^python$
 ^\.clang-format$
 ^bazelisk\.py$
 ^Makefile$
