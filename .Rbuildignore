@@ -40,3 +40,4 @@
 ^requirements\.in$
 ^requirements_lock\.txt$
 ^setup\.py$
+^pdoc$
