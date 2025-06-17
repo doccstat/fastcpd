@@ -1,10 +1,15 @@
 #ifndef FASTCPD_CLASS_H_
 #define FASTCPD_CLASS_H_
 
+#ifndef NO_RCPP
 // RcppArmadillo has to be on the top of the include list to avoid
 // compiler errors.
 #include <RcppArmadillo.h>
 #include "RProgress.h"
+#else
+#include <armadillo>
+#endif
+
 #include <memory>
 #include <optional>
 #include <unordered_map>
@@ -62,7 +67,10 @@ namespace classes {
 class Fastcpd {
  public:
   Fastcpd(
-      double const beta, std::optional<Rcpp::Function> const& cost,
+      double const beta,
+#ifndef NO_RCPP
+      std::optional<Rcpp::Function> const& cost,
+#endif
       std::function<double(arma::mat)> const& cost_pelt,
       std::function<double(arma::mat, arma::colvec)> const& cost_sen,
       std::string const& cost_adjustment,
@@ -225,7 +233,9 @@ class Fastcpd {
   arma::mat coefficients_;
   arma::mat coefficients_sum_;
   std::string const cost_adjustment_;
+#ifndef NO_RCPP
   std::optional<Rcpp::Function> const cost_function_;
+#endif
   std::function<double(arma::mat)> const cost_function_pelt_;
   std::function<double(arma::mat, arma::colvec)> const cost_function_sen_;
   std::function<arma::colvec(arma::mat, arma::colvec)> const cost_gradient_;
@@ -284,7 +294,9 @@ class Fastcpd {
   arma::colvec result_coefficients_;
   arma::mat result_residuals_;
   double result_value_;
+#ifndef NO_RCPP
   std::unique_ptr<RProgress::RProgress> rProgress_;
+#endif
   arma::mat segment_coefficients_;
   int const segment_count_;
   arma::colvec segment_indices_;

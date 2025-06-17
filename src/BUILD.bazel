@@ -1,0 +1,18 @@
+cc_library(
+    name = "class",
+    srcs = ["fastcpd_classes.cc"],
+    hdrs = ["fastcpd.h"],
+    copts = [
+        "-std=c++17",
+    ],
+    defines = [
+        "NO_RCPP",
+    ],
+    visibility = [
+        "//fastcpd/python/cpp:__pkg__",
+        "//fastcpd:__pkg__",
+    ],
+    deps = [
+        "@armadillo_headers//:armadillo_header",
+    ],
+)

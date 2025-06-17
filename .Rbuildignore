@@ -24,6 +24,7 @@
 ^\.bazelversion$
 ^WORKSPACE$
 ^BUILD\.bazel$
+^src/BUILD\.bazel$
 
 # Python files.
 ^tests/.*\.py$
