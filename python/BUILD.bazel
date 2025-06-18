@@ -34,7 +34,7 @@ py_wheel(
     distribution = "fastcpd",
     python_tag = "py3",
     stamp = 0,
-    version = "0.17.0",
+    version = "0.18.0",
     deps = [
         ":fastcpd_py_package",
     ],
