@@ -18,7 +18,7 @@ Description: Implements fast change point detection algorithm based on the
     regression, penalized linear regression data, and whole lot more
     examples with custom cost function in case the user wants to use their
     own cost function.
-License: GPL (>= 3)
+License: Apache License (>= 2)
 URL: https://fastcpd.xingchi.li, https://github.com/doccstat/fastcpd
 BugReports: https://github.com/doccstat/fastcpd/issues
 Depends:
@@ -48,7 +48,7 @@ VignetteBuilder:
     knitr
 Config/testthat/edition: 3
 Config/testthat/parallel: true
-Config/testthat/start-first:examples-fastcpd_arima, examples-fastcpd_ts
+Config/testthat/start-first: examples-fastcpd_arima, examples-fastcpd_ts
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2
