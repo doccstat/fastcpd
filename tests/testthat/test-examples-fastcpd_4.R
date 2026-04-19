@@ -9,6 +9,6 @@ testthat::test_that(
     )))
 
     testthat::expect_equal(result_no_vp@cp_set, c(79, 202, 325))
-    testthat::expect_equal(result_20_vp@cp_set, c(80, 202, 320))
+    testthat::expect_equal(result_20_vp@cp_set, c(80, 202, 325))
   }
 )

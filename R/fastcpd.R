@@ -463,6 +463,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     tryCatch(
       expr = if (family == "ar") {
         residuals <- matrix(c(rep(NA, p), residuals))
+      } else if (family == "var") {
+        residuals <- rbind(
+          matrix(NA, nrow = order, ncol = ncol(residuals)), residuals
+        )
       } else if (family == "arima") {
         residuals <- matrix(NA, nrow(data))
         segments <- c(0, cp_set, nrow(data))

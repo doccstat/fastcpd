@@ -1,0 +1,41 @@
+#include "fastcpd_template.h"
+#include "families/{POLICY_HEADER}.h"
+
+Rcpp::List fastcpd_{FAMILY_NAME}{FUNC_SUFFIX}_impl(
+    arma::mat const& data, double const beta,
+    int const segment_count,
+    double const trim, double const momentum_coef,
+    Rcpp::Nullable<Rcpp::Function> const& multiple_epochs_function,
+    std::string const& family, double const epsilon, int const p,
+    arma::colvec const& order, Rcpp::Nullable<Rcpp::Function> const& cost_pelt,
+    Rcpp::Nullable<Rcpp::Function> const& cost_sen,
+    Rcpp::Nullable<Rcpp::Function> const& cost_gradient,
+    Rcpp::Nullable<Rcpp::Function> const& cost_hessian, bool const cp_only,
+    double const vanilla_percentage, bool const warm_start,
+    arma::colvec const& lower, arma::colvec const& upper,
+    arma::colvec const& line_search, arma::mat const& variance_estimate,
+    unsigned int const p_response, double const pruning_coef) {
+
+  std::function<unsigned int(unsigned int)> multiple_epochs_function_;
+  if (multiple_epochs_function.isNotNull()) {
+    Rcpp::Function rfun(multiple_epochs_function);
+    multiple_epochs_function_ = [rfun](unsigned int i) -> unsigned int {
+      return Rcpp::as<unsigned int>(rfun(i));
+    };
+  }
+
+  fastcpd::classes::Fastcpd<fastcpd::families::{POLICY_CLASS}, {K_R_PROGRESS}, {K_VANILLA_ONLY}, fastcpd::classes::CostAdjustment::{K_COST_ADJUSTMENT}, {K_LINE_SEARCH}, {K_N_DIMS}> fastcpd_class(
+      beta, std::nullopt, nullptr, nullptr, nullptr,
+      nullptr, cp_only, data, epsilon, family, multiple_epochs_function_,
+      line_search, lower, momentum_coef, order, p, p_response, pruning_coef,
+      segment_count, trim, upper, vanilla_percentage,
+      variance_estimate, warm_start);
+
+  auto result = fastcpd_class.Run();
+
+  return Rcpp::List::create(Rcpp::Named("raw_cp_set") = std::get<0>(result),
+                            Rcpp::Named("cp_set") = std::get<1>(result),
+                            Rcpp::Named("cost_values") = std::get<2>(result),
+                            Rcpp::Named("residual") = std::get<3>(result),
+                            Rcpp::Named("thetas") = std::get<4>(result));
+}
