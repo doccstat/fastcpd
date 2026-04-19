@@ -1,0 +1,306 @@
+# Advanced examples
+
+``` r
+set.seed(1)
+n <- 300
+p_true <- 4
+p <- 40
+x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+theta_0 <- rbind(
+  runif(p_true, 1, 4),
+  runif(p_true, -5, 5),
+  runif(p_true, 1, 4),
+  runif(p_true, -3, 3)
+)
+theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+y <- c(
+  x[1:(n * 0.25), ] %*% theta_0[1, ] + rnorm(n * 0.25),
+  x[(n * 0.25 + 1):(n * 0.5), ] %*% theta_0[2, ] + rnorm(n * 0.25),
+  x[(n * 0.5 + 1):(n * 0.75), ] %*% theta_0[3, ] + rnorm(n * 0.25),
+  x[(n * 0.75 + 1):n, ] %*% theta_0[4, ] + rnorm(n * 0.25)
+)
+small_lasso <- cbind.data.frame(y, x)
+```
+
+``` r
+result <- fastcpd.lasso(small_lasso, segment_count = 2, r.progress = FALSE)
+summary(result)
+#> 
+#> Call:
+#> fastcpd.lasso(data = small_lasso, segment_count = 2, r.progress = FALSE)
+#> 
+#> Change points:
+#> 73 151 
+#> 
+#> Cost values:
+#> 403.3531 330.8874 1131.242 
+#> 
+#> Parameters:
+#> 40 x 3 sparse Matrix of class "dgCMatrix"
+#>       segment 1  segment 2 segment 3
+#>  [1,] 0.2725645  3.2847730 0.3945321
+#>  [2,] 1.0710180 -1.0318006 0.2333177
+#>  [3,] 2.0691658  0.8655912 .        
+#>  [4,] 0.2865536 -2.7810274 1.4952166
+#>  [5,] .          .         .        
+#>  [6,] .          .         .        
+#>  [7,] .          .         .        
+#>  [8,] .          .         .        
+#>  [9,] .          .         .        
+#> [10,] .          .         .        
+#> [11,] .          .         .        
+#> [12,] .          .         .        
+#> [13,] .          .         .        
+#> [14,] .          .         .        
+#> [15,] .          .         .        
+#> [16,] .          .         .        
+#> [17,] .          .         .        
+#> [18,] .          .         .        
+#> [19,] .          .         .        
+#> [20,] .          .         .        
+#> [21,] .          .         .        
+#> [22,] .          .         .        
+#> [23,] .          .         .        
+#> [24,] .          .         .        
+#> [25,] .          .         .        
+#> [26,] .          .         .        
+#> [27,] .          .         .        
+#> [28,] .          .         .        
+#> [29,] .          .         .        
+#> [30,] .          .         .        
+#> [31,] .          .         .        
+#> [32,] .          .         .        
+#> [33,] .          .         .        
+#> [34,] .          .         .        
+#> [35,] .          .         .        
+#> [36,] .          .         .        
+#> [37,] .          .         .        
+#> [38,] .          .         .        
+#> [39,] .          .         .        
+#> [40,] .          .         .
+```
+
+## Vanilla percentage
+
+``` r
+result_vanilla_percentage <- fastcpd.lasso(
+  small_lasso, segment_count = 2, vanilla_percentage = 0.5,
+  r.progress = FALSE
+)
+summary(result_vanilla_percentage)
+#> 
+#> Call:
+#> fastcpd.lasso(data = small_lasso, segment_count = 2, vanilla_percentage = 0.5, 
+#>     r.progress = FALSE)
+#> 
+#> Change points:
+#> 74 150 
+#> 
+#> Cost values:
+#> 404.3949 296.7204 1162.25 
+#> 
+#> Parameters:
+#> 40 x 3 sparse Matrix of class "dgCMatrix"
+#>       segment 1 segment 2 segment 3
+#>  [1,] 0.2835972  3.208983 0.4299211
+#>  [2,] 1.0913097 -1.306468 0.3019345
+#>  [3,] 2.0550480  0.697885 .        
+#>  [4,] 0.2928737 -2.771848 1.4996787
+#>  [5,] .          .        .        
+#>  [6,] .          .        .        
+#>  [7,] .          .        .        
+#>  [8,] .          .        .        
+#>  [9,] .          .        .        
+#> [10,] .          .        .        
+#> [11,] .          .        .        
+#> [12,] .          .        .        
+#> [13,] .          .        .        
+#> [14,] .          .        .        
+#> [15,] .          .        .        
+#> [16,] .          .        .        
+#> [17,] .          .        .        
+#> [18,] .          .        .        
+#> [19,] .          .        .        
+#> [20,] .          .        .        
+#> [21,] .          .        .        
+#> [22,] .          .        .        
+#> [23,] .          .        .        
+#> [24,] .          .        .        
+#> [25,] .          .        .        
+#> [26,] .          .        .        
+#> [27,] .          .        .        
+#> [28,] .          .        .        
+#> [29,] .          .        .        
+#> [30,] .          .        .        
+#> [31,] .          .        .        
+#> [32,] .          .        .        
+#> [33,] .          .        .        
+#> [34,] .          .        .        
+#> [35,] .          .        .        
+#> [36,] .          .        .        
+#> [37,] .          .        .        
+#> [38,] .          .        .        
+#> [39,] .          .        .        
+#> [40,] .          .        .
+```
+
+## Multiple epochs
+
+``` r
+result_multiple_epochs <- fastcpd.lasso(
+  small_lasso,
+  segment_count = 2,
+  multiple_epochs = function(segment_length) {
+    if (segment_length < 25) 1 else 0
+  },
+  r.progress = FALSE
+)
+summary(result_multiple_epochs)
+#> 
+#> Call:
+#> fastcpd.lasso(data = small_lasso, segment_count = 2, multiple_epochs = function(segment_length) {
+#>     if (segment_length < 25) 
+#>         1
+#>     else 0
+#> }, r.progress = FALSE)
+#> 
+#> Change points:
+#> 74 151 227 
+#> 
+#> Cost values:
+#> 404.3949 323.0533 394.7117 245.3975 
+#> 
+#> Parameters:
+#> 40 x 4 sparse Matrix of class "dgCMatrix"
+#>       segment 1 segment 2 segment 3 segment 4
+#>  [1,] 0.2835972  3.269615 0.9960117 .        
+#>  [2,] 1.0913097 -1.089741 1.6936173 .        
+#>  [3,] 2.0550480  0.896723 1.5956191 .        
+#>  [4,] 0.2928737 -2.769824 2.1702226 0.1701821
+#>  [5,] .          .        .         .        
+#>  [6,] .          .        .         .        
+#>  [7,] .          .        .         .        
+#>  [8,] .          .        .         .        
+#>  [9,] .          .        .         .        
+#> [10,] .          .        .         .        
+#> [11,] .          .        .         .        
+#> [12,] .          .        .         .        
+#> [13,] .          .        .         .        
+#> [14,] .          .        .         .        
+#> [15,] .          .        .         .        
+#> [16,] .          .        .         .        
+#> [17,] .          .        .         .        
+#> [18,] .          .        .         .        
+#> [19,] .          .        .         .        
+#> [20,] .          .        .         .        
+#> [21,] .          .        .         .        
+#> [22,] .          .        .         .        
+#> [23,] .          .        .         .        
+#> [24,] .          .        .         .        
+#> [25,] .          .        .         .        
+#> [26,] .          .        .         .        
+#> [27,] .          .        .         .        
+#> [28,] .          .        .         .        
+#> [29,] .          .        .         .        
+#> [30,] .          .        .         .        
+#> [31,] .          .        .         .        
+#> [32,] .          .        .         .        
+#> [33,] .          .        .         .        
+#> [34,] .          .        .         .        
+#> [35,] .          .        .         .        
+#> [36,] .          .        .         .        
+#> [37,] .          .        .         .        
+#> [38,] .          .        .         .        
+#> [39,] .          .        .         .        
+#> [40,] .          .        .         .
+```
+
+## Notes
+
+This document is generated by the following code:
+
+``` shell
+R -e 'knitr::knit("vignettes/examples-advanced.Rmd.original", output = "vignettes/examples-advanced.Rmd")'
+```
+
+## Appendix: all code snippets
+
+``` r
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>", eval = TRUE, warning = FALSE
+)
+library(fastcpd)
+set.seed(1)
+n <- 300
+p_true <- 4
+p <- 40
+x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+theta_0 <- rbind(
+  runif(p_true, 1, 4),
+  runif(p_true, -5, 5),
+  runif(p_true, 1, 4),
+  runif(p_true, -3, 3)
+)
+theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+y <- c(
+  x[1:(n * 0.25), ] %*% theta_0[1, ] + rnorm(n * 0.25),
+  x[(n * 0.25 + 1):(n * 0.5), ] %*% theta_0[2, ] + rnorm(n * 0.25),
+  x[(n * 0.5 + 1):(n * 0.75), ] %*% theta_0[3, ] + rnorm(n * 0.25),
+  x[(n * 0.75 + 1):n, ] %*% theta_0[4, ] + rnorm(n * 0.25)
+)
+small_lasso <- cbind.data.frame(y, x)
+result <- fastcpd.lasso(small_lasso, segment_count = 2, r.progress = FALSE)
+summary(result)
+set.seed(1)
+n <- 300
+p_true <- 4
+p <- 40
+x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+theta_0 <- rbind(
+  runif(p_true, 1, 4),
+  runif(p_true, -5, 5),
+  runif(p_true, 1, 4),
+  runif(p_true, -3, 3)
+)
+theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+y <- c(
+  x[1:(n * 0.25), ] %*% theta_0[1, ] + rnorm(n * 0.25),
+  x[(n * 0.25 + 1):(n * 0.5), ] %*% theta_0[2, ] + rnorm(n * 0.25),
+  x[(n * 0.5 + 1):(n * 0.75), ] %*% theta_0[3, ] + rnorm(n * 0.25),
+  x[(n * 0.75 + 1):n, ] %*% theta_0[4, ] + rnorm(n * 0.25)
+)
+small_lasso <- cbind.data.frame(y, x)
+result_vanilla_percentage <- fastcpd.lasso(
+  small_lasso, segment_count = 2, vanilla_percentage = 0.5,
+  r.progress = FALSE
+)
+summary(result_vanilla_percentage)
+set.seed(1)
+n <- 300
+p_true <- 4
+p <- 40
+x <- mvtnorm::rmvnorm(n, rep(0, p), diag(p))
+theta_0 <- rbind(
+  runif(p_true, 1, 4),
+  runif(p_true, -5, 5),
+  runif(p_true, 1, 4),
+  runif(p_true, -3, 3)
+)
+theta_0 <- cbind(theta_0, matrix(0, ncol = p - p_true, nrow = 4))
+y <- c(
+  x[1:(n * 0.25), ] %*% theta_0[1, ] + rnorm(n * 0.25),
+  x[(n * 0.25 + 1):(n * 0.5), ] %*% theta_0[2, ] + rnorm(n * 0.25),
+  x[(n * 0.5 + 1):(n * 0.75), ] %*% theta_0[3, ] + rnorm(n * 0.25),
+  x[(n * 0.75 + 1):n, ] %*% theta_0[4, ] + rnorm(n * 0.25)
+)
+small_lasso <- cbind.data.frame(y, x)
+result_multiple_epochs <- fastcpd.lasso(
+  small_lasso,
+  segment_count = 2,
+  multiple_epochs = function(segment_length) {
+    if (segment_length < 25) 1 else 0
+  },
+  r.progress = FALSE
+)
+summary(result_multiple_epochs)
+```
