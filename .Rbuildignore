@@ -17,14 +17,25 @@
 ^vignettes/.*\.original$
 ^vignettes/comparison-packages-results\.RData$
 
+# Developer / tooling files not needed in the CRAN tarball.
+^CLAUDE\.md$
+^gen_package$
+
 # Bazel files.
 ^bazel$
+^bazel-.*$
 ^\.bazeliskrc$
 ^\.bazelrc$
 ^\.bazelversion$
 ^WORKSPACE$
 ^BUILD\.bazel$
 ^src/BUILD\.bazel$
+
+# Python build artefacts.
+^fastcpd\.egg-info$
+^.*\.egg-info$
+^dist$
+^__pycache__$
 
 # Python files.
 ^tests/.*\.py$

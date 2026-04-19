@@ -1,13 +1,18 @@
 cc_library(
     name = "class",
-    srcs = ["fastcpd.cc"],
-    hdrs = ["fastcpd.h"],
+    hdrs = [
+        "fastcpd_family.h",
+        "fastcpd_template.h",
+        "families/lasso.h",
+        "families/mean.h",
+        "families/meanvariance.h",
+        "families/mgaussian.h",
+        "families/variance.h",
+    ],
     copts = [
         "-std=c++17",
     ],
-    defines = [
-        "NO_RCPP",
-    ],
+    strip_include_prefix = ".",
     visibility = [
         "//fastcpd/python/cpp:__pkg__",
         "//python:__pkg__",

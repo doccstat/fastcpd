@@ -1,0 +1,7 @@
+#!/bin/sh
+# configure.win -- Windows equivalent of configure.
+# Generates all 216 family translation units from pelt.tmpl / segd.tmpl.
+
+echo "* fastcpd: generating family translation units..."
+"${R_HOME}/bin/Rscript" tools/codegen.R src src
+echo "* fastcpd: code generation complete."

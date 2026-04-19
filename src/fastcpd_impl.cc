@@ -1,49 +1,111 @@
 #include "fastcpd_impl.h"
-#include "fastcpd.h"
 
-// Implementation of the fastcpd algorithm.
-//
-// @param data A data frame containing the data to be segmented.
-// @param beta Initial cost value.
-// @param cost_adjustment Adjustment for the cost function.
-// @param d Dimension of the data.
-// @param segment_count Number of segments for initial guess.
-// @param trim Trimming for the boundary change points.
-// @param momentum_coef Momentum coefficient to be applied to each update.
-// @param multiple_epochs_function Function on number of epochs in SGD.
-// @param family Family of the models. Can be "binomial", "poisson", "lasso",
-//   "lm" or "arma". If not provided, the user must specify the cost function
-//   and its gradient (and Hessian).
-// @param epsilon Epsilon to avoid numerical issues. Only used for binomial and
-//   poisson.
-// @param p Number of parameters to be estimated.
-// @param order Order for time series models.
-// @param cost Cost function to be used. If not specified, the default is
-//   the negative log-likelihood for the corresponding family.
-// @param cost_gradient Gradient for custom cost function.
-// @param cost_hessian Hessian for custom cost function.
-// @param cp_only Whether to return only the change points or with the cost
-//   values for each segment. If family is not provided or set to be
-//   "custom", this parameter will be set to be true.
-// @param vanilla_percentage How many of the data should be processed through
-//   vanilla PELT. Range should be between 0 and 1. If set to be 0, all data
-//   will be processed through sequential gradient descnet. If set to be 1,
-//   all data will be processed through vaniall PELT. If the cost function
-//   have an explicit solution, i.e. does not depend on coefficients like
-//   the mean change case, this parameter will be set to be 1.
-// @param warm_start Whether to use warm start for the initial guess.
-// @param lower A vector containing the lower bounds for the parameters.
-// @param upper A vector containing the upper bounds for the parameters.
-// @param line_search A vector containing the line search coefficients.
-// @param variance_estimate Covariance matrix of the data, only used in mean
-//   change and gaussian.
-// @param p_response Dimension of the response, used with multivariate
-//   response.
-// @param pruning_coef The constant to satisfy the pruning condition.
-// @param r_progress Whether to show progress bar.
-//
-// @return A list containing the change points and the cost values for each
-//   segment.
+// Signature shared by every generated fastcpd_*_impl function.
+// r_progress, cost_adjustment, vanilla_percentage==1, and line_search!=c(1)
+// have all been consumed by dispatch below.
+#define IMPL_PARAMS \
+    arma::mat const& data, double const beta, \
+    int const segment_count, \
+    double const trim, double const momentum_coef, \
+    Rcpp::Nullable<Rcpp::Function> const& multiple_epochs_function, \
+    std::string const& family, double const epsilon, int const p, \
+    arma::colvec const& order, Rcpp::Nullable<Rcpp::Function> const& cost_pelt, \
+    Rcpp::Nullable<Rcpp::Function> const& cost_sen, \
+    Rcpp::Nullable<Rcpp::Function> const& cost_gradient, \
+    Rcpp::Nullable<Rcpp::Function> const& cost_hessian, bool const cp_only, \
+    double const vanilla_percentage, bool const warm_start, \
+    arma::colvec const& lower, arma::colvec const& upper, \
+    arma::colvec const& line_search, arma::mat const& variance_estimate, \
+    unsigned int const p_response, double const pruning_coef
+
+// PELT families: 3 cost × 2 progress = 6 variants each.
+#define DECLARE_PELT(name) \
+    Rcpp::List fastcpd_##name##_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mbic_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mdl_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mbic_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mdl_prog_impl(IMPL_PARAMS);
+
+// SEGD families: 3 cost × 2 vanilla × 2 line_search × 2 progress = 24 variants each.
+#define DECLARE_SEGD(name) \
+    Rcpp::List fastcpd_##name##_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_ls_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_van_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_van_ls_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mbic_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mbic_ls_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mbic_van_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mbic_van_ls_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mdl_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mdl_ls_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mdl_van_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mdl_van_ls_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_ls_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_van_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_van_ls_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mbic_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mbic_ls_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mbic_van_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mbic_van_ls_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mdl_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mdl_ls_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mdl_van_prog_impl(IMPL_PARAMS); \
+    Rcpp::List fastcpd_##name##_mdl_van_ls_prog_impl(IMPL_PARAMS);
+
+DECLARE_PELT(mean)
+DECLARE_PELT(mean_1d)
+DECLARE_PELT(mgaussian)
+DECLARE_PELT(variance)
+DECLARE_PELT(variance_1d)
+DECLARE_PELT(meanvariance)
+DECLARE_PELT(meanvariance_1d)
+DECLARE_PELT(garch)
+DECLARE_SEGD(arma)
+DECLARE_SEGD(binomial)
+DECLARE_SEGD(custom)
+DECLARE_SEGD(gaussian)
+DECLARE_SEGD(lasso)
+DECLARE_SEGD(ma)
+DECLARE_SEGD(poisson)
+
+#undef DECLARE_PELT
+#undef DECLARE_SEGD
+
+#define ARGS \
+    data, beta, segment_count, trim, momentum_coef, \
+    multiple_epochs_function, family, epsilon, p, order, cost_pelt, cost_sen, \
+    cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start, \
+    lower, upper, line_search, variance_estimate, p_response, pruning_coef
+
+// Dispatch on r_progress for a fully-qualified base name.
+#define CALL_PROG(base) \
+    return r_progress ? base##_prog_impl(ARGS) : base##_impl(ARGS)
+
+// Dispatch on cost_adjustment for PELT families.
+#define DISPATCH_PELT(name) \
+    if (cost_adjustment == "MBIC") { CALL_PROG(fastcpd_##name##_mbic); } \
+    else if (cost_adjustment == "MDL") { CALL_PROG(fastcpd_##name##_mdl); } \
+    else { CALL_PROG(fastcpd_##name); }
+
+// Dispatch on cost_adjustment + vanilla + line_search for SEGD families.
+// Suffix order: [_mbic|_mdl][_van][_ls]
+#define DISPATCH_SEGD_LS(base_with_van) \
+    if (ls) { CALL_PROG(base_with_van##_ls); } \
+    else     { CALL_PROG(base_with_van); }
+
+#define DISPATCH_SEGD_VAN(base_with_cost) \
+    if (van) { DISPATCH_SEGD_LS(base_with_cost##_van); } \
+    else      { DISPATCH_SEGD_LS(base_with_cost); }
+
+#define DISPATCH_SEGD(name) \
+    bool const van = (vanilla_percentage == 1); \
+    bool const ls  = (line_search.n_elem > 1 || line_search(0) != 1.0); \
+    if (cost_adjustment == "MBIC") { DISPATCH_SEGD_VAN(fastcpd_##name##_mbic); } \
+    else if (cost_adjustment == "MDL") { DISPATCH_SEGD_VAN(fastcpd_##name##_mdl); } \
+    else { DISPATCH_SEGD_VAN(fastcpd_##name); }
+
 // [[Rcpp::export]]
 Rcpp::List fastcpd_impl(
     arma::mat const& data, double const beta,
@@ -60,71 +122,34 @@ Rcpp::List fastcpd_impl(
     arma::colvec const& line_search, arma::mat const& variance_estimate,
     unsigned int const p_response, double const pruning_coef,
     bool const r_progress) {
-  std::function<double(arma::mat)> cost_pelt_;
-  if (family == "custom" && cost_pelt.isNotNull()) {
-    // Capture the R function in a local Rcpp::Function object.
-    Rcpp::Function rfun(cost_pelt);
-    cost_pelt_ = [rfun](arma::mat data) -> double {
-      // Call the R function and convert its result to double.
-      return Rcpp::as<double>(rfun(data));
-    };
+
+  if (family == "mean") {
+    if (data.n_cols == 1) { DISPATCH_PELT(mean_1d); }
+    else                  { DISPATCH_PELT(mean); }
   }
-  std::function<double(arma::mat, arma::colvec)> cost_sen_;
-  if (family == "custom" && cost_sen.isNotNull()) {
-    // Capture the R function in a local Rcpp::Function object.
-    Rcpp::Function rfun(cost_sen);
-    cost_sen_ = [rfun](arma::mat data, arma::colvec theta) -> double {
-      // Call the R function and convert its result to double.
-      return Rcpp::as<double>(rfun(data, theta));
-    };
+  if (family == "mgaussian")                     { DISPATCH_PELT(mgaussian); }
+  if (family == "variance") {
+    if (data.n_cols == 1) { DISPATCH_PELT(variance_1d); }
+    else                  { DISPATCH_PELT(variance); }
   }
-  std::optional<Rcpp::Function> cost = std::nullopt;
-  if (family == "custom" && cost_pelt.isNotNull()) {
-    Rcpp::Function rfun(cost_pelt);
-    cost = rfun;
-  } else if (family == "custom" && cost_sen.isNotNull()) {
-    Rcpp::Function rfun(cost_sen);
-    cost = rfun;
+  if (family == "meanvariance") {
+    if (data.n_cols == 1) { DISPATCH_PELT(meanvariance_1d); }
+    else                  { DISPATCH_PELT(meanvariance); }
   }
-  std::function<arma::colvec(arma::mat, arma::colvec)> cost_gradient_;
-  if (family == "custom" && cost_gradient.isNotNull()) {
-    // Capture the R function in a local Rcpp::Function object.
-    Rcpp::Function rfun(cost_gradient);
-    cost_gradient_ = [rfun](arma::mat data,
-                            arma::colvec theta) -> arma::colvec {
-      // Call the R function and convert its result to arma::colvec.
-      return Rcpp::as<arma::colvec>(rfun(data, theta));
-    };
-  }
-  std::function<arma::mat(arma::mat, arma::colvec)> cost_hessian_;
-  if (family == "custom" && cost_hessian.isNotNull()) {
-    // Capture the R function in a local Rcpp::Function object.
-    Rcpp::Function rfun(cost_hessian);
-    cost_hessian_ = [rfun](arma::mat data, arma::colvec theta) -> arma::mat {
-      // Call the R function and convert its result to arma::mat.
-      return Rcpp::as<arma::mat>(rfun(data, theta));
-    };
-  }
-  std::function<unsigned int(unsigned int)> multiple_epochs_function_;
-  if (multiple_epochs_function.isNotNull()) {
-    // Capture the R function in a local Rcpp::Function object.
-    Rcpp::Function rfun(multiple_epochs_function);
-    multiple_epochs_function_ = [rfun](unsigned int i) -> unsigned int {
-      // Call the R function and convert its result to unsigned int.
-      return Rcpp::as<unsigned int>(rfun(i));
-    };
-  }
-  fastcpd::classes::Fastcpd fastcpd_class(
-      beta, cost, cost_pelt_, cost_sen_, cost_adjustment, cost_gradient_,
-      cost_hessian_, cp_only, data, epsilon, family, multiple_epochs_function_,
-      line_search, lower, momentum_coef, order, p, p_response, pruning_coef,
-      r_progress, segment_count, trim, upper, vanilla_percentage,
-      variance_estimate, warm_start);
-  std::tuple<arma::colvec, arma::colvec, arma::colvec, arma::mat, arma::mat>
-      result = fastcpd_class.Run();
-  return Rcpp::List::create(Rcpp::Named("raw_cp_set") = std::get<0>(result),
-                            Rcpp::Named("cp_set") = std::get<1>(result),
-                            Rcpp::Named("cost_values") = std::get<2>(result),
-                            Rcpp::Named("residual") = std::get<3>(result),
-                            Rcpp::Named("thetas") = std::get<4>(result));
+  if (family == "garch")                         { DISPATCH_PELT(garch); }
+  if (family == "arma" || family == "arima")     { DISPATCH_SEGD(arma); }
+  if (family == "binomial")                      { DISPATCH_SEGD(binomial); }
+  if (family == "gaussian" || family == "lm")    { DISPATCH_SEGD(gaussian); }
+  if (family == "lasso")                         { DISPATCH_SEGD(lasso); }
+  if (family == "ma")                            { DISPATCH_SEGD(ma); }
+  if (family == "poisson")                       { DISPATCH_SEGD(poisson); }
+  DISPATCH_SEGD(custom);
 }
+
+#undef IMPL_PARAMS
+#undef ARGS
+#undef CALL_PROG
+#undef DISPATCH_PELT
+#undef DISPATCH_SEGD_LS
+#undef DISPATCH_SEGD_VAN
+#undef DISPATCH_SEGD

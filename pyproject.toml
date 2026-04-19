@@ -42,6 +42,7 @@ version = {attr = "fastcpd.__version__"}
 requires = [
     "numpy>=2.0.3",
     "build",
+    "packaging",
     "pytest",
     "setuptools",
 ]

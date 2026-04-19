@@ -1,3 +1,7 @@
+# fastcpd 0.20.0
+
+*   Use templates generation.
+
 # fastcpd 0.19.0
 
 *   Relicense from GPL-3.0 to Apache 2.0.

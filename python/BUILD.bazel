@@ -42,7 +42,11 @@ py_wheel(
 
 cc_binary(
     name = "interface",
-    srcs = ["pybind.cc"],
+    srcs = [
+        "fastcpd_py.cc",
+        "fastcpd_py.h",
+        "pybind.cc",
+    ],
     copts = ["-std=c++17"],
     includes = [
         ".",
