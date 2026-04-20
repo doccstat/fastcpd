@@ -47,7 +47,7 @@ data <- matrix(c(
 ))
 system.time(result <- fastcpd.mean(data))
 #>    user  system elapsed 
-#>   0.006   0.000   0.006 
+#>   0.006   0.000   0.005 
 summary(result)
 #> 
 #> Call:
@@ -73,7 +73,7 @@ data <- rbind(
 )
 system.time(result <- fastcpd.mean(data, r.progress = FALSE, cp_only = TRUE))
 #>    user  system elapsed 
-#>   3.947   0.295   3.953 
+#>   3.852   0.310   3.856 
 summary(result)
 #> 
 #> Call:
