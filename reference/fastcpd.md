@@ -295,6 +295,10 @@ object.
 
 ## References
 
+Xingchi Li, Xianyang Zhang (2026). “fastcpd: Fast Change Point Detection
+in R.” *Journal of Statistical Software*, **116**(6), 1–53.
+[doi:10.18637/jss.v116.i06](https://doi.org/10.18637/jss.v116.i06) .
+
 Xingchi Li, Xianyang Zhang (2024). “fastcpd: Fast Change Point Detection
 in R.” *arXiv:2404.05933*, <https://arxiv.org/abs/2404.05933>.
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## fastcpd 0.99.9
+
+- Add JSS publication reference: Li and Zhang (2026)
+  <doi:10.18637/jss.v116.i06>.
+- Update CITATION to include the Journal of Statistical Software
+  article.
+
 ## fastcpd 0.20.0
 
 - Use templates generation.
@@ -206,9 +213,7 @@ CRAN release: 2023-12-21
 
 - Add package comparison with other packages.
 
-## fastcpd 0.9.9
-
-CRAN release: 2023-12-11
+## fastcpd 0.99.9
 
 - Add small shiny app.
 

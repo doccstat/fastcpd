@@ -11,7 +11,22 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/doccstat/fastcpd/blob/v0.99.9/inst/CITATION)
+[`inst/CITATION`](https://github.com/doccstat/fastcpd/blob/main/inst/CITATION)
+
+Li X, Zhang X (2026). “fastcpd: Fast Change Point Detection in R.”
+*Journal of Statistical Software*, **116**(6), 1–53.
+[doi:10.18637/jss.v116.i06](https://doi.org/10.18637/jss.v116.i06).
+
+    @Article{,
+      title = {{fastcpd}: Fast Change Point Detection in {R}},
+      author = {Xingchi Li and Xianyang Zhang},
+      journal = {Journal of Statistical Software},
+      year = {2026},
+      volume = {116},
+      number = {6},
+      pages = {1--53},
+      doi = {10.18637/jss.v116.i06},
+    }
 
 Li X, Zhang X (2024). “fastcpd: Fast Change Point Detection in R.”
 [doi:10.48550/arXiv.2404.05933](https://doi.org/10.48550/arXiv.2404.05933).
