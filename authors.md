@@ -11,7 +11,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/doccstat/fastcpd/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/doccstat/fastcpd/blob/v0.99.9/inst/CITATION)
 
 Li X, Zhang X (2024). “fastcpd: Fast Change Point Detection in R.”
 [doi:10.48550/arXiv.2404.05933](https://doi.org/10.48550/arXiv.2404.05933).

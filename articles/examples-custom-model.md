@@ -17,6 +17,7 @@ below, we can obtain similar results as the built-in logistic regression
 model.
 
 ``` r
+
 set.seed(1)
 x <- matrix(rnorm(2000, 0, 1), ncol = 5)
 theta <- rbind(rnorm(5, 0, 1), rnorm(5, 2, 1))
@@ -48,6 +49,7 @@ summary(result)
 ```
 
 ``` r
+
 logistic_loss <- function(data, theta) {
   x <- data[, -1]
   y <- data[, 1]
@@ -108,6 +110,7 @@ R -e 'knitr::knit("vignettes/examples-custom-model.Rmd.original", output = "vign
 ## Appendix: all code snippets
 
 ``` r
+
 knitr::opts_chunk$set(
   collapse = TRUE, comment = "#>", eval = TRUE, warning = FALSE
 )

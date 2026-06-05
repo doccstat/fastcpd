@@ -29,6 +29,7 @@ implmentation of change point detection methods in R/Python.
 ### R
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("doccstat/fastcpd")
 # or install from CRAN
@@ -49,6 +50,7 @@ pip install fastcpd
 ### R
 
 ``` r
+
 set.seed(1)
 n <- 1000
 x <- rep(0, n + 3)
@@ -99,6 +101,7 @@ fastcpd.variance_estimation.mean(data)
 ### Comparison
 
 ``` r
+
 library(microbenchmark)
 set.seed(1)
 n <- 5 * 10^6
@@ -119,6 +122,7 @@ ggplot2::autoplot(microbenchmark(
 ![](reference/figures/README-time-comparison-small-1.png)
 
 ``` r
+
 library(microbenchmark)
 set.seed(1)
 n <- 10^8
@@ -150,6 +154,7 @@ Some packages are not included in the `microbenchmark` comparison due to
 either memory constraints or long running time.
 
 ``` r
+
 # Device: Mac mini (M1, 2020)
 # Memory: 8 GB
 system.time(CptNonPar::np.mojo(mean_data, G = floor(length(mean_data) / 6)))

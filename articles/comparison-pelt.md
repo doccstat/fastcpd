@@ -5,6 +5,7 @@
 ### Logistic regression
 
 ``` r
+
 #' Cost function for Logistic regression, i.e. binomial family in GLM.
 #'
 #' @param data Data to be used to calculate the cost values. The last column is
@@ -242,6 +243,7 @@ segd_binomial <- function(data, beta, B = 10, trim = 0.025) {
 ### Poisson regression
 
 ``` r
+
 #' Cost function for Poisson regression.
 #'
 #' @param data Data to be used to calculate the cost values. The last column is
@@ -497,6 +499,7 @@ data_gen_poisson <- function(n, d, true.coef, true.cp.loc, Sigma) {
 ### Penalized linear regression
 
 ``` r
+
 #' Cost function for penalized linear regression.
 #'
 #' @param data Data to be used to calculate the cost values. The last column is
@@ -794,6 +797,7 @@ data_gen_lasso <- function(n, d, true.coef, true.cp.loc, Sigma, evar) {
 ## Logistic regression
 
 ``` r
+
 set.seed(1)
 p <- 5
 x <- matrix(rnorm(300 * p, 0, 1), ncol = p)
@@ -837,6 +841,7 @@ fastcpd.binomial(
 ## Poisson regression
 
 ``` r
+
 set.seed(1)
 n <- 1500
 d <- 5
@@ -895,6 +900,7 @@ fastcpd.poisson(
 ## Penalized linear regression
 
 ``` r
+
 set.seed(1)
 n <- 1000
 s <- 3
@@ -958,6 +964,7 @@ R -e 'knitr::knit("vignettes/comparison-pelt.Rmd.original", output = "vignettes/
 ## Appendix: all code snippets
 
 ``` r
+
 knitr::opts_chunk$set(
   collapse = TRUE, comment = "#>", eval = TRUE, cache = FALSE,
   warning = FALSE, fig.width = 8, fig.height = 5

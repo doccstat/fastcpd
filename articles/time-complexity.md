@@ -25,6 +25,7 @@ perform a linear regression on the log-transformed data to estimate the
 power law coefficient.
 
 ``` r
+
 # Load necessary libraries
 library(ggplot2)
 library(fastcpd)
@@ -73,6 +74,7 @@ plot of chunk time-complexity
 
 ``` r
 
+
 # Log-transform the data for linear regression
 log_ns <- log10(ns)
 log_times <- log10(execution_times)
@@ -114,6 +116,7 @@ SeDG) and the SeDG-enhanced approach by varying the `vanilla_percentage`
 parameter. The detected change points are extracted for both settings.
 
 ``` r
+
 # Load required libraries
 library(fastcpd)
 
@@ -179,6 +182,7 @@ R -e 'knitr::knit("vignettes/time-complexity.Rmd.original", output = "vignettes/
 ## Appendix: all code snippets
 
 ``` r
+
 knitr::opts_chunk$set(
   collapse = TRUE, comment = "#>", eval = TRUE, warning = FALSE,
   fig.path="time-complexity/"

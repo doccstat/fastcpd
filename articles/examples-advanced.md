@@ -1,6 +1,7 @@
 # Advanced examples
 
 ``` r
+
 set.seed(1)
 n <- 300
 p_true <- 4
@@ -23,6 +24,7 @@ small_lasso <- cbind.data.frame(y, x)
 ```
 
 ``` r
+
 result <- fastcpd.lasso(small_lasso, segment_count = 2, r.progress = FALSE)
 summary(result)
 #> 
@@ -83,6 +85,7 @@ summary(result)
 ## Vanilla percentage
 
 ``` r
+
 result_vanilla_percentage <- fastcpd.lasso(
   small_lasso, segment_count = 2, vanilla_percentage = 0.5,
   r.progress = FALSE
@@ -147,6 +150,7 @@ summary(result_vanilla_percentage)
 ## Multiple epochs
 
 ``` r
+
 result_multiple_epochs <- fastcpd.lasso(
   small_lasso,
   segment_count = 2,
@@ -226,6 +230,7 @@ R -e 'knitr::knit("vignettes/examples-advanced.Rmd.original", output = "vignette
 ## Appendix: all code snippets
 
 ``` r
+
 knitr::opts_chunk$set(
   collapse = TRUE, comment = "#>", eval = TRUE, warning = FALSE
 )

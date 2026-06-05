@@ -3,6 +3,7 @@
 ## Exploration of the QMLE method for ARMA models
 
 ``` r
+
 qmle <- function(data, theta, p = 1, q = 1) {
   if (nrow(data) < max(p, q) + 1) {
     return(0)
@@ -437,6 +438,7 @@ R -e 'knitr::knit("vignettes/exploration-during-development.Rmd.original", outpu
 ## Appendix: all code snippets
 
 ``` r
+
 knitr::opts_chunk$set(
   collapse = TRUE, comment = "#>", eval = TRUE, warning = FALSE
 )
