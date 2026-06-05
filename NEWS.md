@@ -1,3 +1,9 @@
+# fastcpd 0.99.9
+
+*   Add JSS publication reference: Li and Zhang (2026)
+    <doi:10.18637/jss.v116.i06>.
+*   Update CITATION to include the Journal of Statistical Software article.
+
 # fastcpd 0.20.0
 
 *   Use templates generation.
@@ -172,7 +178,7 @@
 
 *   Add package comparison with other packages.
 
-# fastcpd 0.9.9
+# fastcpd 0.99.9
 
 *   Add small shiny app.
 

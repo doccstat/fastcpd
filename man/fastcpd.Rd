@@ -253,6 +253,10 @@ parameters and returns a \linkS4class{fastcpd} object.
 
 \section{References}{
 
+Xingchi Li, Xianyang Zhang (2026). ``fastcpd: Fast Change Point Detection
+in R.'' \emph{Journal of Statistical Software}, \bold{116}(6), 1--53.
+\doi{10.18637/jss.v116.i06}.
+
 Xingchi Li, Xianyang Zhang (2024). ``fastcpd: Fast Change Point Detection
 in R.'' \emph{arXiv:2404.05933}, \url{https://arxiv.org/abs/2404.05933}.
 
