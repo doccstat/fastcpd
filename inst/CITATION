@@ -1,3 +1,20 @@
+bibentry(bibtype = "Article",
+  title        = "{fastcpd}: Fast Change Point Detection in {R}",
+  author       = c(person(given = "Xingchi",
+                          family = "Li",
+                          email = "anthony.li@stat.tamu.edu"),
+                   person(given = "Xianyang",
+                          family = "Zhang",
+                          email = "zhangxiany@stat.tamu.edu")),
+  journal      = "Journal of Statistical Software",
+  year         = "2026",
+  volume       = "116",
+  number       = "6",
+  pages        = "1--53",
+  doi          = "10.18637/jss.v116.i06",
+  header       = "To cite fastcpd in publications use:"
+)
+
 bibentry(
   bibtype   = "Misc",
   title     = "fastcpd: Fast Change Point Detection in R",

@@ -186,6 +186,10 @@
 #' @section Gallery:
 #' <https://github.com/doccstat/fastcpd/tree/main/tests/testthat/examples>
 #' @section References:
+#' Xingchi Li, Xianyang Zhang (2026). ``fastcpd: Fast Change Point Detection
+#' in R.'' _Journal of Statistical Software_, **116**(6), 1--53.
+#' \doi{10.18637/jss.v116.i06}.
+#'
 #' Xingchi Li, Xianyang Zhang (2024). ``fastcpd: Fast Change Point Detection
 #' in R.'' _arXiv:2404.05933_, <https://arxiv.org/abs/2404.05933>.
 #'
