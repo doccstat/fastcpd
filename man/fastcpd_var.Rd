@@ -18,7 +18,7 @@ fastcpd.var(data, order = 0, ...)
 \code{segment_count}.}
 }
 \value{
-A \linkS4class{fastcpd} object.
+A \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
 \code{\link[=fastcpd_var]{fastcpd_var()}} and \code{\link[=fastcpd.var]{fastcpd.var()}} are

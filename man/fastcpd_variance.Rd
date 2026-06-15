@@ -16,7 +16,7 @@ fastcpd.variance(data, ...)
 \code{segment_count}.}
 }
 \value{
-A \linkS4class{fastcpd} object.
+A \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
 \code{\link[=fastcpd_variance]{fastcpd_variance()}} and \code{\link[=fastcpd.variance]{fastcpd.variance()}} are wrapper

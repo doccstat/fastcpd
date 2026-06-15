@@ -16,7 +16,7 @@ fastcpd.mean(data, ...)
 \code{segment_count}.}
 }
 \value{
-A \linkS4class{fastcpd} object.
+A \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
 \code{\link[=fastcpd_mean]{fastcpd_mean()}} and \code{\link[=fastcpd.mean]{fastcpd.mean()}} are wrapper

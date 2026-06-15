@@ -33,7 +33,7 @@ using \code{\link[stats:arima]{stats::arima()}}.
 mean should be included in the model. The default value is \code{TRUE}.}
 }
 \value{
-A \linkS4class{fastcpd} object.
+A \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
 \code{\link[=fastcpd_ts]{fastcpd_ts()}} and \code{\link[=fastcpd.ts]{fastcpd.ts()}} are wrapper functions for

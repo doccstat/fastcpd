@@ -25,7 +25,7 @@ Rcpp::List fastcpd_{FAMILY_NAME}{FUNC_SUFFIX}_impl(
   }
 
   fastcpd::classes::Fastcpd<fastcpd::families::{POLICY_CLASS}, {K_R_PROGRESS}, {K_VANILLA_ONLY}, fastcpd::classes::CostAdjustment::{K_COST_ADJUSTMENT}, {K_LINE_SEARCH}, {K_N_DIMS}> fastcpd_class(
-      beta, std::nullopt, nullptr, nullptr, nullptr,
+      beta, nullptr, nullptr, nullptr,
       nullptr, cp_only, data, epsilon, family, multiple_epochs_function_,
       line_search, lower, momentum_coef, order, p, p_response, pruning_coef,
       segment_count, trim, upper, vanilla_percentage,

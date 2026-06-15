@@ -19,6 +19,7 @@
 
 # Developer / tooling files not needed in the CRAN tarball.
 ^CLAUDE\.md$
+^\.claude$
 ^gen_package$
 
 # Bazel files.

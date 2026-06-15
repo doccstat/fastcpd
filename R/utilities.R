@@ -117,6 +117,34 @@ check_cost <- function(cost, cost_gradient, cost_hessian, family) {  # nolint
   }
 }
 
+#' Determine the number of arguments a `cost` function accepts.
+#'
+#' `cost` may be either an R closure -- where arity is `length(formals(cost))`
+#' as before -- or a compiled cost function passed as an `externalptr` (built
+#' with `Rcpp::XPtr`, see `?fastcpd`). External pointers carry no `formals`,
+#' so compiled costs must instead carry an integer `fastcpd_cost_arity`
+#' attribute: `1` for a PELT-style `cost(data)`, `2` for a SeGD-style
+#' `cost(data, theta)`.
+#' @noRd
+cost_arity <- function(cost) {
+  if (is.function(cost)) {
+    length(formals(cost))
+  } else if (inherits(cost, "externalptr")) {
+    arity <- attr(cost, "fastcpd_cost_arity")
+    if (is.null(arity) || !(arity %in% c(1L, 2L))) {
+      stop(
+        "Compiled (external pointer) cost functions must carry an integer ",
+        "`fastcpd_cost_arity` attribute: 1 for a PELT-style cost(data), or ",
+        "2 for a SeGD-style cost(data, theta). See `?fastcpd` for how to ",
+        "build one with `Rcpp::XPtr`."
+      )
+    }
+    as.integer(arity)
+  } else {
+    stop("`cost` must be a function or an external pointer (see `?fastcpd`).")
+  }
+}
+
 get_pruning_coef <- function(
   pruning_coef_is_set,
   pruning_coef,
@@ -124,7 +152,19 @@ get_pruning_coef <- function(
   fastcpd_family,
   p
 ) {
-  if (!pruning_coef_is_set && (fastcpd_family %in% c("mgaussian", "lasso"))) {
+  # PELT pruning is only valid when segment costs satisfy a subadditivity
+  # condition (Killick, Fearnhead & Eckley 2012, sec. 3.2): roughly, that
+  # extending a segment cannot lower its optimal cost by more than a fixed
+  # constant. This holds for the i.i.d.-type costs (mean/variance/regression)
+  # PELT was designed for, but not for "mgaussian"/"lasso", nor for "garch",
+  # whose likelihood is a recursive function of the whole segment: e.g. the
+  # exact MLE NLL of a length-1 segment is 0 (no recursive terms to sum), so
+  # short candidate segments can look spuriously cheap relative to the
+  # threshold and cause the eventually-optimal split point to be discarded
+  # before it is ever reconsidered. Disabling pruning keeps PELT exact
+  # (falling back to optimal partitioning) for these families.
+  if (!pruning_coef_is_set &&
+      (fastcpd_family %in% c("mgaussian", "lasso", "garch"))) {
     pruning_coef <- -Inf
   }
   if (!pruning_coef_is_set && cost_adjustment == "MBIC") {

@@ -11,8 +11,10 @@ status](https://www.r-pkg.org/badges/version-last-release/fastcpd)](https://cran
 [![doi](https://img.shields.io/badge/doi-10.48550/arXiv.2404.05933-green.svg)](https://doi.org/10.48550/arXiv.2404.05933)
 [![R-CMD-check.yaml](https://github.com/doccstat/fastcpd/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/doccstat/fastcpd/actions)
 [![r-universe](https://doccstat.r-universe.dev/badges/fastcpd)](https://doccstat.r-universe.dev)
-[![Python version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/project/fastcpd/)
-[![Python package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcpd/)
+[![Python
+version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/project/fastcpd/)
+[![Python
+package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcpd/)
 
 ## Overview
 
@@ -22,15 +24,16 @@ implmentation of change point detection methods in R/Python.
 ### Documentation
 
 - R documentation: [fastcpd.xingchi.li](https://fastcpd.xingchi.li)
-- Python documentation: [fastcpd.xingchi.li/python](https://fastcpd.xingchi.li/python/)
+- Python documentation:
+  [fastcpd.xingchi.li/python](https://fastcpd.xingchi.li/python/)
 
 ## Installation
 
 ### R
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("doccstat/fastcpd")
+# install.packages("pak")
+pak::pak("doccstat/fastcpd")
 # or install from CRAN
 install.packages("fastcpd")
 ```
@@ -104,16 +107,14 @@ set.seed(1)
 n <- 5 * 10^6
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
 ggplot2::autoplot(microbenchmark(
-  wbs = wbs::wbs(mean_data),
   not = not::not(mean_data, contrast = "pcwsConstMean"),
   changepoint = changepoint::cpt.mean(mean_data, method = "PELT"),
   jointseg = jointseg::jointSeg(mean_data, K = 12),
   fpop = fpop::Fpop(mean_data, 2 * log(n)),
   mosum = mosum::mosum(c(mean_data), G = 40),
-  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)
+  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1),
+  times = 10
 ))
-#> Warning in microbenchmark(wbs = wbs::wbs(mean_data), not = not::not(mean_data,
-#> : less accurate nanosecond times to avoid potential integer overflows
 ```
 
 ![](man/figures/README-time-comparison-small-1.png)<!-- -->
@@ -125,16 +126,16 @@ n <- 10^8
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
 system.time(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1))
 #>    user  system elapsed 
-#>  11.753   9.150  26.455 
+#>   9.866   4.932  14.831
 system.time(mosum::mosum(c(mean_data), G = 40))
 #>    user  system elapsed 
-#>   5.518  11.516  38.368 
+#>   9.229   6.694  15.936
 system.time(fpop::Fpop(mean_data, 2 * log(n)))
 #>    user  system elapsed 
-#>  35.926   5.231  58.269 
+#>  44.848   2.346  47.220
 system.time(changepoint::cpt.mean(mean_data, method = "PELT"))
-#>    user  system elapsed 
-#>  32.342   9.681  66.056 
+#>     user   system  elapsed 
+#>  468.840  956.814 1479.480
 ggplot2::autoplot(microbenchmark(
   changepoint = changepoint::cpt.mean(mean_data, method = "PELT"),
   fpop = fpop::Fpop(mean_data, 2 * log(n)),
@@ -145,24 +146,6 @@ ggplot2::autoplot(microbenchmark(
 ```
 
 ![](man/figures/README-time-comparison-large-1.png)<!-- -->
-
-Some packages are not included in the `microbenchmark` comparison due to
-either memory constraints or long running time.
-
-``` r
-# Device: Mac mini (M1, 2020)
-# Memory: 8 GB
-system.time(CptNonPar::np.mojo(mean_data, G = floor(length(mean_data) / 6)))
-#> Error: vector memory limit of 16.0 Gb reached, see mem.maxVSize()
-#> Timing stopped at: 0.061 0.026 0.092
-system.time(ecp::e.divisive(matrix(mean_data)))
-#> Error: vector memory limit of 16.0 Gb reached, see mem.maxVSize()
-#> Timing stopped at: 0.076 0.044 0.241
-system.time(strucchange::breakpoints(y ~ 1, data = data.frame(y = mean_data)))
-#> Timing stopped at: 265.1 145.8 832.5
-system.time(breakfast::breakfast(mean_data))
-#> Timing stopped at: 45.9 89.21 562.3
-```
 
 ## Cheatsheet
 

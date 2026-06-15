@@ -22,7 +22,7 @@ model.}
 mean should be included in the model. The default value is \code{TRUE}.}
 }
 \value{
-A \linkS4class{fastcpd} object.
+A \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
 \code{\link[=fastcpd_arima]{fastcpd_arima()}} and \code{\link[=fastcpd.arima]{fastcpd.arima()}} are
