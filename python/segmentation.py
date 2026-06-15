@@ -17,7 +17,7 @@ from fastcpd.interface import fastcpd_impl
 #   garch            — needs tseries::garch() + Fortran
 #   gaussian/lm, binomial, poisson — need glmnet / fastglm (Rcpp + Eigen)
 _SUPPORTED_FAMILIES = frozenset({
-    'mean', 'variance', 'meanvariance', 'mgaussian', 'lasso',
+    'mean', 'variance', 'meanvariance', 'exponential', 'mgaussian', 'lasso',
 })
 
 # Map R-style alias names to the internal C++ family string.
@@ -50,6 +50,20 @@ def mean(data, **kwargs):
         A list of change-point indices, or a CpdResult when cp_only=False.
     """
     return detect(data=data, family='mean', **kwargs)
+
+
+def exponential(data, **kwargs):
+    """Find change points efficiently in exponentially distributed data.
+
+    Args:
+        data: Univariate data where each observation is exponentially
+            distributed; the rate parameter is allowed to change.
+        **kwargs: Additional arguments passed to ``detect()``.
+
+    Returns:
+        A list of change-point indices, or a CpdResult when cp_only=False.
+    """
+    return detect(data=data, family='exponential', **kwargs)
 
 
 def variance(data, **kwargs):
@@ -171,8 +185,8 @@ def detect(
             The numeric value of the penalty is computed by C++ when a string
             is supplied, using the same formulae as the R package.
         cost_adjustment: One of 'BIC', 'MBIC', 'MDL'.
-        family: One of 'mean', 'variance', 'meanvariance', 'mgaussian',
-            'var' (alias for 'mgaussian'), 'lasso'.
+        family: One of 'mean', 'variance', 'meanvariance', 'exponential',
+            'mgaussian', 'var' (alias for 'mgaussian'), 'lasso'.
         line_search: Values for line search step sizes.
         lower: Lower bound for parameters after each update.
         upper: Upper bound for parameters after each update.

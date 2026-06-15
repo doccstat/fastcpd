@@ -4,6 +4,7 @@
 
 #include "fastcpd_py.h"
 #include "fastcpd_template.h"
+#include "families/exponential.h"
 #include "families/lasso.h"
 #include "families/mean.h"
 #include "families/meanvariance.h"
@@ -123,12 +124,13 @@ Result dispatch_impl(
   if (family == "mean")        { DISPATCH_PELT_1D(MeanFamily); }
   if (family == "variance")    { DISPATCH_PELT_1D(VarianceFamily); }
   if (family == "meanvariance"){ DISPATCH_PELT_1D(MeanvarianceFamily); }
+  if (family == "exponential") { DISPATCH_FAMILY(ExponentialFamily); }
   if (family == "mgaussian")   { DISPATCH_FAMILY(MgaussianFamily); }
   if (family == "lasso")       { DISPATCH_FAMILY(LassoFamily); }
 
   throw std::runtime_error(
       "fastcpd Python: unsupported family '" + family +
-      "'. Supported: mean, variance, meanvariance, mgaussian, lasso.");
+      "'. Supported: mean, variance, meanvariance, exponential, mgaussian, lasso.");
 }
 
 #undef FWD_ARGS
