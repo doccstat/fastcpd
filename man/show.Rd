@@ -3,19 +3,19 @@
 \name{show.fastcpd}
 \alias{show.fastcpd}
 \alias{show,fastcpd-method}
-\title{Show the available methods for a \linkS4class{fastcpd} object}
+\title{Show the available methods for a \link[=fastcpd-class]{fastcpd} object}
 \usage{
 \method{show}{fastcpd}(object)
 
 \S4method{show}{fastcpd}(object)
 }
 \arguments{
-\item{object}{A \linkS4class{fastcpd} object.}
+\item{object}{A \link[=fastcpd-class]{fastcpd} object.}
 }
 \value{
 No return value, called for showing a list of available methods
-for a \linkS4class{fastcpd} object.
+for a \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
-Show the available methods for a \linkS4class{fastcpd} object
+Show the available methods for a \link[=fastcpd-class]{fastcpd} object
 }

@@ -2,9 +2,7 @@
 #define FASTCPD_FAMILIES_POISSON_H_
 
 #include "fastcpd_family.h"
-#ifndef NO_RCPP
-#include "ref_fastglm_fit_glm.h"
-#endif
+#include "fastcpd_glm.h"
 
 namespace fastcpd::families {
 
@@ -52,21 +50,18 @@ struct PoissonFamily : BaseFamily {
   static void GetNllPelt(Solver* solver, unsigned int const segment_start,
                          unsigned int const segment_end, bool const cv,
                          std::optional<arma::colvec> const& start) {
-#ifndef NO_RCPP
     arma::mat const data_segment = solver->data_.rows(segment_start, segment_end);
     arma::colvec y = data_segment.col(0);
     arma::mat x = data_segment.cols(1, data_segment.n_cols - 1);
-    Rcpp::List out;
+    fastcpd::glm::FitGlmResult out;
     if (!start.has_value()) {
-      out = fastglm(x, y, name);
+      out = fastcpd::glm::FitGlm(x, y, name);
     } else {
-      out = fastglm(x, y, name, start);
+      out = fastcpd::glm::FitGlm(x, y, name, start);
     }
-    solver->result_coefficients_ = Rcpp::as<arma::colvec>(out["coefficients"]);
-    solver->result_residuals_ =
-        arma::mat(Rcpp::as<arma::colvec>(out["residuals"]));
-    solver->result_value_ = Rcpp::as<double>(out["deviance"]) / 2;
-#endif
+    solver->result_coefficients_ = out.coefficients;
+    solver->result_residuals_ = arma::mat(out.residuals);
+    solver->result_value_ = out.deviance / 2;
   }
 
   template <typename Solver>

@@ -8,11 +8,11 @@ testthat::test_that(
       collapse = "\n"
     )))
 
-    testthat::expect_equal(result@cp_set, 759)
-    testthat::expect_equal(max(result@residuals, na.rm = TRUE), 3.89822750)
+    testthat::expect_equal(result@cp_set, 756)
+    testthat::expect_equal(max(result@residuals, na.rm = TRUE), 3.496100993)
     testthat::expect_equal(result@thetas, data.frame(
-      "segment 1" = c(79.822854422, 0.196544235, 0.000000000),
-      "segment 2" = c(1.376189971, 0.125421192, 0.356561246),
+      "segment 1" = c(19.036319299, 0.639478846, 0.216478285),
+      "segment 2" = c(1.516258347, 0.132955389, 0.296962417),
       check.names = FALSE
     ))
   }

@@ -20,7 +20,7 @@ fastcpd.ar(data, order = 0, ...)
 mean should be included in the model. The default value is \code{TRUE}.}
 }
 \value{
-A \linkS4class{fastcpd} object.
+A \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
 \code{\link[=fastcpd_ar]{fastcpd_ar()}} and \code{\link[=fastcpd.ar]{fastcpd.ar()}} are

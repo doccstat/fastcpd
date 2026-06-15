@@ -71,6 +71,26 @@
 #' provided, which has to be optimized over the parameter \eqn{\theta} to
 #' obtain the cost value. A detailed discussion about the custom cost function
 #' usage can be found in the references.
+#'
+#' \strong{Compiled cost functions.} For performance-sensitive use cases,
+#' \code{cost} (as well as \code{cost_gradient} and \code{cost_hessian}) may
+#' instead be a pre-compiled C++ function passed as an external pointer
+#' (\code{externalptr}), avoiding R-call overhead in the hot loop. Build one
+#' with \code{Rcpp::XPtr}: write a function matching one of
+#' \code{double cost(arma::mat const& data)} (PELT-style, format one above) or
+#' \code{double cost(arma::mat const& data, arma::colvec const& theta)}
+#' (SeGD-style, format two above), take its address, and wrap it as
+#' \code{xptr <- Rcpp::XPtr<FnPtr>(new FnPtr(&your_cost), TRUE,
+#' Rcpp::wrap("fastcpd_cost_pelt"))} (or \code{"fastcpd_cost_sen"} for the
+#' two-argument form) -- the tag string is required and checked at runtime.
+#' Since external pointers carry no \code{formals}, also set
+#' \code{attr(xptr, "fastcpd_cost_arity") <- 1L} (or \code{2L} for the
+#' two-argument form) so [fastcpd()] can route it like an R closure of the
+#' same arity. Pass \code{xptr} as \code{cost} exactly as you would an R
+#' closure. A compiled \code{cost} cannot be combined with
+#' \code{cost_gradient} / \code{cost_hessian} (those drive an R-level
+#' \code{stats::optim} warm start that requires an R closure for \code{cost}).
+#' See the custom model vignette for a complete worked example.
 #' @param cost_gradient Gradient of the custom cost function. Example usage:
 #' ```r
 #' cost_gradient = function(data, theta) {
@@ -84,12 +104,20 @@
 #' The gradient function returns the value of the gradient of the loss function,
 #' i.e.,
 #' \eqn{\sum_{i = s}^t \nabla l(z_i, \theta)}{sum_{i = s}^t l'(z_i, \theta)}.
+#' Like \code{cost}, this may also be a compiled function passed as an
+#' \code{externalptr} matching
+#' \code{arma::colvec cost_gradient(arma::mat const& data, arma::colvec const& theta)},
+#' wrapped via \code{Rcpp::XPtr} and tagged \code{"fastcpd_cost_gradient"}.
 #' @param cost_hessian Hessian of the custom loss function. The Hessian function
 #' takes two inputs, the first being a matrix representing a segment of the
 #' data, similar to the format used in the \code{cost} function, and the second
 #' being the parameter that needs to be optimized. The gradient function returns
 #' the Hessian of the loss function, i.e.,
 #' \eqn{\sum_{i = s}^t \nabla^2 l(z_i, \theta)}{sum_{i = s}^t l''(z_i, \theta)}.
+#' Like \code{cost}, this may also be a compiled function passed as an
+#' \code{externalptr} matching
+#' \code{arma::mat cost_hessian(arma::mat const& data, arma::colvec const& theta)},
+#' wrapped via \code{Rcpp::XPtr} and tagged \code{"fastcpd_cost_hessian"}.
 #' @param line_search If a vector of numeric values is provided, a line search
 #' will be performed to find the optimal step size for each update. Detailed
 #' usage of \code{line_search} can be found in the references.
@@ -202,6 +230,7 @@
 #' @example tests/testthat/examples/fastcpd_2.R
 #' @example tests/testthat/examples/fastcpd_3.txt
 #' @example tests/testthat/examples/fastcpd_4.txt
+#' @example tests/testthat/examples/fastcpd_custom_xptr.txt
 #' @seealso [fastcpd.family] for the family-specific function;
 #' [plot.fastcpd()] for plotting the results,
 #' [summary.fastcpd()] for summarizing the results.
@@ -254,6 +283,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       "var",  # -> "mgaussian"
       "arima",  # -> "custom"
       "garch",  # -> "garch"
+      "exponential",  # -> "exponential"
       "custom"  # -> "custom"
     )
   )
@@ -318,6 +348,10 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     fastcpd_family <- family
     vanilla_percentage <- 1
     p <- ncol(data_)^2 + ncol(data_)
+  } else if (family == "exponential") {
+    fastcpd_family <- family
+    vanilla_percentage <- 1
+    p <- ncol(data_)
   } else if (family == "garch") {
     p <- sum(order) + 1
     fastcpd_family <- family
@@ -365,7 +399,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     }
     p <- sum(order[-2]) + 1 + include_mean
     fastcpd_family <- "custom"
-    if (!is.null(cost) && length(formals(cost)) == 1) {
+    if (!is.null(cost) && cost_arity(cost) == 1) {
       vanilla_percentage <- 1
     }
   } else {
@@ -373,14 +407,14 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       p <- ncol(data_) - 1
     }
     fastcpd_family <- "custom"
-    if (!is.null(cost) && length(formals(cost)) == 1) {
+    if (!is.null(cost) && cost_arity(cost) == 1) {
       vanilla_percentage <- 1
     }
   }
 
   cost_pelt <- NULL
   cost_sen <- NULL
-  if (!is.null(cost) && length(formals(cost)) == 1) {
+  if (!is.null(cost) && cost_arity(cost) == 1) {
     cost_pelt <- cost
   } else {
     cost_sen <- cost
@@ -651,6 +685,8 @@ fastcpd.binomial <- fastcpd_binomial  # nolint: Conventional R function style
 #' except that the data is by default a one-column matrix or univariate vector
 #' and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_garch.txt
+#' @example tests/testthat/examples/fastcpd_garch_2.R
+#' @example tests/testthat/examples/fastcpd_garch_3.R
 #' @seealso [fastcpd()]
 #'
 #' @md
@@ -756,6 +792,41 @@ fastcpd_mean <- function(data, ...) {
 #' @rdname fastcpd_mean
 #' @export
 fastcpd.mean <- fastcpd_mean  # nolint: Conventional R function style
+
+#' @title Find change points efficiently in exponentially distributed data
+#' @param data A matrix, a data frame or a vector.
+#' @param ... Other arguments passed to [fastcpd()], for example,
+#' \code{segment_count}.
+#' @return A [fastcpd-class] object.
+#' @description [fastcpd_exponential()] and [fastcpd.exponential()] are
+#' wrapper functions of [fastcpd()] to find changes in the rate of
+#' exponentially distributed data, i.e. mean change under exponentially
+#' distributed noise (cf. \code{changepoint::cpt.meanvar} with
+#' \code{test.stat = "Exponential"}). The function is similar to
+#' [fastcpd()] except that the data is by default a matrix or data frame or
+#' a vector with each row / element as an observation and thus a formula is
+#' not required here.
+#' @example tests/testthat/examples/fastcpd_exponential_1.R
+#' @seealso [fastcpd()]
+#'
+#' @md
+#' @rdname fastcpd_exponential
+#' @export
+fastcpd_exponential <- function(data, ...) {
+  if (is.null(dim(data)) || length(dim(data)) == 1) {
+    data <- matrix(data, ncol = 1)
+  }
+  result <- fastcpd(
+    formula = ~ . - 1, data = data.frame(x = data), family = "exponential", ...
+  )
+  result@call <- match.call()
+  result
+}
+
+#' @rdname fastcpd_exponential
+#' @export
+fastcpd.exponential <-  # nolint: Conventional R function style
+  fastcpd_exponential
 
 #' @title Find change points efficiently in mean variance change models
 #' @param data A matrix, a data frame or a vector.

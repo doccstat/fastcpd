@@ -6,6 +6,7 @@
 fastcpd_arma*.cc
 fastcpd_binomial*.cc
 fastcpd_custom*.cc
+fastcpd_exponential*.cc
 fastcpd_garch*.cc
 fastcpd_gaussian*.cc
 fastcpd_lasso*.cc

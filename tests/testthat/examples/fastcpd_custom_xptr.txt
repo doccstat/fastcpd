@@ -1,0 +1,67 @@
+\donttest{
+if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
+  # Three equivalent mean-change detectors: built-in "mean" family (fully
+  # compiled), a custom R closure, and a compiled Rcpp::XPtr cost function.
+  # All three detect the same change point; the XPtr eliminates the per-
+  # candidate R call overhead that the R closure incurs in the hot loop.
+  set.seed(1)
+  data <- matrix(c(rnorm(500, 0), rnorm(500, 5)))
+  beta_val <- (ncol(data) + 1) * log(nrow(data)) / 2
+
+  result_builtin <- fastcpd.mean(
+    data, beta = beta_val, cost_adjustment = NULL, r.progress = FALSE
+  )
+
+  cost_r <- function(data) sum((data - mean(data))^2) / 2
+  time_r <- system.time(
+    result_r <- fastcpd(
+      ~ . - 1, data.frame(x = data), family = "custom",
+      cost = cost_r, beta = beta_val, cost_adjustment = NULL,
+      r.progress = FALSE
+    )
+  )
+
+  compiled_env <- new.env()
+  Rcpp::sourceCpp(
+    code = '
+      // [[Rcpp::depends(RcppArmadillo)]]
+      #include <RcppArmadillo.h>
+      // PELT-style cost: one argument, data only (no theta).
+      // Tag the XPtr with "fastcpd_cost_pelt" and set
+      // attr(xptr, "fastcpd_cost_arity") <- 1L on the R side.
+      typedef double (*CostPeltFnPtr)(arma::mat const&);
+
+      double mean_cost(arma::mat const& data) {
+        arma::rowvec const seg_mean = arma::mean(data, 0);
+        return arma::accu(arma::square(data.each_row() - seg_mean)) / 2.0;
+      }
+
+      // [[Rcpp::export]]
+      SEXP make_mean_cost_xptr() {
+        Rcpp::XPtr<CostPeltFnPtr> xptr(
+            new CostPeltFnPtr(&mean_cost), true,
+            Rcpp::wrap("fastcpd_cost_pelt"));
+        return xptr;
+      }
+    ',
+    env = compiled_env
+  )
+  cost_xptr <- compiled_env$make_mean_cost_xptr()
+  attr(cost_xptr, "fastcpd_cost_arity") <- 1L
+  time_xptr <- system.time(
+    result_xptr <- fastcpd(
+      ~ . - 1, data.frame(x = data), family = "custom",
+      cost = cost_xptr, beta = beta_val, cost_adjustment = NULL,
+      r.progress = FALSE
+    )
+  )
+
+  stopifnot(
+    identical(result_r@cp_set, result_builtin@cp_set),
+    identical(result_xptr@cp_set, result_builtin@cp_set)
+  )
+  cat("R closure: ", time_r["elapsed"], "s\n")
+  cat("XPtr:      ", time_xptr["elapsed"], "s\n")
+  summary(result_xptr)
+}
+}

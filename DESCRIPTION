@@ -1,7 +1,7 @@
 Type: Package
 Package: fastcpd
 Title: Fast Change Point Detection via Sequential Gradient Descent
-Version: 0.99.9
+Version: 1.0.0
 Authors@R: c(
     person("Xingchi", "Li", , "anthony.li.stat.tamu.edu@lixingchi.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0006-2493-0853")),
@@ -30,6 +30,7 @@ Suggests:
     knitr,
     matrixStats,
     mvtnorm,
+    RcppArmadillo,
     rmarkdown,
     testthat (>= 3.0.0),
     xml2
@@ -37,7 +38,6 @@ LinkingTo:
     progress,
     Rcpp,
     RcppArmadillo,
-    RcppEigen,
     testthat
 VignetteBuilder:
     knitr
@@ -46,4 +46,4 @@ Config/testthat/parallel: true
 Config/testthat/start-first: examples-fastcpd_arima, examples-fastcpd_ts
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.0.0

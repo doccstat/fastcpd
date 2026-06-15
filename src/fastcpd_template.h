@@ -9,6 +9,7 @@
 #endif
 
 #include "fastcpd_family.h"
+#include "fastcpd_optim.h"
 
 #include <algorithm>
 #include <cmath>
@@ -29,9 +30,6 @@ namespace classes {
 template <bool kIsPeltOnly>
 struct SenFunctions {
   SenFunctions(
-#ifndef NO_RCPP
-      std::optional<Rcpp::Function> const& /* cost */,
-#endif
       std::function<double(arma::mat)> const& /* cost_pelt */,
       std::function<double(arma::mat, arma::colvec)> const& /* cost_sen */,
       std::function<arma::colvec(arma::mat, arma::colvec)> const& /* cost_gradient */,
@@ -40,20 +38,6 @@ struct SenFunctions {
 
 template <>
 struct SenFunctions<false> {
-#ifndef NO_RCPP
-  SenFunctions(
-      std::optional<Rcpp::Function> const& cost,
-      std::function<double(arma::mat)> const& cost_pelt,
-      std::function<double(arma::mat, arma::colvec)> const& cost_sen,
-      std::function<arma::colvec(arma::mat, arma::colvec)> const& cost_gradient,
-      std::function<arma::mat(arma::mat, arma::colvec)> const& cost_hessian)
-      : cost_function_(cost),
-        cost_function_pelt_(cost_pelt),
-        cost_function_sen_(cost_sen),
-        cost_gradient_(cost_gradient),
-        cost_hessian_(cost_hessian) {}
-  std::optional<Rcpp::Function> const cost_function_;
-#else
   SenFunctions(
       std::function<double(arma::mat)> const& cost_pelt,
       std::function<double(arma::mat, arma::colvec)> const& cost_sen,
@@ -63,7 +47,6 @@ struct SenFunctions<false> {
         cost_function_sen_(cost_sen),
         cost_gradient_(cost_gradient),
         cost_hessian_(cost_hessian) {}
-#endif
   std::function<double(arma::mat)> const cost_function_pelt_;
   std::function<double(arma::mat, arma::colvec)> const cost_function_sen_;
   std::function<arma::colvec(arma::mat, arma::colvec)> const cost_gradient_;
@@ -93,9 +76,6 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
 
   Fastcpd(
       double const beta,
-#ifndef NO_RCPP
-      std::optional<Rcpp::Function> const& cost,
-#endif
       std::function<double(arma::mat)> const& cost_pelt,
       std::function<double(arma::mat, arma::colvec)> const& cost_sen,
       std::function<arma::colvec(arma::mat, arma::colvec)> const& cost_gradient,
@@ -110,9 +90,6 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
       arma::colvec const& upper, double const vanilla_percentage,
       arma::mat const& variance_estimate, bool const warm_start)
       : SenFunctions<FamilyPolicy::is_pelt_only>(
-#ifndef NO_RCPP
-            cost,
-#endif
             cost_pelt, cost_sen, cost_gradient, cost_hessian),
         active_coefficients_count_(arma::colvec(segment_count)),
         beta_(beta),
@@ -505,51 +482,59 @@ double Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kN
   return cval;
 }
 
-#ifndef NO_RCPP
+// Solves the per-segment MLE `argmin_theta cost(data, theta)` for the
+// `family = "custom"` PELT path when the user supplies an analytical gradient
+// and/or Hessian alongside `cost` (`CustomFamily::GetNllPelt`'s warm-start
+// branch) -- a from-scratch replacement for the former `stats::optim` call,
+// driven by the unified `cost_function_sen_`/`cost_gradient_` `std::function`
+// wrappers (shared by the R-closure and compiled/XPtr cost paths alike, see
+// `fastcpd_xptr.h`), via `fastcpd::optim::BrentMinimize`/`BfgsMinimize`
+// (`fastcpd_optim.h`).
 template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
           CostAdjustment kCostAdj, bool kLineSearch, int kNDims>
 void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::GetOptimizedCostResult(
     unsigned int const segment_start, unsigned int const segment_end) {
   arma::mat const data_segment = data_.rows(segment_start, segment_end);
   if (parameters_count_ == 1) {
-    Rcpp::Environment stats = Rcpp::Environment::namespace_env("stats");
-    Rcpp::Function optim = stats["optim"];
-    Rcpp::List optim_result = optim(
-        Rcpp::Named("par") = 0,
-        Rcpp::Named("fn") = Rcpp::InternalFunction(
-            +[](double theta, arma::mat data_, Rcpp::Function cost) {
-              return cost(Rcpp::Named("data") = data_,
-                          Rcpp::Named("theta") = std::log(theta / (1 - theta)));
-            }),
-        Rcpp::Named("method") = "Brent", Rcpp::Named("lower") = 0,
-        Rcpp::Named("upper") = 1, Rcpp::Named("data") = data_segment,
-        Rcpp::Named("cost") = this->cost_function_.value());
-    arma::colvec par = Rcpp::as<arma::colvec>(optim_result["par"]);
-    double value = Rcpp::as<double>(optim_result["value"]);
-    result_coefficients_ = arma::log(par / (1 - par));
+    // `cost`'s natural parameter is unconstrained; Brent's method requires a
+    // bounded bracket, so the search runs over `par` in (0, 1) and maps it to
+    // the natural parameter via the logit transform `theta = log(par / (1 -
+    // par))` -- mirroring the former `stats::optim(method = "Brent", lower =
+    // 0, upper = 1)` call exactly (including its `result_value_` convention,
+    // which reports `sigmoid(value)` rather than `value` itself).
+    auto objective = [&](double const par) {
+      return this->cost_function_sen_(data_segment,
+                                       arma::colvec{std::log(par / (1 - par))});
+    };
+    double const par = fastcpd::optim::BrentMinimize(objective, 0.0, 1.0);
+    double const value = objective(par);
+    result_coefficients_ = arma::colvec{std::log(par / (1 - par))};
     result_residuals_ = arma::mat();
     result_value_ = std::exp(value) / (1 + std::exp(value));
   } else {
-    Rcpp::Environment stats = Rcpp::Environment::namespace_env("stats");
-    Rcpp::Function optim = stats["optim"];
-    Rcpp::List optim_result = optim(
-        Rcpp::Named("par") = arma::zeros<arma::vec>(parameters_count_),
-        Rcpp::Named("fn") = this->cost_function_.value(),
-        Rcpp::Named("method") = "L-BFGS-B", Rcpp::Named("data") = data_segment,
-        Rcpp::Named("lower") = parameters_lower_bound_,
-        Rcpp::Named("upper") = parameters_upper_bound_);
-    result_coefficients_ = Rcpp::as<arma::colvec>(optim_result["par"]);
+    // `cost_gradient_` is the SEN per-observation gradient (evaluated at a
+    // single row, for the sequential-gradient-descent update); it is not the
+    // gradient of the full-segment objective `cost_function_sen_` sums over,
+    // so feeding it to BFGS here would pair an inconsistent (f, grad f) and
+    // converge to the wrong optimum. Differentiate the segment objective
+    // numerically instead -- mirroring the former `stats::optim(method =
+    // "L-BFGS-B")` call, which was always invoked without an analytical `gr`
+    // (its `cost_gradient_`/`cost_hessian_` only gated entry to this path).
+    auto cost_only = [&](arma::colvec const& theta) {
+      return this->cost_function_sen_(data_segment, theta);
+    };
+    auto objective = [&](arma::colvec const& theta) {
+      return std::pair<double, arma::colvec>(
+          cost_only(theta), fastcpd::optim::NumericalGradient(cost_only, theta));
+    };
+    arma::colvec const par = fastcpd::optim::BfgsMinimize(
+        objective, arma::zeros<arma::colvec>(parameters_count_),
+        parameters_lower_bound_, parameters_upper_bound_);
+    result_coefficients_ = par;
     result_residuals_ = arma::mat();
-    result_value_ = Rcpp::as<double>(optim_result["value"]);
+    result_value_ = this->cost_function_sen_(data_segment, par);
   }
 }
-#else
-template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
-          CostAdjustment kCostAdj, bool kLineSearch, int kNDims>
-void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::GetOptimizedCostResult(
-    unsigned int const segment_start, unsigned int const segment_end) {
-}
-#endif
 
 template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
           CostAdjustment kCostAdj, bool kLineSearch, int kNDims>

@@ -3,21 +3,21 @@
 \name{print.fastcpd}
 \alias{print.fastcpd}
 \alias{print,fastcpd-method}
-\title{Print the call and the change points for a \linkS4class{fastcpd} object}
+\title{Print the call and the change points for a \link[=fastcpd-class]{fastcpd} object}
 \usage{
 \method{print}{fastcpd}(x, ...)
 
 \S4method{print}{fastcpd}(x, ...)
 }
 \arguments{
-\item{x}{A \linkS4class{fastcpd} object.}
+\item{x}{A \link[=fastcpd-class]{fastcpd} object.}
 
 \item{...}{Ignored.}
 }
 \value{
-Return a (temporarily) invisible copy of the \linkS4class{fastcpd} object.
+Return a (temporarily) invisible copy of the \link[=fastcpd-class]{fastcpd} object.
 Called primarily for printing the change points in the model.
 }
 \description{
-Print the call and the change points for a \linkS4class{fastcpd} object
+Print the call and the change points for a \link[=fastcpd-class]{fastcpd} object
 }

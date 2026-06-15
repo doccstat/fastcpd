@@ -93,7 +93,8 @@ testthat::test_that(
         "The family should be one of \"lm\", \"binomial\", \"poisson\", ",
         "\"lasso\", ",
         "\"mean\", \"variance\", \"meanvariance\", ",
-        "\"arma\", \"ar\", \"var\", \"arima\", \"garch\", \"custom\".",
+        "\"arma\", \"ar\", \"var\", \"arima\", \"garch\", ",
+        "\"exponential\", \"custom\".",
         "\nThe provided family is \"bin0mial\"."
       )
     )

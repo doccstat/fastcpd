@@ -2,7 +2,7 @@
 #define FASTCPD_FAMILIES_GARCH_H_
 
 #include "fastcpd_family.h"
-#include "ref_tseries.h"
+#include "fastcpd_garch.h"
 
 namespace fastcpd::families {
 
@@ -19,13 +19,12 @@ struct GarchFamily : BaseFamily {
   static void GetNllPelt(Solver* solver, unsigned int const segment_start,
                          unsigned int const segment_end, bool const cv,
                          std::optional<arma::colvec> const& start) {
-#ifndef NO_RCPP
     arma::colvec series = solver->data_.rows(segment_start, segment_end).col(0);
-    Rcpp::List out = garch(series, solver->order_);
-    solver->result_coefficients_ = Rcpp::as<arma::colvec>(out["coef"]);
-    solver->result_residuals_ = arma::mat(Rcpp::as<arma::colvec>(out["residuals"]));
-    solver->result_value_ = Rcpp::as<double>(out["n.likeli"]);
-#endif
+    fastcpd::garch::FitGarchResult const out =
+        fastcpd::garch::FitGarch(series, solver->order_);
+    solver->result_coefficients_ = out.coef;
+    solver->result_residuals_ = arma::mat(out.residuals);
+    solver->result_value_ = out.n_likeli;
   }
 
   template <typename Solver>

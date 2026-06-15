@@ -22,7 +22,7 @@ fastcpd.mv(data, ...)
 \code{segment_count}.}
 }
 \value{
-A \linkS4class{fastcpd} object.
+A \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
 \code{\link[=fastcpd_meanvariance]{fastcpd_meanvariance()}}, \code{\link[=fastcpd.meanvariance]{fastcpd.meanvariance()}},

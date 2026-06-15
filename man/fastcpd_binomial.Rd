@@ -17,7 +17,7 @@ column.}
 \code{segment_count}.}
 }
 \value{
-A \linkS4class{fastcpd} object.
+A \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
 \code{\link[=fastcpd_binomial]{fastcpd_binomial()}} and \code{\link[=fastcpd.binomial]{fastcpd.binomial()}} are

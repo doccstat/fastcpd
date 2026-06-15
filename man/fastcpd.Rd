@@ -108,7 +108,27 @@ In the second format, the loss function
 \eqn{\sum_{i = s}^t l(z_i, \theta)}{sum_{i = s}^t l(z_i, \theta)} is
 provided, which has to be optimized over the parameter \eqn{\theta} to
 obtain the cost value. A detailed discussion about the custom cost function
-usage can be found in the references.}
+usage can be found in the references.
+
+\strong{Compiled cost functions.} For performance-sensitive use cases,
+\code{cost} (as well as \code{cost_gradient} and \code{cost_hessian}) may
+instead be a pre-compiled C++ function passed as an external pointer
+(\code{externalptr}), avoiding R-call overhead in the hot loop. Build one
+with \code{Rcpp::XPtr}: write a function matching one of
+\code{double cost(arma::mat const& data)} (PELT-style, format one above) or
+\code{double cost(arma::mat const& data, arma::colvec const& theta)}
+(SeGD-style, format two above), take its address, and wrap it as
+\code{xptr <- Rcpp::XPtr<FnPtr>(new FnPtr(&your_cost), TRUE,
+Rcpp::wrap("fastcpd_cost_pelt"))} (or \code{"fastcpd_cost_sen"} for the
+two-argument form) -- the tag string is required and checked at runtime.
+Since external pointers carry no \code{formals}, also set
+\code{attr(xptr, "fastcpd_cost_arity") <- 1L} (or \code{2L} for the
+two-argument form) so \code{\link[=fastcpd]{fastcpd()}} can route it like an R closure of the
+same arity. Pass \code{xptr} as \code{cost} exactly as you would an R
+closure. A compiled \code{cost} cannot be combined with
+\code{cost_gradient} / \code{cost_hessian} (those drive an R-level
+\code{stats::optim} warm start that requires an R closure for \code{cost}).
+See the custom model vignette for a complete worked example.}
 
 \item{cost_gradient}{Gradient of the custom cost function. Example usage:
 
@@ -123,14 +143,22 @@ a segment of the data, similar to the format used in the \code{cost}
 function, and the second being the parameter that needs to be optimized.
 The gradient function returns the value of the gradient of the loss function,
 i.e.,
-\eqn{\sum_{i = s}^t \nabla l(z_i, \theta)}{sum_{i = s}^t l'(z_i, \theta)}.}
+\eqn{\sum_{i = s}^t \nabla l(z_i, \theta)}{sum_{i = s}^t l'(z_i, \theta)}.
+Like \code{cost}, this may also be a compiled function passed as an
+\code{externalptr} matching
+\code{arma::colvec cost_gradient(arma::mat const& data, arma::colvec const& theta)},
+wrapped via \code{Rcpp::XPtr} and tagged \code{"fastcpd_cost_gradient"}.}
 
 \item{cost_hessian}{Hessian of the custom loss function. The Hessian function
 takes two inputs, the first being a matrix representing a segment of the
 data, similar to the format used in the \code{cost} function, and the second
 being the parameter that needs to be optimized. The gradient function returns
 the Hessian of the loss function, i.e.,
-\eqn{\sum_{i = s}^t \nabla^2 l(z_i, \theta)}{sum_{i = s}^t l''(z_i, \theta)}.}
+\eqn{\sum_{i = s}^t \nabla^2 l(z_i, \theta)}{sum_{i = s}^t l''(z_i, \theta)}.
+Like \code{cost}, this may also be a compiled function passed as an
+\code{externalptr} matching
+\code{arma::mat cost_hessian(arma::mat const& data, arma::colvec const& theta)},
+wrapped via \code{Rcpp::XPtr} and tagged \code{"fastcpd_cost_hessian"}.}
 
 \item{line_search}{If a vector of numeric values is provided, a line search
 will be performed to find the optimal step size for each update. Detailed
@@ -240,11 +268,11 @@ responses.
 }}
 }
 \value{
-A \linkS4class{fastcpd} object.
+A \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
 \code{\link[=fastcpd]{fastcpd()}} takes in formulas, data, families and extra
-parameters and returns a \linkS4class{fastcpd} object.
+parameters and returns a \link[=fastcpd-class]{fastcpd} object.
 }
 \section{Gallery}{
 
@@ -254,7 +282,7 @@ parameters and returns a \linkS4class{fastcpd} object.
 \section{References}{
 
 Xingchi Li, Xianyang Zhang (2026). ``fastcpd: Fast Change Point Detection
-in R.'' \emph{Journal of Statistical Software}, \bold{116}(6), 1--53.
+in R.'' \emph{Journal of Statistical Software}, \strong{116}(6), 1--53.
 \doi{10.18637/jss.v116.i06}.
 
 Xingchi Li, Xianyang Zhang (2024). ``fastcpd: Fast Change Point Detection
@@ -421,6 +449,73 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     pruning_coef = 0
   )
   summary(result_20_vp)
+}
+}
+\donttest{
+if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
+  # Three equivalent mean-change detectors: built-in "mean" family (fully
+  # compiled), a custom R closure, and a compiled Rcpp::XPtr cost function.
+  # All three detect the same change point; the XPtr eliminates the per-
+  # candidate R call overhead that the R closure incurs in the hot loop.
+  set.seed(1)
+  data <- matrix(c(rnorm(500, 0), rnorm(500, 5)))
+  beta_val <- (ncol(data) + 1) * log(nrow(data)) / 2
+
+  result_builtin <- fastcpd.mean(
+    data, beta = beta_val, cost_adjustment = NULL, r.progress = FALSE
+  )
+
+  cost_r <- function(data) sum((data - mean(data))^2) / 2
+  time_r <- system.time(
+    result_r <- fastcpd(
+      ~ . - 1, data.frame(x = data), family = "custom",
+      cost = cost_r, beta = beta_val, cost_adjustment = NULL,
+      r.progress = FALSE
+    )
+  )
+
+  compiled_env <- new.env()
+  Rcpp::sourceCpp(
+    code = '
+      // [[Rcpp::depends(RcppArmadillo)]]
+      #include <RcppArmadillo.h>
+      // PELT-style cost: one argument, data only (no theta).
+      // Tag the XPtr with "fastcpd_cost_pelt" and set
+      // attr(xptr, "fastcpd_cost_arity") <- 1L on the R side.
+      typedef double (*CostPeltFnPtr)(arma::mat const&);
+
+      double mean_cost(arma::mat const& data) {
+        arma::rowvec const seg_mean = arma::mean(data, 0);
+        return arma::accu(arma::square(data.each_row() - seg_mean)) / 2.0;
+      }
+
+      // [[Rcpp::export]]
+      SEXP make_mean_cost_xptr() {
+        Rcpp::XPtr<CostPeltFnPtr> xptr(
+            new CostPeltFnPtr(&mean_cost), true,
+            Rcpp::wrap("fastcpd_cost_pelt"));
+        return xptr;
+      }
+    ',
+    env = compiled_env
+  )
+  cost_xptr <- compiled_env$make_mean_cost_xptr()
+  attr(cost_xptr, "fastcpd_cost_arity") <- 1L
+  time_xptr <- system.time(
+    result_xptr <- fastcpd(
+      ~ . - 1, data.frame(x = data), family = "custom",
+      cost = cost_xptr, beta = beta_val, cost_adjustment = NULL,
+      r.progress = FALSE
+    )
+  )
+
+  stopifnot(
+    identical(result_r@cp_set, result_builtin@cp_set),
+    identical(result_xptr@cp_set, result_builtin@cp_set)
+  )
+  cat("R closure: ", time_r["elapsed"], "s\n")
+  cat("XPtr:      ", time_xptr["elapsed"], "s\n")
+  summary(result_xptr)
 }
 }
 }
