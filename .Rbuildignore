@@ -37,6 +37,7 @@
 ^.*\.egg-info$
 ^dist$
 ^__pycache__$
+^\.pytest_cache$
 
 # Python files.
 ^tests/.*\.py$

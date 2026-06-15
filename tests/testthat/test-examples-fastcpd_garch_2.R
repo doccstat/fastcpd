@@ -1,8 +1,12 @@
 testthat::test_that(
-  "examples/fastcpd_garch_2.R", {
+  "examples/fastcpd_garch_2.txt", {
     testthat::skip_if_not_installed("ggplot2")
 
-    source("examples/fastcpd_garch_2.R")
+    examples_garch_2 <- readLines("examples/fastcpd_garch_2.txt")
+    source(textConnection(paste(
+      examples_garch_2[seq_len(length(examples_garch_2) - 2) + 1],
+      collapse = "\n"
+    )))
 
     testthat::expect_equal(result@cp_set, 98)
     testthat::expect_equal(max(result@residuals, na.rm = TRUE), 2.603021577)

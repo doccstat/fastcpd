@@ -48,6 +48,7 @@ result <- suppressWarnings(
 summary(result)
 plot(result)
 }
+\donttest{
 set.seed(1)
 n <- 200
 sigma_2 <- rep(1, n + 1)
@@ -65,6 +66,8 @@ result <- suppressWarnings(
 )
 summary(result)
 plot(result)
+}
+\donttest{
 set.seed(1)
 n <- 300
 sigma_2 <- rep(1, n + 1)
@@ -82,6 +85,7 @@ result <- suppressWarnings(
 )
 summary(result)
 plot(result)
+}
 }
 \seealso{
 \code{\link[=fastcpd]{fastcpd()}}
