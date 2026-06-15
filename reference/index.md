@@ -43,6 +43,9 @@ the main functions for time series data (also wrapper functions of
 Used for data without response variables, for example, mean change and
 variance change.
 
+- [`fastcpd_exponential()`](https://fastcpd.xingchi.li/reference/fastcpd_exponential.md)
+  [`fastcpd.exponential()`](https://fastcpd.xingchi.li/reference/fastcpd_exponential.md)
+  : Find change points efficiently in exponentially distributed data
 - [`fastcpd_mean()`](https://fastcpd.xingchi.li/reference/fastcpd_mean.md)
   [`fastcpd.mean()`](https://fastcpd.xingchi.li/reference/fastcpd_mean.md)
   : Find change points efficiently in mean change models

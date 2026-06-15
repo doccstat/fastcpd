@@ -29,7 +29,7 @@ logistic regression models.
 
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -157,21 +157,93 @@ results as the built-in logistic regression model.</p>
 <span><span class="co">#&gt;     epsilon = 1e-05, r.progress = FALSE)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
-<span><span class="co">#&gt; 9 252 </span></span>
+<span><span class="co">#&gt; 252 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt;   segment 1 segment 2 segment 3</span></span>
-<span><span class="co">#&gt; 1         0         0         0</span></span>
-<span><span class="co">#&gt; 2         0         0         0</span></span>
-<span><span class="co">#&gt; 3         0         0         0</span></span>
-<span><span class="co">#&gt; 4         0         0         0</span></span>
-<span><span class="co">#&gt; 5         0         0         0</span></span></code></pre></div>
+<span><span class="co">#&gt;   segment 1 segment 2</span></span>
+<span><span class="co">#&gt; 1         0         0</span></span>
+<span><span class="co">#&gt; 2         0         0</span></span>
+<span><span class="co">#&gt; 3         0         0</span></span>
+<span><span class="co">#&gt; 4         0         0</span></span>
+<span><span class="co">#&gt; 5         0         0</span></span></code></pre></div>
 <p>Note that the result obtained through custom cost functions is
 inferior compared to the one obtained through built-in models. We remark
 that the results can be improved with extra parameters already provided
 in the package. The detailed discussion of several advanced usages of
 the package can be found in <a href="examples-advanced.html">Advanced
 examples</a>.</p>
+<div class="section level2">
+<h2 id="compiled-c-custom-cost-functions">Compiled (C++) custom cost functions<a class="anchor" aria-label="anchor" href="#compiled-c-custom-cost-functions"></a>
+</h2>
+<p>The custom cost functions above are R closures: <code>cost</code>,
+<code>cost_gradient</code> and <code>cost_hessian</code> are called from
+C++ once per candidate segment via <code>Rcpp::Function</code>, which
+incurs R call overhead. For performance-critical use cases,
+<code><a href="../reference/fastcpd.html">fastcpd()</a></code> also accepts <strong>pre-compiled C++ cost
+functions</strong>, passed through the very same <code>cost</code> /
+<code>cost_gradient</code> / <code>cost_hessian</code> arguments as an
+<code>externalptr</code> built with <code>Rcpp::XPtr</code>. The
+compiled and R-closure paths compute the same mathematical cost and a
+<code>family = "custom"</code> run accepts either interchangeably –
+<code><a href="../reference/fastcpd.html">fastcpd()</a></code> detects which kind of SEXP it received
+(<code>TYPEOF(x) == EXTPTRSXP</code>) and dispatches accordingly, with
+no other change to the call.</p>
+<p>To build a compiled cost, write a C++ function matching one of the
+two expected signatures – a PELT-style <code>cost(data)</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="dt">double</span> my_cost_pelt<span class="op">(</span>arma<span class="op">::</span>mat <span class="at">const</span><span class="op">&amp;</span> data<span class="op">);</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="kw">typedef</span> <span class="dt">double</span> <span class="op">(*</span>CostPeltFnPtr<span class="op">)(</span>arma<span class="op">::</span>mat <span class="at">const</span><span class="op">&amp;);</span></span></code></pre></div>
+<p>or a SeGD-style <code>cost(data, theta)</code> (optionally paired
+with a gradient and a Hessian):</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="dt">double</span> my_cost_sen<span class="op">(</span>arma<span class="op">::</span>mat <span class="at">const</span><span class="op">&amp;</span> data<span class="op">,</span> arma<span class="op">::</span>colvec <span class="at">const</span><span class="op">&amp;</span> theta<span class="op">);</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="kw">typedef</span> <span class="dt">double</span> <span class="op">(*</span>CostSenFnPtr<span class="op">)(</span>arma<span class="op">::</span>mat <span class="at">const</span><span class="op">&amp;,</span> arma<span class="op">::</span>colvec <span class="at">const</span><span class="op">&amp;);</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>arma<span class="op">::</span>colvec my_cost_gradient<span class="op">(</span>arma<span class="op">::</span>mat <span class="at">const</span><span class="op">&amp;</span> data<span class="op">,</span> arma<span class="op">::</span>colvec <span class="at">const</span><span class="op">&amp;</span> theta<span class="op">);</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="kw">typedef</span> arma<span class="op">::</span>colvec <span class="op">(*</span>CostGradientFnPtr<span class="op">)(</span>arma<span class="op">::</span>mat <span class="at">const</span><span class="op">&amp;,</span> arma<span class="op">::</span>colvec <span class="at">const</span><span class="op">&amp;);</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>arma<span class="op">::</span>mat my_cost_hessian<span class="op">(</span>arma<span class="op">::</span>mat <span class="at">const</span><span class="op">&amp;</span> data<span class="op">,</span> arma<span class="op">::</span>colvec <span class="at">const</span><span class="op">&amp;</span> theta<span class="op">);</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="kw">typedef</span> arma<span class="op">::</span>mat <span class="op">(*</span>CostHessianFnPtr<span class="op">)(</span>arma<span class="op">::</span>mat <span class="at">const</span><span class="op">&amp;,</span> arma<span class="op">::</span>colvec <span class="at">const</span><span class="op">&amp;);</span></span></code></pre></div>
+<p>Wrap the function pointer in an <code>Rcpp::XPtr</code>, tagging it
+with the literal string <code>fastcpd</code> expects for that role
+(<code>"fastcpd_cost_pelt"</code>, <code>"fastcpd_cost_sen"</code>,
+<code>"fastcpd_cost_gradient"</code> or
+<code>"fastcpd_cost_hessian"</code> – this tag is how
+<code>fastcpd</code> validates that the pointer was built for the right
+purpose), and export a function that returns it:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>SEXP make_my_cost_pelt_xptr<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  Rcpp<span class="op">::</span>XPtr<span class="op">&lt;</span>CostPeltFnPtr<span class="op">&gt;</span> xptr<span class="op">(</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>      <span class="kw">new</span> CostPeltFnPtr<span class="op">(&amp;</span>my_cost_pelt<span class="op">),</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>      Rcpp<span class="op">::</span>wrap<span class="op">(</span><span class="st">"fastcpd_cost_pelt"</span><span class="op">));</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="cf">return</span> xptr<span class="op">;</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Because external pointers carry no <code><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals()</a></code>,
+<code><a href="../reference/fastcpd.html">fastcpd()</a></code> cannot infer whether a compiled <code>cost</code>
+is PELT-style (one argument) or SeGD-style (two arguments) the way it
+does for R closures. Instead, set an integer
+<code>fastcpd_cost_arity</code> attribute on the returned pointer –
+<code>1L</code> for <code>cost(data)</code>, <code>2L</code> for
+<code>cost(data, theta)</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_cost_pelt_xptr</span> <span class="op">&lt;-</span> <span class="fu">make_my_cost_pelt_xptr</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">my_cost_pelt_xptr</span>, <span class="st">"fastcpd_cost_arity"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1L</span></span>
+<span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
+<span>  <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">data</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"custom"</span>, cost <span class="op">=</span> <span class="va">my_cost_pelt_xptr</span>,</span>
+<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
+<p>A compiled <code>cost</code> can be used on its own (covering both
+the PELT-style and SeGD-style cases above), or paired with compiled
+<code>cost_gradient</code> and <code>cost_hessian</code>
+<code>externalptr</code>s the same way – including the gradient/Hessian-
+driven PELT warm start (<code>fastcpd_cost_arity = 1L</code>), which is
+now solved by a from-scratch Brent / bound-constrained BFGS optimiser
+working directly through the unified
+<code>cost</code>/<code>cost_gradient</code>/<code>cost_hessian</code>
+wrappers, with no R-level callback and therefore no restriction on
+whether <code>cost</code> is an R closure or a compiled
+<code>externalptr</code>.</p>
+</div>
 <div class="section level2">
 <h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>
 </h2>
@@ -181,7 +253,7 @@ examples</a>.</p>
 <div class="section level2">
 <h2 id="appendix-all-code-snippets">Appendix: all code snippets<a class="anchor" aria-label="anchor" href="#appendix-all-code-snippets"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span></span>
 <span>  collapse <span class="op">=</span> <span class="cn">TRUE</span>, comment <span class="op">=</span> <span class="st">"#&gt;"</span>, eval <span class="op">=</span> <span class="cn">TRUE</span>, warning <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
@@ -218,6 +290,14 @@ examples</a>.</p>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
 <span>  <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="va">binomial_data</span>, epsilon <span class="op">=</span> <span class="fl">1e-5</span>, cost <span class="op">=</span> <span class="va">logistic_loss</span>,</span>
 <span>  cost_gradient <span class="op">=</span> <span class="va">logistic_gradient</span>, cost_hessian <span class="op">=</span> <span class="va">logistic_hessian</span>,</span>
+<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="va">my_cost_pelt_xptr</span> <span class="op">&lt;-</span> <span class="fu">make_my_cost_pelt_xptr</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">my_cost_pelt_xptr</span>, <span class="st">"fastcpd_cost_arity"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1L</span></span>
+<span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
+<span>  <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">data</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"custom"</span>, cost <span class="op">=</span> <span class="va">my_cost_pelt_xptr</span>,</span>
 <span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>

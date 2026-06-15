@@ -121,6 +121,26 @@ fastcpd(
   obtain the cost value. A detailed discussion about the custom cost
   function usage can be found in the references.
 
+  **Compiled cost functions.** For performance-sensitive use cases,
+  `cost` (as well as `cost_gradient` and `cost_hessian`) may instead be
+  a pre-compiled C++ function passed as an external pointer
+  (`externalptr`), avoiding R-call overhead in the hot loop. Build one
+  with `Rcpp::XPtr`: write a function matching one of
+  `double cost(arma::mat const& data)` (PELT-style, format one above) or
+  `double cost(arma::mat const& data, arma::colvec const& theta)`
+  (SeGD-style, format two above), take its address, and wrap it as
+  `xptr <- Rcpp::XPtr<FnPtr>(new FnPtr(&your_cost), TRUE, Rcpp::wrap("fastcpd_cost_pelt"))`
+  (or `"fastcpd_cost_sen"` for the two-argument form) – the tag string
+  is required and checked at runtime. Since external pointers carry no
+  `formals`, also set `attr(xptr, "fastcpd_cost_arity") <- 1L` (or `2L`
+  for the two-argument form) so `fastcpd()` can route it like an R
+  closure of the same arity. Pass `xptr` as `cost` exactly as you would
+  an R closure. A compiled `cost` cannot be combined with
+  `cost_gradient` / `cost_hessian` (those drive an R-level
+  [`stats::optim`](https://rdrr.io/r/stats/optim.html) warm start that
+  requires an R closure for `cost`). See the custom model vignette for a
+  complete worked example.
+
 - cost_gradient:
 
   Gradient of the custom cost function. Example usage:
@@ -135,6 +155,10 @@ fastcpd(
   `cost` function, and the second being the parameter that needs to be
   optimized. The gradient function returns the value of the gradient of
   the loss function, i.e., \\\sum\_{i = s}^t \nabla l(z_i, \theta)\\.
+  Like `cost`, this may also be a compiled function passed as an
+  `externalptr` matching
+  `arma::colvec cost_gradient(arma::mat const& data, arma::colvec const& theta)`,
+  wrapped via `Rcpp::XPtr` and tagged `"fastcpd_cost_gradient"`.
 
 - cost_hessian:
 
@@ -143,7 +167,10 @@ fastcpd(
   similar to the format used in the `cost` function, and the second
   being the parameter that needs to be optimized. The gradient function
   returns the Hessian of the loss function, i.e., \\\sum\_{i = s}^t
-  \nabla^2 l(z_i, \theta)\\.
+  \nabla^2 l(z_i, \theta)\\. Like `cost`, this may also be a compiled
+  function passed as an `externalptr` matching
+  `arma::mat cost_hessian(arma::mat const& data, arma::colvec const& theta)`,
+  wrapped via `Rcpp::XPtr` and tagged `"fastcpd_cost_hessian"`.
 
 - line_search:
 
@@ -640,5 +667,86 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
 #> [48,] -0.02641484  .          .         .          
 #> [49,]  .           .          .         .          
 #> [50,]  .           .          .         .          
+# }
+# \donttest{
+if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
+  # Three equivalent mean-change detectors: built-in "mean" family (fully
+  # compiled), a custom R closure, and a compiled Rcpp::XPtr cost function.
+  # All three detect the same change point; the XPtr eliminates the per-
+  # candidate R call overhead that the R closure incurs in the hot loop.
+  set.seed(1)
+  data <- matrix(c(rnorm(500, 0), rnorm(500, 5)))
+  beta_val <- (ncol(data) + 1) * log(nrow(data)) / 2
+
+  result_builtin <- fastcpd.mean(
+    data, beta = beta_val, cost_adjustment = NULL, r.progress = FALSE
+  )
+
+  cost_r <- function(data) sum((data - mean(data))^2) / 2
+  time_r <- system.time(
+    result_r <- fastcpd(
+      ~ . - 1, data.frame(x = data), family = "custom",
+      cost = cost_r, beta = beta_val, cost_adjustment = NULL,
+      r.progress = FALSE
+    )
+  )
+
+  compiled_env <- new.env()
+  Rcpp::sourceCpp(
+    code = '
+      // [[Rcpp::depends(RcppArmadillo)]]
+      #include <RcppArmadillo.h>
+      // PELT-style cost: one argument, data only (no theta).
+      // Tag the XPtr with "fastcpd_cost_pelt" and set
+      // attr(xptr, "fastcpd_cost_arity") <- 1L on the R side.
+      typedef double (*CostPeltFnPtr)(arma::mat const&);
+
+      double mean_cost(arma::mat const& data) {
+        arma::rowvec const seg_mean = arma::mean(data, 0);
+        return arma::accu(arma::square(data.each_row() - seg_mean)) / 2.0;
+      }
+
+      // [[Rcpp::export]]
+      SEXP make_mean_cost_xptr() {
+        Rcpp::XPtr<CostPeltFnPtr> xptr(
+            new CostPeltFnPtr(&mean_cost), true,
+            Rcpp::wrap("fastcpd_cost_pelt"));
+        return xptr;
+      }
+    ',
+    env = compiled_env
+  )
+  cost_xptr <- compiled_env$make_mean_cost_xptr()
+  attr(cost_xptr, "fastcpd_cost_arity") <- 1L
+  time_xptr <- system.time(
+    result_xptr <- fastcpd(
+      ~ . - 1, data.frame(x = data), family = "custom",
+      cost = cost_xptr, beta = beta_val, cost_adjustment = NULL,
+      r.progress = FALSE
+    )
+  )
+
+  stopifnot(
+    identical(result_r@cp_set, result_builtin@cp_set),
+    identical(result_xptr@cp_set, result_builtin@cp_set)
+  )
+  cat("R closure: ", time_r["elapsed"], "s\n")
+  cat("XPtr:      ", time_xptr["elapsed"], "s\n")
+  summary(result_xptr)
+}
+#> R closure:  2.059 s
+#> XPtr:       0.105 s
+#> 
+#> Call:
+#> fastcpd(formula = ~. - 1, data = data.frame(x = data), beta = beta_val, 
+#>     cost_adjustment = NULL, family = "custom", cost = cost_xptr, 
+#>     r.progress = FALSE)
+#> 
+#> Change points:
+#> 500 
+#> 
+#> Parameters:
+#> [1] segment 1 segment 2
+#> <0 rows> (or 0-length row.names)
 # }
 ```

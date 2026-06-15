@@ -9,7 +9,7 @@ parameters and returns a fastcpd object."><meta property="og:image" content="htt
 
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -171,7 +171,26 @@ In the second format, the loss function
 \(\sum_{i = s}^t l(z_i, \theta)\) is
 provided, which has to be optimized over the parameter \(\theta\) to
 obtain the cost value. A detailed discussion about the custom cost function
-usage can be found in the references.</p></dd>
+usage can be found in the references.</p>
+<p><strong>Compiled cost functions.</strong> For performance-sensitive use cases,
+<code>cost</code> (as well as <code>cost_gradient</code> and <code>cost_hessian</code>) may
+instead be a pre-compiled C++ function passed as an external pointer
+(<code>externalptr</code>), avoiding R-call overhead in the hot loop. Build one
+with <code>Rcpp::XPtr</code>: write a function matching one of
+<code>double cost(arma::mat const&amp; data)</code> (PELT-style, format one above) or
+<code>double cost(arma::mat const&amp; data, arma::colvec const&amp; theta)</code>
+(SeGD-style, format two above), take its address, and wrap it as
+<code>xptr &lt;- Rcpp::XPtr&lt;FnPtr&gt;(new FnPtr(&amp;your_cost), TRUE,
+Rcpp::wrap("fastcpd_cost_pelt"))</code> (or <code>"fastcpd_cost_sen"</code> for the
+two-argument form) – the tag string is required and checked at runtime.
+Since external pointers carry no <code>formals</code>, also set
+<code>attr(xptr, "fastcpd_cost_arity") &lt;- 1L</code> (or <code>2L</code> for the
+two-argument form) so <code>fastcpd()</code> can route it like an R closure of the
+same arity. Pass <code>xptr</code> as <code>cost</code> exactly as you would an R
+closure. A compiled <code>cost</code> cannot be combined with
+<code>cost_gradient</code> / <code>cost_hessian</code> (those drive an R-level
+<code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">stats::optim</a></code> warm start that requires an R closure for <code>cost</code>).
+See the custom model vignette for a complete worked example.</p></dd>
 
 
 <dt id="arg-cost-gradient">cost_gradient<a class="anchor" aria-label="anchor" href="#arg-cost-gradient"></a></dt>
@@ -185,7 +204,11 @@ a segment of the data, similar to the format used in the <code>cost</code>
 function, and the second being the parameter that needs to be optimized.
 The gradient function returns the value of the gradient of the loss function,
 i.e.,
-\(\sum_{i = s}^t \nabla l(z_i, \theta)\).</p></dd>
+\(\sum_{i = s}^t \nabla l(z_i, \theta)\).
+Like <code>cost</code>, this may also be a compiled function passed as an
+<code>externalptr</code> matching
+<code>arma::colvec cost_gradient(arma::mat const&amp; data, arma::colvec const&amp; theta)</code>,
+wrapped via <code>Rcpp::XPtr</code> and tagged <code>"fastcpd_cost_gradient"</code>.</p></dd>
 
 
 <dt id="arg-cost-hessian">cost_hessian<a class="anchor" aria-label="anchor" href="#arg-cost-hessian"></a></dt>
@@ -194,7 +217,11 @@ takes two inputs, the first being a matrix representing a segment of the
 data, similar to the format used in the <code>cost</code> function, and the second
 being the parameter that needs to be optimized. The gradient function returns
 the Hessian of the loss function, i.e.,
-\(\sum_{i = s}^t \nabla^2 l(z_i, \theta)\).</p></dd>
+\(\sum_{i = s}^t \nabla^2 l(z_i, \theta)\).
+Like <code>cost</code>, this may also be a compiled function passed as an
+<code>externalptr</code> matching
+<code>arma::mat cost_hessian(arma::mat const&amp; data, arma::colvec const&amp; theta)</code>,
+wrapped via <code>Rcpp::XPtr</code> and tagged <code>"fastcpd_cost_hessian"</code>.</p></dd>
 
 
 <dt id="arg-line-search">line_search<a class="anchor" aria-label="anchor" href="#arg-line-search"></a></dt>
@@ -346,7 +373,7 @@ responses.</p></li>
 
 
 <p>Xingchi Li, Xianyang Zhang (2026). “fastcpd: Fast Change Point Detection
-in R.” <em>Journal of Statistical Software</em>, <b>116</b>(6), 1–53.
+in R.” <em>Journal of Statistical Software</em>, <strong>116</strong>(6), 1–53.
 <a href="https://doi.org/10.18637/jss.v116.i06" class="external-link">doi:10.18637/jss.v116.i06</a>
 .</p>
 <p>Xingchi Li, Xianyang Zhang (2024). “fastcpd: Fast Change Point Detection
@@ -686,6 +713,87 @@ volume 206 series Proceedings of Machine Learning Research, 1129-1143.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [48,] -0.02641484  .          .         .          </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [49,]  .           .          .         .          </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [50,]  .           .          .         .          </span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"RcppArmadillo"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co"># Three equivalent mean-change detectors: built-in "mean" family (fully</span></span></span>
+<span class="r-in"><span>  <span class="co"># compiled), a custom R closure, and a compiled Rcpp::XPtr cost function.</span></span></span>
+<span class="r-in"><span>  <span class="co"># All three detect the same change point; the XPtr eliminates the per-</span></span></span>
+<span class="r-in"><span>  <span class="co"># candidate R call overhead that the R closure incurs in the hot loop.</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">500</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">500</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">beta_val</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">result_builtin</span> <span class="op">&lt;-</span> <span class="fu"><a href="fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">data</span>, beta <span class="op">=</span> <span class="va">beta_val</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">cost_r</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">data</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span>  <span class="va">time_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">result_r</span> <span class="op">&lt;-</span> <span class="fu">fastcpd</span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">data</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"custom"</span>,</span></span>
+<span class="r-in"><span>      cost <span class="op">=</span> <span class="va">cost_r</span>, beta <span class="op">=</span> <span class="va">beta_val</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>      r.progress <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">compiled_env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">Rcpp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/sourceCpp.html" class="external-link">sourceCpp</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    code <span class="op">=</span> <span class="st">'</span></span></span>
+<span class="r-in"><span><span class="st">      // [[Rcpp::depends(RcppArmadillo)]]</span></span></span>
+<span class="r-in"><span><span class="st">      #include &lt;RcppArmadillo.h&gt;</span></span></span>
+<span class="r-in"><span><span class="st">      // PELT-style cost: one argument, data only (no theta).</span></span></span>
+<span class="r-in"><span><span class="st">      // Tag the XPtr with "fastcpd_cost_pelt" and set</span></span></span>
+<span class="r-in"><span><span class="st">      // attr(xptr, "fastcpd_cost_arity") &lt;- 1L on the R side.</span></span></span>
+<span class="r-in"><span><span class="st">      typedef double (*CostPeltFnPtr)(arma::mat const&amp;);</span></span></span>
+<span class="r-in"><span><span class="st"></span></span></span>
+<span class="r-in"><span><span class="st">      double mean_cost(arma::mat const&amp; data) {</span></span></span>
+<span class="r-in"><span><span class="st">        arma::rowvec const seg_mean = arma::mean(data, 0);</span></span></span>
+<span class="r-in"><span><span class="st">        return arma::accu(arma::square(data.each_row() - seg_mean)) / 2.0;</span></span></span>
+<span class="r-in"><span><span class="st">      }</span></span></span>
+<span class="r-in"><span><span class="st"></span></span></span>
+<span class="r-in"><span><span class="st">      // [[Rcpp::export]]</span></span></span>
+<span class="r-in"><span><span class="st">      SEXP make_mean_cost_xptr() {</span></span></span>
+<span class="r-in"><span><span class="st">        Rcpp::XPtr&lt;CostPeltFnPtr&gt; xptr(</span></span></span>
+<span class="r-in"><span><span class="st">            new CostPeltFnPtr(&amp;mean_cost), true,</span></span></span>
+<span class="r-in"><span><span class="st">            Rcpp::wrap("fastcpd_cost_pelt"));</span></span></span>
+<span class="r-in"><span><span class="st">        return xptr;</span></span></span>
+<span class="r-in"><span><span class="st">      }</span></span></span>
+<span class="r-in"><span><span class="st">    '</span>,</span></span>
+<span class="r-in"><span>    env <span class="op">=</span> <span class="va">compiled_env</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">cost_xptr</span> <span class="op">&lt;-</span> <span class="va">compiled_env</span><span class="op">$</span><span class="fu">make_mean_cost_xptr</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">cost_xptr</span>, <span class="st">"fastcpd_cost_arity"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1L</span></span></span>
+<span class="r-in"><span>  <span class="va">time_xptr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">result_xptr</span> <span class="op">&lt;-</span> <span class="fu">fastcpd</span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">data</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"custom"</span>,</span></span>
+<span class="r-in"><span>      cost <span class="op">=</span> <span class="va">cost_xptr</span>, beta <span class="op">=</span> <span class="va">beta_val</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>      r.progress <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">result_r</span><span class="op">@</span><span class="va">cp_set</span>, <span class="va">result_builtin</span><span class="op">@</span><span class="va">cp_set</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">result_xptr</span><span class="op">@</span><span class="va">cp_set</span>, <span class="va">result_builtin</span><span class="op">@</span><span class="va">cp_set</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"R closure: "</span>, <span class="va">time_r</span><span class="op">[</span><span class="st">"elapsed"</span><span class="op">]</span>, <span class="st">"s\n"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"XPtr:      "</span>, <span class="va">time_xptr</span><span class="op">[</span><span class="st">"elapsed"</span><span class="op">]</span>, <span class="st">"s\n"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_xptr</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> R closure:  2.059 s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> XPtr:       0.105 s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = ~. - 1, data = data.frame(x = data), beta = beta_val, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     cost_adjustment = NULL, family = "custom", cost = cost_xptr, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     r.progress = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 500 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] segment 1 segment 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;0 rows&gt; (or 0-length row.names)</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
