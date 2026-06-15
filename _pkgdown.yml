@@ -47,6 +47,7 @@ reference:
       Used for data without response variables, for example, mean change and
       variance change.
     contents:
+      - fastcpd.exponential
       - fastcpd.mean
       - fastcpd.variance
       - fastcpd.meanvariance
