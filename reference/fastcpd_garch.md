@@ -79,6 +79,7 @@ summary(result)
 plot(result)
 
 # }
+# \donttest{
 set.seed(1)
 n <- 200
 sigma_2 <- rep(1, n + 1)
@@ -112,6 +113,8 @@ summary(result)
 #> 3 0.5651263 0.04133033
 plot(result)
 
+# }
+# \donttest{
 set.seed(1)
 n <- 300
 sigma_2 <- rep(1, n + 1)
@@ -144,4 +147,6 @@ summary(result)
 #> 2 0.1830536 0.09268943
 #> 3 0.5651263 0.00000000
 plot(result)
+
+# }
 ```
