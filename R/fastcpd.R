@@ -685,8 +685,8 @@ fastcpd.binomial <- fastcpd_binomial  # nolint: Conventional R function style
 #' except that the data is by default a one-column matrix or univariate vector
 #' and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_garch.txt
-#' @example tests/testthat/examples/fastcpd_garch_2.R
-#' @example tests/testthat/examples/fastcpd_garch_3.R
+#' @example tests/testthat/examples/fastcpd_garch_2.txt
+#' @example tests/testthat/examples/fastcpd_garch_3.txt
 #' @seealso [fastcpd()]
 #'
 #' @md
