@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,11 +42,18 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.svg" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/doccstat/fastcpd/blob/v1.0.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/doccstat/fastcpd/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.0.0" id="fastcpd-100">fastcpd 1.0.0<a class="anchor" aria-label="anchor" href="#fastcpd-100"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.0.1" id="fastcpd-101">fastcpd 1.0.1<a class="anchor" aria-label="anchor" href="#fastcpd-101"></a></h2>
+<ul><li>Add <code>exponential</code> family to Python package (<code>fastcpd.segmentation.exponential</code>).</li>
+<li>Fix Bazel build for Python CI: add missing <code>fastcpd_optim.h</code> and <code>families/exponential.h</code> to <code>hdrs</code> in <code>src/BUILD.bazel</code>.</li>
+<li>Improve README benchmark methodology: use subprocess isolation via <code><a href="https://callr.r-lib.org/reference/r.html" class="external-link">callr::r()</a></code> inside <code>microbenchmark</code> with baseline subtraction for fair large-scale (n = 10^8) algorithm comparison.</li>
+<li>Skip slow tests during coverage runs to prevent CI timeout.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.0" id="fastcpd-100">fastcpd 1.0.0<a class="anchor" aria-label="anchor" href="#fastcpd-100"></a></h2><p class="text-muted">CRAN release: 2026-06-16</p>
 <ul><li>Add <code>exponential</code> family (<code>fastcpd_exponential</code> / <code>fastcpd.exponential</code>) for piecewise-constant rate change detection in exponentially distributed data.</li>
 <li>Add support for compiled C++ cost functions via <code>Rcpp::XPtr</code> in <code>family = "custom"</code>, eliminating R-call overhead in the hot PELT/SeGD loop. All three parameters (<code>cost</code>, <code>cost_gradient</code>, <code>cost_hessian</code>) accept tagged external pointers alongside R closures; arity is conveyed via <code>attr(xptr, "fastcpd_cost_arity")</code>.</li>
 <li>Remove bundled third-party source files (<code>ref_fastglm_*</code>, <code>ref_tseries*</code>); GLM and GARCH fitting now uses internal implementations (<code>FitGlm</code>, <code>FitGarch</code>) with no external source copies.</li>
