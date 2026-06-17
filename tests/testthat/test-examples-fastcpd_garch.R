@@ -1,5 +1,6 @@
 testthat::test_that(
   "examples/fastcpd_garch.txt", {
+    testthat::skip_if(Sys.getenv("R_COVR") == "true", "slow GARCH example: skip during coverage")
     testthat::skip_if_not_installed("ggplot2")
 
     examples_garch <- readLines("examples/fastcpd_garch.txt")

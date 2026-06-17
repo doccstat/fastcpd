@@ -112,17 +112,50 @@ library(microbenchmark)
 set.seed(1)
 n <- 10^8
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-system.time(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1))
-system.time(mosum::mosum(c(mean_data), G = 40))
-system.time(fpop::Fpop(mean_data, 2 * log(n)))
-system.time(changepoint::cpt.mean(mean_data, method = "PELT"))
-ggplot2::autoplot(microbenchmark(
-  changepoint = changepoint::cpt.mean(mean_data, method = "PELT"),
-  fpop = fpop::Fpop(mean_data, 2 * log(n)),
-  mosum = mosum::mosum(c(mean_data), G = 40),
-  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1),
-  times = 10
-))
+run_isolated <- function(expr) {
+  callr::r(function(e, n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    system.time(eval(e))
+  }, args = list(e = substitute(expr), n = n))
+}
+print(run_isolated(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)))
+print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
+print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
+print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
+mb_result <- microbenchmark(
+  baseline = callr::r(function(n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+  }, args = list(n = n)),
+  changepoint = callr::r(function(n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    changepoint::cpt.mean(mean_data, method = "PELT")
+  }, args = list(n = n)),
+  fpop = callr::r(function(n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    fpop::Fpop(mean_data, 2 * log(n))
+  }, args = list(n = n)),
+  mosum = callr::r(function(n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    mosum::mosum(c(mean_data), G = 40)
+  }, args = list(n = n)),
+  fastcpd = callr::r(function(n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)
+  }, args = list(n = n)),
+  times = 5
+)
+baseline_median <- median(mb_result$time[mb_result$expr == "baseline"])
+mb_net <- mb_result[mb_result$expr != "baseline", ]
+mb_net$time <- mb_net$time - baseline_median
+mb_net$expr <- droplevels(mb_net$expr)
+class(mb_net) <- class(mb_result)
+ggplot2::autoplot(mb_net)
 ```
 
 ## Cheatsheet
