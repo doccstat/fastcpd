@@ -1,5 +1,9 @@
 ## Updates since last CRAN release (1.0.0)
 
+### fastcpd 1.0.2
+
+*   Use a fairer comparison in README.
+
 ### fastcpd 1.0.1
 
 *   Add `exponential` family to Python package (`fastcpd.segmentation.exponential`).

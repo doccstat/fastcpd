@@ -102,35 +102,6 @@ fastcpd.variance_estimation.mean(data)
 ### Comparison
 
 ``` r
-library(microbenchmark)
-set.seed(1)
-n <- 5 * 10^6
-mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-ggplot2::autoplot(microbenchmark(
-  not = not::not(mean_data, contrast = "pcwsConstMean"),
-  changepoint = changepoint::cpt.mean(mean_data, method = "PELT"),
-  jointseg = jointseg::jointSeg(mean_data, K = 12),
-  fpop = fpop::Fpop(mean_data, 2 * log(n)),
-  mosum = mosum::mosum(c(mean_data), G = 40),
-  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1),
-  times = 10
-))
-#> Warning: no DISPLAY variable so Tk is not available
-#> Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
-#> ℹ Please use tidy evaluation idioms with `aes()`.
-#> ℹ See also `vignette("ggplot2-in-packages")` for more information.
-#> ℹ The deprecated feature was likely used in the microbenchmark package.
-#>   Please report the issue at
-#>   <https://github.com/joshuaulrich/microbenchmark/issues/>.
-#> This warning is displayed once per session.
-#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-#> generated.
-```
-
-![](man/figures/README-time-comparison-small-1.png)<!-- -->
-
-``` r
-library(microbenchmark)
 set.seed(1)
 n <- 10^8
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
@@ -143,16 +114,20 @@ run_isolated <- function(expr) {
 }
 print(run_isolated(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)))
 #>    user  system elapsed 
-#>   9.492   6.798  15.957
+#>   9.497   6.734  15.928
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 #>    user  system elapsed 
-#>   9.086   6.671  15.763
+#>   9.145   6.797  16.007
 print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 #>    user  system elapsed 
-#>  44.762   2.641  47.437
+#>  44.749   2.635  47.486
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
 #>    user  system elapsed 
-#>  31.272   6.148  37.430
+#>  31.332   6.178  37.555
+```
+
+``` r
+library(microbenchmark)
 mb_result <- microbenchmark(
   baseline = callr::r(function(n) {
     set.seed(1)
@@ -186,9 +161,18 @@ mb_net$time <- mb_net$time - baseline_median
 mb_net$expr <- droplevels(mb_net$expr)
 class(mb_net) <- class(mb_result)
 ggplot2::autoplot(mb_net)
+#> Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+#> ℹ Please use tidy evaluation idioms with `aes()`.
+#> ℹ See also `vignette("ggplot2-in-packages")` for more information.
+#> ℹ The deprecated feature was likely used in the microbenchmark package.
+#>   Please report the issue at
+#>   <https://github.com/joshuaulrich/microbenchmark/issues/>.
+#> This warning is displayed once per session.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+#> generated.
 ```
 
-![](man/figures/README-time-comparison-large-1.png)<!-- -->
+![](man/figures/README-time-comparison-microbenchmark-1.png)<!-- -->
 
 ## Cheatsheet
 

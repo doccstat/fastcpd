@@ -91,24 +91,7 @@ fastcpd.variance_estimation.mean(data)
 
 ### Comparison
 
-```{r time-comparison-small}
-library(microbenchmark)
-set.seed(1)
-n <- 5 * 10^6
-mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-ggplot2::autoplot(microbenchmark(
-  not = not::not(mean_data, contrast = "pcwsConstMean"),
-  changepoint = changepoint::cpt.mean(mean_data, method = "PELT"),
-  jointseg = jointseg::jointSeg(mean_data, K = 12),
-  fpop = fpop::Fpop(mean_data, 2 * log(n)),
-  mosum = mosum::mosum(c(mean_data), G = 40),
-  fastcpd = fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1),
-  times = 10
-))
-```
-
-```{r time-comparison-large}
-library(microbenchmark)
+```{r time-comparison-single}
 set.seed(1)
 n <- 10^8
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
@@ -123,6 +106,9 @@ print(run_isolated(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only 
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
+```
+```{r time-comparison-microbenchmark}
+library(microbenchmark)
 mb_result <- microbenchmark(
   baseline = callr::r(function(n) {
     set.seed(1)
