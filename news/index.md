@@ -1,5 +1,9 @@
 # Changelog
 
+## fastcpd 1.0.2
+
+- Use a fairer comparison in README.
+
 ## fastcpd 1.0.1
 
 - Add `exponential` family to Python package

@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -163,33 +163,7 @@ pip install fastcpd</code></pre>
 <h3 id="comparison">Comparison<a class="anchor" aria-label="anchor" href="#comparison"></a>
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/joshuaulrich/microbenchmark/" class="external-link">microbenchmark</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="op">*</span> <span class="fl">10</span><span class="op">^</span><span class="fl">6</span></span>
-<span><span class="va">mean_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2</span>, <span class="fl">50</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="fu">microbenchmark</span><span class="op">(</span></span>
-<span>  not <span class="op">=</span> <span class="fu">not</span><span class="fu">::</span><span class="fu">not</span><span class="op">(</span><span class="va">mean_data</span>, contrast <span class="op">=</span> <span class="st">"pcwsConstMean"</span><span class="op">)</span>,</span>
-<span>  changepoint <span class="op">=</span> <span class="fu">changepoint</span><span class="fu">::</span><span class="fu">cpt.mean</span><span class="op">(</span><span class="va">mean_data</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span>,</span>
-<span>  jointseg <span class="op">=</span> <span class="fu">jointseg</span><span class="fu">::</span><span class="fu">jointSeg</span><span class="op">(</span><span class="va">mean_data</span>, K <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>,</span>
-<span>  fpop <span class="op">=</span> <span class="fu">fpop</span><span class="fu">::</span><span class="fu">Fpop</span><span class="op">(</span><span class="va">mean_data</span>, <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  mosum <span class="op">=</span> <span class="fu">mosum</span><span class="fu">::</span><span class="fu">mosum</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>,</span>
-<span>  fastcpd <span class="op">=</span> <span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span>, variance_estimation <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  times <span class="op">=</span> <span class="fl">10</span></span>
-<span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: no DISPLAY variable so Tk is not available</span></span>
-<span><span class="co">#&gt; Warning: `aes_string()` was deprecated in ggplot2 3.0.0.</span></span>
-<span><span class="co">#&gt; ℹ Please use tidy evaluation idioms with `aes()`.</span></span>
-<span><span class="co">#&gt; ℹ See also `vignette("ggplot2-in-packages")` for more information.</span></span>
-<span><span class="co">#&gt; ℹ The deprecated feature was likely used in the microbenchmark package.</span></span>
-<span><span class="co">#&gt;   Please report the issue at</span></span>
-<span><span class="co">#&gt;   &lt;https://github.com/joshuaulrich/microbenchmark/issues/&gt;.</span></span>
-<span><span class="co">#&gt; This warning is displayed once per session.</span></span>
-<span><span class="co">#&gt; Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span>
-<span><span class="co">#&gt; generated.</span></span></code></pre></div>
-<p><img src="reference/figures/README-time-comparison-small-1.png"><!-- --></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/joshuaulrich/microbenchmark/" class="external-link">microbenchmark</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10</span><span class="op">^</span><span class="fl">8</span></span>
 <span><span class="va">mean_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2</span>, <span class="fl">50</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">run_isolated</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">expr</span><span class="op">)</span> <span class="op">{</span></span>
@@ -201,16 +175,18 @@ pip install fastcpd</code></pre>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">run_isolated</span><span class="op">(</span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span>, variance_estimation <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   9.492   6.798  15.957</span></span>
+<span><span class="co">#&gt;   9.497   6.734  15.928</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">run_isolated</span><span class="op">(</span><span class="fu">mosum</span><span class="fu">::</span><span class="fu">mosum</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   9.086   6.671  15.763</span></span>
+<span><span class="co">#&gt;   9.145   6.797  16.007</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">run_isolated</span><span class="op">(</span><span class="fu">fpop</span><span class="fu">::</span><span class="fu">Fpop</span><span class="op">(</span><span class="va">mean_data</span>, <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  44.762   2.641  47.437</span></span>
+<span><span class="co">#&gt;  44.749   2.635  47.486</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">run_isolated</span><span class="op">(</span><span class="fu">changepoint</span><span class="fu">::</span><span class="fu">cpt.mean</span><span class="op">(</span><span class="va">mean_data</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  31.272   6.148  37.430</span></span>
+<span><span class="co">#&gt;  31.332   6.178  37.555</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/joshuaulrich/microbenchmark/" class="external-link">microbenchmark</a></span><span class="op">)</span></span>
 <span><span class="va">mb_result</span> <span class="op">&lt;-</span> <span class="fu">microbenchmark</span><span class="op">(</span></span>
 <span>  baseline <span class="op">=</span> <span class="fu">callr</span><span class="fu">::</span><span class="fu"><a href="https://callr.r-lib.org/reference/r.html" class="external-link">r</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
@@ -243,8 +219,17 @@ pip install fastcpd</code></pre>
 <span><span class="va">mb_net</span><span class="op">$</span><span class="va">time</span> <span class="op">&lt;-</span> <span class="va">mb_net</span><span class="op">$</span><span class="va">time</span> <span class="op">-</span> <span class="va">baseline_median</span></span>
 <span><span class="va">mb_net</span><span class="op">$</span><span class="va">expr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/droplevels.html" class="external-link">droplevels</a></span><span class="op">(</span><span class="va">mb_net</span><span class="op">$</span><span class="va">expr</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">mb_net</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">mb_result</span><span class="op">)</span></span>
-<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">mb_net</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-time-comparison-large-1.png"><!-- --></p>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">mb_net</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: `aes_string()` was deprecated in ggplot2 3.0.0.</span></span>
+<span><span class="co">#&gt; ℹ Please use tidy evaluation idioms with `aes()`.</span></span>
+<span><span class="co">#&gt; ℹ See also `vignette("ggplot2-in-packages")` for more information.</span></span>
+<span><span class="co">#&gt; ℹ The deprecated feature was likely used in the microbenchmark package.</span></span>
+<span><span class="co">#&gt;   Please report the issue at</span></span>
+<span><span class="co">#&gt;   &lt;https://github.com/joshuaulrich/microbenchmark/issues/&gt;.</span></span>
+<span><span class="co">#&gt; This warning is displayed once per session.</span></span>
+<span><span class="co">#&gt; Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span>
+<span><span class="co">#&gt; generated.</span></span></code></pre></div>
+<p><img src="reference/figures/README-time-comparison-microbenchmark-1.png"><!-- --></p>
 </div>
 </div>
 <div class="section level2">
