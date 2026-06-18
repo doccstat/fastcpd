@@ -65,7 +65,7 @@ summary(result)
 #> 204 
 #> 
 #> Cost values:
-#> 583.9159 306.6093 
+#> 583.9066 306.5838 
 #> 
 #> Parameters:
 #>    segment 1  segment 2

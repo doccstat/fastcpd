@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,15 @@
       <small>Source: <a href="https://github.com/doccstat/fastcpd/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.4" id="fastcpd-104">fastcpd 1.0.4<a class="anchor" aria-label="anchor" href="#fastcpd-104"></a></h2>
+<ul><li>Update macOS CI runner from deprecated <code>macos-13</code> to <code>macos-latest</code>.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.3" id="fastcpd-103">fastcpd 1.0.3<a class="anchor" aria-label="anchor" href="#fastcpd-103"></a></h2>
+<ul><li>Remove <code>glmnet</code> and <code>Matrix</code> from <code>Imports</code>; lasso fitting now uses a pure C++ coordinate descent implementation with 5-fold cross-validation for lambda selection, eliminating two heavy runtime dependencies.</li>
+<li>Replace <code><a href="https://rdrr.io/pkg/Matrix/man/nearPD.html" class="external-link">Matrix::nearPD()</a></code> with a pure-R eigendecomposition-based nearest positive-definite projection (<code>nearest_pd_</code>).</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.2" id="fastcpd-102">fastcpd 1.0.2<a class="anchor" aria-label="anchor" href="#fastcpd-102"></a></h2>
 <ul><li>Use a fairer comparison in README.</li>

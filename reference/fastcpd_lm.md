@@ -96,7 +96,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
 #> 350 
 #> 
 #> Cost values:
-#> 1431.408 1019.454 
+#> 1431.421 1019.442 
 #> 
 #> Parameters:
 #>   segment 1   segment 2
