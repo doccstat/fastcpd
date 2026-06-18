@@ -1,3 +1,11 @@
+# fastcpd 1.0.3
+
+*   Remove `glmnet` and `Matrix` from `Imports`; lasso fitting now uses a
+    pure C++ coordinate descent implementation with 5-fold cross-validation
+    for lambda selection, eliminating two heavy runtime dependencies.
+*   Replace `Matrix::nearPD()` with a pure-R eigendecomposition-based
+    nearest positive-definite projection (`nearest_pd_`).
+
 # fastcpd 1.0.2
 
 *   Use a fairer comparison in README.

@@ -59,7 +59,7 @@ testthat::test_that("penalized linear regression", {
 
   testthat::expect_equal(
     change_points_lasso_fastcpd,
-    c(100, 300, 520, 800, 901)
+    c(101, 300, 507, 800, 901)
   )
 
   change_points_lasso_fastcpd_vanilla <- fastcpd.lasso(
@@ -73,7 +73,7 @@ testthat::test_that("penalized linear regression", {
 
   testthat::expect_equal(
     change_points_lasso_fastcpd_vanilla,
-    c(103, 299, 510, 800, 900)
+    c(103, 299, 519, 800, 900)
   )
 })
 

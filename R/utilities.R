@@ -175,6 +175,15 @@ get_pruning_coef <- function(
   pruning_coef
 }
 
+# Nearest positive definite matrix via eigendecomposition.
+# Clips negative eigenvalues to .Machine$double.eps.
+nearest_pd_ <- function(x) {
+  eig <- eigen(x, symmetric = TRUE)
+  eig$vectors %*%
+    diag(pmax(eig$values, .Machine$double.eps), length(eig$values)) %*%
+    t(eig$vectors)
+}
+
 get_p_response <- function(family, y, data) {
   if (family %in% c(
     "mean", "variance", "meanvariance", "arma", "arima", "garch"

@@ -56,9 +56,8 @@ testthat::test_that(
         "9.5 10.5 ",
         "",
         "Parameters:",
-        "1 x 2 sparse Matrix of class \"dgCMatrix\"",
-        "     segment 1 segment 2",
-        "[1,]         1         2"
+        "  segment 1 segment 2",
+        "1         1         2"
       )
     )
 

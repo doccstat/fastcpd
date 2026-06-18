@@ -1,7 +1,7 @@
 Type: Package
 Package: fastcpd
 Title: Fast Change Point Detection via Sequential Gradient Descent
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: c(
     person("Xingchi", "Li", , "anthony.li.stat.tamu.edu@lixingchi.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0006-2493-0853")),
@@ -19,8 +19,6 @@ BugReports: https://github.com/doccstat/fastcpd/issues
 Depends:
     R (>= 2.10)
 Imports:
-    glmnet,
-    Matrix,
     methods,
     Rcpp (>= 0.11.0),
     stats

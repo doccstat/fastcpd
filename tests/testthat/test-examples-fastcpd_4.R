@@ -8,7 +8,7 @@ testthat::test_that(
       collapse = "\n"
     )))
 
-    testthat::expect_equal(result_no_vp@cp_set, c(79, 202, 325))
-    testthat::expect_equal(result_20_vp@cp_set, c(80, 202, 325))
+    testthat::expect_equal(result_no_vp@cp_set, c(79, 202, 321))
+    testthat::expect_equal(result_20_vp@cp_set, c(80, 202, 321))
   }
 )
