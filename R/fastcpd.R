@@ -236,7 +236,6 @@
 #' [summary.fastcpd()] for summarizing the results.
 #'
 #' @md
-#' @importFrom glmnet glmnet cv.glmnet predict.glmnet
 #' @importFrom methods show
 #' @importFrom Rcpp evalCpp
 #' @export
@@ -425,7 +424,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   } else if (family == "mean") {
     variance.mean(data_)
   } else if (family == "var" || family == "lm" && p_response > 1) {
-    as.matrix(Matrix::nearPD(variance.lm(data_, p_response))$mat)
+    nearest_pd_(variance.lm(data_, p_response))
   } else if (family == "lm" || family == "ar") {
     as.matrix(variance.lm(data_))
   } else {

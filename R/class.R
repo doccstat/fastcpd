@@ -264,7 +264,7 @@ summary.fastcpd <- function(object, ...) {
       if (object@family != "lasso") {
         print(object@thetas)
       } else {
-        print(Matrix::Matrix(as.matrix(object@thetas), sparse = TRUE))
+        print(object@thetas)
       }
     }
   } else {
