@@ -1,3 +1,7 @@
+# fastcpd 1.0.4
+
+*   Update macOS CI runner from deprecated `macos-13` to `macos-latest`.
+
 # fastcpd 1.0.3
 
 *   Remove `glmnet` and `Matrix` from `Imports`; lasso fitting now uses a
