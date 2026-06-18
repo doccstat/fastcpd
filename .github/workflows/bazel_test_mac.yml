@@ -10,7 +10,7 @@ on:
 
 jobs:
   test_macos_bazel:
-    runs-on: macos-13
+    runs-on: macos-latest
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, which is the CWD for
@@ -29,7 +29,7 @@ jobs:
     needs: test_macos_bazel
 
     # virtual environments: https://github.com/actions/virtual-environments
-    runs-on: macos-13
+    runs-on: macos-latest
 
     strategy:
       fail-fast: true
