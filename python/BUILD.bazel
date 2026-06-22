@@ -47,7 +47,10 @@ cc_binary(
         "fastcpd_py.h",
         "pybind.cc",
     ],
-    copts = ["-std=c++17"],
+    copts = select({
+        "@platforms//os:windows": ["/std:c++17"],
+        "//conditions:default": ["-std=c++17"],
+    }),
     includes = [
         ".",
     ],
