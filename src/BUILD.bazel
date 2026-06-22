@@ -12,7 +12,7 @@ cc_library(
         "families/variance.h",
     ],
     copts = select({
-        "@platforms//os:windows": ["/std:c++17"],
+        "@platforms//os:windows": ["/std:c++17", "/D_USE_MATH_DEFINES"],
         "//conditions:default": ["-std=c++17"],
     }),
     strip_include_prefix = ".",
