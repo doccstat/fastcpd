@@ -1,5 +1,9 @@
 ## Updates since last CRAN release (1.0.0)
 
+### fastcpd 1.0.5
+
+*   Add favicon.
+
 ### fastcpd 1.0.4
 
 *   Update macOS CI runner from deprecated `macos-13` to `macos-latest`.

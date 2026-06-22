@@ -291,6 +291,5 @@ inst/doc
 vignettes/*.aux
 vignettes/comparison-packages-results.RData
 .vscode/
-pkgdown/favicon/
 CRAN-SUBMISSION
 docs/
