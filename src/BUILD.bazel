@@ -11,9 +11,10 @@ cc_library(
         "families/mgaussian.h",
         "families/variance.h",
     ],
-    copts = [
-        "-std=c++17",
-    ],
+    copts = select({
+        "@platforms//os:windows": ["/std:c++17"],
+        "//conditions:default": ["-std=c++17"],
+    }),
     strip_include_prefix = ".",
     visibility = [
         "//fastcpd/python/cpp:__pkg__",
