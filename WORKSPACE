@@ -124,6 +124,24 @@ http_archive(
     urls = ["https://github.com/abseil/abseil-cpp/releases/download/20250512.0/abseil-cpp-20250512.0.tar.gz"],
 )
 
+# Pre-built OpenBLAS for Windows x64. Provides libopenblas.lib (import lib)
+# and libopenblas.dll for BLAS/LAPACK on MSVC builds.
+http_archive(
+    name = "openblas_windows",
+    build_file_content = """
+cc_library(
+    name = "openblas",
+    hdrs = glob(["include/*.h"]),
+    includes = ["include"],
+    srcs = ["lib/libopenblas.lib"],
+    data = ["bin/libopenblas.dll"],
+    visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "b42a74d1c9c77bdab2cf2688031b9bc4a322ade71c549427f4950d85fd590fca",
+    url = "https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.29/OpenBLAS-0.3.29_x64.zip",
+)
+
 http_archive(
     name = "com_google_protobuf",
     sha256 = "1451b03faec83aed17cdc71671d1bbdfd72e54086b827f5f6fd02bf7a4041b68",
