@@ -2,3 +2,14 @@ common --enable_bzlmod=false
 common --enable_workspace=true
 common --repositories_without_autoloads=bazel_features_version,bazel_features_globals
 common --incompatible_python_disallow_native_rules
+
+# Abseil 20250512+ requires C++17 globally (including its own source files).
+# --enable_platform_specific_config auto-selects the :linux/:macos/:windows
+# config block below based on the host OS, so no --config= flag is needed.
+common --enable_platform_specific_config
+build:linux --cxxopt=-std=c++17 --host_cxxopt=-std=c++17
+build:macos --cxxopt=-std=c++17 --host_cxxopt=-std=c++17
+# MSVC: /std:c++17 sets the standard; /Zc:__cplusplus makes __cplusplus reflect
+# it (otherwise MSVC reports 199711L and abseil's policy_checks.h fires).
+build:windows --cxxopt=/std:c++17 --host_cxxopt=/std:c++17
+build:windows --cxxopt=/Zc:__cplusplus --host_cxxopt=/Zc:__cplusplus
