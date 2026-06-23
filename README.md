@@ -114,24 +114,30 @@ run_isolated <- function(expr) {
 }
 print(run_isolated(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)))
 #>    user  system elapsed 
-#>   9.497   6.734  15.928
+#>   8.485   6.322  14.506
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 #>    user  system elapsed 
-#>   9.145   6.797  16.007
+#>   9.050   6.812  15.966
 print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 #>    user  system elapsed 
-#>  44.749   2.635  47.486
+#>  45.515   2.721  48.380
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
 #>    user  system elapsed 
-#>  31.332   6.178  37.555
+#>  31.375   6.170  37.641
 ```
 
 ``` r
-library(microbenchmark)
-mb_result <- microbenchmark(
+benchmark <- function(..., times = 100L) {
+  calls <- as.list(match.call(expand.dots = FALSE)$`...`)
+  nms <- names(calls); envir <- parent.frame()
+  do.call(rbind, lapply(seq_along(calls), function(i)
+    data.frame(expr = factor(nms[i], levels = nms),
+               elapsed_s = replicate(times, system.time(eval(calls[[i]], envir))["elapsed"]))))
+}
+bm <- benchmark(
   baseline = callr::r(function(n) {
     set.seed(1)
-    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
   }, args = list(n = n)),
   changepoint = callr::r(function(n) {
     set.seed(1)
@@ -153,26 +159,20 @@ mb_result <- microbenchmark(
     mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
     fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)
   }, args = list(n = n)),
-  times = 5
+  times = 5L
 )
-baseline_median <- median(mb_result$time[mb_result$expr == "baseline"])
-mb_net <- mb_result[mb_result$expr != "baseline", ]
-mb_net$time <- mb_net$time - baseline_median
-mb_net$expr <- droplevels(mb_net$expr)
-class(mb_net) <- class(mb_result)
-ggplot2::autoplot(mb_net)
-#> Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
-#> ℹ Please use tidy evaluation idioms with `aes()`.
-#> ℹ See also `vignette("ggplot2-in-packages")` for more information.
-#> ℹ The deprecated feature was likely used in the microbenchmark package.
-#>   Please report the issue at
-#>   <https://github.com/joshuaulrich/microbenchmark/issues/>.
-#> This warning is displayed once per session.
-#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-#> generated.
+baseline_overhead <- median(bm$elapsed_s[bm$expr == "baseline"])
+bm_net <- bm[bm$expr != "baseline", ]
+bm_net$elapsed_s <- bm_net$elapsed_s - baseline_overhead
+bm_net$expr <- droplevels(bm_net$expr)
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  print(ggplot2::ggplot(bm_net, ggplot2::aes(x = expr, y = elapsed_s)) +
+    ggplot2::geom_boxplot() + ggplot2::labs(x = NULL, y = "Net algorithm time (s)") +
+    ggplot2::coord_flip())
+}
 ```
 
-![](man/figures/README-time-comparison-microbenchmark-1.png)<!-- -->
+![](man/figures/README-time-comparison-fastbench-1.png)<!-- -->
 
 ## Cheatsheet
 
