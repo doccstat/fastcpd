@@ -6,6 +6,8 @@
 #include <optional>
 #include <string>
 
+#include "absl/base/prefetch.h"
+
 namespace fastcpd {
 namespace classes {
 

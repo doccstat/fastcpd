@@ -1,6 +1,5 @@
 testthat::test_that(
   "examples/data-well_log-quantile.txt", {
-    testthat::skip_if(Sys.getenv("R_COVR") == "true", "slow well_log example: skip during coverage")
     testthat::skip_if_not_installed("ggplot2")
     testthat::skip_if_not_installed("matrixStats")
 
