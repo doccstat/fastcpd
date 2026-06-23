@@ -84,9 +84,7 @@ struct ExponentialFamily : BaseFamily {
 
   template <typename Solver>
   static void PrefetchCandidate(Solver* solver, unsigned int const s) {
-#if defined(__GNUC__) || defined(__clang__)
-    __builtin_prefetch(solver->data_c_ptr_ + s, 0, 1);
-#endif
+    absl::PrefetchToLocalCache(solver->data_c_ptr_ + s);
   }
 };
 
