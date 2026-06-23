@@ -19,7 +19,7 @@
 #include <string>
 #include <tuple>
 #include <unordered_map>
-#include <vector>
+#include "absl/container/inlined_vector.h"
 
 namespace fastcpd {
 namespace classes {
@@ -112,14 +112,12 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
         momentum_coef_(momentum_coef),
         multiple_epochs_function_(multiple_epochs_function),
         objective_function_values_(arma::colvec(data_n_rows_ + 1)),
-        objective_function_values_candidates_(arma::colvec(data_n_rows_ + 1)),
-        objective_function_values_candidates_ptr_(
-            objective_function_values_candidates_.memptr()),
+        objective_function_values_candidates_(2, 0.0),
         order_(order),
         parameters_count_(p),
         parameters_lower_bound_(lower),
         parameters_upper_bound_(upper),
-        pruned_set_(arma::zeros<arma::ucolvec>(data_n_rows_ + 1)),
+        pruned_set_(2, 0u),
         pruning_coefficient_(pruning_coef),
         regression_response_count_(p_response),
 #ifndef NO_RCPP
@@ -193,8 +191,7 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
   double const momentum_coef_;
   std::function<unsigned int(unsigned int)> const multiple_epochs_function_;
   arma::colvec objective_function_values_;
-  arma::colvec objective_function_values_candidates_;
-  double* objective_function_values_candidates_ptr_;
+  absl::InlinedVector<double, 64> objective_function_values_candidates_;
   double objective_function_values_min_;
   unsigned int objective_function_values_min_index_;
   arma::colvec const order_;
@@ -202,7 +199,7 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
   arma::colvec const parameters_lower_bound_;
   arma::colvec const parameters_upper_bound_;
   unsigned int pruned_left_n_elem_;
-  arma::ucolvec pruned_set_;
+  absl::InlinedVector<unsigned int, 64> pruned_set_;
   unsigned int pruned_set_size_ = 2;
   double const pruning_coefficient_;
   unsigned int const regression_response_count_;
@@ -237,7 +234,7 @@ std::tuple<arma::colvec, arma::colvec, arma::colvec, arma::mat, arma::mat>
 Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::Run() {
   CreateSegmentStatistics();
   CreateSenParameters();
-  pruned_set_(1) = 1;
+  pruned_set_[1] = 1u;
   objective_function_values_.fill(arma::datum::inf);
   objective_function_values_(0) = -beta_;
   objective_function_values_(1) = GetCostValue(0, 0);
@@ -672,28 +669,38 @@ template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
 void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::UpdateStep() {
   UpdateSenParameters();
 
-  // Cache raw pointers once — eliminates Armadillo bounds-checked operator()
-  // on every candidate access in all four hot loops below.
-  arma::uword const* const pruned_set_raw = pruned_set_.memptr();
+  // Over-allocate by 64 when capacity is full so direct writes run without
+  // function calls for the next ~64 timesteps. The check is false ~63/64
+  // timesteps → perfectly predicted after warm-up. Both buffers are grown
+  // together so their data() pointers stay valid throughout this function.
+  if (pruned_set_.size() <= pruned_set_size_) {
+    pruned_set_.resize(pruned_set_size_ + 64);
+    objective_function_values_candidates_.resize(pruned_set_size_ + 64);
+  }
+  // Cache mutable + const-alias pointers once. Capacity >= pruned_set_size_+1
+  // is guaranteed above, so all writes in [0, pruned_set_size_] are in bounds.
+  unsigned int* const pruned_set_write = pruned_set_.data();
+  unsigned int const* const pruned_set_raw = pruned_set_write;
   double const* const objfn_ptr = objective_function_values_.memptr();
+  double* const candidates_ptr = objective_function_values_candidates_.data();
 
   if constexpr (FamilyPolicy::is_pelt_only) {
     // PELT-only hot loop: split into a prefetch-issuing body and a short tail
     // so there is no per-iteration branch on the prefetch lookahead bound.
     // Memory latency ~200–400 cycles; ~20 cycles compute/candidate → distance
-    // of 16 keeps the memory pipeline saturated.  Both the family's data_c_
+    // of 16 keeps the memory pipeline saturated. Both the family's data_c_
     // slice and the objective function value are prefetched together.
     //
     // GetNllPeltValueFast + cost adjustment are inlined directly here to avoid
     // the GetCostValue → GetCostValuePelt → result_value_ (this-member) write
-    // → GetCostValue read-back chain.  The compiler must treat writes through
+    // → GetCostValue read-back chain. The compiler must treat writes through
     // `this` conservatively (potential aliasing), so the store-reload from
-    // result_value_ cannot be eliminated even with full inlining.  Bypassing
+    // result_value_ cannot be eliminated even with full inlining. Bypassing
     // it keeps the value in a register from GetNllPeltValueFast to the final
     // assignment with no round-trip through memory.
     // segment_length = (t-1) - s + 1 = t - s  (segment is [s, t-1]).
-    auto eval_pelt_candidate = [this, objfn_ptr](unsigned int const s,
-                                                  unsigned int const i) {
+    auto eval_pelt_candidate = [this, objfn_ptr, candidates_ptr](
+                                    unsigned int const s, unsigned int const i) {
       double nll = FamilyPolicy::template GetNllPeltValueFast<kNDims>(this, s, t - 1);
       if constexpr (kCostAdj == CostAdjustment::kMBIC) {
         nll += static_cast<double>(parameters_count_) *
@@ -703,7 +710,7 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
                          std::log(static_cast<double>(t - s)) / 2.0) *
               std::log2(M_E);
       }
-      objective_function_values_candidates_ptr_[i] = objfn_ptr[s] + nll + beta_;
+      candidates_ptr[i] = objfn_ptr[s] + nll + beta_;
     };
     constexpr unsigned int kPrefetchDist = 16;
     unsigned int const hot_end =
@@ -712,9 +719,7 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
     for (unsigned int i = 0; i < hot_end; i++) {
       unsigned int const next_s = pruned_set_raw[i + kPrefetchDist];
       FamilyPolicy::PrefetchCandidate(this, next_s);
-#if defined(__GNUC__) || defined(__clang__)
-      __builtin_prefetch(objfn_ptr + next_s, 0, 0);
-#endif
+      absl::PrefetchToLocalCacheNta(objfn_ptr + next_s);
       eval_pelt_candidate(pruned_set_raw[i], i);
     }
     // tail — last kPrefetchDist candidates, data already en route or in cache
@@ -724,22 +729,20 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
   } else {
     // SEN family candidate loop.
     // When !kVanillaOnly the last candidate always skips GetCostValue (it
-    // represents the trivially-bounded new segment).  Peel that final
+    // represents the trivially-bounded new segment). Peel that final
     // iteration out of the loop body so there is no per-iteration branch.
     // Note: i + 1 < size avoids unsigned underflow when size == 0.
     if constexpr (kVanillaOnly) {
       for (unsigned int i = 0; i < pruned_set_size_; i++) {
         unsigned int const s = pruned_set_raw[i];
-        objective_function_values_candidates_ptr_[i] =
-            objfn_ptr[s] + GetCostValue(s, i) + beta_;
+        candidates_ptr[i] = objfn_ptr[s] + GetCostValue(s, i) + beta_;
       }
     } else {
       for (unsigned int i = 0; i + 1 < pruned_set_size_; i++) {
         unsigned int const s = pruned_set_raw[i];
-        objective_function_values_candidates_ptr_[i] =
-            objfn_ptr[s] + GetCostValue(s, i) + beta_;
+        candidates_ptr[i] = objfn_ptr[s] + GetCostValue(s, i) + beta_;
       }
-      objective_function_values_candidates_ptr_[pruned_set_size_ - 1] =
+      candidates_ptr[pruned_set_size_ - 1] =
           objfn_ptr[pruned_set_raw[pruned_set_size_ - 1]] + beta_;
     }
   }
@@ -747,11 +750,10 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
   // SIMD-friendly argmin: std::min_element auto-vectorizes (no data-dependent
   // branch per iteration), then a single pointer subtraction gives the index.
   double const* const min_it = std::min_element(
-      objective_function_values_candidates_ptr_,
-      objective_function_values_candidates_ptr_ + pruned_set_size_);
+      candidates_ptr, candidates_ptr + pruned_set_size_);
   objective_function_values_min_ = *min_it;
   objective_function_values_min_index_ =
-      static_cast<unsigned int>(min_it - objective_function_values_candidates_ptr_);
+      static_cast<unsigned int>(min_it - candidates_ptr);
   objective_function_values_(t) = objective_function_values_min_;
   change_points_[t] = pruned_set_raw[objective_function_values_min_index_];
 
@@ -761,8 +763,8 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
       objective_function_values_min_ + beta_ - pruning_coefficient_;
   pruned_left_n_elem_ = 0;
   for (unsigned int i = 0; i < pruned_set_size_; i++) {
-    if (objective_function_values_candidates_ptr_[i] <= pruning_threshold) {
-      pruned_set_[pruned_left_n_elem_] = pruned_set_raw[i];
+    if (candidates_ptr[i] <= pruning_threshold) {
+      pruned_set_write[pruned_left_n_elem_] = pruned_set_raw[i];
       if constexpr (!FamilyPolicy::is_pelt_only && !kVanillaOnly) {
         if (pruned_left_n_elem_ != i) {
           std::memcpy(coefficients_.colptr(pruned_left_n_elem_),
@@ -777,9 +779,10 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
       pruned_left_n_elem_++;
     }
   }
-  pruned_set_size_ = pruned_left_n_elem_;
-  pruned_set_[pruned_set_size_] = t;
-  pruned_set_size_++;
+  // Capacity at [pruned_left_n_elem_] is guaranteed by
+  // the over-alloc at the start of this function.
+  pruned_set_write[pruned_left_n_elem_] = t;
+  pruned_set_size_ = pruned_left_n_elem_ + 1;
   UpdateRProgress();
 }
 

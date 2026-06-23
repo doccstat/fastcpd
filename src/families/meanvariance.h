@@ -114,13 +114,11 @@ struct MeanvarianceFamily : BaseFamily {
   // Loop over 64-byte cache lines: no branch, handles any p.
   template <typename Solver>
   static void PrefetchCandidate(Solver* solver, unsigned int const s) {
-#if defined(__GNUC__) || defined(__clang__)
     double const* const ptr =
         solver->data_c_ptr_ + static_cast<std::size_t>(s) * solver->data_c_n_rows_;
     for (unsigned int b = 0; b < solver->data_c_n_rows_; b += 8) {
-      __builtin_prefetch(ptr + b, 0, 1);
+      absl::PrefetchToLocalCache(ptr + b);
     }
-#endif
   }
 };
 

@@ -173,9 +173,12 @@ struct LassoFamily : BaseFamily {
     arma::colvec const lambdas = arma::exp(arma::linspace(
         std::log(lambda_max), std::log(lambda_max / 1000.0), kNLambda));
 
+    // Deterministic fold assignment: sequential cyclic (balanced, no randomness).
+    // Randomising the fold order with arma::shuffle introduces non-reproducibility
+    // because Armadillo's RNG state depends on prior C++ calls in the same
+    // session, making results vary with test execution order.
     arma::uvec fold_id(n);
     for (unsigned int i = 0; i < n; i++) fold_id(i) = i % k_folds;
-    fold_id = arma::shuffle(fold_id);
 
     arma::mat fold_errors(k_folds, kNLambda, arma::fill::zeros);
     for (unsigned int fold = 0; fold < k_folds; fold++) {

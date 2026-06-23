@@ -1,6 +1,5 @@
 testthat::test_that(
   "examples/data-transcriptome.txt", {
-    testthat::skip_if(Sys.getenv("R_COVR") == "true", "slow transcriptome example: skip during coverage")
     testthat::skip_if_not_installed("ggplot2")
     testthat::skip_if_not_installed("gridExtra")
 

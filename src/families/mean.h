@@ -125,12 +125,10 @@ struct MeanFamily : BaseFamily {
   // For p > 15 add further lines here as needed.
   template <typename Solver>
   static void PrefetchCandidate(Solver* solver, unsigned int const s) {
-#if defined(__GNUC__) || defined(__clang__)
     double const* const ptr =
         solver->data_c_ptr_ + static_cast<std::size_t>(s) * solver->data_c_n_rows_;
-    __builtin_prefetch(ptr,     0, 1);
-    __builtin_prefetch(ptr + 8, 0, 1);
-#endif
+    absl::PrefetchToLocalCache(ptr);
+    absl::PrefetchToLocalCache(ptr + 8);
   }
 };
 

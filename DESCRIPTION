@@ -1,7 +1,7 @@
 Type: Package
 Package: fastcpd
 Title: Fast Change Point Detection via Sequential Gradient Descent
-Version: 1.0.5
+Version: 1.0.6
 Authors@R: c(
     person("Xingchi", "Li", , "anthony.li.stat.tamu.edu@lixingchi.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0006-2493-0853")),
@@ -33,6 +33,7 @@ Suggests:
     testthat (>= 3.0.0),
     xml2
 LinkingTo:
+    abseil,
     progress,
     Rcpp,
     RcppArmadillo,

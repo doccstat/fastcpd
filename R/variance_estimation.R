@@ -136,16 +136,8 @@ variance.lm <- variance_lm  # nolint: Conventional R function style
 #' @rdname variance_mean
 #' @export
 variance_mean <- function(data) {
-  data <- as.matrix(data)
-  n <- nrow(data)
-  p <- ncol(data)
-  estimators <- array(NA, c(n - 1, p, p))
-  for (i in seq_len(n - 1)) {
-    estimators[i, , ] <- crossprod(
-      data[i + 1, , drop = FALSE] - data[i, , drop = FALSE]
-    )
-  }
-  colMeans(estimators, na.rm = TRUE) / 2
+  d <- diff(as.matrix(data))
+  crossprod(d) / (2 * nrow(d))
 }
 
 #' @rdname variance_mean

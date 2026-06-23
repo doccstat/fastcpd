@@ -1,3 +1,9 @@
+# fastcpd 1.0.6
+
+*   Performance improvements: absl::InlinedVector for pruned set (O(1) memory
+    vs O(n) pre-allocation), cross-platform prefetch via absl::PrefetchToLocalCache,
+    and baseline-subtracted benchmark plot with horizontal layout.
+
 # fastcpd 1.0.5
 
 *   Add favicon.
