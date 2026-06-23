@@ -56,4 +56,15 @@ print(result.cp_set)  # [200]
 
 """
 
+import os as _os
+import sys as _sys
+
+if _sys.platform == 'win32':
+    # Python 3.8+ no longer searches PATH for DLL dependencies of extension
+    # modules. Register the package directory so Windows finds libopenblas.dll,
+    # which is bundled alongside interface.pyd by setup.py.
+    _os.add_dll_directory(_os.path.dirname(_os.path.abspath(__file__)))
+
+del _os, _sys
+
 __version__ = "0.19.0"
