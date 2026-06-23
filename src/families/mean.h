@@ -84,8 +84,10 @@ struct MeanFamily : BaseFamily {
 #if defined(__GNUC__) || defined(__clang__)
     double const* __restrict__ data_c = static_cast<double const*>(
         __builtin_assume_aligned(solver->data_c_ptr_, 16));
+#elif defined(_MSC_VER)
+    double const* __restrict data_c = solver->data_c_ptr_;
 #else
-    double const* __restrict__ data_c = solver->data_c_ptr_;
+    double const* data_c = solver->data_c_ptr_;
 #endif
     unsigned int const stride = solver->data_c_n_rows_;  // == p+1
     double const* const end_ptr =

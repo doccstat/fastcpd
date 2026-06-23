@@ -21,6 +21,8 @@ cc_library(
         "//python:__pkg__",
     ],
     deps = [
+        "@abseil-cpp//absl/base:prefetch",
+        "@abseil-cpp//absl/container:inlined_vector",
         "@armadillo_headers//:armadillo_header",
     ],
 )

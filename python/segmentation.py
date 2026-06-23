@@ -9,13 +9,14 @@ from fastcpd.interface import fastcpd_impl
 
 # Families supported by the C++ Python binding (NO_RCPP mode).
 #
-# PELT families (fully supported): mean, variance, meanvariance, mgaussian.
+# PELT families (fully supported): mean, variance, meanvariance, exponential,
+#   mgaussian (exposed as var()).
 # SEN families (OLS-initialised, no glmnet/arima): lasso.
 #
-# Not yet supported (require R packages at runtime):
-#   arma, arima, ma  — need stats::arima()
-#   garch            — needs tseries::garch() + Fortran
-#   gaussian/lm, binomial, poisson — need glmnet / fastglm (Rcpp + Eigen)
+# Not supported (require R packages unavailable in the Python binding):
+#   arma, arima, ma — need stats::arima()
+#   garch           — needs tseries::garch() + Fortran
+#   lm/gaussian, binomial, poisson — need glmnet / fastglm (Rcpp + Eigen)
 _SUPPORTED_FAMILIES = frozenset({
     'mean', 'variance', 'meanvariance', 'exponential', 'mgaussian', 'lasso',
 })
@@ -108,20 +109,6 @@ def var(data, order, **kwargs):
     return detect(data=data, family='mgaussian', **kwargs)
 
 
-def arma(data, order=(0, 0), **kwargs):
-    """Find change points efficiently in ARMA models.
-
-    Args:
-        data: Univariate time series data.
-        order: Tuple (p, q) for AR and MA orders.
-        **kwargs: Additional arguments passed to ``detect()``.
-
-    Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
-    """
-    return detect(data=data, family='arma', order=order, **kwargs)
-
-
 def lasso(data, **kwargs):
     """Find change points efficiently in LASSO regression models.
 
@@ -133,20 +120,6 @@ def lasso(data, **kwargs):
         A list of change-point indices, or a CpdResult when cp_only=False.
     """
     return detect(data=data, family='lasso', **kwargs)
-
-
-def ma(data, order=0, **kwargs):
-    """Find change points efficiently in MA (moving average) models.
-
-    Args:
-        data: Univariate time series data.
-        order: MA order q.
-        **kwargs: Additional arguments passed to ``detect()``.
-
-    Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
-    """
-    return detect(data=data, family='ma', order=(0, order), **kwargs)
 
 
 def detect(
@@ -186,7 +159,7 @@ def detect(
             is supplied, using the same formulae as the R package.
         cost_adjustment: One of 'BIC', 'MBIC', 'MDL'.
         family: One of 'mean', 'variance', 'meanvariance', 'exponential',
-            'mgaussian', 'var' (alias for 'mgaussian'), 'lasso'.
+            'mgaussian' / 'var' (alias), 'lasso'.
         line_search: Values for line search step sizes.
         lower: Lower bound for parameters after each update.
         upper: Upper bound for parameters after each update.

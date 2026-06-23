@@ -1,4 +1,6 @@
 numpy>=2.0.3
 build
-pytest
+colorama
+pytest>=9.0.3
 setuptools
+pygments>=2.20.0
