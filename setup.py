@@ -30,6 +30,7 @@ import atexit
 import os
 import shlex
 import shutil
+import subprocess
 import sysconfig
 import tempfile
 
@@ -254,6 +255,44 @@ class BuildExtCommand(setuptools.command.build_ext.build_ext):
                 ext_full_path,
             ))
             shutil.copyfile(built_ext_path, ext_full_path)
+
+            if os.name == 'nt':
+                self._bundle_openblas_dll(ext_full_path, prebuilt_path)
+
+    def _bundle_openblas_dll(self, ext_full_path, prebuilt_path):
+        """Copy libopenblas.dll next to interface.pyd so Windows can find it."""
+        dest_dir = os.path.dirname(ext_full_path)
+        dll_dst = os.path.join(dest_dir, 'libopenblas.dll')
+
+        # Try Bazel's output_base (works for both fresh builds and cache hits).
+        if not prebuilt_path:
+            try:
+                bazelisk = os.getenv('FASTCPD_BAZELISK', 'bazelisk.py')
+                startup_options = shlex.split(
+                    os.getenv('FASTCPD_BAZEL_STARTUP_OPTIONS', ''))
+                output_base = subprocess.check_output(
+                    [sys.executable, '-u', bazelisk] + startup_options +
+                    ['info', 'output_base'],
+                    text=True, stderr=subprocess.DEVNULL).strip()
+                dll_src = os.path.join(
+                    output_base, 'external', 'openblas_windows',
+                    'bin', 'libopenblas.dll')
+                if os.path.exists(dll_src):
+                    print(f'Copying OpenBLAS DLL {dll_src} -> {dll_dst}')
+                    shutil.copyfile(dll_src, dll_dst)
+                    return
+            except Exception as exc:
+                print(f'bazel info output_base failed: {exc}')
+
+        # Fallback: bazel-bin/external symlink/junction (Linux/macOS).
+        dll_src = os.path.join(
+            'bazel-bin', 'external', 'openblas_windows', 'bin', 'libopenblas.dll')
+        if os.path.exists(dll_src):
+            print(f'Copying OpenBLAS DLL {dll_src} -> {dll_dst}')
+            shutil.copyfile(dll_src, dll_dst)
+            return
+
+        print('WARNING: libopenblas.dll not found; Windows import may fail')
 
 
 class InstallCommand(setuptools.command.install.install):
