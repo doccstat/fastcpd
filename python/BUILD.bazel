@@ -48,14 +48,7 @@ cc_binary(
         "pybind.cc",
     ],
     copts = select({
-        "@platforms//os:windows": [
-            "/std:c++17",
-            "/D_USE_MATH_DEFINES",
-            # No system BLAS/LAPACK on Windows; use Armadillo's internal
-            # implementations. Results are numerically equivalent.
-            "/DARMA_DONT_USE_BLAS",
-            "/DARMA_DONT_USE_LAPACK",
-        ],
+        "@platforms//os:windows": ["/std:c++17", "/D_USE_MATH_DEFINES"],
         "//conditions:default": ["-std=c++17"],
     }),
     includes = [
@@ -64,7 +57,7 @@ cc_binary(
     linkopts = select({
         "@platforms//os:osx": ["-undefined dynamic_lookup"],
         "@platforms//os:linux": ["-lopenblas"],
-        "@platforms//os:windows": [],
+        "@platforms//os:windows": [],  # OpenBLAS linked via deps below
     }),
     linkshared = True,
     linkstatic = select({
@@ -76,7 +69,10 @@ cc_binary(
         "//src:class",
         "@com_github_pybind_pybind11//:pybind11",
         "@local_config_python//:python_headers",
-    ],
+    ] + select({
+        "@platforms//os:windows": ["@openblas_windows//:openblas"],
+        "//conditions:default": [],
+    }),
 )
 
 # This wrapper exists to expose the .so binary to python
