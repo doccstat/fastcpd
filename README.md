@@ -16,12 +16,7 @@ version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/proje
 [![Python
 package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcpd/)
 
-## Overview
-
-The fastcpd (**fast** **c**hange **p**oint **d**etection) is a fast
-implmentation of change point detection methods in R/Python.
-
-### Documentation
+## Documentation
 
 - R documentation: [fastcpd.xingchi.li](https://fastcpd.xingchi.li)
 - Python documentation:
@@ -233,7 +228,3 @@ Encountered a bug or unintended behavior?
 
 [![Stargazers over
 time](https://starchart.cc/doccstat/fastcpd.svg)](https://starchart.cc/doccstat/fastcpd)
-
-## Acknowledgements
-
-Special thanks to [clODE](https://github.com/patrickfletcher/clODE).
