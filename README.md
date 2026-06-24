@@ -42,25 +42,18 @@ pip install fastcpd
 set.seed(1)
 n <- 10^8
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-run_isolated <- function(expr) {
-  callr::r(function(e, n) {
-    set.seed(1)
-    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-    system.time(eval(e))
-  }, args = list(e = substitute(expr), n = n))
-}
 print(run_isolated(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)))
 #>    user  system elapsed 
-#>   8.593   6.494  14.851
+#>   8.512   6.297  14.478
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 #>    user  system elapsed 
-#>   9.077   6.882  16.029
+#>   9.022   6.679  15.711
 print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 #>    user  system elapsed 
-#>  44.990   3.088  48.226
+#>  44.988   2.719  47.734
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
 #>    user  system elapsed 
-#>  31.516   6.531  38.159
+#>  31.410   6.476  37.911
 ```
 
 ![](man/figures/README-time-comparison-fastbench-1.png)<!-- -->
