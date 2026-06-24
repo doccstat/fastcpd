@@ -734,7 +734,7 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   cat("XPtr:      ", time_xptr["elapsed"], "s\n")
   summary(result_xptr)
 }
-#> R closure:  2.08 s
+#> R closure:  2.023 s
 #> XPtr:       0.103 s
 #> 
 #> Call:
