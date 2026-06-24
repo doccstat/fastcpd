@@ -21,7 +21,7 @@ fastcpd(
   upper = rep(Inf, p),
   pruning_coef = 0,
   segment_count = 10,
-  trim = 0.05,
+  trim = 0,
   momentum_coef = 0,
   multiple_epochs = function(x) 0,
   epsilon = 1e-10,
@@ -441,14 +441,16 @@ if (
     beta = (p + 1) * log(n) / 2,
     cost = huber_loss,
     cost_gradient = huber_loss_gradient,
-    cost_hessian = huber_loss_hessian
+    cost_hessian = huber_loss_hessian,
+    trim = 0.05
   )
   summary(huber_regression_result)
 }
 #> 
 #> Call:
 #> fastcpd(formula = y ~ . - 1, data = data, beta = (p + 1) * log(n)/2, 
-#>     cost = huber_loss, cost_gradient = huber_loss_gradient, cost_hessian = huber_loss_hessian)
+#>     cost = huber_loss, cost_gradient = huber_loss_gradient, cost_hessian = huber_loss_hessian, 
+#>     trim = 0.05)
 #> 
 #> Change points:
 #> 418 726 
@@ -732,8 +734,8 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   cat("XPtr:      ", time_xptr["elapsed"], "s\n")
   summary(result_xptr)
 }
-#> R closure:  2.149 s
-#> XPtr:       0.102 s
+#> R closure:  2.219 s
+#> XPtr:       0.103 s
 #> 
 #> Call:
 #> fastcpd(formula = ~. - 1, data = data.frame(x = data), beta = beta_val, 

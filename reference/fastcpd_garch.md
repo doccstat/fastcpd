@@ -46,14 +46,14 @@ object.
 ``` r
 # \donttest{
 set.seed(1)
-n <- 1501
+n <- 401
 sigma_2 <- rep(1, n + 1)
 x <- rep(0, n + 1)
-for (i in seq_len(750)) {
+for (i in seq_len(200)) {
   sigma_2[i + 1] <- 20 + 0.8 * x[i]^2 + 0.1 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
-for (i in 751:n) {
+for (i in 201:n) {
   sigma_2[i + 1] <- 1 + 0.1 * x[i]^2 + 0.5 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
@@ -66,29 +66,29 @@ summary(result)
 #> fastcpd.garch(data = x[-1], order = c(1, 1), include.mean = FALSE)
 #> 
 #> Change points:
-#> 756 
+#> 205 
 #> 
 #> Cost values:
-#> 1959.888 742.4338 
+#> 491.9506 188.9431 
 #> 
 #> Parameters:
 #>    segment 1 segment 2
-#> 1 19.0363193 1.5162583
-#> 2  0.6394788 0.1329554
-#> 3  0.2164783 0.2969624
+#> 1 11.5363695 1.9983858
+#> 2  0.4695383 0.0128258
+#> 3  0.3428052 0.1368199
 plot(result)
 
 # }
 # \donttest{
 set.seed(1)
-n <- 200
+n <- 120
 sigma_2 <- rep(1, n + 1)
 x <- rep(0, n + 1)
-for (i in seq_len(100)) {
+for (i in seq_len(60)) {
   sigma_2[i + 1] <- 10 + 0.5 * x[i]^2 + 0.3 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
-for (i in 101:n) {
+for (i in 61:n) {
   sigma_2[i + 1] <- 0.2 + 0.05 * x[i]^2 + 0.1 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
@@ -101,29 +101,29 @@ summary(result)
 #> fastcpd.garch(data = x[-1], order = c(1, 1), include.mean = FALSE)
 #> 
 #> Change points:
-#> 98 
+#> 60 
 #> 
 #> Cost values:
-#> 202.3242 -16.34071 
+#> 120.2821 -15.87097 
 #> 
 #> Parameters:
-#>   segment 1  segment 2
-#> 1 5.6718832 0.19442986
-#> 2 0.1830536 0.08163262
-#> 3 0.5651263 0.04133033
+#>    segment 1 segment 2
+#> 1 13.8346334  0.174438
+#> 2  0.2278886  0.000000
+#> 3  0.0200848  0.000000
 plot(result)
 
 # }
 # \donttest{
 set.seed(1)
-n <- 300
+n <- 150
 sigma_2 <- rep(1, n + 1)
 x <- rep(0, n + 1)
-for (i in seq_len(100)) {
+for (i in seq_len(75)) {
   sigma_2[i + 1] <- 10 + 0.5 * x[i]^2 + 0.3 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
-for (i in 101:n) {
+for (i in 76:n) {
   sigma_2[i + 1] <- 0.2 + 0.05 * x[i]^2 + 0.1 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
@@ -136,16 +136,16 @@ summary(result)
 #> fastcpd.garch(data = x[-1], order = c(1, 1), include.mean = FALSE)
 #> 
 #> Change points:
-#> 98 
+#> 74 
 #> 
 #> Cost values:
-#> 202.3242 -34.68556 
+#> 154.8803 -19.62733 
 #> 
 #> Parameters:
-#>   segment 1  segment 2
-#> 1 5.6718832 0.21471834
-#> 2 0.1830536 0.09268943
-#> 3 0.5651263 0.00000000
+#>   segment 1   segment 2
+#> 1 2.8412668 0.180061756
+#> 2 0.1358175 0.005695202
+#> 3 0.7489304 0.000000000
 plot(result)
 
 # }
