@@ -31,14 +31,14 @@ and thus a formula is not required here.
 \examples{
 \donttest{
 set.seed(1)
-n <- 1501
+n <- 401
 sigma_2 <- rep(1, n + 1)
 x <- rep(0, n + 1)
-for (i in seq_len(750)) {
+for (i in seq_len(200)) {
   sigma_2[i + 1] <- 20 + 0.8 * x[i]^2 + 0.1 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
-for (i in 751:n) {
+for (i in 201:n) {
   sigma_2[i + 1] <- 1 + 0.1 * x[i]^2 + 0.5 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
@@ -50,14 +50,14 @@ plot(result)
 }
 \donttest{
 set.seed(1)
-n <- 200
+n <- 120
 sigma_2 <- rep(1, n + 1)
 x <- rep(0, n + 1)
-for (i in seq_len(100)) {
+for (i in seq_len(60)) {
   sigma_2[i + 1] <- 10 + 0.5 * x[i]^2 + 0.3 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
-for (i in 101:n) {
+for (i in 61:n) {
   sigma_2[i + 1] <- 0.2 + 0.05 * x[i]^2 + 0.1 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
@@ -69,14 +69,14 @@ plot(result)
 }
 \donttest{
 set.seed(1)
-n <- 300
+n <- 150
 sigma_2 <- rep(1, n + 1)
 x <- rep(0, n + 1)
-for (i in seq_len(100)) {
+for (i in seq_len(75)) {
   sigma_2[i + 1] <- 10 + 0.5 * x[i]^2 + 0.3 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }
-for (i in 101:n) {
+for (i in 76:n) {
   sigma_2[i + 1] <- 0.2 + 0.05 * x[i]^2 + 0.1 * sigma_2[i]
   x[i + 1] <- rnorm(1, 0, sqrt(sigma_2[i + 1]))
 }

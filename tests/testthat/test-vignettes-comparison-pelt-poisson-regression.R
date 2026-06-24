@@ -65,7 +65,8 @@ testthat::test_that("poisson regression", {
     beta = beta,
     cost_adjustment = "BIC",
     epsilon = 0.001,
-    segment_count = 10
+    segment_count = 10,
+    trim = 0.05
   )@cp_set
 
   testthat::expect_equal(
