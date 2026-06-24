@@ -24,12 +24,7 @@ options(cli.hyperlink = FALSE, eval = TRUE)
 [![Python version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/project/fastcpd/)
 [![Python package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcpd/)
 
-## Overview
-
-The fastcpd (**fast** **c**hange **p**oint **d**etection) is a fast
-implmentation of change point detection methods in R/Python.
-
-### Documentation
+## Documentation
 
 * R documentation: [fastcpd.xingchi.li](https://fastcpd.xingchi.li)
 * Python documentation: [fastcpd.xingchi.li/python](https://fastcpd.xingchi.li/python/)
@@ -246,7 +241,3 @@ sudo apt install python3-dev
 
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/doccstat/fastcpd.svg)](https://starchart.cc/doccstat/fastcpd)
-
-## Acknowledgements
-
-Special thanks to [clODE](https://github.com/patrickfletcher/clODE).
