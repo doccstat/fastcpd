@@ -73,7 +73,7 @@ data <- rbind(
 )
 system.time(result <- fastcpd.mean(data, r.progress = FALSE, cp_only = TRUE))
 #>    user  system elapsed 
-#>   0.590   0.293   0.585 
+#>   0.637   0.289   0.630 
 summary(result)
 #> 
 #> Call:
