@@ -148,7 +148,8 @@ bm_net$elapsed_s <- bm_net$elapsed_s - baseline_overhead
 bm_net$expr <- droplevels(bm_net$expr)
 if (requireNamespace("ggplot2", quietly = TRUE)) {
   print(ggplot2::ggplot(bm_net, ggplot2::aes(x = expr, y = elapsed_s)) +
-    ggplot2::geom_boxplot() + ggplot2::labs(x = NULL, y = "Net algorithm time (s)") +
+    ggplot2::geom_violin(trim = FALSE) +
+    ggplot2::labs(x = NULL, y = "Net algorithm time (s)") +
     ggplot2::coord_flip())
 }
 ```

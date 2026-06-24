@@ -114,16 +114,16 @@ run_isolated <- function(expr) {
 }
 print(run_isolated(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)))
 #>    user  system elapsed 
-#>   8.485   6.322  14.506
+#>   8.396   6.745  14.873
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 #>    user  system elapsed 
-#>   9.050   6.812  15.966
+#>   8.956   7.075  16.227
 print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 #>    user  system elapsed 
-#>  45.515   2.721  48.380
+#>  44.747   2.931  47.885
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
 #>    user  system elapsed 
-#>  31.375   6.170  37.641
+#>  31.544   6.611  38.199
 ```
 
 ``` r
@@ -167,7 +167,8 @@ bm_net$elapsed_s <- bm_net$elapsed_s - baseline_overhead
 bm_net$expr <- droplevels(bm_net$expr)
 if (requireNamespace("ggplot2", quietly = TRUE)) {
   print(ggplot2::ggplot(bm_net, ggplot2::aes(x = expr, y = elapsed_s)) +
-    ggplot2::geom_boxplot() + ggplot2::labs(x = NULL, y = "Net algorithm time (s)") +
+    ggplot2::geom_violin(trim = FALSE) +
+    ggplot2::labs(x = NULL, y = "Net algorithm time (s)") +
     ggplot2::coord_flip())
 }
 ```

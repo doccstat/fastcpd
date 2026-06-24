@@ -1,6 +1,5 @@
 testthat::test_that(
   "examples/fastcpd_garch_3.txt", {
-    testthat::skip_if(Sys.getenv("R_COVR") == "true", "slow GARCH example: skip during coverage")
     testthat::skip_if_not_installed("ggplot2")
 
     examples_garch_3 <- readLines("examples/fastcpd_garch_3.txt")
@@ -9,11 +8,11 @@ testthat::test_that(
       collapse = "\n"
     )))
 
-    testthat::expect_equal(result@cp_set, 98)
-    testthat::expect_equal(max(result@residuals, na.rm = TRUE), 2.653501297)
+    testthat::expect_equal(result@cp_set, 74)
+    testthat::expect_equal(max(result@residuals, na.rm = TRUE), 2.784562259)
     testthat::expect_equal(result@thetas, data.frame(
-      "segment 1" = c(5.671883227, 0.183053584, 0.565126266),
-      "segment 2" = c(0.214718338, 0.092689432, 0),
+      "segment 1" = c(2.841266842, 0.135817457, 0.748930388),
+      "segment 2" = c(0.180061756, 0.005695202, 0),
       check.names = FALSE
     ))
   }

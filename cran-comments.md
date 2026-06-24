@@ -1,5 +1,13 @@
 ## Updates since last CRAN release (1.0.0)
 
+### fastcpd 1.0.7
+
+*   Change default `trim` from `0.05` to `0`: change points near segment
+    boundaries are no longer suppressed by default.
+*   Reduce GARCH example sizes: `n` reduced from 1501/200/300 to 401/120/150
+    for faster documentation builds and test runs.
+*   Replace boxplot with violin plot in README benchmark figure.
+
 ### fastcpd 1.0.6
 
 *   Performance improvements: absl::InlinedVector for pruned set (O(1) memory

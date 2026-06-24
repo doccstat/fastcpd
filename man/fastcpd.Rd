@@ -18,7 +18,7 @@ fastcpd(
   upper = rep(Inf, p),
   pruning_coef = 0,
   segment_count = 10,
-  trim = 0.05,
+  trim = 0,
   momentum_coef = 0,
   multiple_epochs = function(x) 0,
   epsilon = 1e-10,
@@ -369,7 +369,8 @@ if (
     beta = (p + 1) * log(n) / 2,
     cost = huber_loss,
     cost_gradient = huber_loss_gradient,
-    cost_hessian = huber_loss_hessian
+    cost_hessian = huber_loss_hessian,
+    trim = 0.05
   )
   summary(huber_regression_result)
 }

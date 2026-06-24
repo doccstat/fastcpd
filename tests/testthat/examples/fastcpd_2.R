@@ -54,7 +54,8 @@ if (
     beta = (p + 1) * log(n) / 2,
     cost = huber_loss,
     cost_gradient = huber_loss_gradient,
-    cost_hessian = huber_loss_hessian
+    cost_hessian = huber_loss_hessian,
+    trim = 0.05
   )
   summary(huber_regression_result)
 }
