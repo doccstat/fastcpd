@@ -11,6 +11,14 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-"
 )
 options(cli.hyperlink = FALSE, eval = TRUE)
+
+run_isolated <- function(expr) {
+  callr::r(function(e, n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    system.time(eval(e))
+  }, args = list(e = substitute(expr), n = n))
+}
 ```
 
 # Fast Change Point Detection <a href="https://fastcpd.xingchi.li"><img src="man/figures/logo.png" align="right" height="138" /></a>
@@ -50,13 +58,6 @@ pip install fastcpd
 set.seed(1)
 n <- 10^8
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-run_isolated <- function(expr) {
-  callr::r(function(e, n) {
-    set.seed(1)
-    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-    system.time(eval(e))
-  }, args = list(e = substitute(expr), n = n))
-}
 print(run_isolated(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)))
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
@@ -95,7 +96,7 @@ bm <- benchmark(
     mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
     fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)
   }, args = list(n = n)),
-  times = 5L
+  times = 10L
 )
 baseline_overhead <- median(bm$elapsed_s[bm$expr == "baseline"])
 bm_net <- bm[bm$expr != "baseline", ]
@@ -105,7 +106,15 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   print(ggplot2::ggplot(bm_net, ggplot2::aes(x = expr, y = elapsed_s)) +
     ggplot2::geom_violin(trim = FALSE) +
     ggplot2::labs(x = NULL, y = "Net algorithm time (s)") +
-    ggplot2::coord_flip())
+    ggplot2::coord_flip() +
+    ggplot2::theme(
+      legend.position = "none",
+      panel.background = ggplot2::element_blank(),
+      panel.border = ggplot2::element_rect(fill = NA, colour = "grey20"),
+      panel.grid.major = ggplot2::element_line(colour = "grey98"),
+      panel.grid.minor = ggplot2::element_line(colour = "grey98"),
+      strip.background = ggplot2::element_rect(fill = "grey85", colour = "grey20"),
+    ))
 }
 ```
 
