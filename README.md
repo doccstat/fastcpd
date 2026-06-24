@@ -16,13 +16,7 @@ version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/proje
 [![Python
 package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcpd/)
 
-## Documentation
-
-- R documentation: [fastcpd.xingchi.li](https://fastcpd.xingchi.li)
-- Python documentation:
-  [fastcpd.xingchi.li/python](https://fastcpd.xingchi.li/python/)
-
-## Installation
+## Documentation: [fastcpd.xingchi.li](https://fastcpd.xingchi.li)
 
 ### R
 
@@ -42,59 +36,7 @@ pip install .
 pip install fastcpd
 ```
 
-## Usage
-
-### R
-
-``` r
-set.seed(1)
-n <- 1000
-x <- rep(0, n + 3)
-for (i in 1:600) {
-  x[i + 3] <- 0.6 * x[i + 2] - 0.2 * x[i + 1] + 0.1 * x[i] + rnorm(1, 0, 3)
-}
-for (i in 601:1000) {
-  x[i + 3] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
-}
-result <- fastcpd::fastcpd.ar(x[3 + seq_len(n)], 3, r.progress = FALSE)
-summary(result)
-#> 
-#> Call:
-#> fastcpd::fastcpd.ar(data = x[3 + seq_len(n)], order = 3, r.progress = FALSE)
-#> 
-#> Change points:
-#> 614 
-#> 
-#> Cost values:
-#> 2754.116 2038.945 
-#> 
-#> Parameters:
-#>     segment 1 segment 2
-#> 1  0.57120256 0.2371809
-#> 2 -0.20985108 0.4031244
-#> 3  0.08221978 0.2290323
-plot(result)
-```
-
-![](man/figures/README-ar3-1.png)<!-- -->
-
-### Python WIP
-
-``` python
-import fastcpd.segmentation
-from numpy import concatenate
-from numpy.random import normal, multivariate_normal
-covariance_mat = [[100, 0, 0], [0, 100, 0], [0, 0, 100]]
-data = concatenate((multivariate_normal([0, 0, 0], covariance_mat, 300),
-                    multivariate_normal([50, 50, 50], covariance_mat, 400),
-                    multivariate_normal([2, 2, 2], covariance_mat, 300)))
-fastcpd.segmentation.mean(data)
-
-import fastcpd.variance_estimation
-fastcpd.variance_estimation.mean(data)
-```
-
-### Comparison
+## Comparison
 
 ``` r
 set.seed(1)
