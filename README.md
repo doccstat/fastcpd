@@ -114,63 +114,16 @@ run_isolated <- function(expr) {
 }
 print(run_isolated(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)))
 #>    user  system elapsed 
-#>   8.396   6.745  14.873
+#>   8.593   6.494  14.851
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 #>    user  system elapsed 
-#>   8.956   7.075  16.227
+#>   9.077   6.882  16.029
 print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 #>    user  system elapsed 
-#>  44.747   2.931  47.885
+#>  44.990   3.088  48.226
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
 #>    user  system elapsed 
-#>  31.544   6.611  38.199
-```
-
-``` r
-benchmark <- function(..., times = 100L) {
-  calls <- as.list(match.call(expand.dots = FALSE)$`...`)
-  nms <- names(calls); envir <- parent.frame()
-  do.call(rbind, lapply(seq_along(calls), function(i)
-    data.frame(expr = factor(nms[i], levels = nms),
-               elapsed_s = replicate(times, system.time(eval(calls[[i]], envir))["elapsed"]))))
-}
-bm <- benchmark(
-  baseline = callr::r(function(n) {
-    set.seed(1)
-    c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-  }, args = list(n = n)),
-  changepoint = callr::r(function(n) {
-    set.seed(1)
-    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-    changepoint::cpt.mean(mean_data, method = "PELT")
-  }, args = list(n = n)),
-  fpop = callr::r(function(n) {
-    set.seed(1)
-    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-    fpop::Fpop(mean_data, 2 * log(n))
-  }, args = list(n = n)),
-  mosum = callr::r(function(n) {
-    set.seed(1)
-    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-    mosum::mosum(c(mean_data), G = 40)
-  }, args = list(n = n)),
-  fastcpd = callr::r(function(n) {
-    set.seed(1)
-    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-    fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)
-  }, args = list(n = n)),
-  times = 5L
-)
-baseline_overhead <- median(bm$elapsed_s[bm$expr == "baseline"])
-bm_net <- bm[bm$expr != "baseline", ]
-bm_net$elapsed_s <- bm_net$elapsed_s - baseline_overhead
-bm_net$expr <- droplevels(bm_net$expr)
-if (requireNamespace("ggplot2", quietly = TRUE)) {
-  print(ggplot2::ggplot(bm_net, ggplot2::aes(x = expr, y = elapsed_s)) +
-    ggplot2::geom_violin(trim = FALSE) +
-    ggplot2::labs(x = NULL, y = "Net algorithm time (s)") +
-    ggplot2::coord_flip())
-}
+#>  31.516   6.531  38.159
 ```
 
 ![](man/figures/README-time-comparison-fastbench-1.png)<!-- -->
