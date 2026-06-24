@@ -107,7 +107,7 @@ print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
 ```
-```{r time-comparison-fastbench, eval = requireNamespace("callr", quietly = TRUE)}
+```{r time-comparison-fastbench, eval = requireNamespace("callr", quietly = TRUE), echo = FALSE}
 benchmark <- function(..., times = 100L) {
   calls <- as.list(match.call(expand.dots = FALSE)$`...`)
   nms <- names(calls); envir <- parent.frame()
