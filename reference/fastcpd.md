@@ -734,8 +734,8 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   cat("XPtr:      ", time_xptr["elapsed"], "s\n")
   summary(result_xptr)
 }
-#> R closure:  1.777 s
-#> XPtr:       0.104 s
+#> R closure:  2.052 s
+#> XPtr:       0.103 s
 #> 
 #> Call:
 #> fastcpd(formula = ~. - 1, data = data.frame(x = data), beta = beta_val, 
