@@ -92,7 +92,7 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
     y_label <- "data"
   } else if (family == "quantile") {
     tau <- if (length(x@order) >= 1 && x@order[1] > 0) x@order[1] else 0.5
-    y_label <- paste0("data response (τ = ", tau, ")")
+    y_label <- paste0("data response (tau = ", tau, ")")
   } else {
     y_label <- "data response"
   }
@@ -129,7 +129,7 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
   if (family != "var" && !x@cp_only) {
     if (family == "quantile" && nrow(x@thetas) == 1) {
       # Univariate quantile: overlay fitted quantile as a step function
-      # directly on the data panel — no separate coefficient/residual panels.
+      # directly on the data panel - no separate coefficient/residual panels.
       tau <- if (length(x@order) >= 1 && x@order[1] > 0) x@order[1] else 0.5
       segment_starts <- c(1, x@cp_set + 1)
       segment_ends <- c(x@cp_set, n)
