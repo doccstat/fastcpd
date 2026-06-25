@@ -7,6 +7,9 @@ All implementation of fastcpd is unified into one single function
 
 - [`fastcpd()`](https://fastcpd.xingchi.li/reference/fastcpd.md) : Find
   change points efficiently
+- [`fastcpd_family`](https://fastcpd.xingchi.li/reference/fastcpd_family.md)
+  [`fastcpd.family`](https://fastcpd.xingchi.li/reference/fastcpd_family.md)
+  : Wrapper functions for fastcpd
 
 ## Wrapper functions
 
