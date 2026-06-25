@@ -549,7 +549,6 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 #' [fastcpd.garch()] for change in time series models.
 #'
 #' @md
-#' @keywords internal
 NULL
 
 #' @title Find change points efficiently in AR(\eqn{p}) models
