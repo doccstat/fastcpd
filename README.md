@@ -16,9 +16,11 @@ version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/proje
 [![Python
 package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcpd/)
 
-## Documentation: [fastcpd.xingchi.li](https://fastcpd.xingchi.li)
+## Documentation: [x2r.io](https://x2r.io/fastcpd/reference/)
 
-### R
+<details close>
+
+<summary>Installation</summary>
 
 ``` r
 # install.packages("pak")
@@ -27,14 +29,14 @@ pak::pak("doccstat/fastcpd")
 install.packages("fastcpd")
 ```
 
-### Python WIP
-
 ``` shell
 # python -m ensurepip --upgrade
 pip install .
 # or install from PyPI
 pip install fastcpd
 ```
+
+</details>
 
 ## Comparison
 
