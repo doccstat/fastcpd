@@ -62,6 +62,7 @@ reference:
       - fastcpd.lasso
       - fastcpd.lm
       - fastcpd.poisson
+      - fastcpd.quantile
 
   - title: Utility functions
     desc: >
