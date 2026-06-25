@@ -65,7 +65,7 @@ print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
 [![fastcpd
 cheatsheet](man/figures/cheatsheets.png)](https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf)
 
-### References
+## References
 
 - [fastcpd: Fast Change Point Detection in
   R](https://doi.org/10.48550/arXiv.2404.05933)
