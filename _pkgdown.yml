@@ -26,6 +26,7 @@ reference:
       `fastcpd()`.
     contents:
       - fastcpd
+      - fastcpd_family
 
   - title: Wrapper functions
     desc: >
