@@ -91,7 +91,7 @@ testthat::test_that(
       ),
       paste0(
         "The family should be one of \"lm\", \"binomial\", \"poisson\", ",
-        "\"lasso\", ",
+        "\"lasso\", \"quantile\", ",
         "\"mean\", \"variance\", \"meanvariance\", ",
         "\"arma\", \"ar\", \"var\", \"arima\", \"garch\", ",
         "\"exponential\", \"custom\".",

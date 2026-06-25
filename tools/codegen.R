@@ -67,7 +67,8 @@ FAMILIES_SEGD <- list(
   c("gaussian", "gaussian", "GaussianFamily"),
   c("lasso",    "lasso",    "LassoFamily"),
   c("ma",       "ma",       "MaFamily"),
-  c("poisson",  "poisson",  "PoissonFamily")
+  c("poisson",  "poisson",  "PoissonFamily"),
+  c("quantile", "quantile", "QuantileFamily")
 )
 
 # ---------------------------------------------------------------------------
@@ -149,4 +150,4 @@ for (fam in FAMILIES_PELT)    generate_pelt(fam, "-1")
 for (fam in FAMILIES_PELT_1D) generate_pelt(fam, "1")
 for (fam in FAMILIES_SEGD)    generate_segd(fam)
 
-cat(sprintf("Generated 15 .cc files in %s\n", out_dir))
+cat(sprintf("Generated 16 .cc files in %s\n", out_dir))

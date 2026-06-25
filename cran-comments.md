@@ -1,5 +1,11 @@
 ## Updates since last CRAN release (1.0.0)
 
+### fastcpd 1.0.8
+
+*   Add quantile regression family (`fastcpd_quantile`): robust change-point
+    detection via pinball loss with IRLS fitting; resistant to outliers unlike
+    least-squares methods.
+
 ### fastcpd 1.0.7
 
 *   Change default `trim` from `0.05` to `0`: change points near segment

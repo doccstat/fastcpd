@@ -90,6 +90,9 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
       paste0(toupper(family), "(", paste0(x@order, collapse = ", "), ")")
   } else if (family %in% c("mean", "variance", "meanvariance")) {
     y_label <- "data"
+  } else if (family == "quantile") {
+    tau <- if (length(x@order) >= 1 && x@order[1] > 0) x@order[1] else 0.5
+    y_label <- paste0("data response (τ = ", tau, ")")
   } else {
     y_label <- "data response"
   }
@@ -124,37 +127,57 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
   }
 
   if (family != "var" && !x@cp_only) {
-    p <- p + ggplot2::geom_point(
-      data = residual_label_color,
-      aesthetic_mapping,
-      na.rm = TRUE,
-      alpha = data_point_alpha,
-      size = data_point_size
-    )
-    if (ncol(x@data) == 2 || (family == "ar" && nrow(x@thetas) == 1)) {
-      xend <- c(x@cp_set, n)
-      yend <- as.numeric(x@thetas)
-
-      coefficient_label <- data.frame(
-        x = c(1, x@cp_set),
-        y = yend,
-        xend = xend,
-        yend = yend,
-        label = "coefficient"
-      )
-
-      p <- p + ggplot2::geom_point(
-        data = covariate_label_color,
-        aesthetic_mapping,
-        size = data_point_size
+    if (family == "quantile" && nrow(x@thetas) == 1) {
+      # Univariate quantile: overlay fitted quantile as a step function
+      # directly on the data panel — no separate coefficient/residual panels.
+      tau <- if (length(x@order) >= 1 && x@order[1] > 0) x@order[1] else 0.5
+      segment_starts <- c(1, x@cp_set + 1)
+      segment_ends <- c(x@cp_set, n)
+      y_fitted <- as.numeric(x@thetas)
+      quantile_step <- data.frame(
+        x = segment_starts,
+        xend = segment_ends,
+        y = y_fitted,
+        yend = y_fitted
       )
       p <- p + ggplot2::geom_segment(
-        data = coefficient_label,
+        data = quantile_step,
         ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
-        col = "blue"
+        color = "blue", linewidth = 1.2, inherit.aes = FALSE
       )
+    } else {
+      p <- p + ggplot2::geom_point(
+        data = residual_label_color,
+        aesthetic_mapping,
+        na.rm = TRUE,
+        alpha = data_point_alpha,
+        size = data_point_size
+      )
+      if (ncol(x@data) == 2 || (family == "ar" && nrow(x@thetas) == 1)) {
+        xend <- c(x@cp_set, n)
+        yend <- as.numeric(x@thetas)
+
+        coefficient_label <- data.frame(
+          x = c(1, x@cp_set),
+          y = yend,
+          xend = xend,
+          yend = yend,
+          label = "coefficient"
+        )
+
+        p <- p + ggplot2::geom_point(
+          data = covariate_label_color,
+          aesthetic_mapping,
+          size = data_point_size
+        )
+        p <- p + ggplot2::geom_segment(
+          data = coefficient_label,
+          ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+          col = "blue"
+        )
+      }
+      p <- p + ggplot2::facet_wrap("label", nrow = 2, scales = "free_y")
     }
-    p <- p + ggplot2::facet_wrap("label", nrow = 2, scales = "free_y")
   }
   p <- p + ggplot2::theme(
     legend.position = legend_position,
