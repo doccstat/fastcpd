@@ -219,6 +219,9 @@ Detect change points in the coefficients of regression-type data.
 - [`fastcpd_poisson()`](https://fastcpd.xingchi.li/reference/fastcpd_poisson.md)
   [`fastcpd.poisson()`](https://fastcpd.xingchi.li/reference/fastcpd_poisson.md)
   : Find change points efficiently in Poisson regression models
+- [`fastcpd_quantile()`](https://fastcpd.xingchi.li/reference/fastcpd_quantile.md)
+  [`fastcpd.quantile()`](https://fastcpd.xingchi.li/reference/fastcpd_quantile.md)
+  : Find change points efficiently in quantile regression models
 
 ## Utility functions
 

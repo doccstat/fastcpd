@@ -81,7 +81,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
   summary(result)
 }
 #>    user  system elapsed 
-#>   0.649   0.026   0.675 
+#>   0.660   0.010   0.669 
 #> 
 #> Call:
 #> fastcpd.variance(data = data, r.progress = FALSE, cp_only = TRUE)
