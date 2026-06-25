@@ -16,4 +16,3 @@ models.
 \code{\link[=fastcpd.ar]{fastcpd.ar()}}, \code{\link[=fastcpd.var]{fastcpd.var()}}, \code{\link[=fastcpd.arima]{fastcpd.arima()}}, \code{\link[=fastcpd.arma]{fastcpd.arma()}},
 \code{\link[=fastcpd.garch]{fastcpd.garch()}} for change in time series models.
 }
-\keyword{internal}
