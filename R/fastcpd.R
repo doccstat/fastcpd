@@ -274,6 +274,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       "binomial",  # -> "binomial"
       "poisson",  # -> "poisson"
       "lasso",  # -> "lasso"
+      "quantile",  # -> "quantile"
       "mean",  # -> "mean"
       "variance",  # -> "variance"
       "meanvariance",  # -> "meanvariance"
@@ -335,6 +336,12 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 
   if (family %in% c("binomial", "poisson", "lasso")) {
     fastcpd_family <- family
+  } else if (family == "quantile") {
+    fastcpd_family <- "quantile"
+    stopifnot(
+      "order[1] must be a numeric value in (0, 1) (the quantile level tau)." =
+        is.numeric(order) && order[1] > 0 && order[1] < 1
+    )
   } else if (family == "mean") {
     fastcpd_family <- family
     vanilla_percentage <- 1
@@ -896,6 +903,47 @@ fastcpd_poisson <- function(data, ...) {
 #' @rdname fastcpd_poisson
 #' @export
 fastcpd.poisson <- fastcpd_poisson  # nolint: Conventional R function style
+
+#' @title Find change points efficiently in quantile regression models
+#' @param data A matrix or a data frame with the response variable as the first
+#' column and covariates in the remaining columns.
+#' @param order Quantile level \eqn{\tau}, a numeric value in (0, 1). The
+#' default is 0.5, corresponding to median regression.
+#' @param ... Other arguments passed to [fastcpd()], for example,
+#' \code{segment_count}.
+#' @return A [fastcpd-class] object.
+#' @description [fastcpd_quantile()] and [fastcpd.quantile()] are wrapper
+#' functions of [fastcpd()] to detect change points in quantile regression
+#' models using the pinball (check function) loss
+#' \eqn{\rho_\tau(u) = u(\tau - \mathbf{1}_{u < 0})}.
+#' The function detects changes in the conditional \eqn{\tau}-quantile of
+#' the response given the covariates. The segment cost is minimised via
+#' iteratively reweighted least squares (IRLS).
+#' @example tests/testthat/examples/fastcpd_quantile.txt
+#' @example tests/testthat/examples/fastcpd_quantile_2.R
+#' @seealso [fastcpd()]
+#'
+#' @md
+#' @rdname fastcpd_quantile
+#' @export
+fastcpd_quantile <- function(data, order = 0.5, ...) {
+  stopifnot(
+    "order must be a single numeric value in (0, 1) (the quantile level)." =
+      is.numeric(order) && length(order) == 1 && order > 0 && order < 1
+  )
+  result <- fastcpd(
+    data = data.frame(y = data[, 1], x = data[, -1]),
+    family = "quantile",
+    order = order,
+    ...
+  )
+  result@call <- match.call()
+  result
+}
+
+#' @rdname fastcpd_quantile
+#' @export
+fastcpd.quantile <- fastcpd_quantile  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in time series data
 #' @param data A numeric vector, a matrix, a data frame or a time series object.

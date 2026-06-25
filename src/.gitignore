@@ -15,4 +15,5 @@ fastcpd_mean*.cc
 fastcpd_meanvariance*.cc
 fastcpd_mgaussian*.cc
 fastcpd_poisson*.cc
+fastcpd_quantile*.cc
 fastcpd_variance*.cc

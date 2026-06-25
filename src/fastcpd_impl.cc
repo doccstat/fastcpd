@@ -70,6 +70,7 @@ DECLARE_SEGD(gaussian)
 DECLARE_SEGD(lasso)
 DECLARE_SEGD(ma)
 DECLARE_SEGD(poisson)
+DECLARE_SEGD(quantile)
 
 #undef DECLARE_PELT
 #undef DECLARE_SEGD
@@ -145,6 +146,7 @@ Rcpp::List fastcpd_impl(
   if (family == "lasso")                         { DISPATCH_SEGD(lasso); }
   if (family == "ma")                            { DISPATCH_SEGD(ma); }
   if (family == "poisson")                       { DISPATCH_SEGD(poisson); }
+  if (family == "quantile")                      { DISPATCH_SEGD(quantile); }
   DISPATCH_SEGD(custom);
 }
 
