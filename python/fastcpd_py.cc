@@ -4,11 +4,17 @@
 
 #include "fastcpd_py.h"
 #include "fastcpd_template.h"
+#include "families/arma.h"
+#include "families/binomial.h"
 #include "families/exponential.h"
+#include "families/garch.h"
+#include "families/gaussian.h"
 #include "families/lasso.h"
+#include "families/ma.h"
 #include "families/mean.h"
 #include "families/meanvariance.h"
 #include "families/mgaussian.h"
+#include "families/poisson.h"
 #include "families/variance.h"
 
 #include <cmath>
@@ -22,7 +28,8 @@ namespace fastcpd {
 // ---------------------------------------------------------------------------
 
 int fastcpd_compute_p(std::string const& family, int n_cols,
-                      int p_response, int p_explicit) {
+                      int p_response, arma::colvec const& order,
+                      int p_explicit) {
   if (p_explicit > 0) return p_explicit;
   if (family == "mean")         return n_cols;
   if (family == "variance")     return n_cols * n_cols;
@@ -32,7 +39,13 @@ int fastcpd_compute_p(std::string const& family, int n_cols,
     int k = n_cols - q;
     return (k > 0) ? q * k : q;
   }
-  if (family == "lasso") return n_cols - 1;
+  if (family == "lasso")    return n_cols - 1;
+  if (family == "gaussian") return n_cols - 1;
+  if (family == "binomial") return n_cols - 1;
+  if (family == "poisson")  return n_cols - 1;
+  if (family == "garch")    return static_cast<int>(arma::sum(order)) + 1;
+  if (family == "arma")     return static_cast<int>(arma::sum(order)) + 1;
+  if (family == "ma")       return static_cast<int>(order(1)) + 1;
   return n_cols;  // default fallback
 }
 
@@ -83,33 +96,43 @@ using Result =
     variance_estimate, warm_start
 
 // Instantiate one Fastcpd<> variant, run it, and return the result.
+// kRProg: true = show tqdm bar, false = silent.
 // kNDims: -1 = general path, 1 = scalar fast path.
-#define MAKE_AND_RUN(Policy, kCost, kNDims_val)                            \
+#define MAKE_AND_RUN(kRProg, Policy, kCost, kNDims_val)                    \
   {                                                                        \
-    fastcpd::classes::Fastcpd<fastcpd::families::Policy, false, true,     \
+    fastcpd::classes::Fastcpd<fastcpd::families::Policy, kRProg, true,    \
                               fastcpd::classes::CostAdjustment::kCost,    \
                               false, kNDims_val>                           \
         inst(FWD_ARGS);                                                    \
     return inst.Run();                                                     \
   }
 
-// Dispatch on cost_adjustment for a family that has a 1-D fast path.
-#define DISPATCH_PELT_1D(Policy)                                           \
+// Inner dispatch on cost_adjustment for a 1-D family, given a fixed kRProg.
+#define DISPATCH_PELT_1D_IMPL(kRProg, Policy)                              \
   if (data.n_cols == 1) {                                                  \
-    if (cost_adjustment == "MBIC") MAKE_AND_RUN(Policy, kMBIC, 1);        \
-    if (cost_adjustment == "MDL")  MAKE_AND_RUN(Policy, kMDL,  1);        \
-    MAKE_AND_RUN(Policy, kBIC, 1);                                         \
+    if (cost_adjustment == "MBIC") MAKE_AND_RUN(kRProg, Policy, kMBIC, 1);\
+    if (cost_adjustment == "MDL")  MAKE_AND_RUN(kRProg, Policy, kMDL,  1);\
+    MAKE_AND_RUN(kRProg, Policy, kBIC, 1);                                 \
   } else {                                                                 \
-    if (cost_adjustment == "MBIC") MAKE_AND_RUN(Policy, kMBIC, -1);       \
-    if (cost_adjustment == "MDL")  MAKE_AND_RUN(Policy, kMDL,  -1);       \
-    MAKE_AND_RUN(Policy, kBIC, -1);                                        \
+    if (cost_adjustment == "MBIC") MAKE_AND_RUN(kRProg, Policy, kMBIC,-1);\
+    if (cost_adjustment == "MDL")  MAKE_AND_RUN(kRProg, Policy, kMDL, -1);\
+    MAKE_AND_RUN(kRProg, Policy, kBIC, -1);                                \
   }
 
-// Dispatch on cost_adjustment for a family without a 1-D fast path.
+// Inner dispatch on cost_adjustment for a general family, given a fixed kRProg.
+#define DISPATCH_FAMILY_IMPL(kRProg, Policy)                               \
+  if (cost_adjustment == "MBIC") MAKE_AND_RUN(kRProg, Policy, kMBIC, -1); \
+  if (cost_adjustment == "MDL")  MAKE_AND_RUN(kRProg, Policy, kMDL,  -1); \
+  MAKE_AND_RUN(kRProg, Policy, kBIC, -1);
+
+// Public dispatch macros: select kRProgress at runtime via show_progress.
+#define DISPATCH_PELT_1D(Policy)                                           \
+  if (show_progress) { DISPATCH_PELT_1D_IMPL(true,  Policy) }             \
+  else               { DISPATCH_PELT_1D_IMPL(false, Policy) }
+
 #define DISPATCH_FAMILY(Policy)                                            \
-  if (cost_adjustment == "MBIC") MAKE_AND_RUN(Policy, kMBIC, -1);        \
-  if (cost_adjustment == "MDL")  MAKE_AND_RUN(Policy, kMDL,  -1);        \
-  MAKE_AND_RUN(Policy, kBIC, -1);
+  if (show_progress) { DISPATCH_FAMILY_IMPL(true,  Policy) }              \
+  else               { DISPATCH_FAMILY_IMPL(false, Policy) }
 
 // --- forwarding parameters (match Fastcpd constructor under NO_RCPP) ---
 Result dispatch_impl(
@@ -119,7 +142,7 @@ Result dispatch_impl(
     int p, unsigned int p_response, double pruning_coef, int segment_count,
     double trim, arma::colvec const& upper, double vanilla_percentage,
     arma::mat const& variance_estimate, bool warm_start,
-    std::string const& cost_adjustment) {
+    std::string const& cost_adjustment, bool show_progress) {
 
   if (family == "mean")        { DISPATCH_PELT_1D(MeanFamily); }
   if (family == "variance")    { DISPATCH_PELT_1D(VarianceFamily); }
@@ -127,14 +150,21 @@ Result dispatch_impl(
   if (family == "exponential") { DISPATCH_FAMILY(ExponentialFamily); }
   if (family == "mgaussian")   { DISPATCH_FAMILY(MgaussianFamily); }
   if (family == "lasso")       { DISPATCH_FAMILY(LassoFamily); }
+  if (family == "garch")       { DISPATCH_FAMILY(GarchFamily); }
+  if (family == "gaussian")    { DISPATCH_FAMILY(GaussianFamily); }
+  if (family == "binomial")    { DISPATCH_FAMILY(BinomialFamily); }
+  if (family == "poisson")     { DISPATCH_FAMILY(PoissonFamily); }
+  if (family == "arma")        { DISPATCH_FAMILY(ArmaFamily); }
+  if (family == "ma")          { DISPATCH_FAMILY(MaFamily); }
 
   throw std::runtime_error(
-      "fastcpd Python: unsupported family '" + family +
-      "'. Supported: mean, variance, meanvariance, exponential, mgaussian, lasso.");
+      "fastcpd Python: unsupported family '" + family + "'.");
 }
 
 #undef FWD_ARGS
 #undef MAKE_AND_RUN
+#undef DISPATCH_PELT_1D_IMPL
+#undef DISPATCH_FAMILY_IMPL
 #undef DISPATCH_PELT_1D
 #undef DISPATCH_FAMILY
 
@@ -148,12 +178,12 @@ fastcpd_py_dispatch(
     double momentum_coef, arma::colvec const& order, int p,
     unsigned int p_response, double pruning_coef, int segment_count,
     double trim, arma::colvec const& upper, double vanilla_percentage,
-    arma::mat const& variance_estimate, bool warm_start) {
+    arma::mat const& variance_estimate, bool warm_start, bool show_progress) {
   return dispatch_impl(beta, cp_only, data, epsilon, family, line_search,
                        lower, momentum_coef, order, p, p_response,
                        pruning_coef, segment_count, trim, upper,
                        vanilla_percentage, variance_estimate, warm_start,
-                       cost_adjustment);
+                       cost_adjustment, show_progress);
 }
 
 }  // namespace fastcpd

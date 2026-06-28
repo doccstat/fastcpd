@@ -20,10 +20,10 @@ namespace fastcpd {
 /// Returns p_explicit when p_explicit > 0; auto-infers from family otherwise.
 ///
 /// Mirrors the p-computation blocks in R/fastcpd.R lines 303-375 and
-/// Python segmentation.py lines 207-231 for the families supported by the
-/// Python binding.
+/// Python segmentation.py for all families supported by the Python binding.
 int fastcpd_compute_p(std::string const& family, int n_cols,
-                      int p_response, int p_explicit = 0);
+                      int p_response, arma::colvec const& order,
+                      int p_explicit = 0);
 
 /// Convert a string beta criterion ("BIC", "MBIC", "MDL") to a numeric
 /// penalty value.  When beta_str is empty the supplied beta_val is returned
@@ -54,9 +54,8 @@ double fastcpd_compute_pruning_coef(double pruning_coef,
 /// Dispatch change-point detection to the correct Fastcpd<> template.
 /// Returns (raw_cp_set, cp_set, cost_values, residual, thetas).
 ///
-/// Supported families: mean, variance, meanvariance, mgaussian, lasso.
-/// (Families requiring Rcpp — arma, ma, garch, gaussian/lm, binomial, poisson
-///  — are not yet supported in the Python binding.)
+/// Supported families: mean, variance, meanvariance, exponential, mgaussian,
+/// lasso, garch, gaussian/lm, binomial, poisson, arma, ma.
 std::tuple<arma::colvec, arma::colvec, arma::colvec, arma::mat, arma::mat>
 fastcpd_py_dispatch(
     double beta, std::string const& cost_adjustment, bool cp_only,
@@ -65,6 +64,6 @@ fastcpd_py_dispatch(
     double momentum_coef, arma::colvec const& order, int p,
     unsigned int p_response, double pruning_coef, int segment_count,
     double trim, arma::colvec const& upper, double vanilla_percentage,
-    arma::mat const& variance_estimate, bool warm_start);
+    arma::mat const& variance_estimate, bool warm_start, bool show_progress);
 
 }  // namespace fastcpd

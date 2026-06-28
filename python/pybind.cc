@@ -61,7 +61,7 @@ py::dict fastcpd_impl(
     unsigned int const segment_count, double const trim,
     std::vector<double> const& upper, double const vanilla_percentage,
     std::vector<std::vector<double>> const& variance_estimate,
-    bool const warm_start) {
+    bool const warm_start, bool const show_progress) {
 
   // -- Convert data to arma::mat (n_rows × n_cols). -------------------------
   arma::mat data_(data.size(), data.empty() ? 0 : data[0].size());
@@ -98,7 +98,7 @@ py::dict fastcpd_impl(
   int const n_cols = static_cast<int>(data_.n_cols);
 
   int const resolved_p = fastcpd::fastcpd_compute_p(
-      family, n_cols, static_cast<int>(p_response), p);
+      family, n_cols, static_cast<int>(p_response), order_, p);
 
   // beta_obj is either a Python str ("MBIC" etc.) or a numeric float.
   double beta_val;
@@ -125,7 +125,7 @@ py::dict fastcpd_impl(
       line_search_, lower_, momentum_coef, order_,
       resolved_p, p_response, resolved_pruning,
       static_cast<int>(segment_count), trim, upper_,
-      vanilla_percentage, variance_estimate_, warm_start);
+      vanilla_percentage, variance_estimate_, warm_start, show_progress);
 
   // -- Build the Python dict. -----------------------------------------------
   py::dict out;
@@ -142,5 +142,13 @@ py::dict fastcpd_impl(
 PYBIND11_MODULE(interface, module) {
   module.doc() = "fastcpd C++/Python interface";
   module.def("fastcpd_impl", &fastcpd_impl,
-             "Fast change-point detection");
+             "Fast change-point detection",
+             py::arg("beta_obj"), py::arg("cost_adjustment"),
+             py::arg("cp_only"), py::arg("data"), py::arg("epsilon"),
+             py::arg("family"), py::arg("line_search"), py::arg("lower"),
+             py::arg("momentum_coef"), py::arg("order"), py::arg("p"),
+             py::arg("p_response"), py::arg("pruning_coef"),
+             py::arg("segment_count"), py::arg("trim"), py::arg("upper"),
+             py::arg("vanilla_percentage"), py::arg("variance_estimate"),
+             py::arg("warm_start"), py::arg("show_progress") = false);
 }
