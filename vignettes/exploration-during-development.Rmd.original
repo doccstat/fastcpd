@@ -291,8 +291,7 @@ result <- fastcpd(
   cp_only = TRUE,
   lower = c(rep(-1, 1 + 1), 1e-10),
   upper = c(rep(1, 1 + 1), Inf),
-  line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9),
-  r.progress = FALSE
+  line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
 )
 summary(result)
 
@@ -329,7 +328,7 @@ for (i in 301:n) {
 #   lower = c(rep(-1, 3 + 2), 1e-10),
 #   upper = c(rep(1, 3 + 2), Inf),
 #   line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9),
-#   r.progress = FALSE
+#   // removed
 # )
 # summary(result)
 

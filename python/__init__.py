@@ -15,10 +15,16 @@ where the statistical properties of a sequence of observations change.
 | `segmentation.exponential` | exponential | Change in exponential rate parameter |
 | `segmentation.var` | mgaussian | Change in VAR(p) model coefficients |
 | `segmentation.lasso` | lasso | Change in penalised linear regression coefficients |
+| `segmentation.garch` | garch | Change in GARCH(p,q) model parameters |
+| `segmentation.lm` | gaussian | Change in linear regression coefficients |
+| `segmentation.binomial` | binomial | Change in logistic regression coefficients |
+| `segmentation.poisson` | poisson | Change in Poisson regression coefficients |
+| `segmentation.arma` | arma | Change in ARMA(p,q) model parameters (q > 0) |
+| `segmentation.ar` | ar | Change in AR(p) model parameters (OLS on lags) |
+| `segmentation.arima` | arima | Change in ARIMA(p,d,q) model parameters |
 
-Families not yet supported in the Python binding (require R packages at
-runtime): `arma`, `arima`, `ma`, `garch`, `lm`, `binomial`, `poisson`,
-`custom`.
+Not supported: `custom` (requires Python/R callbacks). Pure MA models are
+accessible via ``arima(data, order=(0, 0, q))``.
 
 # Quickstart
 

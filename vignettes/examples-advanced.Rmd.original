@@ -39,7 +39,7 @@ small_lasso <- cbind.data.frame(y, x)
 ```
 
 ```{r lasso}
-result <- fastcpd.lasso(small_lasso, segment_count = 2, r.progress = FALSE)
+result <- fastcpd.lasso(small_lasso, segment_count = 2)
 summary(result)
 ```
 
@@ -69,8 +69,7 @@ small_lasso <- cbind.data.frame(y, x)
 
 ```{r lasso_vanilla_percentage}
 result_vanilla_percentage <- fastcpd.lasso(
-  small_lasso, segment_count = 2, vanilla_percentage = 0.5,
-  r.progress = FALSE
+  small_lasso, segment_count = 2, vanilla_percentage = 0.5
 )
 summary(result_vanilla_percentage)
 ```
@@ -105,8 +104,7 @@ result_multiple_epochs <- fastcpd.lasso(
   segment_count = 2,
   multiple_epochs = function(segment_length) {
     if (segment_length < 25) 1 else 0
-  },
-  r.progress = FALSE
+  }
 )
 summary(result_multiple_epochs)
 ```

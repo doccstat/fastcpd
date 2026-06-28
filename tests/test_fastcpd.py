@@ -1,7 +1,10 @@
 import unittest
 
 import numpy as np
-from fastcpd.segmentation import exponential, lasso, mean, meanvariance, var, variance
+from fastcpd.segmentation import (
+    ar, arima, arma, binomial, exponential, garch, lasso, lm,
+    mean, meanvariance, poisson, var, variance,
+)
 from numpy import concatenate
 from numpy.random import exponential as rexp
 from numpy.random import multivariate_normal, randn, seed
@@ -61,6 +64,129 @@ class TestBasic(unittest.TestCase):
         data = np.column_stack([concatenate([y1, y2]), X])
         result = lasso(data)
         self.assertEqual(result.cp_set[0], 200)
+
+    def test_lm(self):
+        seed(8)
+        n = 400
+        X = randn(n, 3)
+        y = concatenate([
+            X[:200] @ np.array([1.0, 0.0, 0.0]) + randn(200) * 0.5,
+            X[200:] @ np.array([0.0, 0.0, 1.0]) + randn(200) * 0.5,
+        ])
+        data = np.column_stack([y, X])
+        result = lm(data)
+        self.assertGreater(len(result.cp_set), 0)
+        self.assertAlmostEqual(result.cp_set[0], 200, delta=10)
+
+    def test_binomial(self):
+        seed(9)
+        n = 600
+        X = randn(n, 2)
+        from scipy.special import expit
+        p1 = expit(X[:300] @ np.array([2.0, 0.0]))
+        p2 = expit(X[300:] @ np.array([0.0, 2.0]))
+        y = concatenate([
+            np.random.binomial(1, p1),
+            np.random.binomial(1, p2),
+        ]).astype(float)
+        data = np.column_stack([y, X])
+        result = binomial(data)
+        self.assertGreater(len(result.cp_set), 0)
+        self.assertAlmostEqual(result.cp_set[0], 300, delta=20)
+
+    def test_poisson(self):
+        seed(10)
+        n = 600
+        X = randn(n, 2)
+        mu1 = np.exp(X[:300] @ np.array([0.8, 0.0]))
+        mu2 = np.exp(X[300:] @ np.array([0.0, 0.8]))
+        y = concatenate([
+            np.random.poisson(mu1),
+            np.random.poisson(mu2),
+        ]).astype(float)
+        data = np.column_stack([y, X])
+        result = poisson(data)
+        self.assertGreater(len(result.cp_set), 0)
+        self.assertAlmostEqual(result.cp_set[0], 300, delta=20)
+
+    def test_garch(self):
+        seed(11)
+        n = 600
+        # Two GARCH(1,1) segments with very different persistence.
+        from numpy.random import default_rng
+        rng = default_rng(11)
+        x = np.zeros(n)
+        h = np.ones(n)
+        # Segment 1: low volatility  α=0.05, β=0.10
+        for t in range(1, 300):
+            h[t] = 0.5 + 0.05 * x[t - 1] ** 2 + 0.10 * h[t - 1]
+            x[t] = rng.normal(0, np.sqrt(h[t]))
+        # Segment 2: high volatility α=0.30, β=0.60
+        for t in range(300, n):
+            h[t] = 0.5 + 0.30 * x[t - 1] ** 2 + 0.60 * h[t - 1]
+            x[t] = rng.normal(0, np.sqrt(h[t]))
+        result = garch(x, order=(1, 1))
+        self.assertGreater(len(result.cp_set), 0)
+        self.assertAlmostEqual(result.cp_set[0], 300, delta=30)
+
+    def test_ar(self):
+        seed(12)
+        n = 600
+        x = np.zeros(n)
+        # Segment 1: AR(1) with φ=0.8
+        for t in range(1, 300):
+            x[t] = 0.8 * x[t - 1] + randn()
+        # Segment 2: AR(1) with φ=-0.8
+        for t in range(300, n):
+            x[t] = -0.8 * x[t - 1] + randn()
+        result = ar(x, order=1)
+        self.assertGreater(len(result.cp_set), 0)
+        self.assertAlmostEqual(result.cp_set[0], 300, delta=20)
+
+    def test_arma(self):
+        seed(13)
+        n = 600
+        x = np.zeros(n)
+        eps = randn(n)
+        # Segment 1: ARMA(1,1) with φ=0.5, θ=0.3
+        for t in range(1, 300):
+            x[t] = 0.5 * x[t - 1] + eps[t] + 0.3 * eps[t - 1]
+        # Segment 2: ARMA(1,1) with φ=-0.5, θ=-0.3
+        eps2 = randn(n)
+        for t in range(300, n):
+            x[t] = -0.5 * x[t - 1] + eps2[t] - 0.3 * eps2[t - 1]
+        result = arma(x, order=(1, 1))
+        self.assertGreater(len(result.cp_set), 0)
+        self.assertAlmostEqual(result.cp_set[0], 300, delta=30)
+
+    def test_arima(self):
+        # ARIMA(1,1,0): AR(1) process on first differences.
+        # Build two I(1) segments with different AR(1) drift structures.
+        seed(14)
+        n = 600
+        x = np.zeros(n)
+        # Segment 1: I(1) with AR(1) φ=0.7 on differences
+        for t in range(1, 300):
+            x[t] = x[t - 1] + 0.7 * (x[t - 1] - x[t - 2] if t > 1 else 0) + randn()
+        # Segment 2: I(1) with AR(1) φ=-0.7 on differences
+        for t in range(300, n):
+            x[t] = x[t - 1] - 0.7 * (x[t - 1] - x[t - 2] if t > 1 else 0) + randn()
+        result = arima(x, order=(1, 1, 0))
+        self.assertGreater(len(result.cp_set), 0)
+        self.assertAlmostEqual(result.cp_set[0], 300, delta=30)
+
+    def test_arima_d0_matches_arma(self):
+        # ARIMA(1, 0, 0) should produce the same result as arma(x, order=(1, 0)).
+        seed(15)
+        n = 400
+        x = np.zeros(n)
+        for t in range(1, 200):
+            x[t] = 0.8 * x[t - 1] + randn()
+        for t in range(200, n):
+            x[t] = -0.8 * x[t - 1] + randn()
+        r1 = arima(x, order=(1, 0, 0))
+        r2 = arma(x, order=(1, 0))
+        self.assertEqual(r1.cp_set, r2.cp_set)
 
 
 if __name__ == "__main__":

@@ -3,10 +3,11 @@
 
 #ifndef NO_RCPP
 #include <RcppArmadillo.h>
-#include "RProgress.h"
 #else
 #include <armadillo>
 #endif
+
+#include "fastcpd_progress.h"
 
 #include "fastcpd_family.h"
 #include "fastcpd_optim.h"
@@ -120,12 +121,9 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
         pruned_set_(2, 0u),
         pruning_coefficient_(pruning_coef),
         regression_response_count_(p_response),
-#ifndef NO_RCPP
         rProgress_(kRProgress
-            ? std::make_unique<RProgress::RProgress>(
-                  "[:bar] :current/:total in :elapsed", data_n_rows_)
+            ? std::make_unique<FastcpdProgress>(data_n_rows_)
             : nullptr),
-#endif
         segment_coefficients_(arma::mat(segment_count, p)),
         segment_count_(segment_count),
         segment_indices_(
@@ -206,9 +204,7 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
   arma::colvec result_coefficients_;
   arma::mat result_residuals_;
   double result_value_;
-#ifndef NO_RCPP
-  std::unique_ptr<RProgress::RProgress> rProgress_;
-#endif
+  std::unique_ptr<FastcpdProgress> rProgress_;
   arma::mat segment_coefficients_;
   int const segment_count_;
   arma::colvec segment_indices_;
@@ -254,11 +250,7 @@ Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::
 template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
           CostAdjustment kCostAdj, bool kLineSearch, int kNDims>
 void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::CreateRProgress() {
-  if constexpr (kRProgress) {
-#ifndef NO_RCPP
-    rProgress_->tick(0);
-#endif
-  }
+  // FastcpdProgress renders 0% in its constructor; nothing to do here.
 }
 
 template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
@@ -658,9 +650,7 @@ template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
           CostAdjustment kCostAdj, bool kLineSearch, int kNDims>
 void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::UpdateRProgress() {
   if constexpr (kRProgress) {
-#ifndef NO_RCPP
     rProgress_->tick();
-#endif
   }
 }
 

@@ -1,3 +1,25 @@
+# fastcpd 1.1.0
+
+*   Add `fastcpd_kcp()` / `fastcpd.kcp()`: kernel change-point detection via
+    random Fourier feature approximation of the RBF kernel, routed through the
+    PELT mean path.
+*   Add `fastcpd_rank()` / `fastcpd.rank()`: distribution-free rank-based
+    change-point detection; replaces each column with its centred global rank
+    and detects location shifts via PELT mean.
+*   Replace `RProgress` dependency with a built-in tqdm-format progress bar
+    (`src/fastcpd_progress.h`); remove `progress` from `LinkingTo`. Rename
+    the user-facing parameter `r.progress` → `show.progress`; default changed
+    from `TRUE` to `FALSE` (progress bar is off by default).
+*   Unify ARMA and MA C++ implementation: remove the `#ifndef NO_RCPP` split
+    in `src/families/arma.h` and `src/families/ma.h`. Both families now use a
+    single native C++ path (exact OLS for AR, diffuse Kalman ML + Nelder-Mead
+    for ARMA/MA) in both R and Python builds, eliminating the runtime call to
+    `stats::arima()`.
+*   Python: add `garch`, `lm`, `binomial`, `poisson`, `arma`, `ar`, and
+    `arima` to `fastcpd.segmentation`; all 13 non-custom families now supported.
+*   Fix `NEWS.md` history: `fastcpd 0.99.9` (Add small shiny app) corrected
+    to `fastcpd 0.9.9`.
+
 # fastcpd 1.0.8
 
 *   Add quantile regression family (`fastcpd_quantile`): robust change-point
@@ -244,7 +266,7 @@
 
 *   Add package comparison with other packages.
 
-# fastcpd 0.99.9
+# fastcpd 0.9.9
 
 *   Add small shiny app.
 

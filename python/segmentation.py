@@ -7,23 +7,20 @@ import numpy
 import fastcpd.variance_estimation
 from fastcpd.interface import fastcpd_impl
 
-# Families supported by the C++ Python binding (NO_RCPP mode).
+# Families dispatched to the C++ Python binding (NO_RCPP mode).
 #
-# PELT families (fully supported): mean, variance, meanvariance, exponential,
-#   mgaussian (exposed as var()).
-# SEN families (OLS-initialised, no glmnet/arima): lasso.
-#
-# Not supported (require R packages unavailable in the Python binding):
-#   arma, arima, ma — need stats::arima()
-#   garch           — needs tseries::garch() + Fortran
-#   lm/gaussian, binomial, poisson — need glmnet / fastglm (Rcpp + Eigen)
+# PELT families: mean, variance, meanvariance, exponential, mgaussian, garch.
+# SEN families: lasso, gaussian/lm, binomial, poisson, arma, ma.
+# 'arima' is accepted by detect() and pre-differenced before C++ dispatch.
 _SUPPORTED_FAMILIES = frozenset({
     'mean', 'variance', 'meanvariance', 'exponential', 'mgaussian', 'lasso',
+    'garch', 'gaussian', 'binomial', 'poisson', 'arma', 'ma', 'arima',
 })
 
 # Map R-style alias names to the internal C++ family string.
 _FAMILY_ALIASES = {
     'var': 'mgaussian',
+    'lm':  'gaussian',
 }
 
 # Result object returned by detect() when cp_only=False.
@@ -122,6 +119,117 @@ def lasso(data, **kwargs):
     return detect(data=data, family='lasso', **kwargs)
 
 
+def garch(data, order=(1, 1), **kwargs):
+    """Find change points in GARCH(p, q) models.
+
+    Args:
+        data: Univariate time series, shape (n,) or (n, 1).
+        order: Tuple (p, q) — GARCH and ARCH orders.
+        **kwargs: Additional arguments passed to ``detect()``.
+
+    Returns:
+        A list of change-point indices, or a CpdResult when cp_only=False.
+    """
+    return detect(data=data, family='garch', order=order, **kwargs)
+
+
+def lm(data, **kwargs):
+    """Find change points in ordinary linear regression models.
+
+    Args:
+        data: Array where column 0 is the response and the remaining columns
+            are predictors, shape (n, p+1).
+        **kwargs: Additional arguments passed to ``detect()``.
+
+    Returns:
+        A list of change-point indices, or a CpdResult when cp_only=False.
+    """
+    return detect(data=data, family='gaussian', **kwargs)
+
+
+def binomial(data, **kwargs):
+    """Find change points in logistic regression models.
+
+    Args:
+        data: Array where column 0 is the binary response and the remaining
+            columns are predictors, shape (n, p+1).
+        **kwargs: Additional arguments passed to ``detect()``.
+
+    Returns:
+        A list of change-point indices, or a CpdResult when cp_only=False.
+    """
+    return detect(data=data, family='binomial', **kwargs)
+
+
+def poisson(data, **kwargs):
+    """Find change points in Poisson regression models.
+
+    Args:
+        data: Array where column 0 is the count response and the remaining
+            columns are predictors, shape (n, p+1).
+        **kwargs: Additional arguments passed to ``detect()``.
+
+    Returns:
+        A list of change-point indices, or a CpdResult when cp_only=False.
+    """
+    return detect(data=data, family='poisson', **kwargs)
+
+
+def arma(data, order=(1, 0), **kwargs):
+    """Find change points in ARMA(p, q) models.
+
+    When order[0] == 0 (pure MA), routes to the MA family automatically.
+
+    Args:
+        data: Univariate time series, shape (n,) or (n, 1).
+        order: Tuple (p, q) — AR and MA orders.
+        **kwargs: Additional arguments passed to ``detect()``.
+
+    Returns:
+        A list of change-point indices, or a CpdResult when cp_only=False.
+    """
+    return detect(data=data, family='arma', order=order, **kwargs)
+
+
+def ar(data, order=1, **kwargs):
+    """Find change points in AR(p) models (pure autoregressive).
+
+    Args:
+        data: Univariate time series, shape (n,) or (n, 1).
+        order: AR order p.
+        **kwargs: Additional arguments passed to ``detect()``.
+
+    Returns:
+        A list of change-point indices, or a CpdResult when cp_only=False.
+    """
+    return detect(data=data, family='arma', order=(order, 0), **kwargs)
+
+
+def arima(data, order=(1, 1, 0), **kwargs):
+    """Find change points in ARIMA(p, d, q) models.
+
+    The integration order ``d`` is handled in Python by pre-differencing the
+    series ``d`` times before running ARMA(p, q) change-point detection on the
+    differenced series. This is equivalent to R's ``fastcpd_arima()`` for the
+    common case ``d ≤ 2`` and matches its change-point indices exactly for
+    ``d = 1`` (the most common case).
+
+    Args:
+        data: Univariate time series, shape (n,) or (n, 1).
+        order: Tuple (p, d, q) — AR order, integration order, MA order.
+        **kwargs: Additional arguments passed to ``detect()``.
+
+    Returns:
+        A list of change-point indices, or a CpdResult when cp_only=False.
+
+    Note:
+        For ``d ≥ 2`` the returned change-point indices correspond to the
+        differenced-series positions. For ``d = 0`` this is identical to
+        ``arma(data, order=(p, q))``.
+    """
+    return detect(data=data, family='arima', order=order, **kwargs)
+
+
 def detect(
     formula: str = 'y ~ . - 1',
     data: numpy.ndarray = None,
@@ -147,6 +255,7 @@ def detect(
     cp_only: bool = False,
     vanilla_percentage: float = 1.0,
     warm_start: bool = False,
+    show_progress: bool = False,
     **kwargs
 ):
     r"""Find change points efficiently.
@@ -159,7 +268,9 @@ def detect(
             is supplied, using the same formulae as the R package.
         cost_adjustment: One of 'BIC', 'MBIC', 'MDL'.
         family: One of 'mean', 'variance', 'meanvariance', 'exponential',
-            'mgaussian' / 'var' (alias), 'lasso'.
+            'mgaussian' / 'var' (alias), 'lasso', 'garch', 'gaussian' /
+            'lm' (alias), 'binomial', 'poisson', 'arma', 'ma',
+            'arima' (pre-differenced then routed to arma/ma).
         line_search: Values for line search step sizes.
         lower: Lower bound for parameters after each update.
         upper: Upper bound for parameters after each update.
@@ -182,10 +293,14 @@ def detect(
         cp_only: If True, return only change-point indices (list of floats).
             If False, return a CpdResult namedtuple with cp_set, raw_cp_set,
             cost_values, residuals, and thetas.
-        vanilla_percentage: Fraction of data to run in pure PELT mode.
-            Currently fixed at 1.0 (full PELT) for the Python binding.
+        vanilla_percentage: Fraction of observations evaluated with pure PELT
+            (no gradient update). 1.0 runs full PELT; 0.0 runs full SEN.
         warm_start: If True, use previous segment parameters as initial
             values.
+        show_progress: If True, display a tqdm-format progress bar on stderr
+            showing PELT timestep progress. Same format as Python tqdm default:
+            ``42%|████████████          | 42/100 [00:05<00:07, 8.33it/s]``.
+            Implemented in C++; no tqdm package required.
 
     Returns:
         When cp_only=True: a list of change-point indices (1-based).
@@ -197,9 +312,50 @@ def detect(
     if data.ndim == 1:
         data = data.reshape(-1, 1)
 
+    if cost is not None or cost_gradient is not None or cost_hessian is not None:
+        raise NotImplementedError(
+            "Custom cost functions (cost, cost_gradient, cost_hessian) are not "
+            "supported by the Python binding."
+        )
+
     family = family.lower() if family is not None else 'custom'
-    # Apply aliases (e.g. 'var' → 'mgaussian').
+    # Apply aliases (e.g. 'var' → 'mgaussian', 'lm' → 'gaussian').
     family = _FAMILY_ALIASES.get(family, family)
+
+    # ARIMA(p, d, q): pre-difference the series d times, then route to arma/ma.
+    # numpy.diff does not change the number of rows (it shortens by d rows),
+    # so returned change-point indices are in the original-series index space.
+    if family == 'arima':
+        arima_order = list(order) if hasattr(order, '__len__') else [int(order), 0, 0]
+        while len(arima_order) < 3:
+            arima_order.append(0)
+        p_ar, d_int, q_ma = int(arima_order[0]), int(arima_order[1]), int(arima_order[2])
+        if d_int < 0:
+            raise ValueError(f"ARIMA integration order d must be >= 0, got {d_int}")
+        if d_int > 0:
+            data = numpy.diff(data, n=d_int, axis=0)
+        order = (p_ar, q_ma)
+        family = 'arma' if p_ar > 0 else 'ma'
+
+    # Route pure-MA models: arma with p=0 uses the MA family.
+    if family == 'arma' and hasattr(order, '__len__') and order[0] == 0:
+        family = 'ma'
+
+    # Pure AR(p): route through lag-structured gaussian instead of ARMA.
+    # The ARMA C++ path requires q > 0 in the NO_RCPP (Python) build;
+    # for q == 0, OLS on lagged data gives the exact conditional MLE.
+    _ar_offset = 0
+    if (family == 'arma' and hasattr(order, '__len__') and
+            len(order) >= 2 and int(order[0]) > 0 and int(order[1]) == 0):
+        p_ar = int(order[0])
+        n_rows = data.shape[0]
+        if p_ar < n_rows:
+            y = data[p_ar:, 0:1]
+            lags = numpy.column_stack(
+                [data[p_ar - j - 1:n_rows - j - 1, 0] for j in range(p_ar)])
+            data = numpy.column_stack([y, lags])
+            family = 'gaussian'
+            _ar_offset = p_ar
 
     if family not in _SUPPORTED_FAMILIES:
         raise ValueError(
@@ -243,14 +399,15 @@ def detect(
         float(vanilla_percentage),
         ve.tolist(),
         bool(warm_start),
+        bool(show_progress),
     )
 
     if cp_only:
-        return result['cp_set']
+        return [cp + _ar_offset for cp in result['cp_set']]
 
     return CpdResult(
-        cp_set=result['cp_set'],
-        raw_cp_set=result['raw_cp_set'],
+        cp_set=[cp + _ar_offset for cp in result['cp_set']],
+        raw_cp_set=[cp + _ar_offset for cp in result['raw_cp_set']],
         cost_values=result['cost_values'],
         residuals=result['residuals'],
         thetas=result['thetas'],

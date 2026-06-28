@@ -9,10 +9,18 @@ Wrapper functions for fastcpd to find change points in various
 models.
 }
 \seealso{
-\code{\link[=fastcpd.mean]{fastcpd.mean()}}, \code{\link[=fastcpd.variance]{fastcpd.variance()}}, \code{\link[=fastcpd.mv]{fastcpd.mv()}},
-\code{\link[=fastcpd.meanvariance]{fastcpd.meanvariance()}} for basic statistics change models;
+Basic statistics:
+\code{\link[=fastcpd.mean]{fastcpd.mean()}}, \code{\link[=fastcpd.variance]{fastcpd.variance()}}, \code{\link[=fastcpd.meanvariance]{fastcpd.meanvariance()}},
+\code{\link[=fastcpd.mv]{fastcpd.mv()}}, \code{\link[=fastcpd.exponential]{fastcpd.exponential()}};
+
+Regression:
 \code{\link[=fastcpd.lm]{fastcpd.lm()}}, \code{\link[=fastcpd.binomial]{fastcpd.binomial()}}, \code{\link[=fastcpd.poisson]{fastcpd.poisson()}},
-\code{\link[=fastcpd.lasso]{fastcpd.lasso()}} for regression coefficients change models;
+\code{\link[=fastcpd.lasso]{fastcpd.lasso()}}, \code{\link[=fastcpd.quantile]{fastcpd.quantile()}};
+
+Time series:
 \code{\link[=fastcpd.ar]{fastcpd.ar()}}, \code{\link[=fastcpd.var]{fastcpd.var()}}, \code{\link[=fastcpd.arima]{fastcpd.arima()}}, \code{\link[=fastcpd.arma]{fastcpd.arma()}},
-\code{\link[=fastcpd.garch]{fastcpd.garch()}} for change in time series models.
+\code{\link[=fastcpd.garch]{fastcpd.garch()}};
+
+Distribution-free:
+\code{\link[=fastcpd.kcp]{fastcpd.kcp()}}, \code{\link[=fastcpd.rank]{fastcpd.rank()}}.
 }

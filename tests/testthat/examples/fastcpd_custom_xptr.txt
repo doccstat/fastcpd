@@ -9,15 +9,14 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   beta_val <- (ncol(data) + 1) * log(nrow(data)) / 2
 
   result_builtin <- fastcpd.mean(
-    data, beta = beta_val, cost_adjustment = NULL, r.progress = FALSE
+    data, beta = beta_val, cost_adjustment = NULL
   )
 
   cost_r <- function(data) sum((data - mean(data))^2) / 2
   time_r <- system.time(
     result_r <- fastcpd(
       ~ . - 1, data.frame(x = data), family = "custom",
-      cost = cost_r, beta = beta_val, cost_adjustment = NULL,
-      r.progress = FALSE
+      cost = cost_r, beta = beta_val, cost_adjustment = NULL
     )
   )
 
@@ -51,8 +50,7 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   time_xptr <- system.time(
     result_xptr <- fastcpd(
       ~ . - 1, data.frame(x = data), family = "custom",
-      cost = cost_xptr, beta = beta_val, cost_adjustment = NULL,
-      r.progress = FALSE
+      cost = cost_xptr, beta = beta_val, cost_adjustment = NULL
     )
   )
 

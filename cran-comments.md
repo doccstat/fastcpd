@@ -1,5 +1,21 @@
 ## Updates since last CRAN release (1.0.0)
 
+### fastcpd 1.1.0
+
+*   Add `fastcpd_kcp()` / `fastcpd.kcp()`: kernel change-point detection via
+    random Fourier feature approximation of the RBF kernel.
+*   Add `fastcpd_rank()` / `fastcpd.rank()`: distribution-free rank-based
+    change-point detection.
+*   Replace `RProgress` dependency with a built-in progress bar; remove
+    `progress` from `LinkingTo`. Rename `r.progress` → `show.progress`;
+    default changed to `FALSE`.
+*   Unify ARMA and MA C++ implementation: remove `#ifndef NO_RCPP` split;
+    both families now use a native C++ Kalman ML path in R and Python.
+*   Python: add `garch`, `lm`, `binomial`, `poisson`, `arma`, `ar`, `arima`
+    to `fastcpd.segmentation` (all 13 non-custom families now supported).
+*   Fix `NEWS.md` history: duplicate `fastcpd 0.99.9` entry corrected to
+    `fastcpd 0.9.9`.
+
 ### fastcpd 1.0.8
 
 *   Add quantile regression family (`fastcpd_quantile`): robust change-point
