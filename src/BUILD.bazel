@@ -5,6 +5,7 @@ cc_library(
         "fastcpd_garch.h",
         "fastcpd_glm.h",
         "fastcpd_optim.h",
+        "fastcpd_progress.h",
         "fastcpd_template.h",
         "families/arma.h",
         "families/binomial.h",

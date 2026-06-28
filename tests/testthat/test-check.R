@@ -94,7 +94,7 @@ testthat::test_that(
         "\"lasso\", \"quantile\", ",
         "\"mean\", \"variance\", \"meanvariance\", ",
         "\"arma\", \"ar\", \"var\", \"arima\", \"garch\", ",
-        "\"exponential\", \"custom\".",
+        "\"exponential\", \"kcp\", \"custom\".",
         "\nThe provided family is \"bin0mial\"."
       )
     )
