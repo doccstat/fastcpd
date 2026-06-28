@@ -43,7 +43,7 @@ set.seed(1)
 data <- c(rnorm(300, 0, 1), rnorm(400, 0, 10), rnorm(300, 0, 1))
 system.time(result <- fastcpd.variance(data))
 #>    user  system elapsed 
-#>   0.002   0.000   0.003 
+#>   0.003   0.000   0.002 
 summary(result)
 #> 
 #> Call:
@@ -81,7 +81,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
   summary(result)
 }
 #>    user  system elapsed 
-#>   0.764   0.025   0.790 
+#>   0.730   0.027   0.757 
 #> 
 #> Call:
 #> fastcpd.variance(data = data, cp_only = TRUE)
