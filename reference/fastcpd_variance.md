@@ -75,16 +75,16 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     )
   )
   result_time <- system.time(
-    result <- fastcpd.variance(data, r.progress = FALSE, cp_only = TRUE)
+    result <- fastcpd.variance(data, cp_only = TRUE)
   )
   print(result_time)
   summary(result)
 }
 #>    user  system elapsed 
-#>   0.664   0.020   0.685 
+#>   0.764   0.025   0.790 
 #> 
 #> Call:
-#> fastcpd.variance(data = data, r.progress = FALSE, cp_only = TRUE)
+#> fastcpd.variance(data = data, cp_only = TRUE)
 #> 
 #> Change points:
 #> 300002 700003 

@@ -43,7 +43,6 @@ execution_times <- numeric(length(ns))
 for (i in seq_along(ns)) {
   execution_times[i] <- system.time(fastcpd.mean(
     mvtnorm::rmvnorm(ns[i], mean = rep(0, p), sigma = diag(1, p)),
-    r.progress = FALSE,
     cp_only = TRUE
   ))[[1]]
 }
@@ -153,7 +152,7 @@ y <- c(
 lasso_data <- data.frame(y = y, x = x)
 
 # Detect change points using fastcpd.lasso without SeDG (vanilla_percentage = 0)
-system.time(result_seg_non_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 0, r.progress = FALSE))
+system.time(result_seg_non_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 0))
 #>    user  system elapsed 
 #>   5.556   0.794   6.364
 cat("Change points with SeDG (vanilla_percentage = 0):\n")
@@ -162,7 +161,7 @@ result_seg_non_vanilla@cp_set
 #> [1]  79 203 320
 
 # Detect change points using fastcpd.lasso with the vanilla approach (vanilla_percentage = 1)
-system.time(result_seg_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 1, r.progress = FALSE))
+system.time(result_seg_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 1))
 #>    user  system elapsed 
 #> 112.649   5.302 118.156
 cat("Change points with vanilla approach (vanilla_percentage = 1):\n")
@@ -205,7 +204,6 @@ execution_times <- numeric(length(ns))
 for (i in seq_along(ns)) {
   execution_times[i] <- system.time(fastcpd.mean(
     mvtnorm::rmvnorm(ns[i], mean = rep(0, p), sigma = diag(1, p)),
-    r.progress = FALSE,
     cp_only = TRUE
   ))[[1]]
 }
@@ -276,12 +274,12 @@ y <- c(
 lasso_data <- data.frame(y = y, x = x)
 
 # Detect change points using fastcpd.lasso without SeDG (vanilla_percentage = 0)
-system.time(result_seg_non_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 0, r.progress = FALSE))
+system.time(result_seg_non_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 0))
 cat("Change points with SeDG (vanilla_percentage = 0):\n")
 result_seg_non_vanilla@cp_set
 
 # Detect change points using fastcpd.lasso with the vanilla approach (vanilla_percentage = 1)
-system.time(result_seg_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 1, r.progress = FALSE))
+system.time(result_seg_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 1))
 cat("Change points with vanilla approach (vanilla_percentage = 1):\n")
 result_seg_vanilla@cp_set
 ```

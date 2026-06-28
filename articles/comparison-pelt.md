@@ -819,8 +819,7 @@ fastcpd.binomial(
   cbind(y, x),
   segment_count = 5,
   beta = "BIC",
-  cost_adjustment = "BIC",
-  r.progress = FALSE
+  cost_adjustment = "BIC"
 )@cp_set
 #> [1] 125
 
@@ -832,8 +831,7 @@ fastcpd.binomial(
   segment_count = 5,
   vanilla_percentage = 1,
   beta = "BIC",
-  cost_adjustment = "BIC",
-  r.progress = FALSE
+  cost_adjustment = "BIC"
 )@cp_set
 #> [1] 125
 ```
@@ -878,8 +876,7 @@ fastcpd.poisson(
   beta = beta,
   cost_adjustment = "BIC",
   epsilon = 0.001,
-  segment_count = 10,
-  r.progress = FALSE
+  segment_count = 10
 )@cp_set
 #> [1]  380  751 1136 1251
 
@@ -891,8 +888,7 @@ fastcpd.poisson(
   segment_count = 10,
   vanilla_percentage = 1,
   beta = beta,
-  cost_adjustment = "BIC",
-  r.progress = FALSE
+  cost_adjustment = "BIC"
 )@cp_set
 #> [1]  374  752 1133
 ```
@@ -923,8 +919,7 @@ fastcpd.lasso(
   epsilon = 1e-5,
   beta = beta,
   cost_adjustment = "BIC",
-  pruning_coef = 0,
-  r.progress = FALSE
+  pruning_coef = 0
 )@cp_set
 #> [1] 100 300 520 800 901
 
@@ -947,8 +942,7 @@ fastcpd.lasso(
   epsilon = 1e-5,
   beta = beta,
   cost_adjustment = "BIC",
-  pruning_coef = 0,
-  r.progress = FALSE
+  pruning_coef = 0
 )@cp_set
 #> [1] 103 299 510 800 900
 ```
@@ -1764,8 +1758,7 @@ fastcpd.binomial(
   cbind(y, x),
   segment_count = 5,
   beta = "BIC",
-  cost_adjustment = "BIC",
-  r.progress = FALSE
+  cost_adjustment = "BIC"
 )@cp_set
 
 pelt_vanilla_binomial(cbind(x, y), (p + 1) * log(300) / 2)$cp
@@ -1775,8 +1768,7 @@ fastcpd.binomial(
   segment_count = 5,
   vanilla_percentage = 1,
   beta = "BIC",
-  cost_adjustment = "BIC",
-  r.progress = FALSE
+  cost_adjustment = "BIC"
 )@cp_set
 set.seed(1)
 n <- 1500
@@ -1813,8 +1805,7 @@ fastcpd.poisson(
   beta = beta,
   cost_adjustment = "BIC",
   epsilon = 0.001,
-  segment_count = 10,
-  r.progress = FALSE
+  segment_count = 10
 )@cp_set
 
 pelt_vanilla_poisson(data, beta)$cp
@@ -1824,8 +1815,7 @@ fastcpd.poisson(
   segment_count = 10,
   vanilla_percentage = 1,
   beta = beta,
-  cost_adjustment = "BIC",
-  r.progress = FALSE
+  cost_adjustment = "BIC"
 )@cp_set
 set.seed(1)
 n <- 1000
@@ -1848,8 +1838,7 @@ fastcpd.lasso(
   epsilon = 1e-5,
   beta = beta,
   cost_adjustment = "BIC",
-  pruning_coef = 0,
-  r.progress = FALSE
+  pruning_coef = 0
 )@cp_set
 
 pelt_vanilla_lasso(data, beta, cost = cost_lasso)$cp
@@ -1860,7 +1849,6 @@ fastcpd.lasso(
   epsilon = 1e-5,
   beta = beta,
   cost_adjustment = "BIC",
-  pruning_coef = 0,
-  r.progress = FALSE
+  pruning_coef = 0
 )@cp_set
 ```

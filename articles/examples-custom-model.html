@@ -34,7 +34,7 @@ logistic regression models.
 
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,11 +111,11 @@ results as the built-in logistic regression model.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">binomial_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd.binomial(data = cbind(y, x), r.progress = FALSE, cost_adjustment = NULL)</span></span>
+<span><span class="co">#&gt; fastcpd.binomial(data = cbind(y, x), cost_adjustment = NULL)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
 <span><span class="co">#&gt; 250 </span></span>
@@ -151,15 +151,14 @@ results as the built-in logistic regression model.</p>
 <span><span class="op">}</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
 <span>  <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="va">binomial_data</span>, epsilon <span class="op">=</span> <span class="fl">1e-5</span>, cost <span class="op">=</span> <span class="va">logistic_loss</span>,</span>
-<span>  cost_gradient <span class="op">=</span> <span class="va">logistic_gradient</span>, cost_hessian <span class="op">=</span> <span class="va">logistic_hessian</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  cost_gradient <span class="op">=</span> <span class="va">logistic_gradient</span>, cost_hessian <span class="op">=</span> <span class="va">logistic_hessian</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; fastcpd(formula = y ~ . - 1, data = binomial_data, cost = logistic_loss, </span></span>
 <span><span class="co">#&gt;     cost_gradient = logistic_gradient, cost_hessian = logistic_hessian, </span></span>
-<span><span class="co">#&gt;     epsilon = 1e-05, r.progress = FALSE)</span></span>
+<span><span class="co">#&gt;     epsilon = 1e-05)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
 <span><span class="co">#&gt; 252 </span></span>
@@ -233,8 +232,7 @@ does for R closures. Instead, set an integer
 <span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">my_cost_pelt_xptr</span>, <span class="st">"fastcpd_cost_arity"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1L</span></span>
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">data</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"custom"</span>, cost <span class="op">=</span> <span class="va">my_cost_pelt_xptr</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">data</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"custom"</span>, cost <span class="op">=</span> <span class="va">my_cost_pelt_xptr</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <p>A compiled <code>cost</code> can be used on its own (covering both
@@ -272,7 +270,7 @@ whether <code>cost</code> is an R closure or a compiled
 <span><span class="op">)</span></span>
 <span><span class="va">binomial_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_binomial.html">fastcpd.binomial</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="va">logistic_loss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
@@ -294,16 +292,14 @@ whether <code>cost</code> is an R closure or a compiled
 <span><span class="op">}</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
 <span>  <span class="va">y</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="va">binomial_data</span>, epsilon <span class="op">=</span> <span class="fl">1e-5</span>, cost <span class="op">=</span> <span class="va">logistic_loss</span>,</span>
-<span>  cost_gradient <span class="op">=</span> <span class="va">logistic_gradient</span>, cost_hessian <span class="op">=</span> <span class="va">logistic_hessian</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  cost_gradient <span class="op">=</span> <span class="va">logistic_gradient</span>, cost_hessian <span class="op">=</span> <span class="va">logistic_hessian</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="va">my_cost_pelt_xptr</span> <span class="op">&lt;-</span> <span class="fu">make_my_cost_pelt_xptr</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">my_cost_pelt_xptr</span>, <span class="st">"fastcpd_cost_arity"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1L</span></span>
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd.html">fastcpd</a></span><span class="op">(</span></span>
-<span>  <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">data</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"custom"</span>, cost <span class="op">=</span> <span class="va">my_cost_pelt_xptr</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">data</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"custom"</span>, cost <span class="op">=</span> <span class="va">my_cost_pelt_xptr</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 </div>

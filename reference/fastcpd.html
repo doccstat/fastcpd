@@ -9,7 +9,7 @@ parameters and returns a fastcpd object."><meta property="og:image" content="htt
 
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -350,8 +350,9 @@ current segment. This parameter is only used for the <code>"glm"</code> families
 <dd><p>Other parameters for specific models.</p><ul><li><p><code>include.mean</code> is used to determine if a mean/intercept term
 should be included in the ARIMA(\(p\), \(d\), \(q\)) or
 GARCH(\(p\), \(q\)) models.</p></li>
-<li><p><code>r.progress</code> is used to control the progress bar. By default the
-progress bar will be shown. To disable it, set <code>r.progress = FALSE</code>.</p></li>
+<li><p><code>show.progress</code> is used to control the progress bar. By default
+no progress bar is shown. Set <code>show.progress = TRUE</code> to display a
+tqdm-format progress bar on stderr showing PELT timestep progress.</p></li>
 <li><p><code>p.response</code> is used to specify the number of response variables.
 This parameter is especially useful for linear models with multivariate
 responses.</p></li>
@@ -725,15 +726,14 @@ volume 206 series Proceedings of Machine Learning Research, 1129-1143.</p>
 <span class="r-in"><span>  <span class="va">beta_val</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">result_builtin</span> <span class="op">&lt;-</span> <span class="fu"><a href="fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">data</span>, beta <span class="op">=</span> <span class="va">beta_val</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>    <span class="va">data</span>, beta <span class="op">=</span> <span class="va">beta_val</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">cost_r</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">data</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span></span>
 <span class="r-in"><span>  <span class="va">time_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">result_r</span> <span class="op">&lt;-</span> <span class="fu">fastcpd</span><span class="op">(</span></span></span>
 <span class="r-in"><span>      <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">data</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"custom"</span>,</span></span>
-<span class="r-in"><span>      cost <span class="op">=</span> <span class="va">cost_r</span>, beta <span class="op">=</span> <span class="va">beta_val</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>      r.progress <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>      cost <span class="op">=</span> <span class="va">cost_r</span>, beta <span class="op">=</span> <span class="va">beta_val</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -767,8 +767,7 @@ volume 206 series Proceedings of Machine Learning Research, 1129-1143.</p>
 <span class="r-in"><span>  <span class="va">time_xptr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">result_xptr</span> <span class="op">&lt;-</span> <span class="fu">fastcpd</span><span class="op">(</span></span></span>
 <span class="r-in"><span>      <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">data</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"custom"</span>,</span></span>
-<span class="r-in"><span>      cost <span class="op">=</span> <span class="va">cost_xptr</span>, beta <span class="op">=</span> <span class="va">beta_val</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>      r.progress <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>      cost <span class="op">=</span> <span class="va">cost_xptr</span>, beta <span class="op">=</span> <span class="va">beta_val</span>, cost_adjustment <span class="op">=</span> <span class="cn">NULL</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -780,13 +779,12 @@ volume 206 series Proceedings of Machine Learning Research, 1129-1143.</p>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"XPtr:      "</span>, <span class="va">time_xptr</span><span class="op">[</span><span class="st">"elapsed"</span><span class="op">]</span>, <span class="st">"s\n"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_xptr</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> R closure:  2.042 s</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> XPtr:       0.103 s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> R closure:  1.988 s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> XPtr:       0.102 s</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> fastcpd(formula = ~. - 1, data = data.frame(x = data), beta = beta_val, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     cost_adjustment = NULL, family = "custom", cost = cost_xptr, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     r.progress = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     cost_adjustment = NULL, family = "custom", cost = cost_xptr)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Change points:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 500 </span>

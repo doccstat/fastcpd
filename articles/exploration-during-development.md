@@ -276,8 +276,7 @@ result <- fastcpd(
   cp_only = TRUE,
   lower = c(rep(-1, 1 + 1), 1e-10),
   upper = c(rep(1, 1 + 1), Inf),
-  line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9),
-  r.progress = FALSE
+  line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
 )
 summary(result)
 #> 
@@ -287,8 +286,7 @@ summary(result)
 #>     cost = qmle, cost_gradient = qmle_gradient, cost_hessian = qmle_hessian, 
 #>     line_search = c(1, 0.1, 0.01, 0.001, 1e-04, 1e-05, 1e-06, 
 #>         1e-07, 1e-08, 1e-09), lower = c(rep(-1, 1 + 1), 1e-10), 
-#>     upper = c(rep(1, 1 + 1), Inf), trim = 0, p = 1 + 1 + 1, cp_only = TRUE, 
-#>     r.progress = FALSE)
+#>     upper = c(rep(1, 1 + 1), Inf), trim = 0, p = 1 + 1 + 1, cp_only = TRUE)
 #> 
 #> Change points:
 #> 3 300
@@ -325,8 +323,7 @@ for (i in 301:n) {
 #   cp_only = TRUE,
 #   lower = c(rep(-1, 3 + 2), 1e-10),
 #   upper = c(rep(1, 3 + 2), Inf),
-#   line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9),
-#   r.progress = FALSE
+#   line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
 # )
 # summary(result)
 
@@ -715,8 +712,7 @@ result <- fastcpd(
   cp_only = TRUE,
   lower = c(rep(-1, 1 + 1), 1e-10),
   upper = c(rep(1, 1 + 1), Inf),
-  line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9),
-  r.progress = FALSE
+  line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
 )
 summary(result)
 
@@ -752,8 +748,7 @@ for (i in 301:n) {
 #   cp_only = TRUE,
 #   lower = c(rep(-1, 3 + 2), 1e-10),
 #   upper = c(rep(1, 3 + 2), Inf),
-#   line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9),
-#   r.progress = FALSE
+#   line_search = c(1, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9)
 # )
 # summary(result)
 

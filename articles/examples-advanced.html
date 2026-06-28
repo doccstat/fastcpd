@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,11 +107,11 @@
 <span><span class="op">)</span></span>
 <span><span class="va">small_lasso</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd.lasso(data = small_lasso, segment_count = 2, r.progress = FALSE)</span></span>
+<span><span class="co">#&gt; fastcpd.lasso(data = small_lasso, segment_count = 2)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
 <span><span class="co">#&gt; 73 151 </span></span>
@@ -167,14 +167,12 @@
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_vanilla_percentage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span></span>
-<span>  <span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0.5</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_vanilla_percentage</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; fastcpd.lasso(data = small_lasso, segment_count = 2, vanilla_percentage = 0.5, </span></span>
-<span><span class="co">#&gt;     r.progress = FALSE)</span></span>
+<span><span class="co">#&gt; fastcpd.lasso(data = small_lasso, segment_count = 2, vanilla_percentage = 0.5)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
 <span><span class="co">#&gt; 74 150 </span></span>
@@ -235,8 +233,7 @@
 <span>  segment_count <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  multiple_epochs <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">segment_length</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw">if</span> <span class="op">(</span><span class="va">segment_length</span> <span class="op">&lt;</span> <span class="fl">25</span><span class="op">)</span> <span class="fl">1</span> <span class="kw">else</span> <span class="fl">0</span></span>
-<span>  <span class="op">}</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_multiple_epochs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -245,7 +242,7 @@
 <span><span class="co">#&gt;     if (segment_length &lt; 25) </span></span>
 <span><span class="co">#&gt;         1</span></span>
 <span><span class="co">#&gt;     else 0</span></span>
-<span><span class="co">#&gt; }, r.progress = FALSE)</span></span>
+<span><span class="co">#&gt; })</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Change points:</span></span>
 <span><span class="co">#&gt; 74 151 227 </span></span>
@@ -330,7 +327,7 @@
 <span>  <span class="va">x</span><span class="op">[</span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.75</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">n</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_0</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fl">0.25</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">small_lasso</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span>, r.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span><span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">300</span></span>
@@ -352,8 +349,7 @@
 <span><span class="op">)</span></span>
 <span><span class="va">small_lasso</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span>
 <span><span class="va">result_vanilla_percentage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fastcpd_lasso.html">fastcpd.lasso</a></span><span class="op">(</span></span>
-<span>  <span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="va">small_lasso</span>, segment_count <span class="op">=</span> <span class="fl">2</span>, vanilla_percentage <span class="op">=</span> <span class="fl">0.5</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_vanilla_percentage</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
@@ -380,8 +376,7 @@
 <span>  segment_count <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  multiple_epochs <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">segment_length</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw">if</span> <span class="op">(</span><span class="va">segment_length</span> <span class="op">&lt;</span> <span class="fl">25</span><span class="op">)</span> <span class="fl">1</span> <span class="kw">else</span> <span class="fl">0</span></span>
-<span>  <span class="op">}</span>,</span>
-<span>  r.progress <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_multiple_epochs</span><span class="op">)</span></span></code></pre></div>
 </div>

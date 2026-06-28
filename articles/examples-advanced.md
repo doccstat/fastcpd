@@ -25,11 +25,11 @@ small_lasso <- cbind.data.frame(y, x)
 
 ``` r
 
-result <- fastcpd.lasso(small_lasso, segment_count = 2, r.progress = FALSE)
+result <- fastcpd.lasso(small_lasso, segment_count = 2)
 summary(result)
 #> 
 #> Call:
-#> fastcpd.lasso(data = small_lasso, segment_count = 2, r.progress = FALSE)
+#> fastcpd.lasso(data = small_lasso, segment_count = 2)
 #> 
 #> Change points:
 #> 73 151 
@@ -87,14 +87,12 @@ summary(result)
 ``` r
 
 result_vanilla_percentage <- fastcpd.lasso(
-  small_lasso, segment_count = 2, vanilla_percentage = 0.5,
-  r.progress = FALSE
+  small_lasso, segment_count = 2, vanilla_percentage = 0.5
 )
 summary(result_vanilla_percentage)
 #> 
 #> Call:
-#> fastcpd.lasso(data = small_lasso, segment_count = 2, vanilla_percentage = 0.5, 
-#>     r.progress = FALSE)
+#> fastcpd.lasso(data = small_lasso, segment_count = 2, vanilla_percentage = 0.5)
 #> 
 #> Change points:
 #> 74 150 
@@ -156,8 +154,7 @@ result_multiple_epochs <- fastcpd.lasso(
   segment_count = 2,
   multiple_epochs = function(segment_length) {
     if (segment_length < 25) 1 else 0
-  },
-  r.progress = FALSE
+  }
 )
 summary(result_multiple_epochs)
 #> 
@@ -166,7 +163,7 @@ summary(result_multiple_epochs)
 #>     if (segment_length < 25) 
 #>         1
 #>     else 0
-#> }, r.progress = FALSE)
+#> })
 #> 
 #> Change points:
 #> 74 151 227 
@@ -254,7 +251,7 @@ y <- c(
   x[(n * 0.75 + 1):n, ] %*% theta_0[4, ] + rnorm(n * 0.25)
 )
 small_lasso <- cbind.data.frame(y, x)
-result <- fastcpd.lasso(small_lasso, segment_count = 2, r.progress = FALSE)
+result <- fastcpd.lasso(small_lasso, segment_count = 2)
 summary(result)
 set.seed(1)
 n <- 300
@@ -276,8 +273,7 @@ y <- c(
 )
 small_lasso <- cbind.data.frame(y, x)
 result_vanilla_percentage <- fastcpd.lasso(
-  small_lasso, segment_count = 2, vanilla_percentage = 0.5,
-  r.progress = FALSE
+  small_lasso, segment_count = 2, vanilla_percentage = 0.5
 )
 summary(result_vanilla_percentage)
 set.seed(1)
@@ -304,8 +300,7 @@ result_multiple_epochs <- fastcpd.lasso(
   segment_count = 2,
   multiple_epochs = function(segment_length) {
     if (segment_length < 25) 1 else 0
-  },
-  r.progress = FALSE
+  }
 )
 summary(result_multiple_epochs)
 ```

@@ -47,7 +47,7 @@ data <- matrix(c(
 ))
 system.time(result <- fastcpd.mean(data))
 #>    user  system elapsed 
-#>   0.003   0.000   0.002 
+#>   0.002   0.000   0.002 
 summary(result)
 #> 
 #> Call:
@@ -71,13 +71,13 @@ data <- rbind(
   matrix(rnorm(p * 4e+5, mean = 50, sd = 10), ncol = p),
   matrix(rnorm(p * 3e+5, mean = 2, sd = 10), ncol = p)
 )
-system.time(result <- fastcpd.mean(data, r.progress = FALSE, cp_only = TRUE))
+system.time(result <- fastcpd.mean(data, cp_only = TRUE))
 #>    user  system elapsed 
-#>   0.607   0.323   0.603 
+#>   0.571   0.300   0.556 
 summary(result)
 #> 
 #> Call:
-#> fastcpd.mean(data = data, r.progress = FALSE, cp_only = TRUE)
+#> fastcpd.mean(data = data, cp_only = TRUE)
 #> 
 #> Change points:
 #> 3e+05 7e+05 

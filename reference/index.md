@@ -49,9 +49,15 @@ variance change.
 - [`fastcpd_exponential()`](https://fastcpd.xingchi.li/reference/fastcpd_exponential.md)
   [`fastcpd.exponential()`](https://fastcpd.xingchi.li/reference/fastcpd_exponential.md)
   : Find change points efficiently in exponentially distributed data
+- [`fastcpd_kcp()`](https://fastcpd.xingchi.li/reference/fastcpd_kcp.md)
+  [`fastcpd.kcp()`](https://fastcpd.xingchi.li/reference/fastcpd_kcp.md)
+  : Find change points efficiently via kernel change point detection
 - [`fastcpd_mean()`](https://fastcpd.xingchi.li/reference/fastcpd_mean.md)
   [`fastcpd.mean()`](https://fastcpd.xingchi.li/reference/fastcpd_mean.md)
   : Find change points efficiently in mean change models
+- [`fastcpd_rank()`](https://fastcpd.xingchi.li/reference/fastcpd_rank.md)
+  [`fastcpd.rank()`](https://fastcpd.xingchi.li/reference/fastcpd_rank.md)
+  : Find change points efficiently via rank-based change point detection
 - [`fastcpd_variance()`](https://fastcpd.xingchi.li/reference/fastcpd_variance.md)
   [`fastcpd.variance()`](https://fastcpd.xingchi.li/reference/fastcpd_variance.md)
   : Find change points efficiently in variance change models

@@ -297,7 +297,7 @@ the un-retrievable change points.
 ``` r
 
 results[["mean_data_1"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mean(mean_data_1, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mean(mean_data_1)@cp_set
 ```
 
 ``` r
@@ -537,7 +537,7 @@ are plotted due to the un-retrievable change points.
 ``` r
 
 results[["mv_data_1"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mv(mv_data_1, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mv(mv_data_1)@cp_set
 ```
 
 ``` r
@@ -642,7 +642,7 @@ the un-retrievable change points.
 ``` r
 
 results[["mean_data_3"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mean(mean_data_3, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mean(mean_data_3)@cp_set
 ```
 
 ``` r
@@ -725,7 +725,7 @@ are plotted due to the un-retrievable change points.
 ``` r
 
 results[["mv_data_3"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mv(mv_data_3, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mv(mv_data_3)@cp_set
 ```
 
 ``` r
@@ -752,7 +752,7 @@ The true change points are 100 and 200.
 ``` r
 
 results[["lm_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.lm(lm_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.lm(lm_data)@cp_set
 ```
 
 ``` r
@@ -797,7 +797,7 @@ The true change point is 300.
 ``` r
 
 results[["binomial_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.binomial(binomial_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.binomial(binomial_data)@cp_set
 ```
 
 ``` r
@@ -825,7 +825,7 @@ The true change points are 500, 800 and 1000.
 ``` r
 
 results[["poisson_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.poisson(poisson_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.poisson(poisson_data)@cp_set
 ```
 
 ``` r
@@ -853,7 +853,7 @@ The true change points are 80, 200 and 320.
 ``` r
 
 results[["lasso_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.lasso(lasso_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.lasso(lasso_data)@cp_set
 ```
 
 ``` r
@@ -882,7 +882,7 @@ un-retrievable change points.
 ``` r
 
 results[["ar_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.ar(ar_data, 3, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.ar(ar_data, 3)@cp_set
 ```
 
 ``` r
@@ -952,7 +952,7 @@ The true change point is 750.
 ``` r
 
 results[["garch_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.garch(garch_data, c(1, 1), r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.garch(garch_data, c(1, 1))@cp_set
 ```
 
 ``` r
@@ -992,7 +992,7 @@ The true change points is 500.
 ``` r
 
 results[["var_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.var(var_data, 2, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.var(var_data, 2)@cp_set
 ```
 
 ``` r
@@ -1171,7 +1171,7 @@ Some packages are commented out due to the excessive running time.
 ``` r
 
 results[["microbenchmark"]] <- microbenchmark::microbenchmark(
-  fastcpd = fastcpd::fastcpd.mean(well_log, r.progress = FALSE, cp_only = TRUE),
+  fastcpd = fastcpd::fastcpd.mean(well_log, cp_only = TRUE),
   changepoint = changepoint::cpt.mean(well_log/mad(well_log), method = "PELT"),
   # CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
   # strucchange = strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),
@@ -1430,7 +1430,7 @@ var_data <- x[-seq_len(2), ]
 
 plot.ts(var_data)
 results[["mean_data_1"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mean(mean_data_1, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mean(mean_data_1)@cp_set
 results[["mean_data_1"]][["fastcpd"]]
 testthat::expect_equal(results[["mean_data_1"]][["fastcpd"]], c(300, 700), tolerance = 0.2)
 results[["mean_data_1"]][["CptNonPar"]] <-
@@ -1511,7 +1511,7 @@ if (requireNamespace("bcp", quietly = TRUE)) {
   plot(results[["mean_data_1"]][["bcp"]])
 }
 results[["mv_data_1"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mv(mv_data_1, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mv(mv_data_1)@cp_set
 results[["mv_data_1"]][["fastcpd"]]
 testthat::expect_equal(results[["mv_data_1"]][["fastcpd"]], c(300, 700, 1001, 1300, 1700), tolerance = 0.2)
 results[["mv_data_1"]][["ecp"]] <- ecp::e.divisive(mv_data_1)$estimates
@@ -1543,7 +1543,7 @@ if (requireNamespace("not", quietly = TRUE)) {
   plot(results[["mv_data_1"]][["not"]])
 }
 results[["mean_data_3"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mean(mean_data_3, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mean(mean_data_3)@cp_set
 results[["mean_data_3"]][["fastcpd"]]
 testthat::expect_equal(results[["mean_data_3"]][["fastcpd"]], c(300, 700), tolerance = 0.2)
 results[["mean_data_3"]][["CptNonPar"]] <-
@@ -1568,14 +1568,14 @@ if (requireNamespace("bcp", quietly = TRUE)) {
   plot(results[["mean_data_3"]][["bcp"]])
 }
 results[["mv_data_3"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mv(mv_data_3, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mv(mv_data_3)@cp_set
 results[["mv_data_3"]][["fastcpd"]]
 testthat::expect_equal(results[["mv_data_3"]][["fastcpd"]], c(300, 700, 1013, 1300, 1700), tolerance = 0.2)
 results[["mv_data_3"]][["ecp"]] <- ecp::e.divisive(mv_data_3)$estimates
 results[["mv_data_3"]][["ecp"]]
 testthat::expect_equal(results[["mv_data_3"]][["ecp"]], c(1, 301, 701, 1001, 1301, 1701, 2001), tolerance = 0.2)
 results[["lm_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.lm(lm_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.lm(lm_data)@cp_set
 results[["lm_data"]][["fastcpd"]]
 testthat::expect_equal(results[["lm_data"]][["fastcpd"]], c(97, 201), tolerance = 0.2)
 results[["lm_data"]][["strucchange"]] <-
@@ -1592,7 +1592,7 @@ results[["lm_data"]][["segmented"]] <-
 results[["lm_data"]][["segmented"]]
 testthat::expect_equal(results[["lm_data"]][["segmented"]], c(233), ignore_attr = TRUE, tolerance = 0.2)
 results[["binomial_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.binomial(binomial_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.binomial(binomial_data)@cp_set
 results[["binomial_data"]][["fastcpd"]]
 testthat::expect_equal(results[["binomial_data"]][["fastcpd"]], 302, tolerance = 0.2)
 results[["binomial_data"]][["strucchange"]] <-
@@ -1600,7 +1600,7 @@ results[["binomial_data"]][["strucchange"]] <-
 results[["binomial_data"]][["strucchange"]]
 testthat::expect_equal(results[["binomial_data"]][["strucchange"]], 297, tolerance = 0.2)
 results[["poisson_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.poisson(poisson_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.poisson(poisson_data)@cp_set
 results[["poisson_data"]][["fastcpd"]]
 testthat::expect_equal(results[["poisson_data"]][["fastcpd"]], c(498, 805, 1003), tolerance = 0.2)
 results[["poisson_data"]][["strucchange"]] <-
@@ -1608,7 +1608,7 @@ results[["poisson_data"]][["strucchange"]] <-
 results[["poisson_data"]][["strucchange"]]
 testthat::expect_equal(results[["poisson_data"]][["strucchange"]], 935, tolerance = 0.2)
 results[["lasso_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.lasso(lasso_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.lasso(lasso_data)@cp_set
 results[["lasso_data"]][["fastcpd"]]
 testthat::expect_equal(results[["lasso_data"]][["fastcpd"]], c(79, 199, 320), tolerance = 0.2)
 results[["lasso_data"]][["strucchange"]] <-
@@ -1616,7 +1616,7 @@ results[["lasso_data"]][["strucchange"]] <-
 results[["lasso_data"]][["strucchange"]]
 testthat::expect_equal(results[["lasso_data"]][["strucchange"]], c(80, 200, 321), tolerance = 0.2)
 results[["ar_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.ar(ar_data, 3, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.ar(ar_data, 3)@cp_set
 results[["ar_data"]][["fastcpd"]]
 testthat::expect_equal(results[["ar_data"]][["fastcpd"]], c(614), tolerance = 0.2)
 results[["ar_data"]][["CptNonPar"]] <-
@@ -1642,7 +1642,7 @@ if (requireNamespace("mcp", quietly = TRUE)) {
   plot(results[["ar_data"]][["mcp"]])
 }
 results[["garch_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.garch(garch_data, c(1, 1), r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.garch(garch_data, c(1, 1))@cp_set
 results[["garch_data"]][["fastcpd"]]
 testthat::expect_equal(results[["garch_data"]][["fastcpd"]], c(759), tolerance = 0.2)
 results[["garch_data"]][["CptNonPar"]] <-
@@ -1654,7 +1654,7 @@ results[["garch_data"]][["strucchange"]] <-
 results[["garch_data"]][["strucchange"]]
 testthat::expect_equal(results[["garch_data"]][["strucchange"]], NA, tolerance = 0.2)
 results[["var_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.var(var_data, 2, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.var(var_data, 2)@cp_set
 results[["var_data"]][["fastcpd"]]
 testthat::expect_equal(results[["var_data"]][["fastcpd"]], c(500), tolerance = 0.2)
 results[["var_data"]][["VARDetect"]] <- VARDetect::tbss(var_data)$cp
@@ -1749,7 +1749,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
     ggplot2::xlab(NULL) + ggplot2::ylab(NULL)
 }
 results[["microbenchmark"]] <- microbenchmark::microbenchmark(
-  fastcpd = fastcpd::fastcpd.mean(well_log, r.progress = FALSE, cp_only = TRUE),
+  fastcpd = fastcpd::fastcpd.mean(well_log, cp_only = TRUE),
   changepoint = changepoint::cpt.mean(well_log/mad(well_log), method = "PELT"),
   # CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
   # strucchange = strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),

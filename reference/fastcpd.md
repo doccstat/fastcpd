@@ -304,8 +304,9 @@ fastcpd(
     be included in the ARIMA(\\p\\, \\d\\, \\q\\) or GARCH(\\p\\, \\q\\)
     models.
 
-  - `r.progress` is used to control the progress bar. By default the
-    progress bar will be shown. To disable it, set `r.progress = FALSE`.
+  - `show.progress` is used to control the progress bar. By default no
+    progress bar is shown. Set `show.progress = TRUE` to display a
+    tqdm-format progress bar on stderr showing PELT timestep progress.
 
   - `p.response` is used to specify the number of response variables.
     This parameter is especially useful for linear models with
@@ -679,15 +680,14 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   beta_val <- (ncol(data) + 1) * log(nrow(data)) / 2
 
   result_builtin <- fastcpd.mean(
-    data, beta = beta_val, cost_adjustment = NULL, r.progress = FALSE
+    data, beta = beta_val, cost_adjustment = NULL
   )
 
   cost_r <- function(data) sum((data - mean(data))^2) / 2
   time_r <- system.time(
     result_r <- fastcpd(
       ~ . - 1, data.frame(x = data), family = "custom",
-      cost = cost_r, beta = beta_val, cost_adjustment = NULL,
-      r.progress = FALSE
+      cost = cost_r, beta = beta_val, cost_adjustment = NULL
     )
   )
 
@@ -721,8 +721,7 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   time_xptr <- system.time(
     result_xptr <- fastcpd(
       ~ . - 1, data.frame(x = data), family = "custom",
-      cost = cost_xptr, beta = beta_val, cost_adjustment = NULL,
-      r.progress = FALSE
+      cost = cost_xptr, beta = beta_val, cost_adjustment = NULL
     )
   )
 
@@ -734,13 +733,12 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   cat("XPtr:      ", time_xptr["elapsed"], "s\n")
   summary(result_xptr)
 }
-#> R closure:  2.042 s
-#> XPtr:       0.103 s
+#> R closure:  1.988 s
+#> XPtr:       0.102 s
 #> 
 #> Call:
 #> fastcpd(formula = ~. - 1, data = data.frame(x = data), beta = beta_val, 
-#>     cost_adjustment = NULL, family = "custom", cost = cost_xptr, 
-#>     r.progress = FALSE)
+#>     cost_adjustment = NULL, family = "custom", cost = cost_xptr)
 #> 
 #> Change points:
 #> 500 
