@@ -103,12 +103,10 @@ testthat::test_that(
     attr(cost_pelt_xptr, "fastcpd_cost_arity") <- 1L
 
     result_r <- fastcpd(
-      ~ . - 1, data.frame(x = data), family = "custom", cost = cost_pelt_r,
-      r.progress = FALSE
+      ~ . - 1, data.frame(x = data), family = "custom", cost = cost_pelt_r
     )
     result_xptr <- fastcpd(
-      ~ . - 1, data.frame(x = data), family = "custom", cost = cost_pelt_xptr,
-      r.progress = FALSE
+      ~ . - 1, data.frame(x = data), family = "custom", cost = cost_pelt_xptr
     )
 
     testthat::expect_equal(result_xptr@cp_set, result_r@cp_set)
@@ -144,12 +142,12 @@ testthat::test_that(
     result_r <- fastcpd(
       ~ . - 1, data.frame(x = data), family = "custom", cost = cost_sen_r,
       cost_gradient = cost_gradient_r, cost_hessian = cost_hessian_r,
-      p = 1, r.progress = FALSE
+      p = 1
     )
     result_mixed <- fastcpd(
       ~ . - 1, data.frame(x = data), family = "custom", cost = cost_sen_r,
       cost_gradient = cost_gradient_xptr, cost_hessian = cost_hessian_xptr,
-      p = 1, r.progress = FALSE
+      p = 1
     )
 
     testthat::expect_equal(result_mixed@cp_set, result_r@cp_set)
@@ -167,8 +165,7 @@ testthat::test_that(
 
     testthat::expect_error(
       fastcpd(
-        ~ . - 1, data.frame(x = data), family = "custom", cost = cost_pelt_xptr,
-        r.progress = FALSE
+        ~ . - 1, data.frame(x = data), family = "custom", cost = cost_pelt_xptr
       ),
       "fastcpd_cost_arity"
     )
@@ -191,12 +188,12 @@ testthat::test_that(
     result_xptr <- fastcpd(
       ~ . - 1, data.frame(x = data), family = "custom", cost = cost_sen_xptr,
       cost_gradient = cost_gradient_r, cost_hessian = cost_hessian_r,
-      p = 1, r.progress = FALSE
+      p = 1
     )
     result_r <- fastcpd(
       ~ . - 1, data.frame(x = data), family = "custom", cost = cost_sen_r,
       cost_gradient = cost_gradient_r, cost_hessian = cost_hessian_r,
-      p = 1, r.progress = FALSE
+      p = 1
     )
 
     testthat::expect_equal(result_xptr@cp_set, result_r@cp_set)

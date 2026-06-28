@@ -43,7 +43,7 @@ y <- c(
 )
 binomial_data <- data.frame(y = y, x = x)
 
-result <- fastcpd.binomial(cbind(y, x), r.progress = FALSE, cost_adjustment = NULL)
+result <- fastcpd.binomial(cbind(y, x), cost_adjustment = NULL)
 summary(result)
 ```
 
@@ -68,8 +68,7 @@ logistic_hessian <- function(data, theta) {
 }
 result <- fastcpd(
   y ~ . - 1, binomial_data, epsilon = 1e-5, cost = logistic_loss,
-  cost_gradient = logistic_gradient, cost_hessian = logistic_hessian,
-  r.progress = FALSE
+  cost_gradient = logistic_gradient, cost_hessian = logistic_hessian
 )
 summary(result)
 ```
@@ -145,8 +144,7 @@ my_cost_pelt_xptr <- make_my_cost_pelt_xptr()
 attr(my_cost_pelt_xptr, "fastcpd_cost_arity") <- 1L
 
 result <- fastcpd(
-  ~ . - 1, data.frame(x = data), family = "custom", cost = my_cost_pelt_xptr,
-  r.progress = FALSE
+  ~ . - 1, data.frame(x = data), family = "custom", cost = my_cost_pelt_xptr
 )
 summary(result)
 ```

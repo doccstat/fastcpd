@@ -254,7 +254,7 @@ Some methods are plotted due to the un-retrievable change points.
 
 ```{r univariate-mean-change-fastcpd, eval = rerun}
 results[["mean_data_1"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mean(mean_data_1, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mean(mean_data_1)@cp_set
 ```
 
 ```{r univariate-mean-change-fastcpd-result}
@@ -470,7 +470,7 @@ Some methods are plotted due to the un-retrievable change points.
 
 ```{r univariate-mean-and-or-variance-change-fastcpd, eval = rerun}
 results[["mv_data_1"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mv(mv_data_1, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mv(mv_data_1)@cp_set
 ```
 
 ```{r univariate-mean-and-or-variance-change-fastcpd-result}
@@ -550,7 +550,7 @@ Some methods are plotted due to the un-retrievable change points.
 
 ```{r multivariate-mean-change-fastcpd, eval = rerun}
 results[["mean_data_3"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mean(mean_data_3, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mean(mean_data_3)@cp_set
 ```
 
 ```{r multivariate-mean-change-fastcpd-result}
@@ -631,7 +631,7 @@ Some methods are plotted due to the un-retrievable change points.
 
 ```{r multivariate-mean-and-or-variance-change-fastcpd, eval = rerun}
 results[["mv_data_3"]][["fastcpd"]] <-
-  fastcpd::fastcpd.mv(mv_data_3, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.mv(mv_data_3)@cp_set
 ```
 
 ```{r multivariate-mean-and-or-variance-change-fastcpd-result}
@@ -660,7 +660,7 @@ The true change points are 100 and 200.
 
 ```{r linear-regression-fastcpd, eval = rerun}
 results[["lm_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.lm(lm_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.lm(lm_data)@cp_set
 ```
 
 ```{r linear-regression-fastcpd-result}
@@ -708,7 +708,7 @@ The true change point is 300.
 
 ```{r logistic-regression-fastcpd, eval = rerun}
 results[["binomial_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.binomial(binomial_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.binomial(binomial_data)@cp_set
 ```
 
 ```{r logistic-regression-fastcpd-result}
@@ -738,7 +738,7 @@ The true change points are 500, 800 and 1000.
 
 ```{r poisson-regression-fastcpd, eval = rerun}
 results[["poisson_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.poisson(poisson_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.poisson(poisson_data)@cp_set
 ```
 
 ```{r poisson-regression-fastcpd-result}
@@ -768,7 +768,7 @@ The true change points are 80, 200 and 320.
 
 ```{r lasso-fastcpd, eval = rerun}
 results[["lasso_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.lasso(lasso_data, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.lasso(lasso_data)@cp_set
 ```
 
 ```{r lasso-fastcpd-result}
@@ -799,7 +799,7 @@ Some methods are plotted due to the un-retrievable change points.
 
 ```{r ar3-fastcpd, eval = rerun}
 results[["ar_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.ar(ar_data, 3, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.ar(ar_data, 3)@cp_set
 ```
 
 ```{r ar3-fastcpd-result}
@@ -847,7 +847,7 @@ The true change point is 750.
 
 ```{r garch11-fastcpd, eval = rerun}
 results[["garch_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.garch(garch_data, c(1, 1), r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.garch(garch_data, c(1, 1))@cp_set
 ```
 
 ```{r garch11-fastcpd-result}
@@ -890,7 +890,7 @@ The true change points is 500.
 
 ```{r var2-fastcpd, eval = rerun}
 results[["var_data"]][["fastcpd"]] <-
-  fastcpd::fastcpd.var(var_data, 2, r.progress = FALSE)@cp_set
+  fastcpd::fastcpd.var(var_data, 2)@cp_set
 ```
 
 ```{r var2-fastcpd-result}
@@ -1024,7 +1024,7 @@ Some packages are commented out due to the excessive running time.
 
 ```{r time-comparison-well-log, eval = rerun}
 results[["microbenchmark"]] <- microbenchmark::microbenchmark(
-  fastcpd = fastcpd::fastcpd.mean(well_log, r.progress = FALSE, cp_only = TRUE),
+  fastcpd = fastcpd::fastcpd.mean(well_log, cp_only = TRUE),
   changepoint = changepoint::cpt.mean(well_log/mad(well_log), method = "PELT"),
   # CptNonPar = CptNonPar::np.mojo(well_log, G = floor(length(well_log) / 6)),
   # strucchange = strucchange::breakpoints(y ~ 1, data = data.frame(y = well_log)),

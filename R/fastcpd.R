@@ -202,8 +202,9 @@
 #' \item \code{include.mean} is used to determine if a mean/intercept term
 #' should be included in the ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) or
 #' GARCH(\eqn{p}, \eqn{q}) models.
-#' \item \code{r.progress} is used to control the progress bar. By default the
-#' progress bar will be shown. To disable it, set \code{r.progress = FALSE}.
+#' \item \code{show.progress} is used to control the progress bar. By default
+#' no progress bar is shown. Set \code{show.progress = TRUE} to display a
+#' tqdm-format progress bar on stderr showing PELT timestep progress.
 #' \item \code{p.response} is used to specify the number of response variables.
 #' This parameter is especially useful for linear models with multivariate
 #' responses.
@@ -284,6 +285,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
       "arima",  # -> "custom"
       "garch",  # -> "garch"
       "exponential",  # -> "exponential"
+      "kcp",          # -> "mean" (random Fourier feature transform)
       "custom"  # -> "custom"
     )
   )
@@ -292,6 +294,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   check_cost(cost, cost_gradient, cost_hessian, family)
 
   # Check the validity of the `cost_adjustment` parameter.
+  cost_adjustment_missing <- missing(cost_adjustment)
   if (is.null(cost_adjustment)) {
     cost_adjustment <- "BIC"
   }
@@ -323,15 +326,15 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   # Check the parameters passed in the ellipsis.
   include_mean <- TRUE
   p_response <- get_p_response(family, y, data_)
-  r_progress <- TRUE
+  r_progress <- FALSE
   if (methods::hasArg("include.mean")) {
     include_mean <- eval.parent(match.call()[["include.mean"]])
   }
   if (methods::hasArg("p.response")) {
     p_response <- eval.parent(match.call()[["p.response"]])
   }
-  if (methods::hasArg("r.progress")) {
-    r_progress <- eval.parent(match.call()[["r.progress"]])
+  if (methods::hasArg("show.progress")) {
+    r_progress <- eval.parent(match.call()[["show.progress"]])
   }
 
   if (family %in% c("binomial", "poisson", "lasso")) {
@@ -358,6 +361,25 @@ fastcpd <- function(  # nolint: cyclomatic complexity
     fastcpd_family <- family
     vanilla_percentage <- 1
     p <- ncol(data_)
+  } else if (family == "kcp") {
+    original_p <- ncol(data_)
+    n <- nrow(data_)
+    D <- as.integer(if (length(order) >= 1 && order[1] > 0) order[1] else 100L)
+    sigma_kcp <- if (length(order) >= 2) order[2] else 0
+    if (sigma_kcp <= 0) {
+      idx <- if (n > 1000L) sample.int(n, 1000L) else seq_len(n)
+      d2 <- as.numeric(stats::dist(data_[idx, , drop = FALSE])^2)
+      sigma_kcp <- sqrt(stats::median(d2[d2 > 0]) / 2)
+    }
+    omega <- matrix(stats::rnorm(original_p * D, sd = 1 / sigma_kcp), original_p, D)
+    b <- stats::runif(D, 0, 2 * pi)
+    data_ <- sqrt(2 / D) * cos(data_ %*% omega + matrix(b, n, D, byrow = TRUE))
+    fastcpd_family <- "mean"
+    vanilla_percentage <- 1
+    p <- D
+    if (is.character(beta)) beta <- (original_p + 2) * log(n) / 2
+    if (is.null(variance_estimation)) variance_estimation <- diag(D)
+    if (cost_adjustment_missing) cost_adjustment <- "BIC"
   } else if (family == "garch") {
     p <- sum(order) + 1
     fastcpd_family <- family
@@ -548,12 +570,21 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 #' @title Wrapper functions for fastcpd
 #' @description Wrapper functions for fastcpd to find change points in various
 #' models.
-#' @seealso [fastcpd.mean()], [fastcpd.variance()], [fastcpd.mv()],
-#' [fastcpd.meanvariance()] for basic statistics change models;
+#' @seealso
+#' Basic statistics:
+#' [fastcpd.mean()], [fastcpd.variance()], [fastcpd.meanvariance()],
+#' [fastcpd.mv()], [fastcpd.exponential()];
+#'
+#' Regression:
 #' [fastcpd.lm()], [fastcpd.binomial()], [fastcpd.poisson()],
-#' [fastcpd.lasso()] for regression coefficients change models;
+#' [fastcpd.lasso()], [fastcpd.quantile()];
+#'
+#' Time series:
 #' [fastcpd.ar()], [fastcpd.var()], [fastcpd.arima()], [fastcpd.arma()],
-#' [fastcpd.garch()] for change in time series models.
+#' [fastcpd.garch()];
+#'
+#' Distribution-free:
+#' [fastcpd.kcp()], [fastcpd.rank()].
 #'
 #' @md
 NULL
@@ -944,6 +975,80 @@ fastcpd_quantile <- function(data, order = 0.5, ...) {
 #' @rdname fastcpd_quantile
 #' @export
 fastcpd.quantile <- fastcpd_quantile  # nolint: Conventional R function style
+
+#' @title Find change points efficiently via kernel change point detection
+#' @param data A numeric vector or a matrix with one row per observation.
+#' @param order A numeric vector of length up to 2: \code{order[1]} is the
+#'   number of random Fourier features (default 100; larger values improve
+#'   accuracy at the cost of speed) and \code{order[2]} is the RBF kernel
+#'   bandwidth \eqn{\sigma} (default 0, which triggers the median heuristic
+#'   \eqn{\sigma = \sqrt{\mathrm{median}(d^2)/2}} on a subsample of up to
+#'   1000 observations). Call \code{set.seed()} before this function for
+#'   reproducible results.
+#' @param ... Other arguments passed to [fastcpd()], for example,
+#'   \code{segment_count}.
+#' @return A [fastcpd-class] object.
+#' @description [fastcpd_kcp()] and [fastcpd.kcp()] detect change points in
+#'   the full distribution of the data using the kernel change point (KCP)
+#'   approach. The RBF kernel
+#'   \eqn{k(x,y)=\exp(-\|x-y\|^2/(2\sigma^2))} is approximated by random
+#'   Fourier features via Bochner's theorem, and change points in the
+#'   resulting kernel mean embedding are detected with the existing PELT
+#'   infrastructure. This is \eqn{O(nD)} in time — compared to
+#'   \eqn{O(n^2)} for the exact kernel PELT — where \eqn{D} is
+#'   \code{order[1]}.
+#' @example tests/testthat/examples/fastcpd_kcp.R
+#' @seealso [fastcpd()]
+#' @md
+#' @rdname fastcpd_kcp
+#' @export
+fastcpd_kcp <- function(data, order = c(100L, 0), ...) {
+  result <- fastcpd(
+    formula = ~ . - 1,
+    data = data.frame(as.matrix(data)),
+    family = "kcp",
+    order = order,
+    ...
+  )
+  result@call <- match.call()
+  result
+}
+
+#' @rdname fastcpd_kcp
+#' @export
+fastcpd.kcp <- fastcpd_kcp  # nolint: Conventional R function style
+
+#' @title Find change points efficiently via rank-based change point detection
+#' @param data A numeric vector or a matrix with one row per observation.
+#' @param ... Other arguments passed to [fastcpd()], for example,
+#'   \code{segment_count}.
+#' @return A [fastcpd-class] object.
+#' @description [fastcpd_rank()] and [fastcpd.rank()] detect change points
+#'   using a rank-based, distribution-free cost. Each column is replaced by
+#'   its global rank centred at zero, and change points in the mean of these
+#'   centred ranks are detected with the existing PELT infrastructure. The
+#'   result is fully deterministic and requires no bandwidth selection.
+#'   The method is most powerful for location shifts; for scale-only or
+#'   general distributional changes, [fastcpd_kcp()] is preferable.
+#' @example tests/testthat/examples/fastcpd_rank.R
+#' @seealso [fastcpd()]
+#' @md
+#' @rdname fastcpd_rank
+#' @export
+fastcpd_rank <- function(data, ...) {
+  data_mat <- as.matrix(data)
+  n <- nrow(data_mat)
+  centered_ranks <- apply(data_mat, 2, rank) - (n + 1) / 2
+  result <- fastcpd(
+    formula = ~ . - 1, data = data.frame(centered_ranks), family = "mean", ...
+  )
+  result@call <- match.call()
+  result
+}
+
+#' @rdname fastcpd_rank
+#' @export
+fastcpd.rank <- fastcpd_rank  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in time series data
 #' @param data A numeric vector, a matrix, a data frame or a time series object.

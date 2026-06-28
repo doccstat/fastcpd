@@ -830,8 +830,7 @@ fastcpd.binomial(
   cbind(y, x),
   segment_count = 5,
   beta = "BIC",
-  cost_adjustment = "BIC",
-  r.progress = FALSE
+  cost_adjustment = "BIC"
 )@cp_set
 
 pelt_vanilla_binomial(cbind(x, y), (p + 1) * log(300) / 2)$cp
@@ -841,8 +840,7 @@ fastcpd.binomial(
   segment_count = 5,
   vanilla_percentage = 1,
   beta = "BIC",
-  cost_adjustment = "BIC",
-  r.progress = FALSE
+  cost_adjustment = "BIC"
 )@cp_set
 ```
 
@@ -884,8 +882,7 @@ fastcpd.poisson(
   beta = beta,
   cost_adjustment = "BIC",
   epsilon = 0.001,
-  segment_count = 10,
-  r.progress = FALSE
+  segment_count = 10
 )@cp_set
 
 pelt_vanilla_poisson(data, beta)$cp
@@ -895,8 +892,7 @@ fastcpd.poisson(
   segment_count = 10,
   vanilla_percentage = 1,
   beta = beta,
-  cost_adjustment = "BIC",
-  r.progress = FALSE
+  cost_adjustment = "BIC"
 )@cp_set
 ```
 
@@ -924,8 +920,7 @@ fastcpd.lasso(
   epsilon = 1e-5,
   beta = beta,
   cost_adjustment = "BIC",
-  pruning_coef = 0,
-  r.progress = FALSE
+  pruning_coef = 0
 )@cp_set
 
 pelt_vanilla_lasso(data, beta, cost = cost_lasso)$cp
@@ -936,8 +931,7 @@ fastcpd.lasso(
   epsilon = 1e-5,
   beta = beta,
   cost_adjustment = "BIC",
-  pruning_coef = 0,
-  r.progress = FALSE
+  pruning_coef = 0
 )@cp_set
 ```
 

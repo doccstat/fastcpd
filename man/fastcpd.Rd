@@ -260,8 +260,9 @@ current segment. This parameter is only used for the \code{"glm"} families.}
 \item \code{include.mean} is used to determine if a mean/intercept term
 should be included in the ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) or
 GARCH(\eqn{p}, \eqn{q}) models.
-\item \code{r.progress} is used to control the progress bar. By default the
-progress bar will be shown. To disable it, set \code{r.progress = FALSE}.
+\item \code{show.progress} is used to control the progress bar. By default
+no progress bar is shown. Set \code{show.progress = TRUE} to display a
+tqdm-format progress bar on stderr showing PELT timestep progress.
 \item \code{p.response} is used to specify the number of response variables.
 This parameter is especially useful for linear models with multivariate
 responses.
@@ -463,15 +464,14 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   beta_val <- (ncol(data) + 1) * log(nrow(data)) / 2
 
   result_builtin <- fastcpd.mean(
-    data, beta = beta_val, cost_adjustment = NULL, r.progress = FALSE
+    data, beta = beta_val, cost_adjustment = NULL
   )
 
   cost_r <- function(data) sum((data - mean(data))^2) / 2
   time_r <- system.time(
     result_r <- fastcpd(
       ~ . - 1, data.frame(x = data), family = "custom",
-      cost = cost_r, beta = beta_val, cost_adjustment = NULL,
-      r.progress = FALSE
+      cost = cost_r, beta = beta_val, cost_adjustment = NULL
     )
   )
 
@@ -505,8 +505,7 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   time_xptr <- system.time(
     result_xptr <- fastcpd(
       ~ . - 1, data.frame(x = data), family = "custom",
-      cost = cost_xptr, beta = beta_val, cost_adjustment = NULL,
-      r.progress = FALSE
+      cost = cost_xptr, beta = beta_val, cost_adjustment = NULL
     )
   )
 

@@ -60,7 +60,7 @@ pip install fastcpd
 set.seed(1)
 n <- 10^8
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-print(run_isolated(fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)))
+print(run_isolated(fastcpd::fastcpd.mean(mean_data, cp_only = TRUE, variance_estimation = 1)))
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
@@ -96,7 +96,7 @@ bm <- benchmark(
   fastcpd = callr::r(function(n) {
     set.seed(1)
     mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-    fastcpd::fastcpd.mean(mean_data, r.progress = FALSE, cp_only = TRUE, variance_estimation = 1)
+    fastcpd::fastcpd.mean(mean_data, cp_only = TRUE, variance_estimation = 1)
   }, args = list(n = n)),
   times = 10L
 )
