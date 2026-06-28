@@ -50,7 +50,9 @@ reference:
       variance change.
     contents:
       - fastcpd.exponential
+      - fastcpd.kcp
       - fastcpd.mean
+      - fastcpd.rank
       - fastcpd.variance
       - fastcpd.meanvariance
 
