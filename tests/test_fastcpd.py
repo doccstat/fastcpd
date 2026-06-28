@@ -10,6 +10,16 @@ from numpy.random import exponential as rexp
 from numpy.random import multivariate_normal, randn, seed
 
 
+def _expit(x):
+    x = np.asarray(x, dtype=float)
+    out = np.empty_like(x)
+    positive = x >= 0
+    out[positive] = 1.0 / (1.0 + np.exp(-x[positive]))
+    exp_x = np.exp(x[~positive])
+    out[~positive] = exp_x / (1.0 + exp_x)
+    return out
+
+
 class TestBasic(unittest.TestCase):
 
     def test_mean(self):
@@ -82,9 +92,8 @@ class TestBasic(unittest.TestCase):
         seed(9)
         n = 600
         X = randn(n, 2)
-        from scipy.special import expit
-        p1 = expit(X[:300] @ np.array([2.0, 0.0]))
-        p2 = expit(X[300:] @ np.array([0.0, 2.0]))
+        p1 = _expit(X[:300] @ np.array([2.0, 0.0]))
+        p2 = _expit(X[300:] @ np.array([0.0, 2.0]))
         y = concatenate([
             np.random.binomial(1, p1),
             np.random.binomial(1, p2),
