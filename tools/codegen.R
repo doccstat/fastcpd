@@ -1,9 +1,9 @@
 #!/usr/bin/env Rscript
-# Code generation script: generates 15 consolidated family translation units
+# Code generation script: generates 17 consolidated family translation units
 # (one per family) from pelt.tmpl and segd.tmpl by token substitution.
 #
 # Each TU contains all variant functions for that family, reducing header
-# parsing (fastcpd_template.h + Armadillo + Rcpp) from 216x to 15x with
+# parsing (fastcpd_template.h + Armadillo + Rcpp) from 246x to 17x with
 # zero impact on generated machine code — every specialization is still a
 # distinct template instantiation with its own if-constexpr path.
 #
@@ -144,10 +144,10 @@ generate_segd <- function(fam) {
 }
 
 # ---------------------------------------------------------------------------
-# Generate: 8 PELT files + 7 SEGD files = 15 files total
+# Generate: 9 PELT files + 8 SEGD files = 17 files total
 # ---------------------------------------------------------------------------
 for (fam in FAMILIES_PELT)    generate_pelt(fam, "-1")
 for (fam in FAMILIES_PELT_1D) generate_pelt(fam, "1")
 for (fam in FAMILIES_SEGD)    generate_segd(fam)
 
-cat(sprintf("Generated 16 .cc files in %s\n", out_dir))
+cat(sprintf("Generated 17 .cc files in %s\n", out_dir))

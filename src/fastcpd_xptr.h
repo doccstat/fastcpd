@@ -48,35 +48,35 @@ inline void CheckXPtrTag(SEXP xptr_sexp, char const* expected) {
   }
 }
 
-inline std::function<double(arma::mat)> WrapCostPelt(SEXP xptr_sexp) {
+inline std::function<double(arma::mat const&)> WrapCostPelt(SEXP xptr_sexp) {
   CheckXPtrTag(xptr_sexp, kCostPeltTag);
   CostPeltFnPtr const fn = *Rcpp::XPtr<CostPeltFnPtr>(xptr_sexp);
-  return [fn](arma::mat data) -> double { return fn(data); };
+  return [fn](arma::mat const& data) -> double { return fn(data); };
 }
 
-inline std::function<double(arma::mat, arma::colvec)> WrapCostSen(
+inline std::function<double(arma::mat const&, arma::colvec const&)> WrapCostSen(
     SEXP xptr_sexp) {
   CheckXPtrTag(xptr_sexp, kCostSenTag);
   CostSenFnPtr const fn = *Rcpp::XPtr<CostSenFnPtr>(xptr_sexp);
-  return [fn](arma::mat data, arma::colvec theta) -> double {
+  return [fn](arma::mat const& data, arma::colvec const& theta) -> double {
     return fn(data, theta);
   };
 }
 
-inline std::function<arma::colvec(arma::mat, arma::colvec)> WrapCostGradient(
+inline std::function<arma::colvec(arma::mat const&, arma::colvec const&)> WrapCostGradient(
     SEXP xptr_sexp) {
   CheckXPtrTag(xptr_sexp, kCostGradientTag);
   CostGradientFnPtr const fn = *Rcpp::XPtr<CostGradientFnPtr>(xptr_sexp);
-  return [fn](arma::mat data, arma::colvec theta) -> arma::colvec {
+  return [fn](arma::mat const& data, arma::colvec const& theta) -> arma::colvec {
     return fn(data, theta);
   };
 }
 
-inline std::function<arma::mat(arma::mat, arma::colvec)> WrapCostHessian(
+inline std::function<arma::mat(arma::mat const&, arma::colvec const&)> WrapCostHessian(
     SEXP xptr_sexp) {
   CheckXPtrTag(xptr_sexp, kCostHessianTag);
   CostHessianFnPtr const fn = *Rcpp::XPtr<CostHessianFnPtr>(xptr_sexp);
-  return [fn](arma::mat data, arma::colvec theta) -> arma::mat {
+  return [fn](arma::mat const& data, arma::colvec const& theta) -> arma::mat {
     return fn(data, theta);
   };
 }

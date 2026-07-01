@@ -197,3 +197,11 @@ get_p_response <- function(family, y, data) {
     ncol(y)
   }
 }
+
+fastcpd_matrix_fast_path_data <- function(data, vector_ok = FALSE) {
+  if (is.null(dim(data)) || length(dim(data)) == 1) {
+    if (!vector_ok) return(NULL)
+    data <- matrix(data, ncol = 1)
+  }
+  if (is.matrix(data) && is.numeric(data)) data else NULL
+}

@@ -71,15 +71,12 @@ struct QuantileFamily : BaseFamily {
   static double GetNllSen(Solver* solver, unsigned int const segment_start,
                           unsigned int const segment_end,
                           arma::colvec const& theta) {
-    arma::mat const data_segment =
-        solver->data_.rows(segment_start, segment_end);
-    arma::colvec const y = data_segment.col(0);
-    arma::mat const X = data_segment.cols(1, data_segment.n_cols - 1);
     double const tau = solver->order_(0);
-    arma::colvec const r = y - X * theta;
     double cost = 0.0;
-    for (unsigned int i = 0; i < r.n_elem; ++i) {
-      cost += r(i) >= 0.0 ? tau * r(i) : (tau - 1.0) * r(i);
+    for (unsigned int row = segment_start; row <= segment_end; row++) {
+      double const residual =
+          solver->data_(row, 0) - DotTail(solver, row, theta);
+      cost += residual >= 0.0 ? tau * residual : (tau - 1.0) * residual;
     }
     return cost;
   }
@@ -89,28 +86,18 @@ struct QuantileFamily : BaseFamily {
                                   unsigned int const segment_start,
                                   unsigned int const segment_end,
                                   arma::colvec const& theta) {
-    arma::mat const data_segment =
-        solver->data_.rows(segment_start, segment_end);
-    unsigned int const segment_length = segment_end - segment_start + 1;
-    arma::rowvec const new_data = data_segment.row(segment_length - 1);
-    arma::rowvec const x = new_data.tail(new_data.n_elem - 1);
-    double const y = new_data(0);
+    double const y = solver->data_(segment_end, 0);
     double const tau = solver->order_(0);
-    double const residual = y - arma::as_scalar(x * theta);
+    double const residual = y - DotTail(solver, segment_end, theta);
     double const indicator = (residual < 0.0) ? 1.0 : 0.0;
-    return x.t() * (indicator - tau);
+    return ScaledTail(solver, segment_end, indicator - tau);
   }
 
   template <typename Solver>
   static arma::mat GetHessian(Solver* solver, unsigned int const segment_start,
                               unsigned int const segment_end,
                               arma::colvec const& theta) {
-    arma::mat const data_segment =
-        solver->data_.rows(segment_start, segment_end);
-    unsigned int const segment_length = segment_end - segment_start + 1;
-    arma::rowvec const new_data = data_segment.row(segment_length - 1);
-    arma::rowvec const x = new_data.tail(new_data.n_elem - 1);
-    return x.t() * x;
+    return TailOuter(solver, segment_end);
   }
 
   template <typename Solver>
@@ -118,8 +105,7 @@ struct QuantileFamily : BaseFamily {
     solver->coefficients_.col(0) = solver->segment_coefficients_.row(0).t();
     solver->coefficients_sum_.col(0) = solver->segment_coefficients_.row(0).t();
     solver->hessian_.slice(0) =
-        solver->data_.row(0).tail(solver->parameters_count_).t() *
-            solver->data_.row(0).tail(solver->parameters_count_) +
+        TailOuter(solver, 0) +
         solver->epsilon_in_hessian_ *
             arma::eye<arma::mat>(solver->parameters_count_,
                                  solver->parameters_count_);
@@ -127,14 +113,11 @@ struct QuantileFamily : BaseFamily {
 
   template <typename Solver>
   static void UpdateSenParameters(Solver* solver) {
-    int const segment_index =
-        arma::index_max(arma::find(solver->segment_indices_ <= solver->t - 1));
+    unsigned int const segment_index = solver->segment_index_;
     arma::colvec const coef_add =
         solver->segment_coefficients_.row(segment_index).t();
-    arma::rowvec const x =
-        solver->data_.row(solver->t - 1).tail(solver->parameters_count_);
     arma::mat const hessian_new =
-        x.t() * x +
+        TailOuter(solver, solver->t - 1) +
         solver->epsilon_in_hessian_ *
             arma::eye<arma::mat>(solver->parameters_count_,
                                  solver->parameters_count_);

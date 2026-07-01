@@ -300,15 +300,28 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   }
   stopifnot(cost_adjustment %in% c("BIC", "MBIC", "MDL"))
 
-  # The following code is adapted from the `lm` function from base R.
-  match_formula <- match.call(expand.dots = FALSE)
-  matched_formula <- match(c("formula", "data"), names(match_formula), 0L)
-  match_formula <- match_formula[c(1L, matched_formula)]
-  match_formula$drop.unused.levels <- TRUE
-  match_formula[[1L]] <- quote(stats::model.frame)
-  match_formula <- eval(match_formula, parent.frame())
-  y <- stats::model.response(match_formula, "numeric")
-  data_ <- cbind(y, stats::model.matrix(formula, data = data))
+  matrix_input <- FALSE
+  if (methods::hasArg(".fastcpd_matrix_input")) {
+    matrix_input <- isTRUE(
+      eval.parent(match.call()[[".fastcpd_matrix_input"]])
+    )
+  }
+  if (matrix_input) {
+    data_ <- as.matrix(data)
+    stopifnot("`data` must be numeric." = is.numeric(data_))
+    storage.mode(data_) <- "double"
+    y <- data_[, 1]
+  } else {
+    # The following code is adapted from the `lm` function from base R.
+    match_formula <- match.call(expand.dots = FALSE)
+    matched_formula <- match(c("formula", "data"), names(match_formula), 0L)
+    match_formula <- match_formula[c(1L, matched_formula)]
+    match_formula$drop.unused.levels <- TRUE
+    match_formula[[1L]] <- quote(stats::model.frame)
+    match_formula <- eval(match_formula, parent.frame())
+    y <- stats::model.response(match_formula, "numeric")
+    data_ <- cbind(y, stats::model.matrix(formula, data = data))
+  }
 
   if (family == "ar") {
     stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
@@ -697,9 +710,17 @@ fastcpd.arma <- fastcpd_arma  # nolint: Conventional R function style
 #' @rdname fastcpd_binomial
 #' @export
 fastcpd_binomial <- function(data, ...) {
-  result <- fastcpd(
-    data = data.frame(y = data[, 1], x = data[, -1]), family = "binomial", ...
-  )
+  data_fast <- fastcpd_matrix_fast_path_data(data)
+  if (!is.null(data_fast) && !methods::hasArg("formula")) {
+    result <- fastcpd(
+      data = data_fast, family = "binomial",
+      .fastcpd_matrix_input = TRUE, ...
+    )
+  } else {
+    result <- fastcpd(
+      data = data.frame(y = data[, 1], x = data[, -1]), family = "binomial", ...
+    )
+  }
   result@call <- match.call()
   result
 }
@@ -756,9 +777,17 @@ fastcpd.garch <- fastcpd_garch  # nolint: Conventional R function style
 #' @rdname fastcpd_lasso
 #' @export
 fastcpd_lasso <- function(data, ...) {
-  result <- fastcpd(
-    data = data.frame(y = data[, 1], x = data[, -1]), family = "lasso", ...
-  )
+  data_fast <- fastcpd_matrix_fast_path_data(data)
+  if (!is.null(data_fast) && !methods::hasArg("formula")) {
+    result <- fastcpd(
+      data = data_fast, family = "lasso",
+      .fastcpd_matrix_input = TRUE, ...
+    )
+  } else {
+    result <- fastcpd(
+      data = data.frame(y = data[, 1], x = data[, -1]), family = "lasso", ...
+    )
+  }
   result@call <- match.call()
   result
 }
@@ -786,9 +815,17 @@ fastcpd.lasso <- fastcpd_lasso  # nolint: Conventional R function style
 #' @rdname fastcpd_lm
 #' @export
 fastcpd_lm <- function(data, ...) {
-  result <- fastcpd(
-    data = data.frame(y = data[, 1], x = data[, -1]), family = "lm", ...
-  )
+  data_fast <- fastcpd_matrix_fast_path_data(data)
+  if (!is.null(data_fast) && !methods::hasArg("formula")) {
+    result <- fastcpd(
+      data = data_fast, family = "lm",
+      .fastcpd_matrix_input = TRUE, ...
+    )
+  } else {
+    result <- fastcpd(
+      data = data.frame(y = data[, 1], x = data[, -1]), family = "lm", ...
+    )
+  }
   result@call <- match.call()
   result
 }
@@ -815,12 +852,17 @@ fastcpd.lm <- fastcpd_lm  # nolint: Conventional R function style
 #' @rdname fastcpd_mean
 #' @export
 fastcpd_mean <- function(data, ...) {
-  if (is.null(dim(data)) || length(dim(data)) == 1) {
-    data <- matrix(data, ncol = 1)
+  data_fast <- fastcpd_matrix_fast_path_data(data, vector_ok = TRUE)
+  if (!is.null(data_fast)) {
+    result <- fastcpd(
+      formula = ~ . - 1, data = data_fast, family = "mean",
+      .fastcpd_matrix_input = TRUE, ...
+    )
+  } else {
+    result <- fastcpd(
+      formula = ~ . - 1, data = data.frame(x = data), family = "mean", ...
+    )
   }
-  result <- fastcpd(
-    formula = ~ . - 1, data = data.frame(x = data), family = "mean", ...
-  )
   result@call <- match.call()
   result
 }
@@ -849,12 +891,18 @@ fastcpd.mean <- fastcpd_mean  # nolint: Conventional R function style
 #' @rdname fastcpd_exponential
 #' @export
 fastcpd_exponential <- function(data, ...) {
-  if (is.null(dim(data)) || length(dim(data)) == 1) {
-    data <- matrix(data, ncol = 1)
+  data_fast <- fastcpd_matrix_fast_path_data(data, vector_ok = TRUE)
+  if (!is.null(data_fast)) {
+    result <- fastcpd(
+      formula = ~ . - 1, data = data_fast, family = "exponential",
+      .fastcpd_matrix_input = TRUE, ...
+    )
+  } else {
+    result <- fastcpd(
+      formula = ~ . - 1, data = data.frame(x = data), family = "exponential",
+      ...
+    )
   }
-  result <- fastcpd(
-    formula = ~ . - 1, data = data.frame(x = data), family = "exponential", ...
-  )
   result@call <- match.call()
   result
 }
@@ -883,12 +931,18 @@ fastcpd.exponential <-  # nolint: Conventional R function style
 #' @rdname fastcpd_meanvariance
 #' @export
 fastcpd_meanvariance <- function(data, ...) {
-  if (is.null(dim(data)) || length(dim(data)) == 1) {
-    data <- matrix(data, ncol = 1)
+  data_fast <- fastcpd_matrix_fast_path_data(data, vector_ok = TRUE)
+  if (!is.null(data_fast)) {
+    result <- fastcpd(
+      formula = ~ . - 1, data = data_fast, family = "meanvariance",
+      .fastcpd_matrix_input = TRUE, ...
+    )
+  } else {
+    result <- fastcpd(
+      formula = ~ . - 1, data = data.frame(x = data), family = "meanvariance",
+      ...
+    )
   }
-  result <- fastcpd(
-    formula = ~ . - 1, data = data.frame(x = data), family = "meanvariance", ...
-  )
   result@call <- match.call()
   result
 }
@@ -924,9 +978,17 @@ fastcpd.mv <- fastcpd_meanvariance  # nolint: Conventional R function style
 #' @rdname fastcpd_poisson
 #' @export
 fastcpd_poisson <- function(data, ...) {
-  result <- fastcpd(
-    data = data.frame(y = data[, 1], x = data[, -1]), family = "poisson", ...
-  )
+  data_fast <- fastcpd_matrix_fast_path_data(data)
+  if (!is.null(data_fast) && !methods::hasArg("formula")) {
+    result <- fastcpd(
+      data = data_fast, family = "poisson",
+      .fastcpd_matrix_input = TRUE, ...
+    )
+  } else {
+    result <- fastcpd(
+      data = data.frame(y = data[, 1], x = data[, -1]), family = "poisson", ...
+    )
+  }
   result@call <- match.call()
   result
 }
@@ -962,12 +1024,23 @@ fastcpd_quantile <- function(data, order = 0.5, ...) {
     "order must be a single numeric value in (0, 1) (the quantile level)." =
       is.numeric(order) && length(order) == 1 && order > 0 && order < 1
   )
-  result <- fastcpd(
-    data = data.frame(y = data[, 1], x = data[, -1]),
-    family = "quantile",
-    order = order,
-    ...
-  )
+  data_fast <- fastcpd_matrix_fast_path_data(data)
+  if (!is.null(data_fast) && !methods::hasArg("formula")) {
+    result <- fastcpd(
+      data = data_fast,
+      family = "quantile",
+      order = order,
+      .fastcpd_matrix_input = TRUE,
+      ...
+    )
+  } else {
+    result <- fastcpd(
+      data = data.frame(y = data[, 1], x = data[, -1]),
+      family = "quantile",
+      order = order,
+      ...
+    )
+  }
   result@call <- match.call()
   result
 }
@@ -1150,12 +1223,17 @@ fastcpd.var <- fastcpd_var  # nolint: Conventional R function style
 #' @rdname fastcpd_variance
 #' @export
 fastcpd_variance <- function(data, ...) {
-  if (is.null(dim(data)) || length(dim(data)) == 1) {
-    data <- matrix(data, ncol = 1)
+  data_fast <- fastcpd_matrix_fast_path_data(data, vector_ok = TRUE)
+  if (!is.null(data_fast)) {
+    result <- fastcpd(
+      formula = ~ . - 1, data = data_fast, family = "variance",
+      .fastcpd_matrix_input = TRUE, ...
+    )
+  } else {
+    result <- fastcpd(
+      formula = ~ . - 1, data = data.frame(x = data), family = "variance", ...
+    )
   }
-  result <- fastcpd(
-    formula = ~ . - 1, data = data.frame(x = data), family = "variance", ...
-  )
   result@call <- match.call()
   result
 }
