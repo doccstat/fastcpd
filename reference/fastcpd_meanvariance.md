@@ -53,7 +53,7 @@ data <- c(
 )
 system.time(result <- fastcpd.mv(data))
 #>    user  system elapsed 
-#>   0.003   0.000   0.003 
+#>   0.004   0.000   0.003 
 summary(result)
 #> 
 #> Call:
@@ -94,7 +94,7 @@ data <- if (requireNamespace("mvtnorm", quietly = TRUE)) {
 }
 system.time(result <- fastcpd.mv(data))
 #>    user  system elapsed 
-#>   1.390   0.035   1.425 
+#>   1.378   0.038   1.416 
 summary(result)
 #> 
 #> Call:
