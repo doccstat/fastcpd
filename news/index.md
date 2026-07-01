@@ -1,5 +1,20 @@
 # Changelog
 
+## fastcpd 1.1.1
+
+- Improve performance for matrix-backed wrappers by bypassing avoidable
+  data-frame and model-frame construction when the input is already a
+  numeric matrix or vector.
+- Reduce SEN hot-path allocations for built-in GLM-style families by
+  using direct row access helpers, cached segment lookup, and cached
+  Poisson log-factorials.
+- Reduce copying in compiled custom-cost adapters by passing Armadillo
+  data and parameter objects by const reference internally.
+- Cache MBIC/MDL log segment-length penalties for moderate-size PELT
+  runs.
+- Refresh README benchmark output and remove the obsolete cheatsheet
+  links.
+
 ## fastcpd 1.1.0
 
 - Add

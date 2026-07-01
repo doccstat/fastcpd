@@ -30,7 +30,7 @@
 
     <a class="navbar-brand me-2" href="index.html">fastcpd</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -103,22 +103,17 @@ pip install fastcpd</code></pre>
 <span><span class="va">mean_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2</span>, <span class="fl">50</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">run_isolated</span><span class="op">(</span><span class="fu">fastcpd</span><span class="fu">::</span><span class="fu"><a href="reference/fastcpd_mean.html">fastcpd.mean</a></span><span class="op">(</span><span class="va">mean_data</span>, cp_only <span class="op">=</span> <span class="cn">TRUE</span>, variance_estimation <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   8.512   6.297  14.478</span></span>
+<span><span class="co">#&gt;   6.938   5.040  11.779</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">run_isolated</span><span class="op">(</span><span class="fu">mosum</span><span class="fu">::</span><span class="fu">mosum</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_data</span><span class="op">)</span>, G <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   9.022   6.679  15.711</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">run_isolated</span><span class="op">(</span><span class="fu">fpop</span><span class="fu">::</span><span class="fu">Fpop</span><span class="op">(</span><span class="va">mean_data</span>, <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  44.988   2.719  47.734</span></span>
+<span><span class="co">#&gt;   9.034   6.854  15.964</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">run_isolated</span><span class="op">(</span><span class="fu">changepoint</span><span class="fu">::</span><span class="fu">cpt.mean</span><span class="op">(</span><span class="va">mean_data</span>, method <span class="op">=</span> <span class="st">"PELT"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  31.410   6.476  37.911</span></span></code></pre></div>
+<span><span class="co">#&gt;  31.515   6.507  38.127</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">run_isolated</span><span class="op">(</span><span class="fu">fpop</span><span class="fu">::</span><span class="fu">Fpop</span><span class="op">(</span><span class="va">mean_data</span>, <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    user  system elapsed </span></span>
+<span><span class="co">#&gt;  44.527   2.978  47.632</span></span></code></pre></div>
 <p><img src="reference/figures/README-time-comparison-fastbench-1.png"><!-- --></p>
-</div>
-<div class="section level2">
-<h2 id="cheatsheet">Cheatsheet<a class="anchor" aria-label="anchor" href="#cheatsheet"></a>
-</h2>
-<p><a href="https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf" class="external-link"><img src="reference/figures/cheatsheets.png" alt="fastcpd cheatsheet"></a></p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

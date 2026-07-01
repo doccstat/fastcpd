@@ -50,7 +50,7 @@ data <- matrix(c(
 ))
 system.time(result <- fastcpd.exponential(data))
 #>    user  system elapsed 
-#>   0.002   0.000   0.002 
+#>   0.001   0.000   0.002 
 summary(result)
 #> 
 #> Call:
