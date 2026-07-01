@@ -19,8 +19,9 @@ package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcp
 ## Documentation: [x2r.io](https://x2r.io/fastcpd/reference/)
 
 <details close>
-
-<summary>Installation</summary>
+<summary>
+Installation
+</summary>
 
 ``` r
 # install.packages("pak")
@@ -46,24 +47,19 @@ n <- 10^8
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
 print(run_isolated(fastcpd::fastcpd.mean(mean_data, cp_only = TRUE, variance_estimation = 1)))
 #>    user  system elapsed 
-#>   8.512   6.297  14.478
+#>   6.938   5.040  11.779
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 #>    user  system elapsed 
-#>   9.022   6.679  15.711
-print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
-#>    user  system elapsed 
-#>  44.988   2.719  47.734
+#>   9.034   6.854  15.964
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
 #>    user  system elapsed 
-#>  31.410   6.476  37.911
+#>  31.515   6.507  38.127
+print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
+#>    user  system elapsed 
+#>  44.527   2.978  47.632
 ```
 
 ![](man/figures/README-time-comparison-fastbench-1.png)<!-- -->
-
-## Cheatsheet
-
-[![fastcpd
-cheatsheet](man/figures/cheatsheets.png)](https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf)
 
 ## References
 

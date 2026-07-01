@@ -379,8 +379,7 @@ class MaFamily : public BaseFamily {
 
   template <typename Solver>
   static void UpdateSenParameters(Solver* solver) {
-    int const segment_index =
-        arma::index_max(arma::find(solver->segment_indices_ <= solver->t - 1));
+    unsigned int const segment_index = solver->segment_index_;
     arma::colvec coef_add = solver->segment_coefficients_.row(segment_index).t();
     arma::mat hessian_new =
         MaFamily::GetHessian(solver, 0, solver->t - 1, coef_add);

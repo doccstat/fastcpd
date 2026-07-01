@@ -1,5 +1,15 @@
 ## Updates since last CRAN release (1.0.0)
 
+### fastcpd 1.1.1
+
+*   Improve performance for numeric matrix/vector wrappers by bypassing
+    avoidable data-frame and model-frame construction.
+*   Reduce SEN hot-path allocations with direct row access helpers, cached
+    segment lookup, cached Poisson log-factorials, and const-reference custom
+    cost adapters.
+*   Cache MBIC/MDL log segment-length penalties for moderate-size PELT runs.
+*   Refresh README benchmark output and remove obsolete cheatsheet links.
+
 ### fastcpd 1.1.0
 
 *   Add `fastcpd_kcp()` / `fastcpd.kcp()`: kernel change-point detection via

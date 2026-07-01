@@ -2,6 +2,7 @@
 #define FASTCPD_FAMILY_H_
 
 #include <armadillo>
+#include <cmath>
 #include <cstring>
 #include <optional>
 #include <string>
@@ -37,11 +38,61 @@ struct BaseFamily {
   static arma::mat CreateDataC(arma::mat const& data,
                                arma::mat const& variance_estimate,
                                unsigned int const p_response = 0) {
-    return data;
+    return {};
   }
 
   static unsigned int GetDataNDims(arma::mat const& data) {
     return data.n_cols;
+  }
+
+  template <typename Solver, typename Theta>
+  static double DotTail(Solver* solver, unsigned int const row,
+                        Theta const& theta) {
+    double value = 0.0;
+    for (arma::uword j = 0; j < solver->parameters_count_; j++) {
+      value += solver->data_(row, j + 1) * theta(j);
+    }
+    return value;
+  }
+
+  template <typename Solver>
+  static arma::colvec ScaledTail(Solver* solver, unsigned int const row,
+                                 double const scale) {
+    arma::colvec out(solver->parameters_count_);
+    for (arma::uword j = 0; j < out.n_elem; j++) {
+      out(j) = scale * solver->data_(row, j + 1);
+    }
+    return out;
+  }
+
+  template <typename Solver>
+  static arma::mat TailOuter(Solver* solver, unsigned int const row,
+                             double const scale = 1.0) {
+    arma::uword const p = solver->parameters_count_;
+    arma::mat out(p, p);
+    for (arma::uword j2 = 0; j2 < p; j2++) {
+      double const x_j2 = solver->data_(row, j2 + 1);
+      for (arma::uword j1 = 0; j1 < p; j1++) {
+        out(j1, j2) = scale * solver->data_(row, j1 + 1) * x_j2;
+      }
+    }
+    return out;
+  }
+
+  static double Log1pExp(double const value) {
+    if (value > 0.0) {
+      return value + std::log1p(std::exp(-value));
+    }
+    return std::log1p(std::exp(value));
+  }
+
+  static double Logistic(double const value) {
+    if (value >= 0.0) {
+      double const exp_neg = std::exp(-value);
+      return 1.0 / (1.0 + exp_neg);
+    }
+    double const exp_pos = std::exp(value);
+    return exp_pos / (1.0 + exp_pos);
   }
 
   // Default: initialize SEN parameters from first segment statistics.
@@ -59,8 +110,7 @@ struct BaseFamily {
   // coefficients and an identity-scaled Hessian.
   template <typename Solver>
   static void UpdateSenParameters(Solver* solver) {
-    int const segment_index =
-        arma::index_max(arma::find(solver->segment_indices_ <= solver->t - 1));
+    unsigned int const segment_index = solver->segment_index_;
     arma::colvec coef_add = solver->segment_coefficients_.row(segment_index).t();
     arma::mat hessian_new =
         solver->epsilon_in_hessian_ *

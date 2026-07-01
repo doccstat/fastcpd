@@ -62,8 +62,8 @@ n <- 10^8
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
 print(run_isolated(fastcpd::fastcpd.mean(mean_data, cp_only = TRUE, variance_estimation = 1)))
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
-print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
+print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 ```
 ```{r time-comparison-fastbench, eval = requireNamespace("callr", quietly = TRUE), echo = FALSE}
 benchmark <- function(..., times = 100L) {
@@ -78,6 +78,16 @@ bm <- benchmark(
     set.seed(1)
     c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
   }, args = list(n = n)),
+  fastcpd = callr::r(function(n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    fastcpd::fastcpd.mean(mean_data, cp_only = TRUE, variance_estimation = 1)
+  }, args = list(n = n)),
+  mosum = callr::r(function(n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    mosum::mosum(c(mean_data), G = 40)
+  }, args = list(n = n)),
   changepoint = callr::r(function(n) {
     set.seed(1)
     mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
@@ -88,22 +98,13 @@ bm <- benchmark(
     mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
     fpop::Fpop(mean_data, 2 * log(n))
   }, args = list(n = n)),
-  mosum = callr::r(function(n) {
-    set.seed(1)
-    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-    mosum::mosum(c(mean_data), G = 40)
-  }, args = list(n = n)),
-  fastcpd = callr::r(function(n) {
-    set.seed(1)
-    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-    fastcpd::fastcpd.mean(mean_data, cp_only = TRUE, variance_estimation = 1)
-  }, args = list(n = n)),
   times = 10L
 )
 baseline_overhead <- median(bm$elapsed_s[bm$expr == "baseline"])
 bm_net <- bm[bm$expr != "baseline", ]
 bm_net$elapsed_s <- bm_net$elapsed_s - baseline_overhead
-bm_net$expr <- droplevels(bm_net$expr)
+plot_order <- c("fastcpd", "mosum", "changepoint", "fpop")
+bm_net$expr <- factor(bm_net$expr, levels = rev(plot_order))
 if (requireNamespace("ggplot2", quietly = TRUE)) {
   print(ggplot2::ggplot(bm_net, ggplot2::aes(x = expr, y = elapsed_s)) +
     ggplot2::geom_violin(trim = FALSE) +
@@ -119,10 +120,6 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
     ))
 }
 ```
-
-## Cheatsheet
-
-[![fastcpd cheatsheet](man/figures/cheatsheets.png)](https://github.com/doccstat/fastcpd/blob/main/man/figures/cheatsheets.pdf)
 
 ## References
 

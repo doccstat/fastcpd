@@ -20,6 +20,7 @@
 #include <string>
 #include <tuple>
 #include <unordered_map>
+#include <vector>
 #include "absl/container/inlined_vector.h"
 
 namespace fastcpd {
@@ -31,27 +32,27 @@ namespace classes {
 template <bool kIsPeltOnly>
 struct SenFunctions {
   SenFunctions(
-      std::function<double(arma::mat)> const& /* cost_pelt */,
-      std::function<double(arma::mat, arma::colvec)> const& /* cost_sen */,
-      std::function<arma::colvec(arma::mat, arma::colvec)> const& /* cost_gradient */,
-      std::function<arma::mat(arma::mat, arma::colvec)> const& /* cost_hessian */) {}
+      std::function<double(arma::mat const&)> const& /* cost_pelt */,
+      std::function<double(arma::mat const&, arma::colvec const&)> const& /* cost_sen */,
+      std::function<arma::colvec(arma::mat const&, arma::colvec const&)> const& /* cost_gradient */,
+      std::function<arma::mat(arma::mat const&, arma::colvec const&)> const& /* cost_hessian */) {}
 };
 
 template <>
 struct SenFunctions<false> {
   SenFunctions(
-      std::function<double(arma::mat)> const& cost_pelt,
-      std::function<double(arma::mat, arma::colvec)> const& cost_sen,
-      std::function<arma::colvec(arma::mat, arma::colvec)> const& cost_gradient,
-      std::function<arma::mat(arma::mat, arma::colvec)> const& cost_hessian)
+      std::function<double(arma::mat const&)> const& cost_pelt,
+      std::function<double(arma::mat const&, arma::colvec const&)> const& cost_sen,
+      std::function<arma::colvec(arma::mat const&, arma::colvec const&)> const& cost_gradient,
+      std::function<arma::mat(arma::mat const&, arma::colvec const&)> const& cost_hessian)
       : cost_function_pelt_(cost_pelt),
         cost_function_sen_(cost_sen),
         cost_gradient_(cost_gradient),
         cost_hessian_(cost_hessian) {}
-  std::function<double(arma::mat)> const cost_function_pelt_;
-  std::function<double(arma::mat, arma::colvec)> const cost_function_sen_;
-  std::function<arma::colvec(arma::mat, arma::colvec)> const cost_gradient_;
-  std::function<arma::mat(arma::mat, arma::colvec)> const cost_hessian_;
+  std::function<double(arma::mat const&)> const cost_function_pelt_;
+  std::function<double(arma::mat const&, arma::colvec const&)> const cost_function_sen_;
+  std::function<arma::colvec(arma::mat const&, arma::colvec const&)> const cost_gradient_;
+  std::function<arma::mat(arma::mat const&, arma::colvec const&)> const cost_hessian_;
 };
 
 template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
@@ -74,13 +75,26 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
     if constexpr (!FamilyPolicy::supports_warm_start) { return {}; }
     else { return arma::zeros<arma::mat>(p, n); }
   }
+  static std::vector<double> MakeLogSegmentLengths(arma::uword const n) {
+    if constexpr (kCostAdj == CostAdjustment::kBIC) {
+      return {};
+    } else {
+      constexpr arma::uword kMaxCachedLogLengths = 1000000;
+      if (n > kMaxCachedLogLengths) return {};
+      std::vector<double> log_lengths(n + 1);
+      for (arma::uword i = 1; i <= n; i++) {
+        log_lengths[i] = std::log(static_cast<double>(i));
+      }
+      return log_lengths;
+    }
+  }
 
   Fastcpd(
       double const beta,
-      std::function<double(arma::mat)> const& cost_pelt,
-      std::function<double(arma::mat, arma::colvec)> const& cost_sen,
-      std::function<arma::colvec(arma::mat, arma::colvec)> const& cost_gradient,
-      std::function<arma::mat(arma::mat, arma::colvec)> const& cost_hessian,
+      std::function<double(arma::mat const&)> const& cost_pelt,
+      std::function<double(arma::mat const&, arma::colvec const&)> const& cost_sen,
+      std::function<arma::colvec(arma::mat const&, arma::colvec const&)> const& cost_gradient,
+      std::function<arma::mat(arma::mat const&, arma::colvec const&)> const& cost_hessian,
       bool const cp_only, arma::mat const& data, double const epsilon,
       std::string const& family,
       std::function<unsigned int(unsigned int)> const& multiple_epochs_function,
@@ -109,6 +123,7 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
         family_(family),
         hessian_(MakeHessianCube(p, data.n_rows + 1)),
         line_search_(line_search),
+        log_segment_lengths_(MakeLogSegmentLengths(data.n_rows)),
         momentum_(arma::colvec(p)),
         momentum_coef_(momentum_coef),
         multiple_epochs_function_(multiple_epochs_function),
@@ -155,6 +170,8 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
                         unsigned int const segment_end, unsigned int const i);
   double GetCostValueSen(unsigned int const segment_start,
                          unsigned int const segment_end, unsigned int const i);
+  unsigned int GetSegmentIndex(unsigned int const value) const;
+  void UpdateSegmentIndex(unsigned int const value);
 
   void GetOptimizedCostResult(unsigned int const segment_start,
                               unsigned int const segment_end);
@@ -173,7 +190,7 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
   arma::mat coefficients_;
   arma::mat coefficients_sum_;
   bool const cp_only_;
-  arma::mat const data_;
+  arma::mat const& data_;
   arma::mat const data_c_;
   unsigned int const data_c_n_rows_;
   double const* data_c_ptr_;
@@ -185,6 +202,7 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
   arma::cube hessian_;
   double lasso_penalty_base_;
   arma::colvec line_search_;
+  std::vector<double> const log_segment_lengths_;
   arma::colvec momentum_;
   double const momentum_coef_;
   std::function<unsigned int(unsigned int)> const multiple_epochs_function_;
@@ -207,6 +225,7 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
   std::unique_ptr<FastcpdProgress> rProgress_;
   arma::mat segment_coefficients_;
   int const segment_count_;
+  unsigned int segment_index_ = 0;
   arma::colvec segment_indices_;
   unsigned int t = 1;
   double const trim_;
@@ -413,7 +432,7 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
         segment_end + 1 - segment_start >= 10 * parameters_count_) {
       GetCostResult(segment_start, segment_end, std::nullopt, false,
                     segment_coefficients_
-                        .row(arma::index_max(arma::find(segment_indices_ <= segment_end)))
+                        .row(GetSegmentIndex(segment_end))
                         .t());
       warm_start_.col(segment_start) = result_coefficients_;
       if constexpr (!FamilyPolicy::is_pelt_only && !kVanillaOnly) {
@@ -469,6 +488,27 @@ double Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kN
     }
   }
   return cval;
+}
+
+template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
+          CostAdjustment kCostAdj, bool kLineSearch, int kNDims>
+unsigned int Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::GetSegmentIndex(
+    unsigned int const value) const {
+  auto const begin = segment_indices_.begin();
+  auto const end = segment_indices_.end();
+  auto const upper = std::upper_bound(begin, end, static_cast<double>(value));
+  if (upper == begin) return 0u;
+  return static_cast<unsigned int>((upper - begin) - 1);
+}
+
+template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
+          CostAdjustment kCostAdj, bool kLineSearch, int kNDims>
+void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::UpdateSegmentIndex(
+    unsigned int const value) {
+  while (segment_index_ + 1 < segment_indices_.n_elem &&
+         segment_indices_(segment_index_ + 1) <= value) {
+    segment_index_++;
+  }
 }
 
 // Solves the per-segment MLE `argmin_theta cost(data, theta)` for the
@@ -657,6 +697,7 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
 template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
           CostAdjustment kCostAdj, bool kLineSearch, int kNDims>
 void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::UpdateStep() {
+  UpdateSegmentIndex(t - 1);
   UpdateSenParameters();
 
   // Over-allocate by 64 when capacity is full so direct writes run without
@@ -692,12 +733,32 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
     auto eval_pelt_candidate = [this, objfn_ptr, candidates_ptr](
                                     unsigned int const s, unsigned int const i) {
       double nll = FamilyPolicy::template GetNllPeltValueFast<kNDims>(this, s, t - 1);
+      candidates_ptr[i] = objfn_ptr[s] + nll + beta_;
+    };
+    auto eval_pelt_candidate_log = [this, objfn_ptr, candidates_ptr](
+                                       unsigned int const s, unsigned int const i) {
+      double nll = FamilyPolicy::template GetNllPeltValueFast<kNDims>(this, s, t - 1);
+      double const log_segment_length = std::log(static_cast<double>(t - s));
       if constexpr (kCostAdj == CostAdjustment::kMBIC) {
         nll += static_cast<double>(parameters_count_) *
-               std::log(static_cast<double>(t - s)) / 2.0;
+               log_segment_length / 2.0;
       } else if constexpr (kCostAdj == CostAdjustment::kMDL) {
         nll = (nll + static_cast<double>(parameters_count_) *
-                         std::log(static_cast<double>(t - s)) / 2.0) *
+                         log_segment_length / 2.0) *
+              std::log2(M_E);
+      }
+      candidates_ptr[i] = objfn_ptr[s] + nll + beta_;
+    };
+    auto eval_pelt_candidate_cached = [this, objfn_ptr, candidates_ptr](
+                                          unsigned int const s, unsigned int const i) {
+      double nll = FamilyPolicy::template GetNllPeltValueFast<kNDims>(this, s, t - 1);
+      double const log_segment_length = log_segment_lengths_[t - s];
+      if constexpr (kCostAdj == CostAdjustment::kMBIC) {
+        nll += static_cast<double>(parameters_count_) *
+               log_segment_length / 2.0;
+      } else if constexpr (kCostAdj == CostAdjustment::kMDL) {
+        nll = (nll + static_cast<double>(parameters_count_) *
+                         log_segment_length / 2.0) *
               std::log2(M_E);
       }
       candidates_ptr[i] = objfn_ptr[s] + nll + beta_;
@@ -705,16 +766,27 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
     constexpr unsigned int kPrefetchDist = 16;
     unsigned int const hot_end =
         pruned_set_size_ > kPrefetchDist ? pruned_set_size_ - kPrefetchDist : 0;
-    // hot body — always prefetch, branch-free inner loop
-    for (unsigned int i = 0; i < hot_end; i++) {
-      unsigned int const next_s = pruned_set_raw[i + kPrefetchDist];
-      FamilyPolicy::PrefetchCandidate(this, next_s);
-      absl::PrefetchToLocalCacheNta(objfn_ptr + next_s);
-      eval_pelt_candidate(pruned_set_raw[i], i);
-    }
-    // tail — last kPrefetchDist candidates, data already en route or in cache
-    for (unsigned int i = hot_end; i < pruned_set_size_; i++) {
-      eval_pelt_candidate(pruned_set_raw[i], i);
+    auto run_pelt_candidates = [&](auto const& eval_candidate) {
+      // hot body — always prefetch, branch-free inner loop
+      for (unsigned int i = 0; i < hot_end; i++) {
+        unsigned int const next_s = pruned_set_raw[i + kPrefetchDist];
+        FamilyPolicy::PrefetchCandidate(this, next_s);
+        absl::PrefetchToLocalCacheNta(objfn_ptr + next_s);
+        eval_candidate(pruned_set_raw[i], i);
+      }
+      // tail — last kPrefetchDist candidates, data already en route or in cache
+      for (unsigned int i = hot_end; i < pruned_set_size_; i++) {
+        eval_candidate(pruned_set_raw[i], i);
+      }
+    };
+    if constexpr (kCostAdj == CostAdjustment::kBIC) {
+      run_pelt_candidates(eval_pelt_candidate);
+    } else {
+      if (log_segment_lengths_.empty()) {
+        run_pelt_candidates(eval_pelt_candidate_log);
+      } else {
+        run_pelt_candidates(eval_pelt_candidate_cached);
+      }
     }
   } else {
     // SEN family candidate loop.

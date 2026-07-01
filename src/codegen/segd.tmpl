@@ -24,50 +24,50 @@ Rcpp::List fastcpd_{FAMILY_NAME}{FUNC_SUFFIX}_impl(
   // unwrapped by `fastcpd::xptr::Wrap*` -- see `fastcpd_xptr.h`). Both are
   // adapted to the same `std::function` signatures the solver expects, so no
   // other code needs to know which path produced them.
-  std::function<double(arma::mat)> cost_pelt_;
+  std::function<double(arma::mat const&)> cost_pelt_;
   if (cost_pelt.isNotNull()) {
     SEXP const cost_pelt_sexp = cost_pelt.get();
     if (TYPEOF(cost_pelt_sexp) == EXTPTRSXP) {
       cost_pelt_ = fastcpd::xptr::WrapCostPelt(cost_pelt_sexp);
     } else {
       Rcpp::Function rfun(cost_pelt);
-      cost_pelt_ = [rfun](arma::mat data) -> double {
+      cost_pelt_ = [rfun](arma::mat const& data) -> double {
         return Rcpp::as<double>(rfun(data));
       };
     }
   }
-  std::function<double(arma::mat, arma::colvec)> cost_sen_;
+  std::function<double(arma::mat const&, arma::colvec const&)> cost_sen_;
   if (cost_sen.isNotNull()) {
     SEXP const cost_sen_sexp = cost_sen.get();
     if (TYPEOF(cost_sen_sexp) == EXTPTRSXP) {
       cost_sen_ = fastcpd::xptr::WrapCostSen(cost_sen_sexp);
     } else {
       Rcpp::Function rfun(cost_sen);
-      cost_sen_ = [rfun](arma::mat data, arma::colvec theta) -> double {
+      cost_sen_ = [rfun](arma::mat const& data, arma::colvec const& theta) -> double {
         return Rcpp::as<double>(rfun(data, theta));
       };
     }
   }
-  std::function<arma::colvec(arma::mat, arma::colvec)> cost_gradient_;
+  std::function<arma::colvec(arma::mat const&, arma::colvec const&)> cost_gradient_;
   if (cost_gradient.isNotNull()) {
     SEXP const cost_gradient_sexp = cost_gradient.get();
     if (TYPEOF(cost_gradient_sexp) == EXTPTRSXP) {
       cost_gradient_ = fastcpd::xptr::WrapCostGradient(cost_gradient_sexp);
     } else {
       Rcpp::Function rfun(cost_gradient);
-      cost_gradient_ = [rfun](arma::mat data, arma::colvec theta) -> arma::colvec {
+      cost_gradient_ = [rfun](arma::mat const& data, arma::colvec const& theta) -> arma::colvec {
         return Rcpp::as<arma::colvec>(rfun(data, theta));
       };
     }
   }
-  std::function<arma::mat(arma::mat, arma::colvec)> cost_hessian_;
+  std::function<arma::mat(arma::mat const&, arma::colvec const&)> cost_hessian_;
   if (cost_hessian.isNotNull()) {
     SEXP const cost_hessian_sexp = cost_hessian.get();
     if (TYPEOF(cost_hessian_sexp) == EXTPTRSXP) {
       cost_hessian_ = fastcpd::xptr::WrapCostHessian(cost_hessian_sexp);
     } else {
       Rcpp::Function rfun(cost_hessian);
-      cost_hessian_ = [rfun](arma::mat data, arma::colvec theta) -> arma::mat {
+      cost_hessian_ = [rfun](arma::mat const& data, arma::colvec const& theta) -> arma::mat {
         return Rcpp::as<arma::mat>(rfun(data, theta));
       };
     }
