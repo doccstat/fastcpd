@@ -1,3 +1,11 @@
+# fastcpd 1.1.2
+
+*   Add a standalone C++ library interface (`<fastcpd/fastcpd.h>`) backed by
+    the existing C++ core, with CMake package metadata and a plain Make
+    example for non-R consumers.
+*   Add GitHub Actions coverage for building and running the standalone C++
+    library example.
+
 # fastcpd 1.1.1
 
 *   Improve performance for matrix-backed wrappers by bypassing avoidable
