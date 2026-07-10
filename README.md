@@ -156,8 +156,3 @@ Encountered a bug or unintended behavior?
     [DESCRIPTION](https://github.com/doccstat/fastcpd/blob/main/DESCRIPTION#L5-L10).
 
 </details>
-
-## Stargazers over time
-
-[![Stargazers over
-time](https://starchart.cc/doccstat/fastcpd.svg)](https://starchart.cc/doccstat/fastcpd)
