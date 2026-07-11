@@ -80,6 +80,7 @@ reference:
 
   - subtitle: Class methods
     contents:
+      - confint.fastcpd
       - plot.fastcpd
       - print.fastcpd
       - show.fastcpd
