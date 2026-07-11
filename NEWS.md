@@ -1,3 +1,11 @@
+# fastcpd 1.1.3
+
+*   Add `confint.fastcpd()` for confidence intervals on change-point
+    locations and fitted segment parameters, with bootstrap, profile, and
+    Wald methods where supported.
+*   Add Python confidence-interval helpers via `fastcpd.confint()` and
+    `CpdResult.confint()`.
+
 # fastcpd 1.1.2
 
 *   Add a standalone C++ library interface (`<fastcpd/fastcpd.h>`) backed by

@@ -18,6 +18,7 @@
 ^vignettes/comparison-packages-results\.RData$
 
 # Developer / tooling files not needed in the CRAN tarball.
+^AGENTS\.md$
 ^CLAUDE\.md$
 ^\.claude$
 ^prof\.out$
