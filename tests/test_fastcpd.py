@@ -34,6 +34,17 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(result.cp_set[0], 300)
         self.assertEqual(result.cp_set[1], 700)
 
+    def test_mean_confint(self):
+        seed(16)
+        data = concatenate((np.random.normal(0, 0.2, 40),
+                            np.random.normal(3, 0.2, 40)))
+        result = mean(data)
+        interval = result.confint(
+            data=data, family='mean', method='profile', level=0.8, window=8)
+        self.assertEqual(interval[0]['estimate'], result.cp_set[0])
+        self.assertLessEqual(interval[0]['lower'], result.cp_set[0])
+        self.assertGreaterEqual(interval[0]['upper'], result.cp_set[0])
+
     def test_exponential(self):
         seed(1)
         data = concatenate((rexp(scale=1.0, size=500), rexp(scale=5.0, size=500)))

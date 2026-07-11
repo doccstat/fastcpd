@@ -74,3 +74,5 @@ if _sys.platform == 'win32':
 del _os, _sys
 
 __version__ = "0.19.0"
+
+from fastcpd.confidence import confint  # noqa: E402,F401

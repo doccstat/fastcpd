@@ -23,18 +23,31 @@ _FAMILY_ALIASES = {
     'lm':  'gaussian',
 }
 
-# Result object returned by detect() when cp_only=False.
-# Fields:
-#   cp_set      – list of change-point indices (1-based, matching R package)
-#   raw_cp_set  – raw change-point indices before boundary trimming
-#   cost_values – list of segment cost values (one per segment)
-#   residuals   – nested list of shape (n_obs, n_response)
-#   thetas      – nested list of shape (n_params, n_segments); column j holds
-#                 the estimated parameters for segment j
-CpdResult = collections.namedtuple(
+class CpdResult(collections.namedtuple(
     'CpdResult',
     ['cp_set', 'raw_cp_set', 'cost_values', 'residuals', 'thetas'],
-)
+)):
+    """Result object returned by detect() when cp_only=False.
+
+    Fields:
+        cp_set: Change-point indices (1-based, matching the R package).
+        raw_cp_set: Raw change-point indices before boundary trimming.
+        cost_values: Segment cost values.
+        residuals: Nested list of shape (n_obs, n_response).
+        thetas: Nested list of shape (n_params, n_segments); column j holds
+            the estimated parameters for segment j.
+    """
+
+    __slots__ = ()
+
+    def confint(self, *args, **kwargs):
+        """Construct confidence intervals for this result.
+
+        The Python result keeps fit output compact, so pass the original
+        ``data`` and ``family`` arguments when calling this method.
+        """
+        from fastcpd.confidence import confint
+        return confint(self, *args, **kwargs)
 
 
 def mean(data, **kwargs):
@@ -228,6 +241,16 @@ def arima(data, order=(1, 1, 0), **kwargs):
         ``arma(data, order=(p, q))``.
     """
     return detect(data=data, family='arima', order=order, **kwargs)
+
+
+def confint(result, **kwargs):
+    """Construct confidence intervals for a ``CpdResult``.
+
+    This is the Python analogue of R's ``confint(result, ...)`` API. The
+    result object also exposes ``result.confint(...)``.
+    """
+    from fastcpd.confidence import confint as _confint
+    return _confint(result, **kwargs)
 
 
 def detect(
