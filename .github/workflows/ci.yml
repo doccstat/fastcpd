@@ -1,0 +1,43 @@
+name: C++ CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install C++ dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            g++ \
+            libabsl-dev \
+            libarmadillo-dev \
+            liblapack-dev \
+            libopenblas-dev
+
+      - name: Configure CMake build
+        run: cmake -S . -B build -DFASTCPD_BUILD_EXAMPLES=ON
+
+      - name: Build and run CMake example
+        run: |
+          cmake --build build --target fastcpd_cpp_example --parallel 2
+          ./build/fastcpd_cpp_example
+
+      - name: Validate CMake installation
+        run: cmake --install build --prefix "$RUNNER_TEMP/fastcpd-install"
+
+      - name: Build and run Make example
+        run: |
+          make -C examples/cpp clean all
+          ./examples/cpp/simple
