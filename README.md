@@ -9,7 +9,7 @@ coverage](https://codecov.io/gh/doccstat/fastcpd/branch/main/graph/badge.svg)](h
 [![CRAN
 status](https://www.r-pkg.org/badges/version-last-release/fastcpd)](https://cran.r-project.org/package=fastcpd)
 [![doi](https://img.shields.io/badge/doi-10.48550/arXiv.2404.05933-green.svg)](https://doi.org/10.48550/arXiv.2404.05933)
-[![R-CMD-check.yaml](https://github.com/doccstat/fastcpd/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/doccstat/fastcpd/actions)
+[![Full repository integration](https://github.com/doccstat/fastcpd/actions/workflows/integration.yml/badge.svg)](https://github.com/doccstat/fastcpd/actions/workflows/integration.yml)
 [![r-universe](https://doccstat.r-universe.dev/badges/fastcpd)](https://doccstat.r-universe.dev)
 [![Python
 version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/project/fastcpd/)
