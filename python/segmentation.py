@@ -10,18 +10,21 @@ from fastcpd.interface import fastcpd_impl
 # Families dispatched to the C++ Python binding (NO_RCPP mode).
 #
 # PELT families: mean, variance, meanvariance, exponential, mgaussian, garch.
-# SEN families: lasso, gaussian/lm, binomial, poisson, arma, ma.
+# SEN families: lasso, gaussian/lm, binomial, poisson, quantile, arma, ma.
 # 'arima' is accepted by detect() and pre-differenced before C++ dispatch.
+# 'rank' and 'kernel'/'kcp' are Python-layer transforms routed to mean.
 _SUPPORTED_FAMILIES = frozenset({
     'mean', 'variance', 'meanvariance', 'exponential', 'mgaussian', 'lasso',
-    'garch', 'gaussian', 'binomial', 'poisson', 'arma', 'ma', 'arima',
+    'garch', 'gaussian', 'binomial', 'poisson', 'quantile', 'arma', 'ma',
+    'arima', 'rank', 'kernel', 'kcp',
 })
 
-# Map R-style alias names to the internal C++ family string.
+# Map R-style synonym names to the internal C++ family string.
 _FAMILY_ALIASES = {
     'var': 'mgaussian',
     'lm':  'gaussian',
 }
+
 
 class CpdResult(collections.namedtuple(
     'CpdResult',
@@ -50,7 +53,7 @@ class CpdResult(collections.namedtuple(
         return confint(self, *args, **kwargs)
 
 
-def mean(data, **kwargs):
+def detect_mean(data, **kwargs):
     """Find change points efficiently in mean change models.
 
     Args:
@@ -63,7 +66,7 @@ def mean(data, **kwargs):
     return detect(data=data, family='mean', **kwargs)
 
 
-def exponential(data, **kwargs):
+def detect_exponential(data, **kwargs):
     """Find change points efficiently in exponentially distributed data.
 
     Args:
@@ -77,7 +80,7 @@ def exponential(data, **kwargs):
     return detect(data=data, family='exponential', **kwargs)
 
 
-def variance(data, **kwargs):
+def detect_variance(data, **kwargs):
     """Find change points efficiently in variance change models.
 
     Args:
@@ -90,7 +93,7 @@ def variance(data, **kwargs):
     return detect(data=data, family='variance', **kwargs)
 
 
-def meanvariance(data, **kwargs):
+def detect_meanvariance(data, **kwargs):
     """Find change points efficiently in mean and/or variance change models.
 
     Args:
@@ -104,7 +107,7 @@ def meanvariance(data, **kwargs):
     return detect(data=data, family='meanvariance', **kwargs)
 
 
-def var(data, order, **kwargs):
+def detect_var(data, order, **kwargs):
     """Find change points efficiently in VAR (vector autoregression) models.
 
     Args:
@@ -119,7 +122,7 @@ def var(data, order, **kwargs):
     return detect(data=data, family='mgaussian', **kwargs)
 
 
-def lasso(data, **kwargs):
+def detect_lasso(data, **kwargs):
     """Find change points efficiently in LASSO regression models.
 
     Args:
@@ -132,7 +135,7 @@ def lasso(data, **kwargs):
     return detect(data=data, family='lasso', **kwargs)
 
 
-def garch(data, order=(1, 1), **kwargs):
+def detect_garch(data, order=(1, 1), **kwargs):
     """Find change points in GARCH(p, q) models.
 
     Args:
@@ -146,7 +149,7 @@ def garch(data, order=(1, 1), **kwargs):
     return detect(data=data, family='garch', order=order, **kwargs)
 
 
-def lm(data, **kwargs):
+def detect_lm(data, **kwargs):
     """Find change points in ordinary linear regression models.
 
     Args:
@@ -160,7 +163,7 @@ def lm(data, **kwargs):
     return detect(data=data, family='gaussian', **kwargs)
 
 
-def binomial(data, **kwargs):
+def detect_binomial(data, **kwargs):
     """Find change points in logistic regression models.
 
     Args:
@@ -174,7 +177,7 @@ def binomial(data, **kwargs):
     return detect(data=data, family='binomial', **kwargs)
 
 
-def poisson(data, **kwargs):
+def detect_poisson(data, **kwargs):
     """Find change points in Poisson regression models.
 
     Args:
@@ -188,7 +191,24 @@ def poisson(data, **kwargs):
     return detect(data=data, family='poisson', **kwargs)
 
 
-def arma(data, order=(1, 0), **kwargs):
+def detect_quantile(data, order=0.5, **kwargs):
+    """Find change points in quantile regression models.
+
+    Args:
+        data: Array where column 0 is the response and the remaining columns
+            are predictors, shape (n, p+1).
+        order: Quantile level in (0, 1).
+        **kwargs: Additional arguments passed to ``detect()``.
+
+    Returns:
+        A list of change-point indices, or a CpdResult when cp_only=False.
+    """
+    if not 0 < order < 1:
+        raise ValueError(f"order must be in (0, 1), got {order!r}")
+    return detect(data=data, family='quantile', order=(order,), **kwargs)
+
+
+def detect_arma(data, order=(1, 0), **kwargs):
     """Find change points in ARMA(p, q) models.
 
     When order[0] == 0 (pure MA), routes to the MA family automatically.
@@ -204,7 +224,7 @@ def arma(data, order=(1, 0), **kwargs):
     return detect(data=data, family='arma', order=order, **kwargs)
 
 
-def ar(data, order=1, **kwargs):
+def detect_ar(data, order=1, **kwargs):
     """Find change points in AR(p) models (pure autoregressive).
 
     Args:
@@ -218,7 +238,7 @@ def ar(data, order=1, **kwargs):
     return detect(data=data, family='arma', order=(order, 0), **kwargs)
 
 
-def arima(data, order=(1, 1, 0), **kwargs):
+def detect_arima(data, order=(1, 1, 0), **kwargs):
     """Find change points in ARIMA(p, d, q) models.
 
     The integration order ``d`` is handled in Python by pre-differencing the
@@ -253,11 +273,120 @@ def confint(result, **kwargs):
     return _confint(result, **kwargs)
 
 
+def detect_rank(data, **kwargs):
+    """Find change points using rank-transformed observations.
+
+    Each column is replaced by its centered average rank, then mean-change
+    detection is applied to the transformed data.
+    """
+    return detect(data=data, family='rank', **kwargs)
+
+
+def detect_kernel(data, order=(100, 0), random_state=None, **kwargs):
+    """Find distributional change points using random Fourier features.
+
+    Args:
+        data: Univariate or multivariate data.
+        order: Tuple ``(n_features, bandwidth)``. A non-positive bandwidth
+            uses the median heuristic on up to 1000 sampled observations.
+        random_state: Optional NumPy random seed or generator.
+        **kwargs: Additional arguments passed to ``detect()``.
+
+    Returns:
+        A list of change-point indices, or a CpdResult when cp_only=False.
+    """
+    kwargs.setdefault('cost_adjustment', 'BIC')
+    return detect(
+        data=data, family='kernel', order=order, random_state=random_state,
+        **kwargs
+    )
+
+
+def detect_kcp(data, order=(100, 0), random_state=None, **kwargs):
+    """Find distributional change points using the KCP wrapper name."""
+    return detect_kernel(
+        data, order=order, random_state=random_state, **kwargs
+    )
+
+
+def detect_mean_variance(data, **kwargs):
+    """Find change points in mean and/or variance change models."""
+    return detect(data=data, family='meanvariance', **kwargs)
+
+
+def detect_linear_regression(data, **kwargs):
+    """Find change points in ordinary linear regression models."""
+    return detect(data=data, family='gaussian', **kwargs)
+
+
+def detect_logistic_regression(data, **kwargs):
+    """Find change points in logistic regression models."""
+    return detect(data=data, family='binomial', **kwargs)
+
+
+def detect_poisson_regression(data, **kwargs):
+    """Find change points in Poisson regression models."""
+    return detect(data=data, family='poisson', **kwargs)
+
+
+def detect_quantile_regression(data, order=0.5, **kwargs):
+    """Find change points in quantile regression models."""
+    return detect_quantile(data, order=order, **kwargs)
+
+
+def detect_time_series(data, family=None, order=(0, 0, 0), **kwargs):
+    """Find change points in the supported time-series families."""
+    if family is None:
+        raise ValueError("family must be provided")
+    family = family.lower()
+    if family == 'ar':
+        ar_order = order[0] if hasattr(order, '__len__') else order
+        return detect_ar(data, order=ar_order, **kwargs)
+    if family == 'var':
+        var_order = order[0] if hasattr(order, '__len__') else order
+        return detect_var(data, order=var_order, **kwargs)
+    if family == 'arma':
+        return detect_arma(data, order=order, **kwargs)
+    if family == 'arima':
+        return detect_arima(data, order=order, **kwargs)
+    if family == 'garch':
+        return detect_garch(data, order=order, **kwargs)
+    raise ValueError(
+        "family must be one of 'ar', 'var', 'arma', 'arima', or 'garch'"
+    )
+
+
+def detect_ts(data, family=None, order=(0, 0, 0), **kwargs):
+    """Find change points in the supported time-series families."""
+    return detect_time_series(data, family=family, order=order, **kwargs)
+
+
+mean = detect_mean
+exponential = detect_exponential
+variance = detect_variance
+meanvariance = detect_meanvariance
+var = detect_var
+lasso = detect_lasso
+garch = detect_garch
+lm = detect_lm
+binomial = detect_binomial
+poisson = detect_poisson
+quantile = detect_quantile
+arma = detect_arma
+ar = detect_ar
+arima = detect_arima
+rank = detect_rank
+kernel = detect_kernel
+kcp = detect_kcp
+ts = detect_ts
+time_series = detect_time_series
+
+
 def detect(
     formula: str = 'y ~ . - 1',
     data: numpy.ndarray = None,
     beta='MBIC',
-    cost_adjustment: str = 'MBIC',
+    cost_adjustment: str = None,
     family: str = None,
     cost=None,
     cost_gradient=None,
@@ -279,6 +408,7 @@ def detect(
     vanilla_percentage: float = 1.0,
     warm_start: bool = False,
     show_progress: bool = False,
+    random_state=None,
     **kwargs
 ):
     r"""Find change points efficiently.
@@ -291,9 +421,10 @@ def detect(
             is supplied, using the same formulae as the R package.
         cost_adjustment: One of 'BIC', 'MBIC', 'MDL'.
         family: One of 'mean', 'variance', 'meanvariance', 'exponential',
-            'mgaussian' / 'var' (alias), 'lasso', 'garch', 'gaussian' /
-            'lm' (alias), 'binomial', 'poisson', 'arma', 'ma',
-            'arima' (pre-differenced then routed to arma/ma).
+            'mgaussian' / 'var' (synonym), 'lasso', 'garch', 'gaussian' /
+            'lm' (synonym), 'binomial', 'poisson', 'arma', 'ma',
+            'quantile', 'arima' (pre-differenced then routed to arma/ma),
+            'rank', or 'kernel' / 'kcp' (random Fourier feature transform).
         line_search: Values for line search step sizes.
         lower: Lower bound for parameters after each update.
         upper: Upper bound for parameters after each update.
@@ -341,9 +472,30 @@ def detect(
             "supported by the Python binding."
         )
 
+    cost_adjustment_missing = cost_adjustment is None
+    if cost_adjustment is None:
+        cost_adjustment = 'MBIC'
+
     family = family.lower() if family is not None else 'custom'
-    # Apply aliases (e.g. 'var' → 'mgaussian', 'lm' → 'gaussian').
+    # Apply family-name synonyms (e.g. 'var' → 'mgaussian', 'lm' → 'gaussian').
     family = _FAMILY_ALIASES.get(family, family)
+
+    if family == 'rank':
+        data = _rank_transform(data)
+        family = 'mean'
+        vanilla_percentage = 1.0
+
+    if family in ('kernel', 'kcp'):
+        original_dim = data.shape[1]
+        data = _kernel_transform(data, order=order, random_state=random_state)
+        family = 'mean'
+        vanilla_percentage = 1.0
+        if isinstance(beta, str):
+            beta = (original_dim + 2) * numpy.log(data.shape[0]) / 2
+        if variance_estimation is None:
+            variance_estimation = numpy.eye(data.shape[1])
+        if cost_adjustment_missing:
+            cost_adjustment = 'BIC'
 
     # ARIMA(p, d, q): pre-difference the series d times, then route to arma/ma.
     # numpy.diff does not change the number of rows (it shortens by d rows),
@@ -352,7 +504,9 @@ def detect(
         arima_order = list(order) if hasattr(order, '__len__') else [int(order), 0, 0]
         while len(arima_order) < 3:
             arima_order.append(0)
-        p_ar, d_int, q_ma = int(arima_order[0]), int(arima_order[1]), int(arima_order[2])
+        p_ar = int(arima_order[0])
+        d_int = int(arima_order[1])
+        q_ma = int(arima_order[2])
         if d_int < 0:
             raise ValueError(f"ARIMA integration order d must be >= 0, got {d_int}")
         if d_int > 0:
@@ -437,12 +591,81 @@ def detect(
     )
 
 
+def _rank_transform(data):
+    data_matrix = numpy.asarray(data, dtype=float)
+    if data_matrix.ndim == 1:
+        data_matrix = data_matrix.reshape(-1, 1)
+    ranks = numpy.column_stack([
+        _average_ranks(data_matrix[:, column])
+        for column in range(data_matrix.shape[1])
+    ])
+    return ranks - (data_matrix.shape[0] + 1) / 2
+
+
+def _average_ranks(values):
+    values = numpy.asarray(values, dtype=float)
+    order = numpy.argsort(values, kind='mergesort')
+    sorted_values = values[order]
+    ranks = numpy.empty(values.shape[0], dtype=float)
+    start = 0
+    while start < values.shape[0]:
+        end = start + 1
+        while end < values.shape[0] and sorted_values[end] == sorted_values[start]:
+            end += 1
+        ranks[order[start:end]] = (start + 1 + end) / 2
+        start = end
+    return ranks
+
+
+def _kernel_transform(data, order=(100, 0), random_state=None):
+    data_matrix = numpy.asarray(data, dtype=float)
+    if data_matrix.ndim == 1:
+        data_matrix = data_matrix.reshape(-1, 1)
+    kernel_order = (
+        list(order) if hasattr(order, '__len__') and not isinstance(order, str)
+        else [order]
+    )
+    feature_count = (
+        int(kernel_order[0]) if kernel_order and kernel_order[0] > 0 else 100
+    )
+    bandwidth = float(kernel_order[1]) if len(kernel_order) >= 2 else 0.0
+    rng = _rng_from_random_state(random_state)
+    if bandwidth <= 0:
+        n_rows = data_matrix.shape[0]
+        if n_rows > 1000:
+            idx = rng.choice(n_rows, size=1000, replace=False)
+            sampled = data_matrix[idx, :]
+        else:
+            sampled = data_matrix
+        diffs = sampled[:, None, :] - sampled[None, :, :]
+        squared_distances = numpy.sum(diffs * diffs, axis=2)
+        positive_distances = squared_distances[squared_distances > 0]
+        bandwidth = (
+            numpy.sqrt(numpy.median(positive_distances) / 2)
+            if positive_distances.size else 1.0
+        )
+    omega = rng.normal(
+        loc=0.0, scale=1.0 / bandwidth,
+        size=(data_matrix.shape[1], feature_count),
+    )
+    phase = rng.uniform(0.0, 2 * numpy.pi, size=feature_count)
+    return numpy.sqrt(2.0 / feature_count) * numpy.cos(data_matrix @ omega + phase)
+
+
+def _rng_from_random_state(random_state):
+    if random_state is None:
+        return numpy.random
+    if isinstance(random_state, (numpy.random.Generator, numpy.random.RandomState)):
+        return random_state
+    return numpy.random.default_rng(random_state)
+
+
 def _estimate_variance(data, family, p_response, variance_estimation):
     """Estimate the variance/covariance matrix for the given family."""
     if variance_estimation is not None:
         return numpy.asarray(variance_estimation, dtype=float)
     if family == 'mean':
-        return fastcpd.variance_estimation.mean(data)
+        return fastcpd.variance_estimation.estimate_variance_mean(data)
     if family == 'mgaussian':
         # Estimate Σ using Rice estimator on OLS residuals.
         # Using raw Y differences inflates Σ when predictors have high

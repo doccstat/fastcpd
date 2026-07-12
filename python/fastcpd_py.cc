@@ -15,6 +15,7 @@
 #include "families/meanvariance.h"
 #include "families/mgaussian.h"
 #include "families/poisson.h"
+#include "families/quantile.h"
 #include "families/variance.h"
 
 #include <cmath>
@@ -43,6 +44,7 @@ int fastcpd_compute_p(std::string const& family, int n_cols,
   if (family == "gaussian") return n_cols - 1;
   if (family == "binomial") return n_cols - 1;
   if (family == "poisson")  return n_cols - 1;
+  if (family == "quantile") return n_cols - 1;
   if (family == "garch")    return static_cast<int>(arma::sum(order)) + 1;
   if (family == "arma")     return static_cast<int>(arma::sum(order)) + 1;
   if (family == "ma")       return static_cast<int>(order(1)) + 1;
@@ -154,6 +156,7 @@ Result dispatch_impl(
   if (family == "gaussian")    { DISPATCH_FAMILY(GaussianFamily); }
   if (family == "binomial")    { DISPATCH_FAMILY(BinomialFamily); }
   if (family == "poisson")     { DISPATCH_FAMILY(PoissonFamily); }
+  if (family == "quantile")    { DISPATCH_FAMILY(QuantileFamily); }
   if (family == "arma")        { DISPATCH_FAMILY(ArmaFamily); }
   if (family == "ma")          { DISPATCH_FAMILY(MaFamily); }
 

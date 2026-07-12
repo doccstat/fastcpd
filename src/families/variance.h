@@ -3,6 +3,8 @@
 
 #include "fastcpd_family.h"
 
+#include <vector>
+
 namespace fastcpd::families {
 
 struct VarianceFamily : BaseFamily {
@@ -18,16 +20,42 @@ struct VarianceFamily : BaseFamily {
   static arma::mat CreateDataC(arma::mat const& data,
                                arma::mat const& variance_estimate,
                                unsigned int const p_response = 0) {
-    arma::mat data_c = data;
-    data_c.each_row() -= arma::mean(data_c, 0);
-    arma::mat data_crossprod(data.n_cols * data.n_cols, data.n_rows);
-    for (unsigned int i = 0; i < data.n_rows; i++) {
-      data_crossprod.col(i) =
-          arma::vectorise(data_c.row(i).t() * data_c.row(i));
+    arma::uword const n = data.n_rows;
+    arma::uword const p = data.n_cols;
+    arma::uword const total = p * p;
+    arma::rowvec const means = arma::mean(data, 0);
+    arma::mat out(total, n + 1, arma::fill::none);
+    out.col(0).zeros();
+
+    if (p == 1) {
+      double const mean = means[0];
+      double prefix = 0.0;
+      double const* const x = data.colptr(0);
+      for (arma::uword i = 0; i < n; i++) {
+        double const centered = x[i] - mean;
+        prefix += centered * centered;
+        out(0, i + 1) = prefix;
+      }
+      return out;  // 1 × (n+1): time is the column index
     }
-    data_c = arma::cumsum(data_crossprod.t());
-    data_c = arma::join_cols(arma::zeros<arma::rowvec>(data_c.n_cols), data_c);
-    return data_c.t();  // (p²) × (n+1): time is the column index
+
+    std::vector<double> centered(p);
+    std::vector<double> prefix(total, 0.0);
+    for (arma::uword i = 0; i < n; i++) {
+      for (arma::uword j = 0; j < p; j++) {
+        centered[j] = data(i, j) - means[j];
+      }
+      arma::uword idx = 0;
+      for (arma::uword j2 = 0; j2 < p; j2++) {
+        double const x_j2 = centered[j2];
+        for (arma::uword j1 = 0; j1 < p; j1++) {
+          prefix[idx] += centered[j1] * x_j2;
+          out(idx, i + 1) = prefix[idx];
+          idx++;
+        }
+      }
+    }
+    return out;  // (p²) × (n+1): time is the column index
   }
 
   static unsigned int GetDataNDims(arma::mat const& data) {

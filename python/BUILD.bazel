@@ -5,6 +5,7 @@ py_library(
     name = "fastcpd_init",
     srcs = [
         "__init__.py",
+        "confidence.py",
         "segmentation.py",
         "variance_estimation.py",
     ],

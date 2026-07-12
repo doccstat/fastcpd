@@ -1,9 +1,11 @@
 import unittest
 
+import fastcpd as fastcpd_pkg
 import numpy as np
 from fastcpd.segmentation import (
-    ar, arima, arma, binomial, exponential, garch, lasso, lm,
-    mean, meanvariance, poisson, var, variance,
+    ar, arima, arma, binomial, detect_kernel, detect_mean, detect_quantile,
+    detect_rank, exponential, garch, lasso, lm, mean, meanvariance, poisson,
+    var, variance,
 )
 from numpy import concatenate
 from numpy.random import exponential as rexp
@@ -21,6 +23,63 @@ def _expit(x):
 
 
 class TestBasic(unittest.TestCase):
+
+    def test_unified_interface_aliases(self):
+        self.assertIs(fastcpd_pkg.detect_mean, fastcpd_pkg.mean)
+        self.assertIs(fastcpd_pkg.detect_kernel, fastcpd_pkg.kernel)
+        self.assertIs(fastcpd_pkg.detect_kcp, fastcpd_pkg.kcp)
+        self.assertIs(fastcpd_pkg.detect_lm, fastcpd_pkg.lm)
+        self.assertIs(
+            fastcpd_pkg.estimate_variance_mean,
+            fastcpd_pkg.variance_estimation.mean,
+        )
+
+        seed(17)
+        data = concatenate((np.random.normal(0, 0.2, 40),
+                            np.random.normal(3, 0.2, 40)))
+        self.assertEqual(detect_mean(data).cp_set, mean(data).cp_set)
+        self.assertEqual(
+            detect_rank(data).cp_set,
+            fastcpd_pkg.rank(data).cp_set,
+        )
+        self.assertEqual(
+            detect_kernel(
+                data, order=(20, 1), random_state=17,
+            ).cp_set,
+            fastcpd_pkg.kcp(
+                data, order=(20, 1), random_state=17,
+            ).cp_set,
+        )
+
+        x = np.arange(80, dtype=float)
+        regression_data = np.column_stack([
+            concatenate((x[:40], -x[40:])),
+            x,
+        ])
+        self.assertEqual(
+            fastcpd_pkg.detect_linear_regression(regression_data).cp_set,
+            fastcpd_pkg.lm(regression_data).cp_set,
+        )
+
+    def test_unified_variance_interface(self):
+        data = np.array([0.0, 1.0, 2.0, 4.0])
+        expected = fastcpd_pkg.variance_estimation.mean(data)
+        np.testing.assert_allclose(
+            fastcpd_pkg.estimate_variance_mean(data),
+            expected,
+        )
+        np.testing.assert_allclose(
+            fastcpd_pkg.estimate_variance(data, family='mean'),
+            expected,
+        )
+
+    def test_quantile_interface(self):
+        seed(18)
+        x = randn(120)
+        y = concatenate((2 * x[:60], -2 * x[60:])) + 0.05 * randn(120)
+        result = detect_quantile(np.column_stack([y, x]), order=0.5)
+        self.assertGreater(len(result.cp_set), 0)
+        self.assertAlmostEqual(result.cp_set[0], 60, delta=10)
 
     def test_mean(self):
         seed(0)

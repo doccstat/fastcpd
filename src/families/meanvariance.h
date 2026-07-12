@@ -3,6 +3,8 @@
 
 #include "fastcpd_family.h"
 
+#include <vector>
+
 namespace fastcpd::families {
 
 struct MeanvarianceFamily : BaseFamily {
@@ -17,13 +19,43 @@ struct MeanvarianceFamily : BaseFamily {
   static arma::mat CreateDataC(arma::mat const& data,
                                arma::mat const& variance_estimate,
                                unsigned int const p_response = 0) {
-    arma::mat data_crossprod(data.n_cols * data.n_cols, data.n_rows);
-    for (unsigned int i = 0; i < data.n_rows; i++) {
-      data_crossprod.col(i) = arma::vectorise(data.row(i).t() * data.row(i));
+    arma::uword const n = data.n_rows;
+    arma::uword const p = data.n_cols;
+    arma::uword const total = p + p * p;
+    arma::mat out(total, n + 1, arma::fill::none);
+    out.col(0).zeros();
+
+    if (p == 1) {
+      double sum_x = 0.0;
+      double sum_xx = 0.0;
+      double const* const x = data.colptr(0);
+      for (arma::uword i = 0; i < n; i++) {
+        double const value = x[i];
+        sum_x += value;
+        sum_xx += value * value;
+        out(0, i + 1) = sum_x;
+        out(1, i + 1) = sum_xx;
+      }
+      return out;  // 2 × (n+1): time is the column index
     }
-    arma::mat data_c = arma::cumsum(arma::join_rows(data, data_crossprod.t()));
-    data_c = arma::join_cols(arma::zeros<arma::rowvec>(data_c.n_cols), data_c);
-    return data_c.t();  // (p+p²) × (n+1): time is the column index
+
+    std::vector<double> prefix(total, 0.0);
+    for (arma::uword i = 0; i < n; i++) {
+      for (arma::uword j = 0; j < p; j++) {
+        prefix[j] += data(i, j);
+        out(j, i + 1) = prefix[j];
+      }
+      arma::uword idx = p;
+      for (arma::uword j2 = 0; j2 < p; j2++) {
+        double const x_j2 = data(i, j2);
+        for (arma::uword j1 = 0; j1 < p; j1++) {
+          prefix[idx] += data(i, j1) * x_j2;
+          out(idx, i + 1) = prefix[idx];
+          idx++;
+        }
+      }
+    }
+    return out;  // (p+p²) × (n+1): time is the column index
   }
 
   static unsigned int GetDataNDims(arma::mat const& data) {

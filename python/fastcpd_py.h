@@ -55,7 +55,7 @@ double fastcpd_compute_pruning_coef(double pruning_coef,
 /// Returns (raw_cp_set, cp_set, cost_values, residual, thetas).
 ///
 /// Supported families: mean, variance, meanvariance, exponential, mgaussian,
-/// lasso, garch, gaussian/lm, binomial, poisson, arma, ma.
+/// lasso, garch, gaussian/lm, binomial, poisson, quantile, arma, ma.
 std::tuple<arma::colvec, arma::colvec, arma::colvec, arma::mat, arma::mat>
 fastcpd_py_dispatch(
     double beta, std::string const& cost_adjustment, bool cp_only,
