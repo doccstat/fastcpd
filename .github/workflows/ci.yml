@@ -11,6 +11,9 @@ permissions: read-all
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ABSEIL_VERSION: '20260526.0'
+      ABSEIL_SHA256: 6e1aee535473414164bf83e4ebc40240dec71a4701f8a642d906e95bea1aea0c
 
     steps:
       - uses: actions/checkout@v4
@@ -21,13 +24,32 @@ jobs:
           sudo apt-get install -y \
             cmake \
             g++ \
-            libabsl-dev \
             libarmadillo-dev \
             liblapack-dev \
             libopenblas-dev
 
+      - name: Build Abseil dependency
+        run: |
+          archive="$RUNNER_TEMP/abseil-cpp-${ABSEIL_VERSION}.tar.gz"
+          curl -fsSL \
+            "https://github.com/abseil/abseil-cpp/releases/download/${ABSEIL_VERSION}/abseil-cpp-${ABSEIL_VERSION}.tar.gz" \
+            -o "$archive"
+          echo "${ABSEIL_SHA256}  ${archive}" | sha256sum -c -
+          tar -xzf "$archive" -C "$RUNNER_TEMP"
+          cmake \
+            -S "$RUNNER_TEMP/abseil-cpp-${ABSEIL_VERSION}" \
+            -B "$RUNNER_TEMP/abseil-build" \
+            -DABSL_BUILD_TESTING=OFF \
+            -DABSL_ENABLE_INSTALL=ON \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$RUNNER_TEMP/abseil"
+          cmake --build "$RUNNER_TEMP/abseil-build" --target install --parallel 2
+
       - name: Configure CMake build
-        run: cmake -S . -B build -DFASTCPD_BUILD_EXAMPLES=ON
+        run: >-
+          cmake -S . -B build
+          -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/abseil"
+          -DFASTCPD_BUILD_EXAMPLES=ON
 
       - name: Build and run CMake example
         run: |
@@ -39,5 +61,5 @@ jobs:
 
       - name: Build and run Make example
         run: |
-          make -C examples/cpp clean all
+          make -C examples/cpp clean all ABSL_INCLUDE="$RUNNER_TEMP/abseil/include"
           ./examples/cpp/simple

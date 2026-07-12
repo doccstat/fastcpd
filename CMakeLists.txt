@@ -10,8 +10,6 @@ include(GNUInstallDirs)
 option(FASTCPD_BUILD_EXAMPLES "Build fastcpd C++ examples" ON)
 set(FASTCPD_ARMADILLO_INCLUDE_DIR "" CACHE PATH
   "Optional Armadillo include directory for no-wrapper builds")
-set(FASTCPD_ABSEIL_INCLUDE_DIR "" CACHE PATH
-  "Optional Abseil include directory when Abseil CMake targets are unavailable")
 if(FASTCPD_ARMADILLO_INCLUDE_DIR)
   set(_fastcpd_default_use_arma_wrapper OFF)
 else()
@@ -33,7 +31,7 @@ else()
       "FASTCPD_USE_ARMA_WRAPPER=OFF")
   endif()
 endif()
-find_package(absl CONFIG QUIET)
+find_package(absl 20260526 CONFIG REQUIRED)
 
 add_library(fastcpd cpp/fastcpd.cc)
 add_library(fastcpd::fastcpd ALIAS fastcpd)
@@ -46,8 +44,7 @@ target_include_directories(fastcpd
     $<BUILD_INTERFACE:${FASTCPD_ARMADILLO_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${FASTCPD_ABSEIL_INCLUDE_DIR})
+    ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 if(FASTCPD_USE_ARMA_WRAPPER)
   if(TARGET Armadillo::Armadillo)
@@ -61,18 +58,9 @@ else()
   target_link_libraries(fastcpd PUBLIC LAPACK::LAPACK BLAS::BLAS)
 endif()
 
-set(_fastcpd_absl_targets absl::inlined_vector absl::prefetch)
-foreach(_fastcpd_absl_target IN LISTS _fastcpd_absl_targets)
-  if(TARGET ${_fastcpd_absl_target})
-    target_link_libraries(fastcpd PRIVATE ${_fastcpd_absl_target})
-  elseif(NOT FASTCPD_ABSEIL_INCLUDE_DIR)
-    message(WARNING
-      "Abseil target ${_fastcpd_absl_target} was not found. "
-      "Set FASTCPD_ABSEIL_INCLUDE_DIR or install Abseil with CMake targets.")
-  endif()
-endforeach()
-unset(_fastcpd_absl_target)
-unset(_fastcpd_absl_targets)
+target_link_libraries(fastcpd PRIVATE
+  absl::inlined_vector
+  absl::prefetch)
 
 if(FASTCPD_BUILD_EXAMPLES)
   add_executable(fastcpd_cpp_example examples/cpp/simple.cc)

@@ -35,3 +35,7 @@ repository root and link the interface target:
 find_package(fastcpd REQUIRED)
 target_link_libraries(my_target PRIVATE fastcpd::fastcpd)
 ```
+
+The CMake package requires Abseil `20260526` or newer. If Abseil is installed
+under a non-standard prefix, add that prefix to `CMAKE_PREFIX_PATH` or set
+`absl_DIR` to the directory containing `abslConfig.cmake`.
