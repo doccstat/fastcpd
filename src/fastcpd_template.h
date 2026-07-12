@@ -75,6 +75,10 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
     if constexpr (!FamilyPolicy::supports_warm_start) { return {}; }
     else { return arma::zeros<arma::mat>(p, n); }
   }
+  static std::unique_ptr<unsigned int[]> MakeChangePointBuffer(
+      arma::uword const n) {
+    return std::unique_ptr<unsigned int[]>(new unsigned int[n + 1]);
+  }
   static std::vector<double> MakeLogSegmentLengths(arma::uword const n) {
     if constexpr (kCostAdj == CostAdjustment::kBIC) {
       return {};
@@ -108,7 +112,7 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
             cost_pelt, cost_sen, cost_gradient, cost_hessian),
         active_coefficients_count_(arma::colvec(segment_count)),
         beta_(beta),
-        change_points_(arma::zeros<arma::colvec>(data.n_rows + 1)),
+        change_points_(MakeChangePointBuffer(data.n_rows)),
         coefficients_(MakeSenMat(p, data.n_rows + 1)),
         coefficients_sum_(MakeSenMat(p, data.n_rows + 1)),
         cp_only_(cp_only),
@@ -150,6 +154,8 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
         variance_estimate_(variance_estimate),
         variance_log_det_(arma::log_det_sympd(variance_estimate)),
         warm_start_(MakeWarmStart(p, data_n_rows_)) {
+    change_points_[0] = 0u;
+    if (data_n_rows_ > 0u) change_points_[1] = 0u;
   }
 
   std::tuple<arma::colvec, arma::colvec, arma::colvec, arma::mat, arma::mat>
@@ -186,7 +192,7 @@ class Fastcpd : public SenFunctions<FamilyPolicy::is_pelt_only> {
 
   arma::colvec active_coefficients_count_;
   double beta_;
-  arma::colvec change_points_;
+  std::unique_ptr<unsigned int[]> change_points_;
   arma::mat coefficients_;
   arma::mat coefficients_sum_;
   bool const cp_only_;
@@ -250,7 +256,6 @@ Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::
   CreateSegmentStatistics();
   CreateSenParameters();
   pruned_set_[1] = 1u;
-  objective_function_values_.fill(arma::datum::inf);
   objective_function_values_(0) = -beta_;
   objective_function_values_(1) = GetCostValue(0, 0);
 
@@ -368,9 +373,13 @@ template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
 std::tuple<arma::colvec, arma::colvec, arma::colvec, arma::mat, arma::mat>
 Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::GetChangePointSet() {
   arma::colvec cp_set = UpdateChangePointSet();
+  // `change_points_` is an internal traceback table. The R layer only uses
+  // `cp_set`, so keep this compatibility slot empty instead of materializing
+  // O(n) doubles back into R.
+  arma::colvec raw_cp_set;
 
   if (cp_only_) {
-    return std::make_tuple(change_points_, cp_set, arma::colvec(), arma::mat(), arma::mat());
+    return std::make_tuple(std::move(raw_cp_set), cp_set, arma::colvec(), arma::mat(), arma::mat());
   }
 
   arma::colvec cp_loc_ = arma::zeros<arma::colvec>(cp_set.n_elem + 2);
@@ -401,7 +410,7 @@ Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::
       }
     }
   }
-  return std::make_tuple(change_points_, cp_set, cost_values, residual, thetas);
+  return std::make_tuple(std::move(raw_cp_set), cp_set, cost_values, residual, thetas);
 }
 
 template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
@@ -640,43 +649,66 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
 template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
           CostAdjustment kCostAdj, bool kLineSearch, int kNDims>
 arma::colvec Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::UpdateChangePointSet() {
-  arma::colvec cp_set = arma::zeros<arma::colvec>(data_n_rows_);
-  int ncpts = 0;
-  int last = data_n_rows_;
-  while (last != 0) {
-    cp_set[ncpts] = last;
-    last = change_points_[last];
-    ncpts += 1;
-  }
-  cp_set = arma::sort(cp_set.rows(arma::find(cp_set > 0)));
-  cp_set = cp_set(arma::find(cp_set > trim_ * data_n_rows_));
-  cp_set = cp_set(arma::find(cp_set < (1 - trim_) * data_n_rows_));
-  arma::colvec cp_set_ = arma::zeros<arma::vec>(cp_set.n_elem + 1);
-  if (cp_set.n_elem) {
-    cp_set_.rows(1, cp_set_.n_elem - 1) = std::move(cp_set);
-  }
-  cp_set = arma::sort(arma::unique(std::move(cp_set_)));
+  std::vector<double> cp_values;
+  cp_values.reserve(static_cast<std::size_t>(std::max(segment_count_, 1)) + 2);
 
-  arma::ucolvec cp_set_too_close = arma::find(arma::diff(cp_set) <= trim_ * data_n_rows_);
-  if (cp_set_too_close.n_elem > 0) {
-    int rest_element_count = cp_set.n_elem - cp_set_too_close.n_elem;
-    arma::colvec cp_set_rest_left = arma::zeros<arma::vec>(rest_element_count),
-           cp_set_rest_right = arma::zeros<arma::vec>(rest_element_count);
-    for (unsigned int i = 0, i_left = 0, i_right = 0; i < cp_set.n_elem; i++) {
-      if (arma::ucolvec left_find = arma::find(cp_set_too_close == i);
-          left_find.n_elem == 0) {
-        cp_set_rest_left(i_left) = cp_set(i);
-        i_left++;
+  double const trim_left = trim_ * static_cast<double>(data_n_rows_);
+  double const trim_right = (1.0 - trim_) * static_cast<double>(data_n_rows_);
+  for (unsigned int last = data_n_rows_; last != 0u; last = change_points_[last]) {
+    double const cp = static_cast<double>(last);
+    if (cp > trim_left && cp < trim_right) {
+      cp_values.push_back(cp);
+    }
+  }
+
+  cp_values.push_back(0.0);
+  std::sort(cp_values.begin(), cp_values.end());
+  cp_values.erase(std::unique(cp_values.begin(), cp_values.end()),
+                  cp_values.end());
+
+  double const min_distance = trim_ * static_cast<double>(data_n_rows_);
+  std::vector<unsigned char> too_close;
+  too_close.reserve(cp_values.size() > 0 ? cp_values.size() - 1 : 0);
+  unsigned int too_close_count = 0;
+  for (std::size_t i = 0; i + 1 < cp_values.size(); i++) {
+    unsigned char const close =
+        (cp_values[i + 1] - cp_values[i] <= min_distance) ? 1u : 0u;
+    too_close.push_back(close);
+    too_close_count += close;
+  }
+
+  if (too_close_count > 0u) {
+    std::vector<double> left;
+    std::vector<double> right;
+    std::size_t const kept_count = cp_values.size() - too_close_count;
+    left.reserve(kept_count);
+    right.reserve(kept_count);
+    for (std::size_t i = 0; i < cp_values.size(); i++) {
+      if (i >= too_close.size() || !too_close[i]) {
+        left.push_back(cp_values[i]);
       }
-      if (arma::ucolvec right_find = arma::find(cp_set_too_close == i - 1);
-          right_find.n_elem == 0) {
-        cp_set_rest_right(i_right) = cp_set(i);
-        i_right++;
+      if (i == 0 || !too_close[i - 1]) {
+        right.push_back(cp_values[i]);
       }
     }
-    cp_set = arma::floor((cp_set_rest_left + cp_set_rest_right) / 2);
+    cp_values.resize(kept_count);
+    for (std::size_t i = 0; i < kept_count; i++) {
+      cp_values[i] = std::floor((left[i] + right[i]) / 2.0);
+    }
   }
-  return cp_set(arma::find(cp_set > 0));
+
+  std::size_t out_size = 0;
+  for (double const cp : cp_values) {
+    if (cp > 0.0) out_size++;
+  }
+  arma::colvec cp_set(out_size);
+  std::size_t out_index = 0;
+  for (double const cp : cp_values) {
+    if (cp > 0.0) {
+      cp_set[out_index++] = cp;
+    }
+  }
+  return cp_set;
 }
 
 template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,

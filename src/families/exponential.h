@@ -3,6 +3,8 @@
 
 #include "fastcpd_family.h"
 
+#include <vector>
+
 namespace fastcpd::families {
 
 // Mean-change detection under exponentially distributed noise: each segment
@@ -23,14 +25,34 @@ struct ExponentialFamily : BaseFamily {
 
   // This family is intrinsically univariate (a single rate parameter), so
   // `data_c_` is just the cumulative sum of the raw observations, stored
-  // transposed (1 x (n+1)) to match the cache-friendly layout convention used
+  // transposed (p x (n+1)) to match the cache-friendly layout convention used
   // by `mean`/`variance`/`meanvariance`.
   static arma::mat CreateDataC(arma::mat const& data,
                                arma::mat const& variance_estimate,
                                unsigned int const p_response = 0) {
-    arma::mat data_c = arma::cumsum(data);
-    data_c = arma::join_cols(arma::zeros<arma::rowvec>(data_c.n_cols), data_c);
-    return data_c.t();  // 1 x (n+1)
+    arma::uword const n = data.n_rows;
+    arma::uword const p = data.n_cols;
+    arma::mat out(p, n + 1, arma::fill::none);
+    out.col(0).zeros();
+
+    if (p == 1) {
+      double prefix = 0.0;
+      double const* const x = data.colptr(0);
+      for (arma::uword i = 0; i < n; i++) {
+        prefix += x[i];
+        out(0, i + 1) = prefix;
+      }
+      return out;  // 1 x (n+1)
+    }
+
+    std::vector<double> prefix(p, 0.0);
+    for (arma::uword i = 0; i < n; i++) {
+      for (arma::uword j = 0; j < p; j++) {
+        prefix[j] += data(i, j);
+        out(j, i + 1) = prefix[j];
+      }
+    }
+    return out;  // p x (n+1)
   }
 
   static unsigned int GetDataNDims(arma::mat const& data) {
