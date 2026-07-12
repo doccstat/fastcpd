@@ -73,15 +73,10 @@ print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 
 <details close>
 <summary>
-Should I install suggested packages?
+Banned by xingchi.li and x2r.io?
 </summary>
 
-The suggested packages are not required for the main functionality of
-the package. They are only required for the vignettes. If you want to
-learn more about the package comparison and other vignettes, you could
-either check out vignettes on
-[CRAN](https://CRAN.R-project.org/package=fastcpd) or [pkgdown generated
-documentation](https://fastcpd.xingchi.li/articles/).
+Use fastcpd.xingchi.li.
 
 </details>
 <details close>
