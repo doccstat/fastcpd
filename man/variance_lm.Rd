@@ -2,6 +2,8 @@
 % Please edit documentation in R/variance_estimation.R
 \name{variance_lm}
 \alias{variance_lm}
+\alias{estimate_variance_linear_regression}
+\alias{estimate_variance_lm}
 \alias{variance.lm}
 \title{Variance estimation for linear models with change points}
 \usage{

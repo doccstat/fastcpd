@@ -2,6 +2,8 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_ts}
 \alias{fastcpd_ts}
+\alias{detect_ts}
+\alias{detect_time_series}
 \alias{fastcpd.ts}
 \title{Find change points efficiently in time series data}
 \usage{

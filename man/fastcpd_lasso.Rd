@@ -2,6 +2,7 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_lasso}
 \alias{fastcpd_lasso}
+\alias{detect_lasso}
 \alias{fastcpd.lasso}
 \title{Find change points efficiently in penalized linear regression models}
 \usage{

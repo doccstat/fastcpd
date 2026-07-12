@@ -2,6 +2,7 @@
 % Please edit documentation in R/variance_estimation.R
 \name{variance_arma}
 \alias{variance_arma}
+\alias{estimate_variance_arma}
 \alias{variance.arma}
 \title{Variance estimation for ARMA model with change points}
 \usage{

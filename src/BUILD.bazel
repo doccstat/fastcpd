@@ -18,6 +18,7 @@ cc_library(
         "families/meanvariance.h",
         "families/mgaussian.h",
         "families/poisson.h",
+        "families/quantile.h",
         "families/variance.h",
     ],
     copts = select({

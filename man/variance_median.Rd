@@ -2,6 +2,7 @@
 % Please edit documentation in R/variance_estimation.R
 \name{variance_median}
 \alias{variance_median}
+\alias{estimate_variance_median}
 \alias{variance.median}
 \title{Variance estimation for median change models}
 \usage{

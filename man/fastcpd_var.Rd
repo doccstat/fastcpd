@@ -2,6 +2,7 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_var}
 \alias{fastcpd_var}
+\alias{detect_var}
 \alias{fastcpd.var}
 \title{Find change points efficiently in VAR(\eqn{p}) models}
 \usage{

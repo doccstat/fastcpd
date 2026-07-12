@@ -2,6 +2,8 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_kcp}
 \alias{fastcpd_kcp}
+\alias{detect_kcp}
+\alias{detect_kernel}
 \alias{fastcpd.kcp}
 \title{Find change points efficiently via kernel change point detection}
 \usage{

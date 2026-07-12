@@ -3,6 +3,8 @@
 
 #include "fastcpd_family.h"
 
+#include <vector>
+
 namespace fastcpd::families {
 
 struct MeanFamily : BaseFamily {
@@ -31,11 +33,41 @@ struct MeanFamily : BaseFamily {
   static arma::mat CreateDataC(arma::mat const& data,
                                arma::mat const& variance_estimate,
                                unsigned int const p_response = 0) {
-    arma::mat data_c = data * arma::chol(arma::inv(variance_estimate)).t();
-    data_c =
-        arma::cumsum(arma::join_rows(data_c, arma::sum(arma::square(data_c), 1)));
-    data_c = arma::join_cols(arma::zeros<arma::rowvec>(data_c.n_cols), data_c);
-    return data_c.t();  // (p+1) × (n+1): time is the column index
+    arma::uword const n = data.n_rows;
+    arma::uword const p = data.n_cols;
+    arma::mat out(p + 1, n + 1, arma::fill::none);
+    out.col(0).zeros();
+
+    if (p == 1) {
+      double const scale = 1.0 / std::sqrt(variance_estimate(0, 0));
+      double sum_x = 0.0;
+      double sum_xx = 0.0;
+      double const* const x = data.colptr(0);
+      for (arma::uword i = 0; i < n; i++) {
+        double const value = x[i] * scale;
+        sum_x += value;
+        sum_xx += value * value;
+        out(0, i + 1) = sum_x;
+        out(1, i + 1) = sum_xx;
+      }
+      return out;  // 2 × (n+1): time is the column index
+    }
+
+    arma::mat const transform = arma::chol(arma::inv(variance_estimate)).t();
+    arma::mat const whitened = data * transform;
+    std::vector<double> prefix(p + 1, 0.0);
+    for (arma::uword i = 0; i < n; i++) {
+      double row_square_sum = 0.0;
+      for (arma::uword d = 0; d < p; d++) {
+        double const value = whitened(i, d);
+        prefix[d] += value;
+        row_square_sum += value * value;
+        out(d, i + 1) = prefix[d];
+      }
+      prefix[p] += row_square_sum;
+      out(p, i + 1) = prefix[p];
+    }
+    return out;  // (p+1) × (n+1): time is the column index
   }
 
   static unsigned int GetDataNDims(arma::mat const& data) {

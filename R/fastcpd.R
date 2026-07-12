@@ -1,4 +1,5 @@
 #' @title Find change points efficiently
+#' @aliases detect
 #' @param formula A formula object specifying the model to be fitted. The
 #' (optional) response variable should be on the LHS of the formula, while the
 #' covariates should be on the RHS. The naming of variables used in the formula
@@ -603,6 +604,7 @@ fastcpd <- function(  # nolint: cyclomatic complexity
 NULL
 
 #' @title Find change points efficiently in AR(\eqn{p}) models
+#' @aliases detect_ar
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A positive integer specifying the order of the AR model.
 #' @param ... Other arguments passed to [fastcpd()], for example,
@@ -634,6 +636,7 @@ fastcpd.ar <- fastcpd_ar  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in
 #' ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models
+#' @aliases detect_arima
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A vector of length three specifying the order of the ARIMA
 #' model.
@@ -665,6 +668,7 @@ fastcpd_arima <- function(data, order = 0, ...) {
 fastcpd.arima <- fastcpd_arima  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in ARMA(\eqn{p}, \eqn{q}) models
+#' @aliases detect_arma
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A vector of length two specifying the order of the ARMA
 #' model.
@@ -693,6 +697,7 @@ fastcpd_arma <- function(data, order = c(0, 0), ...) {
 fastcpd.arma <- fastcpd_arma  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in logistic regression models
+#' @aliases detect_binomial detect_logistic_regression
 #' @param data A matrix or a data frame with the response variable as the first
 #' column.
 #' @param ... Other arguments passed to [fastcpd()], for example,
@@ -730,6 +735,7 @@ fastcpd_binomial <- function(data, ...) {
 fastcpd.binomial <- fastcpd_binomial  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in GARCH(\eqn{p}, \eqn{q}) models
+#' @aliases detect_garch
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A positive integer vector of length two specifying the order of
 #' the GARCH model.
@@ -760,6 +766,7 @@ fastcpd_garch <- function(data, order = c(0, 0), ...) {
 fastcpd.garch <- fastcpd_garch  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in penalized linear regression models
+#' @aliases detect_lasso
 #' @param data A matrix or a data frame with the response variable as the first
 #' column.
 #' @param ... Other arguments passed to [fastcpd()], for example,
@@ -797,6 +804,7 @@ fastcpd_lasso <- function(data, ...) {
 fastcpd.lasso <- fastcpd_lasso  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in linear regression models
+#' @aliases detect_lm detect_linear_regression
 #' @param data A matrix or a data frame with the response variable as the first
 #' column.
 #' @param ... Other arguments passed to [fastcpd()], for example,
@@ -835,6 +843,7 @@ fastcpd_lm <- function(data, ...) {
 fastcpd.lm <- fastcpd_lm  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in mean change models
+#' @aliases detect_mean
 #' @param data A matrix, a data frame or a vector.
 #' @param ... Other arguments passed to [fastcpd()], for example,
 #' \code{segment_count}.
@@ -872,6 +881,7 @@ fastcpd_mean <- function(data, ...) {
 fastcpd.mean <- fastcpd_mean  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in exponentially distributed data
+#' @aliases detect_exponential
 #' @param data A matrix, a data frame or a vector.
 #' @param ... Other arguments passed to [fastcpd()], for example,
 #' \code{segment_count}.
@@ -913,6 +923,7 @@ fastcpd.exponential <-  # nolint: Conventional R function style
   fastcpd_exponential
 
 #' @title Find change points efficiently in mean variance change models
+#' @aliases detect_meanvariance detect_mean_variance
 #' @param data A matrix, a data frame or a vector.
 #' @param ... Other arguments passed to [fastcpd()], for example,
 #' \code{segment_count}.
@@ -961,6 +972,7 @@ fastcpd_mv <- fastcpd_meanvariance
 fastcpd.mv <- fastcpd_meanvariance  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in Poisson regression models
+#' @aliases detect_poisson detect_poisson_regression
 #' @param data A matrix or a data frame with the response variable as the first
 #' column.
 #' @param ... Other arguments passed to [fastcpd()], for example,
@@ -998,6 +1010,7 @@ fastcpd_poisson <- function(data, ...) {
 fastcpd.poisson <- fastcpd_poisson  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in quantile regression models
+#' @aliases detect_quantile detect_quantile_regression
 #' @param data A matrix or a data frame with the response variable as the first
 #' column and covariates in the remaining columns.
 #' @param order Quantile level \eqn{\tau}, a numeric value in (0, 1). The
@@ -1050,6 +1063,7 @@ fastcpd_quantile <- function(data, order = 0.5, ...) {
 fastcpd.quantile <- fastcpd_quantile  # nolint: Conventional R function style
 
 #' @title Find change points efficiently via kernel change point detection
+#' @aliases detect_kcp detect_kernel
 #' @param data A numeric vector or a matrix with one row per observation.
 #' @param order A numeric vector of length up to 2: \code{order[1]} is the
 #'   number of random Fourier features (default 100; larger values improve
@@ -1092,6 +1106,7 @@ fastcpd_kcp <- function(data, order = c(100L, 0), ...) {
 fastcpd.kcp <- fastcpd_kcp  # nolint: Conventional R function style
 
 #' @title Find change points efficiently via rank-based change point detection
+#' @aliases detect_rank
 #' @param data A numeric vector or a matrix with one row per observation.
 #' @param ... Other arguments passed to [fastcpd()], for example,
 #'   \code{segment_count}.
@@ -1124,6 +1139,7 @@ fastcpd_rank <- function(data, ...) {
 fastcpd.rank <- fastcpd_rank  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in time series data
+#' @aliases detect_ts detect_time_series
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param family A character string specifying the family of the time series.
 #' The value should be one of \code{"ar"}, \code{"var"}, \code{"arima"} or
@@ -1179,6 +1195,7 @@ fastcpd_ts <- function(data, family = NULL, order = c(0, 0, 0), ...) {
 fastcpd.ts <- fastcpd_ts  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in VAR(\eqn{p}) models
+#' @aliases detect_var
 #' @param data A matrix, a data frame or a time series object.
 #' @param order A positive integer specifying the order of the VAR model.
 #' @param ... Other arguments passed to [fastcpd()], for example,
@@ -1206,6 +1223,7 @@ fastcpd_var <- function(data, order = 0, ...) {
 fastcpd.var <- fastcpd_var  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in variance change models
+#' @aliases detect_variance
 #' @param data A matrix, a data frame or a vector.
 #' @param ... Other arguments passed to [fastcpd()], for example,
 #' \code{segment_count}.
@@ -1241,3 +1259,103 @@ fastcpd_variance <- function(data, ...) {
 #' @rdname fastcpd_variance
 #' @export
 fastcpd.variance <- fastcpd_variance  # nolint: Conventional R function style
+
+#' @noRd
+#' @export
+detect <- fastcpd
+
+#' @noRd
+#' @export
+detect_ar <- fastcpd_ar
+
+#' @noRd
+#' @export
+detect_arima <- fastcpd_arima
+
+#' @noRd
+#' @export
+detect_arma <- fastcpd_arma
+
+#' @noRd
+#' @export
+detect_binomial <- fastcpd_binomial
+
+#' @noRd
+#' @export
+detect_exponential <- fastcpd_exponential
+
+#' @noRd
+#' @export
+detect_garch <- fastcpd_garch
+
+#' @noRd
+#' @export
+detect_kcp <- fastcpd_kcp
+
+#' @noRd
+#' @export
+detect_kernel <- fastcpd_kcp
+
+#' @noRd
+#' @export
+detect_lasso <- fastcpd_lasso
+
+#' @noRd
+#' @export
+detect_linear_regression <- fastcpd_lm
+
+#' @noRd
+#' @export
+detect_lm <- fastcpd_lm
+
+#' @noRd
+#' @export
+detect_logistic_regression <- fastcpd_binomial
+
+#' @noRd
+#' @export
+detect_mean <- fastcpd_mean
+
+#' @noRd
+#' @export
+detect_mean_variance <- fastcpd_meanvariance
+
+#' @noRd
+#' @export
+detect_meanvariance <- fastcpd_meanvariance
+
+#' @noRd
+#' @export
+detect_poisson <- fastcpd_poisson
+
+#' @noRd
+#' @export
+detect_poisson_regression <- fastcpd_poisson
+
+#' @noRd
+#' @export
+detect_quantile <- fastcpd_quantile
+
+#' @noRd
+#' @export
+detect_quantile_regression <- fastcpd_quantile
+
+#' @noRd
+#' @export
+detect_rank <- fastcpd_rank
+
+#' @noRd
+#' @export
+detect_time_series <- fastcpd_ts
+
+#' @noRd
+#' @export
+detect_ts <- fastcpd_ts
+
+#' @noRd
+#' @export
+detect_var <- fastcpd_var
+
+#' @noRd
+#' @export
+detect_variance <- fastcpd_variance

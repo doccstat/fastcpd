@@ -2,6 +2,7 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_mean}
 \alias{fastcpd_mean}
+\alias{detect_mean}
 \alias{fastcpd.mean}
 \title{Find change points efficiently in mean change models}
 \usage{

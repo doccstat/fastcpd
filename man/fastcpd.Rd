@@ -2,6 +2,7 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd}
 \alias{fastcpd}
+\alias{detect}
 \title{Find change points efficiently}
 \usage{
 fastcpd(

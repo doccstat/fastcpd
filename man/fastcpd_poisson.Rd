@@ -2,6 +2,8 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_poisson}
 \alias{fastcpd_poisson}
+\alias{detect_poisson}
+\alias{detect_poisson_regression}
 \alias{fastcpd.poisson}
 \title{Find change points efficiently in Poisson regression models}
 \usage{

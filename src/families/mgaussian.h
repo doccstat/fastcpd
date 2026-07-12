@@ -2,6 +2,7 @@
 #define FASTCPD_FAMILIES_MGAUSSIAN_H_
 
 #include <cmath>
+#include <vector>
 
 #include "fastcpd_family.h"
 
@@ -28,36 +29,49 @@ struct MgaussianFamily : BaseFamily {
   static arma::mat CreateDataC(arma::mat const& data,
                                arma::mat const& variance_estimate,
                                unsigned int const p_response) {
-    unsigned int const n = data.n_rows;
-    unsigned int const q = p_response;
-    unsigned int const p = data.n_cols - q;  // predictor count
-    unsigned int const yy_size = q * q;
-    unsigned int const xy_size = p * q;
-    unsigned int const xx_size = p * p;
-    unsigned int const total = yy_size + xy_size + xx_size;
+    arma::uword const n = data.n_rows;
+    arma::uword const q = p_response;
+    arma::uword const p = data.n_cols - q;  // predictor count
+    arma::uword const yy_size = q * q;
+    arma::uword const xy_size = p * q;
+    arma::uword const xx_size = p * p;
+    arma::uword const total = yy_size + xy_size + xx_size;
 
-    // Build the total×n cross-product matrix, then cumsum + transpose.
-    // Layout per column i: [YY flat | XY flat | XX flat] in column-major order.
-    arma::mat data_crossprod(total, n);
-    for (unsigned int i = 0; i < n; i++) {
-      unsigned int idx = 0;
+    arma::mat out(total, n + 1, arma::fill::none);
+    out.col(0).zeros();
+
+    std::vector<double> prefix(total, 0.0);
+    for (arma::uword i = 0; i < n; i++) {
+      arma::uword idx = 0;
       // YY: q×q outer product y*y', column-major: (j1,j2) → j2*q+j1
-      for (unsigned int j2 = 0; j2 < q; j2++)
-        for (unsigned int j1 = 0; j1 < q; j1++)
-          data_crossprod(idx++, i) = data(i, j1) * data(i, j2);
+      for (arma::uword j2 = 0; j2 < q; j2++) {
+        double const y_j2 = data(i, j2);
+        for (arma::uword j1 = 0; j1 < q; j1++) {
+          prefix[idx] += data(i, j1) * y_j2;
+          out(idx, i + 1) = prefix[idx];
+          idx++;
+        }
+      }
       // XY: p×q outer product x*y', column-major: (j1,j2) → j2*p+j1
-      for (unsigned int j2 = 0; j2 < q; j2++)
-        for (unsigned int j1 = 0; j1 < p; j1++)
-          data_crossprod(idx++, i) = data(i, q + j1) * data(i, j2);
+      for (arma::uword j2 = 0; j2 < q; j2++) {
+        double const y_j2 = data(i, j2);
+        for (arma::uword j1 = 0; j1 < p; j1++) {
+          prefix[idx] += data(i, q + j1) * y_j2;
+          out(idx, i + 1) = prefix[idx];
+          idx++;
+        }
+      }
       // XX: p×p outer product x*x', column-major: (j1,j2) → j2*p+j1
-      for (unsigned int j2 = 0; j2 < p; j2++)
-        for (unsigned int j1 = 0; j1 < p; j1++)
-          data_crossprod(idx++, i) = data(i, q + j1) * data(i, q + j2);
+      for (arma::uword j2 = 0; j2 < p; j2++) {
+        double const x_j2 = data(i, q + j2);
+        for (arma::uword j1 = 0; j1 < p; j1++) {
+          prefix[idx] += data(i, q + j1) * x_j2;
+          out(idx, i + 1) = prefix[idx];
+          idx++;
+        }
+      }
     }
-    // cumsum along rows (dim=0) of the n×total transpose, then prepend zeros.
-    arma::mat cum = arma::cumsum(data_crossprod.t());  // n × total
-    cum = arma::join_cols(arma::zeros<arma::rowvec>(total), cum);  // (n+1) × total
-    return cum.t();  // total × (n+1): time is the column index
+    return out;  // total × (n+1): time is the column index
   }
 
   template <typename Solver>

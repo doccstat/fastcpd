@@ -2,6 +2,7 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_arima}
 \alias{fastcpd_arima}
+\alias{detect_arima}
 \alias{fastcpd.arima}
 \title{Find change points efficiently in
 ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models}

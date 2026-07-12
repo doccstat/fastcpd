@@ -2,6 +2,7 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_rank}
 \alias{fastcpd_rank}
+\alias{detect_rank}
 \alias{fastcpd.rank}
 \title{Find change points efficiently via rank-based change point detection}
 \usage{

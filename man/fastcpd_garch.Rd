@@ -2,6 +2,7 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_garch}
 \alias{fastcpd_garch}
+\alias{detect_garch}
 \alias{fastcpd.garch}
 \title{Find change points efficiently in GARCH(\eqn{p}, \eqn{q}) models}
 \usage{

@@ -2,6 +2,8 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_binomial}
 \alias{fastcpd_binomial}
+\alias{detect_binomial}
+\alias{detect_logistic_regression}
 \alias{fastcpd.binomial}
 \title{Find change points efficiently in logistic regression models}
 \usage{

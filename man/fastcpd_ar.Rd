@@ -2,6 +2,7 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_ar}
 \alias{fastcpd_ar}
+\alias{detect_ar}
 \alias{fastcpd.ar}
 \title{Find change points efficiently in AR(\eqn{p}) models}
 \usage{

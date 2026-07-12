@@ -2,6 +2,8 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_lm}
 \alias{fastcpd_lm}
+\alias{detect_lm}
+\alias{detect_linear_regression}
 \alias{fastcpd.lm}
 \title{Find change points efficiently in linear regression models}
 \usage{

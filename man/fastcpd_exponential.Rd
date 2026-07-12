@@ -2,6 +2,7 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_exponential}
 \alias{fastcpd_exponential}
+\alias{detect_exponential}
 \alias{fastcpd.exponential}
 \title{Find change points efficiently in exponentially distributed data}
 \usage{

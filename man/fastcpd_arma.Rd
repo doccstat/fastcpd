@@ -2,6 +2,7 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_arma}
 \alias{fastcpd_arma}
+\alias{detect_arma}
 \alias{fastcpd.arma}
 \title{Find change points efficiently in ARMA(\eqn{p}, \eqn{q}) models}
 \usage{

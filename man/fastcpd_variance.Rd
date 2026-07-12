@@ -2,6 +2,7 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_variance}
 \alias{fastcpd_variance}
+\alias{detect_variance}
 \alias{fastcpd.variance}
 \title{Find change points efficiently in variance change models}
 \usage{

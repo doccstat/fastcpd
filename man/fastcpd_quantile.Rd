@@ -2,6 +2,8 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_quantile}
 \alias{fastcpd_quantile}
+\alias{detect_quantile}
+\alias{detect_quantile_regression}
 \alias{fastcpd.quantile}
 \title{Find change points efficiently in quantile regression models}
 \usage{

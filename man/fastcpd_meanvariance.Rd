@@ -2,6 +2,8 @@
 % Please edit documentation in R/fastcpd.R
 \name{fastcpd_meanvariance}
 \alias{fastcpd_meanvariance}
+\alias{detect_meanvariance}
+\alias{detect_mean_variance}
 \alias{fastcpd.meanvariance}
 \alias{fastcpd_mv}
 \alias{fastcpd.mv}

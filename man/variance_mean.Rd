@@ -2,6 +2,8 @@
 % Please edit documentation in R/variance_estimation.R
 \name{variance_mean}
 \alias{variance_mean}
+\alias{estimate_variance}
+\alias{estimate_variance_mean}
 \alias{variance.mean}
 \title{Variance estimation for mean change models}
 \usage{

@@ -1,4 +1,5 @@
 #' @title Variance estimation for ARMA model with change points
+#' @aliases estimate_variance_arma
 #' @param data A one-column matrix or a vector.
 #' @param p The order of the autoregressive part.
 #' @param q The order of the moving average part.
@@ -41,6 +42,7 @@ variance_arma <- function(data, p, q, max_order = p * q) {
 variance.arma <- variance_arma  # nolint: Conventional R function style
 
 #' @title Variance estimation for linear models with change points
+#' @aliases estimate_variance_linear_regression estimate_variance_lm
 #' @param data A matrix or a data frame with the response variable as the first
 #' column.
 #' @param d The dimension of the response variable.
@@ -127,6 +129,7 @@ variance_lm <- function(
 variance.lm <- variance_lm  # nolint: Conventional R function style
 
 #' @title Variance estimation for mean change models
+#' @aliases estimate_variance estimate_variance_mean
 #' @param data A matrix or a data frame with data points as each row.
 #' @return A matrix representing the variance-covariance matrix or a numeric
 #' value representing the variance.
@@ -145,6 +148,7 @@ variance_mean <- function(data) {
 variance.mean <- variance_mean  # nolint: Conventional R function style
 
 #' @title Variance estimation for median change models
+#' @aliases estimate_variance_median
 #' @param data A vector of data points.
 #' @return A numeric value representing the variance.
 #' @description Implement Rice estimator.
@@ -159,3 +163,41 @@ variance_median <- function(data) {
 #' @rdname variance_median
 #' @export
 variance.median <- variance_median  # nolint: Conventional R function style
+
+#' @noRd
+#' @export
+estimate_variance_arma <- variance_arma
+
+#' @noRd
+#' @export
+estimate_variance_linear_regression <- variance_lm
+
+#' @noRd
+#' @export
+estimate_variance_lm <- variance_lm
+
+#' @noRd
+#' @export
+estimate_variance_mean <- variance_mean
+
+#' @noRd
+#' @export
+estimate_variance_median <- variance_median
+
+#' @noRd
+#' @export
+estimate_variance <- function(data, family = "mean", ...) {
+  family <- tolower(gsub("[.-]", "_", family))
+  family <- match.arg(
+    family,
+    c("mean", "median", "linear_regression", "lm", "arma")
+  )
+  switch(
+    family,
+    mean = estimate_variance_mean(data, ...),
+    median = estimate_variance_median(data, ...),
+    linear_regression = estimate_variance_linear_regression(data, ...),
+    lm = estimate_variance_linear_regression(data, ...),
+    arma = estimate_variance_arma(data, ...)
+  )
+}
