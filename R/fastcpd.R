@@ -214,7 +214,7 @@
 #' @description [fastcpd()] takes in formulas, data, families and extra
 #' parameters and returns a [fastcpd-class] object.
 #' @section Gallery:
-#' <https://github.com/doccstat/fastcpd/tree/main/tests/testthat/examples>
+#' <https://github.com/doccstat/fastcpd-r/tree/main/tests/testthat/examples>
 #' @section References:
 #' Xingchi Li, Xianyang Zhang (2026). ``fastcpd: Fast Change Point Detection
 #' in R.'' _Journal of Statistical Software_, **116**(6), 1--53.

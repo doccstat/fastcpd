@@ -16,8 +16,8 @@ Description: Implements fast change point detection algorithm based on the
     interface for non-R consumers. See Li and Zhang (2026)
     <doi:10.18637/jss.v116.i06> for details.
 License: Apache License (>= 2)
-URL: https://fastcpd.xingchi.li, https://github.com/doccstat/fastcpd
-BugReports: https://github.com/doccstat/fastcpd/issues
+URL: https://fastcpd.xingchi.li, https://github.com/doccstat/fastcpd-r
+BugReports: https://github.com/doccstat/fastcpd-r/issues
 Depends:
     R (>= 2.10)
 Imports:

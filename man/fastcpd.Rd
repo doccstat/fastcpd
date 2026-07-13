@@ -278,7 +278,7 @@ parameters and returns a \link[=fastcpd-class]{fastcpd} object.
 }
 \section{Gallery}{
 
-\url{https://github.com/doccstat/fastcpd/tree/main/tests/testthat/examples}
+\url{https://github.com/doccstat/fastcpd-r/tree/main/tests/testthat/examples}
 }
 
 \section{References}{
