@@ -47,7 +47,7 @@ pip install fastcpd
 set.seed(1)
 n <- 10^8
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
-print(run_isolated(fastcpd::fastcpd.mean(mean_data, cp_only = TRUE, variance_estimation = 1)))
+print(run_isolated(fastcpd::detect_mean(mean_data, cp_only = TRUE, variance_estimation = 1)))
 #>    user  system elapsed 
 #>   6.938   5.040  11.779
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
