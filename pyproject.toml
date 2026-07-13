@@ -49,4 +49,4 @@ requires = [
 
 [project.urls]
 Documentation = "https://fastcpd.xingchi.li/"
-Repository = "https://github.com/doccstat/fastcpd"
+Repository = "https://github.com/doccstat/fastcpd-py"

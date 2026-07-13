@@ -4,12 +4,12 @@
 # Fast Change Point Detection <a href="https://fastcpd.xingchi.li"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
 [![Codecov test
-coverage](https://codecov.io/gh/doccstat/fastcpd/branch/main/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd?branch=main)
-[![CodeFactor](https://www.codefactor.io/repository/github/doccstat/fastcpd/badge)](https://www.codefactor.io/repository/github/doccstat/fastcpd)
+coverage](https://codecov.io/gh/doccstat/fastcpd-r/branch/main/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd-r?branch=main)
+[![CodeFactor](https://www.codefactor.io/repository/github/doccstat/fastcpd-r/badge)](https://www.codefactor.io/repository/github/doccstat/fastcpd-r)
 [![CRAN
 status](https://www.r-pkg.org/badges/version-last-release/fastcpd)](https://cran.r-project.org/package=fastcpd)
 [![doi](https://img.shields.io/badge/doi-10.48550/arXiv.2404.05933-green.svg)](https://doi.org/10.48550/arXiv.2404.05933)
-[![Full repository integration](https://github.com/doccstat/fastcpd/actions/workflows/integration.yml/badge.svg)](https://github.com/doccstat/fastcpd/actions/workflows/integration.yml)
+[![R CMD check](https://github.com/doccstat/fastcpd-r/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/doccstat/fastcpd-r/actions/workflows/check-standard.yaml)
 [![r-universe](https://doccstat.r-universe.dev/badges/fastcpd)](https://doccstat.r-universe.dev)
 [![Python
 version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/project/fastcpd/)
@@ -18,6 +18,10 @@ package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcp
 
 ## Documentation: [x2r.io](https://x2r.io/fastcpd/reference/)
 
+Python and standalone C++ sources are published separately in
+[`fastcpd-py`](https://github.com/doccstat/fastcpd-py) and
+[`fastcpd-cpp`](https://github.com/doccstat/fastcpd-cpp).
+
 <details close>
 <summary>
 Installation
@@ -25,15 +29,13 @@ Installation
 
 ``` r
 # install.packages("pak")
-pak::pak("doccstat/fastcpd")
+pak::pak("doccstat/fastcpd-r")
 # or install from CRAN
 install.packages("fastcpd")
 ```
 
 ``` shell
-# python -m ensurepip --upgrade
-pip install .
-# or install from PyPI
+# Install the Python package from PyPI
 pip install fastcpd
 ```
 
@@ -146,8 +148,8 @@ Encountered a bug or unintended behavior?
 </summary>
 
 1.  File a ticket at [GitHub
-    Issues](https://github.com/doccstat/fastcpd/issues).
+    Issues](https://github.com/doccstat/fastcpd-r/issues).
 2.  Contact the authors specified in
-    [DESCRIPTION](https://github.com/doccstat/fastcpd/blob/main/DESCRIPTION#L5-L10).
+    [DESCRIPTION](https://github.com/doccstat/fastcpd-r/blob/main/DESCRIPTION#L5-L10).
 
 </details>
