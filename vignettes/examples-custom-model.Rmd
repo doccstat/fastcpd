@@ -16,7 +16,7 @@ We try to reproduce the logistic regression models with
 custom cost functions and show that the results are similar to the built-in
 logistic regression models.
 
-The built-in logistic regression model in `fastcpd()` is implemented with the
+The built-in logistic regression model in `detect()` is implemented with the
 help of the **fastglm** package. The **fastglm** package
 utilizes the iteratively reweighted least squares with the step-halving approach
 to help safeguard against convergence issues. If a
@@ -39,11 +39,11 @@ y <- c(
 )
 binomial_data <- data.frame(y = y, x = x)
 
-result <- fastcpd.binomial(cbind(y, x), cost_adjustment = NULL)
+result <- detect_binomial(cbind(y, x), cost_adjustment = NULL)
 summary(result)
 #> 
 #> Call:
-#> fastcpd.binomial(data = cbind(y, x), cost_adjustment = NULL)
+#> detect_binomial(data = cbind(y, x), cost_adjustment = NULL)
 #> 
 #> Change points:
 #> 250 
@@ -80,14 +80,14 @@ logistic_hessian <- function(data, theta) {
   prob <- 1 / (1 + exp(-x %*% theta))
   (x %o% x) * c((1 - prob) * prob)
 }
-result <- fastcpd(
+result <- detect(
   y ~ . - 1, binomial_data, epsilon = 1e-5, cost = logistic_loss,
   cost_gradient = logistic_gradient, cost_hessian = logistic_hessian
 )
 summary(result)
 #> 
 #> Call:
-#> fastcpd(formula = y ~ . - 1, data = binomial_data, cost = logistic_loss, 
+#> detect(formula = y ~ . - 1, data = binomial_data, cost = logistic_loss,
 #>     cost_gradient = logistic_gradient, cost_hessian = logistic_hessian, 
 #>     epsilon = 1e-05)
 #> 
@@ -117,11 +117,11 @@ in
 The custom cost functions above are R closures: `cost`, `cost_gradient` and
 `cost_hessian` are called from C++ once per candidate segment via
 `Rcpp::Function`, which incurs R call overhead. For performance-critical use
-cases, `fastcpd()` also accepts **pre-compiled C++ cost functions**, passed
+cases, `detect()` also accepts **pre-compiled C++ cost functions**, passed
 through the very same `cost` / `cost_gradient` / `cost_hessian` arguments as
 an `externalptr` built with `Rcpp::XPtr`. The compiled and R-closure paths
 compute the same mathematical cost and a `family = "custom"` run accepts
-either interchangeably -- `fastcpd()` detects which kind of SEXP it received
+either interchangeably -- `detect()` detects which kind of SEXP it received
 (`TYPEOF(x) == EXTPTRSXP`) and dispatches accordingly, with no other change to
 the call.
 
@@ -163,7 +163,7 @@ SEXP make_my_cost_pelt_xptr() {
 }
 ```
 
-Because external pointers carry no `formals()`, `fastcpd()` cannot infer
+Because external pointers carry no `formals()`, `detect()` cannot infer
 whether a compiled `cost` is PELT-style (one argument) or SeGD-style (two
 arguments) the way it does for R closures. Instead, set an integer
 `fastcpd_cost_arity` attribute on the returned pointer -- `1L` for
@@ -174,7 +174,7 @@ arguments) the way it does for R closures. Instead, set an integer
 my_cost_pelt_xptr <- make_my_cost_pelt_xptr()
 attr(my_cost_pelt_xptr, "fastcpd_cost_arity") <- 1L
 
-result <- fastcpd(
+result <- detect(
   ~ . - 1, data.frame(x = data), family = "custom", cost = my_cost_pelt_xptr
 )
 summary(result)
@@ -214,7 +214,7 @@ y <- c(
 )
 binomial_data <- data.frame(y = y, x = x)
 
-result <- fastcpd.binomial(cbind(y, x), cost_adjustment = NULL)
+result <- detect_binomial(cbind(y, x), cost_adjustment = NULL)
 summary(result)
 logistic_loss <- function(data, theta) {
   x <- data[, -1]
@@ -234,7 +234,7 @@ logistic_hessian <- function(data, theta) {
   prob <- 1 / (1 + exp(-x %*% theta))
   (x %o% x) * c((1 - prob) * prob)
 }
-result <- fastcpd(
+result <- detect(
   y ~ . - 1, binomial_data, epsilon = 1e-5, cost = logistic_loss,
   cost_gradient = logistic_gradient, cost_hessian = logistic_hessian
 )
@@ -242,7 +242,7 @@ summary(result)
 my_cost_pelt_xptr <- make_my_cost_pelt_xptr()
 attr(my_cost_pelt_xptr, "fastcpd_cost_arity") <- 1L
 
-result <- fastcpd(
+result <- detect(
   ~ . - 1, data.frame(x = data), family = "custom", cost = my_cost_pelt_xptr
 )
 summary(result)

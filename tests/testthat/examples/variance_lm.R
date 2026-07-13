@@ -9,7 +9,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     x[101:200, ] %*% theta[2, ] + rnorm(100, 0, 3),
     x[201:n, ] %*% theta[3, ] + rnorm(100, 0, 3)
   )
-  (sigma2 <- variance.lm(cbind(y, x)))
+  (sigma2 <- estimate_variance_linear_regression(cbind(y, x)))
 
   set.seed(1)
   n <- 300
@@ -26,5 +26,5 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     x[201:n, ] %*% theta[, 5:6] +
       mvtnorm::rmvnorm(100, rep(0, d), diag(3, d))
   )
-  (sigma <- variance.lm(cbind(y, x), d = d))
+  (sigma <- estimate_variance_linear_regression(cbind(y, x), d = d))
 }

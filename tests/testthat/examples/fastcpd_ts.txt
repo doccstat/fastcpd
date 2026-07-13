@@ -80,7 +80,7 @@ roots_segment3 <- get_roots_data(theta1_3, theta2_3, "Segment 3")
 
 (roots_data <- rbind(roots_segment1, roots_segment2, roots_segment3))
 
-result <- fastcpd.ts(
+result <- detect_time_series(
   y,
   "arma",
   c(0, 2),

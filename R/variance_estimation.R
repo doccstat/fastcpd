@@ -1,5 +1,5 @@
 #' @title Variance estimation for ARMA model with change points
-#' @aliases estimate_variance_arma
+#' @aliases variance_arma variance.arma
 #' @param data A one-column matrix or a vector.
 #' @param p The order of the autoregressive part.
 #' @param q The order of the moving average part.
@@ -8,9 +8,9 @@
 #' @description Estimate the variance for each block and then take the average.
 #' @example tests/testthat/examples/variance_arma.R
 #'
-#' @rdname variance_arma
+#' @rdname estimate_variance_arma
 #' @export
-variance_arma <- function(data, p, q, max_order = p * q) {
+estimate_variance_arma <- function(data, p, q, max_order = p * q) {
   table <- data.frame(
     "sigma2" = numeric(max_order),
     "AIC" = numeric(max_order),
@@ -23,7 +23,7 @@ variance_arma <- function(data, p, q, max_order = p * q) {
     for (p_i in seq_len(order)) {
       x[, p_i] <- data[(order - p_i) + seq_len(length(data) - order)]
     }
-    sigma2 <- variance.lm(cbind(y, x))
+    sigma2 <- estimate_variance_linear_regression(cbind(y, x))
     table[order, ] <- c(
       sigma2,
       log(sigma2) + 2 * order / length(data),
@@ -37,12 +37,16 @@ variance_arma <- function(data, p, q, max_order = p * q) {
   )
 }
 
-#' @rdname variance_arma
+#' @rdname estimate_variance_arma
 #' @export
-variance.arma <- variance_arma  # nolint: Conventional R function style
+variance_arma <- estimate_variance_arma
+
+#' @rdname estimate_variance_arma
+#' @export
+variance.arma <- estimate_variance_arma  # nolint: Conventional R function style
 
 #' @title Variance estimation for linear models with change points
-#' @aliases estimate_variance_linear_regression estimate_variance_lm
+#' @aliases estimate_variance_lm variance_lm variance.lm
 #' @param data A matrix or a data frame with the response variable as the first
 #' column.
 #' @param d The dimension of the response variable.
@@ -53,9 +57,9 @@ variance.arma <- variance_arma  # nolint: Conventional R function style
 #' @description Estimate the variance for each block and then take the average.
 #' @example tests/testthat/examples/variance_lm.R
 #'
-#' @rdname variance_lm
+#' @rdname estimate_variance_linear_regression
 #' @export
-variance_lm <- function(
+estimate_variance_linear_regression <- function(
   data,
   d = 1,
   block_size = ncol(data) - d + 1,
@@ -124,67 +128,71 @@ variance_lm <- function(
   }
 }
 
-#' @rdname variance_lm
+#' @rdname estimate_variance_linear_regression
 #' @export
-variance.lm <- variance_lm  # nolint: Conventional R function style
+estimate_variance_lm <- estimate_variance_linear_regression
+
+#' @rdname estimate_variance_linear_regression
+#' @export
+variance_lm <- estimate_variance_linear_regression
+
+#' @rdname estimate_variance_linear_regression
+#' @export
+variance.lm <- estimate_variance_linear_regression  # nolint: Conventional R function style
 
 #' @title Variance estimation for mean change models
-#' @aliases estimate_variance estimate_variance_mean
+#' @aliases variance_mean variance.mean
 #' @param data A matrix or a data frame with data points as each row.
 #' @return A matrix representing the variance-covariance matrix or a numeric
 #' value representing the variance.
 #' @description Implement Rice estimator for variance in mean change models.
 #' @example tests/testthat/examples/variance_mean.R
 #'
-#' @rdname variance_mean
+#' @rdname estimate_variance_mean
 #' @export
-variance_mean <- function(data) {
+estimate_variance_mean <- function(data) {
   d <- diff(as.matrix(data))
   crossprod(d) / (2 * nrow(d))
 }
 
-#' @rdname variance_mean
+#' @rdname estimate_variance_mean
 #' @export
-variance.mean <- variance_mean  # nolint: Conventional R function style
+variance_mean <- estimate_variance_mean
+
+#' @rdname estimate_variance_mean
+#' @export
+variance.mean <- estimate_variance_mean  # nolint: Conventional R function style
 
 #' @title Variance estimation for median change models
-#' @aliases estimate_variance_median
+#' @aliases variance_median variance.median
 #' @param data A vector of data points.
 #' @return A numeric value representing the variance.
 #' @description Implement Rice estimator.
 #' @example tests/testthat/examples/variance_median.R
 #'
-#' @rdname variance_median
+#' @rdname estimate_variance_median
 #' @export
-variance_median <- function(data) {
+estimate_variance_median <- function(data) {
   2 * (2 * mean(abs(diff(c(data)))) / 3)^2
 }
 
-#' @rdname variance_median
+#' @rdname estimate_variance_median
 #' @export
-variance.median <- variance_median  # nolint: Conventional R function style
+variance_median <- estimate_variance_median
 
-#' @noRd
+#' @rdname estimate_variance_median
 #' @export
-estimate_variance_arma <- variance_arma
+variance.median <- estimate_variance_median  # nolint: Conventional R function style
 
-#' @noRd
-#' @export
-estimate_variance_linear_regression <- variance_lm
-
-#' @noRd
-#' @export
-estimate_variance_lm <- variance_lm
-
-#' @noRd
-#' @export
-estimate_variance_mean <- variance_mean
-
-#' @noRd
-#' @export
-estimate_variance_median <- variance_median
-
-#' @noRd
+#' Estimate variance for change point models
+#'
+#' @param data Data used for variance estimation.
+#' @param family Model family. One of \code{"mean"}, \code{"median"},
+#'   \code{"linear_regression"}, \code{"lm"}, or \code{"arma"}.
+#' @param ... Additional arguments passed to the family-specific estimator.
+#' @return The estimated variance, covariance matrix, or ARMA variance summary.
+#' @seealso [estimate_variance_mean()], [estimate_variance_median()],
+#'   [estimate_variance_linear_regression()], and [estimate_variance_arma()].
 #' @export
 estimate_variance <- function(data, family = "mean", ...) {
   family <- tolower(gsub("[.-]", "_", family))

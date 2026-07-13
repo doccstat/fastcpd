@@ -9,7 +9,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     x[101:200, ] %*% theta_0[2, ] + rnorm(100, 0, 3),
     x[201:n, ] %*% theta_0[3, ] + rnorm(100, 0, 3)
   )
-  result_lm <- fastcpd.lm(cbind(y, x))
+  result_lm <- detect_lm(cbind(y, x))
   summary(result_lm)
   plot(result_lm)
 }

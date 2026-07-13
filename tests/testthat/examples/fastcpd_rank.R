@@ -1,6 +1,6 @@
 set.seed(1)
 x <- c(rt(200, df = 2), rt(200, df = 2, ncp = 5))
-result_mean <- fastcpd_mean(x)
+result_mean <- detect_mean(x)
 summary(result_mean)
-result_rank <- fastcpd_rank(x)
+result_rank <- detect_rank(x)
 summary(result_rank)

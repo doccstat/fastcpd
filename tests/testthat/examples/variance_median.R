@@ -1,1 +1,1 @@
-(sigma2 <- variance.median(well_log))
+(sigma2 <- estimate_variance_median(well_log))

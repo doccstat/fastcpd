@@ -12,7 +12,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     rpois(200, exp(x[801:1000, ] %*% theta_0)),
     rpois(100, exp(x[1001:1100, ] %*% (theta_0 - delta)))
   )
-  result <- fastcpd.poisson(cbind(y, x))
+  result <- detect_poisson(cbind(y, x))
   summary(result)
   plot(result)
 }

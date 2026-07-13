@@ -17,10 +17,14 @@
 #' @param min_segment_length Minimum number of observations on each side of a
 #'   candidate split for profile intervals.
 #' @param seed Optional random seed used for bootstrap reproducibility.
-#' @param refit_envir Environment used to evaluate bootstrap refits.
+#' @param refit_envir Environment used to evaluate bootstrap refits and
+#'   arguments stored in \code{object@call}, such as
+#'   \code{variance_estimation}.
 #' @param ... Ignored.
-#' @return A data frame containing estimates, lower and upper interval bounds,
-#'   and method-specific diagnostics.
+#' @return A data frame of class \code{fastcpd_confint} containing estimates,
+#'   lower and upper interval bounds, and method-specific diagnostics. The
+#'   returned intervals can be visualized with
+#'   [plot.fastcpd_confint()].
 #'
 #' @example tests/testthat/examples/confint.R
 #'
@@ -55,7 +59,7 @@ confint.fastcpd <- function(
   }
   method <- match.arg(method, method_choices)
 
-  switch(
+  intervals <- switch(
     paste(parm, method, sep = ":"),
     "cp:bootstrap" = fastcpd_confint_cp_bootstrap(
       object = object,
@@ -69,13 +73,165 @@ confint.fastcpd <- function(
       object = object,
       level = level,
       window = window,
-      min_segment_length = min_segment_length
+      min_segment_length = min_segment_length,
+      refit_envir = refit_envir
     ),
     "theta:wald" = fastcpd_confint_theta_wald(
       object = object,
       level = level
     )
   )
+
+  structure(
+    intervals,
+    object = object,
+    class = c("fastcpd_confint", class(intervals))
+  )
+}
+
+# Column names used inside ggplot2::aes() in the confint plot methods.
+utils::globalVariables(c("estimate", "lower", "segment", "upper", "y"))
+
+#' @title Plot confidence intervals for a [fastcpd-class] object
+#' @description Visualizes intervals produced by [confint.fastcpd()].
+#' Change-point intervals are drawn as shaded bands over the data with the
+#' point estimates as vertical lines. Parameter intervals are drawn as
+#' point ranges for each segment, with one panel per parameter.
+#'
+#' Plotting change-point intervals requires the fitted object stored on the
+#' \code{fastcpd_confint} data frame, so pass the value returned by
+#' \code{confint()} without subsetting it.
+#' @param x A \code{fastcpd_confint} data frame returned by
+#'   [confint.fastcpd()].
+#' @param data_point_alpha Alpha of the data points.
+#' @param data_point_linewidth Linewidth of the data lines.
+#' @param data_point_size Size of the data points.
+#' @param interval_alpha Alpha of the confidence interval bands.
+#' @param interval_color Color of the confidence intervals.
+#' @param estimate_color Color of the point-estimate lines.
+#' @param estimate_linetype Linetype of the point-estimate lines.
+#' @param xlab Label for the x-axis.
+#' @param ylab Label for the y-axis.
+#' @param ... Ignored.
+#' @return No return value, called for plotting.
+#' @example tests/testthat/examples/plot-confint.R
+#'
+#' @md
+#' @method plot fastcpd_confint
+#' @export
+plot.fastcpd_confint <- function(
+  x,
+  data_point_alpha = 0.8,
+  data_point_linewidth = 0.5,
+  data_point_size = 1,
+  interval_alpha = 0.3,
+  interval_color = "steelblue",
+  estimate_color = "grey",
+  estimate_linetype = "dashed",
+  xlab = NULL,
+  ylab = NULL,
+  ...
+) {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    warning("ggplot2 is not installed. No plot is made.")
+    return(invisible())
+  }
+  if (!nrow(x)) {
+    message("No intervals to plot.")
+    return(invisible())
+  }
+
+  p <- if (x$parm[1] == "cp") {
+    fastcpd_confint_plot_cp(
+      x, data_point_alpha, data_point_linewidth, data_point_size,
+      interval_alpha, interval_color, estimate_color, estimate_linetype
+    )
+  } else {
+    fastcpd_confint_plot_theta(x, interval_color)
+  }
+  p <- p + ggplot2::theme(
+    legend.position = "none",
+    panel.background = ggplot2::element_blank(),
+    panel.border = ggplot2::element_rect(fill = NA, colour = "grey20"),
+    panel.grid.major = ggplot2::element_line(colour = "grey98"),
+    panel.grid.minor = ggplot2::element_line(colour = "grey98"),
+    strip.background = ggplot2::element_rect(fill = "grey85", colour = "grey20")
+  )
+  if (!is.null(xlab)) p <- p + ggplot2::xlab(xlab)
+  if (!is.null(ylab)) p <- p + ggplot2::ylab(ylab)
+  print(p)
+  invisible()
+}
+
+fastcpd_confint_plot_cp <- function(
+  x,
+  data_point_alpha,
+  data_point_linewidth,
+  data_point_size,
+  interval_alpha,
+  interval_color,
+  estimate_color,
+  estimate_linetype
+) {
+  object <- attr(x, "object")
+  if (!methods::is(object, "fastcpd")) {
+    stop(
+      "Plotting change-point intervals requires the fastcpd object stored ",
+      "on the `fastcpd_confint` data frame returned by `confint()`."
+    )
+  }
+  if (object@family == "mean" && ncol(object@data) > 1) {
+    stop("Can not plot mean change point intervals with p > 1.")
+  }
+
+  bands <- x[is.finite(x$lower) & is.finite(x$upper), , drop = FALSE]
+  data_points <- data.frame(
+    x = seq_len(nrow(object@data)),
+    y = object@data[, 1]
+  )
+  p <- ggplot2::ggplot()
+  if (nrow(bands)) {
+    p <- p + ggplot2::geom_rect(
+      data = as.data.frame(bands),
+      ggplot2::aes(xmin = lower, xmax = upper, ymin = -Inf, ymax = Inf),
+      fill = interval_color,
+      alpha = interval_alpha
+    )
+  }
+  p <- p + ggplot2::geom_vline(
+    xintercept = x$estimate,
+    color = estimate_color,
+    linetype = estimate_linetype
+  )
+  if (object@family %in% c("ar", "arma", "arima", "garch")) {
+    p + ggplot2::geom_line(
+      data = data_points,
+      ggplot2::aes(x = x, y = y),
+      alpha = data_point_alpha,
+      linewidth = data_point_linewidth
+    )
+  } else {
+    p + ggplot2::geom_point(
+      data = data_points,
+      ggplot2::aes(x = x, y = y),
+      alpha = data_point_alpha,
+      size = data_point_size
+    )
+  }
+}
+
+fastcpd_confint_plot_theta <- function(x, interval_color) {
+  thetas <- as.data.frame(x)
+  thetas$parameter <- paste("parameter", thetas$parameter)
+  p <- ggplot2::ggplot(
+    thetas,
+    ggplot2::aes(x = segment, y = estimate, ymin = lower, ymax = upper)
+  ) +
+    ggplot2::geom_pointrange(color = interval_color, na.rm = TRUE)
+  if (length(unique(thetas$parameter)) > 1) {
+    p <- p + ggplot2::facet_wrap("parameter", scales = "free_y")
+  }
+  p
 }
 
 fastcpd_confint_cp_bootstrap <- function(
@@ -174,7 +330,8 @@ fastcpd_confint_cp_profile <- function(
   object,
   level,
   window,
-  min_segment_length
+  min_segment_length,
+  refit_envir = parent.frame()
 ) {
   cp_set <- sort(as.integer(object@cp_set))
   if (!length(cp_set)) {
@@ -185,7 +342,7 @@ fastcpd_confint_cp_profile <- function(
   stopifnot("`min_segment_length` must be a positive integer." =
     length(min_segment_length) == 1 && min_segment_length > 0)
 
-  cost_function <- fastcpd_profile_cost_function(object)
+  cost_function <- fastcpd_profile_cost_function(object, refit_envir)
   n <- nrow(object@data)
   bounds <- c(0L, cp_set, n)
   cutoff <- stats::qchisq(level, df = 1) / 2
@@ -223,8 +380,8 @@ fastcpd_confint_cp_profile <- function(
     } else {
       profile_min <- min(costs[finite])
       support <- candidates[finite][costs[finite] - profile_min <= cutoff]
-      lower <- min(support)
-      upper <- max(support)
+      lower <- min(support, cp_set[i])
+      upper <- max(support, cp_set[i])
     }
     out[[i]] <- data.frame(
       parm = "cp",
@@ -361,17 +518,26 @@ fastcpd_segment_bounds <- function(object) {
   )
 }
 
-fastcpd_profile_cost_function <- function(object) {
+fastcpd_profile_cost_function <- function(object, refit_envir = parent.frame()) {
   family <- object@family
   data <- as.matrix(object@data)
   storage.mode(data) <- "double"
+  call_variance <- fastcpd_call_variance(object, refit_envir)
 
   switch(
     family,
-    mean = function(start, end) {
-      segment <- data[start:end, , drop = FALSE]
-      centered <- sweep(segment, 2, colMeans(segment), check.margin = FALSE)
-      sum(centered^2) / 2
+    mean = {
+      # Match the variance scaling used by the mean-family fit so the
+      # chi-squared cutoff applies to a proper log-likelihood difference.
+      if (is.null(call_variance)) {
+        call_variance <- estimate_variance_mean(data)
+      }
+      sigma_inv <- fastcpd_confint_precision(call_variance)
+      function(start, end) {
+        segment <- data[start:end, , drop = FALSE]
+        centered <- sweep(segment, 2, colMeans(segment), check.margin = FALSE)
+        sum((centered %*% sigma_inv) * centered) / 2
+      }
     },
     variance = {
       centered_data <- sweep(data, 2, colMeans(data), check.margin = FALSE)
@@ -395,7 +561,7 @@ fastcpd_profile_cost_function <- function(object) {
       n <- length(segment)
       n * (log(mean(segment)) + 1)
     },
-    lm = fastcpd_profile_cost_lm(data),
+    lm = fastcpd_profile_cost_lm(data, call_variance),
     binomial = fastcpd_profile_cost_glm(data, stats::binomial()),
     poisson = fastcpd_profile_cost_glm(data, stats::poisson()),
     quantile = fastcpd_profile_cost_quantile(data, object@order[1]),
@@ -407,7 +573,16 @@ fastcpd_profile_cost_function <- function(object) {
   )
 }
 
-fastcpd_profile_cost_lm <- function(data) {
+fastcpd_profile_cost_lm <- function(data, call_variance = NULL) {
+  sigma2 <- if (is.null(call_variance)) {
+    tryCatch(
+      as.numeric(estimate_variance_linear_regression(data)),
+      error = function(e) 1
+    )
+  } else {
+    as.numeric(call_variance)[1]
+  }
+  if (!is.finite(sigma2) || sigma2 <= 0) sigma2 <- 1
   function(start, end) {
     segment <- data[start:end, , drop = FALSE]
     y <- segment[, 1]
@@ -415,8 +590,30 @@ fastcpd_profile_cost_lm <- function(data) {
     if (nrow(x) <= ncol(x)) return(Inf)
     fit <- tryCatch(stats::lm.fit(x, y), error = function(e) NULL)
     if (is.null(fit)) return(Inf)
-    sum(fit$residuals^2) / 2
+    sum(fit$residuals^2) / (2 * sigma2)
   }
+}
+
+fastcpd_call_variance <- function(object, refit_envir) {
+  if (!is.call(object@call)) {
+    return(NULL)
+  }
+  variance_expr <- object@call[["variance_estimation"]]
+  if (is.null(variance_expr)) {
+    return(NULL)
+  }
+  tryCatch(
+    eval(variance_expr, envir = refit_envir),
+    error = function(e) NULL
+  )
+}
+
+fastcpd_confint_precision <- function(sigma) {
+  sigma <- as.matrix(sigma)
+  if (!all(is.finite(sigma))) {
+    return(diag(nrow(sigma)))
+  }
+  tryCatch(solve(sigma), error = function(e) diag(nrow(sigma)))
 }
 
 fastcpd_profile_cost_glm <- function(data, family) {

@@ -13,7 +13,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     )
   )
   result_time <- system.time(
-    result <- fastcpd.variance(data, cp_only = TRUE)
+    result <- detect_variance(data, cp_only = TRUE)
   )
   print(result_time)
   summary(result)

@@ -10,7 +10,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     x[1:125, ] %*% theta_1 + mvtnorm::rmvnorm(125, rep(0, d), 3 * diag(d)),
     x[126:n, ] %*% theta_2 + mvtnorm::rmvnorm(75, rep(0, d), 3 * diag(d))
   )
-  result_mlm <- fastcpd(
+  result_mlm <- detect(
     cbind(y.1, y.2) ~ . - 1, cbind.data.frame(y = y, x = x), family = "lm"
   )
   summary(result_mlm)

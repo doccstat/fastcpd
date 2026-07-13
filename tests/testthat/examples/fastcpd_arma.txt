@@ -12,7 +12,7 @@ for (i in 151:n) {
     0.6 * w[i + 2] - 0.1 * w[i + 1] + w[i + 3]
 }
 result <- suppressWarnings(
-  fastcpd.arma(
+  detect_arma(
     data = x[3 + seq_len(n)],
     order = c(3, 2),
     segment_count = 3,

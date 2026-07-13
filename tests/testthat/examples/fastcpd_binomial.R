@@ -8,7 +8,7 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     rbinom(300, 1, 1 / (1 + exp(-x[1:300, ] %*% theta[1, ]))),
     rbinom(200, 1, 1 / (1 + exp(-x[301:n, ] %*% theta[2, ])))
   )
-  result <- suppressWarnings(fastcpd.binomial(cbind(y, x)))
+  result <- suppressWarnings(detect_binomial(cbind(y, x)))
   summary(result)
   plot(result)
 }

@@ -27,11 +27,11 @@ Road Casualties in Great Britain 1969–84.
 }
 \examples{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  result_ar <- fastcpd.ar(diff(uk_seatbelts[, "drivers"], 12), 1, beta = "BIC")
+  result_ar <- detect_ar(diff(uk_seatbelts[, "drivers"], 12), 1, beta = "BIC")
   summary(result_ar)
   plot(result_ar)
 
-  result_lm <- suppressMessages(fastcpd.lm(
+  result_lm <- suppressMessages(detect_lm(
     diff(uk_seatbelts[, c("drivers", "kms", "PetrolPrice", "law")], lag = 12)
   ))
 

@@ -45,21 +45,26 @@ candidate split for profile intervals.}
 
 \item{seed}{Optional random seed used for bootstrap reproducibility.}
 
-\item{refit_envir}{Environment used to evaluate bootstrap refits.}
+\item{refit_envir}{Environment used to evaluate bootstrap refits and
+arguments stored in \code{object@call}, such as
+\code{variance_estimation}.}
 
 \item{...}{Ignored.}
 }
 \value{
-A data frame containing estimates, lower and upper interval bounds,
-and method-specific diagnostics.
+A data frame of class \code{fastcpd_confint} containing estimates,
+lower and upper interval bounds, and method-specific diagnostics. The
+returned intervals can be visualized with
+\code{\link[=plot.fastcpd_confint]{plot.fastcpd_confint()}}.
 }
 \description{
 Confidence intervals for a fastcpd object
 }
 \examples{
-set.seed(1)
-data <- c(stats::rnorm(40, 0, 0.2), stats::rnorm(40, 3, 0.2))
-result <- fastcpd.mean(data)
+# The well-log data contain outliers, so a robust variance estimate keeps
+# the detection and the confidence intervals stable.
+sigma2 <- estimate_variance_median(well_log)
+result <- detect_mean(well_log, trim = 0.001, variance_estimation = sigma2)
 
 (cp_profile_interval <- confint(
   result,
@@ -83,8 +88,6 @@ result <- fastcpd.mean(data)
   seed = 10
 ))
 
-set.seed(3)
-variance_data <- c(stats::rnorm(30, 0, 1), stats::rnorm(30, 0, 3))
-variance_result <- fastcpd.variance(variance_data)
+variance_result <- detect_variance(well_log)
 # Wald intervals are not available for variance-family fits.
 }

@@ -7,6 +7,6 @@ for (i in 1:600) {
 for (i in 601:1000) {
   x[i + 3] <- 0.3 * x[i + 2] + 0.4 * x[i + 1] + 0.2 * x[i] + rnorm(1, 0, 3)
 }
-result <- fastcpd.ar(x[3 + seq_len(n)], 3)
+result <- detect_ar(x[3 + seq_len(n)], 3)
 summary(result)
 plot(result)

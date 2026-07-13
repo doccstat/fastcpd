@@ -36,11 +36,11 @@ small_lasso <- cbind.data.frame(y, x)
 
 
 ``` r
-result <- fastcpd.lasso(small_lasso, segment_count = 2)
+result <- detect_lasso(small_lasso, segment_count = 2)
 summary(result)
 #> 
 #> Call:
-#> fastcpd.lasso(data = small_lasso, segment_count = 2)
+#> detect_lasso(data = small_lasso, segment_count = 2)
 #> 
 #> Change points:
 #> 73 151 
@@ -99,13 +99,13 @@ summary(result)
 
 
 ``` r
-result_vanilla_percentage <- fastcpd.lasso(
+result_vanilla_percentage <- detect_lasso(
   small_lasso, segment_count = 2, vanilla_percentage = 0.5
 )
 summary(result_vanilla_percentage)
 #> 
 #> Call:
-#> fastcpd.lasso(data = small_lasso, segment_count = 2, vanilla_percentage = 0.5)
+#> detect_lasso(data = small_lasso, segment_count = 2, vanilla_percentage = 0.5)
 #> 
 #> Change points:
 #> 74 150 
@@ -164,7 +164,7 @@ summary(result_vanilla_percentage)
 
 
 ``` r
-result_multiple_epochs <- fastcpd.lasso(
+result_multiple_epochs <- detect_lasso(
   small_lasso,
   segment_count = 2,
   multiple_epochs = function(segment_length) {
@@ -174,7 +174,7 @@ result_multiple_epochs <- fastcpd.lasso(
 summary(result_multiple_epochs)
 #> 
 #> Call:
-#> fastcpd.lasso(data = small_lasso, segment_count = 2, multiple_epochs = function(segment_length) {
+#> detect_lasso(data = small_lasso, segment_count = 2, multiple_epochs = function(segment_length) {
 #>     if (segment_length < 25) 
 #>         1
 #>     else 0
@@ -266,7 +266,7 @@ y <- c(
   x[(n * 0.75 + 1):n, ] %*% theta_0[4, ] + rnorm(n * 0.25)
 )
 small_lasso <- cbind.data.frame(y, x)
-result <- fastcpd.lasso(small_lasso, segment_count = 2)
+result <- detect_lasso(small_lasso, segment_count = 2)
 summary(result)
 set.seed(1)
 n <- 300
@@ -287,7 +287,7 @@ y <- c(
   x[(n * 0.75 + 1):n, ] %*% theta_0[4, ] + rnorm(n * 0.25)
 )
 small_lasso <- cbind.data.frame(y, x)
-result_vanilla_percentage <- fastcpd.lasso(
+result_vanilla_percentage <- detect_lasso(
   small_lasso, segment_count = 2, vanilla_percentage = 0.5
 )
 summary(result_vanilla_percentage)
@@ -310,7 +310,7 @@ y <- c(
   x[(n * 0.75 + 1):n, ] %*% theta_0[4, ] + rnorm(n * 0.25)
 )
 small_lasso <- cbind.data.frame(y, x)
-result_multiple_epochs <- fastcpd.lasso(
+result_multiple_epochs <- detect_lasso(
   small_lasso,
   segment_count = 2,
   multiple_epochs = function(segment_length) {

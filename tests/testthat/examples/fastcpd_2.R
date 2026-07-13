@@ -48,7 +48,7 @@ if (
       0.01 * diag(length(theta))
     }
   }
-  huber_regression_result <- fastcpd(
+  huber_regression_result <- detect(
     formula = y ~ . - 1,
     data = data,
     beta = (p + 1) * log(n) / 2,

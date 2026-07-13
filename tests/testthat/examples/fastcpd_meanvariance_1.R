@@ -5,6 +5,6 @@ data <- c(
   rnorm(3000, 10, 20),
   rnorm(1000, 0, 1)
 )
-system.time(result <- fastcpd.mv(data))
+system.time(result <- detect_meanvariance(data))
 summary(result)
 plot(result)

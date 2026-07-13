@@ -2,9 +2,9 @@
 title: "Time Complexity Analysis in fastcpd"
 output: rmarkdown::html_vignette
 description: |
-  This vignette explores the computational complexity of the `fastcpd.mean`
+  This vignette explores the computational complexity of `detect_mean()`
   function and demonstrates the impact of SeDG on change point detection
-  using `fastcpd.lasso()`.
+  using `detect_lasso()`.
 vignette: >
   %\VignetteIndexEntry{Time Complexity Analysis in fastcpd}
   %\VignetteEngine{knitr::rmarkdown}
@@ -17,15 +17,15 @@ vignette: >
 
 This vignette examines two aspects of the **fastcpd** package:
 
-1. **Time Complexity of `fastcpd.mean()`:**
+1. **Time Complexity of `detect_mean()`:**
    We assess how the execution time scales with the length of the data.
 
-2. **Impact of SeDG in `fastcpd.lasso()`:**
+2. **Impact of SeDG in `detect_lasso()`:**
    We simulate a Lasso regression setting with multiple change points and compare the detected change points under two settings of the `vanilla_percentage` parameter. This highlights the performance improvement provided by SeDG.
 
-# Time Complexity Simulation for `fastcpd.mean()`
+# Time Complexity Simulation for `detect_mean()`
 
-In this section, we generate multivariate normal data with varying lengths and measure the execution time of the `fastcpd.mean()` function. We then create a log-log plot of the execution times and perform a linear regression on the log-transformed data to estimate the power law coefficient.
+In this section, we generate multivariate normal data with varying lengths and measure the execution time of the `detect_mean()` function. We then create a log-log plot of the execution times and perform a linear regression on the log-transformed data to estimate the power law coefficient.
 
 
 
@@ -45,7 +45,7 @@ p <- 4  # Dimensionality of the data
 execution_times <- numeric(length(ns))
 
 for (i in seq_along(ns)) {
-  execution_times[i] <- system.time(fastcpd.mean(
+  execution_times[i] <- system.time(detect_mean(
     mvtnorm::rmvnorm(ns[i], mean = rep(0, p), sigma = diag(1, p)),
     cp_only = TRUE
   ))[[1]]
@@ -64,7 +64,7 @@ ggplot(time_data, aes(x = n, y = time)) +
   scale_x_log10() +
   scale_y_log10() +
   labs(
-    title = "Time Complexity of fastcpd.mean",
+    title = "Time Complexity of detect_mean()",
     x = "Data Length (log10 scale)",
     y = "Execution Time (seconds, log10 scale)"
   ) +
@@ -108,7 +108,7 @@ power_coefficient
 #> 0.929341
 ```
 
-# Impact of SeDG in `fastcpd.lasso()`
+# Impact of SeDG in `detect_lasso()`
 
 In this section, we simulate a Lasso regression model with change points. We compare the performance of the vanilla approach (without SeDG) and the SeDG-enhanced approach by varying the `vanilla_percentage` parameter. The detected change points are extracted for both settings.
 
@@ -149,8 +149,8 @@ y <- c(
 # Combine response and predictors into a data frame
 lasso_data <- data.frame(y = y, x = x)
 
-# Detect change points using fastcpd.lasso without SeDG (vanilla_percentage = 0)
-system.time(result_seg_non_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 0))
+# Detect change points using detect_lasso() without SeDG (vanilla_percentage = 0)
+system.time(result_seg_non_vanilla <- detect_lasso(lasso_data, vanilla_percentage = 0))
 #>    user  system elapsed 
 #>   5.556   0.794   6.364
 cat("Change points with SeDG (vanilla_percentage = 0):\n")
@@ -158,8 +158,8 @@ cat("Change points with SeDG (vanilla_percentage = 0):\n")
 result_seg_non_vanilla@cp_set
 #> [1]  79 203 320
 
-# Detect change points using fastcpd.lasso with the vanilla approach (vanilla_percentage = 1)
-system.time(result_seg_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 1))
+# Detect change points using detect_lasso() with the vanilla approach (vanilla_percentage = 1)
+system.time(result_seg_vanilla <- detect_lasso(lasso_data, vanilla_percentage = 1))
 #>    user  system elapsed 
 #> 112.649   5.302 118.156
 cat("Change points with vanilla approach (vanilla_percentage = 1):\n")
@@ -200,7 +200,7 @@ p <- 4  # Dimensionality of the data
 execution_times <- numeric(length(ns))
 
 for (i in seq_along(ns)) {
-  execution_times[i] <- system.time(fastcpd.mean(
+  execution_times[i] <- system.time(detect_mean(
     mvtnorm::rmvnorm(ns[i], mean = rep(0, p), sigma = diag(1, p)),
     cp_only = TRUE
   ))[[1]]
@@ -219,7 +219,7 @@ ggplot(time_data, aes(x = n, y = time)) +
   scale_x_log10() +
   scale_y_log10() +
   labs(
-    title = "Time Complexity of fastcpd.mean",
+    title = "Time Complexity of detect_mean()",
     x = "Data Length (log10 scale)",
     y = "Execution Time (seconds, log10 scale)"
   ) +
@@ -271,13 +271,13 @@ y <- c(
 # Combine response and predictors into a data frame
 lasso_data <- data.frame(y = y, x = x)
 
-# Detect change points using fastcpd.lasso without SeDG (vanilla_percentage = 0)
-system.time(result_seg_non_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 0))
+# Detect change points using detect_lasso() without SeDG (vanilla_percentage = 0)
+system.time(result_seg_non_vanilla <- detect_lasso(lasso_data, vanilla_percentage = 0))
 cat("Change points with SeDG (vanilla_percentage = 0):\n")
 result_seg_non_vanilla@cp_set
 
-# Detect change points using fastcpd.lasso with the vanilla approach (vanilla_percentage = 1)
-system.time(result_seg_vanilla <- fastcpd.lasso(lasso_data, vanilla_percentage = 1))
+# Detect change points using detect_lasso() with the vanilla approach (vanilla_percentage = 1)
+system.time(result_seg_vanilla <- detect_lasso(lasso_data, vanilla_percentage = 1))
 cat("Change points with vanilla approach (vanilla_percentage = 1):\n")
 result_seg_vanilla@cp_set
 ```

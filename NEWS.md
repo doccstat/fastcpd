@@ -3,9 +3,15 @@
 *   Publish language-specific source projections at `fastcpd-r`,
     `fastcpd-py`, and `fastcpd-cpp`, with the combined source maintained in
     the private Depot monorepo.
+*   Make the unified `detect*()` and `estimate_variance*()` APIs the primary R
+    implementations. The existing `fastcpd*()` and `variance_*()` functions
+    remain exported compatibility aliases and are not deprecated yet.
 *   Add `confint.fastcpd()` for confidence intervals on change-point
     locations and fitted segment parameters, with bootstrap, profile, and
     Wald methods where supported.
+*   Add `plot.fastcpd_confint()` to visualize `confint()` results:
+    change-point intervals as shaded bands over the data and segment
+    parameter intervals as point ranges.
 *   Add Python confidence-interval helpers via `fastcpd.confint()` and
     `CpdResult.confint()`.
 *   Fix WebAssembly builds by treating the used Abseil facilities as

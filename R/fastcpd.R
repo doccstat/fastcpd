@@ -1,5 +1,5 @@
 #' @title Find change points efficiently
-#' @aliases detect
+#' @aliases fastcpd
 #' @param formula A formula object specifying the model to be fitted. The
 #' (optional) response variable should be on the LHS of the formula, while the
 #' covariates should be on the RHS. The naming of variables used in the formula
@@ -9,13 +9,13 @@
 #' series models. By default, an intercept column will be added to the data,
 #' similar to the [lm()] function.
 #' Thus, it is suggested that users should remove the intercept term by
-#' appending \code{- 1} to the formula. Note that the [fastcpd.family] functions
+#' appending \code{- 1} to the formula. Note that the [detect_family] functions
 #' do not require a formula input.
 #' @param data A data frame of dimension \eqn{T \times d}{T * d} containing the
 #' data to be segmented (where each row denotes a data point
 #' \eqn{z_t \in \mathbb{R}^d}{z_t in R^d} for \eqn{t = 1, \ldots, T}) is
 #' required in the main function, while a matrix or a vector input is also
-#' accepted in the [fastcpd.family] functions.
+#' accepted in the [detect_family] functions.
 #' @param beta Penalty criterion for the number of change points. This parameter
 #' takes a string value of \code{"BIC"}, \code{"MBIC"}, \code{"MDL"} or a
 #' numeric value.
@@ -64,7 +64,7 @@
 #' the original data frame in the form of a matrix
 #' (a matrix with a single column in the case of a univariate data set).
 #' In the first format, the specified cost function directly calculates the cost
-#' value. [fastcpd()] performs the vanilla PELT algorithm, and
+#' value. [detect()] performs the vanilla PELT algorithm, and
 #' \code{cost_gradient} and \code{cost_hessian} should not be provided since no
 #' parameter updating is necessary for vanilla PELT.
 #' In the second format, the loss function
@@ -86,7 +86,7 @@
 #' two-argument form) -- the tag string is required and checked at runtime.
 #' Since external pointers carry no \code{formals}, also set
 #' \code{attr(xptr, "fastcpd_cost_arity") <- 1L} (or \code{2L} for the
-#' two-argument form) so [fastcpd()] can route it like an R closure of the
+#' two-argument form) so [detect()] can route it like an R closure of the
 #' same arity. Pass \code{xptr} as \code{cost} exactly as you would an R
 #' closure. A compiled \code{cost} cannot be combined with
 #' \code{cost_gradient} / \code{cost_hessian} (those drive an R-level
@@ -211,7 +211,7 @@
 #' responses.
 #' }
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd()] takes in formulas, data, families and extra
+#' @description [detect()] takes in formulas, data, families and extra
 #' parameters and returns a [fastcpd-class] object.
 #' @section Gallery:
 #' <https://github.com/doccstat/fastcpd-r/tree/main/tests/testthat/examples>
@@ -233,7 +233,7 @@
 #' @example tests/testthat/examples/fastcpd_3.txt
 #' @example tests/testthat/examples/fastcpd_4.txt
 #' @example tests/testthat/examples/fastcpd_custom_xptr.txt
-#' @seealso [fastcpd.family] for the family-specific function;
+#' @seealso [detect_family] for the family-specific function;
 #' [plot.fastcpd()] for plotting the results,
 #' [summary.fastcpd()] for summarizing the results.
 #'
@@ -242,7 +242,7 @@
 #' @importFrom Rcpp evalCpp
 #' @export
 #' @useDynLib fastcpd, .registration = TRUE
-fastcpd <- function(  # nolint: cyclomatic complexity
+detect <- function(  # nolint: cyclomatic complexity
   formula = y ~ . - 1,
   data,
   beta = "MBIC",
@@ -579,150 +579,165 @@ fastcpd <- function(  # nolint: cyclomatic complexity
   )
 }
 
-#' @name fastcpd_family
-#' @aliases fastcpd.family
-#' @title Wrapper functions for fastcpd
-#' @description Wrapper functions for fastcpd to find change points in various
-#' models.
+#' @rdname detect
+#' @export
+fastcpd <- detect
+
+#' @name detect_family
+#' @aliases fastcpd_family fastcpd.family
+#' @title Family-specific change point detection
+#' @description Convenience functions built on [detect()] for common models.
 #' @seealso
 #' Basic statistics:
-#' [fastcpd.mean()], [fastcpd.variance()], [fastcpd.meanvariance()],
-#' [fastcpd.mv()], [fastcpd.exponential()];
+#' [detect_mean()], [detect_variance()], [detect_meanvariance()],
+#' [detect_exponential()];
 #'
 #' Regression:
-#' [fastcpd.lm()], [fastcpd.binomial()], [fastcpd.poisson()],
-#' [fastcpd.lasso()], [fastcpd.quantile()];
+#' [detect_lm()], [detect_binomial()], [detect_poisson()],
+#' [detect_lasso()], [detect_quantile()];
 #'
 #' Time series:
-#' [fastcpd.ar()], [fastcpd.var()], [fastcpd.arima()], [fastcpd.arma()],
-#' [fastcpd.garch()];
+#' [detect_ar()], [detect_var()], [detect_arima()], [detect_arma()],
+#' [detect_garch()], [detect_time_series()];
 #'
 #' Distribution-free:
-#' [fastcpd.kcp()], [fastcpd.rank()].
+#' [detect_kernel()], [detect_rank()].
 #'
 #' @md
 NULL
 
 #' @title Find change points efficiently in AR(\eqn{p}) models
-#' @aliases detect_ar
+#' @aliases fastcpd_ar fastcpd.ar
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A positive integer specifying the order of the AR model.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}. One special argument can be passed here is
 #' \code{include.mean}, which is a logical value indicating whether the
 #' mean should be included in the model. The default value is \code{TRUE}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_ar()] and [fastcpd.ar()] are
-#' wrapper functions of [fastcpd()] to find change points in
-#' AR(\eqn{p}) models. The function is similar to [fastcpd()] except that
+#' @description [detect_ar()] and [fastcpd.ar()] are
+#' wrapper functions of [detect()] to find change points in
+#' AR(\eqn{p}) models. The function is similar to [detect()] except that
 #' the data is by default a one-column matrix or univariate vector
 #' and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_ar_1.R
 #' @example tests/testthat/examples/fastcpd_ar_2.R
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_ar
+#' @rdname detect_ar
 #' @export
-fastcpd_ar <- function(data, order = 0, ...) {
-  result <- fastcpd.ts(c(data), "ar", order, ...)
+detect_ar <- function(data, order = 0, ...) {
+  result <- detect_time_series(c(data), "ar", order, ...)
   result@call <- match.call()
   result
 }
 
-#' @rdname fastcpd_ar
+#' @rdname detect_ar
 #' @export
-fastcpd.ar <- fastcpd_ar  # nolint: Conventional R function style
+fastcpd_ar <- detect_ar
+
+#' @rdname detect_ar
+#' @export
+fastcpd.ar <- detect_ar  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in
 #' ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models
-#' @aliases detect_arima
+#' @aliases fastcpd_arima fastcpd.arima
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A vector of length three specifying the order of the ARIMA
 #' model.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}. One special argument can be passed here is
 #' \code{include.mean}, which is a logical value indicating whether the
 #' mean should be included in the model. The default value is \code{TRUE}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_arima()] and [fastcpd.arima()] are
-#' wrapper functions of [fastcpd()] to find change points in
+#' @description [detect_arima()] and [fastcpd.arima()] are
+#' wrapper functions of [detect()] to find change points in
 #' ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models.
-#' The function is similar to [fastcpd()]
+#' The function is similar to [detect()]
 #' except that the data is by default a one-column matrix or univariate vector
 #' and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_arima.txt
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_arima
+#' @rdname detect_arima
 #' @export
-fastcpd_arima <- function(data, order = 0, ...) {
-  result <- fastcpd.ts(c(data), "arima", order, ...)
+detect_arima <- function(data, order = 0, ...) {
+  result <- detect_time_series(c(data), "arima", order, ...)
   result@call <- match.call()
   result
 }
 
-#' @rdname fastcpd_arima
+#' @rdname detect_arima
 #' @export
-fastcpd.arima <- fastcpd_arima  # nolint: Conventional R function style
+fastcpd_arima <- detect_arima
+
+#' @rdname detect_arima
+#' @export
+fastcpd.arima <- detect_arima  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in ARMA(\eqn{p}, \eqn{q}) models
-#' @aliases detect_arma
+#' @aliases fastcpd_arma fastcpd.arma
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A vector of length two specifying the order of the ARMA
 #' model.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_arma()] and [fastcpd.arma()] are
-#' wrapper functions of [fastcpd()] to find change points in
-#' ARMA(\eqn{p}, \eqn{q}) models. The function is similar to [fastcpd()]
+#' @description [detect_arma()] and [fastcpd.arma()] are
+#' wrapper functions of [detect()] to find change points in
+#' ARMA(\eqn{p}, \eqn{q}) models. The function is similar to [detect()]
 #' except that the data is by default a one-column matrix or univariate vector
 #' and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_arma.txt
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_arma
+#' @rdname detect_arma
 #' @export
-fastcpd_arma <- function(data, order = c(0, 0), ...) {
-  result <- fastcpd.ts(c(data), "arma", order, ...)
+detect_arma <- function(data, order = c(0, 0), ...) {
+  result <- detect_time_series(c(data), "arma", order, ...)
   result@call <- match.call()
   result
 }
 
-#' @rdname fastcpd_arma
+#' @rdname detect_arma
 #' @export
-fastcpd.arma <- fastcpd_arma  # nolint: Conventional R function style
+fastcpd_arma <- detect_arma
+
+#' @rdname detect_arma
+#' @export
+fastcpd.arma <- detect_arma  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in logistic regression models
-#' @aliases detect_binomial detect_logistic_regression
+#' @aliases detect_logistic_regression fastcpd_binomial fastcpd.binomial
 #' @param data A matrix or a data frame with the response variable as the first
 #' column.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_binomial()] and [fastcpd.binomial()] are
-#' wrapper functions of [fastcpd()] to find change points in
-#' logistic regression models. The function is similar to [fastcpd()]
+#' @description [detect_binomial()] and [fastcpd.binomial()] are
+#' wrapper functions of [detect()] to find change points in
+#' logistic regression models. The function is similar to [detect()]
 #' except that the data is by default a matrix or data frame with the response
 #' variable as the first column and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_binomial.R
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_binomial
+#' @rdname detect_binomial
 #' @export
-fastcpd_binomial <- function(data, ...) {
+detect_binomial <- function(data, ...) {
   data_fast <- fastcpd_matrix_fast_path_data(data)
   if (!is.null(data_fast) && !methods::hasArg("formula")) {
-    result <- fastcpd(
+    result <- detect(
       data = data_fast, family = "binomial",
       .fastcpd_matrix_input = TRUE, ...
     )
   } else {
-    result <- fastcpd(
+    result <- detect(
       data = data.frame(y = data[, 1], x = data[, -1]), family = "binomial", ...
     )
   }
@@ -730,68 +745,80 @@ fastcpd_binomial <- function(data, ...) {
   result
 }
 
-#' @rdname fastcpd_binomial
+#' @rdname detect_binomial
 #' @export
-fastcpd.binomial <- fastcpd_binomial  # nolint: Conventional R function style
+detect_logistic_regression <- detect_binomial
+
+#' @rdname detect_binomial
+#' @export
+fastcpd_binomial <- detect_binomial
+
+#' @rdname detect_binomial
+#' @export
+fastcpd.binomial <- detect_binomial  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in GARCH(\eqn{p}, \eqn{q}) models
-#' @aliases detect_garch
+#' @aliases fastcpd_garch fastcpd.garch
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A positive integer vector of length two specifying the order of
 #' the GARCH model.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_garch()] and [fastcpd.garch()] are
-#' wrapper functions of [fastcpd()] to find change points in
-#' GARCH(\eqn{p}, \eqn{q}) models. The function is similar to [fastcpd()]
+#' @description [detect_garch()] and [fastcpd.garch()] are
+#' wrapper functions of [detect()] to find change points in
+#' GARCH(\eqn{p}, \eqn{q}) models. The function is similar to [detect()]
 #' except that the data is by default a one-column matrix or univariate vector
 #' and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_garch.txt
 #' @example tests/testthat/examples/fastcpd_garch_2.txt
 #' @example tests/testthat/examples/fastcpd_garch_3.txt
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_garch
+#' @rdname detect_garch
 #' @export
-fastcpd_garch <- function(data, order = c(0, 0), ...) {
-  result <- fastcpd.ts(c(data), "garch", order, ...)
+detect_garch <- function(data, order = c(0, 0), ...) {
+  result <- detect_time_series(c(data), "garch", order, ...)
   result@call <- match.call()
   result
 }
 
-#' @rdname fastcpd_garch
+#' @rdname detect_garch
 #' @export
-fastcpd.garch <- fastcpd_garch  # nolint: Conventional R function style
+fastcpd_garch <- detect_garch
+
+#' @rdname detect_garch
+#' @export
+fastcpd.garch <- detect_garch  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in penalized linear regression models
-#' @aliases detect_lasso
+#' @aliases fastcpd_lasso fastcpd.lasso
 #' @param data A matrix or a data frame with the response variable as the first
 #' column.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_lasso()] and [fastcpd.lasso()] are wrapper
-#' functions of [fastcpd()] to find change points in penalized
-#' linear regression models. The function is similar to [fastcpd()]
+#' @description [detect_lasso()] and [fastcpd.lasso()] are wrapper
+#' functions of [detect()] to find change points in penalized
+#' linear regression models. The function is similar to [detect()]
 #' except that the data is by default a matrix or data frame with the response
 #' variable as the first column and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_lasso.txt
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_lasso
+#' @rdname detect_lasso
 #' @export
-fastcpd_lasso <- function(data, ...) {
+detect_lasso <- function(data, ...) {
   data_fast <- fastcpd_matrix_fast_path_data(data)
   if (!is.null(data_fast) && !methods::hasArg("formula")) {
-    result <- fastcpd(
+    result <- detect(
       data = data_fast, family = "lasso",
       .fastcpd_matrix_input = TRUE, ...
     )
   } else {
-    result <- fastcpd(
+    result <- detect(
       data = data.frame(y = data[, 1], x = data[, -1]), family = "lasso", ...
     )
   }
@@ -799,38 +826,42 @@ fastcpd_lasso <- function(data, ...) {
   result
 }
 
-#' @rdname fastcpd_lasso
+#' @rdname detect_lasso
 #' @export
-fastcpd.lasso <- fastcpd_lasso  # nolint: Conventional R function style
+fastcpd_lasso <- detect_lasso
+
+#' @rdname detect_lasso
+#' @export
+fastcpd.lasso <- detect_lasso  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in linear regression models
-#' @aliases detect_lm detect_linear_regression
+#' @aliases detect_linear_regression fastcpd_lm fastcpd.lm
 #' @param data A matrix or a data frame with the response variable as the first
 #' column.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_lm()] and [fastcpd.lm()] are wrapper
-#' functions of [fastcpd()] to find change points in linear
-#' regression models. The function is similar to [fastcpd()] except that
+#' @description [detect_lm()] and [fastcpd.lm()] are wrapper
+#' functions of [detect()] to find change points in linear
+#' regression models. The function is similar to [detect()] except that
 #' the data is by default a matrix or data frame with the response variable
 #' as the first column and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_lm_1.R
 #' @example tests/testthat/examples/fastcpd_lm_2.txt
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_lm
+#' @rdname detect_lm
 #' @export
-fastcpd_lm <- function(data, ...) {
+detect_lm <- function(data, ...) {
   data_fast <- fastcpd_matrix_fast_path_data(data)
   if (!is.null(data_fast) && !methods::hasArg("formula")) {
-    result <- fastcpd(
+    result <- detect(
       data = data_fast, family = "lm",
       .fastcpd_matrix_input = TRUE, ...
     )
   } else {
-    result <- fastcpd(
+    result <- detect(
       data = data.frame(y = data[, 1], x = data[, -1]), family = "lm", ...
     )
   }
@@ -838,37 +869,45 @@ fastcpd_lm <- function(data, ...) {
   result
 }
 
-#' @rdname fastcpd_lm
+#' @rdname detect_lm
 #' @export
-fastcpd.lm <- fastcpd_lm  # nolint: Conventional R function style
+detect_linear_regression <- detect_lm
+
+#' @rdname detect_lm
+#' @export
+fastcpd_lm <- detect_lm
+
+#' @rdname detect_lm
+#' @export
+fastcpd.lm <- detect_lm  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in mean change models
-#' @aliases detect_mean
+#' @aliases fastcpd_mean fastcpd.mean
 #' @param data A matrix, a data frame or a vector.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_mean()] and [fastcpd.mean()] are wrapper
-#' functions of [fastcpd()] to find the mean change. The function is
-#' similar to [fastcpd()] except that the data is by default a matrix or
+#' @description [detect_mean()] and [fastcpd.mean()] are wrapper
+#' functions of [detect()] to find the mean change. The function is
+#' similar to [detect()] except that the data is by default a matrix or
 #' data frame or a vector with each row / element as an observation and thus a
 #' formula is not required here.
 #' @example tests/testthat/examples/fastcpd_mean_1.R
 #' @example tests/testthat/examples/fastcpd_mean_2.R
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_mean
+#' @rdname detect_mean
 #' @export
-fastcpd_mean <- function(data, ...) {
+detect_mean <- function(data, ...) {
   data_fast <- fastcpd_matrix_fast_path_data(data, vector_ok = TRUE)
   if (!is.null(data_fast)) {
-    result <- fastcpd(
+    result <- detect(
       formula = ~ . - 1, data = data_fast, family = "mean",
       .fastcpd_matrix_input = TRUE, ...
     )
   } else {
-    result <- fastcpd(
+    result <- detect(
       formula = ~ . - 1, data = data.frame(x = data), family = "mean", ...
     )
   }
@@ -876,39 +915,43 @@ fastcpd_mean <- function(data, ...) {
   result
 }
 
-#' @rdname fastcpd_mean
+#' @rdname detect_mean
 #' @export
-fastcpd.mean <- fastcpd_mean  # nolint: Conventional R function style
+fastcpd_mean <- detect_mean
+
+#' @rdname detect_mean
+#' @export
+fastcpd.mean <- detect_mean  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in exponentially distributed data
-#' @aliases detect_exponential
+#' @aliases fastcpd_exponential fastcpd.exponential
 #' @param data A matrix, a data frame or a vector.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_exponential()] and [fastcpd.exponential()] are
-#' wrapper functions of [fastcpd()] to find changes in the rate of
+#' @description [detect_exponential()] and [fastcpd.exponential()] are
+#' wrapper functions of [detect()] to find changes in the rate of
 #' exponentially distributed data, i.e. mean change under exponentially
 #' distributed noise (cf. \code{changepoint::cpt.meanvar} with
 #' \code{test.stat = "Exponential"}). The function is similar to
-#' [fastcpd()] except that the data is by default a matrix or data frame or
+#' [detect()] except that the data is by default a matrix or data frame or
 #' a vector with each row / element as an observation and thus a formula is
 #' not required here.
 #' @example tests/testthat/examples/fastcpd_exponential_1.R
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_exponential
+#' @rdname detect_exponential
 #' @export
-fastcpd_exponential <- function(data, ...) {
+detect_exponential <- function(data, ...) {
   data_fast <- fastcpd_matrix_fast_path_data(data, vector_ok = TRUE)
   if (!is.null(data_fast)) {
-    result <- fastcpd(
+    result <- detect(
       formula = ~ . - 1, data = data_fast, family = "exponential",
       .fastcpd_matrix_input = TRUE, ...
     )
   } else {
-    result <- fastcpd(
+    result <- detect(
       formula = ~ . - 1, data = data.frame(x = data), family = "exponential",
       ...
     )
@@ -917,39 +960,43 @@ fastcpd_exponential <- function(data, ...) {
   result
 }
 
-#' @rdname fastcpd_exponential
+#' @rdname detect_exponential
+#' @export
+fastcpd_exponential <- detect_exponential
+
+#' @rdname detect_exponential
 #' @export
 fastcpd.exponential <-  # nolint: Conventional R function style
-  fastcpd_exponential
+  detect_exponential
 
 #' @title Find change points efficiently in mean variance change models
-#' @aliases detect_meanvariance detect_mean_variance
+#' @aliases detect_mean_variance fastcpd_meanvariance fastcpd.meanvariance fastcpd_mv fastcpd.mv
 #' @param data A matrix, a data frame or a vector.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_meanvariance()], [fastcpd.meanvariance()],
+#' @description [detect_meanvariance()], [fastcpd.meanvariance()],
 #' [fastcpd_mv()], [fastcpd.mv()] are wrapper
-#' functions of [fastcpd()] to find the meanvariance change. The
-#' function is similar to [fastcpd()] except that the data is by
+#' functions of [detect()] to find the meanvariance change. The
+#' function is similar to [detect()] except that the data is by
 #' default a matrix or data frame or a vector with each row / element as an
 #' observation and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_meanvariance_1.R
 #' @example tests/testthat/examples/fastcpd_meanvariance_2.R
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_meanvariance
+#' @rdname detect_meanvariance
 #' @export
-fastcpd_meanvariance <- function(data, ...) {
+detect_meanvariance <- function(data, ...) {
   data_fast <- fastcpd_matrix_fast_path_data(data, vector_ok = TRUE)
   if (!is.null(data_fast)) {
-    result <- fastcpd(
+    result <- detect(
       formula = ~ . - 1, data = data_fast, family = "meanvariance",
       .fastcpd_matrix_input = TRUE, ...
     )
   } else {
-    result <- fastcpd(
+    result <- detect(
       formula = ~ . - 1, data = data.frame(x = data), family = "meanvariance",
       ...
     )
@@ -958,46 +1005,54 @@ fastcpd_meanvariance <- function(data, ...) {
   result
 }
 
-#' @rdname fastcpd_meanvariance
+#' @rdname detect_meanvariance
+#' @export
+detect_mean_variance <- detect_meanvariance
+
+#' @rdname detect_meanvariance
+#' @export
+fastcpd_meanvariance <- detect_meanvariance
+
+#' @rdname detect_meanvariance
 #' @export
 fastcpd.meanvariance <-  # nolint: Conventional R function style
-  fastcpd_meanvariance
+  detect_meanvariance
 
-#' @rdname fastcpd_meanvariance
+#' @rdname detect_meanvariance
 #' @export
-fastcpd_mv <- fastcpd_meanvariance
+fastcpd_mv <- detect_meanvariance
 
-#' @rdname fastcpd_meanvariance
+#' @rdname detect_meanvariance
 #' @export
-fastcpd.mv <- fastcpd_meanvariance  # nolint: Conventional R function style
+fastcpd.mv <- detect_meanvariance  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in Poisson regression models
-#' @aliases detect_poisson detect_poisson_regression
+#' @aliases detect_poisson_regression fastcpd_poisson fastcpd.poisson
 #' @param data A matrix or a data frame with the response variable as the first
 #' column.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_poisson()] and [fastcpd.poisson()] are
-#' wrapper functions of [fastcpd()] to find change points in
-#' Poisson regression models. The function is similar to [fastcpd()]
+#' @description [detect_poisson()] and [fastcpd.poisson()] are
+#' wrapper functions of [detect()] to find change points in
+#' Poisson regression models. The function is similar to [detect()]
 #' except that the data is by default a matrix or data frame with the response
 #' variable as the first column and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_poisson.txt
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_poisson
+#' @rdname detect_poisson
 #' @export
-fastcpd_poisson <- function(data, ...) {
+detect_poisson <- function(data, ...) {
   data_fast <- fastcpd_matrix_fast_path_data(data)
   if (!is.null(data_fast) && !methods::hasArg("formula")) {
-    result <- fastcpd(
+    result <- detect(
       data = data_fast, family = "poisson",
       .fastcpd_matrix_input = TRUE, ...
     )
   } else {
-    result <- fastcpd(
+    result <- detect(
       data = data.frame(y = data[, 1], x = data[, -1]), family = "poisson", ...
     )
   }
@@ -1005,21 +1060,29 @@ fastcpd_poisson <- function(data, ...) {
   result
 }
 
-#' @rdname fastcpd_poisson
+#' @rdname detect_poisson
 #' @export
-fastcpd.poisson <- fastcpd_poisson  # nolint: Conventional R function style
+detect_poisson_regression <- detect_poisson
+
+#' @rdname detect_poisson
+#' @export
+fastcpd_poisson <- detect_poisson
+
+#' @rdname detect_poisson
+#' @export
+fastcpd.poisson <- detect_poisson  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in quantile regression models
-#' @aliases detect_quantile detect_quantile_regression
+#' @aliases detect_quantile_regression fastcpd_quantile fastcpd.quantile
 #' @param data A matrix or a data frame with the response variable as the first
 #' column and covariates in the remaining columns.
 #' @param order Quantile level \eqn{\tau}, a numeric value in (0, 1). The
 #' default is 0.5, corresponding to median regression.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_quantile()] and [fastcpd.quantile()] are wrapper
-#' functions of [fastcpd()] to detect change points in quantile regression
+#' @description [detect_quantile()] and [fastcpd.quantile()] are wrapper
+#' functions of [detect()] to detect change points in quantile regression
 #' models using the pinball (check function) loss
 #' \eqn{\rho_\tau(u) = u(\tau - \mathbf{1}_{u < 0})}.
 #' The function detects changes in the conditional \eqn{\tau}-quantile of
@@ -1027,19 +1090,19 @@ fastcpd.poisson <- fastcpd_poisson  # nolint: Conventional R function style
 #' iteratively reweighted least squares (IRLS).
 #' @example tests/testthat/examples/fastcpd_quantile.txt
 #' @example tests/testthat/examples/fastcpd_quantile_2.R
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_quantile
+#' @rdname detect_quantile
 #' @export
-fastcpd_quantile <- function(data, order = 0.5, ...) {
+detect_quantile <- function(data, order = 0.5, ...) {
   stopifnot(
     "order must be a single numeric value in (0, 1) (the quantile level)." =
       is.numeric(order) && length(order) == 1 && order > 0 && order < 1
   )
   data_fast <- fastcpd_matrix_fast_path_data(data)
   if (!is.null(data_fast) && !methods::hasArg("formula")) {
-    result <- fastcpd(
+    result <- detect(
       data = data_fast,
       family = "quantile",
       order = order,
@@ -1047,7 +1110,7 @@ fastcpd_quantile <- function(data, order = 0.5, ...) {
       ...
     )
   } else {
-    result <- fastcpd(
+    result <- detect(
       data = data.frame(y = data[, 1], x = data[, -1]),
       family = "quantile",
       order = order,
@@ -1058,12 +1121,20 @@ fastcpd_quantile <- function(data, order = 0.5, ...) {
   result
 }
 
-#' @rdname fastcpd_quantile
+#' @rdname detect_quantile
 #' @export
-fastcpd.quantile <- fastcpd_quantile  # nolint: Conventional R function style
+detect_quantile_regression <- detect_quantile
+
+#' @rdname detect_quantile
+#' @export
+fastcpd_quantile <- detect_quantile
+
+#' @rdname detect_quantile
+#' @export
+fastcpd.quantile <- detect_quantile  # nolint: Conventional R function style
 
 #' @title Find change points efficiently via kernel change point detection
-#' @aliases detect_kcp detect_kernel
+#' @aliases detect_kcp fastcpd_kcp fastcpd.kcp
 #' @param data A numeric vector or a matrix with one row per observation.
 #' @param order A numeric vector of length up to 2: \code{order[1]} is the
 #'   number of random Fourier features (default 100; larger values improve
@@ -1072,10 +1143,10 @@ fastcpd.quantile <- fastcpd_quantile  # nolint: Conventional R function style
 #'   \eqn{\sigma = \sqrt{\mathrm{median}(d^2)/2}} on a subsample of up to
 #'   1000 observations). Call \code{set.seed()} before this function for
 #'   reproducible results.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #'   \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_kcp()] and [fastcpd.kcp()] detect change points in
+#' @description [detect_kernel()] and [fastcpd.kcp()] detect change points in
 #'   the full distribution of the data using the kernel change point (KCP)
 #'   approach. The RBF kernel
 #'   \eqn{k(x,y)=\exp(-\|x-y\|^2/(2\sigma^2))} is approximated by random
@@ -1085,12 +1156,12 @@ fastcpd.quantile <- fastcpd_quantile  # nolint: Conventional R function style
 #'   \eqn{O(n^2)} for the exact kernel PELT — where \eqn{D} is
 #'   \code{order[1]}.
 #' @example tests/testthat/examples/fastcpd_kcp.R
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #' @md
-#' @rdname fastcpd_kcp
+#' @rdname detect_kernel
 #' @export
-fastcpd_kcp <- function(data, order = c(100L, 0), ...) {
-  result <- fastcpd(
+detect_kernel <- function(data, order = c(100L, 0), ...) {
+  result <- detect(
     formula = ~ . - 1,
     data = data.frame(as.matrix(data)),
     family = "kcp",
@@ -1101,45 +1172,57 @@ fastcpd_kcp <- function(data, order = c(100L, 0), ...) {
   result
 }
 
-#' @rdname fastcpd_kcp
+#' @rdname detect_kernel
 #' @export
-fastcpd.kcp <- fastcpd_kcp  # nolint: Conventional R function style
+detect_kcp <- detect_kernel
+
+#' @rdname detect_kernel
+#' @export
+fastcpd_kcp <- detect_kernel
+
+#' @rdname detect_kernel
+#' @export
+fastcpd.kcp <- detect_kernel  # nolint: Conventional R function style
 
 #' @title Find change points efficiently via rank-based change point detection
-#' @aliases detect_rank
+#' @aliases fastcpd_rank fastcpd.rank
 #' @param data A numeric vector or a matrix with one row per observation.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #'   \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_rank()] and [fastcpd.rank()] detect change points
+#' @description [detect_rank()] and [fastcpd.rank()] detect change points
 #'   using a rank-based, distribution-free cost. Each column is replaced by
 #'   its global rank centred at zero, and change points in the mean of these
 #'   centred ranks are detected with the existing PELT infrastructure. The
 #'   result is fully deterministic and requires no bandwidth selection.
 #'   The method is most powerful for location shifts; for scale-only or
-#'   general distributional changes, [fastcpd_kcp()] is preferable.
+#'   general distributional changes, [detect_kernel()] is preferable.
 #' @example tests/testthat/examples/fastcpd_rank.R
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #' @md
-#' @rdname fastcpd_rank
+#' @rdname detect_rank
 #' @export
-fastcpd_rank <- function(data, ...) {
+detect_rank <- function(data, ...) {
   data_mat <- as.matrix(data)
   n <- nrow(data_mat)
   centered_ranks <- apply(data_mat, 2, rank) - (n + 1) / 2
-  result <- fastcpd(
+  result <- detect(
     formula = ~ . - 1, data = data.frame(centered_ranks), family = "mean", ...
   )
   result@call <- match.call()
   result
 }
 
-#' @rdname fastcpd_rank
+#' @rdname detect_rank
 #' @export
-fastcpd.rank <- fastcpd_rank  # nolint: Conventional R function style
+fastcpd_rank <- detect_rank
+
+#' @rdname detect_rank
+#' @export
+fastcpd.rank <- detect_rank  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in time series data
-#' @aliases detect_ts detect_time_series
+#' @aliases detect_ts fastcpd_ts fastcpd.ts
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param family A character string specifying the family of the time series.
 #' The value should be one of \code{"ar"}, \code{"var"}, \code{"arima"} or
@@ -1154,23 +1237,23 @@ fastcpd.rank <- fastcpd_rank  # nolint: Conventional R function style
 #'   using [stats::arima()].
 #' \item \code{"garch"}, NUMERIC(2): GARCH(\eqn{p}, \eqn{q}) model.
 #' }
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}. One special argument can be passed here is
 #' \code{include.mean}, which is a logical value indicating whether the
 #' mean should be included in the model. The default value is \code{TRUE}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_ts()] and [fastcpd.ts()] are wrapper functions for
-#' [fastcpd()] to find change points in time series data. The function is
-#' similar to [fastcpd()] except that the data is a time series and the
+#' @description [detect_time_series()] and [detect_ts()] are wrapper functions
+#' for [detect()] to find change points in time series data. The function is
+#' similar to [detect()] except that the data is a time series and the
 #' family is one of \code{"ar"}, \code{"var"}, \code{"arma"}, \code{"arima"} or
 #' \code{"garch"}.
 #' @example tests/testthat/examples/fastcpd_ts.txt
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_ts
+#' @rdname detect_time_series
 #' @export
-fastcpd_ts <- function(data, family = NULL, order = c(0, 0, 0), ...) {
+detect_time_series <- function(data, family = NULL, order = c(0, 0, 0), ...) {
   if (!is.null(family)) {
     family <- tolower(family)
   }
@@ -1179,7 +1262,7 @@ fastcpd_ts <- function(data, family = NULL, order = c(0, 0, 0), ...) {
   stopifnot(check_order(order, family))
 
   # TODO(doccstat): Deal with different data types.
-  result <- fastcpd(
+  result <- detect(
     formula = ~ . - 1,
     data = data.frame(x = data),
     family = family,
@@ -1190,65 +1273,77 @@ fastcpd_ts <- function(data, family = NULL, order = c(0, 0, 0), ...) {
   result
 }
 
-#' @rdname fastcpd_ts
+#' @rdname detect_time_series
 #' @export
-fastcpd.ts <- fastcpd_ts  # nolint: Conventional R function style
+detect_ts <- detect_time_series
+
+#' @rdname detect_time_series
+#' @export
+fastcpd_ts <- detect_time_series
+
+#' @rdname detect_time_series
+#' @export
+fastcpd.ts <- detect_time_series  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in VAR(\eqn{p}) models
-#' @aliases detect_var
+#' @aliases fastcpd_var fastcpd.var
 #' @param data A matrix, a data frame or a time series object.
 #' @param order A positive integer specifying the order of the VAR model.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_var()] and [fastcpd.var()] are
-#' wrapper functions of [fastcpd_ts()] to find change points in
-#' VAR(\eqn{p}) models. The function is similar to [fastcpd_ts()]
+#' @description [detect_var()] and [fastcpd.var()] are
+#' wrapper functions of [detect_time_series()] to find change points in
+#' VAR(\eqn{p}) models. The function is similar to [detect_time_series()]
 #' except that the data is by default a matrix with row as an observation
 #' and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_var.R
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_var
+#' @rdname detect_var
 #' @export
-fastcpd_var <- function(data, order = 0, ...) {
-  result <- fastcpd.ts(data, "var", order, ...)
+detect_var <- function(data, order = 0, ...) {
+  result <- detect_time_series(data, "var", order, ...)
   result@call <- match.call()
   result
 }
 
-#' @rdname fastcpd_var
+#' @rdname detect_var
 #' @export
-fastcpd.var <- fastcpd_var  # nolint: Conventional R function style
+fastcpd_var <- detect_var
+
+#' @rdname detect_var
+#' @export
+fastcpd.var <- detect_var  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in variance change models
-#' @aliases detect_variance
+#' @aliases fastcpd_variance fastcpd.variance
 #' @param data A matrix, a data frame or a vector.
-#' @param ... Other arguments passed to [fastcpd()], for example,
+#' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
-#' @description [fastcpd_variance()] and [fastcpd.variance()] are wrapper
-#' functions of [fastcpd()] to find the variance change. The
-#' function is similar to [fastcpd()] except that the data is by
+#' @description [detect_variance()] and [fastcpd.variance()] are wrapper
+#' functions of [detect()] to find the variance change. The
+#' function is similar to [detect()] except that the data is by
 #' default a matrix or data frame or a vector with each row / element as an
 #' observation and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_variance_1.R
 #' @example tests/testthat/examples/fastcpd_variance_2.R
-#' @seealso [fastcpd()]
+#' @seealso [detect()]
 #'
 #' @md
-#' @rdname fastcpd_variance
+#' @rdname detect_variance
 #' @export
-fastcpd_variance <- function(data, ...) {
+detect_variance <- function(data, ...) {
   data_fast <- fastcpd_matrix_fast_path_data(data, vector_ok = TRUE)
   if (!is.null(data_fast)) {
-    result <- fastcpd(
+    result <- detect(
       formula = ~ . - 1, data = data_fast, family = "variance",
       .fastcpd_matrix_input = TRUE, ...
     )
   } else {
-    result <- fastcpd(
+    result <- detect(
       formula = ~ . - 1, data = data.frame(x = data), family = "variance", ...
     )
   }
@@ -1256,106 +1351,10 @@ fastcpd_variance <- function(data, ...) {
   result
 }
 
-#' @rdname fastcpd_variance
+#' @rdname detect_variance
 #' @export
-fastcpd.variance <- fastcpd_variance  # nolint: Conventional R function style
+fastcpd_variance <- detect_variance
 
-#' @noRd
+#' @rdname detect_variance
 #' @export
-detect <- fastcpd
-
-#' @noRd
-#' @export
-detect_ar <- fastcpd_ar
-
-#' @noRd
-#' @export
-detect_arima <- fastcpd_arima
-
-#' @noRd
-#' @export
-detect_arma <- fastcpd_arma
-
-#' @noRd
-#' @export
-detect_binomial <- fastcpd_binomial
-
-#' @noRd
-#' @export
-detect_exponential <- fastcpd_exponential
-
-#' @noRd
-#' @export
-detect_garch <- fastcpd_garch
-
-#' @noRd
-#' @export
-detect_kcp <- fastcpd_kcp
-
-#' @noRd
-#' @export
-detect_kernel <- fastcpd_kcp
-
-#' @noRd
-#' @export
-detect_lasso <- fastcpd_lasso
-
-#' @noRd
-#' @export
-detect_linear_regression <- fastcpd_lm
-
-#' @noRd
-#' @export
-detect_lm <- fastcpd_lm
-
-#' @noRd
-#' @export
-detect_logistic_regression <- fastcpd_binomial
-
-#' @noRd
-#' @export
-detect_mean <- fastcpd_mean
-
-#' @noRd
-#' @export
-detect_mean_variance <- fastcpd_meanvariance
-
-#' @noRd
-#' @export
-detect_meanvariance <- fastcpd_meanvariance
-
-#' @noRd
-#' @export
-detect_poisson <- fastcpd_poisson
-
-#' @noRd
-#' @export
-detect_poisson_regression <- fastcpd_poisson
-
-#' @noRd
-#' @export
-detect_quantile <- fastcpd_quantile
-
-#' @noRd
-#' @export
-detect_quantile_regression <- fastcpd_quantile
-
-#' @noRd
-#' @export
-detect_rank <- fastcpd_rank
-
-#' @noRd
-#' @export
-detect_time_series <- fastcpd_ts
-
-#' @noRd
-#' @export
-detect_ts <- fastcpd_ts
-
-#' @noRd
-#' @export
-detect_var <- fastcpd_var
-
-#' @noRd
-#' @export
-detect_variance <- fastcpd_variance
+fastcpd.variance <- detect_variance  # nolint: Conventional R function style

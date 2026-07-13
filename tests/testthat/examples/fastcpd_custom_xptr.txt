@@ -8,13 +8,13 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   data <- matrix(c(rnorm(500, 0), rnorm(500, 5)))
   beta_val <- (ncol(data) + 1) * log(nrow(data)) / 2
 
-  result_builtin <- fastcpd.mean(
+  result_builtin <- detect_mean(
     data, beta = beta_val, cost_adjustment = NULL
   )
 
   cost_r <- function(data) sum((data - mean(data))^2) / 2
   time_r <- system.time(
-    result_r <- fastcpd(
+    result_r <- detect(
       ~ . - 1, data.frame(x = data), family = "custom",
       cost = cost_r, beta = beta_val, cost_adjustment = NULL
     )
@@ -48,7 +48,7 @@ if (requireNamespace("RcppArmadillo", quietly = TRUE)) {
   cost_xptr <- compiled_env$make_mean_cost_xptr()
   attr(cost_xptr, "fastcpd_cost_arity") <- 1L
   time_xptr <- system.time(
-    result_xptr <- fastcpd(
+    result_xptr <- detect(
       ~ . - 1, data.frame(x = data), family = "custom",
       cost = cost_xptr, beta = beta_val, cost_adjustment = NULL
     )

@@ -4,6 +4,6 @@ data <- matrix(c(
   rnorm(400, mean = 50, sd = 10),
   rnorm(300, mean = 2, sd = 10)
 ))
-system.time(result <- fastcpd.mean(data))
+system.time(result <- detect_mean(data))
 summary(result)
 plot(result)

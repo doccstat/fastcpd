@@ -22,11 +22,10 @@ navbar:
 reference:
   - title: Main function
     desc: >
-      All implementation of fastcpd is unified into one single function
-      `fastcpd()`.
+      All implementations are unified behind `detect()`.
     contents:
-      - fastcpd
-      - fastcpd_family
+      - detect
+      - detect_family
 
   - title: Wrapper functions
     desc: >
@@ -34,37 +33,37 @@ reference:
 
   - subtitle: Time series
     desc: >
-      `fastcpd_ts()` and `fastcpd.ts()` are the main functions for time series
-      data (also wrapper functions of `fastcpd()`).
+      `detect_time_series()` is the main convenience function for time series
+      data and delegates to `detect()`.
     contents:
-      - fastcpd.ar
-      - fastcpd.arima
-      - fastcpd.arma
-      - fastcpd.garch
-      - fastcpd.ts
-      - fastcpd.var
+      - detect_ar
+      - detect_arima
+      - detect_arma
+      - detect_garch
+      - detect_time_series
+      - detect_var
 
   - subtitle: Unlabeled data
     desc: >
       Used for data without response variables, for example, mean change and
       variance change.
     contents:
-      - fastcpd.exponential
-      - fastcpd.kcp
-      - fastcpd.mean
-      - fastcpd.rank
-      - fastcpd.variance
-      - fastcpd.meanvariance
+      - detect_exponential
+      - detect_kernel
+      - detect_mean
+      - detect_rank
+      - detect_variance
+      - detect_meanvariance
 
   - subtitle: Regression data
     desc: >
       Detect change points in the coefficients of regression-type data.
     contents:
-      - fastcpd.binomial
-      - fastcpd.lasso
-      - fastcpd.lm
-      - fastcpd.poisson
-      - fastcpd.quantile
+      - detect_binomial
+      - detect_lasso
+      - detect_lm
+      - detect_poisson
+      - detect_quantile
 
   - title: Utility functions
     desc: >
@@ -73,15 +72,17 @@ reference:
 
   - subtitle: Variance estimation
     contents:
-      - variance.arma
-      - variance.lm
-      - variance.mean
-      - variance.median
+      - estimate_variance
+      - estimate_variance_arma
+      - estimate_variance_linear_regression
+      - estimate_variance_mean
+      - estimate_variance_median
 
   - subtitle: Class methods
     contents:
       - confint.fastcpd
       - plot.fastcpd
+      - plot.fastcpd_confint
       - print.fastcpd
       - show.fastcpd
       - summary.fastcpd
@@ -99,7 +100,7 @@ reference:
 
   - title: Main class
     desc: >
-      The results of `fastcpd()` will be stored in the class `fastcpd` with
+      The results of `detect()` are stored in the class `fastcpd` with
       accompanied several utility functions.
     contents:
       - fastcpd-class

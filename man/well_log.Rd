@@ -20,16 +20,16 @@ papers obtained from Alan Turing Institute GitHub repository and licensed
 under the MIT license.
 }
 \examples{
-result <- fastcpd.mean(well_log, trim = 0.001)
+result <- detect_mean(well_log, trim = 0.001)
 summary(result)
 plot(result)
 \donttest{
 if (requireNamespace("matrixStats", quietly = TRUE)) {
-  sigma2 <- variance.median(well_log)
+  sigma2 <- estimate_variance_median(well_log)
   median_loss <- function(data) {
     sum(abs(data - matrixStats::colMedians(data))) / sqrt(sigma2) / 2
   }
-  result <- fastcpd(
+  result <- detect(
     formula = ~ x - 1,
     data = cbind.data.frame(x = well_log),
     cost = median_loss,

@@ -67,11 +67,11 @@ Affymetrix HG-U95A and HG-U95Av2 microarrays
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  result <- fastcpd.mean(transcriptome$"10", trim = 0.005)
+  result <- detect_mean(transcriptome$"10", trim = 0.005)
   summary(result)
   plot(result)
 
-  result_all <- fastcpd.mean(
+  result_all <- detect_mean(
     transcriptome,
     beta = (ncol(transcriptome) + 1) * log(nrow(transcriptome)) / 2 * 5,
     trim = 0

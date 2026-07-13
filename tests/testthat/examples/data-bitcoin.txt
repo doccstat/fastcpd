@@ -4,7 +4,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
     ggplot2::geom_line()
   print(p)
 
-  result <- suppressWarnings(fastcpd.garch(
+  result <- suppressWarnings(detect_garch(
     diff(log(bitcoin$price[600:900])), c(1, 1),
     beta = "BIC", cost_adjustment = "BIC"
   ))

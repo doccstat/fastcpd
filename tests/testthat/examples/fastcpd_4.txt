@@ -19,14 +19,14 @@ if (requireNamespace("mvtnorm", quietly = TRUE)) {
     x[321:n, ] %*% theta_0[4, ] + rnorm(160, 0, 1)
   )
   small_lasso_data <- cbind.data.frame(y, x)
-  result_no_vp <- fastcpd.lasso(
+  result_no_vp <- detect_lasso(
     small_lasso_data,
     beta = "BIC",
     cost_adjustment = NULL,
     pruning_coef = 0
   )
   summary(result_no_vp)
-  result_20_vp <- fastcpd.lasso(
+  result_20_vp <- detect_lasso(
     small_lasso_data,
     beta = "BIC",
     cost_adjustment = NULL,

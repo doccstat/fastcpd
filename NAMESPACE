@@ -2,6 +2,7 @@
 
 S3method(confint,fastcpd)
 S3method(plot,fastcpd)
+S3method(plot,fastcpd_confint)
 S3method(print,fastcpd)
 S3method(show,fastcpd)
 S3method(summary,fastcpd)

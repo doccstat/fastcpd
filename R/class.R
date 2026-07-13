@@ -1,7 +1,7 @@
-#' @title An S4 class to store the output created with [fastcpd()]
-#' @description This S4 class stores the output from [fastcpd()] and
-#' [fastcpd.family]. A fastcpd object consist
-#' of several slots including the call to [fastcpd()], the data used, the
+#' @title An S4 class to store the output created with [detect()]
+#' @description This S4 class stores the output from [detect()] and
+#' [detect_family]. A fastcpd object consist
+#' of several slots including the call to [detect()], the data used, the
 #' family of the model, the change points, the cost values, the residuals, the
 #' estimated parameters and a boolean indicating whether the model was fitted
 #' with only change points or with change points and parameters, which you can
@@ -16,7 +16,7 @@
 #' Used only for built-in families.
 #' @slot thetas The estimated parameters for each segment. Used only for
 #' built-in families.
-#' @slot cp_only A boolean indicating whether [fastcpd()] was run to return
+#' @slot cp_only A boolean indicating whether [detect()] was run to return
 #' only the change points or the change points with the estimated parameters
 #' and cost values for each segment.
 #' @md
