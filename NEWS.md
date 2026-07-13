@@ -1,5 +1,8 @@
 # fastcpd 1.1.3
 
+*   Publish language-specific source projections at `fastcpd-r`,
+    `fastcpd-py`, and `fastcpd-cpp`, with the combined source maintained in
+    the private Depot monorepo.
 *   Add `confint.fastcpd()` for confidence intervals on change-point
     locations and fitted segment parameters, with bootstrap, profile, and
     Wald methods where supported.
