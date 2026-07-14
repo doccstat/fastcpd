@@ -1,5 +1,19 @@
 include_guard(GLOBAL)
 
+# Abseil inspects the active language standard while its CMake project is
+# configured, before fastcpd's target-level compile features are applied.
+# Declare the shared standard here so AppleClang and MSVC do not fall back to
+# their pre-C++17 defaults.
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Keep the population-only FetchContent calls compatible with newer CMake
+# releases until their declarations are migrated to MakeAvailable semantics.
+if(POLICY CMP0169)
+  cmake_policy(SET CMP0169 OLD)
+endif()
+
 set(FASTCPD_ARMADILLO_INCLUDE_DIR "" CACHE PATH
   "Optional Armadillo include directory for no-wrapper builds")
 
