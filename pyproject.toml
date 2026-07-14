@@ -1,18 +1,27 @@
+[build-system]
+requires = [
+    "numpy>=2.0.3",
+    "pybind11>=2.13,<3",
+    "scikit-build-core>=0.11,<0.12",
+]
+build-backend = "scikit_build_core.build"
+
 [project]
 name = "fastcpd"
-description="A Python package for performing fast change point detection."
+description = "A Python package for performing fast change point detection."
 dynamic = ["version"]
 authors = [
-    {name="Xingchi Li", email="anthony.li.stat.tamu.edu@lixingchi.com"},
-    {name="Xianyang Zhang", email="zhangxiany@stat.tamu.edu"},
+    {name = "Xingchi Li", email = "anthony.li.stat.tamu.edu@lixingchi.com"},
+    {name = "Xianyang Zhang", email = "zhangxiany@stat.tamu.edu"},
+]
+maintainers = [
+    {name = "Xingchi Li", email = "anthony.li.stat.tamu.edu@lixingchi.com"},
 ]
 requires-python = ">=3.10"
-readme = "README.md"
-
-maintainers = [
-    {name="Xingchi Li", email="anthony.li.stat.tamu.edu@lixingchi.com"},
-]
-
+dependencies = ["numpy>=2.0.3"]
+readme = "python/README.md"
+license = "Apache-2.0"
+license-files = ["LICEN[CS]E*"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Science/Research",
@@ -23,30 +32,92 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: R",
     "Programming Language :: C++",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Topic :: Software Development :: Libraries",
 ]
 
-license = "Apache-2.0"
-license-files = ["LICEN[CS]E*"]
+[project.urls]
+Documentation = "https://x2r.io/fastcpd/python/"
+Repository = "https://github.com/doccstat/fastcpd-py"
 
-
-[tool.setuptools.dynamic]
-version = {attr = "fastcpd.__version__"}
-
-
-[build-system]
-requires = [
-    "numpy>=2.0.3",
-    "build",
-    "packaging",
-    "pytest",
-    "setuptools",
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+build-dir = "build/python/{wheel_tag}"
+wheel.packages = []
+install.components = ["python"]
+cmake.source-dir = "python"
+sdist.include = [
+    "/python/CMakeLists.txt",
+    "/python/__init__.py",
+    "/python/confidence.py",
+    "/python/py.typed",
+    "/python/pybind.cc",
+    "/python/README.md",
+    "/python/segmentation.py",
+    "/python/variance_estimation.py",
+    "/src/standalone/**",
+    "/src/families/**",
+    "/src/fastcpd_family.h",
+    "/src/fastcpd_garch.h",
+    "/src/fastcpd_glm.h",
+    "/src/fastcpd_optim.h",
+    "/src/fastcpd_progress.h",
+    "/src/fastcpd_template.h",
+    "/tests/test_fastcpd.py",
+    "/LICENSE.md",
+]
+sdist.exclude = [
+    ".Rbuildignore",
+    ".covrignore",
+    ".github/**",
+    ".gitignore",
+    ".lintr",
+    ".pytest_cache/**",
+    "AGENTS.md",
+    "CMakeLists.txt",
+    "DESCRIPTION",
+    "NAMESPACE",
+    "NEWS.md",
+    "R/**",
+    "README.md",
+    "README.Rmd",
+    "_pkgdown.yml",
+    "bazel-*",
+    "bazel-*/**",
+    "build/**",
+    "ci/**",
+    "cmake/**",
+    "configure",
+    "configure.win",
+    "cran-comments.md",
+    "data/**",
+    "data-raw/**",
+    "docs/**",
+    "examples/**",
+    "inst/**",
+    "man/**",
+    "pkgdown/**",
+    "python/__pycache__/**",
+    "shiny/**",
+    "src/.gitignore",
+    "src/*.cc",
+    "src/Makevars*",
+    "src/RcppExports.cpp",
+    "src/codegen/**",
+    "src/fastcpd_impl.h",
+    "src/fastcpd_xptr.h",
+    "tests/testthat*",
+    "tests/__pycache__/**",
+    "tools/**",
+    "vignettes/**",
 ]
 
-[project.urls]
-Documentation = "https://fastcpd.xingchi.li/"
-Repository = "https://github.com/doccstat/fastcpd-py"
+[tool.scikit-build.cmake.define]
+FASTCPD_FETCH_DEPENDENCIES = "ON"
+FASTCPD_USE_ARMA_WRAPPER = "OFF"
+
+[tool.scikit-build.metadata.version]
+provider = "scikit_build_core.metadata.regex"
+input = "python/__init__.py"

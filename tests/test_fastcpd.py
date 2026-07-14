@@ -24,6 +24,18 @@ def _expit(x):
 
 class TestBasic(unittest.TestCase):
 
+    def test_shared_cpp_mean_contract(self):
+        data = concatenate((np.zeros(50), np.full(50, 5.0)))
+        result = detect_mean(
+            data,
+            beta=5.0,
+            cost_adjustment='BIC',
+            trim=0.0,
+            variance_estimation=np.eye(1),
+            cp_only=True,
+        )
+        self.assertEqual(result, [50.0])
+
     def test_unified_interface_aliases(self):
         self.assertIs(fastcpd_pkg.detect_mean, fastcpd_pkg.mean)
         self.assertIs(fastcpd_pkg.detect_kernel, fastcpd_pkg.kernel)

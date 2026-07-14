@@ -68,7 +68,7 @@ import sys as _sys
 if _sys.platform == 'win32':
     # Python 3.8+ no longer searches PATH for DLL dependencies of extension
     # modules. Register the package directory so Windows finds libopenblas.dll,
-    # which is bundled alongside interface.pyd by setup.py.
+    # which the CMake install bundles alongside interface.pyd.
     _os.add_dll_directory(_os.path.dirname(_os.path.abspath(__file__)))
 
 del _os, _sys
