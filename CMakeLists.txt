@@ -16,8 +16,8 @@ option(FASTCPD_FETCH_DEPENDENCIES
   "Fetch the C++ dependencies needed for a self-contained build" OFF)
 option(FASTCPD_INSTALL_CPP "Install the standalone C++ library" ON)
 
-include(src/standalone/cmake/FastcpdDependencies.cmake)
-include(src/standalone/cmake/FastcpdTarget.cmake)
+include(cmake/FastcpdDependencies.cmake)
+include(cmake/FastcpdTarget.cmake)
 
 if(FASTCPD_BUILD_EXAMPLES)
   add_executable(fastcpd_cpp_example examples/cpp/simple.cc)
@@ -30,7 +30,7 @@ if(FASTCPD_INSTALL_CPP)
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-  install(DIRECTORY src/standalone/include/
+  install(DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
   write_basic_package_version_file(
