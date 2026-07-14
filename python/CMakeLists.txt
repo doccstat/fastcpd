@@ -11,8 +11,8 @@ include(GNUInstallDirs)
 option(FASTCPD_FETCH_DEPENDENCIES
   "Fetch the C++ dependencies needed for a self-contained build" ON)
 
-include(../src/standalone/cmake/FastcpdDependencies.cmake)
-include(../src/standalone/cmake/FastcpdTarget.cmake)
+include(../cmake/FastcpdDependencies.cmake)
+include(../cmake/FastcpdTarget.cmake)
 
 set(PYBIND11_FINDPYTHON ON)
 find_package(Python 3.10 COMPONENTS Interpreter Development.Module REQUIRED)
