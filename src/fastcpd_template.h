@@ -26,6 +26,10 @@
 namespace fastcpd {
 namespace classes {
 
+// C++17 has no standard math constant for log2(e), and MSVC does not expose
+// the non-standard M_E macro by default.
+constexpr double kLog2E = 1.4426950408889634074;
+
 // Cost-function storage, conditionally compiled out for PELT-only families.
 // SenFunctions<true>  — empty struct; empty-base optimisation gives it 0 bytes.
 // SenFunctions<false> — holds all four std::function members (~160 bytes).
@@ -325,7 +329,7 @@ double Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kN
   } else if constexpr (kCostAdj == CostAdjustment::kMBIC) {
     return parameters_count_ * std::log(nrows) / 2.0;
   } else {  // kMDL
-    return parameters_count_ * std::log(nrows) / 2.0 * std::log2(M_E);
+    return parameters_count_ * std::log(nrows) / 2.0 * kLog2E;
   }
 }
 
@@ -363,7 +367,7 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
     result_value_ = FamilyPolicy::GetNllSen(this, segment_start, segment_end, theta_);
   }
   if constexpr (kCostAdj == CostAdjustment::kMDL) {
-    result_value_ = result_value_ * std::log2(M_E);
+    result_value_ = result_value_ * kLog2E;
   }
   result_value_ += GetCostAdjustmentValue(segment_end - segment_start + 1);
 }
@@ -460,7 +464,7 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
     // the compiler keeps it in a register without a store-reload round trip.
     result_value_ = FamilyPolicy::template GetNllPeltValueFast<kNDims>(this, segment_start, segment_end);
     if constexpr (kCostAdj == CostAdjustment::kMDL) {
-      result_value_ *= std::log2(M_E);
+      result_value_ *= kLog2E;
     }
     result_value_ += GetCostAdjustmentValue(segment_end - segment_start + 1);
   } else {
@@ -777,7 +781,7 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
       } else if constexpr (kCostAdj == CostAdjustment::kMDL) {
         nll = (nll + static_cast<double>(parameters_count_) *
                          log_segment_length / 2.0) *
-              std::log2(M_E);
+              kLog2E;
       }
       candidates_ptr[i] = objfn_ptr[s] + nll + beta_;
     };
@@ -791,7 +795,7 @@ void Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDi
       } else if constexpr (kCostAdj == CostAdjustment::kMDL) {
         nll = (nll + static_cast<double>(parameters_count_) *
                          log_segment_length / 2.0) *
-              std::log2(M_E);
+              kLog2E;
       }
       candidates_ptr[i] = objfn_ptr[s] + nll + beta_;
     };
