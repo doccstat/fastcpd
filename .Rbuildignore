@@ -35,7 +35,6 @@
 ^src/Makevars\.abseil$
 ^src/libabsl\.a$
 ^src/absl_objs$
-^src/standalone$
 ^gen_package$
 
 # Python build artefacts.
