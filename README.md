@@ -75,14 +75,6 @@ print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 
 <details close>
 <summary>
-Banned by xingchi.li and x2r.io?
-</summary>
-
-Use fastcpd.xingchi.li.
-
-</details>
-<details close>
-<summary>
 I countered problems related to gfortran on Mac OSX or Linux!
 </summary>
 

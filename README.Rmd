@@ -132,14 +132,6 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 
 <details close>
 
-<summary>Banned by xingchi.li and x2r.io?</summary>
-
-Use fastcpd.xingchi.li.
-
-</details>
-
-<details close>
-
 <summary>I countered problems related to gfortran on Mac OSX or Linux!</summary>
 
 The package should be able to install on Mac and any Linux distribution without any problems if all the
