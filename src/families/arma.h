@@ -52,7 +52,7 @@ class ArmaFamily : public BaseFamily {
       double const n_eff = static_cast<double>(seg_len - p);
       double const sigma2 = std::max(arma::dot(res, res) / n_eff, 1e-10);
       instance->result_value_ =
-          n_eff / 2.0 * (std::log(2.0 * M_PI) + std::log(sigma2) + 1.0);
+          n_eff / 2.0 * (kLogTwoPi + std::log(sigma2) + 1.0);
       instance->result_coefficients_ = arma::zeros<arma::colvec>(n_params);
       instance->result_coefficients_.rows(0, p - 1) = phi;
       instance->result_coefficients_(n_params - 1) = sigma2;
@@ -160,7 +160,7 @@ class ArmaFamily : public BaseFamily {
       }
       double const s2 = sv2f / seg_len;
       if (s2 <= 0.0 || !std::isfinite(s2)) return 1e10;
-      return 0.5 * seg_len * (1.0 + std::log(2.0 * M_PI) + std::log(s2))
+      return 0.5 * seg_len * (1.0 + kLogTwoPi + std::log(s2))
              + 0.5 * slF;
     };
 
@@ -322,7 +322,7 @@ class ArmaFamily : public BaseFamily {
                          arma::dot(reversed_theta.rows(1, instance->order_(1)),
                                    variance_term.rows(i - instance->order_(1), i - 1));
     }
-    return (std::log(2.0 * M_PI) + std::log(theta(arma::sum(instance->order_)))) *
+    return (kLogTwoPi + std::log(theta(arma::sum(instance->order_)))) *
                (data_segment.n_rows - 2) / 2.0 +
            arma::dot(variance_term, variance_term) / 2.0 / theta(arma::sum(instance->order_));
   }
