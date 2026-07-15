@@ -21,6 +21,10 @@ class Fastcpd;
 
 namespace families {
 
+// C++17 has no standard math constants, and MSVC does not expose M_PI by
+// default. All Gaussian likelihoods use log(2*pi), so store it directly.
+constexpr double kLogTwoPi = 1.8378770664093454836;
+
 struct BaseFamily {
   // True for families that never use sequential gradient descent (SEN).
   // Eliminates all SEN-related code paths at compile time.
