@@ -10,6 +10,11 @@ add_library(fastcpd::fastcpd ALIAS fastcpd)
 set_target_properties(fastcpd PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_compile_features(fastcpd PUBLIC cxx_std_17)
 target_compile_definitions(fastcpd PRIVATE NO_RCPP)
+if(MSVC)
+  # fastcpd.cc instantiates every family through the shared template core and
+  # can exceed the default COFF section limit in optimized Windows builds.
+  target_compile_options(fastcpd PRIVATE /bigobj)
+endif()
 target_include_directories(fastcpd
   PUBLIC
     $<BUILD_INTERFACE:${_fastcpd_root_dir}/include>
