@@ -8,6 +8,8 @@
     Wald methods where supported.
 *   Add Python confidence-interval helpers via `fastcpd.confint()` and
     `CpdResult.confint()`.
+*   Fix WebAssembly builds by treating the used Abseil facilities as
+    header-only instead of linking the host platform's static Abseil archive.
 
 # fastcpd 1.1.2
 
