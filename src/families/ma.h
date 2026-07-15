@@ -124,7 +124,7 @@ class MaFamily : public BaseFamily {
       }
       double const s2 = sv2f / seg_len;
       if (s2 <= 0.0 || !std::isfinite(s2)) return 1e10;
-      return 0.5 * seg_len * (1.0 + std::log(2.0 * M_PI) + std::log(s2))
+      return 0.5 * seg_len * (1.0 + kLogTwoPi + std::log(s2))
              + 0.5 * slF;
     };
 
@@ -272,7 +272,7 @@ class MaFamily : public BaseFamily {
           data_segment(i, 0) -
           arma::dot(reversed_theta.rows(1, q), variance_term.rows(i - q, i - 1));
     }
-    return (std::log(2.0 * M_PI) + std::log(theta(q))) *
+    return (kLogTwoPi + std::log(theta(q))) *
                (data_segment.n_rows - 2) / 2.0 +
            arma::dot(variance_term, variance_term) / 2.0 / theta(q);
   }

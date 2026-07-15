@@ -95,7 +95,7 @@ struct MgaussianFamily : BaseFamily {
     solver->result_residuals_ = y - x * coefficients;
     // Use precomputed log|Σ| to avoid calling log_det_sympd per segment.
     double value =
-        static_cast<double>(q) * std::log(2.0 * M_PI) +
+        static_cast<double>(q) * kLogTwoPi +
         solver->variance_log_det_;
     value *= static_cast<double>(data_segment.n_rows);
     value += arma::trace(arma::solve(solver->variance_estimate_,
@@ -168,7 +168,7 @@ struct MgaussianFamily : BaseFamily {
     arma::mat const rss = yy - xy.t() * b;
 
     return nd / 2.0 *
-               (static_cast<double>(q) * std::log(2.0 * M_PI) +
+               (static_cast<double>(q) * kLogTwoPi +
                 solver->variance_log_det_) +
            arma::trace(arma::solve(solver->variance_estimate_, rss)) / 2.0;
   }
