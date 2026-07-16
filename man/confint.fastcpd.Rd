@@ -98,10 +98,7 @@ arima_large <- rep(c(2, -2), length.out = 41)
 arima_data <- c(0, cumsum(c(arima_small, arima_large)))
 arima_result <- detect_arima(
   arima_data,
-  order = c(0, 1, 0),
-  beta = 20,
-  cost_adjustment = "BIC",
-  segment_count = 2
+  order = c(0, 1, 0)
 )
 arima_profile_interval <- confint(
   arima_result,
