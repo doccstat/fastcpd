@@ -200,6 +200,9 @@
 #' current segment. This parameter is only used for the \code{"glm"} families.
 #' @param ... Other parameters for specific models.
 #' \itemize{
+#' \item \code{include.mean} is retained for call compatibility in ARIMA
+#' models. It defaults to \code{FALSE}; \code{TRUE} is unsupported because R
+#' and Python share a zero-mean native ARMA likelihood.
 #' \item \code{show.progress} is used to control the progress bar. By default
 #' no progress bar is shown. Set \code{show.progress = TRUE} to display a
 #' tqdm-format progress bar on stderr showing PELT timestep progress.
@@ -338,8 +341,12 @@ detect <- function(  # nolint: cyclomatic complexity
   }
 
   # Check the parameters passed in the ellipsis.
+  include_mean <- FALSE
   p_response <- get_p_response(family, y, data_)
   r_progress <- FALSE
+  if (methods::hasArg("include.mean")) {
+    include_mean <- eval.parent(match.call()[["include.mean"]])
+  }
   if (methods::hasArg("p.response")) {
     p_response <- eval.parent(match.call()[["p.response"]])
   }
@@ -443,6 +450,17 @@ detect <- function(  # nolint: cyclomatic complexity
     p <- sum(order) + 1
     fastcpd_family <- family
   } else if (family == "arima") {
+    stopifnot(
+      "`include.mean` must be a single non-missing logical value." =
+        is.logical(include_mean) && length(include_mean) == 1 &&
+          !is.na(include_mean)
+    )
+    if (include_mean) {
+      stop(
+        "`include.mean = TRUE` is not supported by the unified ARIMA ",
+        "likelihood; use the default `FALSE`."
+      )
+    }
     p <- sum(order[-2]) + 1
     if (order[2] == 0) {
       native_order <- order[c(1, 3)]
@@ -656,11 +674,9 @@ fastcpd.ar <- detect_ar  # nolint: Conventional R function style
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A vector of length three specifying the order of the ARIMA
 #' model.
-#' @param include.mean Must be \code{FALSE}. The unified R/Python likelihood
-#'   is a zero-mean ARMA likelihood applied after differencing each candidate
-#'   segment independently.
 #' @param ... Other arguments passed to [detect()], for example,
-#' \code{segment_count}.
+#' \code{segment_count}. The ARIMA-specific \code{include.mean} option is
+#' accepted here, defaults to \code{FALSE}, and must remain \code{FALSE}.
 #' @return A [fastcpd-class] object.
 #' @description [detect_arima()] and [fastcpd.arima()] are
 #' wrapper functions of [detect()] to find change points in
@@ -678,24 +694,7 @@ fastcpd.ar <- detect_ar  # nolint: Conventional R function style
 #' @md
 #' @rdname detect_arima
 #' @export
-detect_arima <- function(
-  data,
-  order = c(1, 1, 0),
-  include.mean = FALSE,
-  ...
-) {
-  stopifnot(
-    "`include.mean` must be a single non-missing logical value." =
-      is.logical(include.mean) && length(include.mean) == 1 &&
-        !is.na(include.mean)
-  )
-  if (include.mean) {
-    stop(
-      "`include.mean = TRUE` is not supported by the unified ARIMA ",
-      "likelihood; use the default `FALSE`."
-    )
-  }
-
+detect_arima <- function(data, order = c(1, 1, 0), ...) {
   result <- detect(
     formula = ~ . - 1,
     data = data.frame(x = c(data)),

@@ -7,11 +7,11 @@
 \title{Find change points efficiently in
 ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models}
 \usage{
-detect_arima(data, order = c(1, 1, 0), include.mean = FALSE, ...)
+detect_arima(data, order = c(1, 1, 0), ...)
 
-fastcpd_arima(data, order = c(1, 1, 0), include.mean = FALSE, ...)
+fastcpd_arima(data, order = c(1, 1, 0), ...)
 
-fastcpd.arima(data, order = c(1, 1, 0), include.mean = FALSE, ...)
+fastcpd.arima(data, order = c(1, 1, 0), ...)
 }
 \arguments{
 \item{data}{A numeric vector, a matrix, a data frame or a time series object.}
@@ -19,12 +19,9 @@ fastcpd.arima(data, order = c(1, 1, 0), include.mean = FALSE, ...)
 \item{order}{A vector of length three specifying the order of the ARIMA
 model.}
 
-\item{include.mean}{Must be \code{FALSE}. The unified R/Python likelihood
-is a zero-mean ARMA likelihood applied after differencing each candidate
-segment independently.}
-
 \item{...}{Other arguments passed to \code{\link[=detect]{detect()}}, for example,
-\code{segment_count}.}
+\code{segment_count}. The ARIMA-specific \code{include.mean} option is
+accepted here, defaults to \code{FALSE}, and must remain \code{FALSE}.}
 }
 \value{
 A \link[=fastcpd-class]{fastcpd} object.
@@ -48,10 +45,7 @@ large_increments <- rep(c(2, -2), length.out = 41)
 x <- c(0, cumsum(c(small_increments, large_increments)))
 result <- detect_arima(
   x,
-  order = c(0, 1, 0),
-  beta = 20,
-  cost_adjustment = "BIC",
-  segment_count = 2
+  order = c(0, 1, 0)
 )
 summary(result)
 plot(result)

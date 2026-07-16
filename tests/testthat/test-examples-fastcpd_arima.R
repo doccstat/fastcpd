@@ -28,17 +28,24 @@ testthat::test_that(
       detect_arima(x, c(0, 1, 0), include.mean = TRUE),
       "include.mean = TRUE"
     )
-    testthat::expect_identical(
-      formals(detect_arima)[["include.mean"]],
-      FALSE
+    testthat::expect_error(
+      detect(
+        formula = ~ . - 1,
+        data = data.frame(x = x),
+        family = "arima",
+        order = c(0, 1, 0),
+        include.mean = TRUE
+      ),
+      "include.mean = TRUE"
     )
-    testthat::expect_identical(
-      formals(fastcpd_arima)[["include.mean"]],
-      FALSE
+    testthat::expect_false(
+      "include.mean" %in% names(formals(detect_arima))
     )
-    testthat::expect_identical(
-      formals(fastcpd.arima)[["include.mean"]],
-      FALSE
+    testthat::expect_false(
+      "include.mean" %in% names(formals(fastcpd_arima))
+    )
+    testthat::expect_false(
+      "include.mean" %in% names(formals(fastcpd.arima))
     )
   }
 )
