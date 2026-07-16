@@ -1,4 +1,4 @@
-# fastcpd 1.1.3
+# fastcpd 1.2.0
 
 *   Publish language-specific source projections at `fastcpd-r`,
     `fastcpd-py`, and `fastcpd-cpp`, with the combined source maintained in
