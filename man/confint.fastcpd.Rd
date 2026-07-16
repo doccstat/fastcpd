@@ -90,4 +90,24 @@ result <- detect_mean(well_log, trim = 0.001, variance_estimation = sigma2)
 
 variance_result <- detect_variance(well_log)
 # Wald intervals are not available for variance-family fits.
+
+# ARIMA profile intervals use the same segment-local native likelihood as the
+# detector rather than a separate stats::arima refit.
+arima_small <- rep(c(0.1, -0.1), 20)
+arima_large <- rep(c(2, -2), length.out = 41)
+arima_data <- c(0, cumsum(c(arima_small, arima_large)))
+arima_result <- detect_arima(
+  arima_data,
+  order = c(0, 1, 0),
+  beta = 20,
+  cost_adjustment = "BIC",
+  segment_count = 2
+)
+arima_profile_interval <- confint(
+  arima_result,
+  parm = "cp",
+  method = "profile",
+  level = 0.8,
+  window = 1
+)
 }

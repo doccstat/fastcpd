@@ -4,10 +4,7 @@ large_increments <- rep(c(2, -2), length.out = 41)
 x <- c(0, cumsum(c(small_increments, large_increments)))
 result <- detect_arima(
   x,
-  order = c(0, 1, 0),
-  beta = 20,
-  cost_adjustment = "BIC",
-  segment_count = 2
+  order = c(0, 1, 0)
 )
 summary(result)
 plot(result)

@@ -9,9 +9,10 @@ testthat::test_that(
     )))
 
     testthat::expect_equal(result@cp_set, 41)
+    mbic_adjustment <- log(41) / 2
     expected_costs <- c(
-      20 * (log(2 * pi) + log(0.01) + 1),
-      20 * (log(2 * pi) + log(4) + 1)
+      20 * (log(2 * pi) + log(0.01) + 1) + mbic_adjustment,
+      20 * (log(2 * pi) + log(4) + 1) + mbic_adjustment
     )
     testthat::expect_equal(result@cost_values, expected_costs)
     testthat::expect_equal(
@@ -26,6 +27,18 @@ testthat::test_that(
     testthat::expect_error(
       detect_arima(x, c(0, 1, 0), include.mean = TRUE),
       "include.mean = TRUE"
+    )
+    testthat::expect_identical(
+      formals(detect_arima)[["include.mean"]],
+      FALSE
+    )
+    testthat::expect_identical(
+      formals(fastcpd_arima)[["include.mean"]],
+      FALSE
+    )
+    testthat::expect_identical(
+      formals(fastcpd.arima)[["include.mean"]],
+      FALSE
     )
   }
 )

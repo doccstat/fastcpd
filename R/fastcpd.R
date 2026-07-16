@@ -200,9 +200,6 @@
 #' current segment. This parameter is only used for the \code{"glm"} families.
 #' @param ... Other parameters for specific models.
 #' \itemize{
-#' \item \code{include.mean} is retained for call compatibility in ARIMA
-#' models but must be \code{FALSE}; R and Python share a zero-mean native
-#' ARMA likelihood.
 #' \item \code{show.progress} is used to control the progress bar. By default
 #' no progress bar is shown. Set \code{show.progress = TRUE} to display a
 #' tqdm-format progress bar on stderr showing PELT timestep progress.
@@ -341,12 +338,8 @@ detect <- function(  # nolint: cyclomatic complexity
   }
 
   # Check the parameters passed in the ellipsis.
-  include_mean <- FALSE
   p_response <- get_p_response(family, y, data_)
   r_progress <- FALSE
-  if (methods::hasArg("include.mean")) {
-    include_mean <- eval.parent(match.call()[["include.mean"]])
-  }
   if (methods::hasArg("p.response")) {
     p_response <- eval.parent(match.call()[["p.response"]])
   }
@@ -450,17 +443,6 @@ detect <- function(  # nolint: cyclomatic complexity
     p <- sum(order) + 1
     fastcpd_family <- family
   } else if (family == "arima") {
-    stopifnot(
-      "`include.mean` must be a single non-missing logical value." =
-        is.logical(include_mean) && length(include_mean) == 1 &&
-          !is.na(include_mean)
-    )
-    if (include_mean) {
-      stop(
-        "`include.mean = TRUE` is not supported by the unified ARIMA ",
-        "likelihood; use the default `FALSE`."
-      )
-    }
     p <- sum(order[-2]) + 1
     if (order[2] == 0) {
       native_order <- order[c(1, 3)]
@@ -702,12 +684,23 @@ detect_arima <- function(
   include.mean = FALSE,
   ...
 ) {
+  stopifnot(
+    "`include.mean` must be a single non-missing logical value." =
+      is.logical(include.mean) && length(include.mean) == 1 &&
+        !is.na(include.mean)
+  )
+  if (include.mean) {
+    stop(
+      "`include.mean = TRUE` is not supported by the unified ARIMA ",
+      "likelihood; use the default `FALSE`."
+    )
+  }
+
   result <- detect(
     formula = ~ . - 1,
     data = data.frame(x = c(data)),
     family = "arima",
     order = order,
-    include.mean = include.mean,
     ...
   )
   result@call <- match.call()
@@ -1278,63 +1271,6 @@ fastcpd_rank <- detect_rank
 #' @rdname detect_rank
 #' @export
 fastcpd.rank <- detect_rank  # nolint: Conventional R function style
-
-#' @title Find change points efficiently in time series data
-#' @aliases fastcpd.ts
-#' @param data A numeric vector, a matrix, a data frame or a time series object.
-#' @param family A character string specifying the family of the time series.
-#' The value should be one of \code{"ar"}, \code{"var"}, \code{"arima"} or
-#' \code{"garch"}.
-#' @param order A positive integer or a vector of length less than four
-#' specifying the order of the time series. Possible combinations with
-#' \code{family} are:
-#' \itemize{
-#' \item \code{"ar"}, NUMERIC(1): AR(\eqn{p}) model using linear regression.
-#' \item \code{"var"}, NUMERIC(1): VAR(\eqn{p}) model using linear regression.
-#' \item \code{"arima"}, NUMERIC(3): ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model
-#'   using segment-local differencing and the shared native ARMA likelihood.
-#' \item \code{"garch"}, NUMERIC(2): GARCH(\eqn{p}, \eqn{q}) model.
-#' }
-#' @param ... Other arguments passed to [detect()], for example,
-#' \code{segment_count}. For ARIMA models, \code{include.mean} must remain
-#' \code{FALSE} so the shared zero-mean R/Python likelihood is used.
-#' @return A [fastcpd-class] object.
-#' @description [fastcpd_ts()] and [fastcpd.ts()] are compatibility wrapper
-#' functions for [detect()] to find change points in time series data. New code
-#' should use a family-specific wrapper such as [detect_ar()] or call [detect()]
-#' directly. Like [detect()], it accepts the time-series families
-#' \code{"ar"}, \code{"var"}, \code{"arma"}, \code{"arima"}, and
-#' \code{"garch"}.
-#' @example tests/testthat/examples/fastcpd_ts.txt
-#' @seealso [detect()]
-#'
-#' @md
-#' @keywords internal
-#' @rdname fastcpd_ts
-#' @export
-fastcpd_ts <- function(data, family = NULL, order = c(0, 0, 0), ...) {
-  if (!is.null(family)) {
-    family <- tolower(family)
-  }
-
-  check_family(family, c("ar", "var", "arima", "arma", "garch"))
-  stopifnot(check_order(order, family))
-
-  # TODO(doccstat): Deal with different data types.
-  result <- detect(
-    formula = ~ . - 1,
-    data = data.frame(x = data),
-    family = family,
-    order = order,
-    ...
-  )
-  result@call <- match.call()
-  result
-}
-
-#' @rdname fastcpd_ts
-#' @export
-fastcpd.ts <- fastcpd_ts  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in VAR(\eqn{p}) models
 #' @aliases fastcpd_var fastcpd.var

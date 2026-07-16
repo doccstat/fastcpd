@@ -644,12 +644,23 @@ fastcpd_profile_cost_quantile <- function(data, tau) {
 fastcpd_profile_cost_arima <- function(data, order) {
   function(start, end) {
     segment <- data[start:end, 1, drop = TRUE]
-    tryCatch(
-      -stats::arima(
-        segment, order = order, method = "ML", include.mean = FALSE
-      )$loglik,
-      error = function(e) Inf
+    fit <- tryCatch(
+      detect_arima(
+        segment,
+        order = order,
+        beta = 1e100,
+        cost_adjustment = "BIC",
+        segment_count = 1L,
+        trim = 0,
+        cp_only = FALSE,
+        show.progress = FALSE
+      ),
+      error = function(e) NULL
     )
+    if (is.null(fit) || length(fit@cp_set) || length(fit@cost_values) != 1L) {
+      return(Inf)
+    }
+    fit@cost_values[1]
   }
 }
 

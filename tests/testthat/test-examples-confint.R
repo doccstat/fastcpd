@@ -34,5 +34,10 @@ testthat::test_that(
       confint(variance_result, parm = "theta", method = "wald"),
       "Wald intervals are not implemented"
     )
+
+    testthat::expect_equal(arima_result@cp_set, 41)
+    testthat::expect_equal(arima_profile_interval$estimate, 41)
+    testthat::expect_lte(arima_profile_interval$lower, 41)
+    testthat::expect_gte(arima_profile_interval$upper, 41)
   }
 )

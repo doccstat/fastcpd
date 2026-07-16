@@ -7,6 +7,14 @@
     no longer supported.
 *   Route pure AR `ARMA(p, 0)` calls through the same lagged Gaussian model as
     the dedicated AR wrappers in both languages.
+*   Extend Python confidence intervals to the R-supported binomial, Poisson,
+    quantile, and ARIMA profile families and binomial/Poisson Wald intervals.
+    ARIMA profile intervals in both languages now reuse the shared native
+    segment-local likelihood. Custom callback families are intentionally
+    R-only; Python continues to expose the built-in GIL-free native families.
+*   Remove the R `fastcpd_ts()` / `fastcpd.ts()` compatibility umbrella in
+    favor of `detect()` or family-specific wrappers. Python does not expose a
+    `fastcpd_ts` counterpart and continues to require the direct APIs.
 
 # fastcpd 1.2.1
 

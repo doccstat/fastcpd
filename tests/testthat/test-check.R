@@ -1,7 +1,7 @@
 testthat::test_that(
   "fastcpd.ts/fastcpd_ts", {
     testthat::expect_error(
-      fastcpd.ts(),
+      suppressWarnings(fastcpd.ts()),
       paste0(
         "The family should be one of \"ar\", \"var\", \"arima\", ",
         "\"arma\", \"garch\"."
@@ -9,7 +9,7 @@ testthat::test_that(
     )
 
     testthat::expect_error(
-      fastcpd.ts(family = "at"),
+      suppressWarnings(fastcpd.ts(family = "at")),
       paste0(
         "The family should be one of \"ar\", \"var\", \"arima\", ",
         "\"arma\", \"garch\".\n",
@@ -18,12 +18,12 @@ testthat::test_that(
     )
 
     testthat::expect_error(
-      fastcpd_ts(family = "ar", order = c(0)),
+      suppressWarnings(fastcpd_ts(family = "ar", order = c(0))),
       "The order should be a positive integer for AR family."
     )
 
     testthat::expect_error(
-      fastcpd.ts(family = "ar", order = c(-1, 0, 0)),
+      suppressWarnings(fastcpd.ts(family = "ar", order = c(-1, 0, 0))),
       paste0(
         "The first element of the order should be a positive integer ",
         "for AR family."
@@ -31,16 +31,16 @@ testthat::test_that(
     )
 
     testthat::expect_error(
-      fastcpd_ts(family = "arima", order = 1.1),
+      suppressWarnings(fastcpd_ts(family = "arima", order = 1.1)),
       "The order should be specified as a vector of length 3 for ARIMA family."
     )
 
     testthat::expect_error(
-      fastcpd_ts(
+      suppressWarnings(fastcpd_ts(
         data = matrix(NA, 1, 2),
         family = "ar",
         order = 1
-      ),
+      )),
       "Data should be a univariate time series."
     )
   }
@@ -49,7 +49,7 @@ testthat::test_that(
 testthat::test_that(
   "order should be specified as a vector of length 1 or 3", {
     testthat::expect_error(
-      fastcpd.ts(seq_len(5), "ar", rep(2, 2)),
+      suppressWarnings(fastcpd.ts(seq_len(5), "ar", rep(2, 2))),
       paste0(
         "The order should be specified as a vector of length 1 or 3 ",
         "for AR family."
@@ -61,7 +61,7 @@ testthat::test_that(
 testthat::test_that(
   "second and third elements of the order should be 0", {
     testthat::expect_error(
-      fastcpd.ts(seq_len(5), "ar", c(1, 1, 0)),
+      suppressWarnings(fastcpd.ts(seq_len(5), "ar", c(1, 1, 0))),
       paste0(
         "The second and third elements of the order should be 0 ",
         "for AR family."
@@ -73,7 +73,7 @@ testthat::test_that(
 testthat::test_that(
   "order should be specified as a single integer", {
     testthat::expect_error(
-      fastcpd.ts(seq_len(5), "var", c(1, 1)),
+      suppressWarnings(fastcpd.ts(seq_len(5), "var", c(1, 1))),
       paste0(
         "The order should be specified as a single integer ",
         "for VAR family."
@@ -174,11 +174,11 @@ testthat::test_that(
     )
 
     testthat::expect_error(
-      fastcpd.ts(
+      suppressWarnings(fastcpd.ts(
         data = seq_len(5),
         family = "ar",
         order = NULL
-      ),
+      )),
       "Please refer to the documentation for the order of the model."
     )
 

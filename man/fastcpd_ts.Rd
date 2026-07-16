@@ -5,9 +5,9 @@
 \alias{fastcpd.ts}
 \title{Find change points efficiently in time series data}
 \usage{
-fastcpd_ts(data, family = NULL, order = c(0, 0, 0), ...)
+fastcpd_ts(data, family = NULL, order = c(0, 0, 0), ..., include.mean = FALSE)
 
-fastcpd.ts(data, family = NULL, order = c(0, 0, 0), ...)
+fastcpd.ts(data, family = NULL, order = c(0, 0, 0), ..., include.mean = FALSE)
 }
 \arguments{
 \item{data}{A numeric vector, a matrix, a data frame or a time series object.}
@@ -28,17 +28,20 @@ using segment-local differencing and the shared native ARMA likelihood.
 }}
 
 \item{...}{Other arguments passed to \code{\link[=detect]{detect()}}, for example,
-\code{segment_count}. For ARIMA models, \code{include.mean} must remain
-\code{FALSE} so the shared zero-mean R/Python likelihood is used.}
+\code{segment_count}.}
+
+\item{include.mean}{Must be \code{FALSE} for ARIMA models. The unified
+R/Python likelihood is a zero-mean ARMA likelihood applied after
+differencing each candidate segment independently.}
 }
 \value{
 A \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
-\code{\link[=fastcpd_ts]{fastcpd_ts()}} and \code{\link[=fastcpd.ts]{fastcpd.ts()}} are compatibility wrapper
-functions for \code{\link[=detect]{detect()}} to find change points in time series data. New code
+\code{\link[=fastcpd_ts]{fastcpd_ts()}} and \code{\link[=fastcpd.ts]{fastcpd.ts()}} are deprecated compatibility
+wrappers for \code{\link[=detect]{detect()}} to find change points in time series data. New code
 should use a family-specific wrapper such as \code{\link[=detect_ar]{detect_ar()}} or call \code{\link[=detect]{detect()}}
-directly. Like \code{\link[=detect]{detect()}}, it accepts the time-series families
+directly. Like \code{\link[=detect]{detect()}}, they accept the time-series families
 \code{"ar"}, \code{"var"}, \code{"arma"}, \code{"arima"}, and
 \code{"garch"}.
 }
@@ -125,6 +128,7 @@ roots_segment3 <- get_roots_data(theta1_3, theta2_3, "Segment 3")
 
 (roots_data <- rbind(roots_segment1, roots_segment2, roots_segment3))
 
+# Deprecated compatibility call; new code should use detect_arma() here.
 result <- fastcpd_ts(
   y,
   "arma",
