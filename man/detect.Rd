@@ -285,9 +285,9 @@ current segment. This parameter is only used for the \code{"glm"} families.}
 
 \item{...}{Other parameters for specific models.
 \itemize{
-\item \code{include.mean} is used to determine if a mean/intercept term
-should be included in the ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) or
-GARCH(\eqn{p}, \eqn{q}) models.
+\item \code{include.mean} is retained for call compatibility in ARIMA
+models but must be \code{FALSE}; R and Python share a zero-mean native
+ARMA likelihood.
 \item \code{show.progress} is used to control the progress bar. By default
 no progress bar is shown. Set \code{show.progress = TRUE} to display a
 tqdm-format progress bar on stderr showing PELT timestep progress.

@@ -23,14 +23,13 @@ specifying the order of the time series. Possible combinations with
 \item \code{"ar"}, NUMERIC(1): AR(\eqn{p}) model using linear regression.
 \item \code{"var"}, NUMERIC(1): VAR(\eqn{p}) model using linear regression.
 \item \code{"arima"}, NUMERIC(3): ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model
-using \code{\link[stats:arima]{stats::arima()}}.
+using segment-local differencing and the shared native ARMA likelihood.
 \item \code{"garch"}, NUMERIC(2): GARCH(\eqn{p}, \eqn{q}) model.
 }}
 
 \item{...}{Other arguments passed to \code{\link[=detect]{detect()}}, for example,
-\code{segment_count}. One special argument can be passed here is
-\code{include.mean}, which is a logical value indicating whether the
-mean should be included in the model. The default value is \code{TRUE}.}
+\code{segment_count}. For ARIMA models, \code{include.mean} must remain
+\code{FALSE} so the shared zero-mean R/Python likelihood is used.}
 }
 \value{
 A \link[=fastcpd-class]{fastcpd} object.

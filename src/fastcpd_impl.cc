@@ -63,6 +63,7 @@ DECLARE_PELT(meanvariance)
 DECLARE_PELT(meanvariance_1d)
 DECLARE_PELT(garch)
 DECLARE_PELT(exponential)
+DECLARE_PELT(arima)
 DECLARE_SEGD(arma)
 DECLARE_SEGD(binomial)
 DECLARE_SEGD(custom)
@@ -140,7 +141,8 @@ Rcpp::List fastcpd_impl(
   }
   if (family == "garch")                         { DISPATCH_PELT(garch); }
   if (family == "exponential")                   { DISPATCH_PELT(exponential); }
-  if (family == "arma" || family == "arima")     { DISPATCH_SEGD(arma); }
+  if (family == "arima")                         { DISPATCH_PELT(arima); }
+  if (family == "arma")                          { DISPATCH_SEGD(arma); }
   if (family == "binomial")                      { DISPATCH_SEGD(binomial); }
   if (family == "gaussian" || family == "lm")    { DISPATCH_SEGD(gaussian); }
   if (family == "lasso")                         { DISPATCH_SEGD(lasso); }

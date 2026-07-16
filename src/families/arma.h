@@ -41,6 +41,19 @@ class ArmaFamily : public BaseFamily {
         instance->result_residuals_ = arma::mat(series);
         return;
       }
+      if (p == 0) {
+        // ARMA(0, 0): zero-mean Gaussian white noise. This is also the
+        // likelihood used for the differenced observations in
+        // ARIMA(0, d, 0).
+        double const n_eff = static_cast<double>(seg_len);
+        double const sigma2 =
+            std::max(arma::dot(series, series) / n_eff, 1e-10);
+        instance->result_value_ =
+            n_eff / 2.0 * (kLogTwoPi + std::log(sigma2) + 1.0);
+        instance->result_coefficients_ = arma::colvec{sigma2};
+        instance->result_residuals_ = arma::mat(series);
+        return;
+      }
       arma::mat X(seg_len - p, p);
       for (unsigned int j = 0; j < p; j++)
         X.col(j) = series.rows(p - j - 1, seg_len - j - 2);

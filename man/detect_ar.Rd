@@ -18,9 +18,7 @@ fastcpd.ar(data, order = 0, ...)
 \item{order}{A positive integer specifying the order of the AR model.}
 
 \item{...}{Other arguments passed to \code{\link[=detect]{detect()}}, for example,
-\code{segment_count}. One special argument can be passed here is
-\code{include.mean}, which is a logical value indicating whether the
-mean should be included in the model. The default value is \code{TRUE}.}
+\code{segment_count}.}
 }
 \value{
 A \link[=fastcpd-class]{fastcpd} object.

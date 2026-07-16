@@ -1,9 +1,9 @@
 #!/usr/bin/env Rscript
-# Code generation script: generates 17 consolidated family translation units
+# Code generation script: generates 18 consolidated family translation units
 # (one per family) from pelt.tmpl and segd.tmpl by token substitution.
 #
 # Each TU contains all variant functions for that family, reducing header
-# parsing (fastcpd_template.h + Armadillo + Rcpp) from 246x to 17x with
+# parsing (fastcpd_template.h + Armadillo + Rcpp) from 252x to 18x with
 # zero impact on generated machine code — every specialization is still a
 # distinct template instantiation with its own if-constexpr path.
 #
@@ -50,7 +50,8 @@ FAMILIES_PELT <- list(
   c("variance",     "variance",     "VarianceFamily"),
   c("meanvariance", "meanvariance", "MeanvarianceFamily"),
   c("garch",        "garch",        "GarchFamily"),
-  c("exponential",  "exponential",  "ExponentialFamily")
+  c("exponential",  "exponential",  "ExponentialFamily"),
+  c("arima",        "arima",        "ArimaFamily")
 )
 
 # p == 1 specialisations: scalar fast paths via kNDims=1.
@@ -144,10 +145,10 @@ generate_segd <- function(fam) {
 }
 
 # ---------------------------------------------------------------------------
-# Generate: 9 PELT files + 8 SEGD files = 17 files total
+# Generate: 10 PELT files + 8 SEGD files = 18 files total
 # ---------------------------------------------------------------------------
 for (fam in FAMILIES_PELT)    generate_pelt(fam, "-1")
 for (fam in FAMILIES_PELT_1D) generate_pelt(fam, "1")
 for (fam in FAMILIES_SEGD)    generate_segd(fam)
 
-cat(sprintf("Generated 17 .cc files in %s\n", out_dir))
+cat(sprintf("Generated 18 .cc files in %s\n", out_dir))

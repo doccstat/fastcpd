@@ -29,7 +29,9 @@ A \link[=fastcpd-class]{fastcpd} object.
 wrapper functions of \code{\link[=detect]{detect()}} to find change points in
 ARMA(\eqn{p}, \eqn{q}) models. The function is similar to \code{\link[=detect]{detect()}}
 except that the data is by default a one-column matrix or univariate vector
-and thus a formula is not required here.
+and thus a formula is not required here. Pure AR models (\eqn{q = 0}) use
+the same lagged Gaussian path as \code{\link[=detect_ar]{detect_ar()}}; pure MA models
+(\eqn{p = 0}) use the native MA family.
 }
 \examples{
 \donttest{

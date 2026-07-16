@@ -200,9 +200,9 @@
 #' current segment. This parameter is only used for the \code{"glm"} families.
 #' @param ... Other parameters for specific models.
 #' \itemize{
-#' \item \code{include.mean} is used to determine if a mean/intercept term
-#' should be included in the ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) or
-#' GARCH(\eqn{p}, \eqn{q}) models.
+#' \item \code{include.mean} is retained for call compatibility in ARIMA
+#' models but must be \code{FALSE}; R and Python share a zero-mean native
+#' ARMA likelihood.
 #' \item \code{show.progress} is used to control the progress bar. By default
 #' no progress bar is shown. Set \code{show.progress = TRUE} to display a
 #' tqdm-format progress bar on stderr showing PELT timestep progress.
@@ -283,7 +283,7 @@ detect <- function(  # nolint: cyclomatic complexity
       "arma",  # -> "arma"
       "ar",  # -> "gaussian"
       "var",  # -> "mgaussian"
-      "arima",  # -> "custom"
+      "arima",  # -> "arima" (segment-local differencing + native ARMA)
       "garch",  # -> "garch"
       "exponential",  # -> "exponential"
       "kcp",          # -> "mean" (random Fourier feature transform)
@@ -341,7 +341,7 @@ detect <- function(  # nolint: cyclomatic complexity
   }
 
   # Check the parameters passed in the ellipsis.
-  include_mean <- TRUE
+  include_mean <- FALSE
   p_response <- get_p_response(family, y, data_)
   r_progress <- FALSE
   if (methods::hasArg("include.mean")) {
@@ -352,6 +352,20 @@ detect <- function(  # nolint: cyclomatic complexity
   }
   if (methods::hasArg("show.progress")) {
     r_progress <- eval.parent(match.call()[["show.progress"]])
+  }
+  native_order <- order
+  index_offset <- 0L
+  make_ar_design <- function(series, ar_order) {
+    if (nrow(series) <= ar_order) {
+      stop("AR order must be smaller than the number of rows.")
+    }
+    response <- series[ar_order + seq_len(nrow(series) - ar_order), ]
+    predictors <- matrix(NA, nrow(series) - ar_order, ar_order)
+    for (order_i in seq_len(ar_order)) {
+      predictors[, order_i] <-
+        series[(ar_order - order_i) + seq_len(nrow(series) - ar_order), ]
+    }
+    cbind(response, predictors)
   }
 
   if (family %in% c("binomial", "poisson", "lasso")) {
@@ -406,12 +420,8 @@ detect <- function(  # nolint: cyclomatic complexity
   } else if (family == "ar") {
     p <- order
     fastcpd_family <- "gaussian"
-    y <- data_[p + seq_len(nrow(data_) - p), ]
-    x <- matrix(NA, nrow(data_) - p, p)
-    for (p_i in seq_len(p)) {
-      x[, p_i] <- data_[(p - p_i) + seq_len(nrow(data_) - p), ]
-    }
-    data_ <- cbind(y, x)
+    data_ <- make_ar_design(data_, p)
+    index_offset <- p
   } else if (family == "lm" && p_response > 1) {
     p <- (ncol(data_) - p_response) * p_response
     fastcpd_family <- "mgaussian"
@@ -427,24 +437,45 @@ detect <- function(  # nolint: cyclomatic complexity
         data_[(order - p_i) + seq_len(nrow(data_) - order), ]
     }
     data_ <- cbind(y, x)
+    index_offset <- order
   } else if (family == "arma" && order[1] == 0) {
     p <- sum(order) + 1
     fastcpd_family <- "ma"
+  } else if (family == "arma" && order[2] == 0) {
+    p <- order[1]
+    fastcpd_family <- "gaussian"
+    data_ <- make_ar_design(data_, p)
+    index_offset <- p
   } else if (family == "arma" && order[1] != 0) {
     p <- sum(order) + 1
     fastcpd_family <- family
   } else if (family == "arima") {
-    cost <- function(data) {
-      tryCatch(
-        expr = -stats::arima(
-          c(data), order = order, method = "ML", include.mean = include_mean
-        )$loglik,
-        error = function(e) 0
+    stopifnot(
+      "`include.mean` must be a single non-missing logical value." =
+        is.logical(include_mean) && length(include_mean) == 1 &&
+          !is.na(include_mean)
+    )
+    if (include_mean) {
+      stop(
+        "`include.mean = TRUE` is not supported by the unified ARIMA ",
+        "likelihood; use the default `FALSE`."
       )
     }
-    p <- sum(order[-2]) + 1 + include_mean
-    fastcpd_family <- "custom"
-    if (!is.null(cost) && cost_arity(cost) == 1) {
+    p <- sum(order[-2]) + 1
+    if (order[2] == 0) {
+      native_order <- order[c(1, 3)]
+      if (order[1] == 0) {
+        fastcpd_family <- "ma"
+      } else if (order[3] == 0) {
+        p <- order[1]
+        fastcpd_family <- "gaussian"
+        data_ <- make_ar_design(data_, p)
+        index_offset <- p
+      } else {
+        fastcpd_family <- "arma"
+      }
+    } else {
+      fastcpd_family <- "arima"
       vanilla_percentage <- 1
     }
   } else {
@@ -502,8 +533,9 @@ detect <- function(  # nolint: cyclomatic complexity
     }
   }
 
-  # No pruning for "lasso" and "mgaussian". Adjust the pruning coefficient for
-  # "MBIC" and "MDL".
+  # Disable pruning for families whose recursive/non-additive costs do not
+  # satisfy PELT's pruning condition. Adjust the pruning coefficient for MBIC
+  # and MDL.
   pruning_coef <- get_pruning_coef(
     methods::hasArg("pruning_coef"),
     pruning_coef,
@@ -514,7 +546,8 @@ detect <- function(  # nolint: cyclomatic complexity
 
   result <- fastcpd_impl(
     data_, beta, cost_adjustment, segment_count, trim, momentum_coef,
-    multiple_epochs, fastcpd_family, epsilon, p, order, cost_pelt, cost_sen,
+    multiple_epochs, fastcpd_family, epsilon, p, native_order, cost_pelt,
+    cost_sen,
     cost_gradient, cost_hessian, cp_only, vanilla_percentage, warm_start,
     lower, upper, line_search, sigma_, p_response, pruning_coef, r_progress
   )
@@ -522,9 +555,9 @@ detect <- function(  # nolint: cyclomatic complexity
   raw_cp_set <- c(result$raw_cp_set)
   cp_set <- c(result$cp_set)
 
-  if (family %in% c("ar", "var") && length(order) == 1) {
-    raw_cp_set <- raw_cp_set + order
-    cp_set <- cp_set + order
+  if (index_offset > 0) {
+    raw_cp_set <- raw_cp_set + index_offset
+    cp_set <- cp_set + index_offset
   }
 
   thetas <- data.frame(result$thetas)
@@ -544,25 +577,12 @@ detect <- function(  # nolint: cyclomatic complexity
 
   if (!cp_only) {
     tryCatch(
-      expr = if (family == "ar") {
-        residuals <- matrix(c(rep(NA, p), residuals))
+      expr = if (index_offset > 0 && family != "var") {
+        residuals <- matrix(c(rep(NA, index_offset), residuals))
       } else if (family == "var") {
         residuals <- rbind(
           matrix(NA, nrow = order, ncol = ncol(residuals)), residuals
         )
-      } else if (family == "arima") {
-        residuals <- matrix(NA, nrow(data))
-        segments <- c(0, cp_set, nrow(data))
-        for (segments_i in seq_len(length(segments) - 1)) {
-          segments_start <- segments[segments_i] + 1
-          segments_end <- segments[segments_i + 1]
-          residuals[segments_start:segments_end] <- stats::arima(
-            c(data[segments_start:segments_end, 1]),
-            order = order,
-            method = "ML",
-            include.mean = include_mean
-          )$residuals
-        }
       },
       error = function(e) message("Residual calculation failed.")
     )
@@ -614,9 +634,7 @@ NULL
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A positive integer specifying the order of the AR model.
 #' @param ... Other arguments passed to [detect()], for example,
-#' \code{segment_count}. One special argument can be passed here is
-#' \code{include.mean}, which is a logical value indicating whether the
-#' mean should be included in the model. The default value is \code{TRUE}.
+#' \code{segment_count}.
 #' @return A [fastcpd-class] object.
 #' @description [detect_ar()] and [fastcpd.ar()] are
 #' wrapper functions of [detect()] to find change points in
@@ -656,14 +674,19 @@ fastcpd.ar <- detect_ar  # nolint: Conventional R function style
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A vector of length three specifying the order of the ARIMA
 #' model.
+#' @param include.mean Must be \code{FALSE}. The unified R/Python likelihood
+#'   is a zero-mean ARMA likelihood applied after differencing each candidate
+#'   segment independently.
 #' @param ... Other arguments passed to [detect()], for example,
-#' \code{segment_count}. One special argument can be passed here is
-#' \code{include.mean}, which is a logical value indicating whether the
-#' mean should be included in the model. The default value is \code{TRUE}.
+#' \code{segment_count}.
 #' @return A [fastcpd-class] object.
 #' @description [detect_arima()] and [fastcpd.arima()] are
 #' wrapper functions of [detect()] to find change points in
 #' ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models.
+#' Differencing is performed independently inside each candidate segment, so
+#' no artificial difference is formed across a proposed change-point boundary.
+#' Change-point indices refer to the original, undifferenced series. When
+#' \eqn{d = 0}, this is the same model as [detect_arma()].
 #' The function is similar to [detect()]
 #' except that the data is by default a one-column matrix or univariate vector
 #' and thus a formula is not required here.
@@ -673,12 +696,18 @@ fastcpd.ar <- detect_ar  # nolint: Conventional R function style
 #' @md
 #' @rdname detect_arima
 #' @export
-detect_arima <- function(data, order = 0, ...) {
+detect_arima <- function(
+  data,
+  order = c(1, 1, 0),
+  include.mean = FALSE,
+  ...
+) {
   result <- detect(
     formula = ~ . - 1,
     data = data.frame(x = c(data)),
     family = "arima",
     order = order,
+    include.mean = include.mean,
     ...
   )
   result@call <- match.call()
@@ -705,7 +734,9 @@ fastcpd.arima <- detect_arima  # nolint: Conventional R function style
 #' wrapper functions of [detect()] to find change points in
 #' ARMA(\eqn{p}, \eqn{q}) models. The function is similar to [detect()]
 #' except that the data is by default a one-column matrix or univariate vector
-#' and thus a formula is not required here.
+#' and thus a formula is not required here. Pure AR models (\eqn{q = 0}) use
+#' the same lagged Gaussian path as [detect_ar()]; pure MA models
+#' (\eqn{p = 0}) use the native MA family.
 #' @example tests/testthat/examples/fastcpd_arma.txt
 #' @seealso [detect()]
 #'
@@ -1261,13 +1292,12 @@ fastcpd.rank <- detect_rank  # nolint: Conventional R function style
 #' \item \code{"ar"}, NUMERIC(1): AR(\eqn{p}) model using linear regression.
 #' \item \code{"var"}, NUMERIC(1): VAR(\eqn{p}) model using linear regression.
 #' \item \code{"arima"}, NUMERIC(3): ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model
-#'   using [stats::arima()].
+#'   using segment-local differencing and the shared native ARMA likelihood.
 #' \item \code{"garch"}, NUMERIC(2): GARCH(\eqn{p}, \eqn{q}) model.
 #' }
 #' @param ... Other arguments passed to [detect()], for example,
-#' \code{segment_count}. One special argument can be passed here is
-#' \code{include.mean}, which is a logical value indicating whether the
-#' mean should be included in the model. The default value is \code{TRUE}.
+#' \code{segment_count}. For ARIMA models, \code{include.mean} must remain
+#' \code{FALSE} so the shared zero-mean R/Python likelihood is used.
 #' @return A [fastcpd-class] object.
 #' @description [fastcpd_ts()] and [fastcpd.ts()] are compatibility wrapper
 #' functions for [detect()] to find change points in time series data. New code

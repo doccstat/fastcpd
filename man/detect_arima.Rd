@@ -7,11 +7,11 @@
 \title{Find change points efficiently in
 ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models}
 \usage{
-detect_arima(data, order = 0, ...)
+detect_arima(data, order = c(1, 1, 0), include.mean = FALSE, ...)
 
-fastcpd_arima(data, order = 0, ...)
+fastcpd_arima(data, order = c(1, 1, 0), include.mean = FALSE, ...)
 
-fastcpd.arima(data, order = 0, ...)
+fastcpd.arima(data, order = c(1, 1, 0), include.mean = FALSE, ...)
 }
 \arguments{
 \item{data}{A numeric vector, a matrix, a data frame or a time series object.}
@@ -19,10 +19,12 @@ fastcpd.arima(data, order = 0, ...)
 \item{order}{A vector of length three specifying the order of the ARIMA
 model.}
 
+\item{include.mean}{Must be \code{FALSE}. The unified R/Python likelihood
+is a zero-mean ARMA likelihood applied after differencing each candidate
+segment independently.}
+
 \item{...}{Other arguments passed to \code{\link[=detect]{detect()}}, for example,
-\code{segment_count}. One special argument can be passed here is
-\code{include.mean}, which is a logical value indicating whether the
-mean should be included in the model. The default value is \code{TRUE}.}
+\code{segment_count}.}
 }
 \value{
 A \link[=fastcpd-class]{fastcpd} object.
@@ -31,30 +33,25 @@ A \link[=fastcpd-class]{fastcpd} object.
 \code{\link[=detect_arima]{detect_arima()}} and \code{\link[=fastcpd.arima]{fastcpd.arima()}} are
 wrapper functions of \code{\link[=detect]{detect()}} to find change points in
 ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) models.
+Differencing is performed independently inside each candidate segment, so
+no artificial difference is formed across a proposed change-point boundary.
+Change-point indices refer to the original, undifferenced series. When
+\eqn{d = 0}, this is the same model as \code{\link[=detect_arma]{detect_arma()}}.
 The function is similar to \code{\link[=detect]{detect()}}
 except that the data is by default a one-column matrix or univariate vector
 and thus a formula is not required here.
 }
 \examples{
 \donttest{
-set.seed(1)
-n <- 801
-w <- rnorm(n + 1, 0, 3)
-dx <- rep(0, n + 1)
-x <- rep(0, n + 1)
-for (i in 1:400) {
-  dx[i + 1] <- 0.9 * dx[i] + w[i + 1] - 0.1 * w[i]
-  x[i + 1] <- x[i] + dx[i + 1]
-}
-for (i in 401:n) {
-  dx[i + 1] <- -0.6 * dx[i] + w[i + 1] + 0.3 * w[i]
-  x[i + 1] <- x[i] + dx[i + 1]
-}
+small_increments <- rep(c(0.1, -0.1), 20)
+large_increments <- rep(c(2, -2), length.out = 41)
+x <- c(0, cumsum(c(small_increments, large_increments)))
 result <- detect_arima(
-  diff(x[1 + seq_len(n)]),
-  c(1, 0, 1),
-  segment_count = 3,
-  include.mean = FALSE
+  x,
+  order = c(0, 1, 0),
+  beta = 20,
+  cost_adjustment = "BIC",
+  segment_count = 2
 )
 summary(result)
 plot(result)

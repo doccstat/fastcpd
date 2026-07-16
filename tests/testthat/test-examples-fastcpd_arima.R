@@ -8,6 +8,24 @@ testthat::test_that(
       collapse = "\n"
     )))
 
-    testthat::expect_equal(result@cp_set, 429)
+    testthat::expect_equal(result@cp_set, 41)
+    expected_costs <- c(
+      20 * (log(2 * pi) + log(0.01) + 1),
+      20 * (log(2 * pi) + log(4) + 1)
+    )
+    testthat::expect_equal(result@cost_values, expected_costs)
+    testthat::expect_equal(
+      unname(as.matrix(result@thetas)),
+      matrix(c(0.01, 4), 1)
+    )
+    testthat::expect_equal(which(is.na(result@residuals)), c(1, 42))
+    testthat::expect_equal(
+      c(result@residuals[!is.na(result@residuals)]),
+      c(small_increments, large_increments[-1])
+    )
+    testthat::expect_error(
+      detect_arima(x, c(0, 1, 0), include.mean = TRUE),
+      "include.mean = TRUE"
+    )
   }
 )

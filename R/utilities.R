@@ -156,15 +156,14 @@ get_pruning_coef <- function(
   # condition (Killick, Fearnhead & Eckley 2012, sec. 3.2): roughly, that
   # extending a segment cannot lower its optimal cost by more than a fixed
   # constant. This holds for the i.i.d.-type costs (mean/variance/regression)
-  # PELT was designed for, but not for "mgaussian"/"lasso", nor for "garch",
-  # whose likelihood is a recursive function of the whole segment: e.g. the
-  # exact MLE NLL of a length-1 segment is 0 (no recursive terms to sum), so
-  # short candidate segments can look spuriously cheap relative to the
-  # threshold and cause the eventually-optimal split point to be discarded
-  # before it is ever reconsidered. Disabling pruning keeps PELT exact
-  # (falling back to optimal partitioning) for these families.
+  # PELT was designed for, but not for "mgaussian"/"lasso", nor for recursive
+  # GARCH and segment-differenced ARIMA likelihoods. Their short candidate
+  # segments can look spuriously cheap relative to the threshold and cause the
+  # eventually-optimal split point to be discarded before it is reconsidered.
+  # Disabling pruning keeps PELT exact (falling back to optimal partitioning)
+  # for these families.
   if (!pruning_coef_is_set &&
-      (fastcpd_family %in% c("mgaussian", "lasso", "garch"))) {
+      (fastcpd_family %in% c("mgaussian", "lasso", "garch", "arima"))) {
     pruning_coef <- -Inf
   }
   if (!pruning_coef_is_set && cost_adjustment == "MBIC") {

@@ -645,7 +645,9 @@ fastcpd_profile_cost_arima <- function(data, order) {
   function(start, end) {
     segment <- data[start:end, 1, drop = TRUE]
     tryCatch(
-      -stats::arima(segment, order = order, method = "ML")$loglik,
+      -stats::arima(
+        segment, order = order, method = "ML", include.mean = FALSE
+      )$loglik,
       error = function(e) Inf
     )
   }

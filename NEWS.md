@@ -1,3 +1,13 @@
+# fastcpd 1.2.2
+
+*   Unify ARIMA detection in R and Python behind a shared native likelihood:
+    each candidate segment is differenced independently, change-point indices
+    stay in the original-series coordinate system, and `d = 0` is identical
+    to ARMA. The unified likelihood is zero-mean, so `include.mean = TRUE` is
+    no longer supported.
+*   Route pure AR `ARMA(p, 0)` calls through the same lagged Gaussian model as
+    the dedicated AR wrappers in both languages.
+
 # fastcpd 1.2.1
 
 *   Remove the redundant `detect_time_series()` / `detect_ts()` umbrella from
