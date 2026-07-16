@@ -24,6 +24,13 @@ The public API includes mean, variance, mean/variance, exponential, VAR,
 linear, lasso, binomial, Poisson, quantile, GARCH, AR, ARMA, and ARIMA change
 detection, plus rank and kernel transforms.
 
+`detect_var(data, order=p)` accepts the raw multivariate time series and
+constructs its lagged VAR design internally, matching the R interface. For an
+already-constructed response/predictor matrix, use
+`detect(data, family="mgaussian", p_response=q)` directly. The older
+`var(data, order=p, p_response=q)` form for a pre-constructed matrix remains
+accepted for compatibility.
+
 ## Native build
 
 Python packaging uses `scikit-build-core` and CMake. The source distribution

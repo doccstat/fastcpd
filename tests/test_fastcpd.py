@@ -1,12 +1,13 @@
+import inspect
 import unittest
 
 import fastcpd as fastcpd_pkg
 import fastcpd.segmentation as segmentation
 import numpy as np
 from fastcpd.segmentation import (
-    ar, arima, arma, binomial, detect_kernel, detect_mean, detect_quantile,
-    detect_rank, exponential, garch, lasso, lm, mean, meanvariance, poisson,
-    var, variance,
+    ar, arima, arma, binomial, detect, detect_kernel, detect_mean,
+    detect_quantile, detect_rank, exponential, garch, lasso, lm, mean,
+    meanvariance, poisson, var, variance,
 )
 from numpy import concatenate
 from numpy.random import exponential as rexp
@@ -89,11 +90,26 @@ class TestBasic(unittest.TestCase):
             expected,
         )
 
+    def test_detect_defaults_match_r(self):
+        parameters = inspect.signature(detect).parameters
+        self.assertEqual(parameters['trim'].default, 0.0)
+        self.assertEqual(parameters['vanilla_percentage'].default, 0.0)
+        self.assertIsNone(parameters['multiple_epochs'].default)
+
+    def test_detect_rejects_unsupported_arguments(self):
+        with self.assertRaisesRegex(TypeError, "unexpected keyword"):
+            detect_mean(np.arange(10), unknown_option=True)
+        with self.assertRaisesRegex(NotImplementedError, "multiple_epochs"):
+            detect_mean(np.arange(10), multiple_epochs=lambda _: 1)
+
     def test_quantile_interface(self):
         seed(18)
         x = randn(120)
         y = concatenate((2 * x[:60], -2 * x[60:])) + 0.05 * randn(120)
-        result = detect_quantile(np.column_stack([y, x]), order=0.5)
+        result = detect_quantile(
+            np.column_stack([y, x]), order=0.5, trim=0.05,
+            vanilla_percentage=1.0,
+        )
         self.assertGreater(len(result.cp_set), 0)
         self.assertAlmostEqual(result.cp_set[0], 60, delta=10)
 
@@ -135,11 +151,11 @@ class TestBasic(unittest.TestCase):
     def test_meanvariance(self):
         seed(3)
         data = concatenate((np.random.normal(0, 1, 300), np.random.normal(5, 3, 300)))
-        result = meanvariance(data)
+        result = meanvariance(data, trim=0.05)
         self.assertEqual(result.cp_set[0], 300)
 
     def test_var_mgaussian(self):
-        # VAR(1) with 2 response cols: data = [y_t, y_{t-1}], shape (n-1, 4)
+        # VAR(1) wrapper accepts the raw two-column time series.
         seed(4)
         q = 2
         cov = [[1, 0], [0, 1]]
@@ -147,9 +163,21 @@ class TestBasic(unittest.TestCase):
             multivariate_normal([0, 0], cov, 300),
             multivariate_normal([5, 5], cov, 300),
         ))
+        result = var(y_raw, order=1, trim=0.05)
+
+        # Advanced mgaussian calls still accept a pre-constructed design.
         data_mg = np.column_stack([y_raw[1:], y_raw[:-1]])
-        result = var(data_mg, order=1, p_response=q)
-        self.assertEqual(result.cp_set[0], 300)
+        direct = detect(
+            data=data_mg, family='mgaussian', p_response=q, order=(1,),
+            trim=0.05,
+        )
+        self.assertGreater(len(direct.cp_set), 0)
+        self.assertEqual(
+            result.cp_set,
+            [change_point + 1 for change_point in direct.cp_set],
+        )
+        legacy = var(data_mg, order=1, p_response=q, trim=0.05)
+        self.assertEqual(legacy.cp_set, direct.cp_set)
 
     def test_lasso(self):
         seed(7)
@@ -200,7 +228,7 @@ class TestBasic(unittest.TestCase):
             np.random.poisson(mu2),
         ]).astype(float)
         data = np.column_stack([y, X])
-        result = poisson(data)
+        result = poisson(data, trim=0.05, vanilla_percentage=1.0)
         self.assertGreater(len(result.cp_set), 0)
         self.assertAlmostEqual(result.cp_set[0], 300, delta=20)
 
@@ -250,7 +278,9 @@ class TestBasic(unittest.TestCase):
         eps2 = randn(n)
         for t in range(300, n):
             x[t] = -0.5 * x[t - 1] + eps2[t] - 0.3 * eps2[t - 1]
-        result = arma(x, order=(1, 1))
+        result = arma(
+            x, order=(1, 1), trim=0.05, vanilla_percentage=1.0,
+        )
         self.assertGreater(len(result.cp_set), 0)
         self.assertAlmostEqual(result.cp_set[0], 300, delta=30)
 

@@ -111,15 +111,14 @@ def detect_var(data, order, **kwargs):
     """Find change points efficiently in VAR (vector autoregression) models.
 
     Args:
-        data: Multivariate time series data, shape (n, q+p) where q columns
-            are responses and p columns are lagged predictors.
+        data: Unlagged multivariate time series data, shape (n, q).
         order: Number of lagged predictors per response (p).
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
         A list of change-point indices, or a CpdResult when cp_only=False.
     """
-    return detect(data=data, family='mgaussian', **kwargs)
+    return detect(data=data, family='var', order=order, **kwargs)
 
 
 def detect_lasso(data, **kwargs):
@@ -367,20 +366,19 @@ def detect(
     upper=None,
     pruning_coef=None,
     segment_count: int = 10,
-    trim: float = 0.05,
+    trim: float = 0.0,
     momentum_coef: float = 0.0,
-    multiple_epochs=lambda x: 0,
+    multiple_epochs=None,
     epsilon: float = 1e-10,
     order=(0, 0, 0),
     p: int = None,
     p_response: int = 0,
     variance_estimation=None,
     cp_only: bool = False,
-    vanilla_percentage: float = 1.0,
+    vanilla_percentage: float = 0.0,
     warm_start: bool = False,
     show_progress: bool = False,
     random_state=None,
-    **kwargs
 ):
     r"""Find change points efficiently.
 
@@ -406,6 +404,8 @@ def detect(
         segment_count: Initial guess for number of segments.
         trim: Trimming proportion for boundary change points.
         momentum_coef: Momentum coefficient for parameter updates.
+        multiple_epochs: Per-step epoch schedule. Custom schedules are not yet
+            supported by the Python binding; leave this as ``None``.
         epsilon: Epsilon for numerical stability.
         order: Order for ARMA/MA models as tuple (ar_order, ma_order).
         p: Number of model parameters.  ``None`` (or 0) triggers automatic
@@ -433,6 +433,11 @@ def detect(
     """
     if data is None:
         raise ValueError("data must be provided")
+    if multiple_epochs is not None:
+        raise NotImplementedError(
+            "Custom multiple_epochs schedules are not supported by the "
+            "Python binding."
+        )
     data = numpy.asarray(data, dtype=float)
     if data.ndim == 1:
         data = data.reshape(-1, 1)
@@ -448,8 +453,29 @@ def detect(
         cost_adjustment = 'MBIC'
 
     family = family.lower() if family is not None else 'custom'
-    # Apply family-name synonyms (e.g. 'var' → 'mgaussian', 'lm' → 'gaussian').
-    family = _FAMILY_ALIASES.get(family, family)
+    index_offset = 0
+    if family == 'var':
+        var_order = _validate_var_order(order)
+        legacy_columns = p_response * (var_order + 1)
+        if p_response > 0 and data.shape[1] == legacy_columns:
+            # Backward compatibility: older Python releases expected var()
+            # input to contain [responses, lagged predictors].
+            order = (var_order,)
+            family = 'mgaussian'
+        else:
+            data, response_count = _var_regression_data(data, var_order)
+            if p_response not in (0, response_count):
+                raise ValueError(
+                    "p_response must match the number of columns in VAR data"
+                )
+            p_response = response_count
+            p = var_order * response_count ** 2
+            order = (var_order,)
+            index_offset = var_order
+            family = 'mgaussian'
+    else:
+        # Apply family-name synonyms (e.g. 'lm' → 'gaussian').
+        family = _FAMILY_ALIASES.get(family, family)
 
     if family == 'rank':
         data = _rank_transform(data)
@@ -492,7 +518,6 @@ def detect(
     # Pure AR(p): route through lag-structured gaussian instead of ARMA.
     # The ARMA C++ path requires q > 0 in the NO_RCPP (Python) build;
     # for q == 0, OLS on lagged data gives the exact conditional MLE.
-    _ar_offset = 0
     if (family == 'arma' and hasattr(order, '__len__') and
             len(order) >= 2 and int(order[0]) > 0 and int(order[1]) == 0):
         p_ar = int(order[0])
@@ -503,7 +528,7 @@ def detect(
                 [data[p_ar - j - 1:n_rows - j - 1, 0] for j in range(p_ar)])
             data = numpy.column_stack([y, lags])
             family = 'gaussian'
-            _ar_offset = p_ar
+            index_offset += p_ar
 
     if family not in _SUPPORTED_FAMILIES:
         raise ValueError(
@@ -551,15 +576,44 @@ def detect(
     )
 
     if cp_only:
-        return [cp + _ar_offset for cp in result['cp_set']]
+        return [cp + index_offset for cp in result['cp_set']]
 
     return CpdResult(
-        cp_set=[cp + _ar_offset for cp in result['cp_set']],
-        raw_cp_set=[cp + _ar_offset for cp in result['raw_cp_set']],
+        cp_set=[cp + index_offset for cp in result['cp_set']],
+        raw_cp_set=[cp + index_offset for cp in result['raw_cp_set']],
         cost_values=result['cost_values'],
         residuals=result['residuals'],
         thetas=result['thetas'],
     )
+
+
+def _validate_var_order(order):
+    """Return a validated scalar VAR order."""
+    if hasattr(order, '__len__') and not isinstance(order, str):
+        order_values = list(order)
+        if len(order_values) != 1:
+            raise ValueError("VAR order must be a positive integer")
+        order = order_values[0]
+    order_float = float(order)
+    order_int = int(order_float)
+    if order_int <= 0 or order_float != order_int:
+        raise ValueError("VAR order must be a positive integer")
+    return order_int
+
+
+def _var_regression_data(data, order):
+    """Construct [responses, lagged predictors] for a VAR(p) series."""
+    if data.ndim != 2 or data.shape[1] == 0:
+        raise ValueError("VAR data must be a non-empty 2-D array")
+    if data.shape[0] <= order:
+        raise ValueError("VAR order must be smaller than the number of rows")
+
+    responses = data[order:, :]
+    predictors = numpy.column_stack([
+        data[order - lag:data.shape[0] - lag, :]
+        for lag in range(1, order + 1)
+    ])
+    return numpy.column_stack([responses, predictors]), data.shape[1]
 
 
 def _rank_transform(data):
