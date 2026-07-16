@@ -25,8 +25,7 @@ def confint(
 
     Args:
         result: A ``fastcpd.segmentation.CpdResult``.
-        data: Original data used for fitting. Required because Python result
-            objects intentionally keep only compact fit output.
+        data: Original data used for fitting. Defaults to ``result.data``.
         parm: ``"cp"`` for change-point locations or ``"theta"`` for segment
             parameters.
         method: For ``parm="cp"``, ``"bootstrap"`` or ``"profile"``. For
@@ -34,7 +33,8 @@ def confint(
         level: Confidence level.
         B: Number of bootstrap replicates.
         family: Family used to refit bootstrap samples or evaluate profile
-            costs. Aliases ``"lm"`` and ``"gaussian"`` are equivalent.
+            costs. Defaults to ``result.family``. Aliases ``"lm"`` and
+            ``"gaussian"`` are equivalent.
         bootstrap: Bootstrap type. Currently only ``"nonparametric"`` is
             implemented.
         window: Optional half-width around each detected change point for
@@ -49,6 +49,15 @@ def confint(
         A list of dictionaries. Each dictionary contains the estimate, lower
         and upper interval bounds, and method-specific diagnostics.
     """
+    if data is None:
+        data = getattr(result, 'data', None)
+    if family is None:
+        family = getattr(result, 'family', None)
+    detect_kwargs = {} if detect_kwargs is None else dict(detect_kwargs)
+    result_order = getattr(result, 'order', None)
+    if result_order is not None:
+        detect_kwargs.setdefault('order', result_order)
+
     if not 0 < level < 1:
         raise ValueError("level must be in (0, 1)")
     if parm not in ('cp', 'theta'):
@@ -101,12 +110,13 @@ def _cp_bootstrap(
     if bootstrap != 'nonparametric':
         raise NotImplementedError(
             "Only bootstrap='nonparametric' is currently implemented")
-    family = _normalize_family(family)
+    if family is None:
+        raise ValueError("family must be provided")
+    family = family.lower()
     data = _as_2d_data(data)
     B = int(B)
     if B <= 0:
         raise ValueError("B must be a positive integer")
-    detect_kwargs = {} if detect_kwargs is None else dict(detect_kwargs)
     rng = _rng(random_state)
     reference_cp = sorted(int(cp) for cp in result.cp_set)
     if not reference_cp:
@@ -118,12 +128,13 @@ def _cp_bootstrap(
     for b in range(B):
         boot_data = _segment_bootstrap_data(data, reference_cp, rng)
         try:
-            boot_cp = segmentation.detect(
+            boot_result = segmentation.detect(
                 data=boot_data,
                 family=family,
                 cp_only=True,
                 **detect_kwargs,
             )
+            boot_cp = boot_result.cp_set
         except Exception:
             boot_cp = []
         matched[b, :] = _match_cp_set(

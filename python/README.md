@@ -37,6 +37,23 @@ points therefore use the original-series indices, and no cross-boundary
 difference contaminates either adjacent segment. The likelihood is zero-mean
 (`include_mean=False`), and `d=0` is identical to `detect_arma()`.
 
+## Result contract
+
+Every detection call returns a frozen `CpdResult` dataclass. Change points are
+read-only NumPy `int64` arrays; costs, residuals, and parameters are read-only
+floating-point arrays. The result stores a read-only copy of the original
+data plus the public family and order, so `result.confint()` can refit without
+repeating them.
+
+`cp_only=True` keeps the same result type and skips detailed native output;
+`cost_values`, `residuals`, and `thetas` are empty and
+`result.details_available` is false. This avoids a return-type branch in user
+code while retaining the lower-cost detection path.
+
+The extension accepts NumPy buffers directly and returns NumPy arrays without
+nested-list conversion. It releases the Python GIL while the shared C++
+detector runs, allowing other Python threads to make progress.
+
 ## Native build
 
 Python packaging uses `scikit-build-core` and CMake. The source distribution

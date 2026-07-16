@@ -42,6 +42,11 @@ classifiers = [
 Documentation = "https://x2r.io/fastcpd/python/"
 Repository = "https://github.com/doccstat/fastcpd-py"
 
+[tool.pytest.ini_options]
+markers = [
+    "long: exact no-pruning stress tests excluded from the routine suite",
+]
+
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 build-dir = "build/python/{wheel_tag}"

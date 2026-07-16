@@ -2,58 +2,81 @@
 
 #include <fastcpd/fastcpd.h>
 
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 
 #include <cmath>
+#include <cstdint>
+#include <cstring>
 #include <stdexcept>
 #include <string>
 #include <utility>
-#include <vector>
 
 namespace py = pybind11;
 
 namespace {
 
-arma::colvec to_colvec(std::vector<double> const& values) {
-  arma::colvec result(values.size());
-  for (std::size_t index = 0; index < values.size(); ++index) {
-    result(index) = values[index];
+using DoubleArray =
+    py::array_t<double, py::array::c_style | py::array::forcecast>;
+
+arma::colvec to_colvec(DoubleArray const& values, char const* name) {
+  py::buffer_info const buffer = values.request();
+  if (buffer.ndim != 1) {
+    throw std::invalid_argument(std::string("fastcpd: ") + name +
+                                " must be one-dimensional");
+  }
+  arma::colvec result(static_cast<arma::uword>(buffer.shape[0]));
+  if (result.n_elem > 0) {
+    std::memcpy(result.memptr(), buffer.ptr,
+                result.n_elem * sizeof(double));
   }
   return result;
 }
 
-arma::mat to_matrix(std::vector<std::vector<double>> const& values,
-                    char const* name) {
-  if (values.empty()) return arma::mat();
-  std::size_t const columns = values.front().size();
-  if (columns == 0) return arma::mat(values.size(), 0);
-  for (auto const& row : values) {
-    if (row.size() != columns) {
-      throw std::invalid_argument(std::string("fastcpd: ") + name +
-                                  " must be rectangular");
-    }
+arma::mat to_matrix(DoubleArray const& values, char const* name) {
+  py::buffer_info const buffer = values.request();
+  if (buffer.ndim != 2) {
+    throw std::invalid_argument(std::string("fastcpd: ") + name +
+                                " must be two-dimensional");
   }
-
-  arma::mat result(values.size(), columns);
-  for (std::size_t row = 0; row < values.size(); ++row) {
-    for (std::size_t column = 0; column < columns; ++column) {
-      result(row, column) = values[row][column];
+  arma::uword const rows = static_cast<arma::uword>(buffer.shape[0]);
+  arma::uword const columns = static_cast<arma::uword>(buffer.shape[1]);
+  double const* const input = static_cast<double const*>(buffer.ptr);
+  arma::mat result(rows, columns);
+  for (arma::uword row = 0; row < rows; ++row) {
+    for (arma::uword column = 0; column < columns; ++column) {
+      result(row, column) = input[row * columns + column];
     }
   }
   return result;
 }
 
-std::vector<double> to_vector(arma::colvec const& values) {
-  return std::vector<double>(values.begin(), values.end());
+py::array_t<std::int64_t> to_index_array(arma::colvec const& values) {
+  py::array_t<std::int64_t> result(values.n_elem);
+  std::int64_t* const output = result.mutable_data();
+  for (arma::uword index = 0; index < values.n_elem; ++index) {
+    output[index] = static_cast<std::int64_t>(values(index));
+  }
+  return result;
 }
 
-std::vector<std::vector<double>> to_rows(arma::mat const& values) {
-  std::vector<std::vector<double>> result(
-      values.n_rows, std::vector<double>(values.n_cols));
+py::array_t<double> to_array(arma::colvec const& values) {
+  py::array_t<double> result(values.n_elem);
+  if (values.n_elem > 0) {
+    std::memcpy(result.mutable_data(), values.memptr(),
+                values.n_elem * sizeof(double));
+  }
+  return result;
+}
+
+py::array_t<double> to_array(arma::mat const& values) {
+  py::array_t<double> result(
+      {static_cast<py::ssize_t>(values.n_rows),
+       static_cast<py::ssize_t>(values.n_cols)});
+  double* const output = result.mutable_data();
   for (arma::uword row = 0; row < values.n_rows; ++row) {
     for (arma::uword column = 0; column < values.n_cols; ++column) {
-      result[row][column] = values(row, column);
+      output[row * values.n_cols + column] = values(row, column);
     }
   }
   return result;
@@ -63,21 +86,21 @@ py::dict fastcpd_impl(
     py::object const& beta,
     std::string const& cost_adjustment,
     bool cp_only,
-    std::vector<std::vector<double>> const& data,
+    DoubleArray const& data,
     double epsilon,
     std::string const& family,
-    std::vector<double> const& line_search,
-    std::vector<double> const& lower,
+    DoubleArray const& line_search,
+    DoubleArray const& lower,
     double momentum_coef,
-    std::vector<double> const& order,
+    DoubleArray const& order,
     int p,
     unsigned int p_response,
     double pruning_coef,
     unsigned int segment_count,
     double trim,
-    std::vector<double> const& upper,
+    DoubleArray const& upper,
     double vanilla_percentage,
-    std::vector<std::vector<double>> const& variance_estimate,
+    DoubleArray const& variance_estimate,
     bool warm_start,
     bool show_progress) {
   fastcpd::Options options;
@@ -90,32 +113,35 @@ py::dict fastcpd_impl(
   options.cost_adjustment = cost_adjustment;
   options.cp_only = cp_only;
   options.epsilon = epsilon;
-  options.line_search = to_colvec(line_search);
-  options.lower = to_colvec(lower);
-  options.upper = to_colvec(upper);
+  options.line_search = to_colvec(line_search, "line_search");
+  options.lower = to_colvec(lower, "lower");
+  options.upper = to_colvec(upper, "upper");
   options.momentum_coef = momentum_coef;
-  options.order = to_colvec(order);
+  options.order = to_colvec(order, "order");
   options.p = p;
   options.p_response = p_response;
   if (!std::isnan(pruning_coef)) options.pruning_coef = pruning_coef;
   options.segment_count = static_cast<int>(segment_count);
   options.trim = trim;
   options.vanilla_percentage = vanilla_percentage;
-  options.variance_estimate = to_matrix(variance_estimate, "variance_estimate");
+  options.variance_estimate =
+      to_matrix(variance_estimate, "variance_estimate");
   options.warm_start = warm_start;
   options.show_progress = show_progress;
 
-  fastcpd::Result const result =
-      fastcpd::detect(to_matrix(data, "data"), std::move(options));
+  arma::mat data_matrix = to_matrix(data, "data");
+  fastcpd::Result result;
+  {
+    py::gil_scoped_release release;
+    result = fastcpd::detect(data_matrix, std::move(options));
+  }
 
   py::dict output;
-  output["cp_set"] = to_vector(result.change_points);
-  output["raw_cp_set"] = to_vector(result.raw_change_points);
-  if (!cp_only) {
-    output["cost_values"] = to_vector(result.cost_values);
-    output["residuals"] = to_rows(result.residuals);
-    output["thetas"] = to_rows(result.thetas);
-  }
+  output["cp_set"] = to_index_array(result.change_points);
+  output["raw_cp_set"] = to_index_array(result.raw_change_points);
+  output["cost_values"] = to_array(result.cost_values);
+  output["residuals"] = to_array(result.residuals);
+  output["thetas"] = to_array(result.thetas);
   return output;
 }
 

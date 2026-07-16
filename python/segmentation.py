@@ -2,7 +2,7 @@
 Perform change point detection using fastcpd.
 """
 
-import collections
+import dataclasses
 import numpy
 import fastcpd.variance_estimation
 from fastcpd.interface import fastcpd_impl
@@ -26,28 +26,61 @@ _FAMILY_ALIASES = {
 }
 
 
-class CpdResult(collections.namedtuple(
-    'CpdResult',
-    ['cp_set', 'raw_cp_set', 'cost_values', 'residuals', 'thetas'],
-)):
-    """Result object returned by detect() when cp_only=False.
+@dataclasses.dataclass(frozen=True, slots=True, eq=False)
+class CpdResult:
+    """Stable result object returned by every ``detect()`` call.
 
     Fields:
-        cp_set: Change-point indices (1-based, matching the R package).
-        raw_cp_set: Raw change-point indices before boundary trimming.
-        cost_values: Segment cost values.
-        residuals: Nested list of shape (n_obs, n_response).
-        thetas: Nested list of shape (n_params, n_segments); column j holds
+        cp_set: Read-only int64 array of 1-based change-point indices.
+        raw_cp_set: Read-only int64 array before boundary trimming.
+        cost_values: Read-only float array of segment cost values.
+        residuals: Read-only float array of shape (n_obs, n_response).
+        thetas: Read-only float array of shape (n_params, n_segments); column j
+            holds
             the estimated parameters for segment j.
+        data: Read-only copy of the original input data, always two-dimensional.
+        family: Public family name requested by the caller.
+        order: Public model order supplied by the caller.
+        cp_only: Whether detailed native fit output was skipped.
     """
 
-    __slots__ = ()
+    cp_set: numpy.ndarray
+    raw_cp_set: numpy.ndarray
+    cost_values: numpy.ndarray
+    residuals: numpy.ndarray
+    thetas: numpy.ndarray
+    data: numpy.ndarray = dataclasses.field(repr=False)
+    family: str
+    order: tuple
+    cp_only: bool = False
+
+    def __post_init__(self):
+        arrays = {
+            'cp_set': numpy.asarray(self.cp_set, dtype=numpy.int64),
+            'raw_cp_set': numpy.asarray(
+                self.raw_cp_set, dtype=numpy.int64
+            ),
+            'cost_values': numpy.asarray(self.cost_values, dtype=float),
+            'residuals': numpy.asarray(self.residuals, dtype=float),
+            'thetas': numpy.asarray(self.thetas, dtype=float),
+            'data': numpy.asarray(self.data, dtype=float),
+        }
+        for name, value in arrays.items():
+            value.setflags(write=False)
+            object.__setattr__(self, name, value)
+        object.__setattr__(self, 'family', str(self.family))
+        object.__setattr__(self, 'order', tuple(self.order))
+        object.__setattr__(self, 'cp_only', bool(self.cp_only))
+
+    @property
+    def details_available(self):
+        """Whether costs, residuals, and parameters were computed."""
+        return not self.cp_only
 
     def confint(self, *args, **kwargs):
         """Construct confidence intervals for this result.
 
-        The Python result keeps fit output compact, so pass the original
-        ``data`` and ``family`` arguments when calling this method.
+        The stored data, family, and order are used automatically.
         """
         from fastcpd.confidence import confint
         return confint(self, *args, **kwargs)
@@ -61,7 +94,7 @@ def detect_mean(data, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     return detect(data=data, family='mean', **kwargs)
 
@@ -75,7 +108,7 @@ def detect_exponential(data, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     return detect(data=data, family='exponential', **kwargs)
 
@@ -88,7 +121,7 @@ def detect_variance(data, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     return detect(data=data, family='variance', **kwargs)
 
@@ -102,7 +135,7 @@ def detect_meanvariance(data, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     return detect(data=data, family='meanvariance', **kwargs)
 
@@ -116,7 +149,7 @@ def detect_var(data, order, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     return detect(data=data, family='var', order=order, **kwargs)
 
@@ -129,7 +162,7 @@ def detect_lasso(data, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     return detect(data=data, family='lasso', **kwargs)
 
@@ -143,7 +176,7 @@ def detect_garch(data, order=(1, 1), **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     return detect(data=data, family='garch', order=order, **kwargs)
 
@@ -157,9 +190,9 @@ def detect_lm(data, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
-    return detect(data=data, family='gaussian', **kwargs)
+    return detect(data=data, family='lm', **kwargs)
 
 
 def detect_binomial(data, **kwargs):
@@ -171,7 +204,7 @@ def detect_binomial(data, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     return detect(data=data, family='binomial', **kwargs)
 
@@ -185,7 +218,7 @@ def detect_poisson(data, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     return detect(data=data, family='poisson', **kwargs)
 
@@ -200,7 +233,7 @@ def detect_quantile(data, order=0.5, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     if not 0 < order < 1:
         raise ValueError(f"order must be in (0, 1), got {order!r}")
@@ -218,7 +251,7 @@ def detect_arma(data, order=(1, 0), **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     return detect(data=data, family='arma', order=order, **kwargs)
 
@@ -232,7 +265,7 @@ def detect_ar(data, order=1, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     return detect(data=data, family='ar', order=order, **kwargs)
 
@@ -252,7 +285,7 @@ def detect_arima(data, order=(1, 1, 0), include_mean=False, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
 
     For ``d = 0`` this is identical to
     ``arma(data, order=(p, q))``.
@@ -293,7 +326,7 @@ def detect_kernel(data, order=(100, 0), random_state=None, **kwargs):
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
-        A list of change-point indices, or a CpdResult when cp_only=False.
+        A CpdResult. When cp_only=True, detail arrays are empty.
     """
     kwargs.setdefault('cost_adjustment', 'BIC')
     return detect(
@@ -304,8 +337,10 @@ def detect_kernel(data, order=(100, 0), random_state=None, **kwargs):
 
 def detect_kcp(data, order=(100, 0), random_state=None, **kwargs):
     """Find distributional change points using the KCP wrapper name."""
-    return detect_kernel(
-        data, order=order, random_state=random_state, **kwargs
+    kwargs.setdefault('cost_adjustment', 'BIC')
+    return detect(
+        data=data, family='kcp', order=order, random_state=random_state,
+        **kwargs
     )
 
 
@@ -316,7 +351,7 @@ def detect_mean_variance(data, **kwargs):
 
 def detect_linear_regression(data, **kwargs):
     """Find change points in ordinary linear regression models."""
-    return detect(data=data, family='gaussian', **kwargs)
+    return detect(data=data, family='lm', **kwargs)
 
 
 def detect_logistic_regression(data, **kwargs):
@@ -419,9 +454,9 @@ def detect(
         variance_estimation: Pre-specified variance/covariance matrix.
             When not supplied, estimated automatically (Rice estimator for
             mean/mgaussian, identity otherwise).
-        cp_only: If True, return only change-point indices (list of floats).
-            If False, return a CpdResult namedtuple with cp_set, raw_cp_set,
-            cost_values, residuals, and thetas.
+        cp_only: If True, skip segment costs, residuals, and parameter
+            estimates. The return type remains ``CpdResult``; its detail
+            arrays are empty and ``details_available`` is False.
         vanilla_percentage: Fraction of observations evaluated with pure PELT
             (no gradient update). 1.0 runs full PELT; 0.0 runs full SEN.
         warm_start: If True, use previous segment parameters as initial
@@ -432,8 +467,7 @@ def detect(
             Implemented in C++; no tqdm package required.
 
     Returns:
-        When cp_only=True: a list of change-point indices (1-based).
-        When cp_only=False: a CpdResult namedtuple.
+        A ``CpdResult`` with read-only NumPy arrays and fit metadata.
     """
     if data is None:
         raise ValueError("data must be provided")
@@ -442,9 +476,12 @@ def detect(
             "Custom multiple_epochs schedules are not supported by the "
             "Python binding."
         )
-    data = numpy.asarray(data, dtype=float)
+    data = numpy.array(data, dtype=float, copy=True, order='C')
     if data.ndim == 1:
         data = data.reshape(-1, 1)
+    if data.ndim != 2:
+        raise ValueError("data must be one- or two-dimensional")
+    original_data = data
 
     if cost is not None or cost_gradient is not None or cost_hessian is not None:
         raise NotImplementedError(
@@ -457,6 +494,8 @@ def detect(
         cost_adjustment = 'MBIC'
 
     family = family.lower() if family is not None else 'custom'
+    public_family = family
+    public_order = _public_order(order)
     index_offset = 0
     if family == 'var':
         var_order = _validate_var_order(order)
@@ -598,35 +637,50 @@ def detect(
         beta,                   # str or float – C++ handles both
         cost_adjustment,
         bool(cp_only),
-        data.tolist(),
+        numpy.ascontiguousarray(data, dtype=float),
         float(epsilon),
         family,
-        list(line_search),
-        list(lower) if lower is not None else [],
+        numpy.atleast_1d(numpy.asarray(line_search, dtype=float)),
+        _optional_vector(lower),
         float(momentum_coef),
-        list(order) if hasattr(order, '__len__') else [float(order)],
+        numpy.asarray(_public_order(order), dtype=float),
         p_int,
         int(p_response),
         pruning_float,          # NaN → auto-compute in C++
         int(segment_count),
         float(trim),
-        list(upper) if upper is not None else [],
+        _optional_vector(upper),
         float(vanilla_percentage),
-        ve.tolist(),
+        numpy.ascontiguousarray(ve, dtype=float),
         bool(warm_start),
         bool(show_progress),
     )
 
-    if cp_only:
-        return [cp + index_offset for cp in result['cp_set']]
-
     return CpdResult(
-        cp_set=[cp + index_offset for cp in result['cp_set']],
-        raw_cp_set=[cp + index_offset for cp in result['raw_cp_set']],
+        cp_set=numpy.asarray(result['cp_set']) + index_offset,
+        raw_cp_set=numpy.asarray(result['raw_cp_set']) + index_offset,
         cost_values=result['cost_values'],
         residuals=result['residuals'],
         thetas=result['thetas'],
+        data=original_data,
+        family=public_family,
+        order=public_order,
+        cp_only=cp_only,
     )
+
+
+def _public_order(order):
+    """Return model order metadata as a tuple without changing its values."""
+    if hasattr(order, '__len__') and not isinstance(order, str):
+        return tuple(order)
+    return (order,)
+
+
+def _optional_vector(value):
+    """Convert an optional vector argument to a contiguous NumPy buffer."""
+    if value is None:
+        return numpy.empty(0, dtype=float)
+    return numpy.atleast_1d(numpy.asarray(value, dtype=float))
 
 
 def _integer_order_values(order, expected_length, family):

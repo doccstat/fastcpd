@@ -1,9 +1,13 @@
 import inspect
+import threading
+import time
 import unittest
 
 import fastcpd as fastcpd_pkg
 import fastcpd.segmentation as segmentation
 import numpy as np
+import pytest
+from fastcpd.interface import fastcpd_impl as native_fastcpd_impl
 from fastcpd.segmentation import (
     ar, arima, arma, binomial, detect, detect_kernel, detect_mean,
     detect_quantile, detect_rank, exponential, garch, lasso, lm, mean,
@@ -36,7 +40,42 @@ class TestBasic(unittest.TestCase):
             variance_estimation=np.eye(1),
             cp_only=True,
         )
-        self.assertEqual(result, [50.0])
+        self.assertIsInstance(result, segmentation.CpdResult)
+        np.testing.assert_array_equal(result.cp_set, [50])
+        self.assertEqual(result.cp_set.dtype, np.dtype(np.int64))
+        self.assertFalse(result.details_available)
+        self.assertEqual(result.cost_values.shape, (0,))
+        self.assertEqual(result.residuals.shape, (0, 0))
+        self.assertEqual(result.thetas.shape, (0, 0))
+        self.assertEqual(result.data.shape, (100, 1))
+        self.assertEqual(result.family, 'mean')
+        self.assertEqual(result.order, (0, 0, 0))
+        self.assertFalse(result.cp_set.flags.writeable)
+        self.assertFalse(result.data.flags.writeable)
+
+    def test_native_numpy_binding_releases_gil(self):
+        data = np.concatenate([np.zeros(5000), np.ones(5000)]).reshape(-1, 1)
+        worker_ran = threading.Event()
+
+        def worker():
+            time.sleep(0.05)
+            worker_ran.set()
+
+        thread = threading.Thread(target=worker)
+        thread.start()
+        native_result = native_fastcpd_impl(
+            5.0, 'BIC', True, data, 1e-10, 'mean', np.array([1.0]),
+            np.empty(0), 0.0, np.array([0.0, 0.0, 0.0]), 0, 0,
+            float('-inf'), 2, 0.0, np.empty(0), 1.0, np.eye(1), False,
+            False,
+        )
+        worker_ran_during_detection = worker_ran.is_set()
+        thread.join()
+
+        self.assertTrue(worker_ran_during_detection)
+        self.assertIsInstance(native_result['cp_set'], np.ndarray)
+        self.assertEqual(native_result['cp_set'].dtype, np.dtype(np.int64))
+        self.assertIsInstance(native_result['residuals'], np.ndarray)
 
     def test_unified_interface_aliases(self):
         self.assertIs(fastcpd_pkg.detect_mean, fastcpd_pkg.mean)
@@ -54,12 +93,14 @@ class TestBasic(unittest.TestCase):
         seed(17)
         data = concatenate((np.random.normal(0, 0.2, 40),
                             np.random.normal(3, 0.2, 40)))
-        self.assertEqual(detect_mean(data).cp_set, mean(data).cp_set)
-        self.assertEqual(
+        np.testing.assert_array_equal(
+            detect_mean(data).cp_set, mean(data).cp_set
+        )
+        np.testing.assert_array_equal(
             detect_rank(data).cp_set,
             fastcpd_pkg.rank(data).cp_set,
         )
-        self.assertEqual(
+        np.testing.assert_array_equal(
             detect_kernel(
                 data, order=(20, 1), random_state=17,
             ).cp_set,
@@ -73,7 +114,7 @@ class TestBasic(unittest.TestCase):
             concatenate((x[:40], -x[40:])),
             x,
         ])
-        self.assertEqual(
+        np.testing.assert_array_equal(
             fastcpd_pkg.detect_linear_regression(regression_data).cp_set,
             fastcpd_pkg.lm(regression_data).cp_set,
         )
@@ -131,10 +172,16 @@ class TestBasic(unittest.TestCase):
                             np.random.normal(3, 0.2, 40)))
         result = mean(data)
         interval = result.confint(
-            data=data, family='mean', method='profile', level=0.8, window=8)
+            method='profile', level=0.8, window=8
+        )
         self.assertEqual(interval[0]['estimate'], result.cp_set[0])
         self.assertLessEqual(interval[0]['lower'], result.cp_set[0])
         self.assertGreaterEqual(interval[0]['upper'], result.cp_set[0])
+        bootstrap_interval = result.confint(
+            method='bootstrap', level=0.8, B=3, random_state=16,
+            detect_kwargs={'beta': 5.0, 'cost_adjustment': 'BIC'},
+        )
+        self.assertEqual(bootstrap_interval[0]['estimate'], result.cp_set[0])
 
     def test_exponential(self):
         seed(1)
@@ -172,12 +219,12 @@ class TestBasic(unittest.TestCase):
             trim=0.05,
         )
         self.assertGreater(len(direct.cp_set), 0)
-        self.assertEqual(
+        np.testing.assert_array_equal(
             result.cp_set,
             [change_point + 1 for change_point in direct.cp_set],
         )
         legacy = var(data_mg, order=1, p_response=q, trim=0.05)
-        self.assertEqual(legacy.cp_set, direct.cp_set)
+        np.testing.assert_array_equal(legacy.cp_set, direct.cp_set)
 
     def test_lasso(self):
         seed(7)
@@ -232,6 +279,7 @@ class TestBasic(unittest.TestCase):
         self.assertGreater(len(result.cp_set), 0)
         self.assertAlmostEqual(result.cp_set[0], 300, delta=20)
 
+    @pytest.mark.long
     def test_garch(self):
         seed(11)
         n = 600
@@ -297,7 +345,7 @@ class TestBasic(unittest.TestCase):
             segment_count=2,
         )
 
-        self.assertEqual(result.cp_set, [41])
+        np.testing.assert_array_equal(result.cp_set, [41])
         expected_costs = [
             20 * (np.log(2 * np.pi) + np.log(0.01) + 1),
             20 * (np.log(2 * np.pi) + np.log(4.0) + 1),
@@ -327,7 +375,7 @@ class TestBasic(unittest.TestCase):
             x[t] = -0.8 * x[t - 1] + randn()
         r1 = arima(x, order=(1, 0, 0))
         r2 = arma(x, order=(1, 0))
-        self.assertEqual(r1.cp_set, r2.cp_set)
+        np.testing.assert_array_equal(r1.cp_set, r2.cp_set)
 
 
 if __name__ == "__main__":

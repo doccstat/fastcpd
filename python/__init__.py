@@ -5,6 +5,10 @@ fastcpd is a Python package for fast change point detection in multivariate
 time series data. It provides efficient algorithms to identify points in time
 where the statistical properties of a sequence of observations change.
 
+Every detector returns a frozen ``CpdResult`` with read-only NumPy arrays and
+the original data/family/order metadata. ``cp_only=True`` skips detail
+computation without changing the return type.
+
 # Supported families
 
 | Function | Family | Description |
@@ -76,7 +80,7 @@ if _sys.platform == 'win32':
 
 del _os, _sys
 
-__version__ = "0.21.0"
+__version__ = "0.22.0"
 
 from fastcpd.confidence import confint  # noqa: E402,F401
 from fastcpd.segmentation import (  # noqa: E402
