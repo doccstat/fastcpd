@@ -43,7 +43,7 @@ VignetteBuilder:
     knitr
 Config/testthat/edition: 3
 Config/testthat/parallel: true
-Config/testthat/start-first: examples-fastcpd_arima, examples-fastcpd_ts
+Config/testthat/start-first: examples-fastcpd_arima
 Encoding: UTF-8
 LazyData: true
 Config/roxygen2/version: 8.0.0

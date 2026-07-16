@@ -51,7 +51,6 @@ testthat::test_that(
       fastcpd.quantile = "detect_quantile",
       fastcpd_rank = "detect_rank",
       fastcpd.rank = "detect_rank",
-      fastcpd.ts = "fastcpd_ts",
       fastcpd_var = "detect_var",
       fastcpd.var = "detect_var",
       fastcpd_variance = "detect_variance",
@@ -80,8 +79,12 @@ testthat::test_that(
     }
 
     exports <- getNamespaceExports("fastcpd")
-    testthat::expect_false("detect_time_series" %in% exports)
-    testthat::expect_false("detect_ts" %in% exports)
+    removed_time_series_umbrellas <- c(
+      "detect_time_series", "detect_ts", "fastcpd_ts", "fastcpd.ts"
+    )
+    for (name in removed_time_series_umbrellas) {
+      testthat::expect_false(name %in% exports)
+    }
 
     legacy_variance_aliases <- c(
       variance_arma = "estimate_variance_arma",
