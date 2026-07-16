@@ -335,6 +335,9 @@ detect <- function(  # nolint: cyclomatic complexity
   } else if (family == "arima") {
     stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
     stopifnot(check_arima_order(order))
+  } else if (family == "arma") {
+    stopifnot("Data should be a univariate time series." = ncol(data_) == 1)
+    stopifnot(check_order(order, family))
   }
 
   # Check the parameters passed in the ellipsis.
@@ -598,7 +601,7 @@ fastcpd <- detect
 #'
 #' Time series:
 #' [detect_ar()], [detect_var()], [detect_arima()], [detect_arma()],
-#' [detect_garch()], [detect_time_series()];
+#' [detect_garch()];
 #'
 #' Distribution-free:
 #' [detect_kernel()], [detect_rank()].
@@ -628,7 +631,13 @@ NULL
 #' @rdname detect_ar
 #' @export
 detect_ar <- function(data, order = 0, ...) {
-  result <- detect_time_series(c(data), "ar", order, ...)
+  result <- detect(
+    formula = ~ . - 1,
+    data = data.frame(x = c(data)),
+    family = "ar",
+    order = order,
+    ...
+  )
   result@call <- match.call()
   result
 }
@@ -665,7 +674,13 @@ fastcpd.ar <- detect_ar  # nolint: Conventional R function style
 #' @rdname detect_arima
 #' @export
 detect_arima <- function(data, order = 0, ...) {
-  result <- detect_time_series(c(data), "arima", order, ...)
+  result <- detect(
+    formula = ~ . - 1,
+    data = data.frame(x = c(data)),
+    family = "arima",
+    order = order,
+    ...
+  )
   result@call <- match.call()
   result
 }
@@ -698,7 +713,13 @@ fastcpd.arima <- detect_arima  # nolint: Conventional R function style
 #' @rdname detect_arma
 #' @export
 detect_arma <- function(data, order = c(0, 0), ...) {
-  result <- detect_time_series(c(data), "arma", order, ...)
+  result <- detect(
+    formula = ~ . - 1,
+    data = data.frame(x = c(data)),
+    family = "arma",
+    order = order,
+    ...
+  )
   result@call <- match.call()
   result
 }
@@ -779,7 +800,13 @@ fastcpd.binomial <- detect_binomial  # nolint: Conventional R function style
 #' @rdname detect_garch
 #' @export
 detect_garch <- function(data, order = c(0, 0), ...) {
-  result <- detect_time_series(c(data), "garch", order, ...)
+  result <- detect(
+    formula = ~ . - 1,
+    data = data.frame(x = c(data)),
+    family = "garch",
+    order = order,
+    ...
+  )
   result@call <- match.call()
   result
 }
@@ -1222,7 +1249,7 @@ fastcpd_rank <- detect_rank
 fastcpd.rank <- detect_rank  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in time series data
-#' @aliases detect_ts fastcpd_ts fastcpd.ts
+#' @aliases fastcpd.ts
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param family A character string specifying the family of the time series.
 #' The value should be one of \code{"ar"}, \code{"var"}, \code{"arima"} or
@@ -1242,18 +1269,20 @@ fastcpd.rank <- detect_rank  # nolint: Conventional R function style
 #' \code{include.mean}, which is a logical value indicating whether the
 #' mean should be included in the model. The default value is \code{TRUE}.
 #' @return A [fastcpd-class] object.
-#' @description [detect_time_series()] and [detect_ts()] are wrapper functions
-#' for [detect()] to find change points in time series data. The function is
-#' similar to [detect()] except that the data is a time series and the
-#' family is one of \code{"ar"}, \code{"var"}, \code{"arma"}, \code{"arima"} or
+#' @description [fastcpd_ts()] and [fastcpd.ts()] are compatibility wrapper
+#' functions for [detect()] to find change points in time series data. New code
+#' should use a family-specific wrapper such as [detect_ar()] or call [detect()]
+#' directly. Like [detect()], it accepts the time-series families
+#' \code{"ar"}, \code{"var"}, \code{"arma"}, \code{"arima"}, and
 #' \code{"garch"}.
 #' @example tests/testthat/examples/fastcpd_ts.txt
 #' @seealso [detect()]
 #'
 #' @md
-#' @rdname detect_time_series
+#' @keywords internal
+#' @rdname fastcpd_ts
 #' @export
-detect_time_series <- function(data, family = NULL, order = c(0, 0, 0), ...) {
+fastcpd_ts <- function(data, family = NULL, order = c(0, 0, 0), ...) {
   if (!is.null(family)) {
     family <- tolower(family)
   }
@@ -1273,17 +1302,9 @@ detect_time_series <- function(data, family = NULL, order = c(0, 0, 0), ...) {
   result
 }
 
-#' @rdname detect_time_series
+#' @rdname fastcpd_ts
 #' @export
-detect_ts <- detect_time_series
-
-#' @rdname detect_time_series
-#' @export
-fastcpd_ts <- detect_time_series
-
-#' @rdname detect_time_series
-#' @export
-fastcpd.ts <- detect_time_series  # nolint: Conventional R function style
+fastcpd.ts <- fastcpd_ts  # nolint: Conventional R function style
 
 #' @title Find change points efficiently in VAR(\eqn{p}) models
 #' @aliases fastcpd_var fastcpd.var
@@ -1293,8 +1314,8 @@ fastcpd.ts <- detect_time_series  # nolint: Conventional R function style
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
 #' @description [detect_var()] and [fastcpd.var()] are
-#' wrapper functions of [detect_time_series()] to find change points in
-#' VAR(\eqn{p}) models. The function is similar to [detect_time_series()]
+#' wrapper functions of [detect()] to find change points in
+#' VAR(\eqn{p}) models. The function is similar to [detect()]
 #' except that the data is by default a matrix with row as an observation
 #' and thus a formula is not required here.
 #' @example tests/testthat/examples/fastcpd_var.R
@@ -1304,7 +1325,13 @@ fastcpd.ts <- detect_time_series  # nolint: Conventional R function style
 #' @rdname detect_var
 #' @export
 detect_var <- function(data, order = 0, ...) {
-  result <- detect_time_series(data, "var", order, ...)
+  result <- detect(
+    formula = ~ . - 1,
+    data = data.frame(x = data),
+    family = "var",
+    order = order,
+    ...
+  )
   result@call <- match.call()
   result
 }

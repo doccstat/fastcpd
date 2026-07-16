@@ -51,8 +51,7 @@ testthat::test_that(
       fastcpd.quantile = "detect_quantile",
       fastcpd_rank = "detect_rank",
       fastcpd.rank = "detect_rank",
-      fastcpd_ts = "detect_time_series",
-      fastcpd.ts = "detect_time_series",
+      fastcpd.ts = "fastcpd_ts",
       fastcpd_var = "detect_var",
       fastcpd.var = "detect_var",
       fastcpd_variance = "detect_variance",
@@ -71,8 +70,7 @@ testthat::test_that(
       detect_logistic_regression = "detect_binomial",
       detect_mean_variance = "detect_meanvariance",
       detect_poisson_regression = "detect_poisson",
-      detect_quantile_regression = "detect_quantile",
-      detect_ts = "detect_time_series"
+      detect_quantile_regression = "detect_quantile"
     )
     for (alias in names(unified_detection_aliases)) {
       testthat::expect_identical(
@@ -80,6 +78,10 @@ testthat::test_that(
         getExportedValue("fastcpd", unified_detection_aliases[[alias]])
       )
     }
+
+    exports <- getNamespaceExports("fastcpd")
+    testthat::expect_false("detect_time_series" %in% exports)
+    testthat::expect_false("detect_ts" %in% exports)
 
     legacy_variance_aliases <- c(
       variance_arma = "estimate_variance_arma",

@@ -19,7 +19,7 @@ Regression:
 
 Time series:
 \code{\link[=detect_ar]{detect_ar()}}, \code{\link[=detect_var]{detect_var()}}, \code{\link[=detect_arima]{detect_arima()}}, \code{\link[=detect_arma]{detect_arma()}},
-\code{\link[=detect_garch]{detect_garch()}}, \code{\link[=detect_time_series]{detect_time_series()}};
+\code{\link[=detect_garch]{detect_garch()}};
 
 Distribution-free:
 \code{\link[=detect_kernel]{detect_kernel()}}, \code{\link[=detect_rank]{detect_rank()}}.

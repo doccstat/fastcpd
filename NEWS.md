@@ -1,3 +1,12 @@
+# fastcpd 1.2.1
+
+*   Remove the redundant `detect_time_series()` / `detect_ts()` umbrella from
+    the R and Python APIs. Time-series family wrappers now call `detect()`
+    directly; the long-standing R `fastcpd_ts()` / `fastcpd.ts()` entry points
+    remain available for compatibility.
+*   Remove the corresponding Python `time_series` and `ts` aliases; use
+    `detect(..., family=...)` or a family-specific wrapper instead.
+
 # fastcpd 1.2.0
 
 *   Publish language-specific source projections at `fastcpd-r`,

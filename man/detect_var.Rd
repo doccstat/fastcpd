@@ -25,8 +25,8 @@ A \link[=fastcpd-class]{fastcpd} object.
 }
 \description{
 \code{\link[=detect_var]{detect_var()}} and \code{\link[=fastcpd.var]{fastcpd.var()}} are
-wrapper functions of \code{\link[=detect_time_series]{detect_time_series()}} to find change points in
-VAR(\eqn{p}) models. The function is similar to \code{\link[=detect_time_series]{detect_time_series()}}
+wrapper functions of \code{\link[=detect]{detect()}} to find change points in
+VAR(\eqn{p}) models. The function is similar to \code{\link[=detect]{detect()}}
 except that the data is by default a matrix with row as an observation
 and thus a formula is not required here.
 }

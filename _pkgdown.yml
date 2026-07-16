@@ -33,14 +33,12 @@ reference:
 
   - subtitle: Time series
     desc: >
-      `detect_time_series()` is the main convenience function for time series
-      data and delegates to `detect()`.
+      Family-specific convenience functions for supported time-series models.
     contents:
       - detect_ar
       - detect_arima
       - detect_arma
       - detect_garch
-      - detect_time_series
       - detect_var
 
   - subtitle: Unlabeled data
