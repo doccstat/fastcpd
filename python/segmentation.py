@@ -11,12 +11,12 @@ from fastcpd.interface import fastcpd_impl
 #
 # PELT families: mean, variance, meanvariance, exponential, mgaussian, garch.
 # SEN families: lasso, gaussian/lm, binomial, poisson, quantile, arma, ma.
-# 'arima' is accepted by detect() and pre-differenced before C++ dispatch.
+# 'arima' uses segment-local differencing in the shared C++ family.
 # 'rank' and 'kernel'/'kcp' are Python-layer transforms routed to mean.
 _SUPPORTED_FAMILIES = frozenset({
     'mean', 'variance', 'meanvariance', 'exponential', 'mgaussian', 'lasso',
     'garch', 'gaussian', 'binomial', 'poisson', 'quantile', 'arma', 'ma',
-    'arima', 'rank', 'kernel', 'kcp',
+    'ar', 'arima', 'rank', 'kernel', 'kcp',
 })
 
 # Map R-style synonym names to the internal C++ family string.
@@ -234,32 +234,33 @@ def detect_ar(data, order=1, **kwargs):
     Returns:
         A list of change-point indices, or a CpdResult when cp_only=False.
     """
-    return detect(data=data, family='arma', order=(order, 0), **kwargs)
+    return detect(data=data, family='ar', order=order, **kwargs)
 
 
-def detect_arima(data, order=(1, 1, 0), **kwargs):
+def detect_arima(data, order=(1, 1, 0), include_mean=False, **kwargs):
     """Find change points in ARIMA(p, d, q) models.
 
-    The integration order ``d`` is handled in Python by pre-differencing the
-    series ``d`` times before running ARMA(p, q) change-point detection on the
-    differenced series. This is equivalent to R's ``fastcpd_arima()`` for the
-    common case ``d ≤ 2`` and matches its change-point indices exactly for
-    ``d = 1`` (the most common case).
+    The integration order ``d`` is applied independently inside every
+    candidate segment by the shared native R/Python implementation. This
+    avoids forming a difference across a proposed change-point boundary and
+    keeps change-point indices in the original-series coordinate system.
 
     Args:
         data: Univariate time series, shape (n,) or (n, 1).
         order: Tuple (p, d, q) — AR order, integration order, MA order.
+        include_mean: Must remain False. The unified likelihood is zero-mean.
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
         A list of change-point indices, or a CpdResult when cp_only=False.
 
-    Note:
-        For ``d ≥ 2`` the returned change-point indices correspond to the
-        differenced-series positions. For ``d = 0`` this is identical to
-        ``arma(data, order=(p, q))``.
+    For ``d = 0`` this is identical to
+    ``arma(data, order=(p, q))``.
     """
-    return detect(data=data, family='arima', order=order, **kwargs)
+    return detect(
+        data=data, family='arima', order=order,
+        include_mean=include_mean, **kwargs
+    )
 
 
 def confint(result, **kwargs):
@@ -371,6 +372,7 @@ def detect(
     multiple_epochs=None,
     epsilon: float = 1e-10,
     order=(0, 0, 0),
+    include_mean: bool = False,
     p: int = None,
     p_response: int = 0,
     variance_estimation=None,
@@ -392,7 +394,7 @@ def detect(
         family: One of 'mean', 'variance', 'meanvariance', 'exponential',
             'mgaussian' / 'var' (synonym), 'lasso', 'garch', 'gaussian' /
             'lm' (synonym), 'binomial', 'poisson', 'arma', 'ma',
-            'quantile', 'arima' (pre-differenced then routed to arma/ma),
+            'quantile', 'arima' (segment-local differencing),
             'rank', or 'kernel' / 'kcp' (random Fourier feature transform).
         line_search: Values for line search step sizes.
         lower: Lower bound for parameters after each update.
@@ -407,7 +409,9 @@ def detect(
         multiple_epochs: Per-step epoch schedule. Custom schedules are not yet
             supported by the Python binding; leave this as ``None``.
         epsilon: Epsilon for numerical stability.
-        order: Order for ARMA/MA models as tuple (ar_order, ma_order).
+        order: Model order. ARMA uses ``(p, q)`` and ARIMA uses ``(p, d, q)``.
+        include_mean: Must be False for ARIMA. The shared native likelihood
+            is zero-mean in both R and Python.
         p: Number of model parameters.  ``None`` (or 0) triggers automatic
             inference from ``family`` and the data dimensions in C++,
             matching the R package's per-family formulas.
@@ -473,6 +477,24 @@ def detect(
             order = (var_order,)
             index_offset = var_order
             family = 'mgaussian'
+    elif family == 'ar':
+        ar_order = _validate_ar_order(order)
+        if data.shape[1] != 1:
+            raise ValueError("AR data must be univariate")
+        if data.shape[0] <= ar_order:
+            raise ValueError(
+                "AR order must be smaller than the number of rows"
+            )
+        n_rows = data.shape[0]
+        response = data[ar_order:, 0:1]
+        lags = numpy.column_stack([
+            data[ar_order - lag:n_rows - lag, 0]
+            for lag in range(1, ar_order + 1)
+        ])
+        data = numpy.column_stack([response, lags])
+        family = 'gaussian'
+        order = (ar_order,)
+        index_offset = ar_order
     else:
         # Apply family-name synonyms (e.g. 'lm' → 'gaussian').
         family = _FAMILY_ALIASES.get(family, family)
@@ -494,41 +516,61 @@ def detect(
         if cost_adjustment_missing:
             cost_adjustment = 'BIC'
 
-    # ARIMA(p, d, q): pre-difference the series d times, then route to arma/ma.
-    # numpy.diff does not change the number of rows (it shortens by d rows),
-    # so returned change-point indices are in the original-series index space.
+    # ARIMA(p, d, q): d=0 is exactly ARMA(p, q); d>0 stays as the
+    # segment-local native ARIMA family so no cross-boundary difference is
+    # introduced and returned indices remain in original-series coordinates.
     if family == 'arima':
-        arima_order = list(order) if hasattr(order, '__len__') else [int(order), 0, 0]
-        while len(arima_order) < 3:
-            arima_order.append(0)
-        p_ar = int(arima_order[0])
-        d_int = int(arima_order[1])
-        q_ma = int(arima_order[2])
-        if d_int < 0:
-            raise ValueError(f"ARIMA integration order d must be >= 0, got {d_int}")
-        if d_int > 0:
-            data = numpy.diff(data, n=d_int, axis=0)
-        order = (p_ar, q_ma)
-        family = 'arma' if p_ar > 0 else 'ma'
+        if include_mean:
+            raise ValueError(
+                "include_mean=True is not supported by the unified ARIMA "
+                "likelihood; use the default False"
+            )
+        p_ar, d_int, q_ma = _validate_arima_order(order)
+        if data.shape[1] != 1:
+            raise ValueError("ARIMA data must be univariate")
+        if data.shape[0] <= d_int:
+            raise ValueError(
+                "ARIMA integration order must be smaller than the number "
+                "of rows"
+            )
+        if d_int == 0:
+            order = (p_ar, q_ma)
+            family = 'arma'
+        else:
+            order = (p_ar, d_int, q_ma)
+    elif include_mean:
+        raise ValueError("include_mean is only supported for ARIMA")
+
+    if family == 'arma':
+        if data.shape[1] != 1:
+            raise ValueError("ARMA data must be univariate")
+        order = _validate_arma_order(order)
 
     # Route pure-MA models: arma with p=0 uses the MA family.
     if family == 'arma' and hasattr(order, '__len__') and order[0] == 0:
         family = 'ma'
 
-    # Pure AR(p): route through lag-structured gaussian instead of ARMA.
-    # The ARMA C++ path requires q > 0 in the NO_RCPP (Python) build;
-    # for q == 0, OLS on lagged data gives the exact conditional MLE.
+    # Pure AR(p) uses the same lag-structured Gaussian path as R's `ar` and
+    # `arma(order = c(p, 0))` interfaces. The sequential ARMA update is not
+    # defined for q=0.
     if (family == 'arma' and hasattr(order, '__len__') and
             len(order) >= 2 and int(order[0]) > 0 and int(order[1]) == 0):
         p_ar = int(order[0])
+        if data.shape[1] != 1:
+            raise ValueError("pure AR data must be univariate")
         n_rows = data.shape[0]
-        if p_ar < n_rows:
-            y = data[p_ar:, 0:1]
-            lags = numpy.column_stack(
-                [data[p_ar - j - 1:n_rows - j - 1, 0] for j in range(p_ar)])
-            data = numpy.column_stack([y, lags])
-            family = 'gaussian'
-            index_offset += p_ar
+        if n_rows <= p_ar:
+            raise ValueError(
+                "AR order must be smaller than the number of rows"
+            )
+        response = data[p_ar:, 0:1]
+        lags = numpy.column_stack([
+            data[p_ar - lag:n_rows - lag, 0]
+            for lag in range(1, p_ar + 1)
+        ])
+        data = numpy.column_stack([response, lags])
+        family = 'gaussian'
+        index_offset += p_ar
 
     if family not in _SUPPORTED_FAMILIES:
         raise ValueError(
@@ -585,6 +627,57 @@ def detect(
         residuals=result['residuals'],
         thetas=result['thetas'],
     )
+
+
+def _integer_order_values(order, expected_length, family):
+    """Return a fixed-length tuple of non-negative integer order values."""
+    if not hasattr(order, '__len__') or isinstance(order, str):
+        raise ValueError(
+            f"{family} order must contain {expected_length} integers"
+        )
+    values = list(order)
+    if len(values) != expected_length:
+        raise ValueError(
+            f"{family} order must contain {expected_length} integers"
+        )
+    integers = []
+    for value in values:
+        value_float = float(value)
+        value_int = int(value_float)
+        if value_int < 0 or value_float != value_int:
+            raise ValueError(
+                f"{family} order must contain non-negative integers"
+            )
+        integers.append(value_int)
+    return tuple(integers)
+
+
+def _validate_ar_order(order):
+    """Return a validated positive scalar AR order."""
+    if hasattr(order, '__len__') and not isinstance(order, str):
+        values = list(order)
+        if len(values) != 1:
+            raise ValueError("AR order must be a positive integer")
+        order = values[0]
+    value_float = float(order)
+    value_int = int(value_float)
+    if value_int <= 0 or value_float != value_int:
+        raise ValueError("AR order must be a positive integer")
+    return value_int
+
+
+def _validate_arma_order(order):
+    values = _integer_order_values(order, 2, "ARMA")
+    if values == (0, 0):
+        raise ValueError("ARMA order must contain at least one non-zero value")
+    return values
+
+
+def _validate_arima_order(order):
+    values = _integer_order_values(order, 3, "ARIMA")
+    if values == (0, 0, 0):
+        raise ValueError("ARIMA order must contain at least one non-zero value")
+    return values
 
 
 def _validate_var_order(order):

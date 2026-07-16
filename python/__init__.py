@@ -19,12 +19,15 @@ where the statistical properties of a sequence of observations change.
 | `segmentation.lm` | gaussian | Change in linear regression coefficients |
 | `segmentation.binomial` | binomial | Change in logistic regression coefficients |
 | `segmentation.poisson` | poisson | Change in Poisson regression coefficients |
-| `segmentation.arma` | arma | Change in ARMA(p,q) model parameters (q > 0) |
+| `segmentation.arma` | arma | Change in ARMA(p,q) model parameters |
 | `segmentation.ar` | ar | Change in AR(p) model parameters (OLS on lags) |
 | `segmentation.arima` | arima | Change in ARIMA(p,d,q) model parameters |
 
 Not supported: `custom` (requires Python/R callbacks). Pure MA models are
-accessible via ``arima(data, order=(0, 0, q))``.
+accessible via ``arma(data, order=(0, q))`` or
+``arima(data, order=(0, 0, q))``. ARIMA differences candidate segments
+independently, returns original-series change-point indices, and uses the same
+zero-mean native likelihood in R and Python.
 
 # Quickstart
 
@@ -73,7 +76,7 @@ if _sys.platform == 'win32':
 
 del _os, _sys
 
-__version__ = "0.20.0"
+__version__ = "0.21.0"
 
 from fastcpd.confidence import confint  # noqa: E402,F401
 from fastcpd.segmentation import (  # noqa: E402

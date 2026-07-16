@@ -285,20 +285,36 @@ class TestBasic(unittest.TestCase):
         self.assertAlmostEqual(result.cp_set[0], 300, delta=30)
 
     def test_arima(self):
-        # ARIMA(1,1,0): AR(1) process on first differences.
-        # Build two I(1) segments with different AR(1) drift structures.
-        seed(14)
-        n = 600
-        x = np.zeros(n)
-        # Segment 1: I(1) with AR(1) φ=0.7 on differences
-        for t in range(1, 300):
-            x[t] = x[t - 1] + 0.7 * (x[t - 1] - x[t - 2] if t > 1 else 0) + randn()
-        # Segment 2: I(1) with AR(1) φ=-0.7 on differences
-        for t in range(300, n):
-            x[t] = x[t - 1] - 0.7 * (x[t - 1] - x[t - 2] if t > 1 else 0) + randn()
-        result = arima(x, order=(1, 1, 0))
-        self.assertGreater(len(result.cp_set), 0)
-        self.assertAlmostEqual(result.cp_set[0], 300, delta=30)
+        # Shared R/Python contract: difference each candidate segment, retain
+        # original-series indices, and omit the cross-boundary difference.
+        small = np.tile([0.1, -0.1], 20)
+        large = np.resize(np.array([2.0, -2.0]), 41)
+        x = np.concatenate([
+            [0.0], np.cumsum(np.concatenate([small, large]))
+        ])
+        result = arima(
+            x, order=(0, 1, 0), beta=20, cost_adjustment='BIC',
+            segment_count=2,
+        )
+
+        self.assertEqual(result.cp_set, [41])
+        expected_costs = [
+            20 * (np.log(2 * np.pi) + np.log(0.01) + 1),
+            20 * (np.log(2 * np.pi) + np.log(4.0) + 1),
+        ]
+        np.testing.assert_allclose(result.cost_values, expected_costs)
+        np.testing.assert_allclose(result.thetas, [[0.01, 4.0]])
+
+        residuals = np.asarray(result.residuals)[:, 0]
+        np.testing.assert_array_equal(
+            np.flatnonzero(np.isnan(residuals)) + 1, [1, 42]
+        )
+        np.testing.assert_allclose(
+            residuals[~np.isnan(residuals)],
+            np.concatenate([small, large[1:]]),
+        )
+        with self.assertRaisesRegex(ValueError, "include_mean=True"):
+            arima(x, order=(0, 1, 0), include_mean=True)
 
     def test_arima_d0_matches_arma(self):
         # ARIMA(1, 0, 0) should produce the same result as arma(x, order=(1, 0)).

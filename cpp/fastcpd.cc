@@ -5,6 +5,7 @@
 #include <fastcpd/fastcpd.h>
 
 #include "fastcpd_template.h"
+#include "families/arima.h"
 #include "families/arma.h"
 #include "families/binomial.h"
 #include "families/custom.h"
@@ -45,7 +46,7 @@ std::string lower_ascii(std::string value) {
 bool is_pelt_family(std::string const& family) {
   return family == "mean" || family == "variance" ||
          family == "meanvariance" || family == "exponential" ||
-         family == "mgaussian" || family == "garch";
+         family == "mgaussian" || family == "garch" || family == "arima";
 }
 
 void validate_cost_adjustment(std::string const& value) {
@@ -89,6 +90,26 @@ int compute_p(std::string const& family, arma::mat const& data,
   if (family == "garch" || family == "arma") {
     return static_cast<int>(arma::sum(order)) + 1;
   }
+  if (family == "arima") {
+    if (order.n_elem != 3) {
+      throw std::invalid_argument(
+          "fastcpd: ARIMA order must contain p, d, and q");
+    }
+    bool any_nonzero = false;
+    for (arma::uword index = 0; index < order.n_elem; ++index) {
+      double const value = order(index);
+      if (!std::isfinite(value) || value < 0.0 || value != std::floor(value)) {
+        throw std::invalid_argument(
+            "fastcpd: ARIMA order values must be non-negative integers");
+      }
+      any_nonzero = any_nonzero || value != 0.0;
+    }
+    if (!any_nonzero) {
+      throw std::invalid_argument(
+          "fastcpd: ARIMA order must contain a non-zero value");
+    }
+    return static_cast<int>(order(0) + order(2)) + 1;
+  }
   if (family == "ma") return static_cast<int>(order_at(order, 1)) + 1;
   if (family == "custom") return std::max(1, n_cols - 1);
   throw std::invalid_argument("fastcpd: unsupported family '" + family + "'");
@@ -115,7 +136,8 @@ double compute_pruning_coef(std::optional<double> pruning_coef,
                             std::string const& family, int p) {
   double value = pruning_coef.value_or(0.0);
   if (!pruning_coef.has_value() &&
-      (family == "mgaussian" || family == "lasso" || family == "garch")) {
+      (family == "mgaussian" || family == "lasso" || family == "garch" ||
+       family == "arima")) {
     value = -std::numeric_limits<double>::infinity();
   }
   if (!pruning_coef.has_value() && cost_adjustment == "MBIC") {
@@ -348,6 +370,12 @@ RunResult dispatch(double beta, std::string const& cost_adjustment,
     }
     FASTCPD_DISPATCH_PELT_COST(false, GarchFamily, -1);
   }
+  if (family == "arima") {
+    if (options.show_progress) {
+      FASTCPD_DISPATCH_PELT_COST(true, ArimaFamily, -1);
+    }
+    FASTCPD_DISPATCH_PELT_COST(false, ArimaFamily, -1);
+  }
   if (family == "gaussian") {
     if (options.show_progress) {
       FASTCPD_DISPATCH_SEGD(true, GaussianFamily);
@@ -426,6 +454,9 @@ Result detect(arma::mat const& data, Options options) {
   arma::colvec const order = options.order;
   int const p = detail::compute_p(family, data, order, options.p_response,
                                   options.p);
+  if (family == "arima" && data.n_cols != 1) {
+    throw std::invalid_argument("fastcpd: ARIMA data must be univariate");
+  }
   if (p <= 0) {
     throw std::invalid_argument(
         "fastcpd: inferred p must be positive; pass Options::p explicitly");

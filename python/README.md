@@ -31,6 +31,12 @@ already-constructed response/predictor matrix, use
 `var(data, order=p, p_response=q)` form for a pre-constructed matrix remains
 accepted for compatibility.
 
+`detect_arima(data, order=(p, d, q))` differences every candidate segment
+independently in the shared native R/Python implementation. Returned change
+points therefore use the original-series indices, and no cross-boundary
+difference contaminates either adjacent segment. The likelihood is zero-mean
+(`include_mean=False`), and `d=0` is identical to `detect_arma()`.
+
 ## Native build
 
 Python packaging uses `scikit-build-core` and CMake. The source distribution
