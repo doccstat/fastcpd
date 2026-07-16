@@ -73,7 +73,7 @@ if _sys.platform == 'win32':
 
 del _os, _sys
 
-__version__ = "0.19.0"
+__version__ = "0.19.1"
 
 from fastcpd.confidence import confint  # noqa: E402,F401
 from fastcpd.segmentation import (  # noqa: E402
@@ -103,8 +103,6 @@ from fastcpd.segmentation import (  # noqa: E402
     detect_quantile,
     detect_quantile_regression,
     detect_rank,
-    detect_time_series,
-    detect_ts,
     detect_var,
     detect_variance,
     exponential,
@@ -118,8 +116,6 @@ from fastcpd.segmentation import (  # noqa: E402
     poisson,
     quantile,
     rank,
-    time_series,
-    ts,
     var,
     variance,
 )
@@ -162,8 +158,6 @@ __all__ = [
     'detect_quantile',
     'detect_quantile_regression',
     'detect_rank',
-    'detect_time_series',
-    'detect_ts',
     'detect_var',
     'detect_variance',
     'exponential',
@@ -183,8 +177,6 @@ __all__ = [
     'poisson',
     'quantile',
     'rank',
-    'time_series',
-    'ts',
     'var',
     'variance',
 ]

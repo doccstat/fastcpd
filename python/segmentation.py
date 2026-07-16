@@ -334,33 +334,6 @@ def detect_quantile_regression(data, order=0.5, **kwargs):
     return detect_quantile(data, order=order, **kwargs)
 
 
-def detect_time_series(data, family=None, order=(0, 0, 0), **kwargs):
-    """Find change points in the supported time-series families."""
-    if family is None:
-        raise ValueError("family must be provided")
-    family = family.lower()
-    if family == 'ar':
-        ar_order = order[0] if hasattr(order, '__len__') else order
-        return detect_ar(data, order=ar_order, **kwargs)
-    if family == 'var':
-        var_order = order[0] if hasattr(order, '__len__') else order
-        return detect_var(data, order=var_order, **kwargs)
-    if family == 'arma':
-        return detect_arma(data, order=order, **kwargs)
-    if family == 'arima':
-        return detect_arima(data, order=order, **kwargs)
-    if family == 'garch':
-        return detect_garch(data, order=order, **kwargs)
-    raise ValueError(
-        "family must be one of 'ar', 'var', 'arma', 'arima', or 'garch'"
-    )
-
-
-def detect_ts(data, family=None, order=(0, 0, 0), **kwargs):
-    """Find change points in the supported time-series families."""
-    return detect_time_series(data, family=family, order=order, **kwargs)
-
-
 mean = detect_mean
 exponential = detect_exponential
 variance = detect_variance
@@ -378,8 +351,6 @@ arima = detect_arima
 rank = detect_rank
 kernel = detect_kernel
 kcp = detect_kcp
-ts = detect_ts
-time_series = detect_time_series
 
 
 def detect(

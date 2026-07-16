@@ -1,6 +1,7 @@
 import unittest
 
 import fastcpd as fastcpd_pkg
+import fastcpd.segmentation as segmentation
 import numpy as np
 from fastcpd.segmentation import (
     ar, arima, arma, binomial, detect_kernel, detect_mean, detect_quantile,
@@ -45,6 +46,9 @@ class TestBasic(unittest.TestCase):
             fastcpd_pkg.estimate_variance_mean,
             fastcpd_pkg.variance_estimation.mean,
         )
+        for name in ('detect_time_series', 'detect_ts', 'time_series', 'ts'):
+            self.assertFalse(hasattr(fastcpd_pkg, name))
+            self.assertFalse(hasattr(segmentation, name))
 
         seed(17)
         data = concatenate((np.random.normal(0, 0.2, 40),
