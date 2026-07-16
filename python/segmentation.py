@@ -483,17 +483,17 @@ def detect(
         raise ValueError("data must be one- or two-dimensional")
     original_data = data
 
-    if cost is not None or cost_gradient is not None or cost_hessian is not None:
-        raise NotImplementedError(
-            "Custom cost functions (cost, cost_gradient, cost_hessian) are not "
-            "supported by the Python binding."
-        )
-
     cost_adjustment_missing = cost_adjustment is None
     if cost_adjustment is None:
         cost_adjustment = 'MBIC'
 
     family = family.lower() if family is not None else 'custom'
+    if (family == 'custom' or cost is not None or cost_gradient is not None or
+            cost_hessian is not None):
+        raise NotImplementedError(
+            "Custom cost callbacks are intentionally R-only; the Python "
+            "binding supports the built-in native families only."
+        )
     public_family = family
     public_order = _public_order(order)
     index_offset = 0

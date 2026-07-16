@@ -71,7 +71,8 @@ def confint(
             detect_kwargs)
     if parm == 'cp' and method == 'profile':
         return _cp_profile(
-            result, data, level, family, window, min_segment_length)
+            result, data, level, family, result_order, window,
+            min_segment_length)
     if parm == 'theta' and method == 'wald':
         return _theta_wald(result, data, level, family)
 
@@ -190,10 +191,12 @@ def _match_cp_set(reference_cp, bootstrap_cp, n):
     return matched
 
 
-def _cp_profile(result, data, level, family, window, min_segment_length):
+def _cp_profile(
+    result, data, level, family, order, window, min_segment_length
+):
     family = _normalize_family(family)
     data = _as_2d_data(data)
-    cost = _profile_cost_function(data, family)
+    cost = _profile_cost_function(data, family, order)
     cp_set = sorted(int(cp) for cp in result.cp_set)
     if not cp_set:
         return []
@@ -225,7 +228,8 @@ def _cp_profile(result, data, level, family, window, min_segment_length):
             support = [
                 tau for tau, value in finite if value - profile_min <= cutoff
             ]
-            lower, upper = min(support), max(support)
+            lower = min(min(support), cp)
+            upper = max(max(support), cp)
         else:
             profile_min, lower, upper = math.nan, math.nan, math.nan
         rows.append({
@@ -242,7 +246,7 @@ def _cp_profile(result, data, level, family, window, min_segment_length):
     return rows
 
 
-def _profile_cost_function(data, family):
+def _profile_cost_function(data, family, order=None):
     if family == 'mean':
         def cost(start, end):
             segment = data[start:end, :]
@@ -290,6 +294,43 @@ def _profile_cost_function(data, family):
             return float(residual @ residual / 2)
         return cost
 
+    if family in ('binomial', 'poisson'):
+        def cost(start, end):
+            segment = data[start:end, :]
+            x = segment[:, 1:]
+            if x.shape[0] <= x.shape[1]:
+                return math.inf
+            return _native_single_segment_cost(
+                segment, family=family, order=(0, 0, 0)
+            )
+        return cost
+
+    if family == 'quantile':
+        if order is None or len(order) < 1:
+            raise ValueError("quantile profile intervals require result.order")
+        tau = float(order[0])
+
+        def cost(start, end):
+            segment = data[start:end, :]
+            x = segment[:, 1:]
+            if x.shape[0] <= x.shape[1]:
+                return math.inf
+            return _native_single_segment_cost(
+                segment, family='quantile', order=(tau,)
+            )
+        return cost
+
+    if family == 'arima':
+        if order is None or len(order) != 3:
+            raise ValueError("ARIMA profile intervals require result.order")
+        arima_order = tuple(int(value) for value in order)
+
+        def cost(start, end):
+            return _native_single_segment_cost(
+                data[start:end, 0], family='arima', order=arima_order
+            )
+        return cost
+
     raise NotImplementedError(
         f"Profile intervals are not implemented for family {family!r}")
 
@@ -308,7 +349,8 @@ def _theta_wald(result, data, level, family):
     bounds = [0] + sorted(int(cp) for cp in result.cp_set) + [data.shape[0]]
     rows = []
     for segment_index, (start, end) in enumerate(zip(bounds[:-1], bounds[1:])):
-        segment_se = se(start, end)
+        segment_theta = theta[:, segment_index]
+        segment_se = se(start, end, segment_theta)
         for param_index, estimate in enumerate(theta[:, segment_index]):
             se_value = segment_se[param_index]
             rows.append({
@@ -327,7 +369,7 @@ def _theta_wald(result, data, level, family):
 
 def _theta_se_function(data, family):
     if family == 'mean':
-        def se(start, end):
+        def se(start, end, estimate=None):
             segment = data[start:end, :]
             if segment.shape[0] <= 1:
                 return numpy.full(segment.shape[1], numpy.nan)
@@ -337,14 +379,14 @@ def _theta_se_function(data, family):
         return se
 
     if family == 'exponential':
-        def se(start, end):
+        def se(start, end, estimate=None):
             segment = data[start:end, 0]
             rate = 1 / segment.mean()
             return numpy.array([rate / numpy.sqrt(segment.size)])
         return se
 
     if family == 'gaussian':
-        def se(start, end):
+        def se(start, end, estimate=None):
             segment = data[start:end, :]
             x = segment[:, 1:]
             y = segment[:, 0]
@@ -358,8 +400,62 @@ def _theta_se_function(data, family):
             return numpy.sqrt(numpy.diag(xtx_inv) * sigma2)
         return se
 
+    if family in ('binomial', 'poisson'):
+        def se(start, end, estimate=None):
+            segment = data[start:end, :]
+            x = segment[:, 1:]
+            try:
+                eta = x @ numpy.asarray(estimate, dtype=float)
+                if family == 'binomial':
+                    mu = _logistic(eta)
+                    weights = mu * (1 - mu)
+                else:
+                    with numpy.errstate(over='raise', invalid='raise'):
+                        weights = numpy.exp(eta)
+                information = x.T @ (x * weights[:, None])
+                information_inv = numpy.linalg.inv(information)
+            except (FloatingPointError, ValueError, numpy.linalg.LinAlgError):
+                return numpy.full(x.shape[1], numpy.nan)
+            return numpy.sqrt(numpy.diag(information_inv))
+        return se
+
     raise NotImplementedError(
         f"Wald intervals are not implemented for family {family!r}")
+
+
+def _logistic(eta):
+    """Evaluate the inverse-logit without overflowing either tail."""
+    eta = numpy.asarray(eta, dtype=float)
+    result = numpy.empty_like(eta)
+    positive = eta >= 0
+    result[positive] = 1 / (1 + numpy.exp(-eta[positive]))
+    exp_eta = numpy.exp(eta[~positive])
+    result[~positive] = exp_eta / (1 + exp_eta)
+    return result
+
+
+def _native_single_segment_cost(data, family, order):
+    """Evaluate one segment with the shared native R/Python likelihood."""
+    from fastcpd import segmentation
+
+    try:
+        fit = segmentation.detect(
+            data=numpy.asarray(data, dtype=float),
+            family=family,
+            order=order,
+            beta=1e100,
+            cost_adjustment='BIC',
+            segment_count=1,
+            trim=0.0,
+            vanilla_percentage=1.0,
+            cp_only=False,
+            show_progress=False,
+        )
+    except (RuntimeError, ValueError, numpy.linalg.LinAlgError):
+        return math.inf
+    if fit.cp_set.size or fit.cost_values.size != 1:
+        return math.inf
+    return float(fit.cost_values[0])
 
 
 def _logdet(matrix):

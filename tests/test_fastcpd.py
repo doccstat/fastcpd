@@ -86,7 +86,9 @@ class TestBasic(unittest.TestCase):
             fastcpd_pkg.estimate_variance_mean,
             fastcpd_pkg.variance_estimation.mean,
         )
-        for name in ('detect_time_series', 'detect_ts', 'time_series', 'ts'):
+        for name in (
+            'detect_time_series', 'detect_ts', 'fastcpd_ts', 'time_series', 'ts'
+        ):
             self.assertFalse(hasattr(fastcpd_pkg, name))
             self.assertFalse(hasattr(segmentation, name))
 
@@ -142,6 +144,11 @@ class TestBasic(unittest.TestCase):
             detect_mean(np.arange(10), unknown_option=True)
         with self.assertRaisesRegex(NotImplementedError, "multiple_epochs"):
             detect_mean(np.arange(10), multiple_epochs=lambda _: 1)
+        with self.assertRaisesRegex(NotImplementedError, "intentionally R-only"):
+            detect(
+                data=np.arange(10), family='custom',
+                cost=lambda segment: float(np.sum(segment)),
+            )
 
     def test_quantile_interface(self):
         seed(18)
@@ -153,6 +160,10 @@ class TestBasic(unittest.TestCase):
         )
         self.assertGreater(len(result.cp_set), 0)
         self.assertAlmostEqual(result.cp_set[0], 60, delta=10)
+        interval = result.confint(method='profile', level=0.8, window=2)
+        self.assertEqual(interval[0]['estimate'], result.cp_set[0])
+        self.assertLessEqual(interval[0]['lower'], result.cp_set[0])
+        self.assertGreaterEqual(interval[0]['upper'], result.cp_set[0])
 
     def test_mean(self):
         seed(0)
@@ -263,6 +274,11 @@ class TestBasic(unittest.TestCase):
         result = binomial(data)
         self.assertGreater(len(result.cp_set), 0)
         self.assertAlmostEqual(result.cp_set[0], 300, delta=20)
+        profile = result.confint(method='profile', level=0.8, window=1)
+        self.assertEqual(profile[0]['estimate'], result.cp_set[0])
+        wald = result.confint(parm='theta', method='wald', level=0.8)
+        self.assertEqual(len(wald), result.thetas.size)
+        self.assertTrue(all(np.isfinite(row['se']) for row in wald))
 
     def test_poisson(self):
         seed(10)
@@ -278,6 +294,11 @@ class TestBasic(unittest.TestCase):
         result = poisson(data, trim=0.05, vanilla_percentage=1.0)
         self.assertGreater(len(result.cp_set), 0)
         self.assertAlmostEqual(result.cp_set[0], 300, delta=20)
+        profile = result.confint(method='profile', level=0.8, window=1)
+        self.assertEqual(profile[0]['estimate'], result.cp_set[0])
+        wald = result.confint(parm='theta', method='wald', level=0.8)
+        self.assertEqual(len(wald), result.thetas.size)
+        self.assertTrue(all(np.isfinite(row['se']) for row in wald))
 
     @pytest.mark.long
     def test_garch(self):
@@ -340,15 +361,13 @@ class TestBasic(unittest.TestCase):
         x = np.concatenate([
             [0.0], np.cumsum(np.concatenate([small, large]))
         ])
-        result = arima(
-            x, order=(0, 1, 0), beta=20, cost_adjustment='BIC',
-            segment_count=2,
-        )
+        result = arima(x, order=(0, 1, 0))
 
         np.testing.assert_array_equal(result.cp_set, [41])
+        mbic_adjustment = np.log(41) / 2
         expected_costs = [
-            20 * (np.log(2 * np.pi) + np.log(0.01) + 1),
-            20 * (np.log(2 * np.pi) + np.log(4.0) + 1),
+            20 * (np.log(2 * np.pi) + np.log(0.01) + 1) + mbic_adjustment,
+            20 * (np.log(2 * np.pi) + np.log(4.0) + 1) + mbic_adjustment,
         ]
         np.testing.assert_allclose(result.cost_values, expected_costs)
         np.testing.assert_allclose(result.thetas, [[0.01, 4.0]])
@@ -363,6 +382,10 @@ class TestBasic(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "include_mean=True"):
             arima(x, order=(0, 1, 0), include_mean=True)
+        interval = result.confint(method='profile', level=0.8, window=1)
+        self.assertEqual(interval[0]['estimate'], 41)
+        self.assertLessEqual(interval[0]['lower'], 41)
+        self.assertGreaterEqual(interval[0]['upper'], 41)
 
     def test_arima_d0_matches_arma(self):
         # ARIMA(1, 0, 0) should produce the same result as arma(x, order=(1, 0)).

@@ -24,6 +24,15 @@ The public API includes mean, variance, mean/variance, exponential, VAR,
 linear, lasso, binomial, Poisson, quantile, GARCH, AR, ARMA, and ARIMA change
 detection, plus rank and kernel transforms.
 
+Python does not expose the removed R `fastcpd_ts()` umbrella. Use
+`detect(data=..., family=...)` or a family-specific wrapper such as
+`detect_ar()` directly.
+
+Custom cost callbacks are intentionally R-only. R can accept ordinary R
+functions or compiled external pointers, while the Python binding keeps the
+detector on the GIL-free built-in native path and does not define a callback
+ABI.
+
 `detect_var(data, order=p)` accepts the raw multivariate time series and
 constructs its lagged VAR design internally, matching the R interface. For an
 already-constructed response/predictor matrix, use
@@ -36,6 +45,12 @@ independently in the shared native R/Python implementation. Returned change
 points therefore use the original-series indices, and no cross-boundary
 difference contaminates either adjacent segment. The likelihood is zero-mean
 (`include_mean=False`), and `d=0` is identical to `detect_arma()`.
+
+`result.confint()` supports profile change-point intervals for mean, variance,
+mean/variance, exponential, linear, binomial, Poisson, quantile, and ARIMA
+models. Wald parameter intervals are available for mean, exponential, linear,
+binomial, and Poisson fits. ARIMA profile intervals reuse the same native
+segment-local likelihood as detection.
 
 ## Result contract
 

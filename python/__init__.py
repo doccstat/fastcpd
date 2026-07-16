@@ -27,8 +27,9 @@ computation without changing the return type.
 | `segmentation.ar` | ar | Change in AR(p) model parameters (OLS on lags) |
 | `segmentation.arima` | arima | Change in ARIMA(p,d,q) model parameters |
 
-Not supported: `custom` (requires Python/R callbacks). Pure MA models are
-accessible via ``arma(data, order=(0, q))`` or
+Custom cost callbacks are intentionally R-only; the Python binding supports
+the built-in native families and keeps their execution GIL-free. Pure MA models
+are accessible via ``arma(data, order=(0, q))`` or
 ``arima(data, order=(0, 0, q))``. ARIMA differences candidate segments
 independently, returns original-series change-point indices, and uses the same
 zero-mean native likelihood in R and Python.
@@ -80,7 +81,7 @@ if _sys.platform == 'win32':
 
 del _os, _sys
 
-__version__ = "0.22.0"
+__version__ = "0.23.0"
 
 from fastcpd.confidence import confint  # noqa: E402,F401
 from fastcpd.segmentation import (  # noqa: E402
