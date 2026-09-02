@@ -9,10 +9,11 @@ Every detector returns a frozen ``CpdResult`` with read-only NumPy arrays and
 the original data/family/order metadata. ``cp_only=True`` skips detail
 computation without changing the return type.
 
-# Supported families
+# Supported families and entry points
 
 | Function | Family | Description |
 |---|---|---|
+| `segmentation.detect` | any built-in R family | Generic detector; use `family="kcp"` for kernel detection, while rank/kernel aliases remain wrapper-only |
 | `segmentation.mean` | mean | Change in mean (univariate or multivariate) |
 | `segmentation.variance` | variance | Change in variance (univariate or multivariate) |
 | `segmentation.meanvariance` | meanvariance | Change in mean and/or variance |
@@ -26,6 +27,22 @@ computation without changing the return type.
 | `segmentation.arma` | arma | Change in ARMA(p,q) model parameters |
 | `segmentation.ar` | ar | Change in AR(p) model parameters (OLS on lags) |
 | `segmentation.arima` | arima | Change in ARIMA(p,d,q) model parameters |
+| `segmentation.quantile` | quantile | Change in conditional quantiles |
+| `segmentation.rank` | rank | Rank-transformed distribution-free mean changes |
+| `segmentation.kernel` / `segmentation.kcp` | kernel/KCP | Random Fourier feature distributional changes |
+
+Every entry point is also exported from the package root, so
+`from fastcpd import detect_mean` and
+`from fastcpd.segmentation import mean` are equivalent ways to call the
+detector. The `detect_*` spellings are the canonical cross-language names;
+short family names (`mean`, `var`, `lm`, and so on) and `fastcpd_*` spellings
+are compatibility aliases for the same functions. For example,
+`detect_linear_regression`, `lm`, and `fastcpd_lm` all call the linear-
+regression detector. `mv` is the legacy alias for `meanvariance`.
+
+Variance helpers follow the same convention: use `estimate_variance_*` (or
+the shorter `variance_*` aliases) to obtain the model-specific variance
+estimate used by a detector.
 
 Custom cost callbacks are intentionally R-only; the Python binding supports
 the built-in native families and keeps their execution GIL-free. Pure MA models
@@ -121,11 +138,36 @@ from fastcpd.segmentation import (  # noqa: E402
     lm,
     mean,
     meanvariance,
+    mv,
     poisson,
     quantile,
     rank,
     var,
     variance,
+    fastcpd,
+    fastcpd_ar,
+    fastcpd_arima,
+    fastcpd_arma,
+    fastcpd_binomial,
+    fastcpd_exponential,
+    fastcpd_garch,
+    fastcpd_kernel,
+    fastcpd_kcp,
+    fastcpd_lasso,
+    fastcpd_linear_regression,
+    fastcpd_lm,
+    fastcpd_mean,
+    fastcpd_mean_variance,
+    fastcpd_meanvariance,
+    fastcpd_mv,
+    fastcpd_logistic_regression,
+    fastcpd_poisson,
+    fastcpd_poisson_regression,
+    fastcpd_quantile,
+    fastcpd_quantile_regression,
+    fastcpd_rank,
+    fastcpd_var,
+    fastcpd_variance,
 )
 from fastcpd.variance_estimation import (  # noqa: E402
     VarianceArmaResult,
@@ -135,6 +177,11 @@ from fastcpd.variance_estimation import (  # noqa: E402
     estimate_variance_lm,
     estimate_variance_mean,
     estimate_variance_median,
+    variance_arma,
+    variance_linear_regression,
+    variance_lm,
+    variance_mean,
+    variance_median,
 )
 
 __all__ = [
@@ -168,6 +215,30 @@ __all__ = [
     'detect_rank',
     'detect_var',
     'detect_variance',
+    'fastcpd',
+    'fastcpd_ar',
+    'fastcpd_arima',
+    'fastcpd_arma',
+    'fastcpd_binomial',
+    'fastcpd_exponential',
+    'fastcpd_garch',
+    'fastcpd_kernel',
+    'fastcpd_kcp',
+    'fastcpd_lasso',
+    'fastcpd_linear_regression',
+    'fastcpd_lm',
+    'fastcpd_mean',
+    'fastcpd_mean_variance',
+    'fastcpd_meanvariance',
+    'fastcpd_mv',
+    'fastcpd_logistic_regression',
+    'fastcpd_poisson',
+    'fastcpd_poisson_regression',
+    'fastcpd_quantile',
+    'fastcpd_quantile_regression',
+    'fastcpd_rank',
+    'fastcpd_var',
+    'fastcpd_variance',
     'exponential',
     'estimate_variance',
     'estimate_variance_arma',
@@ -175,6 +246,11 @@ __all__ = [
     'estimate_variance_lm',
     'estimate_variance_mean',
     'estimate_variance_median',
+    'variance_arma',
+    'variance_linear_regression',
+    'variance_lm',
+    'variance_mean',
+    'variance_median',
     'garch',
     'kernel',
     'kcp',
@@ -182,6 +258,7 @@ __all__ = [
     'lm',
     'mean',
     'meanvariance',
+    'mv',
     'poisson',
     'quantile',
     'rank',

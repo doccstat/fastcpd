@@ -4,6 +4,8 @@ variance_step	variance_step.csv	detect	variance	0	5	BIC	0.1	1	40	-	-
 meanvariance_step	meanvariance_step.csv	detect	meanvariance	0	5	BIC	0.1	1	40	-	-
 exponential_step	exponential_step.csv	detect	exponential	0	5	BIC	0.1	1	40	-	-
 lm_step	lm_step.csv	detect	lm	0	5	BIC	0.1	1	20	-	-
+lm_bic_step	lm_step.csv	detect	lm	0	BIC	BIC	0.1	1	20	-	-
+var_step	var_step.csv	detect	var	1	BIC	BIC	0.05	1	40	-	-
 rank_step	rank_step.csv	detect	rank	0	5	BIC	0.1	1	20	-	-
 arima_increment	arima_increment.csv	detect	arima	0,1,0	MBIC	BIC	0	1	41	-	-
 variance_mean	mean_step.csv	estimate_variance	mean	-	-	-	-	-	-	0.3205128205128205	1e-12

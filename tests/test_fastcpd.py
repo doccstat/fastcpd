@@ -90,6 +90,8 @@ def _run_shared_fixture(row, data):
         return exponential(data, **kwargs)
     if family == 'lm':
         return lm(data, **kwargs)
+    if family == 'var':
+        return var(data, order=order, **kwargs)
     if family == 'rank':
         return detect_rank(data, **kwargs)
     if family == 'arima':
@@ -160,7 +162,28 @@ class TestBasic(unittest.TestCase):
         self.assertIs(fastcpd_pkg.detect_mean, fastcpd_pkg.mean)
         self.assertIs(fastcpd_pkg.detect_kernel, fastcpd_pkg.kernel)
         self.assertIs(fastcpd_pkg.detect_kcp, fastcpd_pkg.kcp)
+        self.assertIs(fastcpd_pkg.detect_kcp, fastcpd_pkg.detect_kernel)
         self.assertIs(fastcpd_pkg.detect_lm, fastcpd_pkg.lm)
+        self.assertIs(
+            fastcpd_pkg.detect_mean_variance,
+            fastcpd_pkg.detect_meanvariance,
+        )
+        self.assertIs(
+            fastcpd_pkg.detect_linear_regression,
+            fastcpd_pkg.detect_lm,
+        )
+        self.assertIs(
+            fastcpd_pkg.detect_logistic_regression,
+            fastcpd_pkg.detect_binomial,
+        )
+        self.assertIs(
+            fastcpd_pkg.detect_poisson_regression,
+            fastcpd_pkg.detect_poisson,
+        )
+        self.assertIs(
+            fastcpd_pkg.detect_quantile_regression,
+            fastcpd_pkg.detect_quantile,
+        )
         self.assertIs(
             fastcpd_pkg.estimate_variance_mean,
             fastcpd_pkg.variance_estimation.mean,
@@ -196,8 +219,10 @@ class TestBasic(unittest.TestCase):
             x,
         ])
         np.testing.assert_array_equal(
-            fastcpd_pkg.detect_linear_regression(regression_data).cp_set,
-            fastcpd_pkg.lm(regression_data).cp_set,
+            fastcpd_pkg.detect_linear_regression(
+                regression_data, beta=5.0
+            ).cp_set,
+            fastcpd_pkg.lm(regression_data, beta=5.0).cp_set,
         )
 
     def test_unified_variance_interface(self):
@@ -243,6 +268,21 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(interval[0]['estimate'], result.cp_set[0])
         self.assertLessEqual(interval[0]['lower'], result.cp_set[0])
         self.assertGreaterEqual(interval[0]['upper'], result.cp_set[0])
+
+    def test_quantile_order_sequence_spellings(self):
+        """One-element sequence orders match R's wrapper normalization."""
+        rng = np.random.default_rng(180)
+        data = np.column_stack([
+            rng.normal(size=40), rng.normal(size=40)
+        ])
+        for order in ((0.5,), [0.5], np.array([0.5])):
+            result = detect_quantile(
+                data, order=order, beta=1e6, cp_only=True,
+                vanilla_percentage=1.0,
+            )
+            self.assertEqual(result.order, (0.5,))
+        with self.assertRaisesRegex(ValueError, 'one level'):
+            detect_quantile(data, order=(0.25, 0.75), cp_only=True)
 
     def test_mean(self):
         seed(0)
@@ -485,6 +525,10 @@ _SHARED_DETECTOR_ROWS = {
     case_id: row for case_id, row in _SHARED_ROWS.items()
     if row['operation'] == 'detect'
 }
+_SHARED_GENERIC_DETECTOR_ROWS = {
+    case_id: row for case_id, row in _SHARED_DETECTOR_ROWS.items()
+    if row['family'] != 'rank'
+}
 _SHARED_VARIANCE_ROWS = {
     case_id: row for case_id, row in _SHARED_ROWS.items()
     if row['operation'].startswith('estimate_variance')
@@ -516,12 +560,12 @@ def test_shared_fixture_change_point_contract(case_id):
 
 @pytest.mark.parametrize(
     'case_id',
-    tuple(_SHARED_DETECTOR_ROWS),
-    ids=tuple(_SHARED_DETECTOR_ROWS),
+    tuple(_SHARED_GENERIC_DETECTOR_ROWS),
+    ids=tuple(_SHARED_GENERIC_DETECTOR_ROWS),
 )
 def test_shared_fixture_wrapper_matches_generic_dispatch(case_id):
-    """Family wrappers and ``detect`` use the same fixture and CP contract."""
-    row = _SHARED_DETECTOR_ROWS[case_id]
+    """Generic R families and their wrappers share the fixture contract."""
+    row = _SHARED_GENERIC_DETECTOR_ROWS[case_id]
     data = _shared_fixture_data(row['data_file'])
     wrapped = _run_shared_fixture(row, data)
     order = _shared_fixture_order(row['order'])
@@ -538,7 +582,7 @@ def test_shared_fixture_wrapper_matches_generic_dispatch(case_id):
         'trim': float(row['trim']),
         'vanilla_percentage': float(row['vanilla_percentage']),
     }
-    if row['family'] in {'arima'}:
+    if row['family'] in {'arima', 'var'}:
         generic_kwargs['order'] = order
     elif row['family'] in {
         'lm', 'mean', 'variance', 'meanvariance', 'exponential'

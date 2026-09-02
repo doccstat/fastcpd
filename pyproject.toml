@@ -53,7 +53,7 @@ skip = "*-musllinux_*"
 archs = ["auto64"]
 build-verbosity = 1
 test-requires = ["pytest>=9.0.3"]
-test-command = 'python -m pytest {project}/tests/test_fastcpd.py -m "not long" -v'
+test-command = 'python -m pytest {project}/tests -m "not long" -v'
 
 [tool.cibuildwheel.linux]
 before-all = "dnf install -y openblas-devel"
@@ -86,7 +86,7 @@ sdist.include = [
     "/src/fastcpd_optim.h",
     "/src/fastcpd_progress.h",
     "/src/fastcpd_template.h",
-    "/tests/test_fastcpd.py",
+    "/tests/test_*.py",
     "/tests/fixtures/README.md",
     "/tests/fixtures/*.csv",
     "/tests/fixtures/generate_fixtures.py",

@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 namespace fastcpd {
 namespace detail {
@@ -167,6 +168,10 @@ arma::colvec normalize_line_search(arma::colvec const& value) {
   return value;
 }
 
+// Match the R helper `nearest_pd_`: symmetrize through an eigendecomposition
+// and lift non-positive eigenvalues only to machine epsilon.  R applies this
+// projection to internally estimated multivariate-regression covariance
+// matrices, but not to user-supplied matrices (see below).
 arma::mat nearest_positive_definite(arma::mat const& matrix) {
   if (matrix.n_rows != matrix.n_cols) {
     throw std::invalid_argument(
@@ -175,20 +180,215 @@ arma::mat nearest_positive_definite(arma::mat const& matrix) {
   if (matrix.n_rows == 0) return matrix;
   arma::vec eigenvalues;
   arma::mat eigenvectors;
-  arma::eig_sym(eigenvalues, eigenvectors, arma::symmatu(matrix));
-  double const floor = std::max(1e-12, std::numeric_limits<double>::epsilon());
+  // R's symmetric eigen path consumes the lower triangle (`uplo = "L"`).
+  // Use symmatl rather than Armadillo's upper-triangle symmatu so asymmetric
+  // block estimates follow the same convention.
+  arma::eig_sym(eigenvalues, eigenvectors, arma::symmatl(matrix));
+  // `.Machine$double.eps` is the exact floor used by R's nearest_pd_.
+  double const floor = std::numeric_limits<double>::epsilon();
   eigenvalues.transform([floor](double value) {
     return value > floor ? value : floor;
   });
   return eigenvectors * arma::diagmat(eigenvalues) * eigenvectors.t();
 }
 
+// Apply the common R `rcond(sigma_) < 1e-10` guard.  A well-conditioned
+// user-supplied covariance is returned byte-for-byte unchanged; R replaces an
+// ill-conditioned one with 1e-10 * I rather than projecting it to a nearby
+// SPD matrix. R's rcond() errors for NaN/Inf matrices, so reject those rather
+// than silently substituting a covariance that changes the requested fit.
+arma::mat apply_rcond_fallback(arma::mat value) {
+  if (value.n_rows != value.n_cols) {
+    throw std::invalid_argument(
+        "fastcpd: variance_estimate must be a square matrix");
+  }
+  if (value.n_rows == 0) return value;
+  if (!value.is_finite()) {
+    throw std::invalid_argument(
+        "fastcpd: variance_estimate must contain only finite values");
+  }
+
+  double const reciprocal_condition = arma::rcond(value);
+  if (!std::isfinite(reciprocal_condition)) {
+    throw std::runtime_error(
+        "fastcpd: unable to compute variance_estimate condition number");
+  }
+  if (reciprocal_condition < 1e-10) {
+    value = 1e-10 * arma::eye<arma::mat>(value.n_rows, value.n_cols);
+  }
+  return value;
+}
+
 arma::mat estimate_mean_variance(arma::mat const& data) {
   if (data.n_rows < 2) return arma::eye(data.n_cols, data.n_cols);
   arma::mat const diffs =
       data.rows(1, data.n_rows - 1) - data.rows(0, data.n_rows - 2);
-  return nearest_positive_definite(diffs.t() * diffs /
-                                   (2.0 * static_cast<double>(diffs.n_rows)));
+  // R's variance.mean() returns the raw Rice estimate.  The common rcond
+  // guard (applied by resolve_variance_estimate) handles singular estimates.
+  return diffs.t() * diffs /
+         (2.0 * static_cast<double>(diffs.n_rows));
+}
+
+// Reproduce R's block-lagged `variance.lm()` estimator.  `data` is laid out
+// as [responses, predictors], with `d` response columns.  The default block
+// size in R is ncol(data) - d + 1, so adjacent blocks share all but one row.
+// Each block contributes an element-wise d×d estimate; means are taken
+// independently while ignoring NA values.
+arma::mat estimate_linear_regression_variance(arma::mat const& data,
+                                              unsigned int d) {
+  if (d == 0 || d > data.n_cols) {
+    throw std::invalid_argument(
+        "fastcpd: p_response must be between 1 and data.n_cols");
+  }
+  unsigned int const predictor_count =
+      static_cast<unsigned int>(data.n_cols - d);
+  // R's default block size is predictor_count + 1.  With no predictors the
+  // regression solve is 0×0 and variance.lm() yields no usable estimates;
+  // callers handle this degenerate direct-mgaussian case below.
+  unsigned int const block_size = predictor_count + 1;
+  if (predictor_count == 0 || data.n_rows <= block_size) {
+    return arma::mat(d, d, arma::fill::value(
+                              std::numeric_limits<double>::quiet_NaN()));
+  }
+
+  arma::mat sums(d, d, arma::fill::zeros);
+  arma::umat counts(d, d, arma::fill::zeros);
+  std::vector<double> scalar_estimates;
+  arma::mat const y = data.cols(0, d - 1);
+  arma::mat const x = data.cols(d, data.n_cols - 1);
+
+  auto reciprocal_condition_ok = [](arma::mat const& value) -> bool {
+    if (!value.is_finite()) return false;
+    try {
+      double const reciprocal_condition = arma::rcond(value);
+      return std::isfinite(reciprocal_condition) &&
+             reciprocal_condition >= std::numeric_limits<double>::epsilon();
+    } catch (...) {
+      return false;
+    }
+  };
+  auto solve_square = [](arma::mat const& lhs, arma::mat const& rhs,
+                         arma::mat* result) -> bool {
+    // The status overload avoids warning/throw paths and mirrors R's
+    // tryCatch around each block.  `no_approx` keeps singular blocks as
+    // failures instead of silently using a least-squares approximation.
+    bool const ok = arma::solve(*result, lhs, rhs, arma::solve_opts::no_approx);
+    return ok && result->is_finite();
+  };
+  auto invert_square = [](arma::mat const& matrix, arma::mat* result) -> bool {
+    bool const ok = arma::inv(*result, matrix);
+    return ok && result->is_finite();
+  };
+
+  arma::uword const block_count = data.n_rows - block_size;
+  for (arma::uword i = 0; i < block_count; ++i) {
+    arma::mat const x_block = x.rows(i, i + block_size - 1);
+    arma::mat const x_block_lagged = x.rows(i + 1, i + block_size);
+    arma::mat const y_block = y.rows(i, i + block_size - 1);
+    arma::mat const y_block_lagged = y.rows(i + 1, i + block_size);
+    arma::mat const x_t_x = x_block.t() * x_block;
+    arma::mat const x_t_x_lagged = x_block_lagged.t() * x_block_lagged;
+
+    arma::mat block_slope;
+    arma::mat block_lagged_slope;
+    arma::mat x_t_x_inv;
+    arma::mat x_t_x_inv_lagged;
+    if (!reciprocal_condition_ok(x_t_x) ||
+        !reciprocal_condition_ok(x_t_x_lagged) ||
+        !solve_square(x_t_x, x_block.t() * y_block, &block_slope) ||
+        !solve_square(x_t_x_lagged, x_block_lagged.t() * y_block_lagged,
+                      &block_lagged_slope) ||
+        !invert_square(x_t_x, &x_t_x_inv) ||
+        !invert_square(x_t_x_lagged, &x_t_x_inv_lagged)) {
+      // R's tryCatch stores an all-NA block when any solve fails.
+      continue;
+    }
+
+    arma::mat const cross_term_x =
+        x_block.rows(1, block_size - 1).t() *
+        x_block_lagged.rows(0, block_size - 2);
+    arma::mat const cross_term =
+        x_t_x_inv * x_t_x_inv_lagged * cross_term_x;
+    arma::mat const slope_delta = block_slope - block_lagged_slope;
+    arma::mat const delta_numerator = slope_delta.t() * slope_delta;
+    arma::mat delta_denominator(d, d, arma::fill::zeros);
+    for (unsigned int j = 0; j < d; ++j) {
+      for (unsigned int k = 0; k < d; ++k) {
+        if (j != k) {
+          arma::colvec const delta =
+              block_slope.col(j) - block_lagged_slope.col(k);
+          delta_denominator(j, k) = arma::dot(delta, delta);
+        }
+      }
+    }
+    // R adds this scalar to every d×d entry via vector recycling.
+    double const denominator_offset =
+        arma::trace(x_t_x_inv + x_t_x_inv_lagged - 2.0 * cross_term);
+    delta_denominator += denominator_offset;
+    arma::mat const estimate = delta_numerator / delta_denominator;
+
+    for (unsigned int j = 0; j < d; ++j) {
+      for (unsigned int k = 0; k < d; ++k) {
+        double const cell = estimate(j, k);
+        // `na.rm = TRUE` removes NA/NaN but retains +/-Inf.  Infinite values
+        // are not expected for valid blocks, but preserving them is closer to
+        // R than silently dropping all non-finite values.
+        if (!std::isnan(cell)) {
+          if (d == 1) {
+            scalar_estimates.push_back(cell);
+          } else {
+            sums(j, k) += cell;
+            counts(j, k) += 1u;
+          }
+        }
+      }
+    }
+  }
+
+  arma::mat result(d, d, arma::fill::zeros);
+  if (d == 1) {
+    if (scalar_estimates.empty()) {
+      result(0, 0) = std::numeric_limits<double>::quiet_NaN();
+      return result;
+    }
+    std::sort(scalar_estimates.begin(), scalar_estimates.end());
+    auto const quantile_type7 = [&scalar_estimates](double probability) {
+      double const index =
+          probability * static_cast<double>(scalar_estimates.size() - 1);
+      std::size_t const lower = static_cast<std::size_t>(std::floor(index));
+      std::size_t const upper = static_cast<std::size_t>(std::ceil(index));
+      if (lower == upper) return scalar_estimates[lower];
+      double const fraction = index - static_cast<double>(lower);
+      return scalar_estimates[lower] +
+             fraction * (scalar_estimates[upper] - scalar_estimates[lower]);
+    };
+    double const q25 = quantile_type7(0.25);
+    double const q75 = quantile_type7(0.75);
+    // variance.lm() defaults outlier_iqr to Inf and still evaluates the
+    // threshold. Preserve R's Inf * 0 = NaN behavior for zero-IQR estimates.
+    double const threshold = q75 + std::numeric_limits<double>::infinity() *
+                                       (q75 - q25);
+    double total = 0.0;
+    std::size_t retained_count = 0;
+    for (double const value : scalar_estimates) {
+      if (value < threshold) {
+        total += value;
+        ++retained_count;
+      }
+    }
+    result(0, 0) = retained_count == 0
+                       ? std::numeric_limits<double>::quiet_NaN()
+                       : total / static_cast<double>(retained_count);
+    return result;
+  }
+  for (unsigned int j = 0; j < d; ++j) {
+    for (unsigned int k = 0; k < d; ++k) {
+      result(j, k) = counts(j, k) == 0
+                         ? std::numeric_limits<double>::quiet_NaN()
+                         : sums(j, k) / static_cast<double>(counts(j, k));
+    }
+  }
+  return result;
 }
 
 arma::mat estimate_mgaussian_variance(arma::mat const& data,
@@ -198,27 +398,17 @@ arma::mat estimate_mgaussian_variance(arma::mat const& data,
     throw std::invalid_argument(
         "fastcpd: p_response must be between 1 and data.n_cols");
   }
-  arma::mat const y = data.cols(0, q - 1);
-  arma::mat residuals;
-  if (q < data.n_cols) {
-    arma::mat const x = data.cols(q, data.n_cols - 1);
-    residuals = y - x * (arma::pinv(x) * y);
-  } else {
-    residuals = y.each_row() - arma::mean(y, 0);
-  }
-  if (residuals.n_rows < 2) return arma::eye(q, q);
-  arma::mat const diffs =
-      residuals.rows(1, residuals.n_rows - 1) -
-      residuals.rows(0, residuals.n_rows - 2);
-  return nearest_positive_definite(diffs.t() * diffs /
-                                   (2.0 * static_cast<double>(diffs.n_rows)));
+  return estimate_linear_regression_variance(data, q);
 }
 
 arma::mat resolve_variance_estimate(Options const& options,
                                     arma::mat const& data,
                                     std::string const& family) {
   if (!options.variance_estimate.is_empty()) {
-    arma::mat value = nearest_positive_definite(options.variance_estimate);
+    // Preserve a user-provided covariance exactly when it is well
+    // conditioned.  R does not call nearest_pd_() for explicit
+    // variance_estimation; it only applies the rcond fallback below.
+    arma::mat value = options.variance_estimate;
     if (family == "mean" && value.n_rows != data.n_cols) {
       throw std::invalid_argument(
           "fastcpd: mean variance_estimate must be data.n_cols by data.n_cols");
@@ -232,11 +422,34 @@ arma::mat resolve_variance_estimate(Options const& options,
             "p_response");
       }
     }
-    return value;
+    return apply_rcond_fallback(std::move(value));
   }
-  if (family == "mean") return estimate_mean_variance(data);
+  if (family == "mean") {
+    return apply_rcond_fallback(estimate_mean_variance(data));
+  }
+  if (family == "gaussian") {
+    // Gaussian costs do not consume variance_estimate. R only uses this
+    // automatic estimate to scale character BIC/MBIC/MDL penalties, so a
+    // numeric beta can skip the block-lagged estimator entirely.
+    if (options.beta.has_value()) return arma::eye<arma::mat>(1, 1);
+    // R's lm/ar wrappers estimate the scalar error variance with
+    // variance.lm(data_).  This value is also used to scale a character
+    // BIC/MBIC/MDL beta before dispatching the Gaussian SEN solver.
+    arma::mat estimated = estimate_linear_regression_variance(data, 1);
+    return apply_rcond_fallback(std::move(estimated));
+  }
   if (family == "mgaussian") {
-    return estimate_mgaussian_variance(data, options.p_response);
+    // R's VAR/multivariate-lm path uses variance.lm(), projects the result to
+    // the nearest positive-definite matrix, then applies the common rcond
+    // guard.  Keep that ordering here as well.
+    arma::mat estimated =
+        estimate_mgaussian_variance(data, options.p_response);
+    if (estimated.is_empty() || !estimated.is_finite()) {
+      throw std::invalid_argument(
+          "fastcpd: automatic variance estimate is not finite");
+    }
+    estimated = nearest_positive_definite(estimated);
+    return apply_rcond_fallback(std::move(estimated));
   }
   return arma::eye(1, 1);
 }
@@ -436,8 +649,9 @@ RunResult dispatch(double beta, std::string const& cost_adjustment,
 #undef FASTCPD_DISPATCH_SEGD
 
 Result make_result(RunResult&& value) {
-  return Result{std::get<0>(value), std::get<1>(value), std::get<2>(value),
-                std::get<3>(value), std::get<4>(value)};
+  return Result{std::move(std::get<0>(value)), std::move(std::get<1>(value)),
+                std::move(std::get<2>(value)), std::move(std::get<3>(value)),
+                std::move(std::get<4>(value))};
 }
 
 }  // namespace detail
@@ -475,9 +689,20 @@ Result detect(arma::mat const& data, Options options) {
   arma::mat const variance_estimate =
       detail::resolve_variance_estimate(options, data, family);
 
-  double const beta =
-      detail::compute_beta(options.beta, options.beta_criterion,
-                           static_cast<int>(data.n_rows), p);
+  double beta = detail::compute_beta(
+      options.beta, options.beta_criterion, static_cast<int>(data.n_rows), p);
+  // R scales character BIC/MBIC/MDL penalties by the estimated Gaussian
+  // variance.  Numeric beta values are already on the caller's scale and are
+  // intentionally left untouched.  `family == "gaussian"` also covers the
+  // R/Python AR and lm wrappers after their design transformation.
+  if (!options.beta.has_value() && family == "gaussian") {
+    if (variance_estimate.n_elem != 1) {
+      throw std::invalid_argument(
+          "fastcpd: variance_estimate for Gaussian criterion beta must be "
+          "scalar");
+    }
+    beta *= variance_estimate(0, 0);
+  }
   double const pruning_coef = detail::compute_pruning_coef(
       options.pruning_coef, options.cost_adjustment, family, p);
   double const vanilla_percentage =

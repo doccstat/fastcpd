@@ -74,5 +74,5 @@ jobs:
       - name: Check Python syntax and undefined names
         run: |
           python -m pip install flake8
-          flake8 python tests/test_fastcpd.py \
+          flake8 python tests/test_*.py \
             --count --select=E9,F63,F7,F82 --show-source --statistics

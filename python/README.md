@@ -24,6 +24,10 @@ The public API includes mean, variance, mean/variance, exponential, VAR,
 linear, lasso, binomial, Poisson, quantile, GARCH, AR, ARMA, and ARIMA change
 detection, plus rank and kernel transforms.
 
+As in R, generic `detect(..., family=...)` accepts `family="kcp"`; the
+`rank` and `kernel` spellings are wrapper-only, through `detect_rank()` and
+`detect_kernel()` respectively.
+
 Python does not expose the removed R `fastcpd_ts()` umbrella. Use
 `detect(data=..., family=...)` or a family-specific wrapper such as
 `detect_ar()` directly.
@@ -45,6 +49,13 @@ independently in the shared native R/Python implementation. Returned change
 points therefore use the original-series indices, and no cross-boundary
 difference contaminates either adjacent segment. The likelihood is zero-mean
 (`include_mean=False`), and `d=0` is identical to `detect_arma()`.
+
+`detect_kernel(data, order=(D, sigma))` (also exposed as `detect_kcp()`) uses
+`D` random Fourier features and an RBF bandwidth `sigma`. As in R, an empty
+order, a non-positive `D`, or a non-positive `sigma` selects the documented
+defaults/median heuristic, and entries after the first two are ignored. Python
+raises `ValueError` for non-finite values or positive non-integer feature
+counts before allocating the feature matrix.
 
 `result.confint()` supports profile change-point intervals for mean, variance,
 mean/variance, exponential, linear, binomial, Poisson, quantile, and ARIMA
