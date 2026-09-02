@@ -85,12 +85,16 @@ run_shared_detector <- function(case) {
     meanvariance = detect_meanvariance,
     exponential = detect_exponential,
     lm = detect_lm,
+    var = detect_var,
     rank = detect_rank,
     arima = detect_arima,
     stop("No R detector registered for family: ", case$family)
   )
   if (case$family == "arima") {
     arguments$data <- case$data[[1]]
+    arguments$order <- parse_shared_order(case$order)
+  }
+  if (case$family == "var") {
     arguments$order <- parse_shared_order(case$order)
   }
   if (case$family == "lm") {
