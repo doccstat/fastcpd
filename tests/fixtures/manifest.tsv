@@ -1,0 +1,12 @@
+case_id	data_file	operation	family	order	beta	cost_adjustment	trim	vanilla_percentage	expected_cp	expected_value	tolerance
+mean_step	mean_step.csv	detect	mean	0	5	BIC	0.1	1	20	-	-
+variance_step	variance_step.csv	detect	variance	0	5	BIC	0.1	1	40	-	-
+meanvariance_step	meanvariance_step.csv	detect	meanvariance	0	5	BIC	0.1	1	40	-	-
+exponential_step	exponential_step.csv	detect	exponential	0	5	BIC	0.1	1	40	-	-
+lm_step	lm_step.csv	detect	lm	0	5	BIC	0.1	1	20	-	-
+rank_step	rank_step.csv	detect	rank	0	5	BIC	0.1	1	20	-	-
+arima_increment	arima_increment.csv	detect	arima	0,1,0	MBIC	BIC	0	1	41	-	-
+variance_mean	mean_step.csv	estimate_variance	mean	-	-	-	-	-	-	0.3205128205128205	1e-12
+variance_median	rank_step.csv	estimate_variance	median	-	-	-	-	-	-	13.32515158156184	1e-12
+variance_lm	lm_step.csv	estimate_variance	lm	-	-	-	-	-	-	97.95856069973233	1e-9
+arma_variance	arma_variance.csv	estimate_variance_arma	arma	2,2	-	-	-	-	-	0.8938872868847426	2e-6
