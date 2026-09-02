@@ -31,6 +31,16 @@ def _lm_rows():
     return rows
 
 
+def _var_rows():
+    """Create two deterministic bivariate VAR regimes."""
+    first_cycle = ((1, 0), (0, 1), (-1, 0), (0, -1))
+    second_cycle = ((5, 1), (1, 5), (-5, -1), (-1, -5))
+    return [
+        f"{first:g},{second:g}"
+        for first, second in first_cycle * 10 + second_cycle * 10
+    ]
+
+
 def _arima_values():
     """Integrate fixed small then large alternating increments."""
     increments = [0.1, -0.1] * 20 + [2.0, -2.0] * 20 + [2.0]
@@ -65,6 +75,7 @@ def rendered_fixture_data():
             "value", _numbers([1, 2, 3, 4] * 10 + [10, 20, 30, 40] * 10)
         ),
         "lm_step.csv": _csv("y,x", _lm_rows()),
+        "var_step.csv": _csv("y1,y2", _var_rows()),
         "rank_step.csv": _csv(
             "value", _numbers([0, 1, 2, 3] * 5 + [100, 101, 102, 103] * 5)
         ),
