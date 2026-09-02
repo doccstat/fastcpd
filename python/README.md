@@ -104,6 +104,6 @@ python -m pip install dist/fastcpd-*.whl
 python -m pytest tests/test_fastcpd.py -m "not long"
 ```
 
-Documentation: <https://x2r.io/fastcpd/python/>
+Documentation: <https://x2r.io/fastcpd-python/>
 
 Issues: <https://github.com/doccstat/fastcpd-py/issues>

@@ -39,7 +39,7 @@ classifiers = [
 ]
 
 [project.urls]
-Documentation = "https://x2r.io/fastcpd/python/"
+Documentation = "https://x2r.io/fastcpd-python/"
 Repository = "https://github.com/doccstat/fastcpd-py"
 
 [tool.pytest.ini_options]
