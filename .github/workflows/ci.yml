@@ -18,6 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Verify shared fixture data
+        run: python3 tests/fixtures/generate_fixtures.py --check
+
       - name: Install C++ dependencies
         run: |
           sudo apt-get update
@@ -53,8 +56,8 @@ jobs:
 
       - name: Build and run CMake example
         run: |
-          cmake --build build --target fastcpd_cpp_example --parallel 2
-          ./build/fastcpd_cpp_example
+          cmake --build build --target fastcpd_mean_change --parallel 2
+          ./build/fastcpd_mean_change
 
       - name: Validate CMake installation
         run: cmake --install build --prefix "$RUNNER_TEMP/fastcpd-install"
@@ -62,4 +65,4 @@ jobs:
       - name: Build and run Make example
         run: |
           make -C examples/cpp clean all ABSL_INCLUDE="$RUNNER_TEMP/abseil/include"
-          ./examples/cpp/simple
+          ./examples/cpp/mean_change

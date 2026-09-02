@@ -18,13 +18,13 @@ LDLIBS += -llapack -lblas
 
 .PHONY: all clean
 
-all: simple
+all: mean_change
 
-simple: simple.cc fastcpd.o
+mean_change: mean_change.cc fastcpd.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< fastcpd.o -o $@ $(LDLIBS)
 
 fastcpd.o: $(FASTCPD_CPP) $(FASTCPD_ROOT)/include/fastcpd/fastcpd.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(FASTCPD_CPP) -o $@
 
 clean:
-	rm -f simple fastcpd.o
+	rm -f mean_change fastcpd.o

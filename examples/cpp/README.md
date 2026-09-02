@@ -1,6 +1,7 @@
 # fastcpd C++ example
 
-This example uses the standalone C++ header API:
+This example uses the standalone C++ header API and the shared
+`tests/fixtures/manifest.tsv` contract:
 
 ```cpp
 #include <fastcpd/fastcpd.h>
@@ -10,7 +11,17 @@ Build from this directory with plain Make:
 
 ```sh
 make
-./simple
+./mean_change
+```
+
+The example selects the mean detector row from the shared manifest and loads
+its CSV relative to the manifest. When run from the repository root (as CI
+does), it discovers `tests/fixtures/manifest.tsv` automatically. When run from
+this directory, it searches `../../tests/fixtures/manifest.tsv`; an explicit
+fixture directory or manifest path may be supplied as the first argument:
+
+```sh
+./mean_change ../../tests/fixtures
 ```
 
 If Abseil is not installed in a standard include path, pass its include

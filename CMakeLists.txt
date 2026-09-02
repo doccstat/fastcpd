@@ -20,8 +20,8 @@ include(cmake/FastcpdDependencies.cmake)
 include(cmake/FastcpdTarget.cmake)
 
 if(FASTCPD_BUILD_EXAMPLES)
-  add_executable(fastcpd_cpp_example examples/cpp/simple.cc)
-  target_link_libraries(fastcpd_cpp_example PRIVATE fastcpd::fastcpd)
+  add_executable(fastcpd_mean_change examples/cpp/mean_change.cc)
+  target_link_libraries(fastcpd_mean_change PRIVATE fastcpd::fastcpd)
 endif()
 
 if(FASTCPD_INSTALL_CPP)
