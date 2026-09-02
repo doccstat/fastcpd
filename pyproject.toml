@@ -87,6 +87,10 @@ sdist.include = [
     "/src/fastcpd_progress.h",
     "/src/fastcpd_template.h",
     "/tests/test_fastcpd.py",
+    "/tests/fixtures/README.md",
+    "/tests/fixtures/*.csv",
+    "/tests/fixtures/generate_fixtures.py",
+    "/tests/fixtures/manifest.tsv",
     "/LICENSE.md",
 ]
 sdist.exclude = [

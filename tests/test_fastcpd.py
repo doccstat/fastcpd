@@ -1,7 +1,11 @@
+import csv
 import inspect
+import subprocess
+import sys
 import threading
 import time
 import unittest
+from pathlib import Path
 
 import fastcpd as fastcpd_pkg
 import fastcpd.segmentation as segmentation
@@ -16,6 +20,81 @@ from fastcpd.segmentation import (
 from numpy import concatenate
 from numpy.random import exponential as rexp
 from numpy.random import multivariate_normal, randn, seed
+
+
+_SHARED_FIXTURE_DIR = Path(__file__).resolve().parent / 'fixtures'
+_SHARED_MANIFEST_COLUMNS = (
+    'case_id', 'data_file', 'operation', 'family', 'order', 'beta',
+    'cost_adjustment', 'trim', 'vanilla_percentage', 'expected_cp',
+    'expected_value', 'tolerance',
+)
+
+
+def _shared_fixture_manifest():
+    """Read the language-neutral fixture manifest.
+
+    The R suite reads the same TSV independently.  Keeping this loader in the
+    test module (rather than in the package) ensures fixture files never become
+    part of the runtime API or wheel payload.
+    """
+    with (_SHARED_FIXTURE_DIR / 'manifest.tsv').open(
+        newline='', encoding='utf-8'
+    ) as stream:
+        reader = csv.DictReader(stream, delimiter='\t')
+        if tuple(reader.fieldnames or ()) != _SHARED_MANIFEST_COLUMNS:
+            raise AssertionError('Unexpected shared fixture manifest columns')
+        rows = list(reader)
+    case_ids = [row['case_id'] for row in rows]
+    if len(case_ids) != len(set(case_ids)):
+        raise AssertionError('Shared fixture case_id values must be unique')
+    return rows
+
+
+def _shared_fixture_data(filename):
+    """Load one shared fixture as a two-dimensional floating-point matrix."""
+    return np.loadtxt(
+        _SHARED_FIXTURE_DIR / filename,
+        delimiter=',',
+        skiprows=1,
+        ndmin=2,
+    )
+
+
+def _shared_fixture_order(value):
+    """Parse the manifest's scalar/comma-separated order representation."""
+    values = tuple(int(item) for item in value.split(',') if item)
+    return values[0] if len(values) == 1 else values
+
+
+def _run_shared_fixture(row, data):
+    """Run a manifest row through the corresponding public Python wrapper."""
+    assert row['operation'] == 'detect'
+    family = row['family']
+    order = _shared_fixture_order(row['order'])
+    beta = row['beta']
+    if beta not in {'BIC', 'MBIC', 'MDL'}:
+        beta = float(beta)
+    kwargs = {
+        'beta': beta,
+        'cost_adjustment': row['cost_adjustment'],
+        'trim': float(row['trim']),
+        'vanilla_percentage': float(row['vanilla_percentage']),
+    }
+    if family == 'mean':
+        return detect_mean(data, **kwargs)
+    if family == 'variance':
+        return variance(data, **kwargs)
+    if family == 'meanvariance':
+        return meanvariance(data, **kwargs)
+    if family == 'exponential':
+        return exponential(data, **kwargs)
+    if family == 'lm':
+        return lm(data, **kwargs)
+    if family == 'rank':
+        return detect_rank(data, **kwargs)
+    if family == 'arima':
+        return arima(data, order=order, **kwargs)
+    raise AssertionError(f'No Python wrapper registered for {family!r}')
 
 
 def _expit(x):
@@ -399,6 +478,149 @@ class TestBasic(unittest.TestCase):
         r1 = arima(x, order=(1, 0, 0))
         r2 = arma(x, order=(1, 0))
         np.testing.assert_array_equal(r1.cp_set, r2.cp_set)
+
+
+_SHARED_ROWS = {row['case_id']: row for row in _shared_fixture_manifest()}
+_SHARED_DETECTOR_ROWS = {
+    case_id: row for case_id, row in _SHARED_ROWS.items()
+    if row['operation'] == 'detect'
+}
+_SHARED_VARIANCE_ROWS = {
+    case_id: row for case_id, row in _SHARED_ROWS.items()
+    if row['operation'].startswith('estimate_variance')
+}
+
+
+@pytest.mark.parametrize(
+    'case_id',
+    tuple(_SHARED_DETECTOR_ROWS),
+    ids=tuple(_SHARED_DETECTOR_ROWS),
+)
+def test_shared_fixture_change_point_contract(case_id):
+    """The deterministic fixture manifest defines a cross-language CP contract."""
+    row = _SHARED_DETECTOR_ROWS[case_id]
+    data = _shared_fixture_data(row['data_file'])
+    result = _run_shared_fixture(row, data)
+    expected = np.asarray(
+        [int(value) for value in row['expected_cp'].split(';') if value],
+        dtype=np.int64,
+    )
+    np.testing.assert_array_equal(result.cp_set, expected)
+    assert result.data.shape == data.shape
+    assert not result.data.flags.writeable
+    # Rank is transformed before entering the native mean family, matching
+    # the public R result metadata.  Other fixture names are native families.
+    expected_family = 'mean' if row['family'] == 'rank' else row['family']
+    assert result.family == expected_family
+
+
+@pytest.mark.parametrize(
+    'case_id',
+    tuple(_SHARED_DETECTOR_ROWS),
+    ids=tuple(_SHARED_DETECTOR_ROWS),
+)
+def test_shared_fixture_wrapper_matches_generic_dispatch(case_id):
+    """Family wrappers and ``detect`` use the same fixture and CP contract."""
+    row = _SHARED_DETECTOR_ROWS[case_id]
+    data = _shared_fixture_data(row['data_file'])
+    wrapped = _run_shared_fixture(row, data)
+    order = _shared_fixture_order(row['order'])
+    beta = (
+        row['beta']
+        if row['beta'] in {'BIC', 'MBIC', 'MDL'}
+        else float(row['beta'])
+    )
+    generic_kwargs = {
+        'data': data,
+        'family': row['family'],
+        'beta': beta,
+        'cost_adjustment': row['cost_adjustment'],
+        'trim': float(row['trim']),
+        'vanilla_percentage': float(row['vanilla_percentage']),
+    }
+    if row['family'] in {'arima'}:
+        generic_kwargs['order'] = order
+    elif row['family'] in {
+        'lm', 'mean', 'variance', 'meanvariance', 'exponential'
+    }:
+        generic_kwargs['order'] = order
+    generic = detect(**generic_kwargs)
+    np.testing.assert_array_equal(wrapped.cp_set, generic.cp_set)
+
+
+@pytest.mark.parametrize(
+    'case_id',
+    tuple(_SHARED_VARIANCE_ROWS),
+    ids=tuple(_SHARED_VARIANCE_ROWS),
+)
+def test_shared_fixture_variance_estimators_are_deterministic(case_id):
+    """Variance helpers consume manifest-selected data and expectations."""
+    row = _SHARED_VARIANCE_ROWS[case_id]
+    data = _shared_fixture_data(row['data_file'])
+    expected = float(row['expected_value'])
+    tolerance = float(row['tolerance'])
+
+    if row['operation'] == 'estimate_variance_arma':
+        order = _shared_fixture_order(row['order'])
+        data = data[:, 0]
+        direct = fastcpd_pkg.estimate_variance_arma(
+            data, p=order[0], q=order[1]
+        )
+        generic = fastcpd_pkg.estimate_variance(
+            data, family=row['family'], p=order[0], q=order[1]
+        )
+        max_order = order[0] * order[1]
+        assert len(direct.table) == max_order
+        assert [item['model'] for item in direct.table] == [
+            f'AR({index})' for index in range(1, max_order + 1)
+        ]
+        direct_value = direct.sigma2_bic
+        generic_value = generic.sigma2_bic
+    else:
+        family = row['family']
+        if family == 'mean':
+            direct = fastcpd_pkg.estimate_variance_mean(data)
+        elif family == 'median':
+            data = data[:, 0]
+            direct = fastcpd_pkg.estimate_variance_median(data)
+        elif family == 'lm':
+            direct = fastcpd_pkg.estimate_variance_linear_regression(data)
+        else:
+            raise AssertionError(
+                f'No variance fixture registered for {family!r}'
+            )
+        generic = fastcpd_pkg.estimate_variance(data, family=family)
+        direct_value = direct
+        generic_value = generic
+
+    np.testing.assert_allclose(
+        direct_value, expected, rtol=tolerance, atol=tolerance
+    )
+    np.testing.assert_allclose(
+        generic_value, direct_value, rtol=tolerance, atol=tolerance
+    )
+
+
+def test_shared_fixture_files_have_no_missing_or_extra_manifest_rows():
+    """Catch accidental fixture renames before the language suites diverge."""
+    listed = {row['data_file'] for row in _SHARED_ROWS.values()}
+    csv_files = {path.name for path in _SHARED_FIXTURE_DIR.glob('*.csv')}
+    assert listed == csv_files
+
+
+def test_shared_fixture_generator_matches_committed_bytes():
+    """The saved deterministic generator reproduces every committed byte."""
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(_SHARED_FIXTURE_DIR / 'generate_fixtures.py'),
+            '--check',
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
 
 
 if __name__ == "__main__":
