@@ -377,13 +377,36 @@ template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
 std::tuple<arma::colvec, arma::colvec, arma::colvec, arma::mat, arma::mat>
 Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::GetChangePointSet() {
   arma::colvec cp_set = UpdateChangePointSet();
-  // `change_points_` is an internal traceback table. The R layer only uses
-  // `cp_set`, so keep this compatibility slot empty instead of materializing
-  // O(n) doubles back into R.
+  // `change_points_` stores the untrimmed traceback.  The standalone/Python
+  // result contract exposes its interior boundaries as ``raw_change_points``
+  // before the public `cp_set` applies trim/merge rules.  Keep the historical
+  // empty R slot: R's wrapper never consumed this internal vector, and
+  // materialising it there would add an unnecessary O(segment-count) copy to
+  // every R fit.
   arma::colvec raw_cp_set;
+#ifdef NO_RCPP
+  // The terminal boundary `n` and origin `0` are segment delimiters, not
+  // change points.
+  std::vector<double> raw_values;
+  raw_values.reserve(
+      static_cast<std::size_t>(std::max(segment_count_, 1)) + 1);
+  for (unsigned int last = data_n_rows_; last != 0u;
+       last = change_points_[last]) {
+    if (last < data_n_rows_) raw_values.push_back(static_cast<double>(last));
+  }
+  // Traceback visits strictly decreasing boundaries because every entry
+  // points to an earlier observation. Reverse once to expose ascending raw
+  // change points in O(k), without sort/unique postprocessing.
+  std::reverse(raw_values.begin(), raw_values.end());
+  raw_cp_set.set_size(raw_values.size());
+  for (arma::uword i = 0; i < raw_cp_set.n_elem; ++i) {
+    raw_cp_set(i) = raw_values[i];
+  }
+#endif
 
   if (cp_only_) {
-    return std::make_tuple(std::move(raw_cp_set), cp_set, arma::colvec(), arma::mat(), arma::mat());
+    return std::make_tuple(std::move(raw_cp_set), cp_set, arma::colvec(),
+                           arma::mat(), arma::mat());
   }
 
   arma::colvec cp_loc_ = arma::zeros<arma::colvec>(cp_set.n_elem + 2);
