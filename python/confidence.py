@@ -280,10 +280,10 @@ def _draw_seed(rng):
     """Draw a uint32-compatible seed from either NumPy RNG API."""
     if hasattr(rng, 'integers'):
         return int(rng.integers(0, 2**32 - 1))
-    # ``RandomState.randint`` accepts an exclusive high endpoint but may
-    # return a NumPy scalar; converting to ``int`` keeps pybind and wrappers
-    # independent of NumPy's scalar type.
-    return int(rng.randint(0, 2**32 - 1))
+    # Windows gives RandomState's default C ``long`` dtype only 32 signed
+    # bits, making the uint32 upper bound invalid. Request uint32 explicitly;
+    # this preserves the same random draw on every platform.
+    return int(rng.randint(0, 2**32 - 1, dtype=numpy.uint32))
 
 
 def _segment_bootstrap_data(data, cp_set, rng):

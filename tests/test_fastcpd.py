@@ -652,8 +652,8 @@ def test_shared_fixture_files_have_no_missing_or_extra_manifest_rows():
     assert listed == csv_files
 
 
-def test_shared_fixture_generator_matches_committed_bytes():
-    """The saved deterministic generator reproduces every committed byte."""
+def test_shared_fixture_generator_matches_committed_content():
+    """The generator reproduces fixture content across Git checkout EOLs."""
     completed = subprocess.run(
         [
             sys.executable,
