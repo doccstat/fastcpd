@@ -5,6 +5,9 @@
     NumPy generator objects retain their native streams. Constant-valued KCP
     input now uses a finite bandwidth fallback in both languages instead of
     producing missing R features and dense spurious change points.
+*   Continue the same R-compatible scalar-seed stream through segment
+    bootstrap resampling and seeded KCP refits, producing matching confidence
+    interval endpoints and detection rates across R and Python.
 
 # fastcpd 1.2.2
 
