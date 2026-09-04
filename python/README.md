@@ -40,9 +40,9 @@ ABI.
 `detect_var(data, order=p)` accepts the raw multivariate time series and
 constructs its lagged VAR design internally, matching the R interface. For an
 already-constructed response/predictor matrix, use
-`detect(data, family="mgaussian", p_response=q)` directly. The older
-`var(data, order=p, p_response=q)` form for a pre-constructed matrix remains
-accepted for compatibility.
+`detect(data, family="mgaussian", p_response=q)` directly. The ambiguous
+pre-1.0 Python form `var(data, order=p, p_response=q)` is no longer accepted:
+`detect_var()` always means raw VAR input in the portable interface.
 
 `detect_arima(data, order=(p, d, q))` differences every candidate segment
 independently in the shared native R/Python implementation. Returned change
@@ -80,6 +80,12 @@ read-only NumPy `int64` arrays; costs, residuals, and parameters are read-only
 floating-point arrays. The result stores a read-only copy of the original
 data plus the public family and order, so `result.confint()` can refit without
 repeating them.
+
+Residuals use the portable `(observation, response)` layout, including one
+leading all-`NaN` row per autoregressive lag. Rank detection computes its
+details on centered ranks; Python retains the original observations in
+`result.data` so bootstrap refits can repeat the transform, while R retains
+the transformed data in its language-specific S4 container.
 
 `cp_only=True` keeps the same result type and skips detailed native output;
 `cost_values`, `residuals`, and `thetas` are empty and

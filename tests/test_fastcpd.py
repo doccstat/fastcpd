@@ -423,8 +423,8 @@ class TestBasic(unittest.TestCase):
             result.cp_set,
             [change_point + 1 for change_point in direct.cp_set],
         )
-        legacy = var(data_mg, order=1, p_response=q, trim=0.05)
-        np.testing.assert_array_equal(legacy.cp_set, direct.cp_set)
+        with self.assertRaisesRegex(ValueError, 'raw multivariate series'):
+            var(data_mg, order=1, p_response=q, trim=0.05)
 
     def test_lasso(self):
         seed(7)

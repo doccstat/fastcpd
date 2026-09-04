@@ -995,21 +995,14 @@ def detect(
         )
     elif raw_family == 'var':
         var_order = _validate_var_order(order)
-        legacy_columns = p_response * (var_order + 1)
-        if p_response > 0 and data.shape[1] == legacy_columns:
-            # Compatibility with the pre-1.0 Python ``var`` call shape,
-            # where callers supplied [responses, lagged predictors].
-            q = p_response
-            if q <= 0 or data.shape[1] != q * (var_order + 1):
-                raise ValueError("invalid legacy VAR design matrix")
-            index_offset = 0
-        else:
-            data, q = _var_regression_data(data, var_order)
-            if p_response not in (0, q):
-                raise ValueError(
-                    "p_response must match the number of columns in VAR data"
-                )
-            index_offset = var_order
+        if p_response != 0:
+            raise ValueError(
+                "p_response is not accepted for VAR input; pass the raw "
+                "multivariate series to detect_var(). For an already-lagged "
+                "response/predictor matrix, use family='mgaussian'."
+            )
+        data, q = _var_regression_data(data, var_order)
+        index_offset = var_order
         native_family = 'mgaussian'
         native_order = (var_order,)
         native_p_response = q

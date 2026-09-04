@@ -40,7 +40,9 @@ def confint(
         parm: ``"cp"`` for change-point locations or ``"theta"`` for segment
             parameters.
         method: For ``parm="cp"``, ``"bootstrap"`` or ``"profile"``. For
-            ``parm="theta"``, ``"wald"``.
+            ``parm="theta"``, ``"wald"``. Multivariate linear-model Wald
+            intervals are intentionally unsupported until a shared estimator
+            contract is defined.
         level: Confidence level.
         B: Number of bootstrap replicates.
         family: Family used to refit bootstrap samples or evaluate profile
@@ -569,6 +571,10 @@ def _theta_wald(result, data, level, family):
         p_response = int(p_response)
     except (TypeError, ValueError, OverflowError):
         p_response = 0
+    if family in ('lm', 'gaussian') and p_response > 1:
+        raise NotImplementedError(
+            "Wald intervals are not implemented for multivariate LM results"
+        )
     se = _theta_se_function(
         data, family, p_response=p_response,
         parameter_count=int(theta.shape[0]),
@@ -705,7 +711,14 @@ def _theta_se_function(data, family, *, p_response=0, parameter_count=None):
                 if weights.size != x.shape[0] or not numpy.all(
                         numpy.isfinite(weights)):
                     return numpy.full(x.shape[1], numpy.nan)
+                separation_threshold = math.sqrt(numpy.finfo(float).eps)
+                if numpy.any(weights <= separation_threshold):
+                    return numpy.full(x.shape[1], numpy.nan)
                 information = x.T @ (x * weights[:, None])
+                condition = numpy.linalg.cond(information, p=1)
+                if (not math.isfinite(condition) or
+                        condition >= 1 / separation_threshold):
+                    return numpy.full(x.shape[1], numpy.nan)
                 information_inv = numpy.linalg.inv(information)
             except (FloatingPointError, ValueError, numpy.linalg.LinAlgError,
                     RuntimeError):

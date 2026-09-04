@@ -319,7 +319,7 @@ def test_cp_only_lagged_models_keep_original_data_dimensions():
     assert var_result.thetas.shape == (0, 0)
 
 
-def test_multivariate_lm_wald_matches_flattened_theta_dimension():
+def test_multivariate_lm_wald_is_outside_portable_contract():
     rng = np.random.default_rng(102)
     x = rng.normal(size=(80, 2))
     y = np.column_stack([
@@ -331,19 +331,12 @@ def test_multivariate_lm_wald_matches_flattened_theta_dimension():
         p_response=2,
         beta=1e6,
     )
-    intervals = result.confint(parm="theta", method="wald")
-    assert len(intervals) == result.thetas.size
-    assert all(np.isfinite(row["se"]) for row in intervals)
+    with pytest.raises(NotImplementedError, match="multivariate LM"):
+        result.confint(parm="theta", method="wald")
 
 
-def test_multivariate_residuals_keep_response_columns_and_r_flatten_order():
-    """Python keeps the native n-by-q residual matrix.
-
-    R's current wrapper applies ``matrix(result$residual)``, which flattens a
-    multivariate matrix in column-major order.  The Python contract retains
-    the more useful n-by-q shape; callers needing the R serialization can use
-    ``result.residuals.ravel(order='F')`` and obtain exactly the same values.
-    """
+def test_multivariate_residuals_keep_portable_response_columns():
+    """The shared result contract uses an n-by-q residual matrix."""
     rng = np.random.default_rng(103)
     x = rng.normal(size=(36, 2))
     y = np.column_stack([
@@ -354,10 +347,26 @@ def test_multivariate_residuals_keep_response_columns_and_r_flatten_order():
 
     assert result.residuals.ndim == 2
     assert result.residuals.shape == (36, 2)
-    np.testing.assert_array_equal(
-        result.residuals.ravel(order='F'),
-        np.concatenate((result.residuals[:, 0], result.residuals[:, 1])),
+
+
+def test_separated_binomial_wald_has_undefined_standard_errors():
+    x = np.linspace(-2, 2, 40)
+    data = np.column_stack([
+        np.r_[np.zeros(20), np.ones(20)],
+        np.ones(40),
+        x,
+    ])
+    result = detect(
+        data,
+        family="binomial",
+        beta=1e6,
+        cost_adjustment="BIC",
+        vanilla_percentage=1,
     )
+    interval = result.confint(parm="theta", method="wald")
+    assert all(np.isnan(row["se"]) for row in interval)
+    assert all(np.isnan(row["lower"]) for row in interval)
+    assert all(np.isnan(row["upper"]) for row in interval)
 
 
 def test_var_residuals_pad_each_response_in_original_coordinates():
