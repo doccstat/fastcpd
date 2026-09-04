@@ -74,12 +74,27 @@ jobs:
       id-token: write
 
     steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
       - name: Download distributions
         uses: actions/download-artifact@v4
         with:
           pattern: python-*
           path: dist
           merge-multiple: true
+
+      - name: Verify source, artifact, and tag versions
+        run: >-
+          python python/_check_versions.py
+          --root .
+          --artifacts dist
+          --tag "$GITHUB_REF_NAME"
+          --require-wheel
+          --require-sdist
 
       - name: Publish to PyPI with trusted publishing
         uses: pypa/gh-action-pypi-publish@release/v1

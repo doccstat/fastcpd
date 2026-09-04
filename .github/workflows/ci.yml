@@ -45,7 +45,10 @@ jobs:
       - name: Build and install wheel
         run: |
           python -m build --wheel
+          python python/_check_versions.py \
+            --root . --artifacts dist --require-wheel
           python -m pip install dist/fastcpd-*.whl
+          python -m pip check
         shell: bash
 
       - name: Verify standalone native extension

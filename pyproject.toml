@@ -70,6 +70,7 @@ cmake.source-dir = "python"
 sdist.include = [
     "/python/CMakeLists.txt",
     "/python/CHANGELOG.md",
+    "/python/_check_versions.py",
     "/python/MIGRATION.md",
     "/python/__init__.py",
     "/python/_r_random.py",
