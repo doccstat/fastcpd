@@ -7,6 +7,8 @@ import warnings
 
 import numpy
 
+from ._r_random import RRandom
+
 
 def _variance_module():
     # Lazy import keeps importing ``fastcpd.confidence`` independent of the
@@ -168,9 +170,12 @@ def _normalize_family(family):
 
 
 def _rng(random_state):
-    if isinstance(random_state, (numpy.random.Generator,
-                                 numpy.random.RandomState)):
+    if isinstance(random_state, (
+        RRandom, numpy.random.Generator, numpy.random.RandomState
+    )):
         return random_state
+    if isinstance(random_state, (int, numpy.integer)):
+        return RRandom(random_state)
     return numpy.random.default_rng(random_state)
 
 
@@ -261,12 +266,12 @@ def _bootstrap_refit(segmentation, data, family, detect_kwargs, rng):
         )
     if fit_family in ('kernel', 'kcp'):
         options.pop('family', None)
-        # A fresh deterministic seed per replicate mirrors R's advancing RNG
-        # stream.  ``RandomState`` (still common in downstream code) exposes
-        # ``randint`` rather than the newer Generator ``integers`` method.
-        # Always draw from the bootstrap RNG instead of reusing a mutable
-        # Generator captured in ``fit_kwargs``.
-        options['random_state'] = _draw_seed(rng)
+        # R uses one advancing stream for segment resampling and every KCP
+        # refit. Scalar Python seeds follow that stream exactly; native NumPy
+        # generators retain the historical per-refit seed behavior.
+        options['random_state'] = (
+            rng if isinstance(rng, RRandom) else _draw_seed(rng)
+        )
         return segmentation.detect_kcp(
             data, cp_only=True, **options
         )

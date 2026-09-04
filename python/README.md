@@ -69,6 +69,10 @@ models. Wald parameter intervals are available for mean, exponential, linear,
 binomial, and Poisson fits. ARIMA profile intervals reuse the same native
 segment-local likelihood as detection.
 
+For bootstrap intervals, an integer `random_state` reproduces R's `seed`
+stream for both within-segment resampling and any seeded KCP refits. NumPy
+generator objects continue to use their native sampling semantics.
+
 ## Result contract
 
 Every detection call returns a frozen `CpdResult` dataclass. Change points are

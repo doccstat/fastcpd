@@ -8,7 +8,16 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from fastcpd import confidence, detect_meanvariance, detect_rank, lm, mv, var
+from fastcpd import (
+    confidence,
+    detect_kernel,
+    detect_mean,
+    detect_meanvariance,
+    detect_rank,
+    lm,
+    mv,
+    var,
+)
 from fastcpd.segmentation import (
     CpdResult,
     _kernel_transform,
@@ -54,6 +63,61 @@ def test_identical_kernel_input_uses_shared_finite_bandwidth_fallback():
         cp_only=True,
     )
     np.testing.assert_array_equal(result.cp_set, np.empty(0, dtype=np.int64))
+
+
+def test_seeded_mean_bootstrap_matches_r_interval():
+    data = np.loadtxt(
+        Path(__file__).parent / "fixtures" / "mean_step.csv",
+        delimiter=",",
+        skiprows=1,
+    )
+    result = detect_mean(
+        data,
+        beta=5,
+        cost_adjustment="BIC",
+        trim=0.1,
+        vanilla_percentage=1,
+    )
+    interval = result.confint(
+        parm="cp", method="bootstrap", B=12, level=0.8, random_state=17
+    )
+    assert interval == [{
+        "parm": "cp",
+        "index": 1,
+        "estimate": 20,
+        "lower": 20.0,
+        "upper": 20.0,
+        "detection_rate": 1.0,
+        "level": 0.8,
+        "method": "bootstrap",
+        "bootstrap": "nonparametric",
+    }]
+
+
+def test_seeded_kcp_bootstrap_continues_the_r_stream():
+    data = np.loadtxt(
+        Path(__file__).parent / "fixtures" / "stochastic" /
+        "kcp_seed_input.csv",
+        delimiter=",",
+        skiprows=1,
+    )
+    result = detect_kernel(
+        data, order=(8, 1.25), random_state=7, beta=2, trim=0
+    )
+    interval = result.confint(
+        parm="cp", method="bootstrap", B=12, level=0.8, random_state=19
+    )
+    assert interval == [{
+        "parm": "cp",
+        "index": 1,
+        "estimate": 13,
+        "lower": 11.0,
+        "upper": 13.0,
+        "detection_rate": 5 / 12,
+        "level": 0.8,
+        "method": "bootstrap",
+        "bootstrap": "nonparametric",
+    }]
 
 
 def test_variance_lm_rejects_computationally_singular_blocks_like_r():
