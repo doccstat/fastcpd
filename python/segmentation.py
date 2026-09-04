@@ -852,8 +852,10 @@ def detect(
         segment_count: Initial guess for number of segments.
         trim: Trimming proportion for boundary change points.
         momentum_coef: Momentum coefficient for parameter updates.
-        multiple_epochs: Per-step epoch schedule. Custom schedules are not yet
-            supported by the Python binding; leave this as ``None``.
+        multiple_epochs: R-only callback schedule. Python intentionally
+            accepts only ``None`` because dispatching a Python callback from
+            native per-segment updates would break the GIL-free detector
+            contract and add overhead to performance-sensitive fits.
         epsilon: Epsilon for numerical stability.
         order: Model order. ARMA uses ``(p, q)`` and ARIMA uses ``(p, d, q)``.
         include_mean: Must be False for ARIMA. For other families this
@@ -894,8 +896,8 @@ def detect(
         raise ValueError("data must be provided")
     if multiple_epochs is not None:
         raise NotImplementedError(
-            "Custom multiple_epochs schedules are not supported by the "
-            "Python binding."
+            "Callable multiple_epochs schedules are intentionally R-only; "
+            "the Python binding preserves a GIL-free native detector path."
         )
 
     # Snapshot the user-facing input before constructing lagged designs.  The

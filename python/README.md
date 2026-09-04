@@ -37,6 +37,12 @@ functions or compiled external pointers, while the Python binding keeps the
 detector on the GIL-free built-in native path and does not define a callback
 ABI.
 
+Callable `multiple_epochs` schedules are also R-only. Invoking a Python
+callback from native per-segment updates would require reacquiring the GIL in
+performance-sensitive execution. Python therefore accepts only
+`multiple_epochs=None`; a future portable schedule would need a declarative
+native representation rather than a language callback.
+
 `detect_var(data, order=p)` accepts the raw multivariate time series and
 constructs its lagged VAR design internally, matching the R interface. For an
 already-constructed response/predictor matrix, use

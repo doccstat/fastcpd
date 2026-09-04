@@ -316,7 +316,9 @@ class TestBasic(unittest.TestCase):
     def test_detect_rejects_unsupported_arguments(self):
         with self.assertRaisesRegex(TypeError, "unexpected keyword"):
             detect_mean(np.arange(10), unknown_option=True)
-        with self.assertRaisesRegex(NotImplementedError, "multiple_epochs"):
+        with self.assertRaisesRegex(
+            NotImplementedError, "intentionally R-only"
+        ):
             detect_mean(np.arange(10), multiple_epochs=lambda _: 1)
         with self.assertRaisesRegex(NotImplementedError, "intentionally R-only"):
             detect(
