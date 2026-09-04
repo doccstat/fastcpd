@@ -31,8 +31,10 @@ dynamic-programming traceback.}
 
 \item{\code{cost_values}}{The cost function values for each segment.}
 
-\item{\code{residuals}}{The residuals of the model with change points.
-Used only for built-in families.}
+\item{\code{residuals}}{The residuals of the model with change points, stored with
+one row per original observation and one column per response. Leading
+lag rows are missing for autoregressive models. Used only for built-in
+families.}
 
 \item{\code{thetas}}{The estimated parameters for each segment. Used only for
 built-in families.}

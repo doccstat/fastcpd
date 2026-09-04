@@ -5,6 +5,14 @@
     paths. The fixtures now compare raw and trimmed change points, segment
     costs, residuals, parameters, and interval diagnostics. R results expose
     the native `raw_cp_set` alongside `cp_set`.
+*   Define the remaining detailed-output boundaries: multivariate residuals
+    now use an observation-by-response matrix in both languages; VAR wrappers
+    always accept raw unlagged series and reject the ambiguous Python-only
+    pre-lagged `p_response` form; multivariate-LM Wald intervals fail clearly
+    in both languages; and separated-binomial Wald intervals return missing
+    standard errors instead of unstable language-dependent finite values.
+    Rank result-data containers remain language-specific while all fitted
+    numerical details are computed from the same centered ranks.
 *   Make scalar Python seeds reproduce R's default Mersenne-Twister,
     inversion-normal, and rejection-sampling stream for kernel random features.
     NumPy generator objects retain their native streams. Constant-valued KCP

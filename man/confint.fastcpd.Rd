@@ -28,7 +28,8 @@ locations or \code{"theta"} for segment parameters.}
 
 \item{method}{Method used to construct intervals. Change-point intervals
 support \code{"bootstrap"} and \code{"profile"}. Parameter intervals
-support \code{"wald"}.}
+support \code{"wald"}; multivariate linear-model Wald intervals are not
+currently part of the portable R/Python contract.}
 
 \item{B}{Number of bootstrap replicates when \code{method = "bootstrap"}.}
 
