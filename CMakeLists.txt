@@ -5,7 +5,7 @@ if(POLICY CMP0135)
 endif()
 
 project(fastcpd
-  VERSION 1.1.2
+  VERSION 1.3.0
   LANGUAGES CXX)
 
 include(CMakePackageConfigHelpers)
