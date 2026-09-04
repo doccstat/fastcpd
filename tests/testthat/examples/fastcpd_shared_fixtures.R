@@ -192,7 +192,8 @@ shared_variance_results <- lapply(
 )
 
 normalize_shared_residuals <- function(result, case) {
-  values <- as.numeric(result@residuals)
+  residual_matrix <- as.matrix(result@residuals)
+  values <- as.numeric(residual_matrix)
   if (!length(values)) return(matrix(numeric(), 0L, 0L))
   n <- nrow(result@data)
   order <- parse_shared_numbers(case$order)
@@ -207,6 +208,10 @@ normalize_shared_residuals <- function(result, case) {
     ncol(result@data)
   } else {
     1L
+  }
+
+  if (identical(dim(residual_matrix), c(n, response_count))) {
+    return(residual_matrix)
   }
 
   if (case$family == "var") {
@@ -304,3 +309,32 @@ parse_shared_expected_output <- function(row) {
   }
   values
 }
+
+# Detailed-output edge contracts shared with Python. VAR wrappers always take
+# raw series input, multivariate LM Wald intervals are outside the portable
+# contract, and complete binomial separation yields undefined (NA) standard
+# errors rather than language-dependent huge finite values.
+shared_var_p_response_error <- tryCatch(
+  detect_var(shared_detector_cases$var_step$data, order = 1, p.response = 2),
+  error = identity
+)
+shared_multivariate_wald_error <- tryCatch(
+  confint(shared_detector_results$lm_multivariate, parm = "theta", method = "wald"),
+  error = identity
+)
+shared_separated_binomial_data <- cbind(
+  y = c(rep(0, 20), rep(1, 20)),
+  intercept = 1,
+  x = seq(-2, 2, length.out = 40)
+)
+shared_separated_binomial_result <- suppressWarnings(detect_binomial(
+  shared_separated_binomial_data,
+  beta = 1e6,
+  cost_adjustment = "BIC",
+  vanilla_percentage = 1
+))
+shared_separated_binomial_wald <- suppressWarnings(confint(
+  shared_separated_binomial_result,
+  parm = "theta",
+  method = "wald"
+))

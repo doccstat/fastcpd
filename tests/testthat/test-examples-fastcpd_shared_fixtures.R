@@ -15,6 +15,19 @@ testthat::test_that(
       unique(vapply(shared_confidence_cases, `[[`, character(1), "operation")),
       c("confint_bootstrap", "confint_profile", "confint_wald")
     )
+    testthat::expect_s3_class(shared_var_p_response_error, "error")
+    testthat::expect_match(
+      conditionMessage(shared_var_p_response_error),
+      "raw multivariate series"
+    )
+    testthat::expect_s3_class(shared_multivariate_wald_error, "error")
+    testthat::expect_match(
+      conditionMessage(shared_multivariate_wald_error),
+      "multivariate LM"
+    )
+    testthat::expect_true(all(is.na(shared_separated_binomial_wald$se)))
+    testthat::expect_true(all(is.na(shared_separated_binomial_wald$lower)))
+    testthat::expect_true(all(is.na(shared_separated_binomial_wald$upper)))
 
     for (case_id in names(shared_detector_results)) {
       testthat::expect_equal(

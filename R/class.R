@@ -14,8 +14,10 @@
 #' @slot raw_cp_set The untrimmed set of change points returned by the native
 #'   dynamic-programming traceback.
 #' @slot cost_values The cost function values for each segment.
-#' @slot residuals The residuals of the model with change points.
-#' Used only for built-in families.
+#' @slot residuals The residuals of the model with change points, stored with
+#'   one row per original observation and one column per response. Leading
+#'   lag rows are missing for autoregressive models. Used only for built-in
+#'   families.
 #' @slot thetas The estimated parameters for each segment. Used only for
 #' built-in families.
 #' @slot cp_only A boolean indicating whether [detect()] was run to return

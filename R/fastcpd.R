@@ -350,6 +350,12 @@ detect <- function(  # nolint: cyclomatic complexity
   if (methods::hasArg("p.response")) {
     p_response <- eval.parent(match.call()[["p.response"]])
   }
+  if (family == "var" && methods::hasArg("p.response")) {
+    stop(
+      "`p.response` is not accepted for VAR input; pass the raw ",
+      "multivariate series and let `detect_var()` infer its dimension."
+    )
+  }
   if (methods::hasArg("show.progress")) {
     r_progress <- eval.parent(match.call()[["show.progress"]])
   }
@@ -578,18 +584,12 @@ detect <- function(  # nolint: cyclomatic complexity
     result$residual <- numeric(0)
   }
 
-  residuals <- matrix(result$residual)
+  residuals <- as.matrix(result$residual)
 
-  if (!cp_only) {
-    tryCatch(
-      expr = if (index_offset > 0 && family != "var") {
-        residuals <- matrix(c(rep(NA, index_offset), residuals))
-      } else if (family == "var") {
-        residuals <- rbind(
-          matrix(NA, nrow = order, ncol = ncol(residuals)), residuals
-        )
-      },
-      error = function(e) message("Residual calculation failed.")
+  if (!cp_only && index_offset > 0) {
+    residuals <- rbind(
+      matrix(NA_real_, nrow = index_offset, ncol = ncol(residuals)),
+      residuals
     )
   }
 
@@ -1251,6 +1251,9 @@ fastcpd.kcp <- detect_kernel  # nolint: Conventional R function style
 #'   its global rank centred at zero, and change points in the mean of these
 #'   centred ranks are detected with the existing PELT infrastructure. The
 #'   result is fully deterministic and requires no bandwidth selection.
+#'   R stores the transformed ranks in its result data slot, while Python
+#'   retains the original input so bootstrap refits can repeat the transform;
+#'   fitted numerical outputs use the centred ranks in both languages.
 #'   The method is most powerful for location shifts; for scale-only or
 #'   general distributional changes, [detect_kernel()] is preferable.
 #' @example tests/testthat/examples/fastcpd_rank.R
@@ -1288,7 +1291,10 @@ fastcpd.rank <- detect_rank  # nolint: Conventional R function style
 #' wrapper functions of [detect()] to find change points in
 #' VAR(\eqn{p}) models. The function is similar to [detect()]
 #' except that the data is by default a matrix with row as an observation
-#' and thus a formula is not required here.
+#' and thus a formula is not required here. Pass the raw, unlagged series;
+#' its response dimension is inferred from the number of columns. The old
+#' Python-only pre-lagged code{p_response}/code{p.response} form is not part
+#' of the portable interface.
 #' @example tests/testthat/examples/fastcpd_var.R
 #' @seealso [detect()]
 #'

@@ -6,7 +6,8 @@
 #' @param level Confidence level.
 #' @param method Method used to construct intervals. Change-point intervals
 #'   support \code{"bootstrap"} and \code{"profile"}. Parameter intervals
-#'   support \code{"wald"}.
+#'   support \code{"wald"}; multivariate linear-model Wald intervals are not
+#'   currently part of the portable R/Python contract.
 #' @param B Number of bootstrap replicates when \code{method = "bootstrap"}.
 #' @param bootstrap Bootstrap type. Currently \code{"nonparametric"} resamples
 #'   observations within each estimated segment and is available for all
@@ -404,6 +405,10 @@ fastcpd_confint_theta_wald <- function(object, level) {
     stop("Wald intervals require a fastcpd object fitted with `cp_only = FALSE`.")
   }
 
+  if (object@family == "lm" && fastcpd_lm_response_count(object) > 1L) {
+    stop("Wald intervals are not implemented for multivariate LM results.")
+  }
+
   se_function <- fastcpd_theta_se_function(object)
   theta <- as.matrix(object@thetas)
   bounds <- fastcpd_segment_bounds(object)
@@ -427,6 +432,22 @@ fastcpd_confint_theta_wald <- function(object, level) {
   }
 
   do.call(rbind, out)
+}
+
+fastcpd_lm_response_count <- function(object) {
+  p_response <- object@call[["p.response"]]
+  if (is.numeric(p_response) && length(p_response) == 1L &&
+      is.finite(p_response) && p_response > 0) {
+    return(as.integer(p_response))
+  }
+  column_count <- ncol(object@data)
+  parameter_count <- nrow(object@thetas)
+  if (parameter_count == column_count - 1L) return(1L)
+  candidates <- seq_len(max(column_count - 1L, 1L))
+  candidates <- candidates[
+    candidates * (column_count - candidates) == parameter_count
+  ]
+  if (length(candidates)) min(candidates) else 1L
 }
 
 fastcpd_empty_confint <- function(parm, level, method) {
@@ -758,8 +779,18 @@ fastcpd_theta_se_glm <- function(data, family) {
       error = function(e) NULL
     )
     if (is.null(fit)) return(rep(NA_real_, ncol(x)))
+    separation_threshold <- sqrt(.Machine$double.eps)
+    if (any(!is.finite(fit$weights)) ||
+        any(fit$weights <= separation_threshold)) {
+      return(rep(NA_real_, ncol(x)))
+    }
+    information <- crossprod(x, x * fit$weights)
+    if (!is.finite(rcond(information)) ||
+        rcond(information) <= separation_threshold) {
+      return(rep(NA_real_, ncol(x)))
+    }
     xtwx_inv <- tryCatch(
-      solve(crossprod(x, x * fit$weights)),
+      solve(information),
       error = function(e) NULL
     )
     if (is.null(xtwx_inv)) return(rep(NA_real_, ncol(x)))
