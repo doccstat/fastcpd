@@ -45,3 +45,10 @@ and all fixture CSVs through the fixture glob in `pyproject.toml`.
 Response columns precede predictor columns, and change-point indices use the
 one-based convention exposed by the public APIs. No language-specific
 serializer or random seed is part of this contract.
+
+`r_rng.tsv` is a separate stochastic-conformance table generated from base R
+with its default Mersenne-Twister, inversion-normal, and rejection-sampling
+settings. It freezes the small subset of `set.seed()` behavior needed for
+same-seed KCP features and confidence-bootstrap resampling. It is not indexed
+by `manifest.tsv` because it describes an RNG stream rather than a detector
+input.
