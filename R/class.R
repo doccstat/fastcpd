@@ -11,6 +11,8 @@
 #' @slot order The order of the time series model.
 #' @slot family The family of the model.
 #' @slot cp_set The set of change points.
+#' @slot raw_cp_set The untrimmed set of change points returned by the native
+#'   dynamic-programming traceback.
 #' @slot cost_values The cost function values for each segment.
 #' @slot residuals The residuals of the model with change points.
 #' Used only for built-in families.
@@ -29,6 +31,7 @@ setClass(
     order = "numeric",
     family = "character",
     cp_set = "numeric",
+    raw_cp_set = "numeric",
     cost_values = "numeric",
     residuals = "matrix",
     thetas = "data.frame",

@@ -26,6 +26,9 @@ select using \code{@}.
 
 \item{\code{cp_set}}{The set of change points.}
 
+\item{\code{raw_cp_set}}{The untrimmed set of change points returned by the native
+dynamic-programming traceback.}
+
 \item{\code{cost_values}}{The cost function values for each segment.}
 
 \item{\code{residuals}}{The residuals of the model with change points.

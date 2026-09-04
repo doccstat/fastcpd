@@ -7,23 +7,38 @@ without depending on an R or NumPy random-number stream.
 
 `manifest.tsv` is the manually maintained, authoritative test index. It names
 each operation, its input CSV, its public arguments, and its expected result.
-Use `-` where a field does not apply. The R and Python suites parse the same
-rows independently; the C++ example selects the manifest's mean detector row.
+Use `-` where a field does not apply. Detector rows cover every portable
+built-in family, and confidence rows refer to their fitted detector through
+`source_case`. The R and Python suites parse the same rows independently; the
+C++ example selects the manifest's mean detector row.
 
 | column | meaning |
 | --- | --- |
 | `case_id` | Stable name used by the test suites. |
 | `data_file` | CSV file relative to this directory. |
-| `operation` | `detect`, `estimate_variance`, or `estimate_variance_arma`. |
+| `operation` | `detect`, `confint_bootstrap`, `confint_profile`, `confint_wald`, `estimate_variance`, or `estimate_variance_arma`. |
+| `source_case` | Detector case used by a confidence operation. |
 | `family` | Public detector or variance-estimator family. |
 | `order` | Scalar order or comma-separated model order. |
 | `beta` | Numeric penalty or criterion name for detector rows. |
 | `cost_adjustment` | Detector cost adjustment (`BIC`, `MBIC`, or `MDL`). |
 | `trim` | Detector boundary/minimum-distance trim proportion. |
 | `vanilla_percentage` | Fraction evaluated with exact PELT. |
+| `p_response` | Response-column count for multivariate linear regression. |
+| `variance_estimation` | Optional scalar or comma-separated covariance diagonal. |
+| `random_state` | Shared scalar seed for KCP or bootstrap. |
+| `level`, `B`, `window` | Confidence-method controls. |
 | `expected_cp` | One-based change points separated by `;`. |
 | `expected_value` | Expected scalar variance result. |
 | `tolerance` | Numeric comparison tolerance for `expected_value`. |
+
+`expected_outputs.tsv` is the normalized numerical contract generated from
+the R reference implementation. Each row stores one vector or matrix field in
+row-major order, including its exact shape and comparison tolerance. Detector
+rows cover `cp_set`, `raw_cp_set`, costs, residuals, and parameters; confidence
+rows cover every numeric interval column. Multivariate residuals are compared
+as conceptual `(observation, response)` matrices, independent of R's current
+flattened S4 storage and Python's native two-dimensional storage.
 
 `generate_fixtures.py` owns only the CSV contents. It records the deterministic
 constructions: fixed step patterns, a repeating regression-error cycle,
@@ -34,6 +49,8 @@ manifest. From the package root, run:
 ```sh
 python tests/fixtures/generate_fixtures.py
 python tests/fixtures/generate_fixtures.py --check
+Rscript tests/fixtures/generate_r_shared_outputs.R
+Rscript tests/fixtures/generate_r_shared_outputs.R --check
 ```
 
 Do not hand-edit a generated CSV. Edit the construction in the generator,
@@ -43,8 +60,9 @@ CSV. The Python source distribution includes the manifest, generator, README,
 and all fixture CSVs through the fixture glob in `pyproject.toml`.
 
 Response columns precede predictor columns, and change-point indices use the
-one-based convention exposed by the public APIs. No language-specific
-serializer or random seed is part of this contract.
+one-based convention exposed by the public APIs. Scalar KCP/bootstrap seeds
+use the explicitly documented R-compatible stream; native NumPy generator
+objects remain a Python-specific extension and are outside these fixtures.
 
 `r_rng.tsv` is a separate stochastic-conformance table generated from base R
 with its default Mersenne-Twister, inversion-normal, and rejection-sampling
