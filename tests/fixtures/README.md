@@ -52,3 +52,12 @@ settings. It freezes the small subset of `set.seed()` behavior needed for
 same-seed KCP features and confidence-bootstrap resampling. It is not indexed
 by `manifest.tsv` because it describes an RNG stream rather than a detector
 input.
+The accompanying seeded feature matrices live under `stochastic/` so the
+detector fixture generator's root-level CSV inventory remains exact.
+
+Regenerate and verify the stochastic tables and seeded KCP feature matrix with:
+
+```sh
+Rscript tests/fixtures/generate_r_stochastic_fixtures.R
+Rscript tests/fixtures/generate_r_stochastic_fixtures.R --check
+```

@@ -400,7 +400,12 @@ detect <- function(  # nolint: cyclomatic complexity
     if (sigma_kcp <= 0) {
       idx <- if (n > 1000L) sample.int(n, 1000L) else seq_len(n)
       d2 <- as.numeric(stats::dist(data_[idx, , drop = FALSE])^2)
-      sigma_kcp <- sqrt(stats::median(d2[d2 > 0]) / 2)
+      positive_d2 <- d2[d2 > 0]
+      sigma_kcp <- if (length(positive_d2)) {
+        sqrt(stats::median(positive_d2) / 2)
+      } else {
+        1
+      }
     }
     omega <- matrix(stats::rnorm(original_p * D, sd = 1 / sigma_kcp), original_p, D)
     b <- stats::runif(D, 0, 2 * pi)
