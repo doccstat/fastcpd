@@ -13,6 +13,9 @@
     standard errors instead of unstable language-dependent finite values.
     Rank result-data containers remain language-specific while all fitted
     numerical details are computed from the same centered ranks.
+*   Keep callable `multiple_epochs` schedules as an explicit R-only extension.
+    Python rejects callbacks so the shared native detector remains GIL-free
+    and no callback dispatch is added to performance-sensitive update paths.
 *   Make scalar Python seeds reproduce R's default Mersenne-Twister,
     inversion-normal, and rejection-sampling stream for kernel random features.
     NumPy generator objects retain their native streams. Constant-valued KCP
