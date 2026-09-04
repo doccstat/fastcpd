@@ -4,6 +4,9 @@
 
 This is the first coordinated R, Python, and standalone C++ source contract.
 
+- R, Python, and standalone C++ sources now report version 1.3.0. Release CI
+  rejects mismatched tags, wheel/sdist filenames, or archive metadata before
+  publication, and the Python package is classified as production/stable.
 - Scalar integer seeds reproduce R's KCP features and bootstrap sampling;
   NumPy generator objects remain a native Python extension.
 - Shared fixtures cover every portable detector family and the common

@@ -24,6 +24,15 @@ The public API includes mean, variance, mean/variance, exponential, VAR,
 linear, lasso, binomial, Poisson, quantile, GARCH, AR, ARMA, and ARIMA change
 detection, plus rank and kernel transforms.
 
+Version 1.3.0 is the first source interface coordinated with the R and
+standalone C++ packages. Portable built-in detectors share native algorithms,
+defaults, seeded scalar-randomness behavior, change points, costs, parameters,
+residual layout, and supported confidence diagnostics. R formulas,
+data frames, custom callbacks, and callable epoch schedules are explicit
+R-only extensions; NumPy generator streams and the immutable `CpdResult`
+container are Python-native extensions. The compiled detector remains GIL-free
+and does not dispatch language callbacks from its PELT or SEN update paths.
+
 As in R, generic `detect(..., family=...)` accepts `family="kcp"`; the
 `rank` and `kernel` spellings are wrapper-only, through `detect_rank()` and
 `detect_kernel()` respectively.
