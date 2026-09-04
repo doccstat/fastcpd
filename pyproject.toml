@@ -70,6 +70,7 @@ cmake.source-dir = "python"
 sdist.include = [
     "/python/CMakeLists.txt",
     "/python/__init__.py",
+    "/python/_r_random.py",
     "/python/confidence.py",
     "/python/py.typed",
     "/python/pybind.cc",
@@ -92,6 +93,7 @@ sdist.include = [
     "/tests/fixtures/*.csv",
     "/tests/fixtures/generate_fixtures.py",
     "/tests/fixtures/manifest.tsv",
+    "/tests/fixtures/r_rng.tsv",
     "/LICENSE.md",
 ]
 sdist.exclude = [

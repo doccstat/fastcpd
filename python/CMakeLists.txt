@@ -24,6 +24,7 @@ target_compile_features(interface PRIVATE cxx_std_17)
 
 install(FILES
   __init__.py
+  _r_random.py
   confidence.py
   py.typed
   segmentation.py

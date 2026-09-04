@@ -1,11 +1,51 @@
-"""Focused tests for cross-language covariance and traceback contracts."""
+"""Focused tests for cross-language stochastic and result contracts."""
+
+import csv
+from pathlib import Path
 
 import numpy as np
 import pytest
 
 from fastcpd import detect_lm, detect_mean
+from fastcpd._r_random import RRandom, is_r_seed
 from fastcpd.interface import fastcpd_impl as native_fastcpd_impl
 from fastcpd.variance_estimation import estimate_variance_linear_regression
+
+
+RNG_FIXTURES = Path(__file__).parent / "fixtures" / "r_rng.tsv"
+
+
+@pytest.mark.parametrize(
+    "row",
+    list(csv.DictReader(RNG_FIXTURES.open(encoding="utf-8"), delimiter="\t")),
+    ids=lambda row: row["case_id"],
+)
+def test_r_random_matches_base_r_golden_vectors(row):
+    rng = RRandom(int(row["seed"]))
+    size = int(row["size"])
+    expected = np.fromstring(row["expected"], sep=";")
+    if row["operation"] == "uniform":
+        actual = rng.uniform(size=size)
+    elif row["operation"] == "normal":
+        actual = rng.normal(size=size)
+    else:
+        actual = rng.choice(
+            int(row["population"]),
+            size=size,
+            replace=row["replace"] == "true",
+        ) + 1
+    np.testing.assert_allclose(
+        actual, expected, rtol=0.0, atol=float(row["tolerance"])
+    )
+
+
+def test_r_random_seed_contract_matches_r_integer_range():
+    assert is_r_seed(-2147483647)
+    assert is_r_seed(np.int64(2147483647))
+    for invalid in (True, -2147483648, 2147483648, 1.5, None):
+        assert not is_r_seed(invalid)
+        with pytest.raises(ValueError, match="R-compatible seeds"):
+            RRandom(invalid)
 
 
 def test_raw_cp_set_keeps_boundary_removed_by_trim():
