@@ -92,8 +92,10 @@ sdist.include = [
     "/tests/fixtures/README.md",
     "/tests/fixtures/*.csv",
     "/tests/fixtures/generate_fixtures.py",
+    "/tests/fixtures/generate_r_stochastic_fixtures.R",
     "/tests/fixtures/manifest.tsv",
     "/tests/fixtures/r_rng.tsv",
+    "/tests/fixtures/stochastic/*.csv",
     "/LICENSE.md",
 ]
 sdist.exclude = [

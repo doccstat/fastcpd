@@ -6,6 +6,8 @@ import dataclasses
 from typing import Mapping
 
 import numpy
+
+from ._r_random import RRandom
 from fastcpd import variance_estimation as _variance_estimation
 from fastcpd.interface import fastcpd_impl
 
@@ -1610,8 +1612,12 @@ def _kernel_transform(data, order=(100, 0), random_state=None):
 def _rng_from_random_state(random_state):
     if random_state is None:
         return numpy.random
-    if isinstance(random_state, (numpy.random.Generator, numpy.random.RandomState)):
+    if isinstance(
+        random_state, (RRandom, numpy.random.Generator, numpy.random.RandomState)
+    ):
         return random_state
+    if isinstance(random_state, (int, numpy.integer)):
+        return RRandom(random_state)
     return numpy.random.default_rng(random_state)
 
 

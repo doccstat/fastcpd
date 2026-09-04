@@ -2,6 +2,7 @@
 
 import copy
 import pickle
+from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
@@ -28,6 +29,31 @@ def test_variance_lm_validates_response_dimension_before_default_block_size():
         )
     with pytest.raises(ValueError, match=r"d"):
         variance_estimation.estimate_variance_linear_regression(data, d=1.5)
+
+
+def test_seeded_kernel_features_match_r_generation_order():
+    fixture_dir = Path(__file__).parent / "fixtures" / "stochastic"
+    data = np.loadtxt(
+        fixture_dir / "kcp_seed_input.csv", delimiter=",", skiprows=1
+    )
+    expected = np.loadtxt(
+        fixture_dir / "kcp_seed_features.csv", delimiter=",", skiprows=1
+    )
+    actual = _kernel_transform(data, order=(8, 1.25), random_state=7)
+    np.testing.assert_allclose(actual, expected, rtol=0.0, atol=2e-15)
+
+
+def test_identical_kernel_input_uses_shared_finite_bandwidth_fallback():
+    result = detect(
+        np.full(20, 3.0),
+        family="kcp",
+        order=(8, 0),
+        random_state=7,
+        beta=2,
+        trim=0,
+        cp_only=True,
+    )
+    np.testing.assert_array_equal(result.cp_set, np.empty(0, dtype=np.int64))
 
 
 def test_variance_lm_rejects_computationally_singular_blocks_like_r():

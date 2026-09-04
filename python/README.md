@@ -57,6 +57,12 @@ defaults/median heuristic, and entries after the first two are ignored. Python
 raises `ValueError` for non-finite values or positive non-integer feature
 counts before allocating the feature matrix.
 
+An integer `random_state` reproduces R's default `set.seed()` stream for the
+bandwidth sample, normal feature weights, and uniform phases. Passing a NumPy
+`Generator` or legacy `RandomState` deliberately retains that object's native
+Python stream. Constant-valued input uses a finite unit-bandwidth fallback and
+therefore returns no artificial change points.
+
 `result.confint()` supports profile change-point intervals for mean, variance,
 mean/variance, exponential, linear, binomial, Poisson, quantile, and ARIMA
 models. Wald parameter intervals are available for mean, exponential, linear,
