@@ -1,5 +1,9 @@
 # fastcpd 1.3.0
 
+*   Coordinate the R, Python, and standalone C++ source interfaces at version
+    1.3.0. Required CI checks all three source versions, and Python release CI
+    rejects a mismatched tag, wheel filename/metadata, or sdist
+    filename/metadata before publication.
 *   Expand the shared R/Python numerical contract to every portable built-in
     detector family and the common bootstrap, profile, and Wald confidence
     paths. The fixtures now compare raw and trimmed change points, segment
