@@ -600,6 +600,7 @@ detect <- function(  # nolint: cyclomatic complexity
     order = order,
     family = family,
     cp_set = cp_set,
+    raw_cp_set = raw_cp_set,
     cost_values = c(result$cost_values),
     residuals = residuals,
     thetas = thetas,

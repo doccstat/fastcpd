@@ -1,5 +1,10 @@
 # fastcpd 1.3.0
 
+*   Expand the shared R/Python numerical contract to every portable built-in
+    detector family and the common bootstrap, profile, and Wald confidence
+    paths. The fixtures now compare raw and trimmed change points, segment
+    costs, residuals, parameters, and interval diagnostics. R results expose
+    the native `raw_cp_set` alongside `cp_set`.
 *   Make scalar Python seeds reproduce R's default Mersenne-Twister,
     inversion-normal, and rejection-sampling stream for kernel random features.
     NumPy generator objects retain their native streams. Constant-valued KCP

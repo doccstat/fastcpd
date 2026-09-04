@@ -377,14 +377,10 @@ template <typename FamilyPolicy, bool kRProgress, bool kVanillaOnly,
 std::tuple<arma::colvec, arma::colvec, arma::colvec, arma::mat, arma::mat>
 Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::GetChangePointSet() {
   arma::colvec cp_set = UpdateChangePointSet();
-  // `change_points_` stores the untrimmed traceback.  The standalone/Python
-  // result contract exposes its interior boundaries as ``raw_change_points``
-  // before the public `cp_set` applies trim/merge rules.  Keep the historical
-  // empty R slot: R's wrapper never consumed this internal vector, and
-  // materialising it there would add an unnecessary O(segment-count) copy to
-  // every R fit.
-  arma::colvec raw_cp_set;
-#ifdef NO_RCPP
+  // `change_points_` stores the untrimmed traceback. Expose its interior
+  // boundaries before the public `cp_set` applies trim/merge rules. This is a
+  // single O(segment-count) post-processing pass after detection; it does not
+  // add work to the PELT or SEN hot loops.
   // The terminal boundary `n` and origin `0` are segment delimiters, not
   // change points.
   std::vector<double> raw_values;
@@ -398,11 +394,10 @@ Fastcpd<FamilyPolicy, kRProgress, kVanillaOnly, kCostAdj, kLineSearch, kNDims>::
   // points to an earlier observation. Reverse once to expose ascending raw
   // change points in O(k), without sort/unique postprocessing.
   std::reverse(raw_values.begin(), raw_values.end());
-  raw_cp_set.set_size(raw_values.size());
+  arma::colvec raw_cp_set(raw_values.size());
   for (arma::uword i = 0; i < raw_cp_set.n_elem; ++i) {
     raw_cp_set(i) = raw_values[i];
   }
-#endif
 
   if (cp_only_) {
     return std::make_tuple(std::move(raw_cp_set), cp_set, arma::colvec(),
