@@ -41,6 +41,58 @@ def _var_rows():
     ]
 
 
+def _multivariate_lm_rows():
+    """Create a deterministic two-response regression with two predictors."""
+    errors = ((0.10, -0.05), (-0.15, 0.12), (0.05, 0.08), (-0.02, -0.10))
+    predictors = ((-2, 1), (-1, -1), (1, -1), (2, 1))
+    rows = []
+    for index in range(48):
+        x1, x2 = predictors[index % len(predictors)]
+        error1, error2 = errors[index % len(errors)]
+        y1 = 1.5 * x1 - 0.5 * x2 + error1
+        y2 = 0.25 * x1 + 1.25 * x2 + error2
+        rows.append(f"{y1:g},{y2:g},{x1},{x2}")
+    return rows
+
+
+def _binomial_rows():
+    """Create two regular, non-separated logistic-regression regimes."""
+    x_values = (-2, -1, 0, 1, 2, 1, 0, -1)
+    first_y = (0, 0, 1, 0, 1, 1, 0, 1)
+    second_y = (1, 1, 0, 1, 0, 0, 1, 0)
+    rows = []
+    for y_cycle in (first_y, second_y):
+        for _ in range(5):
+            rows.extend(
+                f"{response},1,{x_value}"
+                for response, x_value in zip(y_cycle, x_values)
+            )
+    return rows
+
+
+def _poisson_rows():
+    """Create two finite Poisson-regression regimes."""
+    x_values = (-2, -1, 0, 1, 2, 1, 0, -1)
+    first_y = (0, 0, 1, 1, 4, 3, 1, 0)
+    second_y = (4, 3, 1, 0, 0, 1, 1, 3)
+    rows = []
+    for y_cycle in (first_y, second_y):
+        for _ in range(5):
+            rows.extend(
+                f"{response},1,{x_value}"
+                for response, x_value in zip(y_cycle, x_values)
+            )
+    return rows
+
+
+def _kcp_rows():
+    """Mirror the small stochastic-parity input in the root fixture set."""
+    return [
+        f"{index / 10:.17g},{-1 if index % 2 else 1}"
+        for index in range(1, 25)
+    ]
+
+
 def _arima_values():
     """Integrate fixed small then large alternating increments."""
     increments = [0.1, -0.1] * 20 + [2.0, -2.0] * 20 + [2.0]
@@ -75,6 +127,9 @@ def rendered_fixture_data():
             "value", _numbers([1, 2, 3, 4] * 10 + [10, 20, 30, 40] * 10)
         ),
         "lm_step.csv": _csv("y,x", _lm_rows()),
+        "mlm_step.csv": _csv("y1,y2,x1,x2", _multivariate_lm_rows()),
+        "binomial_step.csv": _csv("y,intercept,x", _binomial_rows()),
+        "poisson_step.csv": _csv("y,intercept,x", _poisson_rows()),
         "var_step.csv": _csv("y1,y2", _var_rows()),
         "rank_step.csv": _csv(
             "value", _numbers([0, 1, 2, 3] * 5 + [100, 101, 102, 103] * 5)
@@ -83,13 +138,18 @@ def rendered_fixture_data():
         "arma_variance.csv": _csv(
             "value", [f"{value:.6f}" for value in _arma_values()]
         ),
+        "kcp_step.csv": _csv("x,group", _kcp_rows()),
     }
 
 
 def manifest_data_files():
     """Return the CSV files named by the authoritative fixture manifest."""
     with MANIFEST_PATH.open(newline="", encoding="utf-8") as stream:
-        return {row["data_file"] for row in csv.DictReader(stream, delimiter="\t")}
+        return {
+            row["data_file"]
+            for row in csv.DictReader(stream, delimiter="\t")
+            if row["data_file"] != "-"
+        }
 
 
 def _validate_file_index(payloads):
