@@ -15,7 +15,7 @@ include(../cmake/FastcpdDependencies.cmake)
 include(../cmake/FastcpdTarget.cmake)
 
 set(PYBIND11_FINDPYTHON ON)
-find_package(Python 3.10 COMPONENTS Interpreter Development.Module REQUIRED)
+find_package(Python 3.11 COMPONENTS Interpreter Development.Module REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 
 pybind11_add_module(interface MODULE pybind.cc)
