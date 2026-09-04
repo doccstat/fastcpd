@@ -1,3 +1,11 @@
+# fastcpd 1.3.0
+
+*   Make scalar Python seeds reproduce R's default Mersenne-Twister,
+    inversion-normal, and rejection-sampling stream for kernel random features.
+    NumPy generator objects retain their native streams. Constant-valued KCP
+    input now uses a finite bandwidth fallback in both languages instead of
+    producing missing R features and dense spurious change points.
+
 # fastcpd 1.2.2
 
 *   Unify ARIMA detection in R and Python behind a shared native likelihood:
