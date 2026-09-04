@@ -30,7 +30,7 @@ VAR(\eqn{p}) models. The function is similar to \code{\link[=detect]{detect()}}
 except that the data is by default a matrix with row as an observation
 and thus a formula is not required here. Pass the raw, unlagged series;
 its response dimension is inferred from the number of columns. The old
-Python-only pre-lagged code{p_response}/code{p.response} form is not part
+Python-only pre-lagged \code{p_response}/\code{p.response} form is not part
 of the portable interface.
 }
 \examples{

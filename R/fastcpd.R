@@ -169,7 +169,7 @@
 #' for segments with lengths greater or equal to 100. Callable schedules are
 #' an R-specific extension and are outside the portable R/Python/C++ contract;
 #' Python intentionally keeps detection GIL-free and accepts only
-#' code{multiple_epochs = NULL}.
+#' \code{multiple_epochs = NULL}.
 #' @param epsilon Epsilon to avoid numerical issues. Only used for the Hessian
 #' computation in Logistic Regression and Poisson Regression.
 #' @param order Order of the AR(\eqn{p}), VAR(\eqn{p}) or
@@ -1296,7 +1296,7 @@ fastcpd.rank <- detect_rank  # nolint: Conventional R function style
 #' except that the data is by default a matrix with row as an observation
 #' and thus a formula is not required here. Pass the raw, unlagged series;
 #' its response dimension is inferred from the number of columns. The old
-#' Python-only pre-lagged code{p_response}/code{p.response} form is not part
+#' Python-only pre-lagged \code{p_response}/\code{p.response} form is not part
 #' of the portable interface.
 #' @example tests/testthat/examples/fastcpd_var.R
 #' @seealso [detect()]

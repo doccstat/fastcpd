@@ -22,6 +22,15 @@ Python and standalone C++ sources are published separately in
 [`fastcpd-py`](https://github.com/doccstat/fastcpd-py) and
 [`fastcpd-cpp`](https://github.com/doccstat/fastcpd-cpp).
 
+Version 1.3.0 is the first coordinated R, Python, and standalone C++ source
+interface. Portable built-in detectors share the same native algorithms,
+defaults, seeded stochastic streams, change points, costs, parameters,
+residual layout, and supported confidence diagnostics. Formula/data-frame
+evaluation, custom callbacks, and callable epoch schedules remain R-only;
+NumPy generator streams and Python's immutable result container remain
+language-native extensions. These boundaries keep the detector's compiled
+PELT and SEN paths free of cross-language callback overhead.
+
 <details close>
 <summary>
 Installation
