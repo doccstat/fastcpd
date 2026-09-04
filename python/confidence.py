@@ -64,6 +64,17 @@ def confint(
     Returns:
         A list of dictionaries. Each dictionary contains the estimate, lower
         and upper interval bounds, and method-specific diagnostics.
+
+    Examples:
+        >>> import numpy as np
+        >>> from fastcpd import detect_mean
+        >>> result = detect_mean(
+        ...     np.r_[np.zeros(10), np.full(10, 5.0)],
+        ...     beta=2, cost_adjustment='BIC', variance_estimation=np.eye(1)
+        ... )
+        >>> interval = confint(result, method='profile', level=0.8, window=2)
+        >>> interval[0]['estimate']
+        10
     """
     if data is None:
         data = getattr(result, 'data', None)

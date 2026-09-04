@@ -1,6 +1,7 @@
 """Focused regression tests for the cross-language Python API contract."""
 
 import copy
+import doctest
 import pickle
 from pathlib import Path
 from types import SimpleNamespace
@@ -25,6 +26,7 @@ from fastcpd.segmentation import (
     arima,
 )
 from fastcpd import variance_estimation
+import fastcpd.segmentation as segmentation_module
 from fastcpd.segmentation import detect
 
 
@@ -413,6 +415,51 @@ def test_variance_aliases_are_direct_identities():
     assert variance_estimation.variance_arma is (
         variance_estimation.estimate_variance_arma
     )
+
+
+@pytest.mark.parametrize(
+    "module",
+    (segmentation_module, confidence, variance_estimation),
+    ids=("segmentation", "confidence", "variance_estimation"),
+)
+def test_public_docstring_examples_execute(module):
+    result = doctest.testmod(module, optionflags=doctest.ELLIPSIS)
+    assert result.failed == 0
+
+
+def test_canonical_reference_objects_have_examples():
+    objects = [
+        segmentation_module.CpdResult,
+        segmentation_module.detect,
+        segmentation_module.detect_ar,
+        segmentation_module.detect_arima,
+        segmentation_module.detect_arma,
+        segmentation_module.detect_binomial,
+        segmentation_module.detect_exponential,
+        segmentation_module.detect_garch,
+        segmentation_module.detect_kernel,
+        segmentation_module.detect_lasso,
+        segmentation_module.detect_lm,
+        segmentation_module.detect_mean,
+        segmentation_module.detect_meanvariance,
+        segmentation_module.detect_poisson,
+        segmentation_module.detect_quantile,
+        segmentation_module.detect_rank,
+        segmentation_module.detect_var,
+        segmentation_module.detect_variance,
+        segmentation_module.confint,
+        variance_estimation.VarianceArmaResult,
+        variance_estimation.estimate_variance,
+        variance_estimation.estimate_variance_arma,
+        variance_estimation.estimate_variance_linear_regression,
+        variance_estimation.estimate_variance_mean,
+        variance_estimation.estimate_variance_median,
+    ]
+    missing = [
+        item.__name__ for item in objects
+        if "Examples" not in (item.__doc__ or "")
+    ]
+    assert missing == []
 
 
 def test_cost_adjustment_signature_default_is_public_mbic_string():

@@ -2,17 +2,40 @@
 Variance estimation for change point detection models.
 """
 
-import collections
+from typing import NamedTuple
+
 import numpy
 
-VarianceArmaResult = collections.namedtuple(
-    'VarianceArmaResult',
-    ['table', 'sigma2_aic', 'sigma2_bic'],
-)
+
+class VarianceArmaResult(NamedTuple):
+    """Variance estimates selected from autoregressive approximations.
+
+    Fields:
+        table: One dictionary per fitted AR order with variance, AIC, and BIC.
+        sigma2_aic: Innovation variance selected by AIC.
+        sigma2_bic: Innovation variance selected by BIC.
+
+    Examples:
+        >>> import numpy as np
+        >>> result = estimate_variance_arma(np.sin(np.arange(20.0)), 1, 1)
+        >>> len(result.table)
+        1
+    """
+
+    table: list[dict[str, object]]
+    sigma2_aic: float
+    sigma2_bic: float
 
 
 def estimate_variance(data, family='mean', **kwargs):
-    """Estimate variance using the named model family."""
+    """Estimate variance using the named model family.
+
+    Examples:
+        >>> import numpy as np
+        >>> estimate = estimate_variance(np.array([0.0, 1.0, 2.0]), 'mean')
+        >>> estimate.shape
+        (1, 1)
+    """
     family = family.lower().replace('-', '_').replace('.', '_')
     if family == 'mean':
         return estimate_variance_mean(data, **kwargs)
@@ -51,6 +74,12 @@ def estimate_variance_mean(data):
     -------
     ndarray, shape (p, p)
       Estimated variance-covariance matrix.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> estimate_variance_mean(np.array([0.0, 1.0, 2.0])).tolist()
+    [[0.5]]
     """
     data_matrix = _as_numeric_array(data)
     if data_matrix.ndim == 0 or data_matrix.ndim > 2:
@@ -74,6 +103,12 @@ def estimate_variance_median(data):
     -------
     float
       Estimated variance.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> float(round(estimate_variance_median(np.array([0.0, 1.0, 2.0])), 6))
+    0.888889
     """
     data_flat = _as_numeric_array(data).ravel(order='F')
     if data_flat.size < 2:
@@ -87,7 +122,15 @@ def estimate_variance_linear_regression(
     block_size=None,
     outlier_iqr=numpy.inf,
 ):
-    """Estimate residual variance for piecewise linear regression models."""
+    """Estimate residual variance for piecewise linear regression models.
+
+    Examples:
+        >>> import numpy as np
+        >>> x = np.arange(1.0, 12.0)
+        >>> data = np.column_stack([2 * x + 0.1 * (x % 3), x])
+        >>> bool(np.isfinite(estimate_variance_linear_regression(data)))
+        True
+    """
     data_matrix = _as_numeric_array(data, ndim=2)
     # Validate ``d`` before deriving the default block size.  Computing
     # ``ncol(data) - d + 1`` first used to leak TypeError/OverflowError for
@@ -208,7 +251,14 @@ def _reciprocal_condition_1norm(matrix):
 
 
 def estimate_variance_arma(data, p, q, max_order=None):
-    """Estimate innovation variance for ARMA models via AR approximations."""
+    """Estimate innovation variance for ARMA models via AR approximations.
+
+    Examples:
+        >>> import numpy as np
+        >>> result = estimate_variance_arma(np.sin(np.arange(20.0)), 1, 1)
+        >>> (len(result.table), bool(np.isfinite(result.sigma2_bic)))
+        (1, True)
+    """
     data_flat = _as_numeric_array(data).ravel(order='F')
     try:
         p_float, q_float = float(p), float(q)

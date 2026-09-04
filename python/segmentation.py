@@ -282,6 +282,17 @@ class CpdResult:
         cp_only: Whether detailed native fit output was skipped.
         fit_kwargs: Read-only mapping of the original fit options. It is used
             by ``confint()`` to reproduce bootstrap refits faithfully.
+
+    Examples:
+        >>> import numpy as np
+        >>> result = detect_mean(
+        ...     np.r_[np.zeros(10), np.full(10, 5.0)],
+        ...     beta=2, cost_adjustment='BIC', variance_estimation=np.eye(1)
+        ... )
+        >>> result.cp_set.tolist()
+        [10]
+        >>> result.summary()['details_available']
+        True
     """
 
     cp_set: numpy.ndarray
@@ -461,6 +472,15 @@ def detect_mean(data, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> result = detect_mean(
+        ...     np.r_[np.zeros(10), np.full(10, 5.0)],
+        ...     beta=2, cost_adjustment='BIC', variance_estimation=np.eye(1)
+        ... )
+        >>> result.cp_set.tolist()
+        [10]
     """
     return detect(data=data, family='mean', **kwargs)
 
@@ -475,6 +495,15 @@ def detect_exponential(data, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> values = np.r_[np.ones(10), np.full(10, 10.0)]
+        >>> result = detect_exponential(
+        ...     values, beta=2, cost_adjustment='BIC', trim=0
+        ... )
+        >>> result.cp_set.tolist()
+        [10]
     """
     return detect(data=data, family='exponential', **kwargs)
 
@@ -488,6 +517,16 @@ def detect_variance(data, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> values = np.r_[np.tile([1.0, -1.0], 10),
+        ...                np.tile([5.0, -5.0], 10)]
+        >>> result = detect_variance(
+        ...     values, beta=2, cost_adjustment='BIC', trim=0
+        ... )
+        >>> 20 in result.cp_set
+        True
     """
     return detect(data=data, family='variance', **kwargs)
 
@@ -502,6 +541,16 @@ def detect_meanvariance(data, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> values = np.r_[np.tile([0.0, 1.0, -1.0, 0.0], 5),
+        ...                np.tile([5.0, 8.0, 2.0, 5.0], 5)]
+        >>> result = detect_meanvariance(
+        ...     values, beta=5, cost_adjustment='BIC', trim=0.1
+        ... )
+        >>> result.cp_set.tolist()
+        [20]
     """
     return detect(data=data, family='meanvariance', **kwargs)
 
@@ -516,6 +565,17 @@ def detect_var(data, order=0, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> series = np.tile([[1.0, 0.0], [0.0, 1.0],
+        ...                   [-1.0, 0.0], [0.0, -1.0]], (6, 1))
+        >>> result = detect_var(
+        ...     series, order=1, beta=1e6,
+        ...     cost_adjustment='BIC', variance_estimation=np.eye(2)
+        ... )
+        >>> result.residuals.shape
+        (24, 2)
     """
     return detect(data=data, family='var', order=order, **kwargs)
 
@@ -529,6 +589,16 @@ def detect_lasso(data, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> x = np.arange(1.0, 21.0)
+        >>> data = np.column_stack([2 * x + 0.1 * (x % 3), x])
+        >>> result = detect_lasso(
+        ...     data, beta=1e6, cost_adjustment='BIC', vanilla_percentage=1
+        ... )
+        >>> result.thetas.shape
+        (1, 1)
     """
     return detect(data=data, family='lasso', **kwargs)
 
@@ -543,6 +613,15 @@ def detect_garch(data, order=(0, 0), **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> series = np.sin(np.arange(1.0, 41.0))
+        >>> result = detect_garch(
+        ...     series, order=(1, 1), beta=1e6, cost_adjustment='BIC'
+        ... )
+        >>> result.residuals.shape
+        (40, 1)
     """
     return detect(
         data=_as_univariate_series(data), family='garch', order=order, **kwargs
@@ -559,6 +638,17 @@ def detect_lm(data, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> x = np.arange(1.0, 21.0)
+        >>> data = np.column_stack([2 * x + 0.1 * (x % 3), x])
+        >>> result = detect_lm(
+        ...     data, beta=1e6, cost_adjustment='BIC',
+        ...     variance_estimation=np.eye(1), vanilla_percentage=1
+        ... )
+        >>> result.thetas.shape
+        (1, 1)
     """
     return detect(data=data, family='lm', **kwargs)
 
@@ -573,6 +663,17 @@ def detect_binomial(data, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> x = np.linspace(-1, 1, 24)
+        >>> y = (np.arange(24) % 3 == 0).astype(float)
+        >>> data = np.column_stack([y, np.ones(24), x])
+        >>> result = detect_binomial(
+        ...     data, beta=1e6, cost_adjustment='BIC', vanilla_percentage=1
+        ... )
+        >>> result.thetas.shape
+        (2, 1)
     """
     return detect(data=data, family='binomial', **kwargs)
 
@@ -587,6 +688,17 @@ def detect_poisson(data, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> x = np.linspace(-1, 1, 24)
+        >>> y = (np.arange(24) % 4).astype(float)
+        >>> data = np.column_stack([y, np.ones(24), x])
+        >>> result = detect_poisson(
+        ...     data, beta=1e6, cost_adjustment='BIC', vanilla_percentage=1
+        ... )
+        >>> result.thetas.shape
+        (2, 1)
     """
     return detect(data=data, family='poisson', **kwargs)
 
@@ -602,6 +714,17 @@ def detect_quantile(data, order=0.5, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> x = np.arange(1.0, 21.0)
+        >>> data = np.column_stack([2 * x + 0.1 * (x % 3), x])
+        >>> result = detect_quantile(
+        ...     data, order=0.5, beta=1e6,
+        ...     cost_adjustment='BIC', vanilla_percentage=1
+        ... )
+        >>> result.thetas.shape
+        (1, 1)
     """
     # Normalize scalar, list, tuple, and NumPy one-element-array spellings
     # through the same validator used by the generic dispatcher.  Comparing
@@ -623,6 +746,15 @@ def detect_arma(data, order=(0, 0), **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> series = np.sin(np.arange(1.0, 41.0))
+        >>> result = detect_arma(
+        ...     series, order=(1, 1), beta=1e6, cost_adjustment='BIC'
+        ... )
+        >>> result.residuals.shape
+        (40, 1)
     """
     return detect(
         data=_as_univariate_series(data), family='arma', order=order, **kwargs
@@ -639,6 +771,16 @@ def detect_ar(data, order=0, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> series = np.sin(np.arange(1.0, 41.0))
+        >>> result = detect_ar(
+        ...     series, order=2, beta=1e6, cost_adjustment='BIC',
+        ...     variance_estimation=np.eye(1), vanilla_percentage=1
+        ... )
+        >>> result.residuals.shape
+        (40, 1)
     """
     return detect(
         data=_as_univariate_series(data), family='ar', order=order, **kwargs
@@ -664,6 +806,17 @@ def detect_arima(data, order=(1, 1, 0), include_mean=False, **kwargs):
 
     For ``d = 0`` this is identical to
     ``arma(data, order=(p, q))``.
+
+    Examples:
+        >>> import numpy as np
+        >>> increments = np.tile([0.1, -0.1], 20)
+        >>> series = np.r_[0.0, np.cumsum(increments)]
+        >>> result = detect_arima(
+        ...     series, order=(0, 1, 0), beta=1e6,
+        ...     cost_adjustment='BIC'
+        ... )
+        >>> result.residuals.shape
+        (41, 1)
     """
     return detect(
         data=_as_univariate_series(data), family='arima', order=order,
@@ -676,6 +829,18 @@ def confint(result, **kwargs):
 
     This is the Python analogue of R's ``confint(result, ...)`` API. The
     result object also exposes ``result.confint(...)``.
+
+    Examples:
+        >>> import numpy as np
+        >>> result = detect_mean(
+        ...     np.r_[np.zeros(10), np.full(10, 5.0)],
+        ...     beta=2, cost_adjustment='BIC', variance_estimation=np.eye(1)
+        ... )
+        >>> interval = confint(
+        ...     result, method='profile', level=0.8, window=2
+        ... )
+        >>> interval[0]['estimate']
+        10
     """
     from fastcpd.confidence import confint as _confint
     return _confint(result, **kwargs)
@@ -686,6 +851,15 @@ def detect_rank(data, **kwargs):
 
     Each column is replaced by its centered average rank, then mean-change
     detection is applied to the transformed data.
+
+    Examples:
+        >>> import numpy as np
+        >>> values = np.r_[np.arange(10.0), np.arange(100.0, 110.0)]
+        >>> result = detect_rank(
+        ...     values, beta=5, cost_adjustment='BIC', trim=0.1
+        ... )
+        >>> 10 in result.cp_set
+        True
     """
     data_matrix = _as_2d_data(data)
     transformed = _rank_transform(data_matrix)
@@ -724,6 +898,19 @@ def detect_kernel(data, order=(100, 0), random_state=None, **kwargs):
 
     Returns:
         A CpdResult. When cp_only=True, detail arrays are empty.
+
+    Examples:
+        >>> import numpy as np
+        >>> data = np.column_stack([
+        ...     np.arange(1, 25) / 10,
+        ...     np.where(np.arange(1, 25) % 2, -1.0, 1.0),
+        ... ])
+        >>> result = detect_kernel(
+        ...     data, order=(8, 1.25), random_state=7,
+        ...     beta=2, cost_adjustment='BIC', trim=0
+        ... )
+        >>> result.cp_set.tolist()
+        [13]
     """
     kwargs.setdefault('cost_adjustment', 'BIC')
     return _detect_kcp_wrapper(
@@ -884,6 +1071,16 @@ def detect(
 
     Returns:
         A ``CpdResult`` with read-only NumPy arrays and fit metadata.
+
+    Examples:
+        >>> import numpy as np
+        >>> data = np.r_[np.zeros(10), np.full(10, 5.0)]
+        >>> result = detect(
+        ...     data, family='mean', beta=2, cost_adjustment='BIC',
+        ...     variance_estimation=np.eye(1)
+        ... )
+        >>> result.cp_set.tolist()
+        [10]
     """
     # Python callers naturally spell the generic API as ``detect(array,
     # family=...)``.  Keep R's formula-first signature for compatibility,

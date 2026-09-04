@@ -128,4 +128,8 @@ python -m pytest tests/test_fastcpd.py -m "not long"
 
 Documentation: <https://x2r.io/fastcpd-python/>
 
+See [CHANGELOG.md](CHANGELOG.md) for Python release notes and
+[MIGRATION.md](MIGRATION.md) for the transition from the independent 0.x line
+to the coordinated cross-language interface.
+
 Issues: <https://github.com/doccstat/fastcpd-py/issues>

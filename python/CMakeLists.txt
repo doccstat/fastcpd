@@ -26,7 +26,6 @@ install(FILES
   __init__.py
   _r_random.py
   confidence.py
-  py.typed
   segmentation.py
   variance_estimation.py
   DESTINATION fastcpd
