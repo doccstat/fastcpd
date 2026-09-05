@@ -2,15 +2,72 @@
 
 #include <armadillo>
 
+#include <algorithm>
 #include <cmath>
+#include <filesystem>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <limits>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace {
+
+namespace fs = std::filesystem;
+
+fs::path find_fixture_directory(int argc, char** argv) {
+  std::vector<fs::path> candidates;
+  if (argc > 1) candidates.emplace_back(argv[1]);
+  candidates.emplace_back("tests/fixtures");
+  candidates.emplace_back("../tests/fixtures");
+  candidates.emplace_back("../../tests/fixtures");
+  for (fs::path const& candidate : candidates) {
+    std::error_code error;
+    if (fs::is_regular_file(candidate / "manifest.tsv", error)) {
+      return candidate;
+    }
+  }
+  throw std::runtime_error(
+      "unable to locate tests/fixtures; pass its path as the first argument");
+}
+
+arma::mat read_csv(fs::path const& path) {
+  std::ifstream input(path);
+  if (!input) throw std::runtime_error("unable to open " + path.string());
+  std::string line;
+  if (!std::getline(input, line)) {
+    throw std::runtime_error("empty CSV fixture: " + path.string());
+  }
+  std::size_t columns =
+      static_cast<std::size_t>(std::count(line.begin(), line.end(), ',')) + 1;
+  std::vector<double> values;
+  std::size_t rows = 0;
+  while (std::getline(input, line)) {
+    if (line.empty()) continue;
+    std::stringstream stream(line);
+    std::string field;
+    std::size_t row_columns = 0;
+    while (std::getline(stream, field, ',')) {
+      values.push_back(std::stod(field));
+      ++row_columns;
+    }
+    if (row_columns != columns) {
+      throw std::runtime_error("inconsistent CSV fixture: " + path.string());
+    }
+    ++rows;
+  }
+  arma::mat result(rows, columns);
+  for (std::size_t row = 0; row < rows; ++row) {
+    for (std::size_t column = 0; column < columns; ++column) {
+      result(row, column) = values[row * columns + column];
+    }
+  }
+  return result;
+}
 
 void expect_invalid(std::string const& label,
                     std::function<void()> const& operation) {
@@ -34,8 +91,9 @@ fastcpd::Options mean_options() {
 
 }  // namespace
 
-int main() {
+int main(int argc, char** argv) {
   try {
+    fs::path const fixtures = find_fixture_directory(argc, argv);
     arma::mat data(8, 1, arma::fill::zeros);
     data.rows(4, 7).fill(3.0);
 
@@ -125,6 +183,39 @@ int main() {
         arma::zeros<arma::mat>(12, 1), constant_kernel_options);
     if (!constant_kernel.cost_values.is_finite()) {
       throw std::runtime_error("constant-input KCP bandwidth fallback failed");
+    }
+
+    arma::mat const mean_fixture = read_csv(fixtures / "mean_step.csv");
+    arma::mat const mean_variance =
+        fastcpd::estimate_variance_mean(mean_fixture);
+    if (mean_variance.n_rows != 1 ||
+        std::abs(mean_variance(0, 0) - 0.3205128205128205) > 1e-12) {
+      throw std::runtime_error("mean variance fixture failed");
+    }
+
+    arma::mat const rank_fixture = read_csv(fixtures / "rank_step.csv");
+    double const median_variance =
+        fastcpd::estimate_variance_median(rank_fixture);
+    if (std::abs(median_variance - 13.32515158156184) > 1e-12) {
+      throw std::runtime_error("median variance fixture failed");
+    }
+
+    arma::mat const lm_fixture = read_csv(fixtures / "lm_step.csv");
+    arma::mat const lm_variance =
+        fastcpd::estimate_variance_linear_regression(lm_fixture);
+    if (lm_variance.n_rows != 1 ||
+        std::abs(lm_variance(0, 0) - 97.95856069973233) > 1e-9) {
+      throw std::runtime_error("linear-regression variance fixture failed");
+    }
+
+    arma::colvec const arma_fixture =
+        read_csv(fixtures / "arma_variance.csv").col(0);
+    fastcpd::VarianceArmaResult const arma_variance =
+        fastcpd::estimate_variance_arma(arma_fixture, 2, 2);
+    if (arma_variance.table.size() != 4 ||
+        std::abs(arma_variance.sigma2_aic - 0.8938872868847426) > 2e-6 ||
+        std::abs(arma_variance.sigma2_bic - 0.8938872868847426) > 2e-6) {
+      throw std::runtime_error("ARMA variance fixture failed");
     }
 
     expect_invalid("non-finite data", [&] {
