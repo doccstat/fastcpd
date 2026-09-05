@@ -18,6 +18,9 @@
 *   Expose the shared Rice mean, median, block-regression, and ARMA-selection
     variance estimators in the standalone C++ API, including the same detailed
     AR-order table and AIC/BIC selections returned by R and Python.
+*   Expand standalone C++ regression coverage from one mean-change fixture to
+    all 19 portable detector cases, comparing raw/trimmed change points, costs,
+    residual matrices, and parameters against the R-generated contract.
 *   Expand the shared R/Python numerical contract to every portable built-in
     detector family and the common bootstrap, profile, and Wald confidence
     paths. The fixtures now compare raw and trimmed change points, segment
