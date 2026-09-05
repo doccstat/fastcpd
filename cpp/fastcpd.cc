@@ -22,9 +22,13 @@
 #include "families/variance.h"
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cmath>
+#include <cstdint>
 #include <limits>
+#include <numeric>
+#include <random>
 #include <stdexcept>
 #include <tuple>
 #include <utility>
@@ -809,10 +813,300 @@ Result make_result(RunResult&& value) {
 
 namespace {
 
+class RRandom {
+ public:
+  explicit RRandom(std::int32_t seed) {
+    if (seed == std::numeric_limits<std::int32_t>::min()) {
+      throw std::invalid_argument(
+          "fastcpd: R-compatible seed must be greater than -2147483648");
+    }
+    std::uint32_t value = static_cast<std::uint32_t>(seed);
+    for (int index = 0; index < 50; ++index) value = 69069u * value + 1u;
+    for (std::size_t index = 0; index <= state_.size(); ++index) {
+      value = 69069u * value + 1u;
+      if (index > 0) state_[index - 1] = value;
+    }
+  }
+
+  double uniform() {
+    double value = static_cast<double>(raw()) * 0x1p-32;
+    if (value == 0.0) {
+      value = 0.5 / static_cast<double>(
+                        std::numeric_limits<std::uint32_t>::max());
+    }
+    return value;
+  }
+
+  double normal() {
+    constexpr double precision = 134217728.0;
+    double const probability =
+        (std::floor(precision * uniform()) + uniform()) / precision;
+    return standard_normal_quantile(probability);
+  }
+
+  std::vector<arma::uword> sample_without_replacement(arma::uword population,
+                                                       arma::uword size) {
+    if (size > population) {
+      throw std::invalid_argument(
+          "fastcpd: sample size exceeds the KCP bandwidth population");
+    }
+    std::vector<arma::uword> available(population);
+    std::iota(available.begin(), available.end(), 0u);
+    std::vector<arma::uword> result(size);
+    arma::uword remaining = population;
+    for (arma::uword index = 0; index < size; ++index) {
+      arma::uword const selected = uniform_index(remaining);
+      result[index] = available[selected];
+      --remaining;
+      available[selected] = available[remaining];
+    }
+    return result;
+  }
+
+ private:
+  static double standard_normal_quantile(double probability) {
+    double const q = probability - 0.5;
+    if (std::abs(q) <= 0.425) {
+      double const r = 0.180625 - q * q;
+      double const numerator =
+          (((((((2509.0809287301226727 * r + 33430.575583588128105) * r +
+                 67265.770927008700853) *
+                    r +
+                45921.953931549871457) *
+                   r +
+               13731.693765509461125) *
+                  r +
+              1971.5909503065514427) *
+                 r +
+             133.14166789178437745) *
+                r +
+            3.387132872796366608);
+      double const denominator =
+          (((((((5226.495278852854561 * r + 28729.085735721942674) * r +
+                 39307.89580009271061) *
+                    r +
+                21213.794301586595867) *
+                   r +
+               5394.1960214247511077) *
+                  r +
+              687.1870074920579083) *
+                 r +
+             42.313330701600911252) *
+                r +
+            1.0);
+      return q * numerator / denominator;
+    }
+
+    double r = q > 0.0 ? 1.0 - probability : probability;
+    r = std::sqrt(-std::log(r));
+    double value;
+    if (r <= 5.0) {
+      r -= 1.6;
+      double const numerator =
+          (((((((7.7454501427834140764e-4 * r +
+                 0.0227238449892691845833) *
+                    r +
+                0.24178072517745061177) *
+                   r +
+               1.27045825245236838258) *
+                  r +
+              3.64784832476320460504) *
+                 r +
+             5.7694972214606914055) *
+                r +
+            4.6303378461565452959) *
+               r +
+           1.42343711074968357734);
+      double const denominator =
+          (((((((1.05075007164441684324e-9 * r +
+                 5.475938084995344946e-4) *
+                    r +
+                0.0151986665636164571966) *
+                   r +
+               0.14810397642748007459) *
+                  r +
+              0.68976733498510000455) *
+                 r +
+             1.6763848301838038494) *
+                r +
+            2.05319162663775882187) *
+               r +
+           1.0);
+      value = numerator / denominator;
+    } else {
+      r -= 5.0;
+      double const numerator =
+          (((((((2.01033439929228813265e-7 * r +
+                 2.71155556874348757815e-5) *
+                    r +
+                0.0012426609473880784386) *
+                   r +
+               0.026532189526576123093) *
+                  r +
+              0.29656057182850489123) *
+                 r +
+             1.7848265399172913358) *
+                r +
+            5.4637849111641143699) *
+               r +
+           6.6579046435011037772);
+      double const denominator =
+          (((((((2.04426310338993978564e-15 * r +
+                 1.4215117583164458887e-7) *
+                    r +
+                1.8463183175100546818e-5) *
+                   r +
+               7.868691311456132591e-4) *
+                  r +
+              0.0148753612908506148525) *
+                 r +
+             0.13692988092273580531) *
+                r +
+            0.59983220655588793769) *
+               r +
+           1.0);
+      value = numerator / denominator;
+    }
+    return q < 0.0 ? -value : value;
+  }
+
+  std::uint32_t raw() {
+    if (position_ == state_.size()) twist();
+    std::uint32_t value = state_[position_++];
+    value ^= value >> 11;
+    value ^= (value << 7) & 0x9d2c5680u;
+    value ^= (value << 15) & 0xefc60000u;
+    value ^= value >> 18;
+    return value;
+  }
+
+  void twist() {
+    constexpr std::uint32_t upper_mask = 0x80000000u;
+    constexpr std::uint32_t lower_mask = 0x7fffffffu;
+    for (std::size_t index = 0; index < state_.size(); ++index) {
+      std::uint32_t const combined =
+          (state_[index] & upper_mask) |
+          (state_[(index + 1) % state_.size()] & lower_mask);
+      state_[index] = state_[(index + 397) % state_.size()] ^ (combined >> 1);
+      if (combined & 1u) state_[index] ^= 0x9908b0dfu;
+    }
+    position_ = 0;
+  }
+
+  arma::uword uniform_index(arma::uword population) {
+    unsigned int bits = 0;
+    for (arma::uword value = population - 1; value > 0; value >>= 1) ++bits;
+    unsigned int const chunks = bits / 16 + 1;
+    std::uint64_t const mask =
+        bits == 0 ? 0u : (std::uint64_t{1} << bits) - 1u;
+    while (true) {
+      std::uint64_t candidate = 0;
+      for (unsigned int chunk = 0; chunk < chunks; ++chunk) {
+        candidate = (candidate << 16) + (raw() >> 16);
+      }
+      candidate &= mask;
+      if (candidate < population) return static_cast<arma::uword>(candidate);
+    }
+  }
+
+  std::array<std::uint32_t, 624> state_{};
+  std::size_t position_ = 624;
+};
+
+struct KernelSpec {
+  arma::uword feature_count;
+  double bandwidth;
+  arma::colvec public_order;
+};
+
+KernelSpec kernel_spec(arma::colvec const& order) {
+  double const feature_value = order.n_elem >= 1 ? order(0) : 0.0;
+  double const bandwidth = order.n_elem >= 2 ? order(1) : 0.0;
+  if (!std::isfinite(feature_value) ||
+      (feature_value > 0.0 && feature_value != std::floor(feature_value))) {
+    throw std::invalid_argument(
+        "fastcpd: KCP feature count must be a positive integer when positive");
+  }
+  if (!std::isfinite(bandwidth)) {
+    throw std::invalid_argument("fastcpd: KCP bandwidth must be finite");
+  }
+  double const normalized_features = feature_value > 0.0 ? feature_value : 100.0;
+  if (normalized_features >
+      static_cast<double>(std::numeric_limits<std::int32_t>::max())) {
+    throw std::invalid_argument("fastcpd: KCP feature count is too large");
+  }
+  return KernelSpec{static_cast<arma::uword>(normalized_features), bandwidth,
+                    arma::colvec{normalized_features, bandwidth}};
+}
+
+double median(std::vector<double>* values) {
+  std::sort(values->begin(), values->end());
+  std::size_t const middle = values->size() / 2;
+  if (values->size() % 2 == 1) return (*values)[middle];
+  return ((*values)[middle - 1] + (*values)[middle]) / 2.0;
+}
+
+double kernel_bandwidth(arma::mat const& data, double supplied,
+                        RRandom* random) {
+  if (supplied > 0.0) return supplied;
+  arma::mat sampled;
+  if (data.n_rows > 1000) {
+    std::vector<arma::uword> const indices =
+        random->sample_without_replacement(data.n_rows, 1000);
+    arma::uvec selected(indices.size());
+    for (arma::uword index = 0; index < selected.n_elem; ++index) {
+      selected(index) = indices[index];
+    }
+    sampled = data.rows(selected);
+  } else {
+    sampled = data;
+  }
+
+  std::vector<double> positive_distances;
+  positive_distances.reserve(
+      static_cast<std::size_t>(sampled.n_rows * (sampled.n_rows - 1) / 2));
+  for (arma::uword row = 0; row < sampled.n_rows; ++row) {
+    for (arma::uword other = row + 1; other < sampled.n_rows; ++other) {
+      double const distance =
+          arma::accu(arma::square(sampled.row(row) - sampled.row(other)));
+      if (distance > 0.0) positive_distances.push_back(distance);
+    }
+  }
+  return positive_distances.empty()
+             ? 1.0
+             : std::sqrt(median(&positive_distances) / 2.0);
+}
+
+arma::mat kernel_transform(arma::mat const& data, KernelSpec const& spec,
+                           std::int32_t seed) {
+  RRandom random(seed);
+  double const bandwidth = kernel_bandwidth(data, spec.bandwidth, &random);
+  arma::mat omega(data.n_cols, spec.feature_count);
+  for (arma::uword index = 0; index < omega.n_elem; ++index) {
+    omega(index) = random.normal() / bandwidth;
+  }
+  arma::rowvec phase(spec.feature_count);
+  for (arma::uword index = 0; index < phase.n_elem; ++index) {
+    phase(index) = 2.0 * arma::datum::pi * random.uniform();
+  }
+  arma::mat projection = data * omega;
+  projection.each_row() += phase;
+  return std::sqrt(2.0 / static_cast<double>(spec.feature_count)) *
+         arma::cos(projection);
+}
+
+std::int32_t kernel_seed(std::optional<std::int32_t> seed) {
+  if (seed.has_value()) return *seed;
+  std::random_device random_device;
+  std::uint32_t const value = random_device() & 0x7fffffffu;
+  return static_cast<std::int32_t>(value);
+}
+
 Result detect_native(arma::mat const& data, Options options) {
   if (data.n_rows == 0 || data.n_cols == 0) {
     throw std::invalid_argument("fastcpd: data must be a non-empty matrix");
   }
+  if (options.cost_adjustment.empty()) options.cost_adjustment = "MBIC";
   detail::validate_common_options(options);
   detail::validate_cost_adjustment(options.cost_adjustment);
   std::string const family =
@@ -1000,6 +1294,7 @@ Result detect(arma::mat const& data, Options options) {
   if (family == "lm") return detect_lm(data, std::move(options));
   if (family == "var") return detect_var(data, std::move(options));
   if (family == "rank") return detect_rank(data, std::move(options));
+  if (family == "kcp") return detect_kcp(data, std::move(options));
   if (family == "ar") {
     require_univariate(data, "AR");
     return detect_ar(data.col(0), std::move(options));
@@ -1251,6 +1546,35 @@ Result detect_rank(arma::mat const& data, Options options) {
                               cp_only);
 }
 
+Result detect_kernel(arma::mat const& data, Options options) {
+  require_finite_data(data);
+  KernelSpec const spec = kernel_spec(options.order);
+  bool const cp_only = options.cp_only;
+  arma::mat transformed =
+      kernel_transform(data, spec, kernel_seed(options.seed));
+  if (!options.beta.has_value()) {
+    options.beta =
+        (static_cast<double>(data.n_cols) + 2.0) *
+        std::log(static_cast<double>(data.n_rows)) / 2.0;
+  }
+  if (options.cost_adjustment.empty()) options.cost_adjustment = "BIC";
+  options.family = "mean";
+  options.order = arma::colvec{0.0, 0.0, 0.0};
+  options.p = static_cast<int>(spec.feature_count);
+  options.vanilla_percentage = 1.0;
+  if (options.variance_estimate.is_empty()) {
+    options.variance_estimate =
+        arma::eye<arma::mat>(spec.feature_count, spec.feature_count);
+  }
+  Result result = detect_native(transformed, std::move(options));
+  return with_public_metadata(std::move(result), "kcp", spec.public_order,
+                              cp_only);
+}
+
+Result detect_kcp(arma::mat const& data, Options options) {
+  return detect_kernel(data, std::move(options));
+}
+
 Result mean(arma::mat const& data, Options options) {
   return detect_mean(data, std::move(options));
 }
@@ -1304,6 +1628,12 @@ Result mgaussian(arma::mat const& data, Options options) {
 }
 Result rank(arma::mat const& data, Options options) {
   return detect_rank(data, std::move(options));
+}
+Result kernel(arma::mat const& data, Options options) {
+  return detect_kernel(data, std::move(options));
+}
+Result kcp(arma::mat const& data, Options options) {
+  return detect_kcp(data, std::move(options));
 }
 
 }  // namespace fastcpd

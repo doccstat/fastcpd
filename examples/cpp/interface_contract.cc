@@ -97,6 +97,36 @@ int main() {
       throw std::runtime_error("VAR raw-input contract failed");
     }
 
+    arma::mat kernel_data(24, 2);
+    for (arma::uword row = 0; row < kernel_data.n_rows; ++row) {
+      kernel_data(row, 0) = static_cast<double>(row + 1) / 10.0;
+      kernel_data(row, 1) = row % 2 == 0 ? -1.0 : 1.0;
+    }
+    fastcpd::Options kernel_options = mean_options();
+    kernel_options.order = arma::colvec{8.0, 1.25};
+    kernel_options.seed = 7;
+    kernel_options.beta = 2.0;
+    kernel_options.cp_only = false;
+    kernel_options.variance_estimate.reset();
+    fastcpd::Result kernel =
+        fastcpd::detect_kernel(kernel_data, kernel_options);
+    if (kernel.family != "kcp" || kernel.change_points.n_elem != 1 ||
+        kernel.change_points(0) != 13.0 || kernel.cost_values.n_elem != 2 ||
+        std::abs(kernel.cost_values(0) - 2.6735583651891526) > 1e-10 ||
+        std::abs(kernel.cost_values(1) - 1.9910581518133954) > 1e-10) {
+      throw std::runtime_error("seeded KCP contract failed");
+    }
+
+    fastcpd::Options constant_kernel_options = mean_options();
+    constant_kernel_options.order = arma::colvec{4.0, 0.0};
+    constant_kernel_options.seed = 7;
+    constant_kernel_options.variance_estimate.reset();
+    fastcpd::Result constant_kernel = fastcpd::detect_kernel(
+        arma::zeros<arma::mat>(12, 1), constant_kernel_options);
+    if (!constant_kernel.cost_values.is_finite()) {
+      throw std::runtime_error("constant-input KCP bandwidth fallback failed");
+    }
+
     expect_invalid("non-finite data", [&] {
       arma::mat invalid = data;
       invalid(0, 0) = std::numeric_limits<double>::quiet_NaN();
