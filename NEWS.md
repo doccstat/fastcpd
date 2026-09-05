@@ -21,6 +21,10 @@
 *   Expand standalone C++ regression coverage from one mean-change fixture to
     all 19 portable detector cases, comparing raw/trimmed change points, costs,
     residual matrices, and parameters against the R-generated contract.
+*   Add standalone C++ bootstrap and profile intervals for change points and
+    Wald intervals for fitted parameters. All 13 shared confidence fixtures,
+    including the advancing seeded KCP bootstrap stream, now run through the
+    public C++ interface without adding work to detector candidate loops.
 *   Expand the shared R/Python numerical contract to every portable built-in
     detector family and the common bootstrap, profile, and Wald confidence
     paths. The fixtures now compare raw and trimmed change points, segment
