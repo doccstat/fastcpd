@@ -864,20 +864,20 @@ def detect_rank(data, **kwargs):
     data_matrix = _as_2d_data(data)
     transformed = _rank_transform(data_matrix)
     result = detect(data=transformed, family='mean', **kwargs)
-    # The public R wrapper reports a mean-family fit after transforming ranks,
-    # but bootstrap refits must repeat the rank transform on the original
-    # observations.  Keep that distinction in the stored fit metadata.
+    # Keep the public wrapper family distinct from the native mean-family
+    # transform while retaining the original observations for bootstrap
+    # refits and result introspection.
     rank_fit_kwargs = dict(getattr(result, 'fit_kwargs', {}) or {})
     # Preserve all normalized detector options (including defaults) so a
-    # confidence bootstrap can reproduce the original call.  The public R
-    # object reports this as a mean-family fit, but the wrapper marker tells
-    # Python to repeat the rank transform for every bootstrap sample.
+    # confidence bootstrap can reproduce the original call.  The wrapper
+    # marker tells confidence code to repeat the rank transform for every
+    # bootstrap sample and to use mean-family formulas on transformed data.
     rank_fit_kwargs['family'] = 'rank'
     rank_fit_kwargs['_wrapper_family'] = 'rank'
     rank_fit_kwargs['_native_family'] = 'mean'
     rank_fit_kwargs['order'] = tuple(result.order)
     return _with_metadata(
-        result, data_matrix, family='mean', order=result.order,
+        result, data_matrix, family='rank', order=result.order,
         fit_kwargs=rank_fit_kwargs,
     )
 

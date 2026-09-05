@@ -632,10 +632,7 @@ def test_shared_fixture_change_point_contract(case_id):
     np.testing.assert_array_equal(result.cp_set, expected)
     assert result.data.shape == data.shape
     assert not result.data.flags.writeable
-    # Rank is transformed before entering the native mean family, matching
-    # the public R result metadata.  Other fixture names are native families.
-    expected_family = 'mean' if row['family'] == 'rank' else row['family']
-    assert result.family == expected_family
+    assert result.family == row['family']
 
 
 @pytest.mark.parametrize(

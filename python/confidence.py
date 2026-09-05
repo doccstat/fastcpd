@@ -164,8 +164,8 @@ def _analysis_data(data, detect_kwargs):
     """Return the data representation stored by the equivalent R result."""
     if detect_kwargs.get('_wrapper_family') == 'rank':
         # Python retains original observations so bootstrap refits can repeat
-        # the public wrapper. R stores centered ranks in its mean-family S4
-        # result, so profile and Wald calculations must use that transform.
+        # the public wrapper. Profile and Wald calculations use the centered
+        # rank representation consumed by the native mean-family fit.
         from fastcpd.segmentation import _rank_transform
         return _rank_transform(data)
     return data
@@ -179,6 +179,8 @@ def _normalize_family(family):
         return 'lm'
     if family == 'mgaussian':
         return 'var'
+    if family == 'rank':
+        return 'mean'
     return family
 
 
