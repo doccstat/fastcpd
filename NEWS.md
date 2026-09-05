@@ -58,7 +58,8 @@
 *   Document the three-language interface contract, including native callback
     extensions in R/C++, Python's GIL-free callback boundary, lightweight C++
     result ownership, compatibility-name differences, and the installed CMake
-    dependency requirements.
+    dependency requirements. Python callback errors now describe the actual
+    language boundary instead of incorrectly calling callbacks R-only.
 
 # fastcpd 1.2.2
 
