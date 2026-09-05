@@ -10,8 +10,9 @@ each operation, its input CSV, its public arguments, and its expected result.
 Use `-` where a field does not apply. Detector rows cover every portable
 built-in family, and confidence rows refer to their fitted detector through
 `source_case`. The R and Python suites parse the same rows independently. The
-C++ suite dispatches every detector row and compares every detailed result;
-its interface contract also checks every variance-estimator row.
+C++ suite dispatches every detector and confidence row, compares every
+detailed detector result and numeric interval diagnostic, and uses its
+interface contract to check every variance-estimator row.
 
 | column | meaning |
 | --- | --- |
