@@ -112,6 +112,24 @@ int main(int argc, char** argv) {
       throw std::runtime_error("detect_mean does not match generic mean");
     }
 
+    fastcpd::ConfidenceOptions empty_profile_options;
+    empty_profile_options.method = "profile";
+    empty_profile_options.min_segment_length = 5;
+    empty_profile_options.detector_options = mean_options();
+    std::vector<fastcpd::ConfidenceInterval> const empty_profile =
+        fastcpd::confint(named_mean, data, empty_profile_options);
+    if (empty_profile.size() != 1 ||
+        !std::isnan(empty_profile.front().lower) ||
+        !std::isnan(empty_profile.front().upper)) {
+      throw std::runtime_error("short profile candidate range was not empty");
+    }
+
+    expect_invalid("confidence result boundary", [&] {
+      fastcpd::Result invalid = named_mean;
+      invalid.change_points(0) = static_cast<double>(data.n_rows);
+      fastcpd::confint(invalid, data, empty_profile_options);
+    });
+
     fastcpd::Options rank_options = mean_options();
     fastcpd::Result rank = fastcpd::detect_rank(data, rank_options);
     if (rank.family != "rank" || rank.change_points.n_elem != 1 ||

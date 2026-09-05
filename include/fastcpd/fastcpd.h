@@ -78,6 +78,38 @@ struct VarianceArmaResult {
   double sigma2_bic;
 };
 
+struct ConfidenceInterval {
+  std::string parm;
+  std::string method;
+  std::string bootstrap;
+  unsigned int index = 0;
+  unsigned int segment = 0;
+  unsigned int parameter = 0;
+  double estimate = std::numeric_limits<double>::quiet_NaN();
+  double lower = std::numeric_limits<double>::quiet_NaN();
+  double upper = std::numeric_limits<double>::quiet_NaN();
+  double detection_rate = std::numeric_limits<double>::quiet_NaN();
+  double profile_min = std::numeric_limits<double>::quiet_NaN();
+  double cutoff = std::numeric_limits<double>::quiet_NaN();
+  double se = std::numeric_limits<double>::quiet_NaN();
+  double level = 0.95;
+};
+
+struct ConfidenceOptions {
+  std::string parm = "cp";
+  std::string method;
+  double level = 0.95;
+  unsigned int bootstrap_replicates = 999;
+  std::string bootstrap = "nonparametric";
+  std::optional<unsigned int> window;
+  unsigned int min_segment_length = 2;
+  std::optional<std::int32_t> seed;
+  // C++ results intentionally do not copy the input or full fit options.
+  // Supply the options used for fitting when refit/profile behavior depends
+  // on non-default detector controls.
+  Options detector_options;
+};
+
 Result detect(arma::mat const& data, Options options = {});
 Result detect(arma::colvec const& data, Options options = {});
 
@@ -137,6 +169,13 @@ arma::mat estimate_variance_lm(
 VarianceArmaResult estimate_variance_arma(arma::colvec const& data,
                                           unsigned int p, unsigned int q,
                                           unsigned int max_order = 0);
+
+std::vector<ConfidenceInterval> confint(
+    Result const& result, arma::mat const& data,
+    ConfidenceOptions options = {});
+std::vector<ConfidenceInterval> confint(
+    Result const& result, arma::colvec const& data,
+    ConfidenceOptions options = {});
 
 }  // namespace fastcpd
 

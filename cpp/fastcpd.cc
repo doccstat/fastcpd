@@ -870,7 +870,6 @@ class RRandom {
     return result;
   }
 
- private:
   static double standard_normal_quantile(double probability) {
     double const q = probability - 0.5;
     if (std::abs(q) <= 0.425) {
@@ -977,6 +976,19 @@ class RRandom {
     return q < 0.0 ? -value : value;
   }
 
+  std::vector<arma::uword> sample_with_replacement(arma::uword population,
+                                                    arma::uword size) {
+    if (population == 0 && size > 0) {
+      throw std::invalid_argument("fastcpd: cannot sample an empty segment");
+    }
+    std::vector<arma::uword> result(size);
+    for (arma::uword index = 0; index < size; ++index) {
+      result[index] = uniform_index(population);
+    }
+    return result;
+  }
+
+ private:
   std::uint32_t raw() {
     if (position_ == state_.size()) twist();
     std::uint32_t value = state_[position_++];
@@ -1085,16 +1097,15 @@ double kernel_bandwidth(arma::mat const& data, double supplied,
 }
 
 arma::mat kernel_transform(arma::mat const& data, KernelSpec const& spec,
-                           std::int32_t seed) {
-  RRandom random(seed);
-  double const bandwidth = kernel_bandwidth(data, spec.bandwidth, &random);
+                           RRandom* random) {
+  double const bandwidth = kernel_bandwidth(data, spec.bandwidth, random);
   arma::mat omega(data.n_cols, spec.feature_count);
   for (arma::uword index = 0; index < omega.n_elem; ++index) {
-    omega(index) = random.normal() / bandwidth;
+    omega(index) = random->normal() / bandwidth;
   }
   arma::rowvec phase(spec.feature_count);
   for (arma::uword index = 0; index < phase.n_elem; ++index) {
-    phase(index) = 2.0 * arma::datum::pi * random.uniform();
+    phase(index) = 2.0 * arma::datum::pi * random->uniform();
   }
   arma::mat projection = data * omega;
   projection.each_row() += phase;
@@ -1292,6 +1303,31 @@ arma::mat centered_ranks(arma::mat const& data) {
   }
   result -= static_cast<double>(data.n_rows + 1) / 2.0;
   return result;
+}
+
+Result detect_kernel_with_random(arma::mat const& data, Options options,
+                                 RRandom* random) {
+  require_finite_data(data);
+  KernelSpec const spec = kernel_spec(options.order);
+  bool const cp_only = options.cp_only;
+  arma::mat transformed = kernel_transform(data, spec, random);
+  if (!options.beta.has_value()) {
+    options.beta =
+        (static_cast<double>(data.n_cols) + 2.0) *
+        std::log(static_cast<double>(data.n_rows)) / 2.0;
+  }
+  if (options.cost_adjustment.empty()) options.cost_adjustment = "BIC";
+  options.family = "mean";
+  options.order = arma::colvec{0.0, 0.0, 0.0};
+  options.p = static_cast<int>(spec.feature_count);
+  options.vanilla_percentage = 1.0;
+  if (options.variance_estimate.is_empty()) {
+    options.variance_estimate =
+        arma::eye<arma::mat>(spec.feature_count, spec.feature_count);
+  }
+  Result result = detect_native(transformed, std::move(options));
+  return with_public_metadata(std::move(result), "kcp", spec.public_order,
+                              cp_only);
 }
 
 }  // namespace
@@ -1554,28 +1590,8 @@ Result detect_rank(arma::mat const& data, Options options) {
 }
 
 Result detect_kernel(arma::mat const& data, Options options) {
-  require_finite_data(data);
-  KernelSpec const spec = kernel_spec(options.order);
-  bool const cp_only = options.cp_only;
-  arma::mat transformed =
-      kernel_transform(data, spec, kernel_seed(options.seed));
-  if (!options.beta.has_value()) {
-    options.beta =
-        (static_cast<double>(data.n_cols) + 2.0) *
-        std::log(static_cast<double>(data.n_rows)) / 2.0;
-  }
-  if (options.cost_adjustment.empty()) options.cost_adjustment = "BIC";
-  options.family = "mean";
-  options.order = arma::colvec{0.0, 0.0, 0.0};
-  options.p = static_cast<int>(spec.feature_count);
-  options.vanilla_percentage = 1.0;
-  if (options.variance_estimate.is_empty()) {
-    options.variance_estimate =
-        arma::eye<arma::mat>(spec.feature_count, spec.feature_count);
-  }
-  Result result = detect_native(transformed, std::move(options));
-  return with_public_metadata(std::move(result), "kcp", spec.public_order,
-                              cp_only);
+  RRandom random(kernel_seed(options.seed));
+  return detect_kernel_with_random(data, std::move(options), &random);
 }
 
 Result detect_kcp(arma::mat const& data, Options options) {
@@ -1740,6 +1756,566 @@ VarianceArmaResult estimate_variance_arma(arma::colvec const& data,
     result.table.push_back(VarianceArmaRow{order, sigma2, aic, bic});
   }
   return result;
+}
+
+namespace {
+
+using ProfileCost = std::function<double(arma::uword, arma::uword)>;
+
+std::vector<arma::uword> confidence_change_points(Result const& result,
+                                                  arma::uword data_rows) {
+  std::vector<arma::uword> points;
+  points.reserve(result.change_points.n_elem);
+  for (double const value : result.change_points) {
+    if (!std::isfinite(value) || value <= 0.0 ||
+        value >= static_cast<double>(data_rows) ||
+        value != std::floor(value)) {
+      throw std::invalid_argument(
+          "fastcpd: result change points must be interior integer boundaries");
+    }
+    points.push_back(static_cast<arma::uword>(value));
+  }
+  std::sort(points.begin(), points.end());
+  if (std::adjacent_find(points.begin(), points.end()) != points.end()) {
+    throw std::invalid_argument(
+        "fastcpd: result change points must be unique boundaries");
+  }
+  return points;
+}
+
+arma::mat confidence_analysis_data(Result const& result,
+                                   arma::mat const& data) {
+  if (result.family == "rank") return centered_ranks(data);
+  return data;
+}
+
+std::string confidence_native_family(std::string family) {
+  family = detail::lower_ascii(std::move(family));
+  if (family == "rank") return "mean";
+  if (family == "gaussian") return "lm";
+  if (family == "mgaussian") return "var";
+  return family;
+}
+
+double stable_log_determinant(arma::mat const& matrix) {
+  if (!matrix.is_finite()) return std::numeric_limits<double>::infinity();
+  arma::vec eigenvalues;
+  if (!arma::eig_sym(eigenvalues, arma::symmatl(matrix))) {
+    return std::numeric_limits<double>::infinity();
+  }
+  double total = 0.0;
+  for (double const value : eigenvalues) {
+    total += std::log(
+        std::max(value, std::numeric_limits<double>::epsilon()));
+  }
+  return total;
+}
+
+arma::mat confidence_precision(arma::mat const& covariance,
+                               arma::uword dimension) {
+  if (covariance.n_rows != dimension || covariance.n_cols != dimension ||
+      !covariance.is_finite()) {
+    return arma::eye<arma::mat>(dimension, dimension);
+  }
+  arma::mat precision;
+  if (!arma::inv(precision, covariance) || !precision.is_finite()) {
+    return arma::eye<arma::mat>(dimension, dimension);
+  }
+  return precision;
+}
+
+Result single_segment_fit(arma::mat const& data, std::string const& family,
+                          arma::colvec const& order,
+                          Options detector_options) {
+  detector_options.family = family;
+  detector_options.order = order;
+  detector_options.beta = 1e100;
+  detector_options.cost_adjustment = "BIC";
+  detector_options.cp_only = false;
+  detector_options.segment_count = 1;
+  detector_options.trim = 0.0;
+  detector_options.vanilla_percentage = 1.0;
+  detector_options.pruning_coef.reset();
+  detector_options.show_progress = false;
+  return detect(data, std::move(detector_options));
+}
+
+double single_segment_cost(arma::mat const& data, std::string const& family,
+                           arma::colvec const& order,
+                           Options const& detector_options) {
+  try {
+    Result const fit =
+        single_segment_fit(data, family, order, detector_options);
+    if (fit.change_points.n_elem != 0 || fit.cost_values.n_elem != 1) {
+      return std::numeric_limits<double>::infinity();
+    }
+    return fit.cost_values(0);
+  } catch (...) {
+    return std::numeric_limits<double>::infinity();
+  }
+}
+
+ProfileCost profile_cost_function(Result const& result,
+                                  arma::mat const& analysis_data,
+                                  Options const& detector_options) {
+  std::string const family = confidence_native_family(result.family);
+  if (family == "mean") {
+    arma::mat covariance = detector_options.variance_estimate;
+    if (covariance.is_empty()) covariance = estimate_variance_mean(analysis_data);
+    arma::mat const precision =
+        confidence_precision(covariance, analysis_data.n_cols);
+    return [&analysis_data, precision](arma::uword start, arma::uword end) {
+      arma::mat const segment = analysis_data.rows(start, end - 1);
+      arma::mat const centered =
+          segment.each_row() - arma::mean(segment, 0);
+      return arma::accu((centered * precision) % centered) / 2.0;
+    };
+  }
+  if (family == "variance") {
+    arma::mat const centered_data =
+        analysis_data.each_row() - arma::mean(analysis_data, 0);
+    return [centered_data](arma::uword start, arma::uword end) {
+      arma::mat const segment = centered_data.rows(start, end - 1);
+      arma::mat const covariance = segment.t() * segment /
+                                   static_cast<double>(segment.n_rows);
+      return static_cast<double>(segment.n_rows) *
+             stable_log_determinant(covariance) / 2.0;
+    };
+  }
+  if (family == "meanvariance") {
+    return [&analysis_data](arma::uword start, arma::uword end) {
+      arma::mat const segment = analysis_data.rows(start, end - 1);
+      arma::mat const centered =
+          segment.each_row() - arma::mean(segment, 0);
+      arma::mat const covariance = centered.t() * centered /
+                                   static_cast<double>(segment.n_rows);
+      return static_cast<double>(segment.n_rows) *
+             stable_log_determinant(covariance) / 2.0;
+    };
+  }
+  if (family == "exponential") {
+    return [&analysis_data](arma::uword start, arma::uword end) {
+      arma::colvec const segment = analysis_data.col(0).rows(start, end - 1);
+      if (arma::any(segment <= 0.0)) {
+        return std::numeric_limits<double>::infinity();
+      }
+      return static_cast<double>(segment.n_elem) *
+             (std::log(arma::mean(segment)) + 1.0);
+    };
+  }
+  if (family == "lm") {
+    double sigma2 = 1.0;
+    if (!detector_options.variance_estimate.is_empty()) {
+      sigma2 = detector_options.variance_estimate(0, 0);
+    } else {
+      try {
+        sigma2 = estimate_variance_linear_regression(analysis_data)(0, 0);
+      } catch (...) {
+        sigma2 = 1.0;
+      }
+    }
+    if (!std::isfinite(sigma2) || sigma2 <= 0.0) sigma2 = 1.0;
+    return [&analysis_data, sigma2](arma::uword start, arma::uword end) {
+      arma::mat const segment = analysis_data.rows(start, end - 1);
+      arma::colvec const y = segment.col(0);
+      arma::mat const x = segment.cols(1, segment.n_cols - 1);
+      if (x.n_rows <= x.n_cols) {
+        return std::numeric_limits<double>::infinity();
+      }
+      arma::colvec coefficients;
+      if (!arma::solve(coefficients, x, y) || !coefficients.is_finite()) {
+        return std::numeric_limits<double>::infinity();
+      }
+      arma::colvec const residuals = y - x * coefficients;
+      return arma::dot(residuals, residuals) / (2.0 * sigma2);
+    };
+  }
+  if (family == "binomial" || family == "poisson" ||
+      family == "quantile" || family == "arima") {
+    arma::colvec const order = result.order;
+    return [&analysis_data, family, order, detector_options](
+               arma::uword start, arma::uword end) {
+      return single_segment_cost(analysis_data.rows(start, end - 1), family,
+                                 order, detector_options);
+    };
+  }
+  throw std::invalid_argument("fastcpd: profile intervals are unavailable for " +
+                              result.family);
+}
+
+std::vector<ConfidenceInterval> confidence_profile(
+    Result const& result, arma::mat const& data,
+    ConfidenceOptions const& options) {
+  std::vector<arma::uword> const points =
+      confidence_change_points(result, data.n_rows);
+  if (points.empty()) return {};
+  arma::mat const analysis_data = confidence_analysis_data(result, data);
+  ProfileCost const cost =
+      profile_cost_function(result, analysis_data, options.detector_options);
+  double const z =
+      RRandom::standard_normal_quantile((1.0 + options.level) / 2.0);
+  double const cutoff = z * z / 2.0;
+  std::vector<arma::uword> bounds;
+  bounds.reserve(points.size() + 2);
+  bounds.push_back(0);
+  bounds.insert(bounds.end(), points.begin(), points.end());
+  bounds.push_back(data.n_rows);
+
+  std::vector<ConfidenceInterval> rows;
+  rows.reserve(points.size());
+  for (std::size_t index = 0; index < points.size(); ++index) {
+    arma::uword const point = points[index];
+    arma::uword const left = bounds[index];
+    arma::uword const right = bounds[index + 2];
+    bool const has_candidate_range =
+        options.min_segment_length <= (right - left) / 2;
+    arma::uword minimum = 0;
+    arma::uword maximum = 0;
+    if (has_candidate_range) {
+      minimum = left + options.min_segment_length;
+      maximum = right - options.min_segment_length;
+    }
+    if (has_candidate_range && options.window.has_value()) {
+      arma::uword const window = *options.window;
+      minimum = std::max(minimum, point > window ? point - window : 0u);
+      maximum = std::min(maximum, point + window);
+    }
+
+    ConfidenceInterval row;
+    row.parm = "cp";
+    row.method = "profile";
+    row.index = static_cast<unsigned int>(index + 1);
+    row.estimate = static_cast<double>(point);
+    row.cutoff = cutoff;
+    row.level = options.level;
+    if (has_candidate_range && minimum <= maximum) {
+      double profile_min = std::numeric_limits<double>::infinity();
+      std::vector<std::pair<arma::uword, double>> finite;
+      for (arma::uword candidate = minimum; candidate <= maximum; ++candidate) {
+        double const value =
+            cost(left, candidate) + cost(candidate, right);
+        if (std::isfinite(value)) {
+          finite.emplace_back(candidate, value);
+          profile_min = std::min(profile_min, value);
+        }
+      }
+      if (!finite.empty()) {
+        arma::uword lower = point;
+        arma::uword upper = point;
+        for (auto const& candidate : finite) {
+          if (candidate.second - profile_min <= cutoff) {
+            lower = std::min(lower, candidate.first);
+            upper = std::max(upper, candidate.first);
+          }
+        }
+        row.lower = static_cast<double>(lower);
+        row.upper = static_cast<double>(upper);
+        row.profile_min = profile_min;
+      }
+    }
+    rows.push_back(std::move(row));
+  }
+  return rows;
+}
+
+arma::colvec missing_standard_errors(arma::uword count) {
+  return arma::colvec(
+      count, arma::fill::value(std::numeric_limits<double>::quiet_NaN()));
+}
+
+arma::colvec theta_standard_errors(arma::mat const& data,
+                                   std::string const& family,
+                                   arma::colvec const& order,
+                                   Options const& detector_options) {
+  if (family == "mean") {
+    if (data.n_rows <= 1) return missing_standard_errors(data.n_cols);
+    arma::mat const centered = data.each_row() - arma::mean(data, 0);
+    arma::mat const covariance =
+        centered.t() * centered / static_cast<double>(data.n_rows - 1);
+    return arma::sqrt(covariance.diag() /
+                      static_cast<double>(data.n_rows));
+  }
+  if (family == "exponential") {
+    double const rate = 1.0 / arma::mean(data.col(0));
+    return arma::colvec{rate / std::sqrt(static_cast<double>(data.n_rows))};
+  }
+  if (family == "lm") {
+    arma::colvec const y = data.col(0);
+    arma::mat const x = data.cols(1, data.n_cols - 1);
+    arma::colvec coefficients;
+    arma::mat inverse;
+    if (!arma::solve(coefficients, x, y) ||
+        !arma::inv(inverse, x.t() * x)) {
+      return missing_standard_errors(x.n_cols);
+    }
+    arma::colvec const residuals = y - x * coefficients;
+    arma::uword const degrees =
+        std::max<arma::uword>(x.n_rows - x.n_cols, 1);
+    double const sigma2 =
+        arma::dot(residuals, residuals) / static_cast<double>(degrees);
+    return arma::sqrt(inverse.diag() * sigma2);
+  }
+  if (family == "binomial" || family == "poisson") {
+    arma::mat const x = data.cols(1, data.n_cols - 1);
+    Result fitted;
+    try {
+      fitted = single_segment_fit(data, family, order, detector_options);
+    } catch (...) {
+      return missing_standard_errors(x.n_cols);
+    }
+    if (fitted.thetas.n_cols != 1 || fitted.thetas.n_rows != x.n_cols) {
+      return missing_standard_errors(x.n_cols);
+    }
+    arma::colvec const eta = x * fitted.thetas.col(0);
+    arma::colvec weights(eta.n_elem);
+    if (family == "binomial") {
+      for (arma::uword index = 0; index < eta.n_elem; ++index) {
+        double const probability = eta(index) >= 0.0
+            ? 1.0 / (1.0 + std::exp(-eta(index)))
+            : std::exp(eta(index)) / (1.0 + std::exp(eta(index)));
+        weights(index) = probability * (1.0 - probability);
+      }
+    } else {
+      weights = arma::exp(eta);
+    }
+    double const threshold = std::sqrt(std::numeric_limits<double>::epsilon());
+    if (!weights.is_finite() || arma::any(weights <= threshold)) {
+      return missing_standard_errors(x.n_cols);
+    }
+    arma::mat const information = x.t() * (x.each_col() % weights);
+    double const reciprocal_condition = arma::rcond(information);
+    arma::mat inverse;
+    if (!std::isfinite(reciprocal_condition) ||
+        reciprocal_condition <= threshold ||
+        !arma::inv(inverse, information) || !inverse.is_finite() ||
+        arma::any(inverse.diag() < 0.0)) {
+      return missing_standard_errors(x.n_cols);
+    }
+    return arma::sqrt(inverse.diag());
+  }
+  throw std::invalid_argument("fastcpd: Wald intervals are unavailable for " +
+                              family);
+}
+
+std::vector<ConfidenceInterval> confidence_wald(
+    Result const& result, arma::mat const& data,
+    ConfidenceOptions const& options) {
+  if (result.cp_only || result.thetas.is_empty()) {
+    throw std::invalid_argument(
+        "fastcpd: Wald intervals require a detailed detector result");
+  }
+  std::string const family = confidence_native_family(result.family);
+  unsigned int const p_response = options.detector_options.p_response;
+  if (family == "lm" && p_response > 1) {
+    throw std::invalid_argument(
+        "fastcpd: Wald intervals are unavailable for multivariate LM");
+  }
+  arma::mat const analysis_data = confidence_analysis_data(result, data);
+  std::vector<arma::uword> const points =
+      confidence_change_points(result, data.n_rows);
+  std::vector<arma::uword> bounds;
+  bounds.reserve(points.size() + 2);
+  bounds.push_back(0);
+  bounds.insert(bounds.end(), points.begin(), points.end());
+  bounds.push_back(data.n_rows);
+  if (result.thetas.n_cols != bounds.size() - 1) {
+    throw std::invalid_argument(
+        "fastcpd: result thetas must have one column per segment");
+  }
+  double const z = RRandom::standard_normal_quantile(
+      1.0 - (1.0 - options.level) / 2.0);
+  std::vector<ConfidenceInterval> rows;
+  rows.reserve(result.thetas.n_elem);
+  for (arma::uword segment = 0; segment < result.thetas.n_cols; ++segment) {
+    arma::mat const segment_data =
+        analysis_data.rows(bounds[segment], bounds[segment + 1] - 1);
+    arma::colvec const standard_errors = theta_standard_errors(
+        segment_data, family, result.order, options.detector_options);
+    if (standard_errors.n_elem != result.thetas.n_rows) {
+      throw std::runtime_error(
+          "fastcpd: Wald standard-error dimension differs from theta");
+    }
+    for (arma::uword parameter = 0; parameter < result.thetas.n_rows;
+         ++parameter) {
+      ConfidenceInterval row;
+      row.parm = "theta";
+      row.method = "wald";
+      row.segment = static_cast<unsigned int>(segment + 1);
+      row.parameter = static_cast<unsigned int>(parameter + 1);
+      row.estimate = result.thetas(parameter, segment);
+      row.se = standard_errors(parameter);
+      row.lower = row.estimate - z * row.se;
+      row.upper = row.estimate + z * row.se;
+      row.level = options.level;
+      rows.push_back(std::move(row));
+    }
+  }
+  return rows;
+}
+
+arma::mat segment_bootstrap_data(arma::mat const& data,
+                                 std::vector<arma::uword> const& points,
+                                 RRandom* random) {
+  std::vector<arma::uword> bounds;
+  bounds.reserve(points.size() + 2);
+  bounds.push_back(0);
+  bounds.insert(bounds.end(), points.begin(), points.end());
+  bounds.push_back(data.n_rows);
+  arma::mat result = data;
+  for (std::size_t segment = 0; segment + 1 < bounds.size(); ++segment) {
+    arma::uword const start = bounds[segment];
+    arma::uword const size = bounds[segment + 1] - start;
+    std::vector<arma::uword> const selected =
+        random->sample_with_replacement(size, size);
+    for (arma::uword offset = 0; offset < size; ++offset) {
+      result.row(start + offset) = data.row(start + selected[offset]);
+    }
+  }
+  return result;
+}
+
+Result confidence_refit(Result const& result, arma::mat const& data,
+                        Options detector_options, RRandom* random) {
+  detector_options.family = result.family;
+  detector_options.order = result.order;
+  detector_options.cp_only = true;
+  detector_options.show_progress = false;
+  if (result.family == "kcp") {
+    return detect_kernel_with_random(data, std::move(detector_options), random);
+  }
+  return detect(data, std::move(detector_options));
+}
+
+double quantile_type1(std::vector<double> values, double probability) {
+  std::sort(values.begin(), values.end());
+  if (probability <= 0.0) return values.front();
+  if (probability >= 1.0) return values.back();
+  std::size_t index =
+      static_cast<std::size_t>(std::ceil(probability * values.size())) - 1;
+  index = std::min(index, values.size() - 1);
+  return values[index];
+}
+
+std::vector<ConfidenceInterval> confidence_bootstrap(
+    Result const& result, arma::mat const& data,
+    ConfidenceOptions const& options) {
+  if (options.bootstrap != "nonparametric") {
+    throw std::invalid_argument(
+        "fastcpd: only nonparametric bootstrap is implemented");
+  }
+  if (options.bootstrap_replicates == 0) {
+    throw std::invalid_argument(
+        "fastcpd: bootstrap_replicates must be positive");
+  }
+  std::vector<arma::uword> const points =
+      confidence_change_points(result, data.n_rows);
+  if (points.empty()) return {};
+  RRandom random(kernel_seed(options.seed));
+  arma::mat matched(
+      options.bootstrap_replicates, points.size(),
+      arma::fill::value(std::numeric_limits<double>::quiet_NaN()));
+  for (unsigned int replicate = 0; replicate < options.bootstrap_replicates;
+       ++replicate) {
+    arma::mat const sample = segment_bootstrap_data(data, points, &random);
+    std::vector<arma::uword> fitted_points;
+    try {
+      Result const fitted = confidence_refit(
+          result, sample, options.detector_options, &random);
+      fitted_points = confidence_change_points(fitted, data.n_rows);
+    } catch (...) {
+      continue;
+    }
+    for (std::size_t index = 0; index < points.size(); ++index) {
+      arma::uword const left = index == 0
+                                  ? 0
+                                  : (points[index - 1] + points[index]) / 2;
+      arma::uword const right =
+          index + 1 == points.size()
+              ? data.n_rows
+              : static_cast<arma::uword>(std::ceil(
+                    (points[index] + points[index + 1]) / 2.0));
+      bool found = false;
+      arma::uword best = 0;
+      arma::uword best_distance = std::numeric_limits<arma::uword>::max();
+      for (arma::uword const candidate : fitted_points) {
+        if (candidate <= left || candidate > right) continue;
+        arma::uword const distance = candidate > points[index]
+                                         ? candidate - points[index]
+                                         : points[index] - candidate;
+        if (!found || distance < best_distance) {
+          found = true;
+          best = candidate;
+          best_distance = distance;
+        }
+      }
+      if (found) matched(replicate, index) = static_cast<double>(best);
+    }
+  }
+
+  double const alpha = 1.0 - options.level;
+  std::vector<ConfidenceInterval> rows;
+  rows.reserve(points.size());
+  for (std::size_t index = 0; index < points.size(); ++index) {
+    std::vector<double> detected;
+    for (arma::uword replicate = 0; replicate < matched.n_rows; ++replicate) {
+      if (!std::isnan(matched(replicate, index))) {
+        detected.push_back(matched(replicate, index));
+      }
+    }
+    ConfidenceInterval row;
+    row.parm = "cp";
+    row.method = "bootstrap";
+    row.bootstrap = options.bootstrap;
+    row.index = static_cast<unsigned int>(index + 1);
+    row.estimate = static_cast<double>(points[index]);
+    row.detection_rate = static_cast<double>(detected.size()) /
+                         static_cast<double>(options.bootstrap_replicates);
+    row.level = options.level;
+    if (!detected.empty()) {
+      row.lower = quantile_type1(detected, alpha / 2.0);
+      row.upper = quantile_type1(detected, 1.0 - alpha / 2.0);
+    }
+    rows.push_back(std::move(row));
+  }
+  return rows;
+}
+
+}  // namespace
+
+std::vector<ConfidenceInterval> confint(Result const& result,
+                                        arma::mat const& data,
+                                        ConfidenceOptions options) {
+  require_finite_data(data);
+  if (!std::isfinite(options.level) || options.level <= 0.0 ||
+      options.level >= 1.0) {
+    throw std::invalid_argument("fastcpd: confidence level must be in (0, 1)");
+  }
+  if (options.parm != "cp" && options.parm != "theta") {
+    throw std::invalid_argument("fastcpd: parm must be cp or theta");
+  }
+  if (options.min_segment_length == 0) {
+    throw std::invalid_argument(
+        "fastcpd: min_segment_length must be positive");
+  }
+  if (options.method.empty()) {
+    options.method = options.parm == "cp" ? "bootstrap" : "wald";
+  }
+  if (options.parm == "cp" && options.method == "bootstrap") {
+    return confidence_bootstrap(result, data, options);
+  }
+  if (options.parm == "cp" && options.method == "profile") {
+    return confidence_profile(result, data, options);
+  }
+  if (options.parm == "theta" && options.method == "wald") {
+    return confidence_wald(result, data, options);
+  }
+  throw std::invalid_argument("fastcpd: unavailable confidence method");
+}
+
+std::vector<ConfidenceInterval> confint(Result const& result,
+                                        arma::colvec const& data,
+                                        ConfidenceOptions options) {
+  return confint(result, arma::mat(data), std::move(options));
 }
 
 }  // namespace fastcpd

@@ -117,7 +117,7 @@ arma::colvec as_colvec(std::vector<double> const& values) {
   return result;
 }
 
-fastcpd::Result run_detector(Row const& row, arma::mat const& data) {
+fastcpd::Options detector_options(Row const& row) {
   fastcpd::Options options;
   std::string const beta = row.at("beta");
   if (beta == "BIC" || beta == "MBIC" || beta == "MDL") {
@@ -142,6 +142,12 @@ fastcpd::Result run_detector(Row const& row, arma::mat const& data) {
   std::vector<double> const seed =
       parse_numbers(row.at("random_state"), ',');
   if (!seed.empty()) options.seed = static_cast<std::int32_t>(seed.front());
+
+  return options;
+}
+
+fastcpd::Result run_detector(Row const& row, arma::mat const& data) {
+  fastcpd::Options options = detector_options(row);
 
   std::string const family = row.at("family");
   if (family == "mean") return fastcpd::detect_mean(data, options);
@@ -250,6 +256,64 @@ void compare_detector(std::string const& case_id, fastcpd::Result const& result,
   compare_matrix(case_id + " thetas", result.thetas, expected.at("thetas"));
 }
 
+double confidence_value(fastcpd::ConfidenceInterval const& row,
+                        std::string const& field) {
+  if (field == "index") return row.index;
+  if (field == "segment") return row.segment;
+  if (field == "parameter") return row.parameter;
+  if (field == "estimate") return row.estimate;
+  if (field == "lower") return row.lower;
+  if (field == "upper") return row.upper;
+  if (field == "detection_rate") return row.detection_rate;
+  if (field == "profile_min") return row.profile_min;
+  if (field == "cutoff") return row.cutoff;
+  if (field == "se") return row.se;
+  if (field == "level") return row.level;
+  throw std::runtime_error("unregistered confidence field: " + field);
+}
+
+void compare_confidence(
+    std::string const& case_id,
+    std::vector<fastcpd::ConfidenceInterval> const& actual,
+    ExpectedCase const& expected) {
+  for (auto const& [field, values] : expected) {
+    if (values.shape.size() != 1 || values.shape.front() != actual.size() ||
+        values.values.size() != actual.size()) {
+      throw std::runtime_error(case_id + " " + field + " shape differs");
+    }
+    for (std::size_t index = 0; index < actual.size(); ++index) {
+      compare_value(case_id + " " + field,
+                    confidence_value(actual[index], field),
+                    values.values[index], values.tolerance);
+    }
+  }
+}
+
+fastcpd::ConfidenceOptions confidence_options(
+    Row const& row, Row const& source) {
+  fastcpd::ConfidenceOptions options;
+  std::string const operation = row.at("operation");
+  options.parm = operation == "confint_wald" ? "theta" : "cp";
+  if (operation == "confint_profile") options.method = "profile";
+  if (operation == "confint_wald") options.method = "wald";
+  if (operation == "confint_bootstrap") options.method = "bootstrap";
+  options.level = std::stod(row.at("level"));
+  std::vector<double> const replicates = parse_numbers(row.at("B"), ',');
+  if (!replicates.empty()) {
+    options.bootstrap_replicates =
+        static_cast<unsigned int>(replicates.front());
+  }
+  std::vector<double> const window = parse_numbers(row.at("window"), ',');
+  if (!window.empty()) {
+    options.window = static_cast<unsigned int>(window.front());
+  }
+  std::vector<double> const seed =
+      parse_numbers(row.at("random_state"), ',');
+  if (!seed.empty()) options.seed = static_cast<std::int32_t>(seed.front());
+  options.detector_options = detector_options(source);
+  return options;
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -257,8 +321,12 @@ int main(int argc, char** argv) {
     fs::path const fixtures = find_fixture_directory(argc, argv);
     std::unordered_map<std::string, ExpectedCase> const expected =
         read_expected(fixtures / "expected_outputs.tsv");
+    std::vector<Row> const manifest = read_tsv(fixtures / "manifest.tsv");
+    std::unordered_map<std::string, Row> source_rows;
+    std::unordered_map<std::string, arma::mat> source_data;
+    std::unordered_map<std::string, fastcpd::Result> source_results;
     std::size_t detector_count = 0;
-    for (Row const& row : read_tsv(fixtures / "manifest.tsv")) {
+    for (Row const& row : manifest) {
       if (row.at("operation") != "detect") continue;
       std::string const case_id = row.at("case_id");
       arma::mat const data = read_csv(fixtures / row.at("data_file"));
@@ -267,13 +335,31 @@ int main(int argc, char** argv) {
         throw std::runtime_error(case_id + " public family metadata differs");
       }
       compare_detector(case_id, result, expected.at(case_id));
+      source_rows.emplace(case_id, row);
+      source_data.emplace(case_id, data);
+      source_results.emplace(case_id, result);
       ++detector_count;
     }
     if (detector_count != 19) {
       throw std::runtime_error("unexpected detector fixture count");
     }
-    std::cout << detector_count
-              << " standalone detector fixture contracts passed\n";
+    std::size_t confidence_count = 0;
+    for (Row const& row : manifest) {
+      if (row.at("operation").rfind("confint_", 0) != 0) continue;
+      std::string const case_id = row.at("case_id");
+      std::string const source_case = row.at("source_case");
+      std::vector<fastcpd::ConfidenceInterval> const intervals =
+          fastcpd::confint(source_results.at(source_case),
+                           source_data.at(source_case),
+                           confidence_options(row, source_rows.at(source_case)));
+      compare_confidence(case_id, intervals, expected.at(case_id));
+      ++confidence_count;
+    }
+    if (confidence_count != 13) {
+      throw std::runtime_error("unexpected confidence fixture count");
+    }
+    std::cout << detector_count << " standalone detector and "
+              << confidence_count << " confidence fixture contracts passed\n";
     return 0;
   } catch (std::exception const& error) {
     std::cerr << error.what() << '\n';
