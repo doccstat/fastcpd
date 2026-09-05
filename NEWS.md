@@ -11,6 +11,10 @@
     families. Raw AR and VAR preprocessing, pure-AR ARMA/ARIMA routing, rank
     transformation, original-coordinate change points/residuals, and public
     family/order metadata now match the R and Python contracts.
+*   Add standalone C++ `detect_kernel()` / `detect_kcp()` with the same scalar
+    seed stream, bandwidth fallback, random-feature generation order, default
+    penalty, and detailed numerical output as R and Python. Random-feature
+    preprocessing remains outside the mean-family PELT loop.
 *   Expand the shared R/Python numerical contract to every portable built-in
     detector family and the common bootstrap, profile, and Wald confidence
     paths. The fixtures now compare raw and trimmed change points, segment
