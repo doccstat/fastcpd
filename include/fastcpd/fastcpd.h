@@ -3,6 +3,7 @@
 
 #include <armadillo>
 
+#include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>
@@ -33,7 +34,8 @@ struct Options {
   std::string family = "mean";
   std::optional<double> beta;
   std::string beta_criterion = "MBIC";
-  std::string cost_adjustment = "MBIC";
+  // Empty selects the wrapper default: MBIC generally and BIC for KCP.
+  std::string cost_adjustment;
   bool cp_only = false;
   double epsilon = 1e-10;
   arma::colvec line_search = arma::colvec{1.0};
@@ -53,6 +55,7 @@ struct Options {
   bool warm_start = false;
   bool show_progress = false;
   bool include_mean = false;
+  std::optional<std::int32_t> seed;
 
   CostFunctionPelt cost_pelt;
   CostFunctionSen cost_sen;
@@ -87,6 +90,8 @@ Result detect_garch(arma::colvec const& data, Options options = {});
 Result detect_var(arma::mat const& data, Options options = {});
 Result detect_mgaussian(arma::mat const& data, Options options = {});
 Result detect_rank(arma::mat const& data, Options options = {});
+Result detect_kernel(arma::mat const& data, Options options = {});
+Result detect_kcp(arma::mat const& data, Options options = {});
 
 Result mean(arma::mat const& data, Options options = {});
 Result variance(arma::mat const& data, Options options = {});
@@ -103,6 +108,8 @@ Result arima(arma::colvec const& data, Options options = {});
 Result var(arma::mat const& data, Options options = {});
 Result mgaussian(arma::mat const& data, Options options = {});
 Result rank(arma::mat const& data, Options options = {});
+Result kernel(arma::mat const& data, Options options = {});
+Result kcp(arma::mat const& data, Options options = {});
 
 }  // namespace fastcpd
 
