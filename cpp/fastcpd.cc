@@ -807,7 +807,9 @@ Result make_result(RunResult&& value) {
 
 }  // namespace detail
 
-Result detect(arma::mat const& data, Options options) {
+namespace {
+
+Result detect_native(arma::mat const& data, Options options) {
   if (data.n_rows == 0 || data.n_cols == 0) {
     throw std::invalid_argument("fastcpd: data must be a non-empty matrix");
   }
@@ -862,39 +864,446 @@ Result detect(arma::mat const& data, Options options) {
   double const vanilla_percentage =
       detail::is_pelt_family(family) ? 1.0 : options.vanilla_percentage;
 
-  return detail::make_result(detail::dispatch(
+  Result result = detail::make_result(detail::dispatch(
       beta, options.cost_adjustment, options, data, family, order, p,
       p_response, pruning_coef, options.segment_count, vanilla_percentage,
       variance_estimate, lower, upper, line_search));
+  result.family = family;
+  result.order = order;
+  result.cp_only = options.cp_only;
+  return result;
+}
+
+Result with_public_metadata(Result result, std::string family,
+                            arma::colvec order, bool cp_only) {
+  result.family = std::move(family);
+  result.order = std::move(order);
+  result.cp_only = cp_only;
+  return result;
+}
+
+void require_finite_data(arma::mat const& data) {
+  if (data.n_rows == 0 || data.n_cols == 0) {
+    throw std::invalid_argument("fastcpd: data must be a non-empty matrix");
+  }
+  if (!data.is_finite()) {
+    throw std::invalid_argument(
+        "fastcpd: data must contain only finite values");
+  }
+}
+
+void require_univariate(arma::mat const& data, char const* family) {
+  if (data.n_cols != 1) {
+    throw std::invalid_argument(std::string("fastcpd: ") + family +
+                                " data must be univariate");
+  }
+}
+
+unsigned int positive_scalar_order(arma::colvec const& order,
+                                   char const* family) {
+  if (order.n_elem != 1 || !detail::is_nonnegative_integer(order(0)) ||
+      order(0) <= 0.0) {
+    throw std::invalid_argument(std::string("fastcpd: ") + family +
+                                " order must be a positive integer");
+  }
+  return static_cast<unsigned int>(order(0));
+}
+
+unsigned int ar_order(arma::colvec const& order) {
+  if (order.n_elem == 1) return positive_scalar_order(order, "AR");
+  detail::validate_integer_order(order, 3, "AR");
+  if (order(0) <= 0.0 || order(1) != 0.0 || order(2) != 0.0) {
+    throw std::invalid_argument(
+        "fastcpd: AR order must be p or (p, 0, 0), with p positive");
+  }
+  return static_cast<unsigned int>(order(0));
+}
+
+arma::mat make_ar_design(arma::colvec const& data, unsigned int order) {
+  if (data.n_rows <= order) {
+    throw std::invalid_argument(
+        "fastcpd: AR order must be smaller than data.n_rows");
+  }
+  arma::uword const rows = data.n_rows - order;
+  arma::mat design(rows, order + 1);
+  design.col(0) = data.rows(order, data.n_rows - 1);
+  for (unsigned int lag = 1; lag <= order; ++lag) {
+    design.col(lag) = data.rows(order - lag, data.n_rows - lag - 1);
+  }
+  return design;
+}
+
+arma::mat make_var_design(arma::mat const& data, unsigned int order) {
+  if (data.n_rows <= order) {
+    throw std::invalid_argument(
+        "fastcpd: VAR order must be smaller than data.n_rows");
+  }
+  arma::uword const rows = data.n_rows - order;
+  arma::uword const q = data.n_cols;
+  arma::mat design(rows, q * (order + 1));
+  design.cols(0, q - 1) = data.rows(order, data.n_rows - 1);
+  for (unsigned int lag = 1; lag <= order; ++lag) {
+    arma::uword const first = q * lag;
+    design.cols(first, first + q - 1) =
+        data.rows(order - lag, data.n_rows - lag - 1);
+  }
+  return design;
+}
+
+Result restore_lag_coordinates(Result result, unsigned int offset,
+                               arma::uword original_rows,
+                               arma::uword response_count) {
+  result.raw_change_points += static_cast<double>(offset);
+  result.change_points += static_cast<double>(offset);
+  if (!result.residuals.is_empty()) {
+    arma::mat residuals(
+        original_rows, response_count,
+        arma::fill::value(std::numeric_limits<double>::quiet_NaN()));
+    residuals.rows(offset, original_rows - 1) = result.residuals;
+    result.residuals = std::move(residuals);
+  }
+  return result;
+}
+
+arma::mat centered_ranks(arma::mat const& data) {
+  arma::mat result(data.n_rows, data.n_cols);
+  std::vector<arma::uword> indices(data.n_rows);
+  for (arma::uword column = 0; column < data.n_cols; ++column) {
+    for (arma::uword row = 0; row < data.n_rows; ++row) indices[row] = row;
+    std::stable_sort(indices.begin(), indices.end(),
+                     [&data, column](arma::uword lhs, arma::uword rhs) {
+                       return data(lhs, column) < data(rhs, column);
+                     });
+    arma::uword start = 0;
+    while (start < indices.size()) {
+      arma::uword end = start + 1;
+      while (end < indices.size() &&
+             data(indices[end], column) == data(indices[start], column)) {
+        ++end;
+      }
+      double const average_rank =
+          (static_cast<double>(start + 1) + static_cast<double>(end)) / 2.0;
+      for (arma::uword position = start; position < end; ++position) {
+        result(indices[position], column) = average_rank;
+      }
+      start = end;
+    }
+  }
+  result -= static_cast<double>(data.n_rows + 1) / 2.0;
+  return result;
+}
+
+}  // namespace
+
+Result detect(arma::mat const& data, Options options) {
+  std::string const family = detail::lower_ascii(options.family);
+  if (family == "lm") return detect_lm(data, std::move(options));
+  if (family == "var") return detect_var(data, std::move(options));
+  if (family == "rank") return detect_rank(data, std::move(options));
+  if (family == "ar") {
+    require_univariate(data, "AR");
+    return detect_ar(data.col(0), std::move(options));
+  }
+  if (family == "arma") {
+    require_univariate(data, "ARMA");
+    return detect_arma(data.col(0), std::move(options));
+  }
+  if (family == "arima") {
+    require_univariate(data, "ARIMA");
+    return detect_arima(data.col(0), std::move(options));
+  }
+  if (family == "garch") {
+    require_univariate(data, "GARCH");
+    return detect_garch(data.col(0), std::move(options));
+  }
+  return detect_native(data, std::move(options));
 }
 
 Result detect(arma::colvec const& data, Options options) {
   return detect(arma::mat(data), std::move(options));
 }
 
-Result mean(arma::mat const& data, Options options) {
+Result detect_mean(arma::mat const& data, Options options) {
+  bool const cp_only = options.cp_only;
   options.family = "mean";
-  return detect(data, std::move(options));
+  options.order = arma::colvec{0.0, 0.0, 0.0};
+  return with_public_metadata(detect_native(data, std::move(options)), "mean",
+                              arma::colvec{0.0, 0.0, 0.0}, cp_only);
+}
+
+Result detect_variance(arma::mat const& data, Options options) {
+  bool const cp_only = options.cp_only;
+  options.family = "variance";
+  options.order = arma::colvec{0.0, 0.0, 0.0};
+  return with_public_metadata(detect_native(data, std::move(options)),
+                              "variance", arma::colvec{0.0, 0.0, 0.0},
+                              cp_only);
+}
+
+Result detect_meanvariance(arma::mat const& data, Options options) {
+  bool const cp_only = options.cp_only;
+  options.family = "meanvariance";
+  options.order = arma::colvec{0.0, 0.0, 0.0};
+  return with_public_metadata(detect_native(data, std::move(options)),
+                              "meanvariance", arma::colvec{0.0, 0.0, 0.0},
+                              cp_only);
+}
+
+Result detect_mean_variance(arma::mat const& data, Options options) {
+  return detect_meanvariance(data, std::move(options));
+}
+
+Result detect_exponential(arma::mat const& data, Options options) {
+  bool const cp_only = options.cp_only;
+  options.family = "exponential";
+  options.order = arma::colvec{0.0, 0.0, 0.0};
+  return with_public_metadata(detect_native(data, std::move(options)),
+                              "exponential", arma::colvec{0.0, 0.0, 0.0},
+                              cp_only);
+}
+
+Result detect_lm(arma::mat const& data, Options options) {
+  if (data.n_cols < 2) {
+    throw std::invalid_argument(
+        "fastcpd: linear-regression data must include predictors");
+  }
+  unsigned int const q = options.p_response > 0 ? options.p_response : 1u;
+  if (q >= data.n_cols) {
+    throw std::invalid_argument(
+        "fastcpd: linear-regression response columns must leave predictors");
+  }
+  bool const cp_only = options.cp_only;
+  arma::colvec const public_order = options.order;
+  if (q > 1) {
+    options.family = "mgaussian";
+    options.p_response = q;
+    if (options.p == 0) {
+      options.p = static_cast<int>(q * (data.n_cols - q));
+    }
+    options.vanilla_percentage = 1.0;
+  } else {
+    options.family = "gaussian";
+    options.p_response = 1;
+    if (options.p == 0) options.p = static_cast<int>(data.n_cols - 1);
+  }
+  return with_public_metadata(detect_native(data, std::move(options)), "lm",
+                              public_order, cp_only);
+}
+
+Result detect_linear_regression(arma::mat const& data, Options options) {
+  return detect_lm(data, std::move(options));
+}
+
+#define FASTCPD_DEFINE_REGRESSION_WRAPPER(Name, Family)                      \
+  Result Name(arma::mat const& data, Options options) {                       \
+    bool const cp_only = options.cp_only;                                     \
+    arma::colvec const public_order = options.order;                          \
+    options.family = Family;                                                  \
+    return with_public_metadata(detect_native(data, std::move(options)),      \
+                                Family, public_order, cp_only);               \
+  }
+
+FASTCPD_DEFINE_REGRESSION_WRAPPER(detect_lasso, "lasso")
+FASTCPD_DEFINE_REGRESSION_WRAPPER(detect_binomial, "binomial")
+FASTCPD_DEFINE_REGRESSION_WRAPPER(detect_poisson, "poisson")
+FASTCPD_DEFINE_REGRESSION_WRAPPER(detect_quantile, "quantile")
+
+#undef FASTCPD_DEFINE_REGRESSION_WRAPPER
+
+Result detect_logistic_regression(arma::mat const& data, Options options) {
+  return detect_binomial(data, std::move(options));
+}
+
+Result detect_poisson_regression(arma::mat const& data, Options options) {
+  return detect_poisson(data, std::move(options));
+}
+
+Result detect_quantile_regression(arma::mat const& data, Options options) {
+  return detect_quantile(data, std::move(options));
+}
+
+Result detect_ar(arma::colvec const& data, Options options) {
+  arma::colvec const public_order = options.order;
+  unsigned int const order = ar_order(public_order);
+  bool const cp_only = options.cp_only;
+  arma::mat design = make_ar_design(data, order);
+  options.family = "gaussian";
+  options.order = arma::colvec{static_cast<double>(order)};
+  options.p = static_cast<int>(order);
+  options.p_response = 1;
+  Result result = detect_native(design, std::move(options));
+  result = restore_lag_coordinates(std::move(result), order, data.n_rows, 1);
+  return with_public_metadata(std::move(result), "ar", public_order, cp_only);
+}
+
+Result detect_arma(arma::colvec const& data, Options options) {
+  arma::colvec const public_order = options.order;
+  detail::validate_integer_order(public_order, 2, "ARMA");
+  unsigned int const p = static_cast<unsigned int>(public_order(0));
+  unsigned int const q = static_cast<unsigned int>(public_order(1));
+  if (p == 0 && q == 0) {
+    throw std::invalid_argument(
+        "fastcpd: ARMA order must contain a non-zero value");
+  }
+  bool const cp_only = options.cp_only;
+  Result result;
+  if (q == 0) {
+    options.order = arma::colvec{static_cast<double>(p)};
+    result = detect_ar(data, std::move(options));
+  } else {
+    options.family = p == 0 ? "ma" : "arma";
+    options.p = static_cast<int>(p + q + 1);
+    result = detect_native(arma::mat(data), std::move(options));
+  }
+  return with_public_metadata(std::move(result), "arma", public_order,
+                              cp_only);
+}
+
+Result detect_arima(arma::colvec const& data, Options options) {
+  if (options.include_mean) {
+    throw std::invalid_argument(
+        "fastcpd: include_mean=true is unsupported by the zero-mean ARIMA "
+        "likelihood");
+  }
+  arma::colvec const public_order = options.order;
+  detail::validate_integer_order(public_order, 3, "ARIMA");
+  if (arma::all(public_order == 0.0)) {
+    throw std::invalid_argument(
+        "fastcpd: ARIMA order must contain a non-zero value");
+  }
+  unsigned int const p = static_cast<unsigned int>(public_order(0));
+  unsigned int const d = static_cast<unsigned int>(public_order(1));
+  unsigned int const q = static_cast<unsigned int>(public_order(2));
+  if (d >= data.n_rows) {
+    throw std::invalid_argument(
+        "fastcpd: ARIMA integration order must be smaller than data.n_rows");
+  }
+  bool const cp_only = options.cp_only;
+  Result result;
+  if (d == 0) {
+    options.order = arma::colvec{static_cast<double>(p),
+                                 static_cast<double>(q)};
+    result = detect_arma(data, std::move(options));
+  } else {
+    options.family = "arima";
+    options.p = static_cast<int>(p + q + 1);
+    options.vanilla_percentage = 1.0;
+    result = detect_native(arma::mat(data), std::move(options));
+  }
+  return with_public_metadata(std::move(result), "arima", public_order,
+                              cp_only);
+}
+
+Result detect_garch(arma::colvec const& data, Options options) {
+  arma::colvec const public_order = options.order;
+  detail::validate_integer_order(public_order, 2, "GARCH");
+  if (arma::all(public_order == 0.0)) {
+    throw std::invalid_argument(
+        "fastcpd: GARCH order must contain a non-zero value");
+  }
+  bool const cp_only = options.cp_only;
+  options.family = "garch";
+  options.p = static_cast<int>(arma::sum(public_order)) + 1;
+  options.vanilla_percentage = 1.0;
+  return with_public_metadata(
+      detect_native(arma::mat(data), std::move(options)), "garch",
+      public_order, cp_only);
+}
+
+Result detect_var(arma::mat const& data, Options options) {
+  require_finite_data(data);
+  if (options.p_response != 0) {
+    throw std::invalid_argument(
+        "fastcpd: p_response is not accepted for raw VAR input");
+  }
+  arma::colvec const public_order = options.order;
+  unsigned int const order = positive_scalar_order(public_order, "VAR");
+  bool const cp_only = options.cp_only;
+  unsigned int const q = static_cast<unsigned int>(data.n_cols);
+  arma::mat design = make_var_design(data, order);
+  options.family = "mgaussian";
+  options.order = arma::colvec{static_cast<double>(order)};
+  options.p_response = q;
+  options.p = static_cast<int>(order * q * q);
+  options.vanilla_percentage = 1.0;
+  Result result = detect_native(design, std::move(options));
+  result = restore_lag_coordinates(std::move(result), order, data.n_rows, q);
+  return with_public_metadata(std::move(result), "var", public_order, cp_only);
+}
+
+Result detect_mgaussian(arma::mat const& data, Options options) {
+  bool const cp_only = options.cp_only;
+  arma::colvec const public_order = options.order;
+  options.family = "mgaussian";
+  return with_public_metadata(detect_native(data, std::move(options)),
+                              "mgaussian", public_order, cp_only);
+}
+
+Result detect_rank(arma::mat const& data, Options options) {
+  require_finite_data(data);
+  bool const cp_only = options.cp_only;
+  arma::colvec const public_order = options.order;
+  arma::mat transformed = centered_ranks(data);
+  options.family = "mean";
+  options.order = arma::colvec{0.0, 0.0, 0.0};
+  Result result = detect_native(transformed, std::move(options));
+  return with_public_metadata(std::move(result), "rank", public_order,
+                              cp_only);
+}
+
+Result mean(arma::mat const& data, Options options) {
+  return detect_mean(data, std::move(options));
 }
 
 Result variance(arma::mat const& data, Options options) {
-  options.family = "variance";
-  return detect(data, std::move(options));
+  return detect_variance(data, std::move(options));
 }
 
 Result meanvariance(arma::mat const& data, Options options) {
-  options.family = "meanvariance";
-  return detect(data, std::move(options));
+  return detect_meanvariance(data, std::move(options));
 }
 
 Result exponential(arma::mat const& data, Options options) {
-  options.family = "exponential";
-  return detect(data, std::move(options));
+  return detect_exponential(data, std::move(options));
 }
 
 Result gaussian(arma::mat const& data, Options options) {
+  bool const cp_only = options.cp_only;
+  arma::colvec const public_order = options.order;
   options.family = "gaussian";
-  return detect(data, std::move(options));
+  return with_public_metadata(detect_native(data, std::move(options)),
+                              "gaussian", public_order, cp_only);
+}
+
+Result lm(arma::mat const& data, Options options) {
+  return detect_lm(data, std::move(options));
+}
+Result lasso(arma::mat const& data, Options options) {
+  return detect_lasso(data, std::move(options));
+}
+Result binomial(arma::mat const& data, Options options) {
+  return detect_binomial(data, std::move(options));
+}
+Result poisson(arma::mat const& data, Options options) {
+  return detect_poisson(data, std::move(options));
+}
+Result quantile(arma::mat const& data, Options options) {
+  return detect_quantile(data, std::move(options));
+}
+Result ar(arma::colvec const& data, Options options) {
+  return detect_ar(data, std::move(options));
+}
+Result arima(arma::colvec const& data, Options options) {
+  return detect_arima(data, std::move(options));
+}
+Result var(arma::mat const& data, Options options) {
+  return detect_var(data, std::move(options));
+}
+Result mgaussian(arma::mat const& data, Options options) {
+  return detect_mgaussian(data, std::move(options));
+}
+Result rank(arma::mat const& data, Options options) {
+  return detect_rank(data, std::move(options));
 }
 
 }  // namespace fastcpd

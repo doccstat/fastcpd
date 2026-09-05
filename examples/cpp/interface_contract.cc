@@ -43,6 +43,59 @@ int main() {
     if (valid.change_points.n_elem != 1 || valid.change_points(0) != 4.0) {
       throw std::runtime_error("valid mean contract returned wrong change point");
     }
+    if (valid.family != "mean" || !valid.cp_only) {
+      throw std::runtime_error("generic result metadata is incomplete");
+    }
+
+    fastcpd::Result named_mean = fastcpd::detect_mean(data, mean_options());
+    if (named_mean.family != "mean" ||
+        !arma::approx_equal(named_mean.change_points, valid.change_points,
+                            "absdiff", 0.0)) {
+      throw std::runtime_error("detect_mean does not match generic mean");
+    }
+
+    fastcpd::Options rank_options = mean_options();
+    fastcpd::Result rank = fastcpd::detect_rank(data, rank_options);
+    if (rank.family != "rank" || rank.change_points.n_elem != 1 ||
+        rank.change_points(0) != 4.0) {
+      throw std::runtime_error("rank wrapper contract failed");
+    }
+
+    arma::colvec series = arma::linspace<arma::colvec>(1.0, 16.0, 16);
+    fastcpd::Options ar_options = mean_options();
+    ar_options.order = arma::colvec{1.0};
+    ar_options.beta = 1e6;
+    ar_options.cp_only = false;
+    fastcpd::Result ar = fastcpd::detect_ar(series, ar_options);
+    if (ar.family != "ar" || ar.residuals.n_rows != series.n_rows ||
+        !std::isnan(ar.residuals(0, 0))) {
+      throw std::runtime_error("AR lag-coordinate restoration failed");
+    }
+
+    fastcpd::Options arma_options = ar_options;
+    arma_options.order = arma::colvec{1.0, 0.0};
+    fastcpd::Result pure_ar = fastcpd::detect_arma(series, arma_options);
+    if (pure_ar.family != "arma" ||
+        !arma::approx_equal(pure_ar.change_points, ar.change_points,
+                            "absdiff", 0.0) ||
+        pure_ar.residuals.n_rows != series.n_rows) {
+      throw std::runtime_error("pure-AR ARMA routing failed");
+    }
+
+    arma::mat var_data(series.n_rows, 2);
+    var_data.col(0) = series;
+    var_data.col(1) = 2.0 * series + 1.0;
+    fastcpd::Options var_options = mean_options();
+    var_options.order = arma::colvec{1.0};
+    var_options.beta = 1e6;
+    var_options.cp_only = false;
+    var_options.variance_estimate = arma::eye<arma::mat>(2, 2);
+    fastcpd::Result var = fastcpd::detect_var(var_data, var_options);
+    if (var.family != "var" || var.residuals.n_rows != var_data.n_rows ||
+        var.residuals.n_cols != var_data.n_cols ||
+        !std::isnan(var.residuals(0, 0))) {
+      throw std::runtime_error("VAR raw-input contract failed");
+    }
 
     expect_invalid("non-finite data", [&] {
       arma::mat invalid = data;
