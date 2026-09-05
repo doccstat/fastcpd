@@ -5,8 +5,10 @@
 
 #include <cstdint>
 #include <functional>
+#include <limits>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace fastcpd {
 
@@ -63,6 +65,19 @@ struct Options {
   CostHessianFunction cost_hessian;
 };
 
+struct VarianceArmaRow {
+  unsigned int order;
+  double sigma2;
+  double aic;
+  double bic;
+};
+
+struct VarianceArmaResult {
+  std::vector<VarianceArmaRow> table;
+  double sigma2_aic;
+  double sigma2_bic;
+};
+
 Result detect(arma::mat const& data, Options options = {});
 Result detect(arma::colvec const& data, Options options = {});
 
@@ -110,6 +125,18 @@ Result mgaussian(arma::mat const& data, Options options = {});
 Result rank(arma::mat const& data, Options options = {});
 Result kernel(arma::mat const& data, Options options = {});
 Result kcp(arma::mat const& data, Options options = {});
+
+arma::mat estimate_variance_mean(arma::mat const& data);
+double estimate_variance_median(arma::mat const& data);
+arma::mat estimate_variance_linear_regression(
+    arma::mat const& data, unsigned int d = 1, unsigned int block_size = 0,
+    double outlier_iqr = std::numeric_limits<double>::infinity());
+arma::mat estimate_variance_lm(
+    arma::mat const& data, unsigned int d = 1, unsigned int block_size = 0,
+    double outlier_iqr = std::numeric_limits<double>::infinity());
+VarianceArmaResult estimate_variance_arma(arma::colvec const& data,
+                                          unsigned int p, unsigned int q,
+                                          unsigned int max_order = 0);
 
 }  // namespace fastcpd
 

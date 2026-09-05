@@ -390,7 +390,11 @@ arma::mat estimate_mean_variance(arma::mat const& data) {
 // Each block contributes an element-wise d×d estimate; means are taken
 // independently while ignoring NA values.
 arma::mat estimate_linear_regression_variance(arma::mat const& data,
-                                              unsigned int d) {
+                                              unsigned int d,
+                                              unsigned int block_size = 0,
+                                              double outlier_iqr =
+                                                  std::numeric_limits<
+                                                      double>::infinity()) {
   if (d == 0 || d > data.n_cols) {
     throw std::invalid_argument(
         "fastcpd: p_response must be between 1 and data.n_cols");
@@ -400,8 +404,12 @@ arma::mat estimate_linear_regression_variance(arma::mat const& data,
   // R's default block size is predictor_count + 1.  With no predictors the
   // regression solve is 0×0 and variance.lm() yields no usable estimates;
   // callers handle this degenerate direct-mgaussian case below.
-  unsigned int const block_size = predictor_count + 1;
-  if (predictor_count == 0 || data.n_rows <= block_size) {
+  if (block_size == 0) block_size = predictor_count + 1;
+  if (block_size == 0 || data.n_rows <= block_size) {
+    throw std::invalid_argument(
+        "fastcpd: block_size must be positive and smaller than data.n_rows");
+  }
+  if (predictor_count == 0) {
     return arma::mat(d, d, arma::fill::value(
                               std::numeric_limits<double>::quiet_NaN()));
   }
@@ -521,8 +529,7 @@ arma::mat estimate_linear_regression_variance(arma::mat const& data,
     double const q75 = quantile_type7(0.75);
     // variance.lm() defaults outlier_iqr to Inf and still evaluates the
     // threshold. Preserve R's Inf * 0 = NaN behavior for zero-IQR estimates.
-    double const threshold = q75 + std::numeric_limits<double>::infinity() *
-                                       (q75 - q25);
+    double const threshold = q75 + outlier_iqr * (q75 - q25);
     double total = 0.0;
     std::size_t retained_count = 0;
     for (double const value : scalar_estimates) {
@@ -1634,6 +1641,105 @@ Result kernel(arma::mat const& data, Options options) {
 }
 Result kcp(arma::mat const& data, Options options) {
   return detect_kcp(data, std::move(options));
+}
+
+arma::mat estimate_variance_mean(arma::mat const& data) {
+  require_finite_data(data);
+  if (data.n_rows < 2) {
+    return arma::mat(
+        data.n_cols, data.n_cols,
+        arma::fill::value(std::numeric_limits<double>::quiet_NaN()));
+  }
+  arma::mat const differences =
+      data.rows(1, data.n_rows - 1) - data.rows(0, data.n_rows - 2);
+  return differences.t() * differences /
+         (2.0 * static_cast<double>(differences.n_rows));
+}
+
+double estimate_variance_median(arma::mat const& data) {
+  require_finite_data(data);
+  if (data.n_elem < 2) return std::numeric_limits<double>::quiet_NaN();
+  double absolute_difference_sum = 0.0;
+  double const* const values = data.memptr();
+  for (arma::uword index = 1; index < data.n_elem; ++index) {
+    absolute_difference_sum += std::abs(values[index] - values[index - 1]);
+  }
+  double const mean_absolute_difference =
+      absolute_difference_sum / static_cast<double>(data.n_elem - 1);
+  double const scaled = 2.0 * mean_absolute_difference / 3.0;
+  return 2.0 * scaled * scaled;
+}
+
+arma::mat estimate_variance_linear_regression(arma::mat const& data,
+                                               unsigned int d,
+                                               unsigned int block_size,
+                                               double outlier_iqr) {
+  require_finite_data(data);
+  if (d == 0 || d > data.n_cols) {
+    throw std::invalid_argument(
+        "fastcpd: d must be between 1 and data.n_cols");
+  }
+  if (std::isnan(outlier_iqr)) {
+    throw std::invalid_argument("fastcpd: outlier_iqr must not be NaN");
+  }
+  return detail::estimate_linear_regression_variance(
+      data, d, block_size, outlier_iqr);
+}
+
+arma::mat estimate_variance_lm(arma::mat const& data, unsigned int d,
+                               unsigned int block_size, double outlier_iqr) {
+  return estimate_variance_linear_regression(data, d, block_size,
+                                              outlier_iqr);
+}
+
+VarianceArmaResult estimate_variance_arma(arma::colvec const& data,
+                                          unsigned int p, unsigned int q,
+                                          unsigned int max_order) {
+  if (data.n_elem == 0 || !data.is_finite()) {
+    throw std::invalid_argument(
+        "fastcpd: data must be non-empty and contain only finite values");
+  }
+  if (max_order == 0) max_order = p * q;
+  if (max_order == 0) {
+    throw std::invalid_argument("fastcpd: max_order must be positive");
+  }
+  if (data.n_elem <= static_cast<arma::uword>(max_order + 1u)) {
+    throw std::invalid_argument(
+        "fastcpd: data must contain more observations than max_order");
+  }
+
+  VarianceArmaResult result;
+  result.table.reserve(max_order);
+  double best_aic = std::numeric_limits<double>::infinity();
+  double best_bic = std::numeric_limits<double>::infinity();
+  result.sigma2_aic = std::numeric_limits<double>::quiet_NaN();
+  result.sigma2_bic = std::numeric_limits<double>::quiet_NaN();
+  for (unsigned int order = 1; order <= max_order; ++order) {
+    arma::mat const design = make_ar_design(data, order);
+    arma::mat const estimate = estimate_variance_linear_regression(design);
+    double const sigma2 = estimate(0, 0);
+    double aic = std::numeric_limits<double>::quiet_NaN();
+    double bic = std::numeric_limits<double>::quiet_NaN();
+    if (std::isfinite(sigma2) && sigma2 > 0.0) {
+      aic = std::log(sigma2) +
+            2.0 * static_cast<double>(order) /
+                static_cast<double>(data.n_elem);
+      bic = std::log(sigma2) +
+            static_cast<double>(order) *
+                std::log(static_cast<double>(data.n_elem)) /
+                static_cast<double>(data.n_elem);
+      if (aic < best_aic) {
+        best_aic = aic;
+        result.sigma2_aic = sigma2;
+      }
+      if (bic < best_bic) {
+        best_bic = bic;
+        result.sigma2_bic = sigma2;
+      }
+    }
+    result.table.push_back(VarianceArmaRow{order, sigma2, aic, bic});
+  }
+  return result;
 }
 
 }  // namespace fastcpd
