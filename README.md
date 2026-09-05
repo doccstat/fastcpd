@@ -9,7 +9,8 @@ coverage](https://codecov.io/gh/doccstat/fastcpd-r/branch/main/graph/badge.svg)]
 [![CRAN
 status](https://www.r-pkg.org/badges/version-last-release/fastcpd)](https://cran.r-project.org/package=fastcpd)
 [![doi](https://img.shields.io/badge/doi-10.48550/arXiv.2404.05933-green.svg)](https://doi.org/10.48550/arXiv.2404.05933)
-[![R CMD check](https://github.com/doccstat/fastcpd-r/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/doccstat/fastcpd-r/actions/workflows/check-standard.yaml)
+[![R CMD
+check](https://github.com/doccstat/fastcpd-r/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/doccstat/fastcpd-r/actions/workflows/check-standard.yaml)
 [![r-universe](https://doccstat.r-universe.dev/badges/fastcpd)](https://doccstat.r-universe.dev)
 [![Python
 version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/project/fastcpd/)
@@ -22,100 +23,127 @@ Python and standalone C++ sources are published separately in
 [`fastcpd-py`](https://github.com/doccstat/fastcpd-py) and
 [`fastcpd-cpp`](https://github.com/doccstat/fastcpd-cpp).
 
-Version 1.3.0 is the first coordinated R, Python, and standalone C++ source
-interface. Portable built-in detectors share the same native algorithms,
-defaults, seeded stochastic streams, change points, costs, parameters,
-residual layout, and supported confidence diagnostics. Formula/data-frame
-evaluation remains R-only. R closures/external pointers and C++
-`std::function` callbacks are language-native extension points, while Python
-rejects callbacks to preserve GIL-free detector execution. NumPy generator
-streams and each language's result container also remain idiomatic extensions.
-These boundaries keep the detector's compiled PELT and SEN paths free of
-cross-language callback overhead.
-
-## Three-language interface contract
-
-| Capability | R | Python | Standalone C++ |
-|---|---|---|
-| Portable built-in detectors | `detect*()` on vectors, matrices, formulas, or data frames | `detect*()` on numeric array-like inputs | `detect*()` on Armadillo vectors or matrices |
-| Deterministic numerical contract | Shared change points, costs, residuals, parameters, seeded KCP, and seeded bootstrap | Same | Same |
-| Confidence intervals | `confint()` returns an R data frame | `confint()` returns dictionaries | `confint()` returns `ConfidenceInterval` values |
-| Result ownership | S4 result retains its call and input | Frozen result retains read-only input and fit options | Lightweight result does not copy the input or fit options; pass them explicitly to `confint()` |
-| Callback extensions | R closures or compiled external pointers; callable epoch schedules | Intentionally unavailable | Native `std::function` costs and epoch schedules |
-| Compatibility aliases | R `fastcpd*()` spellings retained | Python short, `detect_*`, and `fastcpd_*` spellings retained | Canonical `detect_*` plus non-conflicting short names; `arma` and `garch` remain namespaces |
-
-The standalone C++ source can build its dependencies for an in-tree build:
-
-``` shell
-git clone https://github.com/doccstat/fastcpd-cpp.git
-cmake -S fastcpd-cpp -B fastcpd-cpp/build \
-  -DFASTCPD_FETCH_DEPENDENCIES=ON \
-  -DFASTCPD_INSTALL_CPP=OFF
-cmake --build fastcpd-cpp/build --parallel
-```
-
-Installed CMake consumers use `find_package(fastcpd CONFIG REQUIRED)` and link
-`fastcpd::fastcpd`. The installed package deliberately expects Armadillo (or
-BLAS/LAPACK for a no-wrapper build) and Abseil 20260526 to be installed
-separately; `FASTCPD_FETCH_DEPENDENCIES=ON` is a source-build convenience, not
-a dependency-bundling install mode.
-
-``` cpp
-#include <fastcpd/fastcpd.h>
-
-arma::mat data(100, 1, arma::fill::randn);
-data.rows(50, 99) += 4.0;
-fastcpd::Options fit_options;
-fit_options.beta = 5.0;
-fit_options.cost_adjustment = "BIC";
-auto result = fastcpd::detect_mean(data, fit_options);
-
-fastcpd::ConfidenceOptions interval_options;
-interval_options.method = "profile";
-interval_options.detector_options = fit_options;
-auto intervals = fastcpd::confint(result, data, interval_options);
-```
-
-<details close>
+<details>
 <summary>
-Installation
+Installation: R, Python, and C++
 </summary>
 
+R package:
+
 ``` r
-# install.packages("pak")
-pak::pak("doccstat/fastcpd-r")
-# or install from CRAN
 install.packages("fastcpd")
 ```
 
+Python package:
+
 ``` shell
-# Install the Python package from PyPI
-pip install fastcpd
+python -m pip install fastcpd
+```
+
+C++ library (requires Armadillo and Abseil 20260526 or newer):
+
+``` shell
+git clone https://github.com/doccstat/fastcpd-cpp.git
+cmake -S fastcpd-cpp -B fastcpd-cpp/build -DFASTCPD_BUILD_EXAMPLES=OFF
+cmake --build fastcpd-cpp/build --parallel
+cmake --install fastcpd-cpp/build --prefix fastcpd-install
 ```
 
 </details>
 
 ## Comparison
 
+### R
+
 ``` r
 set.seed(1)
-n <- 10^8
+n <- 10^7
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
 print(run_isolated(fastcpd::detect_mean(mean_data, cp_only = TRUE, variance_estimation = 1)))
 #>    user  system elapsed 
-#>   6.938   5.040  11.779
+#>   0.743   0.240   1.048
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 #>    user  system elapsed 
-#>   9.034   6.854  15.964
+#>   1.303   0.754   2.117
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
 #>    user  system elapsed 
-#>  31.515   6.507  38.127
+#>   3.347   0.715   4.104
 print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 #>    user  system elapsed 
-#>  44.527   2.978  47.632
+#>   4.162   0.308   4.481
 ```
 
 ![](man/figures/README-time-comparison-fastbench-1.png)<!-- -->
+
+### Python
+
+The following exact L2 PELT comparison evaluates every possible
+change-point location. `ruptures` uses SSE while `fastcpd` uses SSE/2,
+so its penalty is doubled to match the objective.
+
+``` python
+import time
+
+import numpy as np
+import ruptures as rpt
+from fastcpd import detect_mean
+
+rng = np.random.default_rng(1)
+n = 1_000
+x = np.r_[rng.normal(0, 1, n // 2), rng.normal(50, 1, n // 2)]
+
+
+def benchmark(call, times=5):
+    elapsed = []
+    result = None
+    for _ in range(times):
+        start = time.perf_counter()
+        result = call()
+        elapsed.append(time.perf_counter() - start)
+    return result, elapsed
+
+
+fastcpd_result, fastcpd_elapsed = benchmark(
+    lambda: detect_mean(
+        x,
+        beta=np.log(n),
+        cost_adjustment="BIC",
+        variance_estimation=1,
+        cp_only=True,
+    )
+)
+ruptures_result, ruptures_elapsed = benchmark(
+    lambda: rpt.Pelt(model="l2", min_size=1, jump=1)
+    .fit(x)
+    .predict(pen=2 * np.log(n))
+)
+
+results = (
+    ("fastcpd", fastcpd_result.cp_set.tolist(), fastcpd_elapsed),
+    ("ruptures", ruptures_result[:-1], ruptures_elapsed),
+)
+for name, change_points, elapsed in results:
+    points = ",".join(map(str, change_points))
+    for seconds in elapsed:
+        print(f"{name}\t{points}\t{seconds:.9f}")
+```
+
+| Package  | Change points | Median elapsed (s) |
+|:---------|--------------:|-------------------:|
+| fastcpd  |           500 |             0.0016 |
+| ruptures |           500 |             3.8267 |
+
+![](man/figures/README-time-comparison-python-plot-1.png)<!-- -->
+
+### C++
+
+The Python package uses the same standalone C++17 core. The header-only
+C++23 [`signal-kernels`](https://github.com/HarperZ9/signal-kernels)
+library also provides PELT with L1, L2, and Poisson costs, but its
+packaged CMake build is currently Windows/MSVC-only, so no like-for-like
+timing is reported. See the [`fastcpd-cpp`
+examples](https://github.com/doccstat/fastcpd-cpp/tree/main/examples/cpp)
+for native usage.
 
 ## References
 
@@ -124,78 +152,3 @@ print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 - [Sequential Gradient Descent and Quasi-Newton’s Method for
   Change-Point
   Analysis](https://proceedings.mlr.press/v206/zhang23b.html)
-
-## FAQ
-
-<details close>
-<summary>
-I countered problems related to gfortran on Mac OSX or Linux!
-</summary>
-
-The package should be able to install on Mac and any Linux distribution
-without any problems if all the dependencies are installed. However, if
-you encountered problems related to gfortran, it might be because
-`RcppArmadillo` is not installed previously. Try [Mac OSX stackoverflow
-solution](https://stackoverflow.com/a/72997915) or [Linux stackover
-solution](https://stackoverflow.com/a/15540919) if you have trouble
-installing `RcppArmadillo`.
-
-</details>
-<details close>
-<summary>
-We welcome contributions from everyone. Please follow the instructions
-below to make contributions.
-</summary>
-
-1.  Fork the repo.
-
-2.  Create a new branch from `main` branch.
-
-3.  Make changes and commit them.
-
-    1.  Please follow the [Google’s R style
-        guide](https://google.github.io/styleguide/Rguide.html) for
-        naming variables and functions.
-    2.  If you are adding a new family of models with new cost functions
-        with corresponding gradient and Hessian, please add them to
-        `src/fastcpd_class_cost.cc` with proper example and tests in
-        `vignettes/gallery.Rmd` and `tests/testthat/test-gallery.R`.
-    3.  Add the family name to `src/fastcpd_constants.h`.
-    4.  \[Recommended\] Add a new wrapper function in
-        `R/fastcpd_wrappers.R` for the new family of models and move the
-        examples to the new wrapper function as roxygen examples.
-    5.  Add the new wrapper function to the corresponding section in
-        `_pkgdown.yml`.
-
-4.  Push the changes to your fork.
-
-5.  Create a pull request.
-
-6.  Make sure the pull request does not create new warnings or errors in
-    `devtools::check()`.
-
-</details>
-<details close>
-<summary>
-Trouble installing Python package.
-</summary>
-
-Python headers are required to install the Python package. If you are
-using Ubuntu, you can install the headers with:
-
-``` shell
-sudo apt install python3-dev
-```
-
-</details>
-<details close>
-<summary>
-Encountered a bug or unintended behavior?
-</summary>
-
-1.  File a ticket at [GitHub
-    Issues](https://github.com/doccstat/fastcpd-r/issues).
-2.  Contact the authors specified in
-    [DESCRIPTION](https://github.com/doccstat/fastcpd-r/blob/main/DESCRIPTION#L5-L10).
-
-</details>
