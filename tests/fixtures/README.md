@@ -41,6 +41,8 @@ Detector rows cover `cp_set`, `raw_cp_set`, costs, residuals, and parameters;
 confidence rows cover every numeric interval column. Multivariate residuals
 are compared as conceptual `(observation, response)` matrices, independent of
 R's current flattened S4 storage and Python's native two-dimensional storage.
+The character-criterion AR rows also require dedicated AR, pure-AR ARMA, and
+pure-AR ARIMA wrappers to return identical detailed numerical results.
 
 KCP random features can put one bootstrap refit exactly at a native-math
 decision boundary. The `kcp_bootstrap` detection rate therefore permits one

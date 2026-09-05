@@ -14,6 +14,9 @@ var_step	var_step.csv	detect	-	var	1	5	BIC	0.05	1	0	1,1	-	-	-	-	40	-	1e-9
 rank_step	rank_step.csv	detect	-	rank	0	5	BIC	0.1	1	0	-	-	-	-	-	20	-	1e-12
 kcp_step	kcp_step.csv	detect	-	kcp	8,1.25	2	BIC	0	1	0	-	7	-	-	-	13	-	1e-10
 ar_step	arma_variance.csv	detect	-	ar	2	1000000	BIC	0	1	0	-	-	-	-	-	-	-	1e-8
+ar_bic	arma_variance.csv	detect	-	ar	2	BIC	BIC	0	1	0	-	-	-	-	-	-	-	1e-8
+arma_pure_ar_bic	arma_variance.csv	detect	-	arma	2,0	BIC	BIC	0	1	0	-	-	-	-	-	-	-	1e-8
+arima_pure_ar_bic	arma_variance.csv	detect	-	arima	2,0,0	BIC	BIC	0	1	0	-	-	-	-	-	-	-	1e-8
 arma_step	arma_variance.csv	detect	-	arma	1,1	1000000	BIC	0	1	0	-	-	-	-	-	-	-	1e-7
 ma_step	arma_variance.csv	detect	-	arma	0,1	1000000	BIC	0	1	0	-	-	-	-	-	-	-	1e-7
 arima_increment	arima_increment.csv	detect	-	arima	0,1,0	MBIC	BIC	0	1	0	-	-	-	-	-	41	-	1e-8
