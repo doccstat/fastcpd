@@ -2,6 +2,39 @@ testthat::test_that(
   "shared deterministic fixtures define the portable numerical contract", {
     source("examples/fastcpd_shared_fixtures.R")
 
+    expect_shared_absolute_equal <- function(
+      actual, expected, tolerance, info
+    ) {
+      actual <- as.numeric(actual)
+      expected <- as.numeric(expected)
+      testthat::expect_identical(
+        is.na(actual),
+        is.na(expected),
+        info = paste(info, "missing-value positions")
+      )
+      comparable <- !is.na(actual) & !is.na(expected)
+      if (!any(comparable)) return(invisible(actual))
+
+      differences <- ifelse(
+        actual[comparable] == expected[comparable],
+        0,
+        abs(actual[comparable] - expected[comparable])
+      )
+      worst <- which.max(differences)
+      testthat::expect_true(
+        differences[[worst]] <= tolerance,
+        info = paste0(
+          info,
+          "\nactual: ", format(actual[comparable][[worst]], digits = 17),
+          "\nexpected: ", format(expected[comparable][[worst]], digits = 17),
+          "\nabsolute difference: ",
+          format(differences[[worst]], digits = 17),
+          "\nabsolute tolerance: ", format(tolerance, digits = 17)
+        )
+      )
+      invisible(actual)
+    }
+
     expected_families <- c(
       "mean", "variance", "meanvariance", "exponential", "lm", "lasso",
       "binomial", "poisson", "quantile", "var", "rank", "kcp", "ar",
@@ -44,11 +77,11 @@ testthat::test_that(
       testthat::expect_identical(dim(actual), dim(expected), info = paste(
         row$case_id, row$field, "shape"
       ))
-      testthat::expect_equal(
+      expect_shared_absolute_equal(
         as.numeric(actual),
         as.numeric(expected),
-        tolerance = as.numeric(row$tolerance),
-        info = paste(row$case_id, row$field)
+        as.numeric(row$tolerance),
+        paste(row$case_id, row$field)
       )
     }
 
@@ -88,17 +121,17 @@ testthat::test_that(
         generic_value <- as.numeric(result$generic)
       }
 
-      testthat::expect_equal(
+      expect_shared_absolute_equal(
         direct_value,
         expected,
-        tolerance = tolerance,
-        info = case_id
+        tolerance,
+        case_id
       )
-      testthat::expect_equal(
+      expect_shared_absolute_equal(
         generic_value,
         direct_value,
-        tolerance = tolerance,
-        info = case_id
+        tolerance,
+        case_id
       )
     }
   }
