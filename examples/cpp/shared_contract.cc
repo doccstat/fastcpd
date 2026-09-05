@@ -340,7 +340,7 @@ int main(int argc, char** argv) {
       source_results.emplace(case_id, result);
       ++detector_count;
     }
-    if (detector_count != 19) {
+    if (detector_count != 22) {
       throw std::runtime_error("unexpected detector fixture count");
     }
     std::size_t confidence_count = 0;
