@@ -30,15 +30,21 @@ C++ example selects the manifest's mean detector row.
 | `level`, `B`, `window` | Confidence-method controls. |
 | `expected_cp` | One-based change points separated by `;`. |
 | `expected_value` | Expected scalar variance result. |
-| `tolerance` | Numeric comparison tolerance for `expected_value`. |
+| `tolerance` | Absolute numeric comparison tolerance for `expected_value`. |
 
 `expected_outputs.tsv` is the normalized numerical contract generated from
 the R reference implementation. Each row stores one vector or matrix field in
-row-major order, including its exact shape and comparison tolerance. Detector
-rows cover `cp_set`, `raw_cp_set`, costs, residuals, and parameters; confidence
-rows cover every numeric interval column. Multivariate residuals are compared
-as conceptual `(observation, response)` matrices, independent of R's current
-flattened S4 storage and Python's native two-dimensional storage.
+row-major order, including its exact shape and absolute comparison tolerance.
+Detector rows cover `cp_set`, `raw_cp_set`, costs, residuals, and parameters;
+confidence rows cover every numeric interval column. Multivariate residuals
+are compared as conceptual `(observation, response)` matrices, independent of
+R's current flattened S4 storage and Python's native two-dimensional storage.
+
+KCP random features can put one bootstrap refit exactly at a native-math
+decision boundary. The `kcp_bootstrap` detection rate therefore permits one
+of its `B` detection indicators to differ across operating systems, plus
+floating-point roundoff in the ratio. Its change point, interval endpoints,
+and every other fixture field remain subject to their original tolerances.
 
 `generate_fixtures.py` owns only the CSV contents. It records the deterministic
 constructions: fixed step patterns, a repeating regression-error cycle,
@@ -79,3 +85,10 @@ Regenerate and verify the stochastic tables and seeded KCP feature matrix with:
 Rscript tests/fixtures/generate_r_stochastic_fixtures.R
 Rscript tests/fixtures/generate_r_stochastic_fixtures.R --check
 ```
+
+The shared-output `--check` mode compares the current R results with the
+committed rows using their absolute tolerances, so accepted BLAS/libm
+roundoff does not rewrite the reference values. Running without `--check`
+deliberately regenerates those values from the current R environment. An
+output row may use a narrowly scoped tolerance above its manifest case's
+default when only that field needs a cross-toolchain allowance.

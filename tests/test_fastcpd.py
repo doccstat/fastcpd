@@ -662,7 +662,7 @@ def test_shared_fixture_detailed_numerical_contract(case_id):
         np.testing.assert_allclose(
             actual,
             expected,
-            rtol=tolerance,
+            rtol=0.0,
             atol=tolerance,
             equal_nan=True,
             err_msg=f'{case_id}: {field}',
@@ -756,7 +756,7 @@ def test_shared_fixture_confidence_contract(case_id):
         np.testing.assert_allclose(
             actual,
             expected,
-            rtol=tolerance,
+            rtol=0.0,
             atol=tolerance,
             equal_nan=True,
             err_msg=f'{case_id}: {field}',
@@ -809,10 +809,10 @@ def test_shared_fixture_variance_estimators_are_deterministic(case_id):
         generic_value = generic
 
     np.testing.assert_allclose(
-        direct_value, expected, rtol=tolerance, atol=tolerance
+        direct_value, expected, rtol=0.0, atol=tolerance
     )
     np.testing.assert_allclose(
-        generic_value, direct_value, rtol=tolerance, atol=tolerance
+        generic_value, direct_value, rtol=0.0, atol=tolerance
     )
 
 
