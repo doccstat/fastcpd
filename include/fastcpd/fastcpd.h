@@ -24,6 +24,9 @@ struct Result {
   arma::colvec cost_values;
   arma::mat residuals;
   arma::mat thetas;
+  std::string family;
+  arma::colvec order;
+  bool cp_only = false;
 };
 
 struct Options {
@@ -49,6 +52,7 @@ struct Options {
   arma::mat variance_estimate;
   bool warm_start = false;
   bool show_progress = false;
+  bool include_mean = false;
 
   CostFunctionPelt cost_pelt;
   CostFunctionSen cost_sen;
@@ -59,11 +63,46 @@ struct Options {
 Result detect(arma::mat const& data, Options options = {});
 Result detect(arma::colvec const& data, Options options = {});
 
+Result detect_mean(arma::mat const& data, Options options = {});
+Result detect_variance(arma::mat const& data, Options options = {});
+Result detect_meanvariance(arma::mat const& data, Options options = {});
+Result detect_mean_variance(arma::mat const& data, Options options = {});
+Result detect_exponential(arma::mat const& data, Options options = {});
+Result detect_lm(arma::mat const& data, Options options = {});
+Result detect_linear_regression(arma::mat const& data, Options options = {});
+Result detect_lasso(arma::mat const& data, Options options = {});
+Result detect_binomial(arma::mat const& data, Options options = {});
+Result detect_logistic_regression(arma::mat const& data,
+                                  Options options = {});
+Result detect_poisson(arma::mat const& data, Options options = {});
+Result detect_poisson_regression(arma::mat const& data,
+                                 Options options = {});
+Result detect_quantile(arma::mat const& data, Options options = {});
+Result detect_quantile_regression(arma::mat const& data,
+                                  Options options = {});
+Result detect_ar(arma::colvec const& data, Options options = {});
+Result detect_arma(arma::colvec const& data, Options options = {});
+Result detect_arima(arma::colvec const& data, Options options = {});
+Result detect_garch(arma::colvec const& data, Options options = {});
+Result detect_var(arma::mat const& data, Options options = {});
+Result detect_mgaussian(arma::mat const& data, Options options = {});
+Result detect_rank(arma::mat const& data, Options options = {});
+
 Result mean(arma::mat const& data, Options options = {});
 Result variance(arma::mat const& data, Options options = {});
 Result meanvariance(arma::mat const& data, Options options = {});
 Result exponential(arma::mat const& data, Options options = {});
 Result gaussian(arma::mat const& data, Options options = {});
+Result lm(arma::mat const& data, Options options = {});
+Result lasso(arma::mat const& data, Options options = {});
+Result binomial(arma::mat const& data, Options options = {});
+Result poisson(arma::mat const& data, Options options = {});
+Result quantile(arma::mat const& data, Options options = {});
+Result ar(arma::colvec const& data, Options options = {});
+Result arima(arma::colvec const& data, Options options = {});
+Result var(arma::mat const& data, Options options = {});
+Result mgaussian(arma::mat const& data, Options options = {});
+Result rank(arma::mat const& data, Options options = {});
 
 }  // namespace fastcpd
 
