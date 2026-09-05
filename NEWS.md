@@ -19,7 +19,7 @@
     variance estimators in the standalone C++ API, including the same detailed
     AR-order table and AIC/BIC selections returned by R and Python.
 *   Expand standalone C++ regression coverage from one mean-change fixture to
-    all 19 portable detector cases, comparing raw/trimmed change points, costs,
+    all 22 portable detector cases, comparing raw/trimmed change points, costs,
     residual matrices, and parameters against the R-generated contract.
 *   Add standalone C++ bootstrap and profile intervals for change points and
     Wald intervals for fitted parameters. All 13 shared confidence fixtures,
@@ -51,6 +51,10 @@
 *   Continue the same R-compatible scalar-seed stream through segment
     bootstrap resampling and seeded KCP refits, producing matching confidence
     interval endpoints and detection rates across R and Python.
+*   Skip R's unused automatic regression-variance estimate for numeric
+    Gaussian penalties, matching Python/C++ and avoiding estimator-only
+    failures on degenerate designs. Character-criterion pure-AR ARMA and ARIMA
+    calls now use the same variance scaling and detailed results as `detect_ar`.
 *   Document the three-language interface contract, including native callback
     extensions in R/C++, Python's GIL-free callback boundary, lightweight C++
     result ownership, compatibility-name differences, and the installed CMake

@@ -167,8 +167,9 @@
 #' This function will let SeGD perform parameter updates with an additional
 #' epoch for each segment with a length less than 100 and no additional epoch
 #' for segments with lengths greater or equal to 100. Callable schedules are
-#' an R-specific extension and are outside the portable R/Python/C++ contract;
-#' Python intentionally keeps detection GIL-free and accepts only
+#' native R and standalone C++ extensions outside the portable built-in
+#' numerical contract. Python intentionally keeps detection GIL-free and
+#' accepts only
 #' \code{multiple_epochs = NULL}.
 #' @param epsilon Epsilon to avoid numerical issues. Only used for the Hessian
 #' computation in Logistic Regression and Poisson Regression.
@@ -516,7 +517,7 @@ detect <- function(  # nolint: cyclomatic complexity
     variance.mean(data_)
   } else if (family == "var" || family == "lm" && p_response > 1) {
     nearest_pd_(variance.lm(data_, p_response))
-  } else if (family == "lm" || family == "ar") {
+  } else if (fastcpd_family == "gaussian" && is.character(beta)) {
     as.matrix(variance.lm(data_))
   } else {
     diag(1)
