@@ -39,9 +39,10 @@
     Rank results now report the public `rank` family and retain original
     observations in both languages, while fitted numerical details and
     confidence calculations use the same centered ranks.
-*   Keep callable `multiple_epochs` schedules as an explicit R-only extension.
-    Python rejects callbacks so the shared native detector remains GIL-free
-    and no callback dispatch is added to performance-sensitive update paths.
+*   Keep callable `multiple_epochs` schedules as native R and standalone C++
+    extensions. Python rejects callbacks so the shared native detector remains
+    GIL-free and no callback dispatch is added to performance-sensitive update
+    paths.
 *   Make scalar Python seeds reproduce R's default Mersenne-Twister,
     inversion-normal, and rejection-sampling stream for kernel random features.
     NumPy generator objects retain their native streams. Constant-valued KCP
@@ -50,6 +51,10 @@
 *   Continue the same R-compatible scalar-seed stream through segment
     bootstrap resampling and seeded KCP refits, producing matching confidence
     interval endpoints and detection rates across R and Python.
+*   Document the three-language interface contract, including native callback
+    extensions in R/C++, Python's GIL-free callback boundary, lightweight C++
+    result ownership, compatibility-name differences, and the installed CMake
+    dependency requirements.
 
 # fastcpd 1.2.2
 
