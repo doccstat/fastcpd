@@ -15,6 +15,9 @@
     seed stream, bandwidth fallback, random-feature generation order, default
     penalty, and detailed numerical output as R and Python. Random-feature
     preprocessing remains outside the mean-family PELT loop.
+*   Expose the shared Rice mean, median, block-regression, and ARMA-selection
+    variance estimators in the standalone C++ API, including the same detailed
+    AR-order table and AIC/BIC selections returned by R and Python.
 *   Expand the shared R/Python numerical contract to every portable built-in
     detector family and the common bootstrap, profile, and Wald confidence
     paths. The fixtures now compare raw and trimmed change points, segment
