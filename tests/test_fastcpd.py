@@ -217,7 +217,7 @@ class TestBasic(unittest.TestCase):
         native_result = native_fastcpd_impl(
             5.0, 'BIC', True, data, 1e-10, 'mean', np.array([1.0]),
             np.empty(0), 0.0, np.array([0.0, 0.0, 0.0]), 0, 0,
-            float('-inf'), 2, 0.0, np.empty(0), 1.0, np.eye(1), False,
+            -1e300, 2, 0.0, np.empty(0), 1.0, np.eye(1), False,
             False,
         )
         worker_ran_during_detection = worker_ran.is_set()
