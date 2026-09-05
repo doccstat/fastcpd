@@ -4,6 +4,9 @@
     1.3.0. Required CI checks all three source versions, and Python release CI
     rejects a mismatched tag, wheel filename/metadata, or sdist
     filename/metadata before publication.
+*   Validate standalone C++ data, scalar controls, bounds, line-search values,
+    regression shapes, and time-series orders before native dispatch. These
+    checks run once per fit and add no work to PELT or SEN candidate loops.
 *   Expand the shared R/Python numerical contract to every portable built-in
     detector family and the common bootstrap, profile, and Wald confidence
     paths. The fixtures now compare raw and trimmed change points, segment
