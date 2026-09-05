@@ -27,9 +27,9 @@ using a rank-based, distribution-free cost. Each column is replaced by
 its global rank centred at zero, and change points in the mean of these
 centred ranks are detected with the existing PELT infrastructure. The
 result is fully deterministic and requires no bandwidth selection.
-R stores the transformed ranks in its result data slot, while Python
-retains the original input so bootstrap refits can repeat the transform;
-fitted numerical outputs use the centred ranks in both languages.
+The result reports \code{family = "rank"} and retains the original input;
+fitted costs, residuals, parameters, and confidence calculations use the
+centred ranks in every language.
 The method is most powerful for location shifts; for scale-only or
 general distributional changes, \code{\link[=detect_kernel]{detect_kernel()}} is preferable.
 }
@@ -40,6 +40,8 @@ result_mean <- detect_mean(x)
 summary(result_mean)
 result_rank <- detect_rank(x)
 summary(result_rank)
+rank_profile <- confint(result_rank, method = "profile", window = 2)
+rank_wald <- confint(result_rank, parm = "theta", method = "wald")
 }
 \seealso{
 \code{\link[=detect]{detect()}}

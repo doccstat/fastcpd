@@ -15,8 +15,9 @@
     pre-lagged `p_response` form; multivariate-LM Wald intervals fail clearly
     in both languages; and separated-binomial Wald intervals return missing
     standard errors instead of unstable language-dependent finite values.
-    Rank result-data containers remain language-specific while all fitted
-    numerical details are computed from the same centered ranks.
+    Rank results now report the public `rank` family and retain original
+    observations in both languages, while fitted numerical details and
+    confidence calculations use the same centered ranks.
 *   Keep callable `multiple_epochs` schedules as an explicit R-only extension.
     Python rejects callbacks so the shared native detector remains GIL-free
     and no callback dispatch is added to performance-sensitive update paths.

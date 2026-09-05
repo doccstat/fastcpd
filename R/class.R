@@ -66,7 +66,7 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
   if (x@family == "custom") {
     message("Built-in plot should only work for built-in families.")
   }
-  if (x@family == "mean" && ncol(x@data) > 1) {
+  if (x@family %in% c("mean", "rank") && ncol(x@data) > 1) {
     warning("Can not plot mean change points with p > 1.")
     return()
   }
@@ -93,7 +93,7 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
   if (family %in% c("ar", "arma", "arima", "garch")) {
     y_label <-
       paste0(toupper(family), "(", paste0(x@order, collapse = ", "), ")")
-  } else if (family %in% c("mean", "variance", "meanvariance")) {
+  } else if (family %in% c("mean", "rank", "variance", "meanvariance")) {
     y_label <- "data"
   } else if (family == "quantile") {
     tau <- if (length(x@order) >= 1 && x@order[1] > 0) x@order[1] else 0.5

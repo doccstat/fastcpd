@@ -181,7 +181,7 @@ fastcpd_confint_plot_cp <- function(
       "on the `fastcpd_confint` data frame returned by `confint()`."
     )
   }
-  if (object@family == "mean" && ncol(object@data) > 1) {
+  if (object@family %in% c("mean", "rank") && ncol(object@data) > 1) {
     stop("Can not plot mean change point intervals with p > 1.")
   }
 
@@ -543,6 +543,10 @@ fastcpd_profile_cost_function <- function(object, refit_envir = parent.frame()) 
   family <- object@family
   data <- as.matrix(object@data)
   storage.mode(data) <- "double"
+  if (family == "rank") {
+    data <- apply(data, 2, rank) - (nrow(data) + 1) / 2
+    family <- "mean"
+  }
   call_variance <- fastcpd_call_variance(object, refit_envir)
 
   switch(
@@ -725,6 +729,10 @@ fastcpd_theta_se_function <- function(object) {
   family <- object@family
   data <- as.matrix(object@data)
   storage.mode(data) <- "double"
+  if (family == "rank") {
+    data <- apply(data, 2, rank) - (nrow(data) + 1) / 2
+    family <- "mean"
+  }
 
   switch(
     family,

@@ -1254,9 +1254,9 @@ fastcpd.kcp <- detect_kernel  # nolint: Conventional R function style
 #'   its global rank centred at zero, and change points in the mean of these
 #'   centred ranks are detected with the existing PELT infrastructure. The
 #'   result is fully deterministic and requires no bandwidth selection.
-#'   R stores the transformed ranks in its result data slot, while Python
-#'   retains the original input so bootstrap refits can repeat the transform;
-#'   fitted numerical outputs use the centred ranks in both languages.
+#'   The result reports `family = "rank"` and retains the original input;
+#'   fitted costs, residuals, parameters, and confidence calculations use the
+#'   centred ranks in every language.
 #'   The method is most powerful for location shifts; for scale-only or
 #'   general distributional changes, [detect_kernel()] is preferable.
 #' @example tests/testthat/examples/fastcpd_rank.R
@@ -1272,6 +1272,8 @@ detect_rank <- function(data, ...) {
     formula = ~ . - 1, data = data.frame(centered_ranks), family = "mean", ...
   )
   result@call <- match.call()
+  result@data <- data.frame(data_mat)
+  result@family <- "rank"
   result
 }
 
