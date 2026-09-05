@@ -18,13 +18,16 @@ LDLIBS += -llapack -lblas
 
 .PHONY: all clean
 
-all: mean_change
+all: mean_change interface_contract
 
 mean_change: mean_change.cc fastcpd.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< fastcpd.o -o $@ $(LDLIBS)
+
+interface_contract: interface_contract.cc fastcpd.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< fastcpd.o -o $@ $(LDLIBS)
 
 fastcpd.o: $(FASTCPD_CPP) $(FASTCPD_ROOT)/include/fastcpd/fastcpd.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(FASTCPD_CPP) -o $@
 
 clean:
-	rm -f mean_change fastcpd.o
+	rm -f mean_change interface_contract fastcpd.o

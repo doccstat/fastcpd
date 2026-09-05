@@ -50,6 +50,68 @@ bool is_pelt_family(std::string const& family) {
          family == "mgaussian" || family == "garch" || family == "arima";
 }
 
+void validate_common_options(Options const& options) {
+  auto require_finite = [](double value, char const* name) {
+    if (!std::isfinite(value)) {
+      throw std::invalid_argument(std::string("fastcpd: ") + name +
+                                  " must be finite");
+    }
+  };
+
+  if (!std::isfinite(options.trim) || options.trim < 0.0 ||
+      options.trim > 1.0) {
+    throw std::invalid_argument("fastcpd: trim must be in [0, 1]");
+  }
+  if (!std::isfinite(options.vanilla_percentage) ||
+      options.vanilla_percentage < 0.0 ||
+      options.vanilla_percentage > 1.0) {
+    throw std::invalid_argument(
+        "fastcpd: vanilla_percentage must be in [0, 1]");
+  }
+  if (options.segment_count <= 0) {
+    throw std::invalid_argument(
+        "fastcpd: segment_count must be a positive integer");
+  }
+  if (!std::isfinite(options.epsilon) || options.epsilon <= 0.0) {
+    throw std::invalid_argument("fastcpd: epsilon must be finite and positive");
+  }
+  require_finite(options.momentum_coef, "momentum_coef");
+  if (options.p < 0) {
+    throw std::invalid_argument("fastcpd: p must be non-negative");
+  }
+  if (options.beta.has_value()) require_finite(*options.beta, "beta");
+  if (options.pruning_coef.has_value()) {
+    require_finite(*options.pruning_coef, "pruning_coef");
+  }
+
+  for (double const value : options.line_search) {
+    if (!std::isfinite(value) || value <= 0.0) {
+      throw std::invalid_argument(
+          "fastcpd: line_search values must be finite and positive");
+    }
+  }
+  for (double const value : options.lower) {
+    if (std::isnan(value)) {
+      throw std::invalid_argument("fastcpd: lower must not contain NaN");
+    }
+  }
+  for (double const value : options.upper) {
+    if (std::isnan(value)) {
+      throw std::invalid_argument("fastcpd: upper must not contain NaN");
+    }
+  }
+  if (options.lower.n_elem > 0 && options.upper.n_elem > 0 &&
+      options.lower.n_elem != options.upper.n_elem) {
+    throw std::invalid_argument(
+        "fastcpd: lower and upper must have the same length");
+  }
+  if (options.lower.n_elem > 0 && options.upper.n_elem > 0 &&
+      arma::any(options.lower > options.upper)) {
+    throw std::invalid_argument(
+        "fastcpd: lower values must not exceed upper values");
+  }
+}
+
 void validate_cost_adjustment(std::string const& value) {
   if (value != "BIC" && value != "MBIC" && value != "MDL") {
     throw std::invalid_argument(
@@ -63,6 +125,95 @@ std::string normalize_family(std::string family, arma::colvec const& order) {
   if (family == "var") return "mgaussian";
   if (family == "arma" && order.n_elem >= 1 && order(0) == 0.0) return "ma";
   return family;
+}
+
+bool is_nonnegative_integer(double value) {
+  return std::isfinite(value) && value >= 0.0 && value == std::floor(value);
+}
+
+void validate_integer_order(arma::colvec const& order,
+                            arma::uword expected_length,
+                            char const* family) {
+  if (order.n_elem != expected_length) {
+    throw std::invalid_argument(std::string("fastcpd: ") + family +
+                                " order has the wrong length");
+  }
+  for (double const value : order) {
+    if (!is_nonnegative_integer(value)) {
+      throw std::invalid_argument(std::string("fastcpd: ") + family +
+                                  " order values must be non-negative integers");
+    }
+  }
+}
+
+void validate_family_input(std::string const& family, arma::mat const& data,
+                           arma::colvec const& order,
+                           unsigned int p_response) {
+  if (!data.is_finite()) {
+    throw std::invalid_argument(
+        "fastcpd: data must contain only finite values");
+  }
+  bool const regression_family =
+      family == "gaussian" || family == "lasso" || family == "binomial" ||
+      family == "poisson" || family == "quantile";
+  if (regression_family && data.n_cols < 2) {
+    throw std::invalid_argument(
+        "fastcpd: regression data must include predictors");
+  }
+  if (family == "mgaussian") {
+    if (p_response == 0 || p_response >= data.n_cols) {
+      throw std::invalid_argument(
+          "fastcpd: mgaussian requires p_response leading response columns "
+          "and at least one predictor column");
+    }
+  } else if (p_response > data.n_cols) {
+    throw std::invalid_argument(
+        "fastcpd: p_response must not exceed data.n_cols");
+  }
+
+  if (family == "arma") {
+    validate_integer_order(order, 2, "ARMA");
+    if (order(0) == 0.0) {
+      throw std::invalid_argument(
+          "fastcpd: ARMA order must have a positive AR component after "
+          "normalization");
+    }
+  } else if (family == "ma") {
+    validate_integer_order(order, 2, "MA");
+    if (order(0) != 0.0 || order(1) <= 0.0) {
+      throw std::invalid_argument(
+          "fastcpd: MA order must be (0, q), with q positive");
+    }
+  } else if (family == "garch") {
+    validate_integer_order(order, 2, "GARCH");
+    if (order(0) == 0.0 && order(1) == 0.0) {
+      throw std::invalid_argument(
+          "fastcpd: GARCH order must contain a non-zero value");
+    }
+  } else if (family == "arima") {
+    validate_integer_order(order, 3, "ARIMA");
+    if (arma::all(order == 0.0)) {
+      throw std::invalid_argument(
+          "fastcpd: ARIMA order must contain a non-zero value");
+    }
+    if (order(1) >= static_cast<double>(data.n_rows)) {
+      throw std::invalid_argument(
+          "fastcpd: ARIMA integration order must be smaller than data.n_rows");
+    }
+  } else if (family == "quantile") {
+    if (order.n_elem != 1 || !std::isfinite(order(0)) || order(0) <= 0.0 ||
+        order(0) >= 1.0) {
+      throw std::invalid_argument(
+          "fastcpd: quantile order must contain one value in (0, 1)");
+    }
+  }
+
+  if ((family == "arma" || family == "ma" || family == "garch" ||
+       family == "arima") &&
+      data.n_cols != 1) {
+    throw std::invalid_argument(std::string("fastcpd: ") + family +
+                                " data must be univariate");
+  }
 }
 
 double order_at(arma::colvec const& order, arma::uword index,
@@ -660,17 +811,16 @@ Result detect(arma::mat const& data, Options options) {
   if (data.n_rows == 0 || data.n_cols == 0) {
     throw std::invalid_argument("fastcpd: data must be a non-empty matrix");
   }
+  detail::validate_common_options(options);
   detail::validate_cost_adjustment(options.cost_adjustment);
   std::string const family =
       detail::normalize_family(options.family, options.order);
   detail::validate_custom_options(options, family);
 
   arma::colvec const order = options.order;
+  detail::validate_family_input(family, data, order, options.p_response);
   int const p = detail::compute_p(family, data, order, options.p_response,
                                   options.p);
-  if (family == "arima" && data.n_cols != 1) {
-    throw std::invalid_argument("fastcpd: ARIMA data must be univariate");
-  }
   if (p <= 0) {
     throw std::invalid_argument(
         "fastcpd: inferred p must be positive; pass Options::p explicitly");
@@ -686,6 +836,10 @@ Result detect(arma::mat const& data, Options options) {
       options.lower, p, -std::numeric_limits<double>::infinity(), "lower");
   arma::colvec const upper = detail::fill_or_validate_bound(
       options.upper, p, std::numeric_limits<double>::infinity(), "upper");
+  if (arma::any(lower > upper)) {
+    throw std::invalid_argument(
+        "fastcpd: lower values must not exceed upper values");
+  }
   arma::mat const variance_estimate =
       detail::resolve_variance_estimate(options, data, family);
 

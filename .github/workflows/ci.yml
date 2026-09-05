@@ -54,10 +54,11 @@ jobs:
           -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/abseil"
           -DFASTCPD_BUILD_EXAMPLES=ON
 
-      - name: Build and run CMake example
+      - name: Build and run CMake examples
         run: |
-          cmake --build build --target fastcpd_mean_change --parallel 2
+          cmake --build build --target fastcpd_mean_change fastcpd_interface_contract --parallel 2
           ./build/fastcpd_mean_change
+          ./build/fastcpd_interface_contract
 
       - name: Validate CMake installation
         run: cmake --install build --prefix "$RUNNER_TEMP/fastcpd-install"
@@ -66,3 +67,4 @@ jobs:
         run: |
           make -C examples/cpp clean all ABSL_INCLUDE="$RUNNER_TEMP/abseil/include"
           ./examples/cpp/mean_change
+          ./examples/cpp/interface_contract

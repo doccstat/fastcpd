@@ -22,6 +22,9 @@ include(cmake/FastcpdTarget.cmake)
 if(FASTCPD_BUILD_EXAMPLES)
   add_executable(fastcpd_mean_change examples/cpp/mean_change.cc)
   target_link_libraries(fastcpd_mean_change PRIVATE fastcpd::fastcpd)
+
+  add_executable(fastcpd_interface_contract examples/cpp/interface_contract.cc)
+  target_link_libraries(fastcpd_interface_contract PRIVATE fastcpd::fastcpd)
 endif()
 
 if(FASTCPD_INSTALL_CPP)
