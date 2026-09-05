@@ -7,6 +7,10 @@
 *   Validate standalone C++ data, scalar controls, bounds, line-search values,
     regression shapes, and time-series orders before native dispatch. These
     checks run once per fit and add no work to PELT or SEN candidate loops.
+*   Add canonical standalone C++ `detect_*` wrappers for portable built-in
+    families. Raw AR and VAR preprocessing, pure-AR ARMA/ARIMA routing, rank
+    transformation, original-coordinate change points/residuals, and public
+    family/order metadata now match the R and Python contracts.
 *   Expand the shared R/Python numerical contract to every portable built-in
     detector family and the common bootstrap, profile, and Wald confidence
     paths. The fixtures now compare raw and trimmed change points, segment
