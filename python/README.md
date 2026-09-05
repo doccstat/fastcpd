@@ -28,10 +28,11 @@ Version 1.3.0 is the first source interface coordinated with the R and
 standalone C++ packages. Portable built-in detectors share native algorithms,
 defaults, seeded scalar-randomness behavior, change points, costs, parameters,
 residual layout, and supported confidence diagnostics. R formulas,
-data frames, custom callbacks, and callable epoch schedules are explicit
-R-only extensions; NumPy generator streams and the immutable `CpdResult`
-container are Python-native extensions. The compiled detector remains GIL-free
-and does not dispatch language callbacks from its PELT or SEN update paths.
+and data frames are R-only. R and standalone C++ provide native callback
+extension mechanisms, while Python deliberately omits callbacks. NumPy
+generator streams and the immutable `CpdResult` container are Python-native
+extensions. The compiled detector remains GIL-free and does not dispatch
+language callbacks from its PELT or SEN update paths.
 
 As in R, generic `detect(..., family=...)` accepts `family="kcp"`; the
 `rank` and `kernel` spellings are wrapper-only, through `detect_rank()` and
@@ -41,13 +42,14 @@ Python does not expose the removed R `fastcpd_ts()` umbrella. Use
 `detect(data=..., family=...)` or a family-specific wrapper such as
 `detect_ar()` directly.
 
-Custom cost callbacks are intentionally R-only. R can accept ordinary R
-functions or compiled external pointers, while the Python binding keeps the
-detector on the GIL-free built-in native path and does not define a callback
-ABI.
+Custom cost callbacks are unavailable in Python. R accepts ordinary functions
+or compiled external pointers, and standalone C++ accepts `std::function`
+callbacks. The Python binding keeps the detector on the GIL-free built-in
+native path and does not define a callback ABI.
 
-Callable `multiple_epochs` schedules are also R-only. Invoking a Python
-callback from native per-segment updates would require reacquiring the GIL in
+Callable `multiple_epochs` schedules are likewise unavailable in Python, while
+R and standalone C++ expose native callback types. Invoking a Python callback
+from native per-segment updates would require reacquiring the GIL in
 performance-sensitive execution. Python therefore accepts only
 `multiple_epochs=None`; a future portable schedule would need a declarative
 native representation rather than a language callback.

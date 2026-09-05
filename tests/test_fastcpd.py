@@ -317,10 +317,10 @@ class TestBasic(unittest.TestCase):
         with self.assertRaisesRegex(TypeError, "unexpected keyword"):
             detect_mean(np.arange(10), unknown_option=True)
         with self.assertRaisesRegex(
-            NotImplementedError, "intentionally R-only"
+            NotImplementedError, "unavailable in Python"
         ):
             detect_mean(np.arange(10), multiple_epochs=lambda _: 1)
-        with self.assertRaisesRegex(NotImplementedError, "intentionally R-only"):
+        with self.assertRaisesRegex(NotImplementedError, "unavailable in Python"):
             detect(
                 data=np.arange(10), family='custom',
                 cost=lambda segment: float(np.sum(segment)),

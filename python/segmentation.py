@@ -1039,10 +1039,11 @@ def detect(
         segment_count: Initial guess for number of segments.
         trim: Trimming proportion for boundary change points.
         momentum_coef: Momentum coefficient for parameter updates.
-        multiple_epochs: R-only callback schedule. Python intentionally
-            accepts only ``None`` because dispatching a Python callback from
-            native per-segment updates would break the GIL-free detector
-            contract and add overhead to performance-sensitive fits.
+        multiple_epochs: Callback schedule unavailable in Python. R and
+            standalone C++ expose native callback types; Python accepts only
+            ``None`` because dispatching a Python callback from native
+            per-segment updates would break the GIL-free detector contract and
+            add overhead to performance-sensitive fits.
         epsilon: Epsilon for numerical stability.
         order: Model order. ARMA uses ``(p, q)`` and ARIMA uses ``(p, d, q)``.
         include_mean: Must be False for ARIMA. For other families this
@@ -1093,8 +1094,8 @@ def detect(
         raise ValueError("data must be provided")
     if multiple_epochs is not None:
         raise NotImplementedError(
-            "Callable multiple_epochs schedules are intentionally R-only; "
-            "the Python binding preserves a GIL-free native detector path."
+            "Callable multiple_epochs schedules are unavailable in Python; "
+            "the binding preserves a GIL-free native detector path."
         )
 
     # Snapshot the user-facing input before constructing lagged designs.  The
@@ -1154,8 +1155,8 @@ def detect(
     if (raw_family == 'custom' or cost is not None or
             cost_gradient is not None or cost_hessian is not None):
         raise NotImplementedError(
-            "Custom cost callbacks are intentionally R-only; the Python "
-            "binding supports the built-in native families only."
+            "Custom cost callbacks are unavailable in Python; the binding "
+            "supports the built-in native families only."
         )
     if raw_family not in _SUPPORTED_FAMILIES:
         raise ValueError(

@@ -41,8 +41,8 @@ bootstrap parity. Passing a NumPy `Generator` or `RandomState` keeps native
 NumPy semantics.
 
 Python continues to reject callable custom costs and `multiple_epochs`
-schedules. These callbacks are R-specific extensions; omitting them preserves
-the GIL-free native detector path.
+schedules. R and standalone C++ expose language-native callback extensions;
+omitting a Python callback ABI preserves the GIL-free native detector path.
 
 ## Static typing
 

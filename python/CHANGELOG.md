@@ -18,8 +18,9 @@ This is the first coordinated R, Python, and standalone C++ source contract.
   `family="mgaussian"` for a constructed response/predictor matrix.
 - Multivariate-LM Wald intervals are explicitly unsupported, and complete
   binomial separation returns undefined (`NaN`) Wald uncertainty.
-- Callable custom costs and `multiple_epochs` schedules remain R-only so the
-  Python detector stays GIL-free.
+- Callable custom costs and `multiple_epochs` schedules remain unavailable in
+  Python so its detector stays GIL-free; R and standalone C++ retain their
+  native callback extension mechanisms.
 - Public reference pages include executable examples. The package no longer
   ships `py.typed`; runtime annotations are not yet a complete static typing
   contract.

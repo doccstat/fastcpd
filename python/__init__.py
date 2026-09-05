@@ -44,9 +44,10 @@ Variance helpers follow the same convention: use `estimate_variance_*` (or
 the shorter `variance_*` aliases) to obtain the model-specific variance
 estimate used by a detector.
 
-Custom cost callbacks are intentionally R-only; the Python binding supports
-the built-in native families and keeps their execution GIL-free. Pure MA models
-are accessible via ``arma(data, order=(0, q))`` or
+Custom cost callbacks are unavailable in Python; R and standalone C++ retain
+their native callback extensions, while the Python binding supports built-in
+families and keeps their execution GIL-free. Pure MA models are accessible via
+``arma(data, order=(0, q))`` or
 ``arima(data, order=(0, 0, q))``. ARIMA differences candidate segments
 independently, returns original-series change-point indices, and uses the same
 zero-mean native likelihood in R and Python.
