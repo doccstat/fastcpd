@@ -1,7 +1,7 @@
 # Shared fastcpd fixtures
 
-This directory contains deterministic, language-neutral inputs used by the R
-and Python test suites and by the standalone C++ mean-change example. Decimal
+This directory contains deterministic, language-neutral inputs used by the R,
+Python, and standalone C++ contract suites. Decimal
 values are committed directly so every language evaluates the same data
 without depending on an R or NumPy random-number stream.
 
@@ -9,8 +9,9 @@ without depending on an R or NumPy random-number stream.
 each operation, its input CSV, its public arguments, and its expected result.
 Use `-` where a field does not apply. Detector rows cover every portable
 built-in family, and confidence rows refer to their fitted detector through
-`source_case`. The R and Python suites parse the same rows independently; the
-C++ example selects the manifest's mean detector row.
+`source_case`. The R and Python suites parse the same rows independently. The
+C++ suite dispatches every detector row and compares every detailed result;
+its interface contract also checks every variance-estimator row.
 
 | column | meaning |
 | --- | --- |
