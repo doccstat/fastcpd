@@ -26,10 +26,55 @@ Version 1.3.0 is the first coordinated R, Python, and standalone C++ source
 interface. Portable built-in detectors share the same native algorithms,
 defaults, seeded stochastic streams, change points, costs, parameters,
 residual layout, and supported confidence diagnostics. Formula/data-frame
-evaluation, custom callbacks, and callable epoch schedules remain R-only;
-NumPy generator streams and Python's immutable result container remain
-language-native extensions. These boundaries keep the detector's compiled
-PELT and SEN paths free of cross-language callback overhead.
+evaluation remains R-only. R closures/external pointers and C++
+`std::function` callbacks are language-native extension points, while Python
+rejects callbacks to preserve GIL-free detector execution. NumPy generator
+streams and each language's result container also remain idiomatic extensions.
+These boundaries keep the detector's compiled PELT and SEN paths free of
+cross-language callback overhead.
+
+## Three-language interface contract
+
+| Capability | R | Python | Standalone C++ |
+|---|---|---|
+| Portable built-in detectors | `detect*()` on vectors, matrices, formulas, or data frames | `detect*()` on numeric array-like inputs | `detect*()` on Armadillo vectors or matrices |
+| Deterministic numerical contract | Shared change points, costs, residuals, parameters, seeded KCP, and seeded bootstrap | Same | Same |
+| Confidence intervals | `confint()` returns an R data frame | `confint()` returns dictionaries | `confint()` returns `ConfidenceInterval` values |
+| Result ownership | S4 result retains its call and input | Frozen result retains read-only input and fit options | Lightweight result does not copy the input or fit options; pass them explicitly to `confint()` |
+| Callback extensions | R closures or compiled external pointers; callable epoch schedules | Intentionally unavailable | Native `std::function` costs and epoch schedules |
+| Compatibility aliases | R `fastcpd*()` spellings retained | Python short, `detect_*`, and `fastcpd_*` spellings retained | Canonical `detect_*` plus non-conflicting short names; `arma` and `garch` remain namespaces |
+
+The standalone C++ source can build its dependencies for an in-tree build:
+
+``` shell
+git clone https://github.com/doccstat/fastcpd-cpp.git
+cmake -S fastcpd-cpp -B fastcpd-cpp/build \
+  -DFASTCPD_FETCH_DEPENDENCIES=ON \
+  -DFASTCPD_INSTALL_CPP=OFF
+cmake --build fastcpd-cpp/build --parallel
+```
+
+Installed CMake consumers use `find_package(fastcpd CONFIG REQUIRED)` and link
+`fastcpd::fastcpd`. The installed package deliberately expects Armadillo (or
+BLAS/LAPACK for a no-wrapper build) and Abseil 20260526 to be installed
+separately; `FASTCPD_FETCH_DEPENDENCIES=ON` is a source-build convenience, not
+a dependency-bundling install mode.
+
+``` cpp
+#include <fastcpd/fastcpd.h>
+
+arma::mat data(100, 1, arma::fill::randn);
+data.rows(50, 99) += 4.0;
+fastcpd::Options fit_options;
+fit_options.beta = 5.0;
+fit_options.cost_adjustment = "BIC";
+auto result = fastcpd::detect_mean(data, fit_options);
+
+fastcpd::ConfidenceOptions interval_options;
+interval_options.method = "profile";
+interval_options.detector_options = fit_options;
+auto intervals = fastcpd::confint(result, data, interval_options);
+```
 
 <details close>
 <summary>
