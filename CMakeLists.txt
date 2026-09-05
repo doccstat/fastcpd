@@ -25,6 +25,9 @@ if(FASTCPD_BUILD_EXAMPLES)
 
   add_executable(fastcpd_interface_contract examples/cpp/interface_contract.cc)
   target_link_libraries(fastcpd_interface_contract PRIVATE fastcpd::fastcpd)
+
+  add_executable(fastcpd_shared_contract examples/cpp/shared_contract.cc)
+  target_link_libraries(fastcpd_shared_contract PRIVATE fastcpd::fastcpd)
 endif()
 
 if(FASTCPD_INSTALL_CPP)
