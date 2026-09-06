@@ -19,6 +19,7 @@
 
 # Developer / tooling files not needed in the CRAN tarball.
 ^AGENTS\.md$
+^tools/readme-comparison$
 ^CLAUDE\.md$
 ^\.claude$
 ^prof\.out$
