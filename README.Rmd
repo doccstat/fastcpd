@@ -145,23 +145,76 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 
 ### Python
 
-```{python time-comparison-python, eval=FALSE, python.reticulate=FALSE}
+```{python time-comparison-python-single, eval=FALSE, python.reticulate=FALSE}
+import time
+
+import fastcpd
 import numpy as np
-import ruptures as rpt
-from fastcpd import detect_mean
-from sdt.changepoint import Pelt as SdtPelt
-from skchange.detectors import PELT
-from skchange.interval_scorers import L2Cost
+import ruptures
+import sdt
+import sdt.changepoint
+import skchange
+import skchange.detectors
+import skchange.interval_scorers
 
 rng = np.random.default_rng(1)
-n = 1_000
+n = int(1e6)
 x = np.r_[rng.normal(0, 1, n // 2), rng.normal(50, 1, n // 2)]
+step = 10_000
 
+start = time.perf_counter()
+fastcpd.detect_mean(x, variance_estimation=1, cp_only=True)
+print(f"fastcpd: {time.perf_counter() - start:.3f} s")
 
-benchmark("fastcpd", lambda: detect_mean(x, variance_estimation=1, cp_only=True))
-benchmark("skchange", lambda: PELT(cost=L2Cost(), penalty=2 * np.log(n), min_segment_length=1).fit_predict(x.reshape(-1, 1)))
-benchmark("sdt-python", lambda: SdtPelt(cost="l2", min_size=1, jump=1).find_changepoints(x, penalty=2 * np.log(n)))
-benchmark("ruptures", lambda: rpt.Pelt(model="l2", min_size=1, jump=1).fit(x).predict(pen=2 * np.log(n)))
+start = time.perf_counter()
+skchange.detectors.PELT(
+    cost=skchange.interval_scorers.L2Cost(), penalty=2 * np.log(n), step_size=step
+).fit_predict(x.reshape(-1, 1))
+print(f"skchange: {time.perf_counter() - start:.3f} s")
+
+start = time.perf_counter()
+sdt.changepoint.Pelt(cost="l2", min_size=step, jump=step).find_changepoints(
+    x, penalty=2 * np.log(n)
+)
+print(f"sdt-python: {time.perf_counter() - start:.3f} s")
+
+start = time.perf_counter()
+ruptures.Pelt(model="l2", min_size=step, jump=step).fit(x).predict(
+    pen=2 * np.log(n)
+)
+print(f"ruptures: {time.perf_counter() - start:.3f} s")
+```
+
+```{python time-comparison-python, eval=FALSE, include=FALSE, python.reticulate=FALSE}
+import fastcpd
+import numpy as np
+import ruptures
+import sdt
+import sdt.changepoint
+import skchange
+import skchange.detectors
+import skchange.interval_scorers
+
+rng = np.random.default_rng(1)
+n = int(1e6)
+x = np.r_[rng.normal(0, 1, n // 2), rng.normal(50, 1, n // 2)]
+step = 10_000
+
+benchmark("fastcpd", lambda: fastcpd.detect_mean(x, variance_estimation=1, cp_only=True))
+benchmark("skchange", lambda: skchange.detectors.PELT(cost=skchange.interval_scorers.L2Cost(), penalty=2 * np.log(n), step_size=step).fit_predict(x.reshape(-1, 1)))
+benchmark("sdt-python", lambda: sdt.changepoint.Pelt(cost="l2", min_size=step, jump=step).find_changepoints(x, penalty=2 * np.log(n)))
+benchmark("ruptures", lambda: ruptures.Pelt(model="l2", min_size=step, jump=step).fit(x).predict(pen=2 * np.log(n)))
+```
+
+```{r time-comparison-python-single-run, echo=FALSE}
+python_executable <- Sys.getenv("FASTCPD_README_PYTHON", unset = Sys.which("python3"))
+if (!nzchar(python_executable)) stop("Set FASTCPD_README_PYTHON to a Python with fastcpd and comparison packages")
+python_script <- tempfile(fileext = ".py")
+writeLines(unlist(knitr::knit_code$get("time-comparison-python-single"), use.names = FALSE), python_script)
+python_output <- system2(python_executable, python_script, stdout = TRUE, stderr = TRUE)
+unlink(python_script)
+if (!is.null(attr(python_output, "status")) && attr(python_output, "status") != 0) stop(paste(python_output, collapse = "\n"))
+cat(paste(python_output, collapse = "\n"))
 ```
 
 ```{python time-comparison-python-helper, eval=FALSE, include=FALSE, python.reticulate=FALSE}
@@ -170,7 +223,7 @@ import time
 
 def benchmark(name, call):
     call()  # Warm up imports and Numba compilation before timing.
-    for _ in range(10):
+    for _ in range(3):
         start = time.perf_counter()
         result = call()
         seconds = time.perf_counter() - start
@@ -181,8 +234,7 @@ def benchmark(name, call):
         else:
             change_points = result.tolist()
         assert change_points == [n // 2]
-        points = ",".join(map(str, change_points))
-        print(f"{name}\t{points}\t{seconds:.9f}")
+        print(f"{name}\t{seconds:.9f}")
 ```
 
 ```{r time-comparison-python-run, include=FALSE}
@@ -213,7 +265,7 @@ if (!is.null(python_status) && python_status != 0) {
 python_benchmark <- utils::read.delim(
   text = paste(python_output, collapse = "\n"),
   header = FALSE,
-  col.names = c("algorithm", "change_points", "elapsed_s"),
+  col.names = c("algorithm", "elapsed_s"),
   stringsAsFactors = FALSE
 )
 python_benchmark$algorithm <- factor(
