@@ -320,10 +320,85 @@ class TestBasic(unittest.TestCase):
             NotImplementedError, "unavailable in Python"
         ):
             detect_mean(np.arange(10), multiple_epochs=lambda _: 1)
-        with self.assertRaisesRegex(NotImplementedError, "unavailable in Python"):
+        with self.assertRaisesRegex(ValueError, "requires a cost callback"):
+            detect(data=np.arange(10), family='custom')
+        with self.assertRaisesRegex(ValueError, "only accepted"):
+            detect_mean(
+                np.arange(10), cost=lambda segment: float(np.sum(segment))
+            )
+        with self.assertRaisesRegex(ValueError, "two-argument SEN"):
             detect(
                 data=np.arange(10), family='custom',
-                cost=lambda segment: float(np.sum(segment)),
+                cost=lambda segment, theta: float(np.sum(segment)),
+            )
+
+    def test_custom_pelt_cost_callback(self):
+        data = np.concatenate([np.zeros(30), np.full(30, 5.0)])
+        calls = []
+
+        def cost(segment):
+            calls.append(segment.shape)
+            centered = segment - segment.mean(axis=0)
+            return float(np.sum(centered * centered) / 2.0)
+
+        result = detect(
+            data=data, family='custom', cost=cost, beta=5.0,
+            cost_adjustment='BIC', cp_only=True,
+        )
+        np.testing.assert_array_equal(result.cp_set, [30])
+        self.assertGreater(len(calls), 0)
+        self.assertTrue(all(len(shape) == 2 for shape in calls))
+        self.assertIs(result.fit_kwargs['cost'], cost)
+
+    def test_custom_sen_callbacks(self):
+        data = np.concatenate([np.zeros(20), np.full(20, 4.0)])
+        calls = {'cost': 0, 'gradient': 0, 'hessian': 0}
+
+        def cost(segment, theta):
+            calls['cost'] += 1
+            residual = segment[:, 0] - theta[0]
+            return float(np.sum(residual * residual) / 2.0)
+
+        def gradient(segment, theta):
+            calls['gradient'] += 1
+            residual = segment[-1, 0] - theta[0]
+            return np.array([-residual])
+
+        def hessian(segment, theta):
+            calls['hessian'] += 1
+            return np.array([[1.0]])
+
+        result = detect(
+            data=data, family='custom', cost=cost,
+            cost_gradient=gradient, cost_hessian=hessian,
+            beta=2.0, cost_adjustment='BIC', cp_only=True,
+            epsilon=1e-5,
+        )
+        self.assertIsInstance(result, segmentation.CpdResult)
+        self.assertGreater(calls['cost'], 0)
+        self.assertGreater(calls['gradient'], 0)
+        self.assertGreater(calls['hessian'], 0)
+        self.assertIs(result.fit_kwargs['cost_gradient'], gradient)
+
+    def test_custom_callback_shape_and_exception_validation(self):
+        data = np.concatenate([np.zeros(8), np.ones(8)])
+
+        with self.assertRaisesRegex(ValueError, "returned 2 values"):
+            detect(
+                data=data, family='custom',
+                cost=lambda segment, theta: float(np.sum(segment)),
+                cost_gradient=lambda segment, theta: np.array([1.0, 2.0]),
+                cost_hessian=lambda segment, theta: np.eye(1),
+                p=1, beta=2.0, cp_only=True,
+            )
+
+        def failing_cost(segment):
+            raise RuntimeError('custom callback failed')
+
+        with self.assertRaisesRegex(RuntimeError, 'custom callback failed'):
+            detect(
+                data=data, family='custom', cost=failing_cost,
+                beta=2.0, cp_only=True,
             )
 
     def test_quantile_interface(self):

@@ -23,16 +23,17 @@ print(result.cp_set)
 The public API includes mean, variance, mean/variance, exponential, VAR,
 linear, lasso, binomial, Poisson, quantile, GARCH, AR, ARMA, and ARIMA change
 detection, plus rank and kernel transforms.
+The generic detector also accepts Python custom cost callbacks.
 
 Version 1.3.0 is the first source interface coordinated with the R and
 standalone C++ packages. Portable built-in detectors share native algorithms,
 defaults, seeded scalar-randomness behavior, change points, costs, parameters,
-residual layout, and supported confidence diagnostics. R formulas,
-and data frames are R-only. R and standalone C++ provide native callback
-extension mechanisms, while Python deliberately omits callbacks. NumPy
-generator streams and the immutable `CpdResult` container are Python-native
-extensions. The compiled detector remains GIL-free and does not dispatch
-language callbacks from its PELT or SEN update paths.
+residual layout, and supported confidence diagnostics. R formulas and data
+frames are R-only. Each language exposes its own custom-cost adapter: R
+accepts functions and compiled external pointers, C++ accepts `std::function`,
+and Python accepts callables. NumPy generator streams and the immutable
+`CpdResult` container are Python-native extensions. Built-in Python detectors
+remain GIL-free; custom-cost calls reacquire the GIL around the callback.
 
 As in R, generic `detect(..., family=...)` accepts `family="kcp"`; the
 `rank` and `kernel` spellings are wrapper-only, through `detect_rank()` and
@@ -42,17 +43,32 @@ Python does not expose the removed R `fastcpd_ts()` umbrella. Use
 `detect(data=..., family=...)` or a family-specific wrapper such as
 `detect_ar()` directly.
 
-Custom cost callbacks are unavailable in Python. R accepts ordinary functions
-or compiled external pointers, and standalone C++ accepts `std::function`
-callbacks. The Python binding keeps the detector on the GIL-free built-in
-native path and does not define a callback ABI.
+Custom costs are supported through `family="custom"`. A one-argument
+`cost(segment)` callback supplies a PELT segment cost. A two-argument
+`cost(segment, theta)` callback supplies a SEN cost and must be paired with
+`cost_gradient(segment, theta)` and `cost_hessian(segment, theta)`. Callbacks
+receive a two-dimensional NumPy segment array; the gradient is a vector and
+the Hessian is a square matrix. Callback execution reacquires the GIL, while
+built-in detector families retain the GIL-free native path.
 
-Callable `multiple_epochs` schedules are likewise unavailable in Python, while
-R and standalone C++ expose native callback types. Invoking a Python callback
-from native per-segment updates would require reacquiring the GIL in
-performance-sensitive execution. Python therefore accepts only
-`multiple_epochs=None`; a future portable schedule would need a declarative
-native representation rather than a language callback.
+```python
+from fastcpd import detect
+
+def squared_error(segment):
+    centered = segment - segment.mean(axis=0)
+    return float((centered * centered).sum() / 2)
+
+result = detect(data, family="custom", cost=squared_error, beta=5)
+```
+
+Custom callbacks are reused for bootstrap refits through the stored
+`CpdResult.fit_kwargs`; generic profile and Wald intervals remain unavailable
+because their likelihood-specific calculations cannot be inferred from an
+arbitrary callback.
+
+Callable `multiple_epochs` schedules remain unavailable in Python, while R and
+standalone C++ expose native callback types. Python accepts only
+`multiple_epochs=None` for this separate callback schedule.
 
 `detect_var(data, order=p)` accepts the raw multivariate time series and
 constructs its lagged VAR design internally, matching the R interface. For an
