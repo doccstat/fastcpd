@@ -158,9 +158,8 @@ import skchange.detectors
 import skchange.interval_scorers
 
 rng = np.random.default_rng(1)
-n = int(1e6)
+n = int(1e4)
 x = np.r_[rng.normal(0, 1, n // 2), rng.normal(50, 1, n // 2)]
-step = 10_000
 
 start = time.perf_counter()
 fastcpd.detect_mean(x, variance_estimation=1, cp_only=True)
@@ -168,18 +167,18 @@ print(f"fastcpd: {time.perf_counter() - start:.3f} s")
 
 start = time.perf_counter()
 skchange.detectors.PELT(
-    cost=skchange.interval_scorers.L2Cost(), penalty=2 * np.log(n), step_size=step
+    cost=skchange.interval_scorers.L2Cost(), penalty=2 * np.log(n), step_size=1
 ).fit_predict(x.reshape(-1, 1))
 print(f"skchange: {time.perf_counter() - start:.3f} s")
 
 start = time.perf_counter()
-sdt.changepoint.Pelt(cost="l2", min_size=step, jump=step).find_changepoints(
+sdt.changepoint.Pelt(cost="l2", min_size=1, jump=1).find_changepoints(
     x, penalty=2 * np.log(n)
 )
 print(f"sdt-python: {time.perf_counter() - start:.3f} s")
 
 start = time.perf_counter()
-ruptures.Pelt(model="l2", min_size=step, jump=step).fit(x).predict(
+ruptures.Pelt(model="l2", min_size=1, jump=1).fit(x).predict(
     pen=2 * np.log(n)
 )
 print(f"ruptures: {time.perf_counter() - start:.3f} s")
@@ -196,14 +195,13 @@ import skchange.detectors
 import skchange.interval_scorers
 
 rng = np.random.default_rng(1)
-n = int(1e6)
+n = int(1e4)
 x = np.r_[rng.normal(0, 1, n // 2), rng.normal(50, 1, n // 2)]
-step = 10_000
 
 benchmark("fastcpd", lambda: fastcpd.detect_mean(x, variance_estimation=1, cp_only=True))
-benchmark("skchange", lambda: skchange.detectors.PELT(cost=skchange.interval_scorers.L2Cost(), penalty=2 * np.log(n), step_size=step).fit_predict(x.reshape(-1, 1)))
-benchmark("sdt-python", lambda: sdt.changepoint.Pelt(cost="l2", min_size=step, jump=step).find_changepoints(x, penalty=2 * np.log(n)))
-benchmark("ruptures", lambda: ruptures.Pelt(model="l2", min_size=step, jump=step).fit(x).predict(pen=2 * np.log(n)))
+benchmark("skchange", lambda: skchange.detectors.PELT(cost=skchange.interval_scorers.L2Cost(), penalty=2 * np.log(n), step_size=1).fit_predict(x.reshape(-1, 1)))
+benchmark("sdt-python", lambda: sdt.changepoint.Pelt(cost="l2", min_size=1, jump=1).find_changepoints(x, penalty=2 * np.log(n)))
+benchmark("ruptures", lambda: ruptures.Pelt(model="l2", min_size=1, jump=1).fit(x).predict(pen=2 * np.log(n)))
 ```
 
 ```{r time-comparison-python-single-run, echo=FALSE}
@@ -223,7 +221,7 @@ import time
 
 def benchmark(name, call):
     call()  # Warm up imports and Numba compilation before timing.
-    for _ in range(3):
+    for _ in range(10):
         start = time.perf_counter()
         result = call()
         seconds = time.perf_counter() - start
