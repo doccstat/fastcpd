@@ -40,9 +40,13 @@ Scalar integer `random_state` values use the R-compatible stream for KCP and
 bootstrap parity. Passing a NumPy `Generator` or `RandomState` keeps native
 NumPy semantics.
 
-Python continues to reject callable custom costs and `multiple_epochs`
-schedules. R and standalone C++ expose language-native callback extensions;
-omitting a Python callback ABI preserves the GIL-free native detector path.
+Python accepts callable custom costs through `family="custom"`: one positional
+argument selects a PELT segment cost, while two positional arguments select a
+SEN cost that also requires gradient and Hessian callbacks. Callback calls
+reacquire the GIL; built-in families retain the GIL-free native detector path.
+
+Callable `multiple_epochs` schedules remain unavailable in Python. R and
+standalone C++ expose language-native schedule callbacks.
 
 ## Static typing
 

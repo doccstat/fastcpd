@@ -13,7 +13,7 @@ computation without changing the return type.
 
 | Function | Family | Description |
 |---|---|---|
-| `segmentation.detect` | any built-in R family | Generic detector; use `family="kcp"` for kernel detection, while rank/kernel aliases remain wrapper-only |
+| `segmentation.detect` | built-in or custom | Generic detector; use `family="kcp"` for kernel detection, while rank/kernel aliases remain wrapper-only |
 | `segmentation.mean` | mean | Change in mean (univariate or multivariate) |
 | `segmentation.variance` | variance | Change in variance (univariate or multivariate) |
 | `segmentation.meanvariance` | meanvariance | Change in mean and/or variance |
@@ -44,9 +44,10 @@ Variance helpers follow the same convention: use `estimate_variance_*` (or
 the shorter `variance_*` aliases) to obtain the model-specific variance
 estimate used by a detector.
 
-Custom cost callbacks are unavailable in Python; R and standalone C++ retain
-their native callback extensions, while the Python binding supports built-in
-families and keeps their execution GIL-free. Pure MA models are accessible via
+``detect(..., family="custom", cost=...)`` accepts a one-argument PELT segment
+cost or a two-argument SEN cost paired with gradient and Hessian callbacks.
+Custom callbacks reacquire the GIL during each invocation; built-in detector
+families keep their execution GIL-free. Pure MA models are accessible via
 ``arma(data, order=(0, q))`` or
 ``arima(data, order=(0, 0, q))``. ARIMA differences candidate segments
 independently, returns original-series change-point indices, and uses the same

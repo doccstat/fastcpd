@@ -3,6 +3,7 @@ Perform change point detection using fastcpd.
 """
 
 import dataclasses
+import inspect
 from typing import Mapping
 
 import numpy
@@ -164,7 +165,8 @@ def _build_fit_kwargs(
     *, family, order, beta, cost_adjustment, line_search, lower, upper,
     pruning_coef, segment_count, trim, momentum_coef, epsilon, p,
     p_response, variance_estimation, vanilla_percentage, warm_start,
-    show_progress, random_state=None,
+    show_progress, random_state=None, cost=None, cost_gradient=None,
+    cost_hessian=None,
 ):
     """Capture enough of a detection call for a faithful confidence refit."""
     options = {
@@ -195,6 +197,12 @@ def _build_fit_kwargs(
     # re-estimate it rather than reusing the original sample's value.
     if variance_estimation is not None:
         options['variance_estimation'] = variance_estimation
+    if cost is not None:
+        options['cost'] = cost
+    if cost_gradient is not None:
+        options['cost_gradient'] = cost_gradient
+    if cost_hessian is not None:
+        options['cost_hessian'] = cost_hessian
     if random_state is not None:
         # A NumPy Generator/RandomState is mutable and cannot be made truly
         # immutable by the recursive fit-options snapshot.  KCP bootstrap
@@ -1039,11 +1047,22 @@ def detect(
         segment_count: Initial guess for number of segments.
         trim: Trimming proportion for boundary change points.
         momentum_coef: Momentum coefficient for parameter updates.
+        cost: Custom cost callback. With ``family="custom"``, a callback
+            accepting one positional argument is a PELT segment cost and a
+            callback accepting two arguments (segment data and parameter
+            vector) is a SEN cost. The latter requires ``cost_gradient`` and
+            ``cost_hessian`` callbacks as well. Each callback receives a
+            two-dimensional NumPy segment array; gradients are one-dimensional
+            and Hessians are square arrays.
+        cost_gradient: Per-observation gradient callback for a two-argument
+            custom cost. It receives ``(segment, theta)`` and returns one
+            value per parameter.
+        cost_hessian: Hessian callback for a two-argument custom cost. It
+            receives ``(segment, theta)`` and returns a square parameter
+            matrix.
         multiple_epochs: Callback schedule unavailable in Python. R and
             standalone C++ expose native callback types; Python accepts only
-            ``None`` because dispatching a Python callback from native
-            per-segment updates would break the GIL-free detector contract and
-            add overhead to performance-sensitive fits.
+            ``None``.
         epsilon: Epsilon for numerical stability.
         order: Model order. ARMA uses ``(p, q)`` and ARIMA uses ``(p, d, q)``.
         include_mean: Must be False for ARIMA. For other families this
@@ -1152,12 +1171,46 @@ def detect(
         raise ValueError("lower values must not exceed upper values")
 
     raw_family = 'custom' if family is None else str(family).lower()
-    if (raw_family == 'custom' or cost is not None or
-            cost_gradient is not None or cost_hessian is not None):
-        raise NotImplementedError(
-            "Custom cost callbacks are unavailable in Python; the binding "
-            "supports the built-in native families only."
+    custom_arity = None
+    if raw_family != 'custom' and any(
+        callback is not None
+        for callback in (cost, cost_gradient, cost_hessian)
+    ):
+        raise ValueError(
+            "cost, cost_gradient, and cost_hessian are only accepted with "
+            "family='custom'"
         )
+    if raw_family == 'custom':
+        if cost is None:
+            raise ValueError(
+                "family='custom' requires a cost callback"
+            )
+        custom_arity = _callback_arity(cost, 'cost')
+        gradients_supplied = cost_gradient is not None
+        hessian_supplied = cost_hessian is not None
+        if gradients_supplied != hessian_supplied:
+            raise ValueError(
+                "cost_gradient and cost_hessian must be supplied together"
+            )
+        if custom_arity == 1 and gradients_supplied:
+            raise ValueError(
+                "one-argument PELT costs cannot be combined with "
+                "cost_gradient or cost_hessian"
+            )
+        if custom_arity == 2 and not gradients_supplied:
+            raise ValueError(
+                "two-argument SEN costs require cost_gradient and "
+                "cost_hessian"
+            )
+        if gradients_supplied:
+            if _callback_arity(cost_gradient, 'cost_gradient') != 2:
+                raise ValueError(
+                    "cost_gradient must accept (segment, theta)"
+                )
+            if _callback_arity(cost_hessian, 'cost_hessian') != 2:
+                raise ValueError(
+                    "cost_hessian must accept (segment, theta)"
+                )
     if raw_family not in _SUPPORTED_FAMILIES:
         raise ValueError(
             f"Family '{raw_family}' is not supported by the Python binding. "
@@ -1172,6 +1225,12 @@ def detect(
     native_p_response = p_response
     native_vanilla = vanilla_percentage
     index_offset = 0
+
+    if raw_family == 'custom':
+        if native_p is None:
+            native_p = max(1, data.shape[1] - 1)
+        if custom_arity == 1:
+            native_vanilla = 1.0
 
     # KCP is the sole distribution-free family accepted by R's generic
     # dispatcher. Rank and ``kernel`` remain wrapper-only spellings.
@@ -1396,6 +1455,10 @@ def detect(
         variance_value,
         bool(warm_start),
         bool(show_progress),
+        cost if raw_family == 'custom' and custom_arity == 1 else None,
+        cost if raw_family == 'custom' and custom_arity == 2 else None,
+        cost_gradient if raw_family == 'custom' else None,
+        cost_hessian if raw_family == 'custom' else None,
     )
 
     residuals = numpy.asarray(result['residuals'], dtype=float)
@@ -1428,6 +1491,9 @@ def detect(
         warm_start=warm_start,
         show_progress=show_progress,
         random_state=random_state if raw_family == 'kcp' else None,
+        cost=cost if raw_family == 'custom' else None,
+        cost_gradient=cost_gradient if raw_family == 'custom' else None,
+        cost_hessian=cost_hessian if raw_family == 'custom' else None,
     )
 
     cp_set = numpy.asarray(result['cp_set'], dtype=numpy.int64)
@@ -1508,6 +1574,37 @@ def _coerce_finite_scalar(value, name, *, positive=False):
         suffix = " greater than zero" if positive else ""
         raise ValueError(f"{name} must be a finite numeric value{suffix}")
     return value_float
+
+
+def _callback_arity(callback, name):
+    """Return the positional arity of a custom Python cost callback."""
+    if not callable(callback):
+        raise TypeError(f"{name} must be callable")
+    try:
+        signature = inspect.signature(callback)
+    except (TypeError, ValueError) as error:
+        raise TypeError(
+            f"{name} must expose a signature with one or two positional "
+            "arguments"
+        ) from error
+    parameters = tuple(signature.parameters.values())
+    if any(parameter.kind is inspect.Parameter.VAR_POSITIONAL
+           for parameter in parameters):
+        raise ValueError(
+            f"{name} must accept exactly one or two positional arguments"
+        )
+    positional = tuple(
+        parameter for parameter in parameters
+        if parameter.kind in (
+            inspect.Parameter.POSITIONAL_ONLY,
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        )
+    )
+    if len(positional) not in (1, 2):
+        raise ValueError(
+            f"{name} must accept exactly one or two positional arguments"
+        )
+    return len(positional)
 
 
 def _validate_option_vector(value, name):

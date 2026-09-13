@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -18,6 +19,91 @@ namespace {
 
 using DoubleArray =
     py::array_t<double, py::array::c_style | py::array::forcecast>;
+
+arma::colvec to_colvec(DoubleArray const& values, char const* name);
+arma::mat to_matrix(DoubleArray const& values, char const* name);
+
+// Python callbacks are invoked while the detector's outer GIL-release scope
+// is active. Keep the Python function in a shared holder whose final
+// destruction reacquires the GIL; native solver copies of std::function may
+// otherwise release the last Python reference on a GIL-free thread.
+using Callback = std::shared_ptr<py::function>;
+
+Callback make_callback(py::object const& object, char const* name) {
+  if (object.is_none()) return {};
+  if (!PyCallable_Check(object.ptr())) {
+    throw py::type_error(std::string("fastcpd: ") + name +
+                         " must be callable");
+  }
+  return Callback(
+      new py::function(object), [](py::function* function) {
+        py::gil_scoped_acquire acquire;
+        delete function;
+      });
+}
+
+double callback_scalar(py::object const& value, char const* name) {
+  double result;
+  try {
+    result = value.cast<double>();
+  } catch (py::cast_error const& error) {
+    throw py::type_error(std::string("fastcpd: ") + name +
+                         " must return a numeric scalar");
+  }
+  // Infinite costs are useful for custom models that disallow short or
+  // otherwise invalid segments. NaN has no meaningful ordering in PELT/SEN.
+  if (std::isnan(result)) {
+    throw std::invalid_argument(std::string("fastcpd: ") + name +
+                                " must not return NaN");
+  }
+  return result;
+}
+
+arma::colvec callback_colvec(py::object const& value, char const* name,
+                             arma::uword expected_size) {
+  DoubleArray array = DoubleArray::ensure(value);
+  if (!array) {
+    throw py::type_error(std::string("fastcpd: ") + name +
+                         " must return a one-dimensional numeric array");
+  }
+  arma::colvec result = to_colvec(array, name);
+  if (result.n_elem != expected_size) {
+    throw std::invalid_argument(std::string("fastcpd: ") + name +
+                                " returned " +
+                                std::to_string(result.n_elem) +
+                                " values; expected " +
+                                std::to_string(expected_size));
+  }
+  if (!result.is_finite()) {
+    throw std::invalid_argument(std::string("fastcpd: ") + name +
+                                " must return finite values");
+  }
+  return result;
+}
+
+arma::mat callback_matrix(py::object const& value, char const* name,
+                          arma::uword expected_size) {
+  DoubleArray array = DoubleArray::ensure(value);
+  if (!array) {
+    throw py::type_error(std::string("fastcpd: ") + name +
+                         " must return a two-dimensional numeric array");
+  }
+  arma::mat result = to_matrix(array, name);
+  if (result.n_rows != expected_size || result.n_cols != expected_size) {
+    throw std::invalid_argument(std::string("fastcpd: ") + name +
+                                " returned a " +
+                                std::to_string(result.n_rows) + "x" +
+                                std::to_string(result.n_cols) +
+                                " matrix; expected " +
+                                std::to_string(expected_size) + "x" +
+                                std::to_string(expected_size));
+  }
+  if (!result.is_finite()) {
+    throw std::invalid_argument(std::string("fastcpd: ") + name +
+                                " must return finite values");
+  }
+  return result;
+}
 
 arma::colvec to_colvec(DoubleArray const& values, char const* name) {
   py::buffer_info const buffer = values.request();
@@ -102,7 +188,11 @@ py::dict fastcpd_impl(
     double vanilla_percentage,
     DoubleArray const& variance_estimate,
     bool warm_start,
-    bool show_progress) {
+    bool show_progress,
+    py::object cost_pelt,
+    py::object cost_sen,
+    py::object cost_gradient,
+    py::object cost_hessian) {
   fastcpd::Options options;
   options.family = family;
   if (py::isinstance<py::str>(beta)) {
@@ -128,6 +218,49 @@ py::dict fastcpd_impl(
       to_matrix(variance_estimate, "variance_estimate");
   options.warm_start = warm_start;
   options.show_progress = show_progress;
+
+  Callback const pelt_callback = make_callback(cost_pelt, "cost_pelt");
+  Callback const sen_callback = make_callback(cost_sen, "cost_sen");
+  Callback const gradient_callback =
+      make_callback(cost_gradient, "cost_gradient");
+  Callback const hessian_callback =
+      make_callback(cost_hessian, "cost_hessian");
+  if (pelt_callback) {
+    options.cost_pelt = [pelt_callback](arma::mat const& segment) {
+      py::gil_scoped_acquire acquire;
+      py::object const value = (*pelt_callback)(to_array(segment));
+      return callback_scalar(value, "cost_pelt");
+    };
+  }
+  if (sen_callback) {
+    options.cost_sen = [sen_callback](arma::mat const& segment,
+                                      arma::colvec const& theta) {
+      py::gil_scoped_acquire acquire;
+      py::object const value =
+          (*sen_callback)(to_array(segment), to_array(theta));
+      return callback_scalar(value, "cost_sen");
+    };
+  }
+  if (gradient_callback) {
+    options.cost_gradient =
+        [gradient_callback](arma::mat const& segment,
+                            arma::colvec const& theta) {
+          py::gil_scoped_acquire acquire;
+          py::object const value =
+              (*gradient_callback)(to_array(segment), to_array(theta));
+          return callback_colvec(value, "cost_gradient", theta.n_elem);
+        };
+  }
+  if (hessian_callback) {
+    options.cost_hessian =
+        [hessian_callback](arma::mat const& segment,
+                           arma::colvec const& theta) {
+          py::gil_scoped_acquire acquire;
+          py::object const value =
+              (*hessian_callback)(to_array(segment), to_array(theta));
+          return callback_matrix(value, "cost_hessian", theta.n_elem);
+        };
+  }
 
   arma::mat data_matrix = to_matrix(data, "data");
   fastcpd::Result result;
@@ -159,5 +292,8 @@ PYBIND11_MODULE(interface, module) {
       py::arg("pruning_coef"), py::arg("segment_count"), py::arg("trim"),
       py::arg("upper"), py::arg("vanilla_percentage"),
       py::arg("variance_estimate"), py::arg("warm_start"),
-      py::arg("show_progress") = false);
+      py::arg("show_progress") = false,
+      py::arg("cost_pelt") = py::none(), py::arg("cost_sen") = py::none(),
+      py::arg("cost_gradient") = py::none(),
+      py::arg("cost_hessian") = py::none());
 }
