@@ -61,16 +61,16 @@ n <- 10^7
 mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
 print(run_isolated(fastcpd::detect_mean(mean_data, cp_only = TRUE, variance_estimation = 1)))
 #>    user  system elapsed 
-#>   0.745   0.194   0.981
+#>   0.729   0.201   0.930
 print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
 #>    user  system elapsed 
-#>   1.282   0.696   2.236
+#>   1.219   0.667   1.893
 print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
 #>    user  system elapsed 
-#>   3.381   0.665   4.418
+#>   3.326   0.598   3.929
 print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 #>    user  system elapsed 
-#>   4.027   0.299   4.483
+#>   3.953   0.262   4.218
 ```
 
 ![](https://raw.githubusercontent.com/doccstat/fastcpd-r/main/man/figures/README-time-comparison-fastbench-1.png)<!-- -->
@@ -78,23 +78,49 @@ print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 ### Python
 
 ``` python
+import time
+
+import fastcpd
 import numpy as np
-import ruptures as rpt
-from fastcpd import detect_mean
-from sdt.changepoint import Pelt as SdtPelt
-from skchange.detectors import PELT
-from skchange.interval_scorers import L2Cost
+import ruptures
+import sdt
+import sdt.changepoint
+import skchange
+import skchange.detectors
+import skchange.interval_scorers
 
 rng = np.random.default_rng(1)
-n = 1_000
+n = int(1e6)
 x = np.r_[rng.normal(0, 1, n // 2), rng.normal(50, 1, n // 2)]
+step = 10_000
 
+start = time.perf_counter()
+fastcpd.detect_mean(x, variance_estimation=1, cp_only=True)
+print(f"fastcpd: {time.perf_counter() - start:.3f} s")
 
-benchmark("fastcpd", lambda: detect_mean(x, variance_estimation=1, cp_only=True))
-benchmark("skchange", lambda: PELT(cost=L2Cost(), penalty=2 * np.log(n), min_segment_length=1).fit_predict(x.reshape(-1, 1)))
-benchmark("sdt-python", lambda: SdtPelt(cost="l2", min_size=1, jump=1).find_changepoints(x, penalty=2 * np.log(n)))
-benchmark("ruptures", lambda: rpt.Pelt(model="l2", min_size=1, jump=1).fit(x).predict(pen=2 * np.log(n)))
+start = time.perf_counter()
+skchange.detectors.PELT(
+    cost=skchange.interval_scorers.L2Cost(), penalty=2 * np.log(n), step_size=step
+).fit_predict(x.reshape(-1, 1))
+print(f"skchange: {time.perf_counter() - start:.3f} s")
+
+start = time.perf_counter()
+sdt.changepoint.Pelt(cost="l2", min_size=step, jump=step).find_changepoints(
+    x, penalty=2 * np.log(n)
+)
+print(f"sdt-python: {time.perf_counter() - start:.3f} s")
+
+start = time.perf_counter()
+ruptures.Pelt(model="l2", min_size=step, jump=step).fit(x).predict(
+    pen=2 * np.log(n)
+)
+print(f"ruptures: {time.perf_counter() - start:.3f} s")
 ```
+
+    #> fastcpd: 0.061 s
+    #> skchange: 0.316 s
+    #> sdt-python: 5.989 s
+    #> ruptures: 0.852 s
 
 ![](https://raw.githubusercontent.com/doccstat/fastcpd-r/main/man/figures/README-time-comparison-python-plot-1.png)<!-- -->
 
