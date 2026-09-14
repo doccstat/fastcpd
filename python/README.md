@@ -52,7 +52,10 @@ the Hessian is a square matrix. Callback execution reacquires the GIL, while
 built-in detector families retain the GIL-free native path.
 
 ```python
+import numpy as np
 from fastcpd import detect
+
+data = np.r_[np.zeros(50), np.full(50, 5.0)]
 
 def squared_error(segment):
     centered = segment - segment.mean(axis=0)
