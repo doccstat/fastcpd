@@ -1185,9 +1185,11 @@ def detect(
             raise ValueError(
                 "family='custom' requires a cost callback"
             )
-        custom_arity = _callback_arity(cost, 'cost')
         gradients_supplied = cost_gradient is not None
         hessian_supplied = cost_hessian is not None
+        custom_arity = _callback_arity(cost, 'cost')
+        if custom_arity is None:
+            custom_arity = 2 if gradients_supplied else 1
         if gradients_supplied != hessian_supplied:
             raise ValueError(
                 "cost_gradient and cost_hessian must be supplied together"
@@ -1203,11 +1205,13 @@ def detect(
                 "cost_hessian"
             )
         if gradients_supplied:
-            if _callback_arity(cost_gradient, 'cost_gradient') != 2:
+            gradient_arity = _callback_arity(cost_gradient, 'cost_gradient')
+            if gradient_arity not in (None, 2):
                 raise ValueError(
                     "cost_gradient must accept (segment, theta)"
                 )
-            if _callback_arity(cost_hessian, 'cost_hessian') != 2:
+            hessian_arity = _callback_arity(cost_hessian, 'cost_hessian')
+            if hessian_arity not in (None, 2):
                 raise ValueError(
                     "cost_hessian must accept (segment, theta)"
                 )
@@ -1588,11 +1592,10 @@ def _callback_arity(callback, name):
             "arguments"
         ) from error
     parameters = tuple(signature.parameters.values())
-    if any(parameter.kind is inspect.Parameter.VAR_POSITIONAL
-           for parameter in parameters):
-        raise ValueError(
-            f"{name} must accept exactly one or two positional arguments"
-        )
+    has_varargs = any(
+        parameter.kind is inspect.Parameter.VAR_POSITIONAL
+        for parameter in parameters
+    )
     positional = tuple(
         parameter for parameter in parameters
         if parameter.kind in (
@@ -1600,6 +1603,10 @@ def _callback_arity(callback, name):
             inspect.Parameter.POSITIONAL_OR_KEYWORD,
         )
     )
+    if has_varargs:
+        # A variadic callable can implement either callback shape. The caller
+        # resolves the intended shape from whether SEN derivatives are present.
+        return None
     if len(positional) not in (1, 2):
         raise ValueError(
             f"{name} must accept exactly one or two positional arguments"
