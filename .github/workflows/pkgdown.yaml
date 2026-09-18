@@ -2,7 +2,7 @@ name: pkgdown
 
 on:
   push:
-    branches: [main]
+    branches: [r]
   pull_request:
   release:
     types: [published]

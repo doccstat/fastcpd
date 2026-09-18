@@ -2,7 +2,7 @@ name: R test coverage
 
 on:
   push:
-    branches: [main]
+    branches: [r]
   pull_request:
   workflow_dispatch:
 

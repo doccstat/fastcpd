@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-"
 )
 knitr::opts_knit$set(
-  base.url = "https://raw.githubusercontent.com/doccstat/fastcpd-r/main/"
+  base.url = "https://raw.githubusercontent.com/doccstat/fastcpd-r/r/"
 )
 options(cli.hyperlink = FALSE, eval = TRUE)
 
@@ -42,9 +42,9 @@ run_isolated <- function(expr) {
 }
 ```
 
-# Fast Change Point Detection <a href="https://fastcpd.xingchi.li"><img src="https://raw.githubusercontent.com/doccstat/fastcpd-r/main/man/figures/logo.png" align="right" height="138" /></a>
+# Fast Change Point Detection <a href="https://fastcpd.xingchi.li"><img src="https://raw.githubusercontent.com/doccstat/fastcpd-r/r/man/figures/logo.png" align="right" height="138" /></a>
 
-[![Codecov test coverage](https://codecov.io/gh/doccstat/fastcpd-r/branch/main/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd-r?branch=main)
+[![Codecov test coverage](https://codecov.io/gh/doccstat/fastcpd-r/branch/r/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd-r?branch=r)
 [![CodeFactor](https://www.codefactor.io/repository/github/doccstat/fastcpd-r/badge)](https://www.codefactor.io/repository/github/doccstat/fastcpd-r)
 [![CRAN status](https://www.r-pkg.org/badges/version-last-release/fastcpd)](https://cran.r-project.org/package=fastcpd)
 [![doi](https://img.shields.io/badge/doi-10.48550/arXiv.2404.05933-green.svg)](https://doi.org/10.48550/arXiv.2404.05933)
@@ -56,8 +56,7 @@ run_isolated <- function(expr) {
 ## Documentation: [x2r.io](https://x2r.io/fastcpd/reference/)
 
 Python and standalone C++ sources are published separately in
-[`fastcpd-py`](https://github.com/doccstat/fastcpd-py) and
-[`fastcpd-cpp`](https://github.com/doccstat/fastcpd-cpp).
+the `py` and `cpp` branches of [`fastcpd-r`](https://github.com/doccstat/fastcpd-r).
 
 <details>
 <summary>Installation: R, Python, and C++</summary>
@@ -77,7 +76,7 @@ python -m pip install fastcpd
 C++ library (requires Armadillo and Abseil 20260526 or newer):
 
 ```shell
-git clone https://github.com/doccstat/fastcpd-cpp.git
+git clone --branch cpp https://github.com/doccstat/fastcpd-r.git fastcpd-cpp
 cmake -S fastcpd-cpp -B fastcpd-cpp/build -DFASTCPD_BUILD_EXAMPLES=OFF
 cmake --build fastcpd-cpp/build --parallel
 cmake --install fastcpd-cpp/build --prefix fastcpd-install
@@ -284,7 +283,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 ### C++
 
 Native fastcpd and fpop on Linux ARM64, with 1,000,000 observations.
-[Source and build instructions](https://github.com/doccstat/fastcpd-r/tree/main/tools/readme-comparison).
+[Source and build instructions](https://github.com/doccstat/fastcpd-r/tree/r/tools/readme-comparison).
 
 ```{r time-comparison-cpp-run, include=FALSE}
 cpp_executable <- Sys.getenv("FASTCPD_README_CPP")
