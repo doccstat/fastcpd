@@ -1,16 +1,16 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Fast Change Point Detection <a href="https://fastcpd.xingchi.li"><img src="https://raw.githubusercontent.com/doccstat/fastcpd-r/r/man/figures/logo.png" align="right" height="138" /></a>
+# Fast Change Point Detection <a href="https://fastcpd.xingchi.li"><img src="https://raw.githubusercontent.com/doccstat/fastcpd/r/man/figures/logo.png" align="right" height="138" /></a>
 
 [![Codecov test
-coverage](https://codecov.io/gh/doccstat/fastcpd-r/branch/r/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd-r?branch=r)
-[![CodeFactor](https://www.codefactor.io/repository/github/doccstat/fastcpd-r/badge)](https://www.codefactor.io/repository/github/doccstat/fastcpd-r)
+coverage](https://codecov.io/gh/doccstat/fastcpd/branch/r/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd?branch=r)
+[![CodeFactor](https://www.codefactor.io/repository/github/doccstat/fastcpd/badge/r)](https://www.codefactor.io/repository/github/doccstat/fastcpd/overview/r)
 [![CRAN
 status](https://www.r-pkg.org/badges/version-last-release/fastcpd)](https://cran.r-project.org/package=fastcpd)
 [![doi](https://img.shields.io/badge/doi-10.48550/arXiv.2404.05933-green.svg)](https://doi.org/10.48550/arXiv.2404.05933)
 [![R CMD
-check](https://github.com/doccstat/fastcpd-r/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/doccstat/fastcpd-r/actions/workflows/check-standard.yaml)
+check](https://github.com/doccstat/fastcpd/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/doccstat/fastcpd/actions/workflows/check-standard.yaml)
 [![r-universe](https://doccstat.r-universe.dev/badges/fastcpd)](https://doccstat.r-universe.dev)
 [![Python
 version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/project/fastcpd/)
@@ -20,7 +20,7 @@ package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcp
 ## Documentation: [x2r.io](https://x2r.io/fastcpd/reference/)
 
 Python and standalone C++ sources are published in the `py` and `cpp` branches
-of [`fastcpd-r`](https://github.com/doccstat/fastcpd-r).
+of [`fastcpd`](https://github.com/doccstat/fastcpd).
 
 <details>
 <summary>
@@ -42,7 +42,7 @@ python -m pip install fastcpd
 C++ library (requires Armadillo and Abseil 20260526 or newer):
 
 ``` shell
-git clone --branch cpp https://github.com/doccstat/fastcpd-r.git fastcpd-cpp
+git clone --branch cpp https://github.com/doccstat/fastcpd.git fastcpd-cpp
 cmake -S fastcpd-cpp -B fastcpd-cpp/build -DFASTCPD_BUILD_EXAMPLES=OFF
 cmake --build fastcpd-cpp/build --parallel
 cmake --install fastcpd-cpp/build --prefix fastcpd-install
@@ -72,7 +72,7 @@ print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 #>   3.977   0.280   4.265
 ```
 
-![](https://raw.githubusercontent.com/doccstat/fastcpd-r/r/man/figures/README-time-comparison-fastbench-1.png)<!-- -->
+![](https://raw.githubusercontent.com/doccstat/fastcpd/r/man/figures/README-time-comparison-fastbench-1.png)<!-- -->
 
 ### Python
 
@@ -120,15 +120,15 @@ print(f"ruptures: {time.perf_counter() - start:.3f} s")
     #> sdt-python: 50.173 s
     #> ruptures: 442.609 s
 
-![](https://raw.githubusercontent.com/doccstat/fastcpd-r/r/man/figures/README-time-comparison-python-plot-1.png)<!-- -->
+![](https://raw.githubusercontent.com/doccstat/fastcpd/r/man/figures/README-time-comparison-python-plot-1.png)<!-- -->
 
 ### C++
 
 Native fastcpd and fpop on Linux ARM64, with 1,000,000 observations.
 [Source and build
-instructions](https://github.com/doccstat/fastcpd-r/tree/r/tools/readme-comparison).
+instructions](https://github.com/doccstat/fastcpd/tree/r/tools/readme-comparison).
 
-![](https://raw.githubusercontent.com/doccstat/fastcpd-r/r/man/figures/README-time-comparison-cpp-plot-1.png)<!-- -->
+![](https://raw.githubusercontent.com/doccstat/fastcpd/r/man/figures/README-time-comparison-cpp-plot-1.png)<!-- -->
 
 ## References
 
