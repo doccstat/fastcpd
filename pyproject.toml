@@ -40,8 +40,8 @@ classifiers = [
 ]
 
 [project.urls]
-Documentation = "https://x2r.io/fastcpd-python/"
-Repository = "https://github.com/doccstat/fastcpd-r/tree/py"
+Documentation = "https://x2r.io/fastcpd/?lang=python"
+Repository = "https://github.com/doccstat/fastcpd/tree/py"
 
 [tool.pytest.ini_options]
 markers = [
