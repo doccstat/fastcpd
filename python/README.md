@@ -2,7 +2,7 @@
 
 `fastcpd` provides fast change-point detection for Python through the same
 canonical C++ implementation used by the standalone `cpp` branch of
-`fastcpd-r`.
+`fastcpd`.
 The Python package is independently buildable: it does not require R, invoke
 R code generation, or download another fastcpd repository.
 
@@ -157,10 +157,10 @@ python -m pip install dist/fastcpd-*.whl
 python -m pytest tests/test_fastcpd.py -m "not long"
 ```
 
-Documentation: <https://x2r.io/fastcpd-python/>
+Documentation: <https://x2r.io/fastcpd/?lang=python>
 
 See [CHANGELOG.md](CHANGELOG.md) for Python release notes and
 [MIGRATION.md](MIGRATION.md) for the transition from the independent 0.x line
 to the coordinated cross-language interface.
 
-Issues: <https://github.com/doccstat/fastcpd-r/issues>
+Issues: <https://github.com/doccstat/fastcpd/issues>
