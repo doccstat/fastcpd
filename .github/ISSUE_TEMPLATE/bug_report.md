@@ -19,7 +19,7 @@ about: Submit a bug report to help us improve fastcpd
   please omit these from the code.
 
 * Please check whether somebody has reported the same problem in the
-  [issues](https://github.com/doccstat/fastcpd-r/issues).
+  [issues](https://github.com/doccstat/fastcpd/issues).
 
 Delete these instructions once you have read them.
 
