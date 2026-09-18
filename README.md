@@ -1,10 +1,10 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Fast Change Point Detection <a href="https://fastcpd.xingchi.li"><img src="https://raw.githubusercontent.com/doccstat/fastcpd-r/main/man/figures/logo.png" align="right" height="138" /></a>
+# Fast Change Point Detection <a href="https://fastcpd.xingchi.li"><img src="https://raw.githubusercontent.com/doccstat/fastcpd-r/r/man/figures/logo.png" align="right" height="138" /></a>
 
 [![Codecov test
-coverage](https://codecov.io/gh/doccstat/fastcpd-r/branch/main/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd-r?branch=main)
+coverage](https://codecov.io/gh/doccstat/fastcpd-r/branch/r/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd-r?branch=r)
 [![CodeFactor](https://www.codefactor.io/repository/github/doccstat/fastcpd-r/badge)](https://www.codefactor.io/repository/github/doccstat/fastcpd-r)
 [![CRAN
 status](https://www.r-pkg.org/badges/version-last-release/fastcpd)](https://cran.r-project.org/package=fastcpd)
@@ -19,9 +19,8 @@ package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcp
 
 ## Documentation: [x2r.io](https://x2r.io/fastcpd/reference/)
 
-Python and standalone C++ sources are published separately in
-[`fastcpd-py`](https://github.com/doccstat/fastcpd-py) and
-[`fastcpd-cpp`](https://github.com/doccstat/fastcpd-cpp).
+Python and standalone C++ sources are published in the `py` and `cpp` branches
+of [`fastcpd-r`](https://github.com/doccstat/fastcpd-r).
 
 <details>
 <summary>
@@ -43,7 +42,7 @@ python -m pip install fastcpd
 C++ library (requires Armadillo and Abseil 20260526 or newer):
 
 ``` shell
-git clone https://github.com/doccstat/fastcpd-cpp.git
+git clone --branch cpp https://github.com/doccstat/fastcpd-r.git fastcpd-cpp
 cmake -S fastcpd-cpp -B fastcpd-cpp/build -DFASTCPD_BUILD_EXAMPLES=OFF
 cmake --build fastcpd-cpp/build --parallel
 cmake --install fastcpd-cpp/build --prefix fastcpd-install
@@ -73,7 +72,7 @@ print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
 #>   3.977   0.280   4.265
 ```
 
-![](https://raw.githubusercontent.com/doccstat/fastcpd-r/main/man/figures/README-time-comparison-fastbench-1.png)<!-- -->
+![](https://raw.githubusercontent.com/doccstat/fastcpd-r/r/man/figures/README-time-comparison-fastbench-1.png)<!-- -->
 
 ### Python
 
@@ -121,15 +120,15 @@ print(f"ruptures: {time.perf_counter() - start:.3f} s")
     #> sdt-python: 50.173 s
     #> ruptures: 442.609 s
 
-![](https://raw.githubusercontent.com/doccstat/fastcpd-r/main/man/figures/README-time-comparison-python-plot-1.png)<!-- -->
+![](https://raw.githubusercontent.com/doccstat/fastcpd-r/r/man/figures/README-time-comparison-python-plot-1.png)<!-- -->
 
 ### C++
 
 Native fastcpd and fpop on Linux ARM64, with 1,000,000 observations.
 [Source and build
-instructions](https://github.com/doccstat/fastcpd-r/tree/main/tools/readme-comparison).
+instructions](https://github.com/doccstat/fastcpd-r/tree/r/tools/readme-comparison).
 
-![](https://raw.githubusercontent.com/doccstat/fastcpd-r/main/man/figures/README-time-comparison-cpp-plot-1.png)<!-- -->
+![](https://raw.githubusercontent.com/doccstat/fastcpd-r/r/man/figures/README-time-comparison-cpp-plot-1.png)<!-- -->
 
 ## References
 

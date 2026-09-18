@@ -2,7 +2,7 @@ name: R CMD check
 
 on:
   push:
-    branches: [main]
+    branches: [r]
   pull_request:
   workflow_dispatch:
 
