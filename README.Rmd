@@ -1,0 +1,317 @@
+---
+output:
+  github_document:
+    html_preview: false
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-"
+)
+knitr::opts_knit$set(
+  base.url = "https://raw.githubusercontent.com/doccstat/fastcpd/r/"
+)
+options(cli.hyperlink = FALSE, eval = TRUE)
+
+comparison_violin <- function(data, order, label) {
+  data$algorithm <- factor(data$algorithm, levels = rev(order))
+  ggplot2::ggplot(data, ggplot2::aes(x = algorithm, y = elapsed_s)) +
+    ggplot2::geom_violin(trim = FALSE) +
+    ggplot2::labs(x = NULL, y = label) +
+    ggplot2::coord_flip() +
+    ggplot2::theme(
+      legend.position = "none",
+      panel.background = ggplot2::element_blank(),
+      panel.border = ggplot2::element_rect(fill = NA, colour = "grey20"),
+      panel.grid.major = ggplot2::element_line(colour = "grey98"),
+      panel.grid.minor = ggplot2::element_line(colour = "grey98"),
+      strip.background = ggplot2::element_rect(fill = "grey85", colour = "grey20")
+    )
+}
+
+run_isolated <- function(expr) {
+  callr::r(function(e, n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    system.time(eval(e))
+  }, args = list(e = substitute(expr), n = n))
+}
+```
+
+# Fast Change Point Detection <a href="https://fastcpd.xingchi.li"><img src="https://raw.githubusercontent.com/doccstat/fastcpd/r/man/figures/logo.png" align="right" height="138" /></a>
+
+[![Codecov test coverage](https://codecov.io/gh/doccstat/fastcpd/branch/r/graph/badge.svg)](https://app.codecov.io/gh/doccstat/fastcpd?branch=r)
+[![CodeFactor](https://www.codefactor.io/repository/github/doccstat/fastcpd/badge/r)](https://www.codefactor.io/repository/github/doccstat/fastcpd/overview/r)
+[![CRAN status](https://www.r-pkg.org/badges/version-last-release/fastcpd)](https://cran.r-project.org/package=fastcpd)
+[![doi](https://img.shields.io/badge/doi-10.48550/arXiv.2404.05933-green.svg)](https://doi.org/10.48550/arXiv.2404.05933)
+[![R CMD check](https://github.com/doccstat/fastcpd/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/doccstat/fastcpd/actions/workflows/check-standard.yaml)
+[![r-universe](https://doccstat.r-universe.dev/badges/fastcpd)](https://doccstat.r-universe.dev)
+[![Python version](https://img.shields.io/pypi/pyversions/fastcpd)](https://pypi.org/project/fastcpd/)
+[![Python package](https://img.shields.io/pypi/v/fastcpd)](https://pypi.org/project/fastcpd/)
+
+## Documentation: [x2r.io](https://x2r.io/fastcpd/reference/)
+
+Python and standalone C++ sources are published in
+the `py` and `cpp` branches of [`fastcpd`](https://github.com/doccstat/fastcpd).
+
+<details>
+<summary>Installation: R, Python, and C++</summary>
+
+R package:
+
+```r
+install.packages("fastcpd")
+```
+
+Python package:
+
+```shell
+python -m pip install fastcpd
+```
+
+C++ library (requires Armadillo and Abseil 20260526 or newer):
+
+```shell
+git clone --branch cpp https://github.com/doccstat/fastcpd.git fastcpd-cpp
+cmake -S fastcpd-cpp -B fastcpd-cpp/build -DFASTCPD_BUILD_EXAMPLES=OFF
+cmake --build fastcpd-cpp/build --parallel
+cmake --install fastcpd-cpp/build --prefix fastcpd-install
+```
+
+</details>
+
+## Comparison
+
+### R
+
+```{r time-comparison-single}
+set.seed(1)
+n <- 10^7
+mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+print(run_isolated(fastcpd::detect_mean(mean_data, cp_only = TRUE, variance_estimation = 1)))
+print(run_isolated(mosum::mosum(c(mean_data), G = 40)))
+print(run_isolated(changepoint::cpt.mean(mean_data, method = "PELT")))
+print(run_isolated(fpop::Fpop(mean_data, 2 * log(n))))
+```
+```{r time-comparison-fastbench, eval = requireNamespace("callr", quietly = TRUE), echo = FALSE}
+benchmark <- function(..., times = 100L) {
+  calls <- as.list(match.call(expand.dots = FALSE)$`...`)
+  nms <- names(calls); envir <- parent.frame()
+  do.call(rbind, lapply(seq_along(calls), function(i)
+    data.frame(expr = factor(nms[i], levels = nms),
+               elapsed_s = replicate(times, system.time(eval(calls[[i]], envir))["elapsed"]))))
+}
+bm <- benchmark(
+  baseline = callr::r(function(n) {
+    set.seed(1)
+    c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+  }, args = list(n = n)),
+  fastcpd = callr::r(function(n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    fastcpd::detect_mean(mean_data, cp_only = TRUE, variance_estimation = 1)
+  }, args = list(n = n)),
+  mosum = callr::r(function(n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    mosum::mosum(c(mean_data), G = 40)
+  }, args = list(n = n)),
+  changepoint = callr::r(function(n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    changepoint::cpt.mean(mean_data, method = "PELT")
+  }, args = list(n = n)),
+  fpop = callr::r(function(n) {
+    set.seed(1)
+    mean_data <- c(rnorm(n / 2, 0, 1), rnorm(n / 2, 50, 1))
+    fpop::Fpop(mean_data, 2 * log(n))
+  }, args = list(n = n)),
+  times = 10L
+)
+baseline_overhead <- median(bm$elapsed_s[bm$expr == "baseline"])
+bm_net <- bm[bm$expr != "baseline", ]
+bm_net$elapsed_s <- bm_net$elapsed_s - baseline_overhead
+plot_order <- c("fastcpd", "mosum", "changepoint", "fpop")
+bm_net$algorithm <- bm_net$expr
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  print(comparison_violin(bm_net, plot_order, "Net algorithm time (s)"))
+}
+```
+
+### Python
+
+```{python time-comparison-python-single, eval=FALSE, python.reticulate=FALSE}
+import time
+
+import fastcpd
+import numpy as np
+import ruptures
+import sdt
+import sdt.changepoint
+import skchange
+import skchange.detectors
+import skchange.interval_scorers
+
+rng = np.random.default_rng(1)
+n = int(1e4)
+x = np.r_[rng.normal(0, 1, n // 2), rng.normal(50, 1, n // 2)]
+
+start = time.perf_counter()
+fastcpd.detect_mean(x, variance_estimation=1, cp_only=True)
+print(f"fastcpd: {time.perf_counter() - start:.3f} s")
+
+start = time.perf_counter()
+skchange.detectors.PELT(
+    cost=skchange.interval_scorers.L2Cost(), penalty=2 * np.log(n), step_size=1
+).fit_predict(x.reshape(-1, 1))
+print(f"skchange: {time.perf_counter() - start:.3f} s")
+
+start = time.perf_counter()
+sdt.changepoint.Pelt(cost="l2", min_size=1, jump=1).find_changepoints(
+    x, penalty=2 * np.log(n)
+)
+print(f"sdt-python: {time.perf_counter() - start:.3f} s")
+
+start = time.perf_counter()
+ruptures.Pelt(model="l2", min_size=1, jump=1).fit(x).predict(
+    pen=2 * np.log(n)
+)
+print(f"ruptures: {time.perf_counter() - start:.3f} s")
+```
+
+```{python time-comparison-python, eval=FALSE, include=FALSE, python.reticulate=FALSE}
+import fastcpd
+import numpy as np
+import ruptures
+import sdt
+import sdt.changepoint
+import skchange
+import skchange.detectors
+import skchange.interval_scorers
+
+rng = np.random.default_rng(1)
+n = int(1e4)
+x = np.r_[rng.normal(0, 1, n // 2), rng.normal(50, 1, n // 2)]
+
+benchmark("fastcpd", lambda: fastcpd.detect_mean(x, variance_estimation=1, cp_only=True))
+benchmark("skchange", lambda: skchange.detectors.PELT(cost=skchange.interval_scorers.L2Cost(), penalty=2 * np.log(n), step_size=1).fit_predict(x.reshape(-1, 1)))
+benchmark("sdt-python", lambda: sdt.changepoint.Pelt(cost="l2", min_size=1, jump=1).find_changepoints(x, penalty=2 * np.log(n)))
+benchmark("ruptures", lambda: ruptures.Pelt(model="l2", min_size=1, jump=1).fit(x).predict(pen=2 * np.log(n)))
+```
+
+```{r time-comparison-python-single-run, echo=FALSE}
+python_executable <- Sys.getenv("FASTCPD_README_PYTHON", unset = Sys.which("python3"))
+if (!nzchar(python_executable)) stop("Set FASTCPD_README_PYTHON to a Python with fastcpd and comparison packages")
+python_script <- tempfile(fileext = ".py")
+writeLines(unlist(knitr::knit_code$get("time-comparison-python-single"), use.names = FALSE), python_script)
+python_output <- system2(python_executable, python_script, stdout = TRUE, stderr = TRUE)
+unlink(python_script)
+if (!is.null(attr(python_output, "status")) && attr(python_output, "status") != 0) stop(paste(python_output, collapse = "\n"))
+cat(paste(python_output, collapse = "\n"))
+```
+
+```{python time-comparison-python-helper, eval=FALSE, include=FALSE, python.reticulate=FALSE}
+import time
+
+
+def benchmark(name, call):
+    call()  # Warm up imports and Numba compilation before timing.
+    for _ in range(10):
+        start = time.perf_counter()
+        result = call()
+        seconds = time.perf_counter() - start
+        if name == "fastcpd":
+            change_points = result.cp_set.tolist()
+        elif name == "ruptures":
+            change_points = result[:-1]
+        else:
+            change_points = result.tolist()
+        assert change_points == [n // 2]
+        print(f"{name}\t{seconds:.9f}")
+```
+
+```{r time-comparison-python-run, include=FALSE}
+python_executable <- Sys.getenv(
+  "FASTCPD_README_PYTHON",
+  unset = Sys.which("python3")
+)
+if (!nzchar(python_executable)) {
+  stop("Set FASTCPD_README_PYTHON to a Python with fastcpd, ruptures, skchange[numba] and sdt-python")
+}
+python_script <- tempfile(fileext = ".py")
+python_source <- unlist(
+  knitr::knit_code$get(c("time-comparison-python-helper", "time-comparison-python")),
+  use.names = FALSE
+)
+writeLines(python_source, python_script)
+python_output <- system2(
+  python_executable,
+  python_script,
+  stdout = TRUE,
+  stderr = TRUE
+)
+unlink(python_script)
+python_status <- attr(python_output, "status")
+if (!is.null(python_status) && python_status != 0) {
+  stop(paste(python_output, collapse = "\n"))
+}
+python_benchmark <- utils::read.delim(
+  text = paste(python_output, collapse = "\n"),
+  header = FALSE,
+  col.names = c("algorithm", "elapsed_s"),
+  stringsAsFactors = FALSE
+)
+python_benchmark$algorithm <- factor(
+  python_benchmark$algorithm,
+  levels = c("fastcpd", "skchange", "sdt-python", "ruptures")
+)
+```
+
+```{r time-comparison-python-plot, echo=FALSE}
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  print(comparison_violin(
+    python_benchmark, levels(python_benchmark$algorithm),
+    "Elapsed time (s)"
+  ))
+}
+```
+
+### C++
+
+Native fastcpd and fpop on Linux ARM64, with 1,000,000 observations.
+[Source and build instructions](https://github.com/doccstat/fastcpd/tree/r/tools/readme-comparison).
+
+```{r time-comparison-cpp-run, include=FALSE}
+cpp_executable <- Sys.getenv("FASTCPD_README_CPP")
+if (!nzchar(cpp_executable)) {
+  stop("Set FASTCPD_README_CPP to the compiled readme_comparison executable")
+}
+set.seed(1)
+cpp_n <- 1000000L
+comparison_input <- tempfile(fileext = ".txt")
+writeLines(sprintf("%.17g", c(rnorm(cpp_n / 2), rnorm(cpp_n / 2, 50))), comparison_input)
+cpp_output <- system2(cpp_executable, shQuote(comparison_input), stdout = TRUE, stderr = TRUE)
+unlink(comparison_input)
+cpp_status <- attr(cpp_output, "status")
+if (!is.null(cpp_status) && cpp_status != 0) {
+  stop(paste(cpp_output, collapse = "\n"))
+}
+cpp_benchmark <- utils::read.delim(
+  text = paste(cpp_output, collapse = "\n"), header = FALSE,
+  col.names = c("algorithm", "change_points", "elapsed_s")
+)
+cpp_benchmark$algorithm <- factor(cpp_benchmark$algorithm, levels = c("fastcpd", "fpop"))
+```
+
+```{r time-comparison-cpp-plot, echo=FALSE}
+print(comparison_violin(cpp_benchmark, c("fastcpd", "fpop"), "Elapsed time (s)"))
+```
+
+## References
+
+* [fastcpd: Fast Change Point Detection in R](https://doi.org/10.48550/arXiv.2404.05933)
+* [Sequential Gradient Descent and Quasi-Newton's Method for Change-Point Analysis](https://proceedings.mlr.press/v206/zhang23b.html)

@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
@@ -43,7 +42,7 @@ jobs:
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
-      # Fork PRs still run coverage tests, but cannot request our OIDC identity.
+      # Fork PRs still run coverage tests, but cannot access repository secrets.
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
@@ -51,7 +50,7 @@ jobs:
           files: ./cobertura.xml
           plugins: noop
           disable_search: true
-          use_oidc: true
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
 
       - name: Show testthat output
