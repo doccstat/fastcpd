@@ -61,6 +61,13 @@ before-all = "dnf install -y openblas-devel"
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"
 
+[tool.cibuildwheel.windows]
+# The Windows wheel bundles the exact OpenBLAS DLL installed by CMake, and
+# python/__init__.py registers the package directory with add_dll_directory.
+# Delvewheel's default repair pass is unnecessary and can fail while trying to
+# rewrite this already self-contained DLL layout.
+repair-wheel-command = ""
+
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 build-dir = "build/python/{wheel_tag}"
