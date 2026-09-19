@@ -1,6 +1,8 @@
 name: Publish Python distributions
 
 on:
+  push:
+    branches: [py]
   release:
     types: [published]
 
@@ -8,16 +10,18 @@ permissions:
   contents: read
 
 concurrency:
-  group: python-release-${{ github.ref }}
+  # Serialize push and release uploads.  PyPI versions are immutable, so two
+  # runs for the same source version must not race to upload the same files.
+  group: python-release-${{ github.repository }}-py
   cancel-in-progress: false
 
 jobs:
   validate-release:
-    name: Verify Python release tag
+    name: Verify Python source/release
     if: >-
       github.repository == 'doccstat/fastcpd' &&
-      github.event_name == 'release' &&
-      !github.event.release.prerelease
+      ((github.event_name == 'push' && github.ref == 'refs/heads/py') ||
+      (github.event_name == 'release' && !github.event.release.prerelease))
     runs-on: ubuntu-latest
     outputs:
       publish: ${{ steps.classify.outputs.publish }}
@@ -32,16 +36,63 @@ jobs:
         with:
           python-version: '3.14'
 
-      - name: Classify the release tag
+      - name: Classify the source version
         id: classify
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          if ! git merge-base --is-ancestor HEAD refs/remotes/origin/py; then
-            echo "This release tag is not on the Python projection; skipping PyPI publication."
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-            exit 0
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "release" ]]; then
+            if ! git merge-base --is-ancestor HEAD refs/remotes/origin/py; then
+              echo "This release tag is not on the Python projection; skipping PyPI publication."
+              echo "publish=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            python python/_check_versions.py --root . --tag "$REF_NAME"
+          else
+            python python/_check_versions.py --root .
           fi
-          python python/_check_versions.py --root . --tag "$GITHUB_REF_NAME"
-          echo "publish=true" >> "$GITHUB_OUTPUT"
+
+          version="$(python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, "python")
+          from _check_versions import read_python_version
+
+          print(read_python_version(Path("python/__init__.py")))
+          PY
+          )"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+          # A push may repeat a version that was already uploaded.  PyPI does
+          # not allow replacing any file, so skip the build/upload in that case.
+          existing="$(python - "$version" <<'PY'
+          import json
+          import sys
+          import urllib.error
+          import urllib.request
+
+          try:
+              with urllib.request.urlopen(
+                  "https://pypi.org/pypi/fastcpd/json", timeout=30
+              ) as response:
+                  payload = json.load(response)
+          except urllib.error.HTTPError as error:
+              if error.code != 404:
+                  raise
+              print("false")
+          else:
+              print("true" if sys.argv[1] in payload.get("releases", {}) else "false")
+          PY
+          )"
+          if [[ "$existing" == "true" ]]; then
+            echo "fastcpd $version is already on PyPI; skipping publication."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "fastcpd $version is not on PyPI; publishing it."
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
 
   build-sdist:
     name: Build source distribution
@@ -129,13 +180,12 @@ jobs:
           merge-multiple: true
 
       - name: Verify source, artifact, and tag versions
-        run: >-
-          python python/_check_versions.py
-          --root .
-          --artifacts dist
-          --tag "$GITHUB_REF_NAME"
-          --require-wheel
-          --require-sdist
+        run: |
+          args=(--root . --artifacts dist --require-wheel --require-sdist)
+          if [[ "$GITHUB_EVENT_NAME" == "release" ]]; then
+            args+=(--tag "$GITHUB_REF_NAME")
+          fi
+          python python/_check_versions.py "${args[@]}"
 
       - name: Publish to PyPI with trusted publishing
         uses: pypa/gh-action-pypi-publish@release/v1
