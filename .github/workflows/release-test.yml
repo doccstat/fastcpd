@@ -1,52 +1,37 @@
-name: Publish Python distributions
+name: Publish Python distributions to TestPyPI
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: python-release-${{ github.ref }}
+  group: python-test-release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  validate-release:
-    name: Verify Python release tag
+  validate-source:
+    name: Verify Python projection
     if: >-
       github.repository == 'doccstat/fastcpd' &&
-      github.event_name == 'release' &&
-      !github.event.release.prerelease
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/py'
     runs-on: ubuntu-latest
-    outputs:
-      publish: ${{ steps.classify.outputs.publish }}
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
 
-      - name: Classify the release tag
-        id: classify
-        run: |
-          if ! git merge-base --is-ancestor HEAD refs/remotes/origin/py; then
-            echo "This release tag is not on the Python projection; skipping PyPI publication."
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          python python/_check_versions.py --root . --tag "$GITHUB_REF_NAME"
-          echo "publish=true" >> "$GITHUB_OUTPUT"
+      - name: Verify source version
+        run: python python/_check_versions.py --root .
 
   build-sdist:
     name: Build source distribution
-    needs: validate-release
-    if: needs.validate-release.outputs.publish == 'true'
+    needs: validate-source
     runs-on: ubuntu-latest
 
     steps:
@@ -65,14 +50,13 @@ jobs:
       - name: Upload source distribution
         uses: actions/upload-artifact@v4
         with:
-          name: python-sdist
+          name: python-test-sdist
           path: dist/*.tar.gz
           if-no-files-found: error
 
   build-wheels:
-    name: Build wheels on ${{ matrix.os }}
-    needs: validate-release
-    if: needs.validate-release.outputs.publish == 'true'
+    name: Build TestPyPI wheels on ${{ matrix.os }}
+    needs: validate-source
     runs-on: ${{ matrix.os }}
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: '2'
@@ -99,17 +83,17 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-${{ matrix.artifact }}
+          name: python-test-wheels-${{ matrix.artifact }}
           path: wheelhouse/*.whl
           if-no-files-found: error
 
   publish:
-    name: Publish distributions to PyPI
+    name: Publish distributions to TestPyPI
     needs: [build-sdist, build-wheels]
     runs-on: ubuntu-latest
     environment:
-      name: release
-      url: https://pypi.org/p/fastcpd
+      name: test
+      url: https://test.pypi.org/p/fastcpd
     permissions:
       contents: read
       id-token: write
@@ -124,18 +108,19 @@ jobs:
       - name: Download distributions
         uses: actions/download-artifact@v4
         with:
-          pattern: python-*
+          pattern: python-test-*
           path: dist
           merge-multiple: true
 
-      - name: Verify source, artifact, and tag versions
+      - name: Verify built distributions
         run: >-
           python python/_check_versions.py
           --root .
           --artifacts dist
-          --tag "$GITHUB_REF_NAME"
           --require-wheel
           --require-sdist
 
-      - name: Publish to PyPI with trusted publishing
+      - name: Publish to TestPyPI with trusted publishing
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/

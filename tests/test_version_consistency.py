@@ -95,7 +95,7 @@ def test_unified_source_mismatch_fails_with_the_source_name(tmp_path):
         version_check.check_versions(tmp_path, unified=True)
 
 
-def test_artifact_metadata_and_release_tag_mismatches_fail(tmp_path):
+def test_artifact_metadata_mismatches_fail(tmp_path):
     _write_sources(tmp_path)
     artifact_dir = tmp_path / "dist"
     artifact_dir.mkdir()
@@ -105,5 +105,25 @@ def test_artifact_metadata_and_release_tag_mismatches_fail(tmp_path):
 
     with pytest.raises(version_check.VersionCheckError, match="wheel metadata"):
         version_check.check_versions(tmp_path, artifact_dirs=(artifact_dir,))
+
+
+@pytest.mark.parametrize("tag", [
+    "v1.3.1", "py-v1.3.0", "r-v1.3.0", "cpp-v1.3.0", "1.3.0", "v1.3.0rc1",
+    "v1.3.0-extra", "refs/tags/v1.3.0", "",
+])
+def test_wrong_version_or_nonstandard_release_tags_fail(tmp_path, tag):
+    _write_sources(tmp_path)
     with pytest.raises(version_check.VersionCheckError, match="release tag"):
-        version_check.check_versions(tmp_path, tag="v1.3.1")
+        version_check.check_versions(tmp_path, tag=tag)
+
+
+def test_cli_checks_the_shared_version_without_importing_fastcpd(tmp_path, capsys):
+    _write_sources(tmp_path)
+    assert version_check.main([
+        "--root", str(tmp_path), "--unified", "--tag", "v1.3.0",
+    ]) == 0
+    assert "version consistency check passed for 1.3.0" in capsys.readouterr().out
+    assert version_check.main([
+        "--root", str(tmp_path), "--tag", "v1.3.1",
+    ]) == 1
+    assert "release tag" in capsys.readouterr().err
