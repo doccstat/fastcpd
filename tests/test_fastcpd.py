@@ -205,11 +205,13 @@ class TestBasic(unittest.TestCase):
         self.assertFalse(result.data.flags.writeable)
 
     def test_native_numpy_binding_releases_gil(self):
-        data = np.concatenate([np.zeros(5000), np.ones(5000)]).reshape(-1, 1)
+        # Keep enough native work to observe a concurrent thread even on fast
+        # Apple-silicon runners, without relying on a 50 ms wall-clock bound.
+        data = np.concatenate([np.zeros(20000), np.ones(20000)]).reshape(-1, 1)
         worker_ran = threading.Event()
 
         def worker():
-            time.sleep(0.05)
+            time.sleep(0.01)
             worker_ran.set()
 
         thread = threading.Thread(target=worker)
