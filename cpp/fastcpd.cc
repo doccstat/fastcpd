@@ -48,6 +48,33 @@ std::string lower_ascii(std::string value) {
   return value;
 }
 
+void apply_default_order(Options* options) {
+  if (options == nullptr || options->order.n_elem != 0) return;
+  std::string const family = lower_ascii(options->family);
+  if (family == "ar") {
+    options->order = arma::colvec{1.0};
+  } else if (family == "arma") {
+    options->order = arma::colvec{1.0, 1.0};
+  } else if (family == "arima") {
+    options->order = arma::colvec{1.0, 1.0, 0.0};
+  } else if (family == "garch") {
+    options->order = arma::colvec{1.0, 1.0};
+  } else if (family == "var") {
+    options->order = arma::colvec{1.0};
+  } else if (family == "quantile") {
+    options->order = arma::colvec{0.5};
+  } else if (family == "kcp" || family == "kernel") {
+    options->order = arma::colvec{100.0, 0.0};
+  } else if (family == "mean" || family == "variance" ||
+             family == "meanvariance" || family == "exponential" ||
+             family == "gaussian" || family == "lm" ||
+             family == "mgaussian" || family == "lasso" ||
+             family == "binomial" || family == "poisson" ||
+             family == "rank" || family == "custom") {
+    options->order = arma::colvec{0.0, 0.0, 0.0};
+  }
+}
+
 bool is_pelt_family(std::string const& family) {
   return family == "mean" || family == "variance" ||
          family == "meanvariance" || family == "exponential" ||
@@ -1124,6 +1151,7 @@ Result detect_native(arma::mat const& data, Options options) {
   if (data.n_rows == 0 || data.n_cols == 0) {
     throw std::invalid_argument("fastcpd: data must be a non-empty matrix");
   }
+  detail::apply_default_order(&options);
   if (options.cost_adjustment.empty()) options.cost_adjustment = "MBIC";
   detail::validate_common_options(options);
   detail::validate_cost_adjustment(options.cost_adjustment);
@@ -1333,6 +1361,7 @@ Result detect_kernel_with_random(arma::mat const& data, Options options,
 }  // namespace
 
 Result detect(arma::mat const& data, Options options) {
+  detail::apply_default_order(&options);
   std::string const family = detail::lower_ascii(options.family);
   if (family == "lm") return detect_lm(data, std::move(options));
   if (family == "var") return detect_var(data, std::move(options));
@@ -1401,6 +1430,8 @@ Result detect_exponential(arma::mat const& data, Options options) {
 }
 
 Result detect_lm(arma::mat const& data, Options options) {
+  options.family = "lm";
+  detail::apply_default_order(&options);
   if (data.n_cols < 2) {
     throw std::invalid_argument(
         "fastcpd: linear-regression data must include predictors");
@@ -1435,8 +1466,9 @@ Result detect_linear_regression(arma::mat const& data, Options options) {
 #define FASTCPD_DEFINE_REGRESSION_WRAPPER(Name, Family)                      \
   Result Name(arma::mat const& data, Options options) {                       \
     bool const cp_only = options.cp_only;                                     \
-    arma::colvec const public_order = options.order;                          \
     options.family = Family;                                                  \
+    detail::apply_default_order(&options);                                    \
+    arma::colvec const public_order = options.order;                          \
     return with_public_metadata(detect_native(data, std::move(options)),      \
                                 Family, public_order, cp_only);               \
   }
@@ -1461,6 +1493,7 @@ Result detect_quantile_regression(arma::mat const& data, Options options) {
 }
 
 Result detect_ar(arma::colvec const& data, Options options) {
+  if (options.order.n_elem == 0) options.order = arma::colvec{1.0};
   arma::colvec const public_order = options.order;
   unsigned int const order = ar_order(public_order);
   bool const cp_only = options.cp_only;
@@ -1475,6 +1508,7 @@ Result detect_ar(arma::colvec const& data, Options options) {
 }
 
 Result detect_arma(arma::colvec const& data, Options options) {
+  if (options.order.n_elem == 0) options.order = arma::colvec{1.0, 1.0};
   arma::colvec const public_order = options.order;
   detail::validate_integer_order(public_order, 2, "ARMA");
   unsigned int const p = static_cast<unsigned int>(public_order(0));
@@ -1498,6 +1532,7 @@ Result detect_arma(arma::colvec const& data, Options options) {
 }
 
 Result detect_arima(arma::colvec const& data, Options options) {
+  if (options.order.n_elem == 0) options.order = arma::colvec{1.0, 1.0, 0.0};
   if (options.include_mean) {
     throw std::invalid_argument(
         "fastcpd: include_mean=true is unsupported by the zero-mean ARIMA "
@@ -1533,6 +1568,7 @@ Result detect_arima(arma::colvec const& data, Options options) {
 }
 
 Result detect_garch(arma::colvec const& data, Options options) {
+  if (options.order.n_elem == 0) options.order = arma::colvec{1.0, 1.0};
   arma::colvec const public_order = options.order;
   detail::validate_integer_order(public_order, 2, "GARCH");
   if (arma::all(public_order == 0.0)) {
@@ -1549,6 +1585,7 @@ Result detect_garch(arma::colvec const& data, Options options) {
 }
 
 Result detect_var(arma::mat const& data, Options options) {
+  if (options.order.n_elem == 0) options.order = arma::colvec{1.0};
   require_finite_data(data);
   if (options.p_response != 0) {
     throw std::invalid_argument(
@@ -1570,14 +1607,17 @@ Result detect_var(arma::mat const& data, Options options) {
 }
 
 Result detect_mgaussian(arma::mat const& data, Options options) {
+  options.family = "mgaussian";
+  detail::apply_default_order(&options);
   bool const cp_only = options.cp_only;
   arma::colvec const public_order = options.order;
-  options.family = "mgaussian";
   return with_public_metadata(detect_native(data, std::move(options)),
                               "mgaussian", public_order, cp_only);
 }
 
 Result detect_rank(arma::mat const& data, Options options) {
+  options.family = "rank";
+  detail::apply_default_order(&options);
   require_finite_data(data);
   bool const cp_only = options.cp_only;
   arma::colvec const public_order = options.order;
@@ -1615,9 +1655,10 @@ Result exponential(arma::mat const& data, Options options) {
 }
 
 Result gaussian(arma::mat const& data, Options options) {
+  options.family = "gaussian";
+  detail::apply_default_order(&options);
   bool const cp_only = options.cp_only;
   arma::colvec const public_order = options.order;
-  options.family = "gaussian";
   return with_public_metadata(detect_native(data, std::move(options)),
                               "gaussian", public_order, cp_only);
 }
