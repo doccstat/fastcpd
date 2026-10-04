@@ -46,7 +46,9 @@ struct Options {
   double momentum_coef = 0.0;
   MultipleEpochsFunction multiple_epochs =
       [](unsigned int) -> unsigned int { return 0u; };
-  arma::colvec order = arma::colvec{0.0, 0.0, 0.0};
+  // Empty means use the family-specific default. Explicit zero orders remain
+  // distinguishable and are validated normally.
+  arma::colvec order;
   int p = 0;
   unsigned int p_response = 0;
   std::optional<double> pruning_coef;

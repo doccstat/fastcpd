@@ -112,6 +112,86 @@ int main(int argc, char** argv) {
       throw std::runtime_error("detect_mean does not match generic mean");
     }
 
+    // Omitted time-series orders use the same defaults in generic and named
+    // entry points. Explicit all-zero orders remain invalid.
+    arma::colvec const default_series =
+        arma::sin(arma::linspace<arma::colvec>(0.0, 23.0, 24));
+    std::vector<std::pair<std::string, arma::colvec>> const default_orders = {
+        {"ar", {1.0}}, {"arma", {1.0, 1.0}},
+        {"arima", {1.0, 1.0, 0.0}}, {"garch", {1.0, 1.0}}};
+    for (auto const& entry : default_orders) {
+      fastcpd::Options options = mean_options();
+      options.beta = 1e6;
+      options.family = entry.first;
+      fastcpd::Result generic = fastcpd::detect(default_series, options);
+      options.family = "mean";  // Named wrappers choose their own family.
+      fastcpd::Result named = entry.first == "ar"
+          ? fastcpd::detect_ar(default_series, options)
+          : entry.first == "arma"
+              ? fastcpd::detect_arma(default_series, options)
+              : entry.first == "arima"
+                  ? fastcpd::detect_arima(default_series, options)
+                  : fastcpd::detect_garch(default_series, options);
+      if (!arma::approx_equal(generic.order, entry.second, "absdiff", 0.0) ||
+          !arma::approx_equal(named.order, entry.second, "absdiff", 0.0) ||
+          !arma::approx_equal(generic.change_points, named.change_points,
+                              "absdiff", 0.0)) {
+        throw std::runtime_error("default order contract failed: " + entry.first);
+      }
+      options.family = entry.first;
+      options.order.zeros(entry.second.n_elem);
+      expect_invalid("explicit zero " + entry.first + " order", [&] {
+        fastcpd::detect(default_series, options);
+      });
+    }
+
+    arma::mat default_design(default_series.n_rows, 2, arma::fill::ones);
+    default_design.col(0) = default_series;
+    fastcpd::Options default_options;
+    default_options.beta = 1e6;
+    for (std::string const family : {"lm", "lasso", "binomial", "poisson",
+                                     "quantile", "rank"}) {
+      arma::mat family_data = default_design;
+      if (family == "binomial" || family == "poisson") {
+        for (arma::uword row = 0; row < family_data.n_rows; ++row) {
+          family_data(row, 0) = static_cast<double>(row % 2);
+        }
+      }
+      if (family == "rank") family_data = default_series;
+      default_options.family = family;
+      fastcpd::Result const result = fastcpd::detect(family_data, default_options);
+      arma::colvec const expected_order = family == "quantile"
+          ? arma::colvec{0.5} : arma::colvec{0.0, 0.0, 0.0};
+      if (!arma::approx_equal(result.order, expected_order, "absdiff", 0.0)) {
+        throw std::runtime_error("default metadata contract failed: " + family);
+      }
+    }
+    default_options.family = "mean";
+    fastcpd::Result const default_quantile =
+        fastcpd::detect_quantile(default_design, default_options);
+    if (default_quantile.order.n_elem != 1 || default_quantile.order(0) != 0.5) {
+      throw std::runtime_error("named quantile did not default to the median");
+    }
+    arma::mat default_var_data(default_series.n_rows, 2);
+    default_var_data.col(0) = default_series;
+    default_var_data.col(1) = arma::cos(
+        arma::linspace<arma::colvec>(0.0, 23.0, 24) * 0.7);
+    fastcpd::Result const default_var =
+        fastcpd::detect_var(default_var_data, default_options);
+    default_options.family = "var";
+    fastcpd::Result const generic_var = fastcpd::detect(default_var_data, default_options);
+    if (default_var.order.n_elem != 1 || default_var.order(0) != 1.0 ||
+        !arma::approx_equal(default_var.order, generic_var.order, "absdiff", 0.0)) {
+      throw std::runtime_error("default VAR order contract failed");
+    }
+    default_options.family = "kcp";
+    default_options.seed = 31;
+    fastcpd::Result const default_kcp = fastcpd::detect(default_series, default_options);
+    if (!arma::approx_equal(default_kcp.order, arma::colvec{100.0, 0.0},
+                            "absdiff", 0.0)) {
+      throw std::runtime_error("default KCP order contract failed");
+    }
+
     fastcpd::ConfidenceOptions empty_profile_options;
     empty_profile_options.method = "profile";
     empty_profile_options.min_segment_length = 5;
