@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+- Fix R plotting for change-point-only results whose detail arrays are empty.
+
 ## 1.3.0
 
 This is the first coordinated R, Python, and standalone C++ source contract.
