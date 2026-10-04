@@ -310,9 +310,10 @@ def _segment_bootstrap_data(data, cp_set, rng):
     bounds = [0] + list(cp_set) + [data.shape[0]]
     boot_data = numpy.empty_like(data)
     for start, end in zip(bounds[:-1], bounds[1:]):
-        rows = numpy.arange(start, end)
-        if rows.size:
-            boot_data[rows, :] = data[rng.choice(rows, rows.size, replace=True), :]
+        segment_size = end - start
+        if segment_size:
+            rows = start + rng.choice(segment_size, segment_size, replace=True)
+            boot_data[start:end, :] = data[rows, :]
     return boot_data
 
 
