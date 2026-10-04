@@ -348,12 +348,12 @@ def _match_cp_set(reference_cp, bootstrap_cp, n):
 
 def _quantile_type1(values, probabilities):
     """R's ``stats::quantile(..., type = 1)`` for finite 1-D values."""
-    values = numpy.sort(numpy.asarray(values, dtype=float))
+    values = numpy.asarray(values, dtype=float)
     probabilities = tuple(probabilities)
     if values.size == 0:
         return (math.nan,) * len(probabilities)
-    out = []
     n = values.size
+    indices = []
     for probability in probabilities:
         probability = float(probability)
         if probability <= 0:
@@ -364,8 +364,12 @@ def _quantile_type1(values, probabilities):
             # Inverse empirical CDF: min{i/n >= p}, with one-based i.
             index = int(math.ceil(probability * n)) - 1
             index = max(0, min(n - 1, index))
-        out.append(float(values[index]))
-    return tuple(out)
+        indices.append(index)
+    # Only the requested order statistics are needed.  Partial selection
+    # avoids sorting all bootstrap matches while retaining exact duplicate and
+    # tie behavior for R's type-1 quantile.
+    selected = numpy.partition(values, numpy.asarray(indices, dtype=numpy.intp))
+    return tuple(float(selected[index]) for index in indices)
 
 
 def _cp_profile(
