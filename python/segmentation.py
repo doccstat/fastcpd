@@ -563,12 +563,12 @@ def detect_meanvariance(data, **kwargs):
     return detect(data=data, family='meanvariance', **kwargs)
 
 
-def detect_var(data, order=0, **kwargs):
+def detect_var(data, order=1, **kwargs):
     """Find change points efficiently in VAR (vector autoregression) models.
 
     Args:
         data: Unlagged multivariate time series data, shape (n, q).
-        order: Number of lagged predictors per response (p).
+        order: Number of lagged predictors per response (p); defaults to 1.
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
@@ -611,12 +611,12 @@ def detect_lasso(data, **kwargs):
     return detect(data=data, family='lasso', **kwargs)
 
 
-def detect_garch(data, order=(0, 0), **kwargs):
+def detect_garch(data, order=(1, 1), **kwargs):
     """Find change points in GARCH(p, q) models.
 
     Args:
         data: Univariate time series, shape (n,) or (n, 1).
-        order: Tuple (p, q) — GARCH and ARCH orders.
+        order: Tuple (p, q) — GARCH and ARCH orders; defaults to (1, 1).
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
@@ -742,14 +742,14 @@ def detect_quantile(data, order=0.5, **kwargs):
     return detect(data=data, family='quantile', order=(order,), **kwargs)
 
 
-def detect_arma(data, order=(0, 0), **kwargs):
+def detect_arma(data, order=(1, 1), **kwargs):
     """Find change points in ARMA(p, q) models.
 
     When order[0] == 0 (pure MA), routes to the MA family automatically.
 
     Args:
         data: Univariate time series, shape (n,) or (n, 1).
-        order: Tuple (p, q) — AR and MA orders.
+        order: Tuple (p, q) — AR and MA orders; defaults to (1, 1).
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
@@ -769,12 +769,12 @@ def detect_arma(data, order=(0, 0), **kwargs):
     )
 
 
-def detect_ar(data, order=0, **kwargs):
+def detect_ar(data, order=1, **kwargs):
     """Find change points in AR(p) models (pure autoregressive).
 
     Args:
         data: Univariate time series, shape (n,) or (n, 1).
-        order: AR order p.
+        order: AR order p; defaults to 1.
         **kwargs: Additional arguments passed to ``detect()``.
 
     Returns:
@@ -805,7 +805,8 @@ def detect_arima(data, order=(1, 1, 0), include_mean=False, **kwargs):
 
     Args:
         data: Univariate time series, shape (n,) or (n, 1).
-        order: Tuple (p, d, q) — AR order, integration order, MA order.
+        order: Tuple (p, d, q) — AR order, integration order, MA order;
+            defaults to (1, 1, 0).
         include_mean: Must remain False. The unified likelihood is zero-mean.
         **kwargs: Additional arguments passed to ``detect()``.
 
@@ -1009,7 +1010,7 @@ def detect(
     momentum_coef: float = 0.0,
     multiple_epochs=None,
     epsilon: float = 1e-10,
-    order=(0, 0, 0),
+    order=None,
     include_mean: bool = False,
     p: int = None,
     p_response: int = 0,
@@ -1065,6 +1066,9 @@ def detect(
             ``None``.
         epsilon: Epsilon for numerical stability.
         order: Model order. ARMA uses ``(p, q)`` and ARIMA uses ``(p, d, q)``.
+            If omitted, the generic API uses AR(1), ARMA(1, 1),
+            ARIMA(1, 1, 0), GARCH(1, 1), VAR(1), median quantile, or the
+            100-feature KCP default as appropriate.
         include_mean: Must be False for ARIMA. For other families this
             compatibility option is ignored, as it is in R. The shared ARIMA
             likelihood is zero-mean in both R and Python.
@@ -1220,6 +1224,9 @@ def detect(
             f"Family '{raw_family}' is not supported by the Python binding. "
             f"Supported families: {sorted(_SUPPORTED_FAMILIES)}."
         )
+
+    if order is None:
+        order = _default_order_for_family(raw_family)
 
     public_family = raw_family
     public_order = _public_order(order)
@@ -1531,6 +1538,19 @@ def _public_order(order):
         except TypeError:
             pass
     return (order,)
+
+
+def _default_order_for_family(family):
+    """Return the documented order for a family when order is omitted."""
+    return {
+        'ar': (1,),
+        'arma': (1, 1),
+        'arima': (1, 1, 0),
+        'garch': (1, 1),
+        'var': (1,),
+        'quantile': (0.5,),
+        'kcp': (100, 0),
+    }.get(family, (0, 0, 0))
 
 
 def _optional_vector(value):

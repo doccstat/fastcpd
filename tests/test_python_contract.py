@@ -30,6 +30,42 @@ import fastcpd.segmentation as segmentation_module
 from fastcpd.segmentation import detect
 
 
+@pytest.mark.parametrize(
+    "family,order",
+    [("ar", (1,)), ("arma", (1, 1)), ("arima", (1, 1, 0)),
+     ("garch", (1, 1)), ("var", (1,)), ("quantile", (0.5,)),
+     ("kcp", (100, 0))],
+)
+def test_generic_and_wrapper_default_orders_agree(family, order):
+    rng = np.random.default_rng(31)
+    data = rng.normal(size=(24, 2 if family == "var" else 1))
+    if family == "quantile":
+        data = np.column_stack([data, np.ones(24)])
+    kwargs = {"beta": 1e6}
+    if family == "kcp":
+        kwargs["random_state"] = 31
+    wrapper = getattr(segmentation_module, "detect_" + family)
+    named = wrapper(data, **kwargs)
+    generic = detect(data, family=family, **kwargs)
+    explicit = detect(data, family=family, order=order, **kwargs)
+    assert named.order == generic.order == order
+    for field in ("cp_set", "raw_cp_set", "cost_values", "residuals", "thetas"):
+        np.testing.assert_allclose(getattr(named, field), getattr(explicit, field))
+        np.testing.assert_allclose(getattr(generic, field), getattr(explicit, field))
+
+
+@pytest.mark.parametrize("family", ["ar", "arma", "arima", "garch", "var", "quantile"])
+def test_explicit_zero_order_is_not_treated_as_omitted(family):
+    data = np.ones((24, 2 if family in ("var", "quantile") else 1))
+    order = {"ar": 0, "arma": (0, 0), "arima": (0, 0, 0),
+             "garch": (0, 0), "var": 0, "quantile": 0}[family]
+    with pytest.raises(ValueError):
+        detect(data, family=family, order=order, beta=1e6)
+    wrapper = getattr(segmentation_module, "detect_" + family)
+    with pytest.raises(ValueError):
+        wrapper(data, order=order, beta=1e6)
+
+
 def test_variance_lm_validates_response_dimension_before_default_block_size():
     data = np.ones((12, 2))
     with pytest.raises(ValueError, match=r"d"):

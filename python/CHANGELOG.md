@@ -2,6 +2,9 @@
 
 ## 1.3.1
 
+- Omitted model orders now agree across R, Python, and standalone C++ generic
+  and family APIs: AR(1), ARMA(1, 1), ARIMA(1, 1, 0), GARCH(1, 1), VAR(1),
+  median quantile, and 100-feature KCP. Explicit invalid orders still error.
 - Fix R plotting for change-point-only results whose detail arrays are empty.
 
 ## 1.3.0
