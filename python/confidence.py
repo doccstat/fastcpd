@@ -642,9 +642,11 @@ def _theta_se_function(data, family, *, p_response=0, parameter_count=None):
             segment = data[start:end, :]
             if segment.shape[0] <= 1:
                 return numpy.full(segment.shape[1], numpy.nan)
-            covariance = numpy.atleast_2d(numpy.cov(segment, rowvar=False))
-            return numpy.sqrt(numpy.diag(covariance) /
-                              segment.shape[0])
+            # Wald intervals use only each response's marginal variance.
+            # Avoid forming the full q-by-q covariance matrix, which is
+            # unnecessary O(q²) work for wide multivariate results.
+            variance = numpy.var(segment, axis=0, ddof=1)
+            return numpy.sqrt(variance / segment.shape[0])
         return se
 
     if family == 'exponential':
