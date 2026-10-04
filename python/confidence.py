@@ -4,6 +4,7 @@ Confidence intervals for fastcpd Python results.
 
 import math
 import warnings
+from bisect import bisect_left, bisect_right
 
 import numpy
 
@@ -325,9 +326,21 @@ def _match_cp_set(reference_cp, bootstrap_cp, n):
         left = 0 if i == 0 else math.floor((reference_cp[i - 1] + cp) / 2)
         right = n if i == len(reference_cp) - 1 else math.ceil(
             (cp + reference_cp[i + 1]) / 2)
-        candidates = [x for x in bootstrap_cp if left < x <= right]
-        if candidates:
-            matched.append(min(candidates, key=lambda x: abs(x - cp)))
+        first = bisect_right(bootstrap_cp, left)
+        last = bisect_right(bootstrap_cp, right)
+        if first < last:
+            pivot = bisect_left(bootstrap_cp, cp, first, last)
+            if pivot == first:
+                matched.append(bootstrap_cp[pivot])
+            elif pivot == last:
+                matched.append(bootstrap_cp[pivot - 1])
+            else:
+                lower = bootstrap_cp[pivot - 1]
+                upper = bootstrap_cp[pivot]
+                # The previous min() call retained the lower value on a tie.
+                matched.append(
+                    lower if cp - lower <= upper - cp else upper
+                )
         else:
             matched.append(math.nan)
     return matched
