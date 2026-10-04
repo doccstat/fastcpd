@@ -1,3 +1,8 @@
+# fastcpd 1.3.1
+
+*   Fix `plot()` for change-point-only results by constructing residual and
+    covariate layers only when detailed output is available.
+
 # fastcpd 1.3.0
 
 *   Coordinate the R, Python, and standalone C++ source interfaces at version

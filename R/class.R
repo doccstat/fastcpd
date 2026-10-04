@@ -105,18 +105,6 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
   data_label_color <- data.frame(
     x = seq_len(n), y = y, label = y_label, color = color
   )
-  residual_label_color <- data.frame(
-    x = seq_len(n),
-    y = x@residuals,
-    label = "residual",
-    color = color
-  )
-  covariate_label_color <- data.frame(
-    x = seq_len(n),
-    y = x@data[, ncol(x@data)],
-    label = "covariate",
-    color = color
-  )
   aesthetic_mapping <- ggplot2::aes(x = x, y = y, color = color)
 
   if (family %in% c("ar", "arma", "arima", "garch")) {
@@ -132,6 +120,19 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
   }
 
   if (family != "var" && !x@cp_only) {
+    # cp-only results have no residuals; allocate detail frames only when used.
+    residual_label_color <- data.frame(
+      x = seq_len(n),
+      y = x@residuals,
+      label = "residual",
+      color = color
+    )
+    covariate_label_color <- data.frame(
+      x = seq_len(n),
+      y = x@data[, ncol(x@data)],
+      label = "covariate",
+      color = color
+    )
     if (family == "quantile" && nrow(x@thetas) == 1) {
       # Univariate quantile: overlay fitted quantile as a step function
       # directly on the data panel - no separate coefficient/residual panels.
