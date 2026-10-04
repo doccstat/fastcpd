@@ -89,7 +89,10 @@ def estimate_variance_mean(data):
     if data_matrix.shape[0] < 2:
         return numpy.full((data_matrix.shape[1], data_matrix.shape[1]), numpy.nan)
     diffs = data_matrix[1:] - data_matrix[:-1]
-    return numpy.mean(diffs[:, :, None] * diffs[:, None, :], axis=0) / 2
+    # Form the Rice estimator as one BLAS-backed cross-product.  Broadcasting
+    # the two difference axes creates an (n - 1) x p x p temporary, which is
+    # avoidable and becomes a substantial allocation for long series.
+    return (diffs.T @ diffs) / (2 * diffs.shape[0])
 
 
 def estimate_variance_median(data):
