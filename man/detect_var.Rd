@@ -6,16 +6,17 @@
 \alias{fastcpd.var}
 \title{Find change points efficiently in VAR(\eqn{p}) models}
 \usage{
-detect_var(data, order = 0, ...)
+detect_var(data, order = 1, ...)
 
-fastcpd_var(data, order = 0, ...)
+fastcpd_var(data, order = 1, ...)
 
-fastcpd.var(data, order = 0, ...)
+fastcpd.var(data, order = 1, ...)
 }
 \arguments{
 \item{data}{A matrix, a data frame or a time series object.}
 
-\item{order}{A positive integer specifying the order of the VAR model.}
+\item{order}{A positive integer specifying the order of the VAR model;
+defaults to 1 (VAR(1)).}
 
 \item{...}{Other arguments passed to \code{\link[=detect]{detect()}}, for example,
 \code{segment_count}.}

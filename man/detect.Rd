@@ -23,7 +23,7 @@ detect(
   momentum_coef = 0,
   multiple_epochs = function(x) 0,
   epsilon = 1e-10,
-  order = c(0, 0, 0),
+  order = NULL,
   p = ncol(data) - 1,
   variance_estimation = NULL,
   cp_only = FALSE,
@@ -50,7 +50,7 @@ fastcpd(
   momentum_coef = 0,
   multiple_epochs = function(x) 0,
   epsilon = 1e-10,
-  order = c(0, 0, 0),
+  order = NULL,
   p = ncol(data) - 1,
   variance_estimation = NULL,
   cp_only = FALSE,
@@ -253,7 +253,9 @@ accepts only
 computation in Logistic Regression and Poisson Regression.}
 
 \item{order}{Order of the AR(\eqn{p}), VAR(\eqn{p}) or
-ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model.}
+ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model. If omitted, a family-specific
+default is used (AR(1), ARMA(1, 1), ARIMA(1, 1, 0), GARCH(1, 1),
+VAR(1), median quantile, or 100-feature KCP).}
 
 \item{p}{Number of covariates in the model. If not specified, the number of
 covariates will be inferred from the data, i.e.,

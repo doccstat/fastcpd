@@ -1,5 +1,9 @@
 # fastcpd 1.3.1
 
+*   Resolve omitted model orders consistently in the R, Python, and standalone
+    C++ generic and family APIs: AR(1), ARMA(1, 1), ARIMA(1, 1, 0),
+    GARCH(1, 1), VAR(1), median quantile, and 100-feature KCP. Explicit invalid
+    orders still fail validation.
 *   Fix `plot()` for change-point-only results by constructing residual and
     covariate layers only when detailed output is available.
 

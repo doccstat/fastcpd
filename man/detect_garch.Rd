@@ -6,17 +6,17 @@
 \alias{fastcpd.garch}
 \title{Find change points efficiently in GARCH(\eqn{p}, \eqn{q}) models}
 \usage{
-detect_garch(data, order = c(0, 0), ...)
+detect_garch(data, order = c(1, 1), ...)
 
-fastcpd_garch(data, order = c(0, 0), ...)
+fastcpd_garch(data, order = c(1, 1), ...)
 
-fastcpd.garch(data, order = c(0, 0), ...)
+fastcpd.garch(data, order = c(1, 1), ...)
 }
 \arguments{
 \item{data}{A numeric vector, a matrix, a data frame or a time series object.}
 
 \item{order}{A positive integer vector of length two specifying the order of
-the GARCH model.}
+the GARCH model; defaults to \code{c(1, 1)}.}
 
 \item{...}{Other arguments passed to \code{\link[=detect]{detect()}}, for example,
 \code{segment_count}.}

@@ -6,17 +6,17 @@
 \alias{fastcpd.arma}
 \title{Find change points efficiently in ARMA(\eqn{p}, \eqn{q}) models}
 \usage{
-detect_arma(data, order = c(0, 0), ...)
+detect_arma(data, order = c(1, 1), ...)
 
-fastcpd_arma(data, order = c(0, 0), ...)
+fastcpd_arma(data, order = c(1, 1), ...)
 
-fastcpd.arma(data, order = c(0, 0), ...)
+fastcpd.arma(data, order = c(1, 1), ...)
 }
 \arguments{
 \item{data}{A numeric vector, a matrix, a data frame or a time series object.}
 
 \item{order}{A vector of length two specifying the order of the ARMA
-model.}
+model; defaults to \code{c(1, 1)}.}
 
 \item{...}{Other arguments passed to \code{\link[=detect]{detect()}}, for example,
 \code{segment_count}.}
