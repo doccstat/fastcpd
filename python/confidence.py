@@ -308,7 +308,7 @@ def _draw_seed(rng):
 
 def _segment_bootstrap_data(data, cp_set, rng):
     bounds = [0] + list(cp_set) + [data.shape[0]]
-    boot_data = numpy.array(data, copy=True)
+    boot_data = numpy.empty_like(data)
     for start, end in zip(bounds[:-1], bounds[1:]):
         rows = numpy.arange(start, end)
         if rows.size:
