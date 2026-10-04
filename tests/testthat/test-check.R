@@ -71,7 +71,8 @@ testthat::test_that(
       fastcpd(
         formula = ~ x - 1,
         data = data.frame(x = 0),
-        family = "ar"
+        family = "ar",
+        order = c(0, 0, 0)
       ),
       paste0(
         "The first element of the order should be a positive integer ",

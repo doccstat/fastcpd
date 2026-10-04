@@ -174,7 +174,9 @@
 #' @param epsilon Epsilon to avoid numerical issues. Only used for the Hessian
 #' computation in Logistic Regression and Poisson Regression.
 #' @param order Order of the AR(\eqn{p}), VAR(\eqn{p}) or
-#' ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model.
+#' ARIMA(\eqn{p}, \eqn{d}, \eqn{q}) model. If omitted, a family-specific
+#' default is used (AR(1), ARMA(1, 1), ARIMA(1, 1, 0), GARCH(1, 1),
+#' VAR(1), median quantile, or 100-feature KCP).
 #' @param p Number of covariates in the model. If not specified, the number of
 #' covariates will be inferred from the data, i.e.,
 #' \code{p = ncol(data) - 1}. This parameter is superseded by `order` in the
@@ -264,7 +266,7 @@ detect <- function(  # nolint: cyclomatic complexity
   momentum_coef = 0,
   multiple_epochs = function(x) 0,
   epsilon = 1e-10,
-  order = c(0, 0, 0),
+  order = NULL,
   p = ncol(data) - 1,
   variance_estimation = NULL,
   cp_only = FALSE,
@@ -294,6 +296,23 @@ detect <- function(  # nolint: cyclomatic complexity
       "custom"  # -> "custom"
     )
   )
+
+  # Resolve omitted orders at the generic boundary so family wrappers and
+  # direct calls share the same valid defaults. Explicit zero orders still
+  # reach the family validators and produce their normal diagnostics.
+  if (is.null(order)) {
+    order <- switch(
+      family,
+      ar = 1,
+      arma = c(1, 1),
+      arima = c(1, 1, 0),
+      garch = c(1, 1),
+      var = 1,
+      quantile = 0.5,
+      kcp = c(100, 0),
+      c(0, 0, 0)
+    )
+  }
 
   # Check the validity of the `cost` parameter.
   check_cost(cost, cost_gradient, cost_hessian, family)
@@ -642,7 +661,8 @@ NULL
 #' @title Find change points efficiently in AR(\eqn{p}) models
 #' @aliases fastcpd_ar fastcpd.ar
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
-#' @param order A positive integer specifying the order of the AR model.
+#' @param order A positive integer specifying the order of the AR model;
+#' defaults to 1 (AR(1)).
 #' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
@@ -658,7 +678,7 @@ NULL
 #' @md
 #' @rdname detect_ar
 #' @export
-detect_ar <- function(data, order = 0, ...) {
+detect_ar <- function(data, order = 1, ...) {
   result <- detect(
     formula = ~ . - 1,
     data = data.frame(x = c(data)),
@@ -683,7 +703,7 @@ fastcpd.ar <- detect_ar  # nolint: Conventional R function style
 #' @aliases fastcpd_arima fastcpd.arima
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A vector of length three specifying the order of the ARIMA
-#' model.
+#' model; defaults to \code{c(1, 1, 0)}.
 #' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}. The ARIMA-specific \code{include.mean} option is
 #' accepted here, defaults to \code{FALSE}, and must remain \code{FALSE}.
@@ -728,7 +748,7 @@ fastcpd.arima <- detect_arima  # nolint: Conventional R function style
 #' @aliases fastcpd_arma fastcpd.arma
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A vector of length two specifying the order of the ARMA
-#' model.
+#' model; defaults to \code{c(1, 1)}.
 #' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
@@ -745,7 +765,7 @@ fastcpd.arima <- detect_arima  # nolint: Conventional R function style
 #' @md
 #' @rdname detect_arma
 #' @export
-detect_arma <- function(data, order = c(0, 0), ...) {
+detect_arma <- function(data, order = c(1, 1), ...) {
   result <- detect(
     formula = ~ . - 1,
     data = data.frame(x = c(data)),
@@ -815,7 +835,7 @@ fastcpd.binomial <- detect_binomial  # nolint: Conventional R function style
 #' @aliases fastcpd_garch fastcpd.garch
 #' @param data A numeric vector, a matrix, a data frame or a time series object.
 #' @param order A positive integer vector of length two specifying the order of
-#' the GARCH model.
+#' the GARCH model; defaults to \code{c(1, 1)}.
 #' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
@@ -832,7 +852,7 @@ fastcpd.binomial <- detect_binomial  # nolint: Conventional R function style
 #' @md
 #' @rdname detect_garch
 #' @export
-detect_garch <- function(data, order = c(0, 0), ...) {
+detect_garch <- function(data, order = c(1, 1), ...) {
   result <- detect(
     formula = ~ . - 1,
     data = data.frame(x = c(data)),
@@ -1289,7 +1309,8 @@ fastcpd.rank <- detect_rank  # nolint: Conventional R function style
 #' @title Find change points efficiently in VAR(\eqn{p}) models
 #' @aliases fastcpd_var fastcpd.var
 #' @param data A matrix, a data frame or a time series object.
-#' @param order A positive integer specifying the order of the VAR model.
+#' @param order A positive integer specifying the order of the VAR model;
+#' defaults to 1 (VAR(1)).
 #' @param ... Other arguments passed to [detect()], for example,
 #' \code{segment_count}.
 #' @return A [fastcpd-class] object.
@@ -1307,7 +1328,7 @@ fastcpd.rank <- detect_rank  # nolint: Conventional R function style
 #' @md
 #' @rdname detect_var
 #' @export
-detect_var <- function(data, order = 0, ...) {
+detect_var <- function(data, order = 1, ...) {
   result <- detect(
     formula = ~ . - 1,
     data = data.frame(x = data),

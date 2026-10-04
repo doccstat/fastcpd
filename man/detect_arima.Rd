@@ -17,7 +17,7 @@ fastcpd.arima(data, order = c(1, 1, 0), ...)
 \item{data}{A numeric vector, a matrix, a data frame or a time series object.}
 
 \item{order}{A vector of length three specifying the order of the ARIMA
-model.}
+model; defaults to \code{c(1, 1, 0)}.}
 
 \item{...}{Other arguments passed to \code{\link[=detect]{detect()}}, for example,
 \code{segment_count}. The ARIMA-specific \code{include.mean} option is

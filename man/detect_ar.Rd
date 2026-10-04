@@ -6,16 +6,17 @@
 \alias{fastcpd.ar}
 \title{Find change points efficiently in AR(\eqn{p}) models}
 \usage{
-detect_ar(data, order = 0, ...)
+detect_ar(data, order = 1, ...)
 
-fastcpd_ar(data, order = 0, ...)
+fastcpd_ar(data, order = 1, ...)
 
-fastcpd.ar(data, order = 0, ...)
+fastcpd.ar(data, order = 1, ...)
 }
 \arguments{
 \item{data}{A numeric vector, a matrix, a data frame or a time series object.}
 
-\item{order}{A positive integer specifying the order of the AR model.}
+\item{order}{A positive integer specifying the order of the AR model;
+defaults to 1 (AR(1)).}
 
 \item{...}{Other arguments passed to \code{\link[=detect]{detect()}}, for example,
 \code{segment_count}.}
