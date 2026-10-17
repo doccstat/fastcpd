@@ -120,10 +120,16 @@ plot.fastcpd <- function(  # nolint: cyclomatic complexity
   }
 
   if (family != "var" && !x@cp_only) {
-    # cp-only results have no residuals; allocate detail frames only when used.
+    # Plot the first response, matching the data layer. Legacy or incomplete
+    # detailed results may lack aligned residuals; keep their panel missing.
+    residual_values <- if (nrow(x@residuals) == n && ncol(x@residuals) >= 1) {
+      x@residuals[, 1]
+    } else {
+      rep(NA_real_, n)
+    }
     residual_label_color <- data.frame(
       x = seq_len(n),
-      y = x@residuals,
+      y = residual_values,
       label = "residual",
       color = color
     )
